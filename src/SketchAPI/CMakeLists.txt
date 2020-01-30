@@ -22,6 +22,7 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   SketchAPI.h
   SketchAPI_Arc.h
+  SketchAPI_BSpline.h
   SketchAPI_Circle.h
   SketchAPI_Constraint.h
   SketchAPI_ConstraintAngle.h
@@ -45,6 +46,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
   SketchAPI_Arc.cpp
+  SketchAPI_BSpline.cpp
   SketchAPI_Circle.cpp
   SketchAPI_Constraint.cpp
   SketchAPI_ConstraintAngle.cpp

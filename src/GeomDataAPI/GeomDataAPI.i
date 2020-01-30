@@ -40,13 +40,16 @@
 %shared_ptr(GeomDataAPI_Point)
 %shared_ptr(GeomDataAPI_Dir)
 %shared_ptr(GeomDataAPI_Point2D)
+%shared_ptr(GeomDataAPI_Point2DArray)
 
 // all supported interfaces
 %include "GeomDataAPI_Point.h"
 %include "GeomDataAPI_Dir.h"
 %include "GeomDataAPI_Point2D.h"
+%include "GeomDataAPI_Point2DArray.h"
 
 template<class T> std::shared_ptr<T> castTo(std::shared_ptr<ModelAPI_Attribute> theObject);
 %template(geomDataAPI_Point) castTo<GeomDataAPI_Point>;
 %template(geomDataAPI_Dir) castTo<GeomDataAPI_Dir>;
 %template(geomDataAPI_Point2D) castTo<GeomDataAPI_Point2D>;
+%template(geomDataAPI_Point2DArray) castTo<GeomDataAPI_Point2DArray>;

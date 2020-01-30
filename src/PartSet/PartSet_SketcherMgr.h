@@ -137,7 +137,8 @@ public:
   /// Struct to define selection model information to store/restore selection
   struct SelectionInfo
   {
-    std::set<AttributePtr> myAttributes; /// the selected attributes
+    /// the selected attributes and indices of points if array
+    std::map<AttributePtr, int> myAttributes;
     std::set<ResultPtr> myResults; /// the selected results
     TopoDS_Shape myFirstResultShape; /// the first shape of feature result
     TopTools_MapOfShape myLocalSelectedShapes; /// shapes of local selection

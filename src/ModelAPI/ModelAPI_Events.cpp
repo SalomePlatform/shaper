@@ -335,10 +335,12 @@ void ModelAPI_ObjectMovedMessage::setMovedObject(const ObjectPtr& theMovedObject
   myMovedAttribute = AttributePtr();
 }
 
-void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMovedAttribute)
+void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMovedAttribute,
+                                                    const int thePointIndex)
 {
   myMovedAttribute = theMovedAttribute;
   myMovedObject = ObjectPtr();
+  myMovedPointIndex = thePointIndex;
 }
 
 void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)

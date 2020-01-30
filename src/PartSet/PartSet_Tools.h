@@ -193,9 +193,11 @@ public:
   * \param theObj - an object
   * \param theShape - a Shape
   * \param theSketch - a Sketch to get a plane of converting to 2d
+  * \return Found attribute and index of point if the attribute is an array
   */
-  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape,
-                                             FeaturePtr theSketch);
+  static std::pair<AttributePtr, int> findAttributeBy2dPoint(ObjectPtr theObj,
+                                                             const TopoDS_Shape theShape,
+                                                             FeaturePtr theSketch);
 
   /**
   * Finds an attribute value in attribute reference attribute value
@@ -216,12 +218,22 @@ public:
 
   /**
   * Convertes parameters into a geom point
-  * \theEvent a Qt event to find mouse position
+  * \param theEvent a Qt event to find mouse position
   * \param theWindow view window to define eye of view
   * \param theSketch to convert 3D point coordinates into coorditates of the sketch plane
   */
   static std::shared_ptr<GeomAPI_Pnt2d> getPnt2d(QMouseEvent* theEvent,
                                                  ModuleBase_IViewWindow* theWindow,
+                                                 const FeaturePtr& theSketch);
+
+  /** Returns point 2d from selected shape
+   *  \param theView a view window
+   *  \param theShape a vertex shape
+   *  \param theX an output value of X coordinate
+   *  \param theY an output value of Y coordinate
+   */
+  static std::shared_ptr<GeomAPI_Pnt2d> getPnt2d(const Handle(V3d_View)& theView,
+                                                 const TopoDS_Shape& theShape,
                                                  const FeaturePtr& theSketch);
 
   /**

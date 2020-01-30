@@ -9,8 +9,7 @@ lcov --capture --directory ${BUILD_DIR} --no-external --base-directory ${SOURCES
 # make a working copy of report
 cp -f coverage.info.noext covfile
 # remove all reports of GUI and external parts (for all the next kinds of reports)
-# RefAttrList is unused type of attribute for now
-for MASK in '*wrap*' 'moc_*' 'XAO_*' 'SketcherPrs_*' 'GeomAlgoImpl_*' 'ModuleBase_*' '*Widget*' '*Splitter*' '*RefAttrList*'; do
+for MASK in '*wrap*' 'moc_*' 'XAO_*' 'SketcherPrs_*' 'GeomAlgoImpl_*' 'ModuleBase_*' '*Widget*' '*Splitter*'; do
 lcov -r covfile ${MASK} --output-file covfile_res -q
 mv -f covfile_res covfile
 done

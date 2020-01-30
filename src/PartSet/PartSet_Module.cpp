@@ -22,6 +22,7 @@
 #include "PartSet_Validators.h"
 #include "PartSet_Tools.h"
 #include "PartSet_PreviewPlanes.h"
+#include "PartSet_WidgetBSplinePoints.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
@@ -39,6 +40,7 @@
 #include "PartSet_OverconstraintListener.h"
 #include "PartSet_TreeNodes.h"
 #include "PartSet_FieldStepPrs.h"
+#include "PartSet_BSplineWidget.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -804,12 +806,12 @@ bool PartSet_Module::createWidgets(const FeaturePtr& theFeature, const QString& 
             return aProcessed;
         }
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-        AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
-                                                               mySketchMgr->activeSketch());
-        if (anAttribute.get()) {
+        std::pair<AttributePtr, int> anAttribute =
+            PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape, mySketchMgr->activeSketch());
+        if (anAttribute.first.get()) {
           ModuleBase_WidgetFactory aFactory(theXmlRepr.toStdString(), workshop());
 
-          const std::string anAttributeId = anAttribute->id();
+          const std::string anAttributeId = anAttribute.first->id();
           aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);
 
           theWidgets = aFactory.getModelWidgets();
@@ -915,16 +917,27 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aPointSelectorWgt;
   }
+  else if (theType == "sketch-bspline_selector") {
+    PartSet_WidgetBSplinePoints* aBSplineWgt =
+        new PartSet_WidgetBSplinePoints(theParent, aWorkshop, theWidgetApi);
+    aBSplineWgt->setSketch(mySketchMgr->activeSketch());
+    aWgt = aBSplineWgt;
+  }
   else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi);
   } else if (theType == "export_file_selector") {
     aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi);
   } else if (theType == "sketch_launcher") {
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi);
-  } else if (theType == "module_choice") {
+  }
+  else if (theType == "module_choice") {
     aWgt = new ModuleBase_WidgetChoice(theParent, theWidgetApi);
     connect(aWgt, SIGNAL(itemSelected(ModuleBase_ModelWidget*, int)),
-            this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
+      this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
+  } else if (theType == "bspline-panel") {
+    PartSet_BSplineWidget* aPanel = new PartSet_BSplineWidget(theParent, theWidgetApi);
+    //aPanel->setFeature(theFeature);
+    aWgt = aPanel;
   }
   return aWgt;
 }
@@ -1728,8 +1741,9 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
 
   if (aGeomShape.get()) {
     TopoDS_Shape aTDSShape = aGeomShape->impl<TopoDS_Shape>();
-    return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape,
-                                                 mySketchMgr->activeSketch());
+    std::pair<AttributePtr, int> anAttrAndIndex =
+        PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, mySketchMgr->activeSketch());
+    return anAttrAndIndex.first;
   }
   return anAttribute;
 }

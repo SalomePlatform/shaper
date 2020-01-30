@@ -90,12 +90,14 @@ class SketchSolver_Group
                    const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
   /** \brief Updates the data corresponding the specified point moved in GUI.
    *         Special kind of Fixed constraints is created.
-   *  \param[in] thePoint the attribute to be updated
-   *  \param[in] theFrom  start point of the movement
-   *  \param[in] theTo    final point of the movement
+   *  \param[in] thePointOrArray the attribute to be updated
+   *  \param[in] thePointIndex   index of moved point in array
+   *  \param[in] theFrom         start point of the movement
+   *  \param[in] theTo           destination point of the movement
    *  \return \c true, if the attribute is really moved
    */
-  bool movePoint(AttributePtr thePoint,
+  bool movePoint(AttributePtr thePointOrArray,
+                 const int thePointIndex,
                  const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
                  const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
 

@@ -486,6 +486,7 @@ class ModelAPI_ObjectMovedMessage : public Events_Message
 {
   ObjectPtr myMovedObject;
   AttributePtr myMovedAttribute;
+  int myMovedPointIndex;
 
   std::shared_ptr<GeomAPI_Pnt2d> myOriginalPosition;
   std::shared_ptr<GeomAPI_Pnt2d> myCurrentPosition;
@@ -496,7 +497,10 @@ public:
   /// Set object which is being moved (if the message already contains attribute it will be cleared)
   MODELAPI_EXPORT void setMovedObject(const ObjectPtr& theMovedObject);
   /// Set attribute which is being moved (if the message already contains object it will be cleared)
-  MODELAPI_EXPORT void setMovedAttribute(const AttributePtr& theMovedAttribute);
+  /// \param[in] theMovedAttribute moved attribute
+  /// \param[in] thePointIndex     index of the point if the moved attribute is an array of points
+  MODELAPI_EXPORT void setMovedAttribute(const AttributePtr& theMovedAttribute,
+                                         const int thePointIndex = -1);
 
   /// Return moved object
   ObjectPtr movedObject() const
@@ -504,6 +508,9 @@ public:
   /// Return moved attribute
   AttributePtr movedAttribute() const
   { return myMovedAttribute; }
+  /// Return index of the moved point
+  int movedPointIndex() const
+  { return myMovedPointIndex; }
 
   /// Set original mouse position
   MODELAPI_EXPORT void setOriginalPosition(double theX, double theY);

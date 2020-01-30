@@ -19,10 +19,14 @@
 
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_Error.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
+#include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 #include <GeomDataAPI_Point2D.h>
+
+#include <ModelAPI_AttributeInteger.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
@@ -186,6 +190,20 @@ static void processEllipticArcExtremities(SketchSolver_ConstraintType& theType,
   }
 }
 
+static void getPointFromArray(EntityWrapperPtr& theArray,
+                              const ConstraintPtr& theConstraint,
+                              const std::string& theIndexAttrId)
+{
+  if (theArray && theArray->type() == ENTITY_POINT_ARRAY) {
+    AttributeIntegerPtr anIndexAttr = theConstraint->integer(theIndexAttrId);
+    if (anIndexAttr) {
+      PointArrayWrapperPtr aPointsArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(theArray);
+      theArray = aPointsArray->value(anIndexAttr->value());
+    }
+  }
+}
+
 
 void SketchSolver_ConstraintCoincidence::process()
 {
@@ -207,7 +225,7 @@ void SketchSolver_ConstraintCoincidence::process()
 
   mySolverConstraint = PlaneGCSSolver_Tools::createConstraint(
       myBaseConstraint, getType(),
-      aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
+      myAuxValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
 
   myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateCoincidence::GROUP());
   myStorage->notify(myBaseConstraint);
@@ -218,6 +236,13 @@ bool SketchSolver_ConstraintCoincidence::remove()
   myInSolver = false;
   myFeatureExtremities[0] = EntityWrapperPtr();
   myFeatureExtremities[1] = EntityWrapperPtr();
+  if (myAuxValue) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+    GCS::SET_pD aParams;
+    aParams.insert(myAuxValue->scalar());
+    aStorage->removeParameters(aParams);
+  }
   return SketchSolver_Constraint::remove();
 }
 
@@ -240,10 +265,24 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
                                   theAttributes, myFeatureExtremities);
   } else if (theAttributes[2]) {
     myType = CONSTRAINT_PT_ON_CURVE;
-    // obtain extremity points of the coincident feature for further checking of multi-coincidence
-    getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
+    // point-on-bspline requires additional parameter
+    if (theAttributes[2]->type() == ENTITY_BSPLINE) {
+      std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+          std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+      myAuxValue.reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+    }
+    else {
+      // obtain extremity points of the coincident feature for further checking of multi-coincidence
+      getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
+    }
   } else
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+
+  // process internal coincidence with a point in the array of points
+  getPointFromArray(theAttributes[0], myBaseConstraint,
+                    SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A());
+  getPointFromArray(theAttributes[1], myBaseConstraint,
+                    SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
 }
 
 void SketchSolver_ConstraintCoincidence::notify(const FeaturePtr&      theFeature,
@@ -297,6 +336,21 @@ void SketchSolver_ConstraintCoincidence::notify(const FeaturePtr&      theFeatur
     if (myInSolver) {
       myInSolver = false;
       myStorage->removeConstraint(myBaseConstraint);
+    }
+  }
+}
+
+void SketchSolver_ConstraintCoincidence::adjustConstraint()
+{
+  if (myBaseConstraint->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
+    AttributeIntegerPtr anIndexA = myBaseConstraint->integer(
+        SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A());
+    AttributeIntegerPtr anIndexB = myBaseConstraint->integer(
+        SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+    if ((anIndexA && anIndexA->isInitialized()) ||
+        (anIndexB && anIndexB->isInitialized())) {
+      remove();
+      process();
     }
   }
 }

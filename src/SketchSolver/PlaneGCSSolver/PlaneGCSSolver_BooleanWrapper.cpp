@@ -19,7 +19,21 @@
 
 #include <PlaneGCSSolver_BooleanWrapper.h>
 
+#include <ModelAPI_AttributeBoolean.h>
+
 PlaneGCSSolver_BooleanWrapper::PlaneGCSSolver_BooleanWrapper(bool theParam)
   : myValue(theParam)
 {
+}
+
+bool PlaneGCSSolver_BooleanWrapper::update(AttributePtr theAttribute)
+{
+  bool isUpdated = false;
+  AttributeBooleanPtr aBoolean =
+      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
+  if (aBoolean) {
+    isUpdated = value() != aBoolean->value();
+    setValue(aBoolean->value());
+  }
+  return isUpdated;
 }

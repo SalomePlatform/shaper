@@ -31,7 +31,10 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Ellipse2d.h>
 
+#include <ModelAPI_AttributeInteger.h>
+
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
@@ -112,14 +115,20 @@ void SketchSolver_ConstraintTangent::rebuild()
   mySharedPoint = AttributePtr();
   if (myAuxPoint) {
     GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(myAuxPoint);
+    if (myAuxParameters[0])
+      aParams.insert(myAuxParameters[0]->scalar());
+    if (myAuxParameters[1])
+      aParams.insert(myAuxParameters[1]->scalar());
     aStorage->removeParameters(aParams);
     myAuxPoint = EntityWrapperPtr();
+    myAuxParameters[0] = myAuxParameters[1] = ScalarWrapperPtr();
   }
 
   // Check the quantity of entities of each type and their order (arcs first)
   int aNbLines = 0;
   int aNbCircles = 0;
   int aNbEllipses = 0;
+  int aNbSplines = 0;
   std::list<EntityWrapperPtr>::iterator anEntIt = myAttributes.begin();
   for (; anEntIt != myAttributes.end(); ++anEntIt) {
     if (!(*anEntIt).get())
@@ -130,16 +139,18 @@ void SketchSolver_ConstraintTangent::rebuild()
       ++aNbCircles;
     else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTIC_ARC)
       ++aNbEllipses;
+    else if ((*anEntIt)->type() == ENTITY_BSPLINE)
+      ++aNbSplines;
   }
 
-  if (aNbCircles + aNbEllipses < 1) {
+  if (aNbCircles + aNbEllipses + aNbSplines < 1) {
     myErrorMsg = SketchSolver_Error::INCORRECT_TANGENCY_ATTRIBUTE();
     return;
   }
   if (aNbLines == 1 && aNbCircles == 1) {
     myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
   }
-  else if (aNbLines + aNbCircles + aNbEllipses == 2) {
+  else if (aNbLines + aNbCircles + aNbEllipses + aNbSplines == 2) {
     myType = CONSTRAINT_TANGENT_CURVE_CURVE;
     isArcArcInternal = isArcArcTangencyInternal(myAttributes.front(), myAttributes.back());
   }
@@ -148,20 +159,61 @@ void SketchSolver_ConstraintTangent::rebuild()
     return;
   }
 
-  FeaturePtr aFeature1, aFeature2;
-  getTangentFeatures(myBaseConstraint, aFeature1, aFeature2);
+  FeaturePtr aFeatures[2];
+  getTangentFeatures(myBaseConstraint, aFeatures[0], aFeatures[1]);
 
   // check number of coincident points
-  std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeature1, aFeature2);
+  std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeatures[0], aFeatures[1]);
   if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 2) {
     myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
     return;
   }
 
-  // Try to find non-boundary points coincident with both features.
-  // It is necesasry to create tangency with ellipse
-  if (aCoincidentPoints.empty() && aNbEllipses > 0)
-    aCoincidentPoints = coincidentPoints(aFeature1, aFeature2);
+  EntityWrapperPtr aTgEntities[2] = { myAttributes.front(), myAttributes.back() };
+
+  if (aCoincidentPoints.empty()) {
+    // Try to find non-boundary points coincident with both features.
+    // It is necesasry to create tangency with ellipse.
+    if (aNbEllipses > 0)
+      aCoincidentPoints = coincidentPoints(aFeatures[0], aFeatures[1]);
+  }
+  else if (aNbSplines > 0) {
+    // General approach applying tangency to B-spline leads to hang-up in PlaneGCS.
+    // So, the tangency will be applied for the construction segment instead of B-spline curve.
+    for (int i = 0; i < 2; ++i) {
+      if (aTgEntities[i]->type() == ENTITY_BSPLINE) {
+        EdgeWrapperPtr anEdge =
+            std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aTgEntities[i]);
+        std::shared_ptr<GCS::BSpline> aBSpline =
+            std::dynamic_pointer_cast<GCS::BSpline>(anEdge->entity());
+
+        // which boundary is coincident?
+        GCS::Point aPoint1, aPoint2;
+        for (std::set<AttributePtr>::iterator aPIt = aCoincidentPoints.begin();
+             aPIt != aCoincidentPoints.end(); ++aPIt) {
+          if ((*aPIt)->owner() == aFeatures[i]) {
+            if ((*aPIt)->id() == SketchPlugin_BSpline::START_ID()) {
+              aPoint1 = aBSpline->poles[0];
+              aPoint2 = aBSpline->poles[1];
+            }
+            else if ((*aPIt)->id() == SketchPlugin_BSpline::END_ID()) {
+              aPoint1 = aBSpline->poles[aBSpline->poles.size() - 2];
+              aPoint2 = aBSpline->poles[aBSpline->poles.size() - 1];
+            }
+            break;
+          }
+        }
+
+        // substitute B-spline by its boundary segment
+        std::shared_ptr<GCS::Line> aSegment(new GCS::Line);
+        aSegment->p1 = aPoint1;
+        aSegment->p2 = aPoint2;
+        aTgEntities[i] = EdgeWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aSegment));
+        --aNbSplines;
+        ++aNbLines;
+      }
+    }
+  }
 
   EntityWrapperPtr aSharedPointEntity;
   std::list<GCSConstraintPtr> anAuxConstraints;
@@ -169,32 +221,36 @@ void SketchSolver_ConstraintTangent::rebuild()
     mySharedPoint = *aCoincidentPoints.begin();
     aSharedPointEntity = myStorage->entity(mySharedPoint);
   }
-  else if (aNbEllipses > 0) {
+  else if (aNbEllipses + aNbSplines > 0) {
     // create auxiliary point
     GCSPointPtr aPoint(new GCS::Point);
     aPoint->x = aStorage->createParameter();
     aPoint->y = aStorage->createParameter();
-    calculateTangencyPoint(myAttributes.front(), myAttributes.back(), aPoint);
+    calculateTangencyPoint(aTgEntities[0], aTgEntities[1], aPoint);
 
     myAuxPoint.reset(new PlaneGCSSolver_PointWrapper(aPoint));
     aSharedPointEntity = myAuxPoint;
 
-    // create auxiliary coincident constraints for tangency with ellipse
     EntityWrapperPtr aDummy;
-    ConstraintWrapperPtr aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
-        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.front(), aDummy);
-    anAuxConstraints = aCoincidence->constraints();
-    aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
-        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.back(), aDummy);
-    anAuxConstraints.insert(anAuxConstraints.end(),
-        aCoincidence->constraints().begin(), aCoincidence->constraints().end());
+    for (int i = 0; i < 2; ++i) {
+      // create auxiliary parameters for coincidence with B-spline
+      if (aTgEntities[i]->type() == ENTITY_BSPLINE)
+        myAuxParameters[i].reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+
+      // create auxiliary coincident constraints for tangency with ellipse
+      ConstraintWrapperPtr aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
+          CONSTRAINT_PT_ON_CURVE, myAuxParameters[i],
+          aSharedPointEntity, aDummy, aTgEntities[i], aDummy);
+      anAuxConstraints.insert(anAuxConstraints.end(),
+          aCoincidence->constraints().begin(), aCoincidence->constraints().end());
+    }
   }
 
   if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
-    mySolverConstraint = createArcLineTangency(myAttributes.front(), myAttributes.back(),
+    mySolverConstraint = createArcLineTangency(aTgEntities[0], aTgEntities[1],
                                            aSharedPointEntity, &myCurveCurveAngle);
   } else {
-    mySolverConstraint = createCurveCurveTangency(myAttributes.front(), myAttributes.back(),
+    mySolverConstraint = createCurveCurveTangency(aTgEntities[0], aTgEntities[1],
                             isArcArcInternal, aSharedPointEntity, &myCurveCurveAngle);
   }
 
@@ -282,6 +338,24 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
     rebuild();
 }
 
+bool SketchSolver_ConstraintTangent::remove()
+{
+  if (myAuxPoint) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+
+    GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(myAuxPoint);
+    if (myAuxParameters[0])
+      aParams.insert(myAuxParameters[0]->scalar());
+    if (myAuxParameters[1])
+      aParams.insert(myAuxParameters[1]->scalar());
+    aStorage->removeParameters(aParams);
+    myAuxPoint = EntityWrapperPtr();
+    myAuxParameters[0] = myAuxParameters[1] = ScalarWrapperPtr();
+  }
+  return SketchSolver_Constraint::remove();
+}
+
 
 
 
@@ -302,13 +376,22 @@ std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeaturePtr theF
   const std::set<AttributePtr>& aRefs2 = theFeature2->data()->refsToMe();
 
   std::set<FeaturePtr> aCoincidences;
+  std::map<AttributePtr, FeaturePtr> aCoincidentPoints;
   std::set<AttributePtr>::const_iterator anIt;
 
   // collect coincidences referred to the first feature
   for (anIt = aRefs1.begin(); anIt != aRefs1.end(); ++anIt) {
     FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
-    if (aRef && aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+    if (aRef && (aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+                 aRef->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID())) {
       aCoincidences.insert(aRef);
+      AttributeRefAttrPtr aRefAttrA = aRef->refattr(SketchPlugin_Constraint::ENTITY_A());
+      if (!aRefAttrA->isObject())
+        aCoincidentPoints[aRefAttrA->attr()] = aRef;
+      AttributeRefAttrPtr aRefAttrB = aRef->refattr(SketchPlugin_Constraint::ENTITY_B());
+      if (!aRefAttrB->isObject())
+        aCoincidentPoints[aRefAttrB->attr()] = aRef;
+    }
   }
 
   // leave only coincidences referred to the second feature
@@ -317,6 +400,20 @@ std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeaturePtr theF
     FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
     if (aCoincidences.find(aRef) != aCoincidences.end())
       aCoincidencesBetweenFeatures.insert(aRef);
+    else if (aRef && (aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+                      aRef->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID())) {
+      for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+        AttributeRefAttrPtr aRefAttr = aRef->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+        if (aRefAttr && !aRefAttr->isObject()) {
+          std::map<AttributePtr, FeaturePtr>::iterator aFound =
+              aCoincidentPoints.find(aRefAttr->attr());
+          if (aFound != aCoincidentPoints.end()) {
+            aCoincidencesBetweenFeatures.insert(aRef);
+            aCoincidencesBetweenFeatures.insert(aFound->second);
+          }
+        }
+      }
+    }
   }
 
   return aCoincidencesBetweenFeatures;
@@ -329,20 +426,31 @@ std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeatureP
   std::set<AttributePtr> aCoincidentPoints;
   std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
   for (; aCIt != aCoincidences.end(); ++ aCIt) {
-    AttributeRefAttrPtr aRefAttrA = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
-    AttributeRefAttrPtr aRefAttrB = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_B());
-    if (!aRefAttrA || aRefAttrA->isObject() ||
-        !aRefAttrB || aRefAttrB->isObject())
-      continue;
+    for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+      AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+      if (!aRefAttr || aRefAttr->isObject())
+        continue;
 
-    AttributePtr anAttrA = aRefAttrA->attr();
-    AttributePtr anAttrB = aRefAttrB->attr();
-    if (anAttrA->id() != SketchPlugin_Arc::CENTER_ID() &&
-        anAttrA->id() != SketchPlugin_Circle::CENTER_ID() &&
-        anAttrB->id() != SketchPlugin_Arc::CENTER_ID() &&
-        anAttrB->id() != SketchPlugin_Circle::CENTER_ID()) {
-      aCoincidentPoints.insert(anAttrA);
-      aCoincidentPoints.insert(anAttrB);
+      AttributePtr anAttr = aRefAttr->attr();
+      FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
+      if (anOwner == theFeature1 || anOwner == theFeature2) {
+        if (anAttr->id() == SketchPlugin_BSplineBase::POLES_ID()) {
+          AttributeIntegerPtr anIndex = (*aCIt)->integer(i == 0 ?
+              SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A() :
+              SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+          if (anIndex) {
+            if (anIndex->value() == 0)
+              anAttr = anOwner->attribute(SketchPlugin_BSpline::START_ID());
+            else
+              anAttr = anOwner->attribute(SketchPlugin_BSpline::END_ID());
+            if (anAttr)
+              aCoincidentPoints.insert(anAttr);
+          }
+        }
+        else if (anAttr->id() != SketchPlugin_Arc::CENTER_ID() &&
+                 anAttr->id() != SketchPlugin_Circle::CENTER_ID())
+          aCoincidentPoints.insert(anAttr);
+      }
     }
   }
   return aCoincidentPoints;

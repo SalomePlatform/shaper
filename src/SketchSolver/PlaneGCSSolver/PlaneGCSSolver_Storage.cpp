@@ -23,6 +23,8 @@
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
+#include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_Tools.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
@@ -33,7 +35,10 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
+#include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_Projection.h>
 
@@ -102,55 +107,6 @@ EntityWrapperPtr PlaneGCSSolver_Storage::createAttribute(
   return aResult;
 }
 
-/// \brief Update value
-static bool updateValue(const double& theSource, double& theDest)
-{
-  static const double aTol = 1.e4 * tolerance;
-  bool isUpdated = fabs(theSource - theDest) > aTol;
-  if (isUpdated)
-    theDest = theSource;
-  return isUpdated;
-}
-
-/// \brief Update coordinates of the point or scalar using its base attribute
-static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity)
-{
-  bool isUpdated = false;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
-  if (aPoint2D) {
-    const GCSPointPtr& aGCSPoint =
-        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity)->point();
-    isUpdated = updateValue(aPoint2D->x(), *(aGCSPoint->x)) || isUpdated;
-    isUpdated = updateValue(aPoint2D->y(), *(aGCSPoint->y)) || isUpdated;
-  } else {
-    AttributeDoublePtr aScalar =
-        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-    if (aScalar) {
-      ScalarWrapperPtr aWrapper =
-          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(theEntity);
-      // There is possible angular value, which is converted between degrees and radians.
-      // So, we use its value instead of using direct pointer to value.
-      double aValue = aWrapper->value();
-      isUpdated = updateValue(aScalar->value(), aValue);
-      if (isUpdated)
-        aWrapper->setValue(aValue);
-    } else {
-      AttributeBooleanPtr aBoolean =
-          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
-      if (aBoolean) {
-        BooleanWrapperPtr aWrapper =
-            std::dynamic_pointer_cast<PlaneGCSSolver_BooleanWrapper>(theEntity);
-        isUpdated = aWrapper->value() != aBoolean->value();
-        aWrapper->setValue(aBoolean->value());
-      }
-    }
-  }
-
-  return isUpdated;
-}
-
 static bool hasReference(std::shared_ptr<SketchPlugin_Feature> theFeature,
                          const std::string& theFeatureKind)
 {
@@ -203,9 +159,7 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
   std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
   for (; anAttrIt != anAttributes.end(); ++anAttrIt)
-    if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeBoolean::typeId())
+    if (PlaneGCSSolver_Tools::isAttributeApplicable((*anAttrIt)->id(), theFeature->getKind()))
       isUpdated = update(*anAttrIt) || isUpdated;
 
   // check external attribute is changed
@@ -257,7 +211,8 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
     return aRelated.get() != 0;
   }
 
-  bool isUpdated = updateValues(anAttribute, aRelated);
+  PlaneGCSSolver_AttributeBuilder aBuilder(aRelated->isExternal() ? 0 : this);
+  bool isUpdated = aBuilder.updateAttribute(anAttribute, aRelated);
   if (isUpdated) {
     setNeedToResolve(true);
     notify(aFeature);
@@ -413,6 +368,47 @@ static void createEllipticArcConstraints(
   constraintsToSolver(aConstraint, theSolver);
 }
 
+static void createBSplineConstraints(
+    const EntityWrapperPtr& theCurve,
+    const SolverPtr& theSolver,
+    const ConstraintID theConstraintID,
+    std::map<EntityWrapperPtr, ConstraintWrapperPtr>& theConstraints)
+{
+  // set start and end point of B-spline equal to first and last pole correspondingly
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theCurve);
+  std::shared_ptr<GCS::BSpline> aBSpline =
+      std::dynamic_pointer_cast<GCS::BSpline>(anEdge->entity());
+  if (aBSpline->periodic)
+    return; // additional constraints are not necessary
+
+  std::list<GCSConstraintPtr> aBSplineConstraints;
+
+  const std::map<std::string, EntityWrapperPtr>& anAdditional = anEdge->additionalAttributes();
+  PointWrapperPtr aStartPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      anAdditional.at(SketchPlugin_BSpline::START_ID()));
+
+  const GCS::Point& sp = *aStartPoint->point();
+  const GCS::Point& p0 = aBSpline->poles.front();
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(p0.x, sp.x)));
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(p0.y, sp.y)));
+
+  PointWrapperPtr aEndPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      anAdditional.at(SketchPlugin_BSpline::END_ID()));
+
+  const GCS::Point& ep = *aEndPoint->point();
+  const GCS::Point& pN = aBSpline->poles.back();
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(pN.x, ep.x)));
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(pN.y, ep.y)));
+
+  ConstraintWrapperPtr aWrapper(
+      new PlaneGCSSolver_ConstraintWrapper(aBSplineConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(theConstraintID);
+  if (theSolver)
+    constraintsToSolver(aWrapper, theSolver);
+
+  theConstraints[theCurve] = aWrapper;
+}
+
 void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& theEntity)
 {
   if (!theEntity || theEntity->isExternal())
@@ -426,6 +422,8 @@ void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& 
     createEllipticArcConstraints(theEntity, mySketchSolver,
                                  ++myConstraintLastID, myAuxConstraintMap);
   }
+  else if (theEntity->type() == ENTITY_BSPLINE)
+    createBSplineConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
 }
 
 void PlaneGCSSolver_Storage::removeAuxiliaryConstraints(const EntityWrapperPtr& theEntity)
@@ -578,6 +576,8 @@ double* PlaneGCSSolver_Storage::createParameter()
 void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 {
   mySketchSolver->removeParameters(theParams);
+  //for (GCS::SET_pD::iterator it = theParams.begin(); it != theParams.end(); ++it)
+  //  delete *it;
 }
 
 // indicates attribute containing in the external feature
@@ -626,6 +626,23 @@ void PlaneGCSSolver_Storage::refresh() const
       }
       continue;
     }
+    std::shared_ptr<GeomDataAPI_Point2DArray> aPointArray =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(anIt->first);
+    if (aPointArray) {
+      std::shared_ptr<PlaneGCSSolver_PointArrayWrapper> anArrayWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(anIt->second);
+      int aSize = aPointArray->size();
+      for (int anIndex = 0; anIndex < aSize; ++anIndex) {
+        GeomPnt2dPtr anOriginal = aPointArray->pnt(anIndex);
+        GCSPointPtr aGCSPoint = anArrayWrapper->value(anIndex)->point();
+        if (fabs(anOriginal->x() - (*aGCSPoint->x)) > aTol ||
+            fabs(anOriginal->y() - (*aGCSPoint->y)) > aTol) {
+          aPointArray->setPnt(anIndex, *aGCSPoint->x, *aGCSPoint->y);
+          addOwnerToSet(anIt->first, anUpdatedFeatures);
+        }
+      }
+      continue;
+    }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
     if (aScalar) {
       ScalarWrapperPtr aScalarWrapper =
@@ -633,6 +650,20 @@ void PlaneGCSSolver_Storage::refresh() const
       if (fabs(aScalar->value() - aScalarWrapper->value()) > aTol) {
         aScalar->setValue(aScalarWrapper->value());
         addOwnerToSet(anIt->first, anUpdatedFeatures);
+      }
+      continue;
+    }
+    AttributeDoubleArrayPtr aRealArray =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(anIt->first);
+    if (aRealArray) {
+      std::shared_ptr<PlaneGCSSolver_ScalarArrayWrapper> anArrayWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
+      int aSize = aRealArray->size();
+      for (int anIndex = 0; anIndex < aSize; ++anIndex) {
+        if (fabs(aRealArray->value(anIndex) - *anArrayWrapper->array()[anIndex]) > aTol) {
+          aRealArray->setValue(anIndex, *anArrayWrapper->array()[anIndex]);
+          addOwnerToSet(anIt->first, anUpdatedFeatures);
+        }
       }
       continue;
     }

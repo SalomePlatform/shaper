@@ -19,6 +19,10 @@
 
 #include "SketchPlugin_ConstraintCoincidenceInternal.h"
 
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
+
 SketchPlugin_ConstraintCoincidenceInternal::SketchPlugin_ConstraintCoincidenceInternal()
 {
 }
@@ -26,6 +30,12 @@ SketchPlugin_ConstraintCoincidenceInternal::SketchPlugin_ConstraintCoincidenceIn
 void SketchPlugin_ConstraintCoincidenceInternal::initAttributes()
 {
   SketchPlugin_ConstraintCoincidence::initAttributes();
+
+  data()->addAttribute(INDEX_ENTITY_A(), ModelAPI_AttributeInteger::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), INDEX_ENTITY_A());
+
+  data()->addAttribute(INDEX_ENTITY_B(), ModelAPI_AttributeInteger::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), INDEX_ENTITY_B());
 }
 
 void SketchPlugin_ConstraintCoincidenceInternal::execute()

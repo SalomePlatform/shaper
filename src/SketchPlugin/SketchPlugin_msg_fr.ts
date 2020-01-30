@@ -4713,4 +4713,12 @@
     </message>
   </context>
 
+  <context>
+    <name>SketchBSpline</name>
+    <message>
+        <source>Number of B-spline poles should be 2 or more</source>
+        <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
+    </message>
+  </context>
+
 </TS>

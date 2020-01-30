@@ -27,10 +27,13 @@ SET(PLANEGCSSOLVER_HEADERS
     PlaneGCSSolver_EdgeWrapper.h
     PlaneGCSSolver_EntityWrapper.h
     PlaneGCSSolver_PointWrapper.h
+    PlaneGCSSolver_PointArrayWrapper.h
     PlaneGCSSolver_ScalarWrapper.h
+    PlaneGCSSolver_ScalarArrayWrapper.h
     PlaneGCSSolver_AngleWrapper.h
     PlaneGCSSolver_BooleanWrapper.h
     PlaneGCSSolver_Tools.h
+    PlaneGCSSolver_GeoExtensions.h
 )
 
 SET(PLANEGCSSOLVER_SOURCES
@@ -39,10 +42,13 @@ SET(PLANEGCSSOLVER_SOURCES
     PlaneGCSSolver_ConstraintWrapper.cpp
     PlaneGCSSolver_EdgeWrapper.cpp
     PlaneGCSSolver_PointWrapper.cpp
+    PlaneGCSSolver_PointArrayWrapper.cpp
     PlaneGCSSolver_ScalarWrapper.cpp
+    PlaneGCSSolver_ScalarArrayWrapper.cpp
     PlaneGCSSolver_AngleWrapper.cpp
     PlaneGCSSolver_BooleanWrapper.cpp
     PlaneGCSSolver_Tools.cpp
+    PlaneGCSSolver_GeoExtensions.cpp
 )
 
 SET(PLANEGCSSOLVER_BUILDER_HEADERS

@@ -27,6 +27,10 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
 #include <memory>
+#include <vector>
+
+class GeomAPI_Ax3;
+class GeomAPI_BSpline2d;
 
 /**\class GeomAlgoAPI_EdgeBuilder
  * \ingroup DataAlgo
@@ -89,6 +93,19 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
       const double                        theMinorRadius,
       const std::shared_ptr<GeomAPI_Pnt>& theStart,
       const std::shared_ptr<GeomAPI_Pnt>& theEnd);
+
+  /// Creates planar B-spline edge
+  static GeomEdgePtr bsplineOnPlane(const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                                    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+                                    const std::list<double>& theWeights,
+                                    const std::list<double>& theKnots,
+                                    const std::list<int>& theMults,
+                                    const int theDegree,
+                                    const bool thePeriodic);
+
+  /// Creates planar B-spline edge
+  static GeomEdgePtr bsplineOnPlane(const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                                    const std::shared_ptr<GeomAPI_BSpline2d>& theCurve);
 };
 
 #endif

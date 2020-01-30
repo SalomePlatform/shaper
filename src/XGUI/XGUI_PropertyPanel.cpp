@@ -225,8 +225,11 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
     QString aXmlRepr = anOperation->getDescription()->xmlRepresentation();
 
     ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myOperationMgr->workshop());
-    aFactory.createPanel(contentWidget(), theFeature);
-    /// Apply button should be update if the feature was modified by the panel
+    ModuleBase_PageBase* aPage = contentWidget();
+    aFactory.createPanel(aPage, theFeature);
+    // update model widgets if exist
+    setModelWidgets(aPage->modelWidgets());
+    // Apply button should be update if the feature was modified by the panel
     myOperationMgr->onValidateOperation();
   }
   ModuleBase_OperationFeature* aFeatureOp =

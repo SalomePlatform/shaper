@@ -85,12 +85,14 @@ protected:
                    const std::shared_ptr<GeomAPI_Pnt2d>& theToPoint);
 
   /** \brief Move feature using its moved attribute
-   *  \param[in] theMovedAttribute dragged point attribute of sketch feature
-   *  \param[in] theFromPoint      original position of the moved point
-   *  \param[in] theToPoint        prefereble position (current position of the mouse)
+   *  \param[in] theMovedAttribute  dragged point (array of points) attribute of sketch feature
+   *  \param[in] theMovedPointIndex index of dragged point in an array (-1 otherwise)
+   *  \param[in] theFromPoint       original position of the moved point
+   *  \param[in] theToPoint         prefereble position (current position of the mouse)
    *  \return \c true if the attribute owner has been changed successfully
    */
-  bool moveAttribute(const std::shared_ptr<GeomDataAPI_Point2D>& theMovedAttribute,
+  bool moveAttribute(const std::shared_ptr<ModelAPI_Attribute>& theMovedAttribute,
+                     const int theMovedPointIndex,
                      const std::shared_ptr<GeomAPI_Pnt2d>& theFromPoint,
                      const std::shared_ptr<GeomAPI_Pnt2d>& theToPoint);
 

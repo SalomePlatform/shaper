@@ -18,13 +18,18 @@
 //
 
 #include <PlaneGCSSolver_FeatureBuilder.h>
-#include <PlaneGCSSolver_EdgeWrapper.h>
-#include <PlaneGCSSolver_PointWrapper.h>
-#include <PlaneGCSSolver_ScalarWrapper.h>
 #include <PlaneGCSSolver_BooleanWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
+#include <PlaneGCSSolver_GeoExtensions.h>
+#include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
+#include <PlaneGCSSolver_ScalarWrapper.h>
+#include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_Tools.h>
 
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_EllipticArc.h>
@@ -36,8 +41,6 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
-static bool isAttributeApplicable(const std::string& theAttrName,
-                                  const std::string& theOwnerName);
 
 static EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes);
@@ -46,6 +49,8 @@ static EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
 static EntityWrapperPtr createEllipse(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createEllipticArc(const AttributeEntityMap& theAttributes,
                                           PlaneGCSSolver_Storage*   theStorage);
+template <typename TYPE>
+static EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes);
 
 
 PlaneGCSSolver_FeatureBuilder::PlaneGCSSolver_FeatureBuilder(
@@ -64,7 +69,7 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createAttribute(
 {
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
   EntityWrapperPtr anAttr;
-  if (isAttributeApplicable(theAttribute->id(), anOwner->getKind()))
+  if (PlaneGCSSolver_Tools::isAttributeApplicable(theAttribute->id(), anOwner->getKind()))
     anAttr = PlaneGCSSolver_AttributeBuilder::createAttribute(theAttribute);
   if (anAttr)
     myAttributes[theAttribute] = anAttr;
@@ -102,6 +107,11 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createFeature(FeaturePtr theFeat
   // Arc of ellipse
   else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
     aResult = createEllipticArc(myAttributes, myStorage);
+  // B-spline curve
+  else if (aFeatureKind == SketchPlugin_BSpline::ID())
+    aResult = createBSpline<SketchPlugin_BSpline>(myAttributes);
+  else if (aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
+    aResult = createBSpline<SketchPlugin_BSplinePeriodic>(myAttributes);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID() ||
            aFeatureKind == SketchPlugin_IntersectionPoint::ID()) {
@@ -288,48 +298,57 @@ EntityWrapperPtr createEllipticArc(const AttributeEntityMap& theAttributes,
   return anEllipseWrapper;
 }
 
-bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)
+template <typename TYPE>
+EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
 {
-  if (theOwnerName == SketchPlugin_Arc::ID()) {
-    return theAttrName == SketchPlugin_Arc::CENTER_ID() ||
-           theAttrName == SketchPlugin_Arc::START_ID() ||
-           theAttrName == SketchPlugin_Arc::END_ID() ||
-           theAttrName == SketchPlugin_Arc::REVERSED_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Circle::ID()) {
-    return theAttrName == SketchPlugin_Circle::CENTER_ID() ||
-           theAttrName == SketchPlugin_Circle::RADIUS_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Line::ID()) {
-    return theAttrName == SketchPlugin_Line::START_ID() ||
-           theAttrName == SketchPlugin_Line::END_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Ellipse::ID()) {
-    return theAttrName == SketchPlugin_Ellipse::CENTER_ID() ||
-           theAttrName == SketchPlugin_Ellipse::FIRST_FOCUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::SECOND_FOCUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_RADIUS_ID();
-  }
-  else if (theOwnerName == SketchPlugin_EllipticArc::ID()) {
-    return theAttrName == SketchPlugin_EllipticArc::CENTER_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::FIRST_FOCUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::SECOND_FOCUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::START_POINT_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::END_POINT_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::REVERSED_ID();
+  std::shared_ptr<GCS::BSplineImpl> aNewSpline(new GCS::BSplineImpl);
+
+  aNewSpline->degree = 3;
+  aNewSpline->periodic = std::is_same<TYPE, SketchPlugin_BSplinePeriodic>();
+
+  std::map<std::string, EntityWrapperPtr> anAdditionalAttributes;
+
+  AttributeEntityMap::const_iterator anIt = theAttributes.begin();
+  for (; anIt != theAttributes.end(); ++anIt) {
+    const std::string& anAttrID = anIt->first->id();
+    if (anAttrID == TYPE::POLES_ID()) {
+      PointArrayWrapperPtr anArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(anIt->second);
+
+      int aSize = anArray->size();
+      aNewSpline->poles.reserve(aSize);
+      for (int anIndex = 0; anIndex < aSize; ++anIndex)
+        aNewSpline->poles.push_back(*anArray->value(anIndex)->point());
+
+      aNewSpline->start = aNewSpline->poles.front();
+      aNewSpline->end = aNewSpline->poles.back();
+    }
+    else if (anAttrID == TYPE::DEGREE_ID()) {
+      ScalarWrapperPtr aScalar =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
+      aNewSpline->degree = (int)aScalar->value();
+    }
+    else if (anAttrID == SketchPlugin_BSpline::START_ID() ||
+             anAttrID == SketchPlugin_BSpline::END_ID()) {
+      anAdditionalAttributes[anAttrID] = anIt->second;
+    }
+    else {
+      ScalarArrayWrapperPtr anArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
+      if (anAttrID == TYPE::WEIGHTS_ID())
+        aNewSpline->weights = anArray->array();
+      else if (anAttrID == TYPE::KNOTS_ID())
+        aNewSpline->knots = anArray->array();
+      else if (anAttrID == TYPE::MULTS_ID()) {
+        const GCS::VEC_pD& aValues = anArray->array();
+        aNewSpline->mult.reserve(aValues.size());
+        for (GCS::VEC_pD::const_iterator anIt = aValues.begin(); anIt != aValues.end(); ++anIt)
+          aNewSpline->mult.push_back((int)(**anIt));
+      }
+    }
   }
 
-  // suppose that all remaining features are points
-  return theAttrName == SketchPlugin_Point::COORD_ID();
+  EdgeWrapperPtr aWrapper(new PlaneGCSSolver_EdgeWrapper(aNewSpline));
+  aWrapper->setAdditionalAttributes(anAdditionalAttributes);
+  return aWrapper;
 }

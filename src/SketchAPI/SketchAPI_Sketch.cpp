@@ -53,6 +53,7 @@
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
+#include "SketchAPI_BSpline.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Ellipse.h"
 #include "SketchAPI_EllipticArc.h"
@@ -698,6 +699,32 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
 }
 
 //--------------------------------------------------------------------------------------
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
+    const ModelHighAPI_Selection & external,
+    const int degree,
+    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& poles,
+    const std::list<ModelHighAPI_Double>& weights,
+    const std::list<ModelHighAPI_Double>& knots,
+    const std::list<ModelHighAPI_Integer>& multiplicities,
+    const bool periodic)
+{
+  FeaturePtr aFeature = compositeFeature()->addFeature(
+    periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
+
+  BSplinePtr aBSpline(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
+                               : new SketchAPI_BSpline(aFeature));
+  if (external.variantType() != ModelHighAPI_Selection::VT_Empty)
+    aBSpline->setByExternal(external);
+  else if (knots.empty() || multiplicities.empty())
+    aBSpline->setByDegreePolesAndWeights(degree, poles, weights);
+  else
+    aBSpline->setByParameters(degree, poles, weights, knots, multiplicities);
+
+  return aBSpline;
+}
+
+//--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
     const ModelHighAPI_Selection & theExternalFeature,
     bool theKeepResult)
@@ -1184,7 +1211,16 @@ static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeatur
   return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
-static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnBSpline(const FeaturePtr& theFeature,
+                                                           SketchAPI_Sketch* theSketch)
+{
+  GeomAPI_Edge anEdge(theFeature->lastResult()->shape());
+  GeomPointPtr aMiddle = anEdge.middlePoint();
+  return theSketch->to2D(aMiddle);
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
+                                                  SketchAPI_Sketch* theSketch)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -1203,6 +1239,9 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
       aMiddlePoint = pointOnEllipse(aFeature);
     else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
       aMiddlePoint = pointOnEllipse(aFeature, false);
+    else if (aFeatureKind == SketchPlugin_BSpline::ID() ||
+             aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
+      aMiddlePoint = middlePointOnBSpline(aFeature, theSketch);
   }
   return aMiddlePoint;
 }
@@ -1217,7 +1256,7 @@ void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
   if (aMessage->movedAttribute())
     anOriginalPosition = pointCoordinates(aMessage->movedAttribute());
   else
-    anOriginalPosition = middlePoint(aMessage->movedObject());
+    anOriginalPosition = middlePoint(aMessage->movedObject(), this);
 
   if (!anOriginalPosition)
     return; // something has gone wrong, do not process movement

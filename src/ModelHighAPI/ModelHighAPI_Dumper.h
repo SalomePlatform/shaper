@@ -36,10 +36,13 @@ class GeomAPI_Dir;
 class GeomDataAPI_Dir;
 class GeomDataAPI_Point;
 class GeomDataAPI_Point2D;
+class GeomDataAPI_Point2DArray;
 
 class ModelAPI_Attribute;
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDouble;
+class ModelAPI_AttributeDoubleArray;
+class ModelAPI_AttributeIntArray;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefAttrList;
@@ -262,6 +265,9 @@ public:
   /// "X, Y"
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<GeomDataAPI_Point2D>& thePoint);
+  /// Dump GeomDataAPI_Point2DArray as a list of 2D points
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<GeomDataAPI_Point2DArray>& thePointArray);
 
   /// Dump AttributeBoolean
   MODELHIGHAPI_EXPORT
@@ -269,9 +275,15 @@ public:
   /// Dump AttributeInteger
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeInteger>& theAttrInt);
+  /// Dump AttributeIntArray
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeIntArray>& theArray);
   /// Dump AttributeDouble
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeDouble>& theAttrReal);
+  /// Dump AttributeDoubleArray
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeDoubleArray>& theArray);
   /// Dump AttributeString
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeString>& theAttrStr);

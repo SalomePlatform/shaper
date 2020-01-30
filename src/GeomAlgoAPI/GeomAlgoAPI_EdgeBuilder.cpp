@@ -20,7 +20,10 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 
 #include <GeomAPI_Ax2.h>
+#include <GeomAPI_Ax3.h>
+#include <GeomAPI_BSpline2d.h>
 #include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Pnt2d.h>
 
 #include <gp_Pln.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
@@ -28,9 +31,11 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <Geom2d_BSplineCurve.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <GeomLib.hxx>
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
@@ -261,6 +266,34 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipticArc(
   anEllipse.parameter(aEndPnt, Precision::Confusion(), aEndParam);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse.impl<gp_Elips>(), aStartParam, aEndParam);
+  GeomEdgePtr aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
+GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(
+    const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+    const std::list<GeomPnt2dPtr>& thePoles,
+    const std::list<double>& theWeights,
+    const std::list<double>& theKnots,
+    const std::list<int>& theMults,
+    const int theDegree,
+    const bool thePeriodic)
+{
+  std::shared_ptr<GeomAPI_BSpline2d> aBSplineCurve(
+      new GeomAPI_BSpline2d(theDegree, thePoles, theWeights, theKnots, theMults, thePeriodic));
+  return bsplineOnPlane(thePlane, aBSplineCurve);
+}
+
+GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(
+    const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+    const std::shared_ptr<GeomAPI_BSpline2d>& theCurve)
+{
+  Handle(Geom_Curve) aCurve3D = GeomLib::To3d(thePlane->impl<gp_Ax3>().Ax2(),
+                                              theCurve->impl<Handle_Geom2d_BSplineCurve>());
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCurve3D);
   GeomEdgePtr aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));

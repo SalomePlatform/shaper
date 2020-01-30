@@ -42,6 +42,11 @@ public:
   virtual SketchSolver_EntityType type() const
   { return ENTITY_POINT; }
 
+protected:
+  /// \brief Update entity by the values of theAttribute
+  /// \return \c true if any value of attribute is not equal to the stored in the entity
+  virtual bool update(std::shared_ptr<ModelAPI_Attribute> theAttribute);
+
 private:
   GCSPointPtr myPoint;
 };

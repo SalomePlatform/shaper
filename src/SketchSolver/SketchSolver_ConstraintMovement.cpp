@@ -22,6 +22,7 @@
 #include <SketchSolver_Manager.h>
 
 #include <PlaneGCSSolver_EdgeWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 
 #include <SketchPlugin_Arc.h>
@@ -53,12 +54,14 @@ SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(FeaturePtr theF
 {
 }
 
-SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(AttributePtr thePoint)
+SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(AttributePtr theAttribute,
+                                                                 const int thePointIndex)
   : SketchSolver_ConstraintFixed(ConstraintPtr()),
-    myDraggedPoint(thePoint),
+    myDraggedAttribute(theAttribute),
+    myDraggedPointIndex(thePointIndex),
     mySimpleMove(true)
 {
-  myMovedFeature = ModelAPI_Feature::feature(thePoint->owner());
+  myMovedFeature = ModelAPI_Feature::feature(theAttribute->owner());
 }
 
 void SketchSolver_ConstraintMovement::blockEvents(bool isBlocked)
@@ -115,22 +118,27 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::initMovement()
     return aConstraint;
   }
 
-  EntityWrapperPtr anEntity =
-      myDraggedPoint ? myStorage->entity(myDraggedPoint) : myStorage->entity(myMovedFeature);
+  EntityWrapperPtr anEntity = myDraggedAttribute ? myStorage->entity(myDraggedAttribute)
+                                                 : myStorage->entity(myMovedFeature);
   if (!anEntity) {
     myStorage->update(myMovedFeature, true);
-    anEntity =
-        myDraggedPoint ? myStorage->entity(myDraggedPoint) : myStorage->entity(myMovedFeature);
+    anEntity = myDraggedAttribute ? myStorage->entity(myDraggedAttribute)
+                                  : myStorage->entity(myMovedFeature);
     if (!anEntity)
       return aConstraint;
   }
 
-  mySimpleMove = isSimpleMove(myMovedFeature, myDraggedPoint);
+  mySimpleMove = isSimpleMove(myMovedFeature, myDraggedAttribute);
 
-  if (mySimpleMove)
+  if (mySimpleMove) {
+    if (anEntity->type() == ENTITY_POINT_ARRAY) {
+      anEntity = std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(anEntity)
+                 ->value(myDraggedPointIndex);
+    }
     aConstraint = fixFeature(anEntity);
+  }
   else {
-    if (myDraggedPoint) // start or end point of arc has been moved
+    if (myDraggedAttribute) // start or end point of arc has been moved
       aConstraint = fixArcExtremity(anEntity);
     else if (anEntity->type() == ENTITY_CIRCLE || anEntity->type() == ENTITY_ARC) {
       // arc or circle has been moved
@@ -311,7 +319,8 @@ void SketchSolver_ConstraintMovement::moveTo(
 #ifdef CHANGE_RADIUS_WHILE_MOVE
   int aMaxSize = mySimpleMove ? (int)myFixedValues.size() : 2;
 #else
-  int aMaxSize = myMovedFeature->getKind() == SketchPlugin_Line::ID() && !myDraggedPoint ? 4 : 2;
+  int aMaxSize =
+      myMovedFeature->getKind() == SketchPlugin_Line::ID() && !myDraggedAttribute ? 4 : 2;
 #endif
   for (int i = 0; i < aMaxSize; ++i)
     myFixedValues[i] += aDelta[i % 2];

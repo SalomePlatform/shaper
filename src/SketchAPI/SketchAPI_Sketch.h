@@ -30,6 +30,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Selection.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_CompositeFeature;
 class ModelAPI_Object;
@@ -37,7 +38,6 @@ class ModelHighAPI_Double;
 class ModelHighAPI_Integer;
 class ModelHighAPI_RefAttr;
 class ModelHighAPI_Reference;
-class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_MacroArc;
 class SketchAPI_Circle;
@@ -46,6 +46,7 @@ class SketchAPI_Ellipse;
 class SketchAPI_MacroEllipse;
 class SketchAPI_EllipticArc;
 class SketchAPI_MacroEllipticArc;
+class SketchAPI_BSpline;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -323,6 +324,18 @@ public:
   /// Add elliptic arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const std::string & theExternalName);
+
+  /// Add B-spline
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addSpline(
+      const ModelHighAPI_Selection & external = ModelHighAPI_Selection(),
+      const int degree = -1,
+      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& poles =
+                                          std::list<std::shared_ptr<GeomAPI_Pnt2d> >(),
+      const std::list<ModelHighAPI_Double>& weights = std::list<ModelHighAPI_Double>(),
+      const std::list<ModelHighAPI_Double>& knots = std::list<ModelHighAPI_Double>(),
+      const std::list<ModelHighAPI_Integer>& multiplicities = std::list<ModelHighAPI_Integer>(),
+      const bool periodic = false);
 
   /// Add projection
   SKETCHAPI_EXPORT

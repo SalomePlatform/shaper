@@ -52,9 +52,14 @@ protected:
   virtual void getAttributes(EntityWrapperPtr&              theValue,
                              std::vector<EntityWrapperPtr>& theAttributes);
 
+  /// \brief This method is used in derived objects to check consistency of constraint.
+  ///        E.g. the distance between line and point may be signed.
+  virtual void adjustConstraint();
+
 protected:
   bool myInSolver; ///< shows the constraint is added to the solver
   EntityWrapperPtr myFeatureExtremities[2]; ///< extremities of a feature, a point is coincident to
+  ScalarWrapperPtr myAuxValue; ///< parameter on B-spline curve
 };
 
 #endif

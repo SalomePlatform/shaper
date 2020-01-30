@@ -211,14 +211,6 @@ protected:
   virtual void initializeValueByActivate();
 
  private:
-   /// Returns point 2d from selected vertex
-   /// \param theView a view window
-   /// \param theShape a vertex shape
-   /// \param theX an output value of X coordinate
-   /// \param theY an output value of Y coordinate
-   bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape,
-                   double& theX, double& theY) const;
-
    /// Creates constrains of the clicked point
    /// \param theClickedX the horizontal coordnate of the point
    /// \param theClickedY the vertical coordnate of the point
@@ -230,6 +222,7 @@ protected:
    /// \return true if succed
    bool setConstraintToObject(const ObjectPtr& theObject);
 
+public:
    /// Returns if the feature is an orphan point, circle or an arc. Returns true if it
    /// has no a coincident to other lines. It processes point, circle and arc features
    /// In circle an arc features, only centers are processed, for other points, it returns
@@ -274,6 +267,7 @@ protected:
                                        const FeaturePtr& theSkipFeature,
                                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
+private:
   /// Returns attribute reference if the key is defined in XML definition of this control
   /// \return found attribute or null
   std::shared_ptr<ModelAPI_AttributeRefAttr> attributeRefAttr() const;

@@ -66,12 +66,12 @@ class TestMiddlePointOnEllipticArc(unittest.TestCase):
     self.checkPointOnEllipse(thePoint, anEllipse)
     # check angles
     TOLERANCE = 1.e-5
-    startAngle = 0; startPoint = GeomAPI_Pnt(theArc.startPoint().x(), theArc.startPoint().y(), 0)
-    startAngle = anEllipse.parameter(startPoint, TOLERANCE, startAngle)
-    endAngle = 0; endPoint = GeomAPI_Pnt(theArc.endPoint().x(), theArc.endPoint().y(), 0)
-    endAngle = anEllipse.parameter(endPoint, TOLERANCE, endAngle)
-    midAngle = 0; midPoint = GeomAPI_Pnt(thePoint.x(), thePoint.y(), 0)
-    midAngle = anEllipse.parameter(midPoint, TOLERANCE, midAngle)
+    startPoint = GeomAPI_Pnt(theArc.startPoint().x(), theArc.startPoint().y(), 0)
+    isCalculated, startAngle = anEllipse.parameter(startPoint, TOLERANCE)
+    endPoint = GeomAPI_Pnt(theArc.endPoint().x(), theArc.endPoint().y(), 0)
+    isCalculated, endAngle = anEllipse.parameter(endPoint, TOLERANCE)
+    midPoint = GeomAPI_Pnt(thePoint.x(), thePoint.y(), 0)
+    isCalculated, midAngle = anEllipse.parameter(midPoint, TOLERANCE)
     diffMS = self.toPeriod(midAngle - startAngle)
     diffEM = self.toPeriod(endAngle - midAngle)
     self.assertAlmostEqual(diffMS, diffEM)

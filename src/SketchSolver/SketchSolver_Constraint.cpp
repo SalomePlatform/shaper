@@ -233,7 +233,7 @@ void SketchSolver_Constraint::getAttributes(
     SketchSolver_EntityType aType = anEntity->type();
     if (aType == ENTITY_UNKNOWN)
       continue;
-    else if (aType == ENTITY_POINT)
+    else if (aType == ENTITY_POINT || aType == ENTITY_POINT_ARRAY)
       theAttributes[aPtInd++] = anEntity; // the point is created
     else { // another entity (not a point) is created
       if (aEntInd < anInitNbOfAttr)

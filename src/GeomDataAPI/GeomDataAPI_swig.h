@@ -28,6 +28,7 @@
   #include "GeomDataAPI_Point.h"
   #include "GeomDataAPI_Dir.h"
   #include "GeomDataAPI_Point2D.h"
+  #include "GeomDataAPI_Point2DArray.h"
 
   #include <memory>
   #include <string>

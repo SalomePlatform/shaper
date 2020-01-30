@@ -163,6 +163,16 @@ GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
     aParameters.push_back(anEllArc->endAngle);
     break;
     }
+  case ENTITY_BSPLINE: {
+    std::shared_ptr<GCS::BSpline> aBSpline =
+        std::dynamic_pointer_cast<GCS::BSpline>(anEntity->entity());
+    for (GCS::VEC_P::iterator anIt = aBSpline->poles.begin();
+         anIt != aBSpline->poles.end(); ++anIt) {
+      aParameters.push_back(anIt->x);
+      aParameters.push_back(anIt->y);
+    }
+    break;
+  }
   default:
     break;
   }

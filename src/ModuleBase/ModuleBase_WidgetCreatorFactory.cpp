@@ -99,12 +99,13 @@ bool ModuleBase_WidgetCreatorFactory::hasPanelWidget(const std::string& theType)
 
 QWidget* ModuleBase_WidgetCreatorFactory::createPanelByType(const std::string& theType,
                                                             QWidget* theParent,
-                                                            const FeaturePtr& theFeature)
+                                                            const FeaturePtr& theFeature,
+                                                            Config_WidgetAPI* myWidgetApi)
 {
   QWidget* aPanel = 0;
   if (myPanelToCreator.contains(theType)) {
     WidgetCreatorPtr aCreator = myPanelToCreator[theType];
-    aPanel = aCreator->createPanelByType(theType, theParent, theFeature);
+    aPanel = aCreator->createPanelByType(theType, theParent, theFeature, myWidgetApi);
   }
   return aPanel;
 }
