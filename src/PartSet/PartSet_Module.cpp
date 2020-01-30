@@ -1564,17 +1564,14 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     XGUI_Displayer* aDisplayer = aWorkshop->displayer();
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
     bool aHidden;
-    bool aUpdateViewer = false;
     foreach(ObjectPtr aObj, aObjects) {
       aHidden = !aObj->data() || !aObj->data()->isValid() ||
         aObj->isDisabled() || (!aObj->isDisplayed());
       if (!aHidden) {
         aDisplayer->redisplay(aObj, false);
-        aUpdateViewer = true;
       }
     }
-    if (aUpdateViewer)
-     aDisplayer->updateViewer();
+    aDisplayer->updateViewer();
     // Update tree items if they are expanded
     if (needUpdate) {
       aTreeView->viewport()->update(aTreeView->viewport()->rect());
