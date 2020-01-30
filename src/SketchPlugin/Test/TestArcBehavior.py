@@ -28,6 +28,7 @@
 #=========================================================================
 # of the test
 #=========================================================================
+from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import *
 import math
