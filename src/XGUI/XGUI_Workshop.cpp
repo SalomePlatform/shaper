@@ -1860,6 +1860,9 @@ void XGUI_Workshop::deleteObjects()
   }
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  if (anObjects.isEmpty())
+    return;
+
   if (!abortAllOperations())
     return;
 
