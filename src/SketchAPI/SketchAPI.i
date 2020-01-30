@@ -32,6 +32,7 @@
 %include "doxyhelp.i"
 
 // import other modules
+%import "GeomAPI.i"
 %import "ModelAPI.i"
 %import "ModelHighAPI.i"
 

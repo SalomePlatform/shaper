@@ -21,6 +21,7 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_EllipticArc.h>
@@ -153,8 +154,10 @@ static const std::set<std::string>& ARC_PROJECTION()
 static const std::set<std::string>& BSPLINE_PROJECTION()
 {
   static std::set<std::string> aProj;
-  if (aProj.empty())
+  if (aProj.empty()) {
     aProj.insert(SketchPlugin_BSpline::ID());
+    aProj.insert(SketchPlugin_BSplinePeriodic::ID());
+  }
   return aProj;
 }
 
@@ -495,9 +498,10 @@ bool SketchPlugin_Projection::fillBSpline(FeaturePtr& theProjection,
                                           const GeomCurvePtr& theCurve,
                                           const GeomPlanePtr& thePlane)
 {
-  rebuildProjectedFeature(theProjection, BSPLINE_PROJECTION(), SketchPlugin_BSpline::ID());
-
   GeomAPI_BSpline aBSpline(theCurve);
+
+  rebuildProjectedFeature(theProjection, BSPLINE_PROJECTION(),
+      aBSpline.isPeriodic() ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
 
   theProjection->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(aBSpline.degree());
 

@@ -218,8 +218,5 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(PointList) std::list<std::shared_ptr<GeomAPI_Pnt> >;
 %template(PointSet) std::set<std::shared_ptr<GeomAPI_Pnt> >;
 
-// Geometry casts
-%template(shapeToEdge) shared_ptr_cast<GeomAPI_Edge, GeomAPI_Shape>;
-
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
 %template(featureToPresentation) shared_ptr_cast<GeomAPI_IPresentable, ModelAPI_Feature>;

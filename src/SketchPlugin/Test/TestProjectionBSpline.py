@@ -23,26 +23,26 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10, 180)
-Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Cylinder_1_1/Face_5"))
-SketchCircle_1 = Sketch_1.addCircle(-0.87355746875896, 7.873567272779828, 3.095312696967586)
-model.do()
-ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")], model.selection(), [model.selection("SOLID", "Cylinder_1_1")])
-Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_1_1")], model.selection("EDGE", "PartSet/OX"), 45)
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_1][(Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_1)(Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_5)(Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_4)(Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_3)2]")], False)
+Point_2 = model.addPoint(Part_1_doc, -10, 5, 10)
+Point_3 = model.addPoint(Part_1_doc, -5, 10, 15)
+Point_4 = model.addPoint(Part_1_doc, 10, 0, 20)
+Point_5 = model.addPoint(Part_1_doc, 10, -10, 15)
+Point_6 = model.addPoint(Part_1_doc, -5, -5, 12)
+Interpolation_1_objects = [model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Point_2"), model.selection("VERTEX", "Point_3"), model.selection("VERTEX", "Point_4"), model.selection("VERTEX", "Point_5")]
+Interpolation_1 = model.addInterpolation(Part_1_doc, Interpolation_1_objects, False, False)
 
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Edge_1_1"), True)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Interpolation_1_1"), True)
 SketchBSpline_1 = SketchProjection_1.createdFeature()
 model.do()
 
 Sketch_3 = model.addSketch(Part_1_doc, model.standardPlane("XOZ"))
-SketchProjection_2 = Sketch_3.addProjection(model.selection("EDGE", "Edge_1_1"), True)
+SketchProjection_2 = Sketch_3.addProjection(model.selection("EDGE", "Interpolation_1_1"), True)
 SketchBSpline_2 = SketchProjection_2.createdFeature()
 model.do()
 
 Sketch_4 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
-SketchProjection_3 = Sketch_4.addProjection(model.selection("EDGE", "Edge_1_1"), True)
+SketchProjection_3 = Sketch_4.addProjection(model.selection("EDGE", "Interpolation_1_1"), True)
 SketchBSpline_3 = SketchProjection_3.createdFeature()
 model.do()
 
@@ -64,7 +64,7 @@ def checkProjection(theBSpline3D, theBSpline2D, theFlags):
                math.fabs((p2d.z() - p3d.z()) * theFlags.z()) < TOLERANCE)
 
 
-bspline0 = GeomAPI_BSpline(GeomAPI_Curve(Edge_1.results()[-1].resultSubShapePair()[0].shape()))
+bspline0 = GeomAPI_BSpline(GeomAPI_Curve(Interpolation_1.results()[-1].resultSubShapePair()[0].shape()))
 
 bsplineShape1 = SketchBSpline_1.results()[-1].resultSubShapePair()[0].shape()
 checkProjection(bspline0, bsplineShape1, GeomAPI_Pnt(1, 1, 0))

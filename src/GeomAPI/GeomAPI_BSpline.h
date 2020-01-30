@@ -52,6 +52,9 @@ public:
 
   /// Multiplicities of B-spline knots
   GEOMAPI_EXPORT std::list<int> mults() const;
+
+  /// Return \c true if the curve is periodic
+  GEOMAPI_EXPORT bool isPeriodic() const;
 };
 
 //! Pointer on the object

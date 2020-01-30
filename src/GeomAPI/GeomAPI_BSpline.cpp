@@ -71,3 +71,8 @@ std::list<int> GeomAPI_BSpline::mults() const
   const TColStd_Array1OfInteger& aBSplMults = MY_BSPLINE->Multiplicities();
   return std::list<int>(aBSplMults.begin(), aBSplMults.end());
 }
+
+bool GeomAPI_BSpline::isPeriodic() const
+{
+  return MY_BSPLINE->IsPeriodic();
+}
