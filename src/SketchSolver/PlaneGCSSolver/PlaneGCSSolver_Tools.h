@@ -104,7 +104,7 @@ namespace PlaneGCSSolver_Tools
   /// \brief Update value in theDest if theSource is differ more than theTolerance
   /// \return \c true if the value was updated.
   bool updateValue(const double& theSource, double& theDest,
-                   const double theTolerance = 1.e-4 * tolerance);
+                   const double theTolerance = 1.e4 * tolerance);
 
   double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2);
 
