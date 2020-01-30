@@ -657,6 +657,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         if (!anOrphanPoint)
           emit vertexSelected(); // it stops the reentrant operation
 
+        myPreSelected.reset();
         emit focusOutWidget(this);
       }
     }
@@ -701,6 +702,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         updateObject(feature());
         if (!anOrphanPoint && !anExternal && !isAuxiliaryFeature)
           emit vertexSelected();
+        myPreSelected.reset();
         emit focusOutWidget(this);
       }
     }
@@ -735,6 +737,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         setPoint(aPnt->x(), aPnt->y());
       }
       emit vertexSelected(); // it stops the reentrant operation
+      myPreSelected.reset();
       emit focusOutWidget(this);
     }
   }
@@ -748,6 +751,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     if (!setPoint(aX, aY) || isFeatureContainsPoint(myFeature, aX, aY))
       return;
 
+    myPreSelected.reset();
     emit focusOutWidget(this);
   }
 }
@@ -759,7 +763,6 @@ void PartSet_WidgetPoint2D::setPreSelection(
 {
   myPreSelected = thePreSelected;
   mouseReleased(theWnd, theEvent);
-  myPreSelected = ModuleBase_ViewerPrsPtr();
 }
 
 void PartSet_WidgetPoint2D::getGeomSelection_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,

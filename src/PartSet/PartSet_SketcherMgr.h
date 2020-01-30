@@ -55,6 +55,7 @@
 #include <QObject>
 #include <QList>
 #include <QMap>
+#include <QPoint>
 
 #include <set>
 
@@ -510,6 +511,8 @@ private:
   QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
 
   bool myNoDragMoving;
+
+  QPoint myMousePoint;
 };
 
 

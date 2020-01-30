@@ -359,6 +359,9 @@ void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviou
     return;
   }
 
+  if (Config_PropManager::boolean(SKETCH_TAB_NAME, "create_by_dragging"))
+    return;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())

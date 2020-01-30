@@ -349,8 +349,13 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 }
 */
 
+static bool MyModeByDrag = false;
+static bool MyMultiselectionState = true;
+
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  MyModeByDrag = Config_PropManager::boolean(SKETCH_TAB_NAME, "create_by_dragging");
+
   // Clear dragging mode
   myIsDragging = false;
 
@@ -399,9 +404,26 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     // Ignore creation sketch operation
-    if ((!isSketcher) && (!isEditing))
+    if ((!isSketcher) && (!isEditing)) {
+      if (MyModeByDrag) {
+        myMousePoint.setX(theEvent->x());
+        myMousePoint.setX(theEvent->y());
+        ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+        PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
+        if (aProcessor) {
+          MyMultiselectionState = aViewer->isMultiSelectionEnabled();
+          aViewer->enableMultiselection(false);
+          myIsDragging = true;
+          ModuleBase_ISelection* aSelection = aWorkshop->selection();
+          QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getHighlighted();
+          if (!aPreSelected.empty())
+            aProcessor->setPreSelection(aPreSelected.first(), theWnd, theEvent);
+          else
+            aProcessor->mouseReleased(theWnd, theEvent);
+        }
+      }
       return;
-
+    }
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     storeSelection(aHasShift ? ST_SelectAndHighlightType : ST_HighlightType, myCurrentSelection);
 
@@ -506,12 +528,13 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (!myIsMouseOverViewProcessed) {
     return;
   }
-  //if (!aViewer->canDragByMouse())
-  //  return;
+
   ModuleBase_OperationFeature* aOp =
     dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
+  bool isEditing = false;
   if (aOp) {
-    bool aStartNoDragOperation = !aViewer->canDragByMouse() && aOp->isEditOperation();
+    isEditing = aOp->isEditOperation();
+    bool aStartNoDragOperation = !aViewer->canDragByMouse() && isEditing;
     if (aStartNoDragOperation || myNoDragMoving) {
       // Process edit operation without dragging
       if (myCurrentSelection.size() > 0)
@@ -541,11 +564,29 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     }
   }
 
-
   ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
   PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
-  if (aProcessor)
-    aProcessor->mouseReleased(theWnd, theEvent);
+  if (aProcessor) {
+    ModuleBase_ISelection* aSelection = aWorkshop->selection();
+    QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getHighlighted();
+    if (MyModeByDrag && !aPreSelected.empty() && !isEditing)
+      aProcessor->setPreSelection(aPreSelected.first(), theWnd, theEvent);
+    else
+      aProcessor->mouseReleased(theWnd, theEvent);
+  }
+  if (MyModeByDrag && aOp) {
+    QString aOpId = aOp->id();
+    if (aOpId == "Sketch")
+      return;
+    QPoint aPnt(theEvent->x(), theEvent->y());
+    if (aPnt == myMousePoint) {
+      aOp->abort();
+      return;
+    }
+    if ((aOpId != "SketchMacroArc") && (!isEditing)) {
+      module()->launchOperation(aOpId, true);
+    }
+  }
 }
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -563,6 +604,9 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     qDebug(QString("%1").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
   }
 #endif
+  if (MyModeByDrag && !myIsDragging)
+    return;
+
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
