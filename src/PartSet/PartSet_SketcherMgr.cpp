@@ -604,8 +604,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     qDebug(QString("%1").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
   }
 #endif
-  if (MyModeByDrag && !myIsDragging)
-    return;
 
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
