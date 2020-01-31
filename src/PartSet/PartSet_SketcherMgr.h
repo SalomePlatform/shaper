@@ -382,6 +382,9 @@ public:
   */
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  /// Returns true if current mode of objects creation is by drag mouse
+  bool isDragModeCreation() const;
+
 
 public slots:
   /// Process sketch plane selected event
@@ -468,9 +471,6 @@ private:
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
                         const bool isToDisplay, const bool isFlushRedisplay = true);
-
-  /// Returns true if current mode of objects creation is by drag mouse
-  bool isDragModeCreation() const;
 
 private:
   /// Updates selection priority of the presentation
