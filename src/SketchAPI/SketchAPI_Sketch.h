@@ -56,6 +56,8 @@ class SketchAPI_Rectangle;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
 //--------------------------------------------------------------------------------------
+typedef std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> PointOrReference;
+//--------------------------------------------------------------------------------------
 /**\class SketchAPI_Sketch
  * \ingroup CPPHighAPI
  * \brief Interface for Sketch feature
@@ -291,9 +293,9 @@ public:
   /// Add ellipse
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroEllipse> addEllipse(
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint1,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint2,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePassedPoint,
+      const PointOrReference& thePoint1,
+      const PointOrReference& thePoint2,
+      const PointOrReference& thePassedPoint,
       bool isPoint1Center = true);
   /// Add ellipse
   SKETCHAPI_EXPORT
@@ -313,10 +315,10 @@ public:
   /// Add elliptic arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroEllipticArc> addEllipticArc(
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theStartPoint,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theEndPoint,
+      const PointOrReference& theCenter,
+      const PointOrReference& theMajorAxisPoint,
+      const PointOrReference& theStartPoint,
+      const PointOrReference& theEndPoint,
       bool theInversed = false);
   /// Add elliptic arc
   SKETCHAPI_EXPORT
@@ -330,8 +332,7 @@ public:
   std::shared_ptr<SketchAPI_BSpline> addSpline(
       const ModelHighAPI_Selection & external = ModelHighAPI_Selection(),
       const int degree = -1,
-      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& poles =
-                                          std::list<std::shared_ptr<GeomAPI_Pnt2d> >(),
+      const std::list<PointOrReference>& poles = std::list<PointOrReference>(),
       const std::list<ModelHighAPI_Double>& weights = std::list<ModelHighAPI_Double>(),
       const std::list<ModelHighAPI_Double>& knots = std::list<ModelHighAPI_Double>(),
       const std::list<ModelHighAPI_Integer>& multiplicities = std::list<ModelHighAPI_Integer>(),

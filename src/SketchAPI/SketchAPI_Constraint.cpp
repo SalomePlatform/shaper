@@ -156,19 +156,6 @@ static const std::string& constraintTypeToSetter(const std::string& theType)
   return DUMMY;
 }
 
-static std::string angleTypeToString(int theAngleType)
-{
-  switch (theAngleType) {
-  case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-    return std::string("Complementary");
-  case SketcherPrs_Tools::ANGLE_BACKWARD:
-    return std::string("Backward");
-  default:
-    break;
-  }
-  return std::string();
-}
-
 bool SketchAPI_Constraint::areAllAttributesDumped(ModelHighAPI_Dumper& theDumper) const
 {
   bool areAttributesDumped = true;

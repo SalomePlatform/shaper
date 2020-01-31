@@ -40,6 +40,7 @@
 #include <SketchPlugin_Split.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MacroBSpline.h>
 #include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_Events.h>
@@ -607,9 +608,9 @@ std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
 }
 
 std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint1,
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint2,
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePassedPoint,
+    const PointOrReference& thePoint1,
+    const PointOrReference& thePoint2,
+    const PointOrReference& thePassedPoint,
     bool isPoint1Center)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
@@ -666,10 +667,10 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
 }
 
 std::shared_ptr<SketchAPI_MacroEllipticArc> SketchAPI_Sketch::addEllipticArc(
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theStartPoint,
-    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theEndPoint,
+    const PointOrReference& theCenter,
+    const PointOrReference& theMajorAxisPoint,
+    const PointOrReference& theStartPoint,
+    const PointOrReference& theEndPoint,
     bool theInversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
@@ -703,24 +704,74 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
 std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
     const ModelHighAPI_Selection & external,
     const int degree,
-    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& poles,
+    const std::list<PointOrReference>& poles,
     const std::list<ModelHighAPI_Double>& weights,
     const std::list<ModelHighAPI_Double>& knots,
     const std::list<ModelHighAPI_Integer>& multiplicities,
     const bool periodic)
 {
-  FeaturePtr aFeature = compositeFeature()->addFeature(
-    periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
+  // split poles and references to other shapes
+  bool hasReference = false;
+  std::list<GeomPnt2dPtr> aPoints;
+  std::list<ModelHighAPI_RefAttr> aReferences;
+  for (std::list<PointOrReference>::const_iterator it = poles.begin(); it != poles.end(); ++it) {
+    aPoints.push_back(it->first);
+    aReferences.push_back(it->second);
+    if (!it->second.isEmpty())
+      hasReference = true;
+  }
 
-  BSplinePtr aBSpline(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
-                               : new SketchAPI_BSpline(aFeature));
-  if (external.variantType() != ModelHighAPI_Selection::VT_Empty)
-    aBSpline->setByExternal(external);
-  else if (knots.empty() || multiplicities.empty())
-    aBSpline->setByDegreePolesAndWeights(degree, poles, weights);
-  else
-    aBSpline->setByParameters(degree, poles, weights, knots, multiplicities);
+  BSplinePtr aBSpline;
+  CompositeFeaturePtr aSketch = compositeFeature();
+  if (hasReference) {
+    // use macro-feature to create coincidences to referred features
+    FeaturePtr aMacroFeature = aSketch->addFeature(
+        periodic ? SketchPlugin_MacroBSplinePeriodic::ID() : SketchPlugin_MacroBSpline::ID());
+    AttributePoint2DArrayPtr aPolesAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
+        aMacroFeature->attribute(SketchPlugin_MacroBSpline::POLES_ID()));
+    AttributeDoubleArrayPtr aWeightsAttr =
+        aMacroFeature->data()->realArray(SketchPlugin_MacroBSpline::WEIGHTS_ID());
+    AttributeRefAttrListPtr aPolesRefAttr =
+        aMacroFeature->data()->refattrlist(SketchPlugin_MacroBSpline::REF_POLES_ID());
+    // always generate a control polygon to apply coincidences correctly
+    aMacroFeature->boolean(SketchPlugin_MacroBSpline::CONTROL_POLYGON_ID())->setValue(true);
+    // initialize B-spline attributes
+    fillAttribute(aPoints, aPolesAttr);
+    if (weights.empty())
+      fillAttribute(std::list<ModelHighAPI_Double>(poles.size(), 1.0), aWeightsAttr);
+    else
+      fillAttribute(weights, aWeightsAttr);
+    fillAttribute(aReferences, aPolesRefAttr);
+    apply(); // to kill macro-feature
 
+    // find created B-spline feature
+    const std::string& aKindToFind =
+        periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID();
+    int aNbSubs = aSketch->numberOfSubs();
+    for (int anIndex = aNbSubs - 1; anIndex >= 0; --anIndex) {
+      FeaturePtr aFeature = aSketch->subFeature(anIndex);
+      if (aFeature->getKind() == aKindToFind) {
+        aBSpline.reset(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
+                                : new SketchAPI_BSpline(aFeature));
+        aBSpline->execute();
+        break;
+      }
+    }
+  }
+  else {
+    // compute B-spline by parameters
+    FeaturePtr aFeature = aSketch->addFeature(
+        periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
+
+    aBSpline.reset(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
+                            : new SketchAPI_BSpline(aFeature));
+    if (external.variantType() != ModelHighAPI_Selection::VT_Empty)
+      aBSpline->setByExternal(external);
+    else if (knots.empty() || multiplicities.empty())
+      aBSpline->setByDegreePolesAndWeights(degree, aPoints, weights);
+    else
+      aBSpline->setByParameters(degree, aPoints, weights, knots, multiplicities);
+  }
   return aBSpline;
 }
 

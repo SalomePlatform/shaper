@@ -27,7 +27,7 @@
 #include "ModelHighAPI_Interface.h"
 //--------------------------------------------------------------------------------------
 ModelHighAPI_RefAttr::ModelHighAPI_RefAttr()
-: myVariantType(VT_ATTRIBUTE)
+: myVariantType(VT_OBJECT)
 {
 }
 

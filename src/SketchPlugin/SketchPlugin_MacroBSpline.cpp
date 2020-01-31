@@ -142,6 +142,9 @@ std::string SketchPlugin_MacroBSpline::processEvent(
 
 FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
 {
+  if (myKnots.empty() || myMultiplicities.empty())
+    getAISObject(AISObjectPtr()); // fill B-spline parameters
+
   FeaturePtr aBSpline = sketch()->addFeature(
       myIsPeriodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
 

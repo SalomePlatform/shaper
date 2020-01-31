@@ -344,29 +344,114 @@
 %typemap(freearg) const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & {}
 
 
-%typemap(in) const std::list<std::shared_ptr<GeomAPI_Pnt2d> > & (std::list<std::shared_ptr<GeomAPI_Pnt2d> > temp) {
-  std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
-  int newmem = 0;
+%typemap(in) const std::list<std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> > & (std::list<std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> > temp) {
   if (PySequence_Check($input)) {
     for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
       PyObject * item = PySequence_GetItem($input, i);
-      if (PyTuple_Check(item)) {
-        if (PyTuple_Size(item) == 2) {
-          double x = (double)PyFloat_AsDouble(PySequence_GetItem(item, 0));
-          double y = (double)PyFloat_AsDouble(PySequence_GetItem(item, 1));
-          temp.push_back(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y)));
-        } else {
-          PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
-          return NULL;
+
+      std::list<PyObject*> temp_inputlist;
+      if (PySequence_Check(item)) {
+        for (Py_ssize_t i = 0; i < PySequence_Size(item); ++i) {
+          PyObject * tmpItem = PySequence_GetItem(item, i);
+          temp_inputlist.push_back(tmpItem);
         }
-      } else
-      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
-        temp.push_back(*temp_point);
-        if (temp_point && (newmem & SWIG_CAST_NEW_MEMORY)) {
+      } else {
+        temp_inputlist.push_back(item);
+      }
+
+      std::shared_ptr<ModelAPI_Attribute> * temp_attribute = 0;
+      std::shared_ptr<ModelAPI_Object> * temp_object = 0;
+      std::shared_ptr<ModelHighAPI_Interface> * temp_interface = 0;
+      ModelHighAPI_Selection* temp_selection = 0;
+      std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>* temp_pair = 0;
+      std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
+      ModelHighAPI_RefAttr temp_refattr;
+      int newmem = 0;
+      int clearmem = 0;
+
+      for (std::list<PyObject*>::iterator it = temp_inputlist.begin(); it != temp_inputlist.end(); ++it) {
+        PyObject* item = *it;
+
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_selection) {
+            temp_refattr = ModelHighAPI_RefAttr(std::shared_ptr<ModelAPI_Object>(temp_selection->resultSubShapePair().first));
+            if (newmem & SWIG_CAST_NEW_MEMORY) {
+              delete temp_selection;
+            }
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_attribute, $descriptor(std::shared_ptr<ModelAPI_Attribute> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_attribute) {
+            temp_refattr = ModelHighAPI_RefAttr(*temp_attribute);
+            if (newmem & SWIG_CAST_NEW_MEMORY) {
+              delete temp_attribute;
+            }
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_object) {
+            temp_refattr = ModelHighAPI_RefAttr(*temp_object);
+            if (newmem & SWIG_CAST_NEW_MEMORY) {
+              delete temp_object;
+            }
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_interface) {
+            temp_refattr = ModelHighAPI_RefAttr(*temp_interface);
+            if (newmem & SWIG_CAST_NEW_MEMORY) {
+              delete temp_interface;
+            }
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_pair, $descriptor(std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_pair) {
+            temp_point = &temp_pair->first;
+            temp_refattr = temp_pair->second;
+            if (newmem & SWIG_CAST_NEW_MEMORY) {
+              delete temp_pair;
+            }
+          }
+        } else
+        if (PyTuple_Check(item)) {
+          if (PyTuple_Size(item) == 2) {
+            double x = (double)PyFloat_AsDouble(PySequence_GetItem(item, 0));
+            double y = (double)PyFloat_AsDouble(PySequence_GetItem(item, 1));
+            temp_point = new std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
+            clearmem = 1;
+          } else {
+            PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
+            return NULL;
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          // fall through
+        } else
+        if (PyNumber_Check(item)) {
+          PyObject* item1 = *(++it);
+          if (PyNumber_Check(item1)) {
+            double x = (double)PyFloat_AsDouble(item);
+            double y = (double)PyFloat_AsDouble(item1);
+            temp_point = new std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
+            clearmem = 1;
+          } else {
+            PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
+            return NULL;
+          }
+        }
+      }
+
+      if (temp_point || !temp_refattr.isEmpty()) {
+        if (temp_point) {
+          temp.push_back(std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>(*temp_point, temp_refattr));
+        } else {
+          temp.push_back(std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>(std::shared_ptr<GeomAPI_Pnt2d>(), temp_refattr));
+        }
+        if (temp_point && ((newmem & SWIG_CAST_NEW_MEMORY) || clearmem)) {
           delete temp_point;
         }
       } else {
-        PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
+        PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_RefAttr, ModelHighAPI_Selection, ModelHighAPI_Interface, ModelAPI_Attribute or ModelAPI_Object.");
         return NULL;
       }
       Py_DECREF(item);
@@ -378,25 +463,88 @@
   }
 }
 
-%typecheck(SWIG_TYPECHECK_POINTER) std::list<std::shared_ptr<GeomAPI_Pnt2d> >, const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& {
-  std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> >, const std::list<std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> >& {
   int newmem = 0;
   if (PySequence_Check($input)) {
     for (Py_ssize_t i = 0; i < PySequence_Size($input) && $1; ++i) {
       PyObject * item = PySequence_GetItem($input, i);
-      if (PyTuple_Check(item)) {
-        if (PyTuple_Size(item) == 2) {
-          if (PyNumber_Check(PySequence_GetItem(item, 0)) && PyNumber_Check(PySequence_GetItem(item, 1))) {
+
+      std::list<PyObject*> temp_inputlist;
+      if (PySequence_Check(item)) {
+        for (Py_ssize_t i = 0; i < PySequence_Size(item); ++i) {
+          PyObject * tmpItem = PySequence_GetItem(item, i);
+          temp_inputlist.push_back(tmpItem);
+        }
+      } else {
+        temp_inputlist.push_back(item);
+      }
+
+      std::shared_ptr<ModelAPI_Attribute> * temp_attribute = 0;
+      std::shared_ptr<ModelAPI_Object> * temp_object = 0;
+      std::shared_ptr<ModelHighAPI_Interface> * temp_interface = 0;
+      ModelHighAPI_Selection* temp_selection = 0;
+      std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>* temp_pair = 0;
+      std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
+      ModelHighAPI_RefAttr temp_refattr;
+
+      $1 = 1;
+      for (std::list<PyObject*>::iterator it = temp_inputlist.begin(); it != temp_inputlist.end() && $1; ++it) {
+        PyObject* item = *it;
+
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_selection) {
             $1 = 1;
           } else {
             $1 = 0;
           }
-        } else {
-          $1 = 0;
-        }
-      } else
-      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
-        if (temp_point) {
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_attribute, $descriptor(std::shared_ptr<ModelAPI_Attribute> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_attribute) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_object) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_interface) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_pair, $descriptor(std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_pair) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else
+        if (PyTuple_Check(item)) {
+          if (PyTuple_Size(item) == 2) {
+            if (PyNumber_Check(PySequence_GetItem(item, 0)) && PyNumber_Check(PySequence_GetItem(item, 1))) {
+              $1 = 1;
+            } else {
+              $1 = 0;
+            }
+          } else {
+            $1 = 0;
+          }
+        } else
+        if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+          if (temp_point) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else
+        if (PyNumber_Check(item)) {
           $1 = 1;
         } else {
           $1 = 0;
