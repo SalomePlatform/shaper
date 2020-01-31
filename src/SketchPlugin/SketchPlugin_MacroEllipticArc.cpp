@@ -360,7 +360,7 @@ GeomShapePtr SketchPlugin_MacroEllipticArc::getArcShape()
     return GeomShapePtr();
 
   SketchPlugin_Sketch* aSketch = sketch();
-  if (!aSketch)
+  if (!aSketch || myCenter->distance(myMajorAxis) < 1.e-7)
     return GeomShapePtr();
 
   GeomPointPtr aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
