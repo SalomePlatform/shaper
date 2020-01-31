@@ -469,6 +469,9 @@ private:
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
                         const bool isToDisplay, const bool isFlushRedisplay = true);
 
+  /// Returns true if current mode of objects creation is by drag mouse
+  bool isDragModeCreation() const;
+
 private:
   /// Updates selection priority of the presentation
   /// \param theObject object to find a presentation which will be corrected

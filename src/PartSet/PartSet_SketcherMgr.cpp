@@ -349,15 +349,34 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 }
 */
 
+bool PartSet_SketcherMgr::isDragModeCreation() const
+{
+  ModuleBase_Operation* aOp = getCurrentOperation();
+  if (!aOp)
+    return false;
+  bool aUserPref = Config_PropManager::boolean(SKETCH_TAB_NAME, "create_by_dragging");
+  if (!aUserPref)
+    return false;
+  QString aId = aOp->id();
+  // Acceptable features;
+  QStringList aList;
+  aList << "SketchLine" << "SketchMacroCircle" << "SketchMacroArc" <<
+    "SketchMacroEllipse" << "SketchMacroEllipticArc" << "SketchRectangle";
+  return aList.contains(aId);
+}
+
 static bool MyModeByDrag = false;
 static bool MyMultiselectionState = true;
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  MyModeByDrag = Config_PropManager::boolean(SKETCH_TAB_NAME, "create_by_dragging");
+  MyModeByDrag = isDragModeCreation();
 
   // Clear dragging mode
   myIsDragging = false;
+
+  myMousePoint.setX(theEvent->x());
+  myMousePoint.setY(theEvent->y());
 
   if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
     return;
@@ -406,8 +425,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     // Ignore creation sketch operation
     if ((!isSketcher) && (!isEditing)) {
       if (MyModeByDrag) {
-        myMousePoint.setX(theEvent->x());
-        myMousePoint.setX(theEvent->y());
         ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
         PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
         if (aProcessor) {
@@ -579,11 +596,13 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     if (aOpId == "Sketch")
       return;
     QPoint aPnt(theEvent->x(), theEvent->y());
-    if (aPnt == myMousePoint) {
+    anActiveWidget = getActiveWidget();
+    if ((aPnt == myMousePoint) && anActiveWidget) {
       aOp->abort();
       return;
     }
-    if ((aOpId != "SketchMacroArc") && (!isEditing)) {
+    bool aCanRestart = !anActiveWidget && !isEditing;
+    if (aCanRestart) {
       module()->launchOperation(aOpId, true);
     }
   }
