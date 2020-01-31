@@ -44,6 +44,7 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
+static const double TOLERANCE = 1.e-7;
 
 SketchPlugin_MacroEllipse::SketchPlugin_MacroEllipse()
 : SketchPlugin_SketchEntity(),
@@ -168,6 +169,9 @@ void SketchPlugin_MacroEllipse::attributeChanged(const std::string& theID)
       anEllipsePoints[0]->setX(0.5 * (anEllipsePoints[0]->x() + anEllipsePoints[1]->x()));
       anEllipsePoints[0]->setY(0.5 * (anEllipsePoints[0]->y() + anEllipsePoints[1]->y()));
     }
+
+    if (anEllipsePoints[0]->distance(anEllipsePoints[1]) < TOLERANCE)
+      return; // ellipse is not valid
 
     std::shared_ptr<GeomAPI_Ellipse2d> anEllipse;
     if (aNbInitialized == 2) {

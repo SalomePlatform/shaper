@@ -421,6 +421,8 @@
                                      tooltip="Passed point coordinates"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
+            <validator id="GeomValidators_Different" parameters="first_point,second_point,passed_point"/>
+            <validator id="SketchPlugin_DifferentPointReference" parameters="first_point_ref,second_point_ref"/>
           </box>
           <box id="by_major_axis_and_point"
                icon="icons/Sketch/ellipse_axes_32x32.png"
@@ -443,6 +445,8 @@
                                      tooltip="Passed point coordinates"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
+            <validator id="GeomValidators_Different" parameters="first_point_1,second_point_1,passed_point_1"/>
+            <validator id="SketchPlugin_DifferentPointReference" parameters="first_point_ref_1,second_point_ref_1"/>
           </box>
         </toolbox>
         <labelvalue id="major_radius"
@@ -594,6 +598,10 @@
                    default="false"
                    obligatory="0"
                    change_visual_attributes="true"/>
+        <validator id="GeomValidators_Different" parameters="center,major_axis_point"/>
+        <validator id="SketchPlugin_DifferentPointReference" parameters="center_ref,major_axis_point_ref"/>
+        <validator id="GeomValidators_Different" parameters="start_point,end_point"/>
+        <validator id="SketchPlugin_DifferentPointReference" parameters="start_point_ref,end_point_ref"/>
       </feature>
     </group>
 

@@ -42,6 +42,7 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 
 
+const double TOLERANCE = 1.e-7;
 const double paramTolerance = 1.e-4;
 const double PI = 3.141592653589793238463;
 
@@ -131,6 +132,9 @@ void SketchPlugin_MacroEllipticArc::attributeChanged(const std::string& theID)
   myMajorAxis = anEllipsePoints[1];
   myStartPnt  = anEllipsePoints[2];
   myEndPnt    = anEllipsePoints[3];
+
+  if (myCenter->distance(myMajorAxis) < TOLERANCE)
+    return; // ellipse is not valid
 
   std::shared_ptr<GeomAPI_Ellipse2d> anEllipse;
   if (aNbInitialized == 2) {
