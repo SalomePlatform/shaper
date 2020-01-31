@@ -359,11 +359,13 @@ void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviou
     return;
   }
 
-  if (module()->sketchMgr()->isDragModeCreation())
-    return;
-
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
+  if (module()->sketchMgr()->isDragModeCreation()) {
+    if (aFOperation && myIsAutoConstraints)
+      addConstraints(aFOperation->feature());
+    return;
+  }
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return;
 
