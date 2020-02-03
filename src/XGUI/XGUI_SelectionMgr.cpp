@@ -142,9 +142,14 @@ void XGUI_SelectionMgr::onViewerSelection()
   myLastSelectionPlace = ModuleBase_ISelection::Viewer;
   QList<ModuleBase_ViewerPrsPtr> aValues;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull())
+  if (!aContext.IsNull()) {
     aValues = selection()->getSelected(ModuleBase_ISelection::Viewer);
-
+    // Update is necessary for OCCT 7.4.0: when it is clears selection it doesn't updates viewer
+#if OCC_VERSION_HEX == 0x070400
+    if (aValues.isEmpty())
+      aContext->UpdateCurrentViewer();
+#endif
+  }
   QObjectPtrList anObjects;
   convertToObjectBrowserSelection(aValues, anObjects);
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
