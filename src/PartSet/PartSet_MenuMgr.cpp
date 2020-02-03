@@ -46,6 +46,7 @@
 #include <XGUI_DataModel.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -56,6 +57,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QEvent>
+#include <QApplication>
 
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
@@ -104,6 +106,10 @@ void PartSet_MenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(":icons/edit.png"), tr("Edit..."), aParent,
                          this, SLOT(onEdit(bool)));
   myActions["EDIT_CMD"] = aAction;
+
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Load all parts"), aParent,
+                        this, SLOT(onActivateAllParts()));
+  myActions["ACTIVATE_ALL_PARTS_CMD"] = aAction;
 }
 
 
@@ -501,6 +507,39 @@ void PartSet_MenuMgr::activatePart(ResultPartPtr thePart) const
     std::list<bool> aStates;
     aDoc->restoreNodesState(aStates);
     aObjBrowser->setStateForDoc(aDoc, aStates);
+  }
+}
+
+void PartSet_MenuMgr::onActivateAllParts()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isOperation())
+    return;
+
+  DocumentPtr aDoc = aMgr->moduleDocument();
+  int aNbParts = aDoc->size(ModelAPI_ResultPart::group());
+  bool isActivated = false;
+  QList<ResultPartPtr> aPartsToLoad;
+  for (int i = 0; i < aNbParts; i++) {
+    ObjectPtr aObj = aDoc->object(ModelAPI_ResultPart::group(), i);
+    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (!aPartRes->partDoc().get())
+      aPartsToLoad.append(aPartRes);
+  }
+  if (!aPartsToLoad.isEmpty()) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    aMgr->startOperation("All Parts loading");
+    foreach(ResultPartPtr aPartRes, aPartsToLoad) {
+      aPartRes->loadPart();
+    }
+    aMgr->finishOperation();
+
+    XGUI_Workshop* aWorkshop = myModule->getWorkshop();
+    XGUI_ObjectsBrowser* aObjBrowser = aWorkshop->objectBrowser();
+    aObjBrowser->update();
+    aWorkshop->viewer()->update();
+    aWorkshop->updateCommandStatus();
+    QApplication::restoreOverrideCursor();
   }
 }
 

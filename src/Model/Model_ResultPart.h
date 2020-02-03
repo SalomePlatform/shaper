@@ -95,6 +95,9 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the shape selected in the selection index
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> selectionValue(const int theIndex);
 
+  /// Loading the part from file
+  MODEL_EXPORT virtual void loadPart();
+
 protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();

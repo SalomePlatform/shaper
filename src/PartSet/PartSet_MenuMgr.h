@@ -100,6 +100,9 @@ private slots:
   /// A slot called on edit of feature
   void onEdit(bool);
 
+  /// Activates all not loaded parts
+  void onActivateAllParts();
+
 protected:
   /// Redefinition of virtual method
   /// \param theObj an object

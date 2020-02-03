@@ -97,6 +97,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 
   /// Updates the shape-result of the part (called on Part feature execution)
   virtual void updateShape() = 0;
+
+  /// Loading the part from file
+  virtual void loadPart() = 0;
 };
 
 //! Pointer on feature object

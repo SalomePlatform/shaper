@@ -89,7 +89,8 @@ void Model_ResultPart::activate()
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!aMgr->isOperation()) {
     // open transaction even document is not created to set current docs in setActiveDocument
-    aMgr->startOperation("Activation");
+    std::string aMsg = "Activation " + data()->name();
+    aMgr->startOperation(aMsg);
     isNewTransaction = true;
   }
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
@@ -112,6 +113,22 @@ void Model_ResultPart::activate()
     aMgr->finishOperation();
   }
 }
+
+
+void Model_ResultPart::loadPart()
+{
+  std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
+  if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
+    Handle(Model_Application) anApp = Model_Application::getApplication();
+    if (anApp->isLoadByDemand(data()->name(), aDocRef->docId())) {
+      anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just new part, load fails
+    }
+    else {
+      anApp->createDocument(aDocRef->docId());
+    }
+  }
+}
+
 
 std::shared_ptr<ModelAPI_ResultPart> Model_ResultPart::original()
 {

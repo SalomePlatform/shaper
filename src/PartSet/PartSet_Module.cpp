@@ -1313,6 +1313,27 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
 
   QMenu aMenu;
   aMenu.addAction(aActivatePartAction);
+
+#ifndef HAVE_SALOME
+  if (aMgr->activeDocument() == aMgr->moduleDocument()) {
+    DocumentPtr aDoc = aMgr->moduleDocument();
+    int aNbParts = aDoc->size(ModelAPI_ResultPart::group());
+    bool aHaveToActivate = false;
+    for (int i = 0; i < aNbParts; i++) {
+      ObjectPtr aObj = aDoc->object(ModelAPI_ResultPart::group(), i);
+      ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+      if (!aPartRes->partDoc().get()) {
+        aHaveToActivate = true;
+        break;
+      }
+    }
+    if (aHaveToActivate) {
+      QAction* aActivateAllPartAction = myMenuMgr->action("ACTIVATE_ALL_PARTS_CMD");
+      aMenu.addAction(aActivateAllPartAction);
+    }
+  }
+#endif
+
   aMenu.exec(aHeader->mapToGlobal(thePnt));
 }
 
