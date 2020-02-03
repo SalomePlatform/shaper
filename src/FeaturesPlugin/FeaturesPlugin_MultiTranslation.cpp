@@ -209,8 +209,8 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
                                                aListOfTranslationAlgo, aCompound, "Translated");
 
       setResult(aResultBody, aResultIndex);
+      aResultIndex++;
     }
-    aResultIndex++;
   }
 
   // Remove the rest results if there were produced in the previous pass.
@@ -410,8 +410,8 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
                                                aListOfTranslationAlgo, aCompound, "Translated");
 
       setResult(aResultBody, aResultIndex);
+      aResultIndex++;
     }
-    aResultIndex++;
   }
 
   // Remove the rest results if there were produced in the previous pass.

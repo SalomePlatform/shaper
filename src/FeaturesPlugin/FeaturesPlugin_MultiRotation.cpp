@@ -227,8 +227,8 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
                                                aListOfRotationAlgo, aCompound, "Rotated");
 
       setResult(aResultBody, aResultIndex);
+      aResultIndex++;
     }
-    aResultIndex++;
   }
 
   // Remove the rest results if there were produced in the previous pass.
@@ -412,8 +412,8 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
       loadNamingDS2(aListOfTranslationAlgo, aResultBody, aBaseShape);
       loadNamingDS3(aListOfRotationAlgo, aResultBody, aBaseShape, nbRadial);
       setResult(aResultBody, aResultIndex);
+      aResultIndex++;
     }
-    aResultIndex++;
   }
 
   // Remove the rest results if there were produced in the previous pass.

@@ -566,4 +566,6 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestDefeaturing_OnCompsolid2.py
                TestDefeaturing_OnCompsolid3.py
                TestDefeaturing_OnCompound.py
+               Test3137_1.py
+               Test3137_2.py
 )
