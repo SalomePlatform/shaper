@@ -29,6 +29,24 @@
 
 #include <Config_ModuleReader.h>
 
+#ifdef EXCHANGEPLUGIN_DUMP_NAMING
+static const bool THE_DUMP_NAMING = true;
+#else
+static const bool THE_DUMP_NAMING = false;
+#endif
+
+#ifdef EXCHANGEPLUGIN_DUMP_GEO
+static const bool THE_DUMP_GEO = true;
+#else
+static const bool THE_DUMP_GEO = false;
+#endif
+
+#ifdef EXCHANGEPLUGIN_DUMP_WEAK
+static const bool THE_DUMP_WEAK = true;
+#else
+static const bool THE_DUMP_WEAK = false;
+#endif
+
 
 ExchangePlugin_Dump::ExchangePlugin_Dump()
 {
@@ -48,9 +66,9 @@ void ExchangePlugin_Dump::initAttributes()
   data()->addAttribute(WEAK_NAMING_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
 
   // default values
-  boolean(TOPOLOGICAL_NAMING_DUMP_ID())->setValue(true);
-  boolean(GEOMETRIC_DUMP_ID())->setValue(true);
-  boolean(WEAK_NAMING_DUMP_ID())->setValue(false);
+  boolean(TOPOLOGICAL_NAMING_DUMP_ID())->setValue(THE_DUMP_NAMING);
+  boolean(GEOMETRIC_DUMP_ID())->setValue(THE_DUMP_GEO);
+  boolean(WEAK_NAMING_DUMP_ID())->setValue(THE_DUMP_WEAK);
 }
 
 void ExchangePlugin_Dump::execute()
