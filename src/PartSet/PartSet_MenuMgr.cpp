@@ -107,8 +107,8 @@ void PartSet_MenuMgr::createActions()
                          this, SLOT(onEdit(bool)));
   myActions["EDIT_CMD"] = aAction;
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Load all parts"), aParent,
-                        this, SLOT(onActivateAllParts()));
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Load all parts"),
+    aParent, this, SLOT(onActivateAllParts()));
   myActions["ACTIVATE_ALL_PARTS_CMD"] = aAction;
 }
 
