@@ -226,7 +226,15 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   // Load translations
   QStringList aLangs;
   aLangs << "*_en.ts"; // load by default eng translations
+
+  /// If version of OCCT is 7.4.0 or more then it means that
+  /// this is version of SALOME older then 9.4.0
+#if OCC_VERSION_HEX >= 0x070400
+  QString aCurrLang = aResMgr->language();
+#else
   QString aCurrLang = aResMgr->stringValue("language", "language", "en");
+#endif
+
   if(aCurrLang != "en") {
     aLangs << "*_" + aCurrLang + ".ts"; // then replace with translated files
   }
