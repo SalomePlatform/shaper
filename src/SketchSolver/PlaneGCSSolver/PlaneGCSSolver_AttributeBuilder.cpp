@@ -216,9 +216,9 @@ bool PlaneGCSSolver_AttributeBuilder::updateAttribute(
     std::shared_ptr<GeomDataAPI_Point2DArray> anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute);
 
+    std::vector<PointWrapperPtr> aPointsArray = aWrapper->array();
+    std::vector<PointWrapperPtr>::iterator aPos = aPointsArray.begin();
     if (aWrapper->size() != anAttribute->size()) {
-      std::vector<PointWrapperPtr> aPointsArray = aWrapper->array();
-      std::vector<PointWrapperPtr>::iterator aPos = aPointsArray.begin();
       while (anAttribute->size() > (int)aPointsArray.size()) {
         // add points to the middle of array
         GeomPnt2dPtr aValue;
@@ -241,6 +241,15 @@ bool PlaneGCSSolver_AttributeBuilder::updateAttribute(
       }
 
       aWrapper->setArray(aPointsArray);
+    }
+    else {
+      // update coordinates of points
+      for (int anIndex = 0; aPos != aPointsArray.end(); ++aPos, ++anIndex) {
+        const GCSPointPtr& aGCSPoint = (*aPos)->point();
+        GeomPnt2dPtr aCoord = anAttribute->pnt(anIndex);
+        *aGCSPoint->x = aCoord->x();
+        *aGCSPoint->y = aCoord->y();
+      }
     }
   }
   else if (theEntity->type() == ENTITY_SCALAR_ARRAY) {

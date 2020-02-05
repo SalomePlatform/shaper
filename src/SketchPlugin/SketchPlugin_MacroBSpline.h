@@ -123,6 +123,11 @@ private:
   static void createAuxiliarySegment(std::shared_ptr<GeomDataAPI_Point2DArray> theBSplinePoles,
                                      const int thePoleIndex1,
                                      const int thePoleIndex2);
+  /// Set name of auxiliary feature representing the control polygon
+  static void assignDefaultNameForAux(FeaturePtr theAuxFeature,
+                                      std::shared_ptr<GeomDataAPI_Point2DArray> theBSplinePoles,
+                                      const int thePoleIndex1,
+                                      const int thePoleIndex2 = -1);
   friend class SketchPlugin_BSplineBase;
 
 private:

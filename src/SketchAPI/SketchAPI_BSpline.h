@@ -97,6 +97,12 @@ public:
       const std::list<int>& regular   = std::list<int>(),
       const std::list<int>& auxiliary = std::list<int>()) const;
 
+  /// Insert new pole after the pole with the given index
+  SKETCHAPI_EXPORT
+  bool insertPole(const int theIndex,
+                  const std::shared_ptr<GeomAPI_Pnt2d>& theCoordinates,
+                  const ModelHighAPI_Double& theWeight = ModelHighAPI_Double(1.0));
+
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

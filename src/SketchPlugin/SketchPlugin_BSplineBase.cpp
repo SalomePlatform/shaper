@@ -22,6 +22,7 @@
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MacroBSpline.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
 
 #include <Events_InfoMessage.h>
@@ -108,55 +109,6 @@ bool SketchPlugin_BSplineBase::isFixed() {
 }
 
 void SketchPlugin_BSplineBase::attributeChanged(const std::string& theID) {
-  // the second condition for unability to move external segments anywhere
-  if (theID == EXTERNAL_ID() || isFixed()) {
-    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
-    if (!aSelection) {
-      // empty shape in selection shows that the shape is equal to context
-      ResultPtr anExtRes = selection(EXTERNAL_ID())->context();
-      if (anExtRes)
-        aSelection = anExtRes->shape();
-    }
-////    // update arguments due to the selection value
-////    if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
-////      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aSelection));
-////      std::shared_ptr<GeomAPI_Ellipse> anEllipse = anEdge->ellipse();
-////
-////      bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-////      std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
-////        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
-////      aCenterAttr->setValue(sketch()->to2D(anEllipse->center()));
-////
-////      std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
-////        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_FOCUS_ID()));
-////      aFocusAttr->setValue(sketch()->to2D(anEllipse->firstFocus()));
-////
-////      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr =
-////        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
-////      aStartAttr->setValue(sketch()->to2D(anEdge->firstPoint()));
-////
-////      std::shared_ptr<GeomDataAPI_Point2D> aEndAttr =
-////        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_ID()));
-////      aEndAttr->setValue(sketch()->to2D(anEdge->lastPoint()));
-////
-////      real(MAJOR_RADIUS_ID())->setValue(anEllipse->majorRadius());
-////      real(MINOR_RADIUS_ID())->setValue(anEllipse->minorRadius());
-////
-////      double aStartParam, aMidParam, aEndParam;
-////      anEllipse->parameter(anEdge->firstPoint(), tolerance, aStartParam);
-////      anEllipse->parameter(anEdge->middlePoint(), tolerance, aMidParam);
-////      anEllipse->parameter(anEdge->lastPoint(), tolerance, aEndParam);
-////      if (aEndParam < aStartParam)
-////        aEndParam += 2.0 * PI;
-////      if (aMidParam < aStartParam)
-////        aMidParam += 2.0 * PI;
-////      boolean(REVERSED_ID())->setValue(aMidParam > aEndParam);
-////
-////      data()->blockSendAttributeUpdated(aWasBlocked, false);
-////
-////      fillCharacteristicPoints();
-////    }
-  }
 }
 
 bool SketchPlugin_BSplineBase::customAction(const std::string& theActionId)
@@ -175,7 +127,7 @@ bool SketchPlugin_BSplineBase::customAction(const std::string& theActionId)
   }
 
   std::string aMsg = "Error: Feature \"%1\" does not support action \"%2\".";
-  Events_InfoMessage("SketchPlugin_BSplineBase", aMsg).arg(getKind()).arg(anAction).send();
+  Events_InfoMessage("SketchPlugin_BSplineBase", aMsg).arg(getKind()).arg(theActionId).send();
   return false;
 }
 
@@ -189,31 +141,41 @@ bool SketchPlugin_BSplineBase::addPole(const int theAfter)
 
   // find internal coincidences applied to the poles with greater indices
   std::list<AttributeIntegerPtr> aCoincidentPoleIndex;
+  std::map<int, FeaturePtr> aControlPoles, aControlSegments;
   bool hasAuxSegment = false;
   const std::set<AttributePtr>& aRefs = data()->refsToMe();
   for (std::set<AttributePtr>::iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt) {
     FeaturePtr aFeature = ModelAPI_Feature::feature((*anIt)->owner());
     if (aFeature->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
       AttributeIntegerPtr anIndex;
-      if ((*anIt)->id() == SketchPlugin_ConstraintCoincidenceInternal::ENTITY_A())
+      AttributeRefAttrPtr aNonSplinePoint;
+      if ((*anIt)->id() == SketchPlugin_ConstraintCoincidenceInternal::ENTITY_A()) {
         anIndex = aFeature->integer(SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A());
-      else if ((*anIt)->id() == SketchPlugin_ConstraintCoincidenceInternal::ENTITY_B())
+        aNonSplinePoint = aFeature->refattr(SketchPlugin_Constraint::ENTITY_B());
+      }
+      else if ((*anIt)->id() == SketchPlugin_ConstraintCoincidenceInternal::ENTITY_B()) {
         anIndex = aFeature->integer(SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+        aNonSplinePoint = aFeature->refattr(SketchPlugin_Constraint::ENTITY_A());
+      }
 
       if (anIndex && anIndex->isInitialized()) {
-        if (anIndex->value() > anAfter)
+        if (anIndex->value() > anAfter) {
           aCoincidentPoleIndex.push_back(anIndex);
+          FeaturePtr aParent = ModelAPI_Feature::feature(aNonSplinePoint->attr()->owner());
+          if (aParent->getKind() == SketchPlugin_Point::ID())
+            aControlPoles[anIndex->value()] = aParent;
+          else if (aParent->getKind() == SketchPlugin_Line::ID() &&
+                   aNonSplinePoint->attr()->id() == SketchPlugin_Line::START_ID())
+            aControlSegments[anIndex->value()] = aParent;
+        }
         else if (anIndex->value() == anAfter && !hasAuxSegment) {
           // check the constrained object is a segment of the control polygon
-          const std::string& anOtherAttr =
-              (*anIt)->id() == SketchPlugin_ConstraintCoincidenceInternal::ENTITY_A() ?
-                               SketchPlugin_ConstraintCoincidenceInternal::ENTITY_B() :
-                               SketchPlugin_ConstraintCoincidenceInternal::ENTITY_A();
-          AttributeRefAttrPtr aRefAttr = aFeature->refattr(anOtherAttr);
-          if (aRefAttr && !aRefAttr->isObject() &&
-              aRefAttr->attr()->id() == SketchPlugin_Line::START_ID()) {
+          if (aNonSplinePoint && !aNonSplinePoint->isObject() &&
+              aNonSplinePoint->attr()->id() == SketchPlugin_Line::START_ID()) {
             hasAuxSegment = true;
             aCoincidentPoleIndex.push_back(anIndex);
+            aControlSegments[anIndex->value()] =
+                ModelAPI_Feature::feature(aNonSplinePoint->attr()->owner());
           }
         }
       }
@@ -282,6 +244,17 @@ bool SketchPlugin_BSplineBase::addPole(const int theAfter)
   SketchPlugin_MacroBSpline::createAuxiliaryPole(aPolesArray, anAfter + 1);
   if (hasAuxSegment)
     SketchPlugin_MacroBSpline::createAuxiliarySegment(aPolesArray, anAfter, anAfter + 1);
+
+  // update names of features representing control polygon
+  for (std::map<int, FeaturePtr>::iterator anIt = aControlPoles.begin();
+       anIt != aControlPoles.end(); ++anIt) {
+    SketchPlugin_MacroBSpline::assignDefaultNameForAux(anIt->second, aPolesArray, anIt->first + 1);
+  }
+  for (std::map<int, FeaturePtr>::iterator anIt = aControlSegments.begin();
+       anIt != aControlSegments.end(); ++anIt) {
+    SketchPlugin_MacroBSpline::assignDefaultNameForAux(anIt->second, aPolesArray,
+        anIt->first + 1, (anIt->first + 2) % aPolesArray->size());
+  }
 
   return true;
 }

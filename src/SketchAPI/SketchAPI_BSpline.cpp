@@ -473,6 +473,46 @@ void SketchAPI_BSpline::dumpControlPolygon(
   theDumper << ")" << std::endl;
 }
 
+static void setCoordinates(const FeaturePtr& theFeature,
+                           const std::string& theAttrName,
+                           const GeomPnt2dPtr& theCoordinates)
+{
+  AttributePoint2DPtr aPoint =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->attribute(theAttrName));
+  aPoint->setValue(theCoordinates);
+}
+
+bool SketchAPI_BSpline::insertPole(const int theIndex,
+                                   const GeomPnt2dPtr& theCoordinates,
+                                   const ModelHighAPI_Double& theWeight)
+{
+  std::ostringstream anActionName;
+  anActionName << SketchPlugin_BSplineBase::ADD_POLE_ACTION_ID() << "#" << theIndex;
+  bool isOk = feature()->customAction(anActionName.str());
+  if (isOk) {
+    int anIndex = theIndex + 1;
+    if (feature()->getKind() == SketchPlugin_BSpline::ID() && anIndex + 1 >= poles()->size())
+      anIndex = poles()->size() - 2;
+    // initialize coordinates and weight of new pole
+    poles()->setPnt(anIndex, theCoordinates);
+    weights()->setValue(anIndex, theWeight.value());
+
+    // update coordinates of points of control polygon
+    std::map<int, FeaturePtr> aPoints, aLines;
+    collectAuxiliaryFeatures(feature(), aPoints, aLines);
+    std::map<int, FeaturePtr>::iterator aFound = aPoints.find(anIndex);
+    if (aFound != aPoints.end())
+      setCoordinates(aFound->second, SketchPlugin_Point::COORD_ID(), theCoordinates);
+    aFound = aLines.find(anIndex);
+    if (aFound != aLines.end())
+      setCoordinates(aFound->second, SketchPlugin_Line::START_ID(), theCoordinates);
+    aFound = aLines.find(anIndex - 1);
+    if (aFound != aLines.end())
+      setCoordinates(aFound->second, SketchPlugin_Line::END_ID(), theCoordinates);
+  }
+  return isOk;
+}
+
 
 
 // =================================================================================================

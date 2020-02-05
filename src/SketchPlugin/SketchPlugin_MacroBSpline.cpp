@@ -309,6 +309,24 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
 
 // ==========================     Auxiliary functions    ===========================================
 
+void SketchPlugin_MacroBSpline::assignDefaultNameForAux(FeaturePtr theAuxFeature,
+                                                        AttributePoint2DArrayPtr theBSplinePoles,
+                                                        const int thePoleIndex1,
+                                                        const int thePoleIndex2)
+{
+  FeaturePtr aBSpline = ModelAPI_Feature::feature(theBSplinePoles->owner());
+
+  std::ostringstream aName;
+  aName << aBSpline->name();
+  if (theAuxFeature->getKind() == SketchPlugin_Point::ID())
+    aName << "_" << theBSplinePoles->id() << "_" << thePoleIndex1;
+  else
+    aName << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
+
+  theAuxFeature->data()->setName(aName.str());
+  theAuxFeature->lastResult()->data()->setName(aName.str());
+}
+
 FeaturePtr SketchPlugin_MacroBSpline::createAuxiliaryPole(AttributePoint2DArrayPtr theBSplinePoles,
                                                           const int thePoleIndex)
 {
@@ -329,11 +347,7 @@ FeaturePtr SketchPlugin_MacroBSpline::createAuxiliaryPole(AttributePoint2DArrayP
   aCoord->setValue(aPole);
 
   aPointFeature->execute();
-
-  std::ostringstream aName;
-  aName << aBSpline->name() << "_" << theBSplinePoles->id() << "_" << thePoleIndex;
-  aPointFeature->data()->setName(aName.str());
-  aPointFeature->lastResult()->data()->setName(aName.str());
+  assignDefaultNameForAux(aPointFeature, theBSplinePoles, thePoleIndex);
 
   // internal constraint to keep position of the point
   createInternalConstraint(aSketch, aCoord, theBSplinePoles, thePoleIndex);
@@ -364,11 +378,7 @@ void SketchPlugin_MacroBSpline::createAuxiliarySegment(AttributePoint2DArrayPtr 
   aLineEnd->setValue(theBSplinePoles->pnt(thePoleIndex2));
 
   aLineFeature->execute();
-
-  std::ostringstream aName;
-  aName << aBSpline->name() << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
-  aLineFeature->data()->setName(aName.str());
-  aLineFeature->lastResult()->data()->setName(aName.str());
+  assignDefaultNameForAux(aLineFeature, theBSplinePoles, thePoleIndex1, thePoleIndex2);
 
   // internal constraints to keep the segment position
   createInternalConstraint(aSketch, aLineStart, theBSplinePoles, thePoleIndex1);
