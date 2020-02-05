@@ -80,11 +80,12 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(
       DocumentPtr aDoc = aObj->document();
       SessionPtr aMgr = ModelAPI_Session::get();
 
-      ModuleBase_ModelWidget* aWidget = anOperation->propertyPanel()->activeWidget();
-      if (aWidget && aWidget->canUseExternalParts())
-        aValid = Standard_True;
-      else
-        aValid = (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
+      if (anOperation->propertyPanel()) {
+        ModuleBase_ModelWidget* aWidget = anOperation->propertyPanel()->activeWidget();
+        if (aWidget && aWidget->canUseExternalParts())
+          return Standard_True;
+      }
+      return (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
     }
     else {
       // This object is not controlled by the filter
