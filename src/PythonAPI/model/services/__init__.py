@@ -29,3 +29,9 @@ from ModelHighAPI import reset
 from ModelHighAPI import addFolder, removeFolder
 from ModelHighAPI import ModelHighAPI_Selection as selection
 from ModelHighAPI import checkPythonDump as checkPythonDump
+
+# a method used for the python dump of the SHAPER STUDY
+def publishToShaperStudy():
+  begin()
+  activeDocument().addFeature("PublishToStudy")
+  end()
