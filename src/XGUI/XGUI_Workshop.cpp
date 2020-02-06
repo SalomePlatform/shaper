@@ -1302,6 +1302,7 @@ void XGUI_Workshop::onImportPart()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ImportPart::ID()));
+    myPropertyPanel->updateApplyPlusButton(anImportPartOp->feature());
     operationMgr()->startOperation(anImportPartOp);
   }
 }
@@ -1312,6 +1313,7 @@ void XGUI_Workshop::onImportShape()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_Import::ID()));
+    myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
     operationMgr()->startOperation(anImportOp);
   }
 }
@@ -1322,6 +1324,7 @@ void XGUI_Workshop::onExportPart()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anExportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ExportPart::ID()));
+    myPropertyPanel->updateApplyPlusButton(anExportPartOp->feature());
     operationMgr()->startOperation(anExportPartOp);
   }
 }
