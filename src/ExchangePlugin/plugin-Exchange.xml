@@ -1,8 +1,20 @@
 <plugin>
   <workbench id="Part">
     <group id="Exchange">
-      <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png" document="Part"
-               helpfile="importFeature.html">
+      <feature id="ImportMacro" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
+               helpfile="importFeature.html"
+               internal="1">
+        <file_selector id="file_path" title="Import file" path="">
+          <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
+        </file_selector>
+        <choice id="target_part"
+                string_list_attribute="target_parts_list"
+                label="Import to"
+                tooltip="Select the part to import the document" />
+      </feature>
+      <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
+               helpfile="importFeature.html"
+               internal="1">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
         </file_selector>

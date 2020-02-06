@@ -80,6 +80,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultField.h>
+#include <ModuleBase_IconFactory.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -89,6 +90,7 @@
 
 #include <ExchangePlugin_ExportPart.h>
 #include <ExchangePlugin_ImportPart.h>
+#include <ExchangePlugin_Import.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -491,6 +493,13 @@ void XGUI_Workshop::initMenu()
                                           QIcon(), QKeySequence(),
                                           false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportPart()));
+
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_SHAPE_CMD", tr("Import shape..."),
+    tr("Import shape from a file"),
+    ModuleBase_IconFactory::loadIcon("icons/Exchange/import.png"),
+    QKeySequence(), false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportShape()));
+
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
 #else
@@ -1294,6 +1303,16 @@ void XGUI_Workshop::onImportPart()
     ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ImportPart::ID()));
     operationMgr()->startOperation(anImportPartOp);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onImportShape()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_Import::ID()));
+    operationMgr()->startOperation(anImportOp);
   }
 }
 

@@ -401,6 +401,9 @@ signals:
   /// Import part structure from a file
   void onImportPart();
 
+  /// Import part structure from a file
+  void onImportShape();
+
   /// Export features to a file
   void onExportPart();
 
