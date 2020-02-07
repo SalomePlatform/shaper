@@ -314,6 +314,15 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       double aTransparency = ModelAPI_Tools::getTransparency(aResult);
       if ((aTransparency >= 0) && (aTransparency != aAISObj->getTransparency()))
         aAISObj->setTransparency(aTransparency);
+
+      // Set Iso-Lines
+      std::vector<int> aIsoValues;
+      ModelAPI_Tools::getIsoLines(aResult, aIsoValues);
+      if (aIsoValues.size() > 0) {
+        Handle(ModuleBase_ResultPrs) aResPrs = Handle(ModuleBase_ResultPrs)::DownCast(aAISIO);
+        if (!aResPrs.IsNull())
+          aResPrs->setIsolinesNumber(aIsoValues[0], aIsoValues[1]);
+      }
     }
     myWorkshop->module()->storeSelection();
 

@@ -785,6 +785,19 @@ void removeResults(const std::list<ResultPtr>& theResults)
   }
 }
 
+
+//**************************************************************
+void setDeflection(ResultPtr theResult, const double theDeflection)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
+  if (aDeflectionAttr.get() != NULL) {
+    aDeflectionAttr->setValue(theDeflection);
+  }
+}
+
 // used by GUI only
 // LCOV_EXCL_START
 double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult)
@@ -803,6 +816,22 @@ double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult)
   return aDeflection;
 }
 
+//******************************************************
+void setColor(ResultPtr theResult, const std::vector<int>& theColor)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+  if (aColorAttr.get() != NULL) {
+    if (!aColorAttr->size()) {
+      aColorAttr->setSize(3);
+    }
+    aColorAttr->setValue(0, theColor[0]);
+    aColorAttr->setValue(1, theColor[1]);
+    aColorAttr->setValue(2, theColor[2]);
+  }
+}
 
 void getColor(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int>& theColor)
 {
@@ -816,6 +845,49 @@ void getColor(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int
       theColor.push_back(aColorAttr->value(1));
       theColor.push_back(aColorAttr->value(2));
     }
+  }
+}
+
+//******************************************************
+void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int>& theNbLines)
+{
+  theNbLines.clear();
+  // get color from the attribute of the result
+  if (theResult.get() != NULL &&
+    theResult->data()->attribute(ModelAPI_Result::ISO_LINES_ID()).get() != NULL) {
+    AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+    if (aAttr.get() && aAttr->size()) {
+      theNbLines.push_back(aAttr->value(0));
+      theNbLines.push_back(aAttr->value(1));
+    }
+  }
+}
+
+//******************************************************
+void setIsoLines(ResultPtr theResult, const std::vector<int>& theIso)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+  if (aAttr.get() != NULL) {
+    if (!aAttr->size()) {
+      aAttr->setSize(2);
+    }
+    aAttr->setValue(0, theIso[0]);
+    aAttr->setValue(1, theIso[1]);
+  }
+}
+
+//**************************************************************
+void setTransparency(ResultPtr theResult, double theTransparency)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+  if (anAttribute.get() != NULL) {
+    anAttribute->setValue(theTransparency);
   }
 }
 
@@ -845,6 +917,16 @@ void copyVisualizationAttrs(
       aDestColor->setSize(aSourceColor->size());
       for(int a = 0; a < aSourceColor->size(); a++)
         aDestColor->setValue(a, aSourceColor->value(a));
+    }
+  }
+  // Iso-lines
+  AttributeIntArrayPtr aSource = theSource->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+  if (aSource.get() && aSource->isInitialized() && aSource->size()) {
+    AttributeIntArrayPtr aDest = theDest->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+    if (aDest.get()) {
+      aDest->setSize(aSource->size());
+      for(int a = 0; a < aSource->size(); a++)
+        aDest->setValue(a, aSource->value(a));
     }
   }
   // deflection

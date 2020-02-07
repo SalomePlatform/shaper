@@ -216,6 +216,13 @@ MODELAPI_EXPORT void removeResults(const std::list<std::shared_ptr<ModelAPI_Resu
 */
 MODELAPI_EXPORT double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult);
 
+/*! Sets the deflection value
+* \param theResult a result object
+* \param a deflection value
+*/
+MODELAPI_EXPORT void setDeflection(std::shared_ptr<ModelAPI_Result> theResult,
+  const double theDeflection);
+
 /*! Returns current color of the current result
 * \param[in] theResult a result object
 * \param[out] theColor a color values if it is defined
@@ -223,11 +230,40 @@ MODELAPI_EXPORT double getDeflection(const std::shared_ptr<ModelAPI_Result>& the
 MODELAPI_EXPORT void getColor(const std::shared_ptr<ModelAPI_Result>& theResult,
   std::vector<int>& theColor);
 
+/*! Set color of the result
+* \param[in] theResult a result object
+* \param[in] theColor a color values
+*/
+MODELAPI_EXPORT void setColor(std::shared_ptr<ModelAPI_Result> theResult,
+  const std::vector<int>& theColor);
+
+/*! Returns number of iso-lines of the current result
+* \param[in] theResult a result object
+* \param[out] theNbLines values of iso-lines
+*/
+MODELAPI_EXPORT void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult,
+  std::vector<int>& theNbLines);
+
+/*! Set number of iso-lines of the result
+* \param[in] theResult a result object
+* \param[in] theIso nb iso-lines
+*/
+MODELAPI_EXPORT void setIsoLines(std::shared_ptr<ModelAPI_Result> theResult,
+  const std::vector<int>& theIso);
+
 /*! Returns current transparency in the given result
 * \param theResult a result object
 * \return a transparency value or -1 if it was not defined
 */
 MODELAPI_EXPORT double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult);
+
+/*! Set transparency for the given result
+* \param theResult a result object
+* \param a transparency value
+*/
+MODELAPI_EXPORT void setTransparency(std::shared_ptr<ModelAPI_Result> theResult,
+  double theTransparency);
+
 
 /*! Copies all visualization attributes from one result to another.
 * \param theSource a result that contains the copied attributes

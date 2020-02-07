@@ -95,5 +95,6 @@
      <file>pictures/ArrowCursor.png</file>
      <file>pictures/CrossCursor.png</file>
      <file>pictures/HandCursor.png</file>
+     <file>pictures/iso_lines.png</file>
  </qresource>
  </RCC>

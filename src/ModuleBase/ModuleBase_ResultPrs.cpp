@@ -83,8 +83,19 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   aDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1));
   aDrawer->SetFaceBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1));
 
-  aDrawer->VIsoAspect()->SetNumber(0);
-  aDrawer->UIsoAspect()->SetNumber(0);
+  Quantity_Color aColor;
+  Color(aColor);
+
+  std::vector<int> aIsoValues;
+  ModelAPI_Tools::getIsoLines(myResult, aIsoValues);
+  if (aIsoValues.size() == 0) {
+    aIsoValues.push_back(1);
+    aIsoValues.push_back(1);
+  }
+  myUIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[0]);
+  myVIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[1]);
+  aDrawer->SetUIsoAspect(myUIsoAspect);
+  aDrawer->SetVIsoAspect(myVIsoAspect);
 
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
@@ -95,8 +106,10 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   if (aDrawer.IsNull()) {
     if (!ModuleBase_IViewer::DefaultHighlightDrawer.IsNull()) {
       aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
-      aDrawer->VIsoAspect()->SetNumber(0);
-      aDrawer->UIsoAspect()->SetNumber(0);
+      Handle(Prs3d_IsoAspect) aUIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, 0);
+      Handle(Prs3d_IsoAspect) aVIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, 0);
+      aDrawer->SetUIsoAspect(aUIsoAspect);
+      aDrawer->SetVIsoAspect(aVIsoAspect);
       SetDynamicHilightAttributes(aDrawer);
     }
   } else {
@@ -127,6 +140,8 @@ void ModuleBase_ResultPrs::SetColor (const Quantity_Color& theColor)
   ViewerData_AISShape::SetColor(theColor);
   myHiddenSubShapesDrawer->ShadingAspect()->SetColor (theColor, myCurrentFacingModel);
   setEdgesDefaultColor();
+  myUIsoAspect->SetColor(theColor);
+  myVIsoAspect->SetColor(theColor);
 }
 
 void ModuleBase_ResultPrs::setEdgesDefaultColor()

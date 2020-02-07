@@ -213,6 +213,10 @@ Q_OBJECT
   /// theObjects a list of selected objects
   void changeTransparency(const QObjectPtrList& theObjects);
 
+  /// Change number of iso-lines for the given objects
+  /// theObjects a list of selected objects
+  void changeIsoLines(const QObjectPtrList& theObjects);
+
   /// Show the given features in 3d Viewer
   void showObjects(const QObjectPtrList& theList, bool isVisible);
 

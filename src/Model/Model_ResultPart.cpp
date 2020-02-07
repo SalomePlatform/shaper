@@ -54,6 +54,7 @@ void Model_ResultPart::initAttributes()
   data()->addAttribute(BASE_REF_ID(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ISO_LINES_ID(), ModelAPI_AttributeIntArray::typeId());
 
   if (aDocRef->isInitialized() && // initialized immediately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))

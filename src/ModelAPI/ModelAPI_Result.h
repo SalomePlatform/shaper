@@ -63,6 +63,14 @@ class ModelAPI_Result : public ModelAPI_Object
     return MY_TRANSPARENCY_ID;
   }
 
+  /// Reference to the transparency of the result.
+  /// The double value is used. The value is in [0, 1] range
+  inline static const std::string& ISO_LINES_ID()
+  {
+    static const std::string MY_ISO_LINES_ID("Iso_lines");
+    return MY_ISO_LINES_ID;
+  }
+
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
   MODELAPI_EXPORT virtual bool isConcealed();
 

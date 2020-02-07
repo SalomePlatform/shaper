@@ -37,6 +37,7 @@ void ModelAPI_Result::initAttributes()
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
   aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
   aData->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
+  aData->addAttribute(ISO_LINES_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
