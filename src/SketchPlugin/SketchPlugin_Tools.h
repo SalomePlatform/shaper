@@ -146,6 +146,9 @@ void customizeFeaturePrs(const AISObjectPtr& thePrs, bool isAxiliary);
 
 void setDimensionColor(const AISObjectPtr& theDimPrs);
 
+/// Replace string in the name of object
+void replaceInName(ObjectPtr theObject, const std::string& theSource, const std::string& theDest);
+
 }; // namespace SketchPlugin_Tools
 
 namespace SketchPlugin_SegmentationTools

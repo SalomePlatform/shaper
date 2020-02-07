@@ -563,6 +563,17 @@ void setDimensionColor(const AISObjectPtr& theDimPrs)
     theDimPrs->setColor(aColor[0], aColor[1], aColor[2]);
 }
 
+void replaceInName(ObjectPtr theObject, const std::string& theSource, const std::string& theDest)
+{
+  std::string aName = theObject->data()->name();
+  size_t aPos = aName.find(theSource);
+  if (aPos != std::string::npos) {
+    std::string aNewName = aName.substr(0, aPos) + theDest
+                         + aName.substr(aPos + theSource.size());
+    theObject->data()->setName(aNewName);
+  }
+}
+
 } // namespace SketchPlugin_Tools
 
 

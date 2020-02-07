@@ -1164,8 +1164,16 @@ FeaturePtr SketchPlugin_Split::splitClosed(FeaturePtr& theSplitFeature,
         aRefsToParent.push_back(*aRef);
     }
     for (std::list<AttributePtr>::iterator aRef = aRefsToParent.begin();
-         aRef != aRefsToParent.end(); ++aRef)
-      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRef)->setValue(theSplitFeature);
+         aRef != aRefsToParent.end(); ++aRef) {
+      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRef)->setValue(
+          theBaseFeatureModified);
+
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRef)->owner());
+      SketchPlugin_Tools::replaceInName(anOwner,
+          aBaseFeature->name(), theBaseFeatureModified->name());
+      SketchPlugin_Tools::replaceInName(anOwner->lastResult(),
+          aBaseFeature->name(), theBaseFeatureModified->name());
+    }
   }
 
   theCreatedFeatures.insert(theBaseFeatureModified);

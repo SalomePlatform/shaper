@@ -1065,8 +1065,14 @@ FeaturePtr SketchPlugin_Trim::trimClosed(const std::shared_ptr<GeomAPI_Pnt2d>& t
         aRefsToParent.push_back(*aRef);
     }
     for (std::list<AttributePtr>::iterator aRef = aRefsToParent.begin();
-         aRef != aRefsToParent.end(); ++aRef)
+         aRef != aRefsToParent.end(); ++aRef) {
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRef)->setValue(anNewFeature);
+
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRef)->owner());
+      SketchPlugin_Tools::replaceInName(anOwner, aBaseFeature->name(), anNewFeature->name());
+      SketchPlugin_Tools::replaceInName(anOwner->lastResult(),
+          aBaseFeature->name(), anNewFeature->name());
+    }
   }
 
   const std::string& aStartAttrName = anNewFeature->getKind() == SketchPlugin_Arc::ID() ?

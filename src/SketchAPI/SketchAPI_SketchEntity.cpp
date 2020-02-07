@@ -86,7 +86,8 @@ bool SketchAPI_SketchEntity::isCopy() const
 {
   // check the feature is a copy of another entity
   AttributeBooleanPtr isCopy = feature()->boolean(SketchPlugin_SketchEntity::COPY_ID());
-  return isCopy.get() && isCopy->value();
+  AttributeReferencePtr hasParent = feature()->reference(SketchPlugin_SketchEntity::PARENT_ID());
+  return (isCopy.get() && isCopy->value()) || (hasParent && hasParent->value());
 }
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> >
