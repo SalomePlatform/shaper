@@ -107,8 +107,12 @@
       <translation>The selected results were created using external references outside of this Part from features %1. Please, remove these references or select another sub-set of results to be able to export.</translation>
     </message>
     <message>
-      <source>The selected results were created using references to results of Parts %1. Please, remove these references or select another sub-set of results to be able to export.</source>
-      <translation>The selected results were created using references to results of Parts %1. Please, remove these references or select another sub-set of results to be able to export.</translation>
+      <source>The selected results were created using references to the results of Parts: %1. Please, remove these references or select another sub-set of results to be able to export.</source>
+      <translation>The selected results were created using references to the results of Parts: %1. Please, remove these references or select another sub-set of results to be able to export.</translation>
+    </message>
+    <message>
+      <source>The export of Part's result is forbidden (%1).</source>
+      <translation>The export of Part&apos;s result is forbidden (%1).</translation>
     </message>
   </context>
 

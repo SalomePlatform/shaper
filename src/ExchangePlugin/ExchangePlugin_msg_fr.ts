@@ -238,4 +238,36 @@
     </message>
   </context>
 
+  <context>
+    <name>Export:ExchangePlugin_ExportPart</name>
+    <message>
+      <source>Cannot save the document.</source>
+      <translation>Impossible d&apos;enregistrer le document.</translation>
+    </message>
+    <message>
+      <source>Selected features cannot be exported from the document.</source>
+      <translation>Les fonctions sélectionnées ne peuvent pas être exportées à partir du document.</translation>
+    </message>
+    <message>
+      <source>The selected results were created using external references outside of this Part from features %1. Please, remove these references or select another sub-set of results to be able to export.</source>
+      <translation>Les résultats sélectionnés ont été créés à l&apos;aide de références externes en dehors de cette pièce à partir des fonctions %1. Veuillez supprimer ces références ou sélectionner un autre sous-ensemble de résultats pour pouvoir exporter.</translation>
+    </message>
+    <message>
+      <source>The selected results were created using references to results of Parts %1. Please, remove these references or select another sub-set of results to be able to export.</source>
+      <translation>Les résultats sélectionnés ont été créés en utilisant des références aux résultats des pièces: %1. Veuillez supprimer ces références ou sélectionner un autre sous-ensemble de résultats pour pouvoir exporter.</translation>
+    </message>
+    <message>
+      <source>The export of Part's result is forbidden (%1).</source>
+      <translation>L&apos;exportation du résultat de la pièce est interdite (%1).</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Import:ExchangePlugin_ImportPart</name>
+    <message>
+      <source>Cannot import the document.</source>
+      <translation>Impossible d&apos;importer le document.</translation>
+    </message>
+  </context>
+
 </TS>

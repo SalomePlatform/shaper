@@ -47,7 +47,10 @@ static void collectConstructions(DocumentPtr theDocument, std::list<FeaturePtr>&
 // Returns true if all features can be exported.
 static bool verifyExport(const std::list<FeaturePtr>& theFeatures,
                          std::list<FeaturePtr>& theExternalReferences,
-                         std::list<FeaturePtr>& theExportedParts);
+                         std::list<FeaturePtr>& theExportedParts,
+                         std::list<FeaturePtr>& theReferredParts);
+// Collect names of features as a single string
+static std::string namesOfFeatures(const std::list<FeaturePtr>& theFeatures);
 
 
 ExchangePlugin_ExportPart::ExchangePlugin_ExportPart()
@@ -95,38 +98,30 @@ void ExchangePlugin_ExportPart::execute()
   if (aFeaturesToExport.back()->getKind() == ExchangePlugin_ExportPart::ID())
     aFeaturesToExport.pop_back();
 
-  std::list<FeaturePtr> anExternalLinks, aReferredParts;
-  if (!verifyExport(aFeaturesToExport, anExternalLinks, aReferredParts)) {
+  std::list<FeaturePtr> anExternalLinks, anExportedParts, aReferredParts;
+  if (!verifyExport(aFeaturesToExport, anExternalLinks, anExportedParts, aReferredParts)) {
     if (!anExternalLinks.empty()) {
-      // collect names of features as a string
-      std::ostringstream aListOfFeatures;
-      for (std::list<FeaturePtr>::iterator anIt = anExternalLinks.begin();
-           anIt != anExternalLinks.end(); ++anIt) {
-        if (anIt != anExternalLinks.begin())
-          aListOfFeatures << ", ";
-        aListOfFeatures << "'" << (*anIt)->name() << "'";
-      }
+      std::string aListOfFeatures = namesOfFeatures(anExternalLinks);
 
       std::string aMessage = "The selected results were created using external references "
                              "outside of this Part from features %1. "
                              "Please, remove these references or select another "
                              "sub-set of results to be able to export.";
-      Events_InfoMessage(getKind(), aMessage).arg(aListOfFeatures.str()).send();
+      Events_InfoMessage(getKind(), aMessage).arg(aListOfFeatures).send();
     }
     if (!aReferredParts.empty()) {
-      // collect names of parts as a string
-      std::ostringstream aListOfParts;
-      for (std::list<FeaturePtr>::iterator anIt = aReferredParts.begin();
-           anIt != aReferredParts.end(); ++anIt) {
-        if (anIt != aReferredParts.begin())
-          aListOfParts << ", ";
-        aListOfParts << "'" << (*anIt)->name() << "'";
-      }
+      std::string aListOfParts = namesOfFeatures(aReferredParts);
 
       std::string aMessage = "The selected results were created using references "
-                             "to results of Parts %1. Please, remove these references "
+                             "to the results of Parts: %1. Please, remove these references "
                              "or select another sub-set of results to be able to export.";
-      Events_InfoMessage(getKind(), aMessage).arg(aListOfParts.str()).send();
+      Events_InfoMessage(getKind(), aMessage).arg(aListOfParts).send();
+    }
+    if (!anExportedParts.empty()) {
+      std::string aListOfParts = namesOfFeatures(anExportedParts);
+
+      std::string aMessage = "The export of Part's result is forbidden (%1).";
+      Events_InfoMessage(getKind(), aMessage).arg(aListOfParts).send();
     }
     // should not export anything
     aFeaturesToExport.clear();
@@ -244,7 +239,8 @@ void collectConstructions(DocumentPtr theDocument, std::list<FeaturePtr>& theExp
 
 bool verifyExport(const std::list<FeaturePtr>& theFeatures,
                   std::list<FeaturePtr>& theExternalReferences,
-                  std::list<FeaturePtr>& theExportedParts)
+                  std::list<FeaturePtr>& theExportedParts,
+                  std::list<FeaturePtr>& theReferredParts)
 {
   for (std::list<FeaturePtr>::const_iterator anIt = theFeatures.begin();
        anIt != theFeatures.end(); ++anIt) {
@@ -268,11 +264,23 @@ bool verifyExport(const std::list<FeaturePtr>& theFeatures,
             theExternalReferences.push_back(*anIt);
           // feature refers to result of a part
           if (aFeature->getKind() == PartSetPlugin_Part::ID())
-            theExportedParts.push_back(*anIt);
+            theReferredParts.push_back(*anIt);
         }
       }
     }
   }
 
-  return theExternalReferences.empty() && theExportedParts.empty();
+  return theExternalReferences.empty() && theExportedParts.empty() && theReferredParts.empty();
+}
+
+std::string namesOfFeatures(const std::list<FeaturePtr>& theFeatures)
+{
+  std::ostringstream aListOfFeatures;
+  for (std::list<FeaturePtr>::const_iterator anIt = theFeatures.begin();
+       anIt != theFeatures.end(); ++anIt) {
+    if (anIt != theFeatures.begin())
+      aListOfFeatures << ", ";
+    aListOfFeatures << "'" << (*anIt)->name() << "'";
+  }
+  return aListOfFeatures.str();
 }
