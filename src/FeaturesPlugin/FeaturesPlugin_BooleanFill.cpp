@@ -50,7 +50,7 @@ FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
 void FeaturesPlugin_BooleanFill::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //=================================================================================================
@@ -78,16 +78,13 @@ void FeaturesPlugin_BooleanFill::execute()
     return;
   }
 
-  // version of Split feature
-  int aSplitVersion = version();
-
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
   GeomShapePtr aResultCompound;
-  if (aSplitVersion == THE_VERSION_1) {
+  if (data()->version() == BOP_VERSION_9_4()) {
     // merge hierarchies of compounds containing objects and tools
     aResultCompound =
         keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);

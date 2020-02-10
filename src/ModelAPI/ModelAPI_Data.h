@@ -78,6 +78,11 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Return \c true if the object has been renamed by the user
   virtual bool hasUserDefinedName() const = 0;
 
+  /// Returns version of the feature (empty string if not applicable)
+  virtual std::string version() = 0;
+  /// Initialize the version of the feature
+  virtual void setVersion(const std::string& theVersion) = 0;
+
   /// Returns the attribute that references to another document
   virtual std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision

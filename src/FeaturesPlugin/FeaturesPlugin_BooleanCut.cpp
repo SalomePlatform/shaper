@@ -45,7 +45,7 @@ FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 void FeaturesPlugin_BooleanCut::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -67,9 +67,6 @@ void FeaturesPlugin_BooleanCut::execute()
     return;
   }
 
-  // version of CUT feature
-  int aCutVersion = version();
-
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
   std::string anError;
@@ -77,7 +74,7 @@ void FeaturesPlugin_BooleanCut::execute()
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
   GeomShapePtr aResultCompound;
-  if (aCutVersion == THE_VERSION_1) {
+  if (data()->version() == BOP_VERSION_9_4()) {
     // merge hierarchies of compounds containing objects and tools
     aResultCompound =
         keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);

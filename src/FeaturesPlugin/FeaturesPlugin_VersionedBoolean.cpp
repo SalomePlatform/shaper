@@ -71,19 +71,20 @@ static void performBoolean(const GeomAlgoAPI_Tools::BOPType theBooleanType,
 }
 
 //=================================================================================================
-void FeaturesPlugin_VersionedBoolean::initVersion(const int theVersion,
+void FeaturesPlugin_VersionedBoolean::initVersion(const std::string& theVersion,
                                                   const AttributePtr theObjectsAttr,
                                                   const AttributePtr theToolsAttr)
 {
-  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
-  aVerAttr->setIsArgument(false);
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
-  if (!integer(VERSION_ID())->isInitialized() &&
-      (!theObjectsAttr || !theObjectsAttr->isInitialized()) &&
-      (!theToolsAttr || !theToolsAttr->isInitialized())) {
+  AttributeIntegerPtr anOldVersionAttr = integer("version");
+  if (anOldVersionAttr && anOldVersionAttr->isInitialized() && data()->version().empty()) {
+    // move value to the common version interface in ModelAPI_Data
+    data()->setVersion(BOP_VERSION_9_4());
+  }
+  else if ((!theObjectsAttr || !theObjectsAttr->isInitialized()) &&
+           (!theToolsAttr || !theToolsAttr->isInitialized())) {
     // this is a newly created feature (not read from file),
     // so, initialize the latest version
-    integer(VERSION_ID())->setValue(theVersion);
+    data()->setVersion(theVersion);
   }
 }
 
@@ -448,16 +449,6 @@ void FeaturesPlugin_VersionedBoolean::resizePlanes(
     theMakeShapeList->appendAlgo(aMkShCustom);
     *anIt = aTool;
   }
-}
-
-//=================================================================================================
-int FeaturesPlugin_VersionedBoolean::version()
-{
-  AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());
-  int aVersion = 0;
-  if (aVersionAttr && aVersionAttr->isInitialized())
-    aVersion = aVersionAttr->value();
-  return aVersion;
 }
 
 //=================================================================================================

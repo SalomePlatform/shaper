@@ -47,7 +47,7 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -167,8 +167,7 @@ void FeaturesPlugin_BooleanSmash::execute()
   }
 
   // take into account a version of SMASH feature
-  int aSmashVersion = version();
-  if (aSmashVersion == THE_VERSION_1) {
+  if (data()->version() == BOP_VERSION_9_4()) {
     // merge hierarchies of compounds containing objects and tools
     // and append the result of the FUSE operation
     aShape = keepUnusedSubsOfCompound(aShape, anObjectsHistory, aToolsHistory, aMakeShapeList);

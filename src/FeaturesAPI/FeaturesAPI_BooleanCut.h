@@ -44,8 +44,7 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
-                         const std::list<ModelHighAPI_Selection>& theToolObjects,
-                         const int theVersion = 0);
+                         const std::list<ModelHighAPI_Selection>& theToolObjects);
 
   /// Destructor.
   FEATURESAPI_EXPORT

@@ -35,12 +35,10 @@ FeaturesAPI_BooleanFill::FeaturesAPI_BooleanFill(
 FeaturesAPI_BooleanFill::FeaturesAPI_BooleanFill(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects,
-  const int theVersion)
+  const std::list<ModelHighAPI_Selection>& theToolObjects)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
 
@@ -84,13 +82,10 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanFill::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanFill::TOOL_LIST_ID());
-  AttributeIntegerPtr aVersion =
-    aBase->integer(FeaturesPlugin_BooleanFill::VERSION_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
 
-  if (aVersion && aVersion->isInitialized() &&
-      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1)
+  if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
@@ -103,10 +98,7 @@ BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFill::ID());
-  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
-                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
-  return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature,
-                                                    theMainObjects,
-                                                    theToolObjects,
-                                                    aVersion));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+  return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature, theMainObjects, theToolObjects));
 }

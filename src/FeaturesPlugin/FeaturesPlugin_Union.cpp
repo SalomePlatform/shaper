@@ -42,7 +42,7 @@ FeaturesPlugin_Union::FeaturesPlugin_Union()
 void FeaturesPlugin_Union::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  initVersion(THE_VERSION_1, selectionList(BASE_OBJECTS_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
@@ -65,7 +65,6 @@ void FeaturesPlugin_Union::execute()
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
 
-  int aUnionVersion = version();
   GeomShapePtr aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(ListOfShape());
 
   // Fuse objects.
@@ -102,7 +101,7 @@ void FeaturesPlugin_Union::execute()
 
   GeomShapePtr aShape;
   GeomAPI_ShapeIterator aCIt(aResultCompound);
-  if (aUnionVersion < THE_VERSION_1) {
+  if (data()->version().empty()) {
     // if the compound consists of a single sub-shape, take it,
     // otherwise, take the full compound
     aShape = aCIt.current();

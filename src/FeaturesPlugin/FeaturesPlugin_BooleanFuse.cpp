@@ -60,7 +60,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -102,7 +102,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // version of FUSE feature
-  int aFuseVersion = version();
+  const std::string aFuseVersion = data()->version();
 
   // Collecting all solids which will be fused.
   ListOfShape aSolidsToFuse;
@@ -111,7 +111,7 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
-  bool isProcessCompsolid = !isSimpleCreation || aFuseVersion >= THE_VERSION_1;
+  bool isProcessCompsolid = !isSimpleCreation || !aFuseVersion.empty();
   ListOfShape aShapesToAdd;
   for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
        isProcessCompsolid && anObjectsIt != anObjectsHierarchy.End();
@@ -234,7 +234,7 @@ void FeaturesPlugin_BooleanFuse::execute()
     aMakeShapeList->appendAlgo(aUnifyAlgo);
   }
 
-  if (aFuseVersion == THE_VERSION_1) {
+  if (aFuseVersion == BOP_VERSION_9_4()) {
     // merge hierarchies of compounds containing objects and tools
     // and append the result of the FUSE operation
     aShape = keepUnusedSubsOfCompound(aShape, anObjectsHierarchy, aToolsHierarchy, aMakeShapeList);

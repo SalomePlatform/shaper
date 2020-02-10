@@ -52,7 +52,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -87,7 +87,7 @@ void FeaturesPlugin_BooleanCommon::execute()
   }
 
   // version of COMMON feature
-  int aCommonVersion = version();
+  const std::string aCommonVersion = data()->version();
 
   int aResultIndex = 0;
   GeomShapePtr aResultCompound;
@@ -115,7 +115,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       aMakeShapeList->appendAlgo(aCommonAlgo);
     }
 
-    if (aCommonVersion == THE_VERSION_1) {
+    if (aCommonVersion == BOP_VERSION_9_4()) {
       // merge hierarchies of compounds containing objects and tools
       // and append the result of the FUSE operation
       aShape = keepUnusedSubsOfCompound(aShape, anObjects, aTools, aMakeShapeList);
@@ -147,7 +147,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       aResultShapesList.push_back(aShape);
     }
   } else {
-    if (aCommonVersion == THE_VERSION_1) {
+    if (aCommonVersion == BOP_VERSION_9_4()) {
       // merge hierarchies of compounds containing objects and tools
       aResultCompound =
           keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);

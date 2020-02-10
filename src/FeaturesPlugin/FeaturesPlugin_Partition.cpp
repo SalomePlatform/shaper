@@ -58,7 +58,7 @@ FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 void FeaturesPlugin_Partition::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  initVersion(THE_VERSION_1, selectionList(BASE_OBJECTS_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
@@ -124,8 +124,7 @@ void FeaturesPlugin_Partition::execute()
 
   int aResultIndex = 0;
 
-  int aPartitionVersion = version();
-  if (aPartitionVersion < THE_VERSION_1) {
+  if (data()->version().empty()) {
     // default behaviors of Partition
     if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {

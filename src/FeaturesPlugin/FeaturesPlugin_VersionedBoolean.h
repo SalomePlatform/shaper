@@ -36,18 +36,12 @@ class GeomAlgoAPI_MakeShapeList;
 /// \brief Feature controls a version of Boolean operations.
 class FeaturesPlugin_VersionedBoolean : public ModelAPI_Feature
 {
-public:
-  static const int THE_VERSION_0 = 0;
-  static const int THE_VERSION_1 = 20190506;
-
-  /// Attribute name of the version of Boolean feature
-  inline static const std::string& VERSION_ID()
-  {
-    static const std::string MY_VERSION_ID("version");
-    return MY_VERSION_ID;
-  }
-
 protected:
+  static const std::string& BOP_VERSION_9_4()
+  {
+    static const std::string VERSION("v9.4");
+    return VERSION;
+  }
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_VersionedBoolean() {}
@@ -55,7 +49,7 @@ protected:
   /// Initialize version field of the Boolean feature.
   /// The version is initialized for newly created features,
   /// not read from previously stored document.
-  void initVersion(const int theVersion,
+  void initVersion(const std::string& theVersion,
                    const std::shared_ptr<ModelAPI_Attribute> theObjectsAttr
                             = std::shared_ptr<ModelAPI_Attribute>(),
                    const std::shared_ptr<ModelAPI_Attribute> theToolsAttr
@@ -202,9 +196,6 @@ protected:
       const ObjectHierarchy& theObjectsHierarchy,
       const ObjectHierarchy& theToolsHierarchy,
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList);
-
-  /// Return version of the feature
-  int version();
 
 private:
   void parentForShape(const GeomShapePtr& theShape,
