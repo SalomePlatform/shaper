@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Inspection tool</source>
-        <translation>Outil d&apos;inspection</translation>
+        <translation type="vanished">Outil d&apos;inspection</translation>
     </message>
     <message>
         <source>Edit toolbars of the module</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
         <source> (%1 commands)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1 commandes)</translation>
     </message>
 </context>
 </TS>

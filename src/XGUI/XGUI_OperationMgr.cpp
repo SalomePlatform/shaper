@@ -40,8 +40,10 @@
 #include "ModuleBase_OperationFeature.h"
 #include "ModuleBase_Tools.h"
 
-#include "ModelAPI_CompositeFeature.h"
-#include "ModelAPI_Session.h"
+#include <Config_Translator.h>
+
+#include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Session.h>
 
 #include <XGUI_PropertyPanel.h>
 #include <QToolButton>
@@ -336,7 +338,13 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
   if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
-    QString aTitle = theOperation->getDescription()->description();
+    ModuleBase_OperationFeature* aOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    std::string aContext;
+    if (aOp)
+      aContext = aOp->feature()->getKind();
+    QString aTitle = Config_Translator::translate(aContext,
+      theOperation->getDescription()->description().toStdString()).c_str();
+
     if (theMessageKind == XGUI_AbortOperationMessage) {
       QString aMessage = tr("%1 operation will be aborted.").arg(aTitle);
       myActiveMessageBox = createMessageBox(aMessage);

@@ -204,6 +204,10 @@
         <source>Windows</source>
         <translation>Fenêtres</translation>
     </message>
+    <message>
+        <source>Iso-lines...</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>
@@ -680,6 +684,18 @@ Supprimer des objets du panneau à afficher ?</translation>
     <message>
         <source>Import structure of a part</source>
         <translation>Structure d&apos;importation d&apos;une pièce</translation>
+    </message>
+    <message>
+        <source>Import shape...</source>
+        <translation>Forme de l&apos;importation...</translation>
+    </message>
+    <message>
+        <source>Import shape from a file</source>
+        <translation>Importer une forme à partir d&apos;un fichier</translation>
+    </message>
+    <message>
+        <source>Number of Iso-lines</source>
+        <translation>Nombre de lignes Iso-Lines</translation>
     </message>
 </context>
 </TS>

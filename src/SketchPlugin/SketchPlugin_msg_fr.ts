@@ -2412,6 +2412,10 @@
       <source>Sketch</source>
       <translation>Esquisse</translation>
     </message>
+    <message>
+      <source>&lt;b&gt;The constraint is conflicting with others. To fix this, you can either &lt;font color='red'&gt;undo (Ctrl+Z)&lt;/font&gt; your operation or &lt;font color='red'&gt;remove&lt;/font&gt; a conflicting constraint.&lt;/b&gt;</source>
+      <translation>&lt;b&gt;La contrainte est en conflit avec d'autres. Pour y remédier, vous pouvez soit &lt;font color='red'&gt;annuler (Ctrl+Z)&lt;/font&gt; votre opération, soit &lt;font color='red'&gt;supprimer&lt;/font&gt; une contrainte conflictuelle.&lt;/b&gt;</translation>
+    </message>
   </context>
   <context>
     <name>Sketch:External</name>
@@ -2426,12 +2430,13 @@
       <source>The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.</source>
       <translation>La contrainte est en conflit avec les autres. Pour résoudre ce problème, vous pouvez annuler votre opération ou supprimer une contrainte en conflit.</translation>
     </message>
-  </context>
-  <context>
-    <name>Sketch:SketchPlugin_SolverErrorValidator</name>
     <message>
       <source>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</source>
       <translation>L&apos;ensemble des contraintes conduit à une géométrie dégénérée. Pour résoudre ce problème, vous pouvez annuler votre opération ou supprimer une contrainte ou la géométrie dégénérée..</translation>
+    </message>
+    <message>
+      <source>&lt;b&gt;The constraint is conflicting with others. To fix this, you can either &lt;font color='red'&gt;undo (Ctrl+Z)&lt;/font&gt; your operation or &lt;font color='red'&gt;remove&lt;/font&gt; a conflicting constraint.&lt;/b&gt;</source>
+      <translation>&lt;b&gt;La contrainte est en conflit avec d'autres. Pour y remédier, vous pouvez soit &lt;font color='red'&gt;annuler (Ctrl+Z)&lt;/font&gt; votre opération, soit &lt;font color='red'&gt;supprimer&lt;/font&gt; une contrainte conflictuelle.&lt;/b&gt;</translation>
     </message>
   </context>
 

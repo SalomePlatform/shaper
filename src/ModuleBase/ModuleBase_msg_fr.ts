@@ -275,9 +275,7 @@
     <message>
         <source>The following parts will be deleted: %1.
 </source>
-        <translation>Les pièces suivantes seront supprimées : %1.
-
-</translation>
+        <translation>Les pièces suivantes seront supprimées : %1.</translation>
     </message>
     <message>
         <source>Replace</source>
