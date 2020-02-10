@@ -48,6 +48,9 @@ public:
   virtual bool isOk(const GeomShapePtr& theShape, const ResultPtr&,
                     const ModelAPI_FiltersArgs& theArgs) const override;
 
+  /// Returns True if the filter can be used several times within one filtering
+  virtual bool isMultiple() const { return true; }
+
   /// Returns XML string which represents GUI of the filter
   virtual std::string xmlRepresentation() const override;
 

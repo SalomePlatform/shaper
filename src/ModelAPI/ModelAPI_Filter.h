@@ -50,6 +50,9 @@ public:
                     const ResultPtr& theResult,
                     const ModelAPI_FiltersArgs& theArgs) const = 0;
 
+  /// Returns True if the filter can be used several times within one filtering
+  virtual bool isMultiple() const { return false; }
+
   /// Returns XML string which represents GUI of the filter
   /// By default it returns nothing (no GUI)
   virtual std::string xmlRepresentation() const { return ""; }
