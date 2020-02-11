@@ -30,6 +30,7 @@ class ModelAPI_ResultParameter;
 class ModelAPI_ResultBody;
 
 class GeomAPI_Shape;
+class GeomAPI_ShapeHierarchy;
 
 #include <memory>
 #include <vector>
@@ -205,6 +206,16 @@ MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
  */
 MODELAPI_EXPORT std::set<std::shared_ptr<ModelAPI_Feature> >
     getParents(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+/*! Store shape and its parent shape to the hierarchy data structure
+ *  \param[in] theShape      the shape to store
+ *  \param[in] theContext    the result (parent shape) for the given shape
+ *  \param[out] theHierarchy container for shape hierarchy
+ */
+MODELAPI_EXPORT void fillShapeHierarchy(
+    const std::shared_ptr<GeomAPI_Shape>& theShape,
+    const std::shared_ptr<ModelAPI_Result>& theContext,
+    GeomAPI_ShapeHierarchy& theHierarchy);
 
 /*! Creates a remove result features with the given results
 */

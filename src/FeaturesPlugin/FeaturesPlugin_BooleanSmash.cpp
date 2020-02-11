@@ -54,7 +54,7 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
 void FeaturesPlugin_BooleanSmash::execute()
 {
   std::string anError;
-  ObjectHierarchy anObjectsHistory, aToolsHistory;
+  GeomAPI_ShapeHierarchy anObjectsHistory, aToolsHistory;
   ListOfShape aPlanes;
 
   // Getting objects and tools.
@@ -64,41 +64,41 @@ void FeaturesPlugin_BooleanSmash::execute()
 
   int aResultIndex = 0;
 
-  if (anObjectsHistory.IsEmpty() || aToolsHistory.IsEmpty()) {
+  if (anObjectsHistory.empty() || aToolsHistory.empty()) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
   }
 
   // Collecting all shapes which will be smashed.
-  ListOfShape aShapesToSmash = anObjectsHistory.Objects();
+  ListOfShape aShapesToSmash = anObjectsHistory.objects();
 
   // List of original shapes for naming.
   ListOfShape anOriginalShapes;
   anOriginalShapes.insert(anOriginalShapes.end(), aShapesToSmash.begin(), aShapesToSmash.end());
-  ListOfShape aTools = aToolsHistory.Objects();
+  ListOfShape aTools = aToolsHistory.objects();
   anOriginalShapes.insert(anOriginalShapes.end(), aTools.begin(), aTools.end());
 
   // Collecting solids from compsolids which will not be modified in
   // boolean operation and will be added to result.
   ListOfShape aShapesToAdd;
-  for (ObjectHierarchy::Iterator anIt = anObjectsHistory.Begin();
-       anIt != anObjectsHistory.End();
+  for (GeomAPI_ShapeHierarchy::iterator anIt = anObjectsHistory.begin();
+       anIt != anObjectsHistory.end();
        ++anIt)
   {
-    GeomShapePtr aParent = anObjectsHistory.Parent(*anIt, false);
+    GeomShapePtr aParent = anObjectsHistory.parent(*anIt, false);
     if (aParent) {
       anOriginalShapes.push_back(aParent);
 
       ListOfShape aUsed, aNotUsed;
-      anObjectsHistory.SplitCompound(aParent, aUsed, aNotUsed);
+      anObjectsHistory.splitCompound(aParent, aUsed, aNotUsed);
       aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
 
       // add unused shapes of compounds/compsolids to the history,
       // to avoid treating them as unused later when constructing a compound containing
       // the result of Smash and all unused sub-shapes of multi-level compounds
       for (ListOfShape::iterator anIt = aNotUsed.begin(); anIt != aNotUsed.end(); ++anIt)
-        anObjectsHistory.AddObject(*anIt);
+        anObjectsHistory.addObject(*anIt);
     }
   }
 

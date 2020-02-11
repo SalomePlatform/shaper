@@ -59,7 +59,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
 void FeaturesPlugin_BooleanCommon::execute()
 {
   ListOfShape aPlanes;
-  ObjectHierarchy anObjects, aTools;
+  GeomAPI_ShapeHierarchy anObjects, aTools;
 
   bool isSimpleMode = false;
 
@@ -80,7 +80,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       !processAttribute(TOOL_LIST_ID(), aTools, aPlanes))
     return;
 
-  if (anObjects.IsEmpty() || (!isSimpleMode && aTools.IsEmpty() && aPlanes.empty())) {
+  if (anObjects.empty() || (!isSimpleMode && aTools.empty() && aPlanes.empty())) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
@@ -98,9 +98,9 @@ void FeaturesPlugin_BooleanCommon::execute()
   ListOfShape aResultShapesList;
 
   if (isSimpleMode) {
-    ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
+    GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
     GeomShapePtr aShape = *anObjectsIt;
-    for (++anObjectsIt; anObjectsIt != anObjects.End(); ++anObjectsIt) {
+    for (++anObjectsIt; anObjectsIt != anObjects.end(); ++anObjectsIt) {
       std::shared_ptr<GeomAlgoAPI_Boolean> aCommonAlgo(
         new GeomAlgoAPI_Boolean(aShape,
                                 *anObjectsIt,
@@ -126,7 +126,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
-      ListOfShape anObjectList = anObjects.Objects();
+      ListOfShape anObjectList = anObjects.objects();
       ListOfShape aToolsList;
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
                                                anObjectList,
@@ -154,39 +154,39 @@ void FeaturesPlugin_BooleanCommon::execute()
     }
 
     bool isOk = true;
-    for (ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
-         anObjectsIt != anObjects.End() && isOk;
+    for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+         anObjectsIt != anObjects.end() && isOk;
          ++anObjectsIt)
     {
       GeomShapePtr anObject = *anObjectsIt;
-      GeomShapePtr aParent = anObjects.Parent(anObject);
+      GeomShapePtr aParent = anObjects.parent(anObject);
 
       if (aParent) {
         GeomAPI_Shape::ShapeType aShapeType = aParent->shapeType();
         if (aShapeType == GeomAPI_Shape::COMPOUND) {
           // Compound handling
           isOk = processCompound(GeomAlgoAPI_Tools::BOOL_COMMON,
-                                 anObjects, aParent, aTools.Objects(),
+                                 anObjects, aParent, aTools.objects(),
                                  aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                  aResultCompound);
         }
         else if (aShapeType == GeomAPI_Shape::COMPSOLID) {
           // Compsolid handling
           isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_COMMON,
-                                  anObjects, aParent, aTools.Objects(), ListOfShape(),
+                                  anObjects, aParent, aTools.objects(), ListOfShape(),
                                   aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                   aResultCompound);
         }
       } else {
         // process object as is
         isOk = processObject(GeomAlgoAPI_Tools::BOOL_COMMON,
-                             anObject, aTools.Objects(), aPlanes,
+                             anObject, aTools.objects(), aPlanes,
                              aResultIndex, aResultBaseAlgoList, aResultShapesList,
                              aResultCompound);
       }
     }
 
-    storeResult(anObjects.Objects(), aTools.Objects(), aResultCompound, aResultIndex,
+    storeResult(anObjects.objects(), aTools.objects(), aResultCompound, aResultIndex,
                 aMakeShapeList, aResultBaseAlgoList);
   }
 
@@ -195,7 +195,7 @@ void FeaturesPlugin_BooleanCommon::execute()
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
-                                          aTools.Objects(),
+                                          aTools.objects(),
                                           aResultCompound);
 
   // remove the rest results if there were produced in the previous pass

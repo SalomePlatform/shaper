@@ -38,6 +38,8 @@
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
+#include <GeomAPI_ShapeHierarchy.h>
+
 #define RECURSE_TOP_LEVEL 50
 
 //#define DEBUG_REMOVE_FEATURES
@@ -761,6 +763,21 @@ std::set<FeaturePtr> getParents(const FeaturePtr& theFeature)
   }
   return aParents;
 }
+
+void fillShapeHierarchy(const GeomShapePtr& theShape,
+                        const ResultPtr& theContext,
+                        GeomAPI_ShapeHierarchy& theHierarchy)
+{
+  ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(theContext);
+  if (aResCompSolidPtr.get()) {
+    std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
+    if (aContextShape->shapeType() <= GeomAPI_Shape::COMPSOLID) {
+      theHierarchy.addParent(theShape, aContextShape);
+      fillShapeHierarchy(aContextShape, aResCompSolidPtr, theHierarchy);
+    }
+  }
+}
+
 
 void removeResults(const std::list<ResultPtr>& theResults)
 {

@@ -48,14 +48,14 @@ void FeaturesPlugin_Union::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_Union::execute()
 {
-  ObjectHierarchy anObjects;
+  GeomAPI_ShapeHierarchy anObjects;
   ListOfShape anEmptyList;
 
   // Getting objects.
   if (!processAttribute(BASE_OBJECTS_ID(), anObjects, anEmptyList))
     return;
 
-  if(anObjects.Objects().size() < 2) {
+  if(anObjects.objects().size() < 2) {
     setError("Error: Not enough objects for operation. Should be at least 2.");
     return;
   }
@@ -69,15 +69,15 @@ void FeaturesPlugin_Union::execute()
 
   // Fuse objects.
   bool isOk = true;
-  for (ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
-       anObjectsIt != anObjects.End() && isOk;
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end() && isOk;
        ++anObjectsIt) {
     GeomShapePtr anObject = *anObjectsIt;
-    GeomShapePtr aParent = anObjects.Parent(anObject, false);
+    GeomShapePtr aParent = anObjects.parent(anObject, false);
 
     if (aParent && aParent->shapeType() <= GeomAPI_Shape::COMPSOLID) {
       // get parent once again to mark it and the subs as processed
-      aParent = anObjects.Parent(anObject);
+      aParent = anObjects.parent(anObject);
       // compsolid handling
       isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_FUSE,
                               anObjects, aParent, anEmptyList, anEmptyList,
@@ -111,7 +111,8 @@ void FeaturesPlugin_Union::execute()
   }
   else {
     // merge hierarchies of compounds containing objects and tools
-    aShape = keepUnusedSubsOfCompound(aCIt.current(), anObjects, ObjectHierarchy(), aMakeShapeList);
+    aShape = keepUnusedSubsOfCompound(aCIt.current(), anObjects, GeomAPI_ShapeHierarchy(),
+                                      aMakeShapeList);
     for (aCIt.next(); aCIt.more(); aCIt.next()) {
       std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
       aBuilder->add(aShape, aCIt.current());
@@ -121,7 +122,7 @@ void FeaturesPlugin_Union::execute()
 
   // Store result and naming.
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  ListOfShape anObjectsList = anObjects.Objects();
+  ListOfShape anObjectsList = anObjects.objects();
   aResultBody->storeModified(anObjectsList.front(), aShape);
 
   for(ListOfShape::const_iterator anIter = anObjectsList.begin();

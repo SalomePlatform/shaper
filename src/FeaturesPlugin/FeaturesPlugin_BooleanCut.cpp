@@ -51,7 +51,7 @@ void FeaturesPlugin_BooleanCut::initAttributes()
 //==================================================================================================
 void FeaturesPlugin_BooleanCut::execute()
 {
-  ObjectHierarchy anObjects, aTools;
+  GeomAPI_ShapeHierarchy anObjects, aTools;
   ListOfShape aPlanes;
 
   // Getting objects and tools
@@ -61,7 +61,7 @@ void FeaturesPlugin_BooleanCut::execute()
 
   int aResultIndex = 0;
 
-  if(anObjects.IsEmpty() || aTools.IsEmpty()) {
+  if(anObjects.empty() || aTools.empty()) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
@@ -82,38 +82,38 @@ void FeaturesPlugin_BooleanCut::execute()
 
   // For solids cut each object with all tools.
   bool isOk = true;
-  for (ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
-       anObjectsIt != anObjects.End() && isOk;
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end() && isOk;
        ++anObjectsIt) {
     GeomShapePtr anObject = *anObjectsIt;
-    GeomShapePtr aParent = anObjects.Parent(anObject);
+    GeomShapePtr aParent = anObjects.parent(anObject);
 
     if (aParent) {
       GeomAPI_Shape::ShapeType aShapeType = aParent->shapeType();
       if (aShapeType == GeomAPI_Shape::COMPOUND) {
         // Compound handling
         isOk = processCompound(GeomAlgoAPI_Tools::BOOL_CUT,
-                               anObjects, aParent, aTools.Objects(),
+                               anObjects, aParent, aTools.objects(),
                                aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                aResultCompound);
       }
       else if (aShapeType == GeomAPI_Shape::COMPSOLID) {
         // Compsolid handling
         isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_CUT,
-                                anObjects, aParent, aTools.Objects(), ListOfShape(),
+                                anObjects, aParent, aTools.objects(), ListOfShape(),
                                 aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                 aResultCompound);
       }
     } else {
       // process object as is
       isOk = processObject(GeomAlgoAPI_Tools::BOOL_CUT,
-                           anObject, aTools.Objects(), aPlanes,
+                           anObject, aTools.objects(), aPlanes,
                            aResultIndex, aResultBaseAlgoList, aResultShapesList,
                            aResultCompound);
     }
   }
 
-  storeResult(anObjects.Objects(), aTools.Objects(), aResultCompound, aResultIndex,
+  storeResult(anObjects.objects(), aTools.objects(), aResultCompound, aResultIndex,
               aMakeShapeList, aResultBaseAlgoList);
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
@@ -121,7 +121,7 @@ void FeaturesPlugin_BooleanCut::execute()
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
-                                          aTools.Objects(),
+                                          aTools.objects(),
                                           aResultCompound);
 
   // remove the rest results if there were produced in the previous pass

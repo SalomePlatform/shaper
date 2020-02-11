@@ -73,7 +73,7 @@ private:
   /// Cut all of unused subs of compsolids by the full compsolid of the first selected object,
   /// and vice versa, cut all objects of Partition by not used subs of the first selected object.
   /// Store results of operation to the separated lists of shapes.
-  bool cutSubs(ObjectHierarchy& theHierarchy,
+  bool cutSubs(GeomAPI_ShapeHierarchy& theHierarchy,
                ListOfShape& theUsed,
                ListOfShape& theNotUsed,
                std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,

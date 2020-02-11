@@ -89,22 +89,8 @@ void FeaturesPlugin_VersionedBoolean::initVersion(const std::string& theVersion,
 }
 
 //=================================================================================================
-void FeaturesPlugin_VersionedBoolean::parentForShape(const GeomShapePtr& theShape,
-                                            const ResultPtr& theContext,
-                                            ObjectHierarchy& theShapesHierarchy)
-{
-  ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(theContext);
-  if (aResCompSolidPtr.get()) {
-    std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
-    if (aContextShape->shapeType() <= GeomAPI_Shape::COMPSOLID) {
-      theShapesHierarchy.AddParent(theShape, aContextShape);
-      parentForShape(aContextShape, aResCompSolidPtr, theShapesHierarchy);
-    }
-  }
-}
-
 bool FeaturesPlugin_VersionedBoolean::processAttribute(const std::string& theAttributeName,
-                                              ObjectHierarchy& theObjects,
+                                              GeomAPI_ShapeHierarchy& theObjects,
                                               ListOfShape& thePlanesList)
 {
   AttributeSelectionListPtr anObjectsSelList = selectionList(theAttributeName);
@@ -122,10 +108,10 @@ bool FeaturesPlugin_VersionedBoolean::processAttribute(const std::string& theAtt
         return false;
     }
 
-    theObjects.AddObject(anObject);
+    theObjects.addObject(anObject);
 
     ResultPtr aContext = anObjectAttr->context();
-    parentForShape(anObject, aContext, theObjects);
+    ModelAPI_Tools::fillShapeHierarchy(anObject, aContext, theObjects);
   }
   return true;
 }
@@ -224,7 +210,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
 //=================================================================================================
 bool FeaturesPlugin_VersionedBoolean::processCompsolid(
     const GeomAlgoAPI_Tools::BOPType theBooleanType,
-    ObjectHierarchy& theCompsolidHierarchy,
+    GeomAPI_ShapeHierarchy& theCompsolidHierarchy,
     const GeomShapePtr& theCompsolid,
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
@@ -235,7 +221,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 {
   ListOfShape aUsedInOperationSolids;
   ListOfShape aNotUsedSolids;
-  theCompsolidHierarchy.SplitCompound(theCompsolid, aUsedInOperationSolids, aNotUsedSolids);
+  theCompsolidHierarchy.splitCompound(theCompsolid, aUsedInOperationSolids, aNotUsedSolids);
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
@@ -260,7 +246,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 
   // Add result to not used solids from compsolid.
   if (!aNotUsedSolids.empty()) {
-    theCompsolidHierarchy.MarkProcessed(aNotUsedSolids);
+    theCompsolidHierarchy.markProcessed(aNotUsedSolids);
 
     ListOfShape aShapesToAdd = aNotUsedSolids;
     aShapesToAdd.push_back(aBoolAlgo->shape());
@@ -319,7 +305,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 //=================================================================================================
 bool FeaturesPlugin_VersionedBoolean::processCompound(
     const GeomAlgoAPI_Tools::BOPType theBooleanType,
-    ObjectHierarchy& theCompoundHierarchy,
+    GeomAPI_ShapeHierarchy& theCompoundHierarchy,
     const GeomShapePtr& theCompound,
     const ListOfShape& theTools,
     int& theResultIndex,
@@ -329,7 +315,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 {
   ListOfShape aUsedInOperationShapes;
   ListOfShape aNotUsedShapes;
-  theCompoundHierarchy.SplitCompound(theCompound, aUsedInOperationShapes, aNotUsedShapes);
+  theCompoundHierarchy.splitCompound(theCompound, aUsedInOperationShapes, aNotUsedShapes);
   if (theResultCompound) {
     // Not necessary to keep all subs of the current compound,
     // all unused solids are already stored in the result compound.
@@ -352,7 +338,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 
   // Add result to not used shape from compound.
   if (!aNotUsedShapes.empty()) {
-    theCompoundHierarchy.MarkProcessed(aNotUsedShapes);
+    theCompoundHierarchy.markProcessed(aNotUsedShapes);
 
     ListOfShape aShapesForResult = aNotUsedShapes;
     if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
@@ -408,13 +394,13 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 //==================================================================================================
 GeomShapePtr FeaturesPlugin_VersionedBoolean::keepUnusedSubsOfCompound(
     const GeomShapePtr& theResult,
-    const ObjectHierarchy& theObjectsHierarchy,
-    const ObjectHierarchy& theToolsHierarchy,
+    const GeomAPI_ShapeHierarchy& theObjectsHierarchy,
+    const GeomAPI_ShapeHierarchy& theToolsHierarchy,
     std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList)
 {
   ListOfShape aCompounds;
-  theObjectsHierarchy.CompoundsOfUnusedObjects(aCompounds);
-  theToolsHierarchy.CompoundsOfUnusedObjects(aCompounds);
+  theObjectsHierarchy.compoundsOfUnusedObjects(aCompounds);
+  theToolsHierarchy.compoundsOfUnusedObjects(aCompounds);
 
   GeomShapePtr aResultShape = theResult;
   if (!aCompounds.empty()) {
@@ -449,236 +435,4 @@ void FeaturesPlugin_VersionedBoolean::resizePlanes(
     theMakeShapeList->appendAlgo(aMkShCustom);
     *anIt = aTool;
   }
-}
-
-//=================================================================================================
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::AddObject(const GeomShapePtr& theObject)
-{
-  myObjects.push_back(theObject);
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::AddParent(const GeomShapePtr& theShape,
-                                                                 const GeomShapePtr& theParent)
-{
-  myParent[theShape] = theParent;
-
-  MapShapeToIndex::iterator aFound = myParentIndices.find(theParent);
-  size_t anIndex = myParentIndices.size();
-  if (aFound == myParentIndices.end()) {
-    myParentIndices[theParent] = anIndex;
-    mySubshapes.push_back(ShapeAndSubshapes(theParent, ListOfShape()));
-  } else
-    anIndex = aFound->second;
-
-  mySubshapes[anIndex].second.push_back(theShape);
-}
-
-GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Parent(const GeomShapePtr& theShape,
-                                                                      bool theMarkProcessed)
-{
-  MapShapeToParent::const_iterator aFound = myParent.find(theShape);
-  GeomShapePtr aParent;
-  if (aFound != myParent.end()) {
-    aParent = aFound->second;
-    if (theMarkProcessed) {
-      // mark the parent and all its subs as processed by Boolean algorithm
-      myProcessedObjects.insert(aParent);
-      const ListOfShape& aSubs = mySubshapes[myParentIndices[aParent]].second;
-      for (ListOfShape::const_iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt)
-        myProcessedObjects.insert(*anIt);
-    }
-  }
-  return aParent;
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::MarkProcessed(const GeomShapePtr& theShape)
-{
-  myProcessedObjects.insert(theShape);
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::MarkProcessed(const ListOfShape& theShapes)
-{
-  for (ListOfShape::const_iterator anIt = theShapes.begin(); anIt != theShapes.end(); ++anIt)
-    MarkProcessed(*anIt);
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::ObjectsByType(
-    ListOfShape& theShapesByType,
-    ListOfShape& theOtherShapes,
-    const GeomAPI_Shape::ShapeType theMinType,
-    const GeomAPI_Shape::ShapeType theMaxType) const
-{
-  if (theMinType > theMaxType)
-    return ObjectsByType(theShapesByType, theOtherShapes, theMaxType, theMinType);
-
-  // no need to select objects if whole range is specified
-  if (theMinType == GeomAPI_Shape::COMPOUND && theMaxType == GeomAPI_Shape::SHAPE) {
-    theShapesByType.insert(theShapesByType.end(), myObjects.begin(), myObjects.end());
-    return;
-  }
-
-  for (ListOfShape::const_iterator anIt = myObjects.begin(); anIt != myObjects.end(); ++anIt) {
-    GeomAPI_Shape::ShapeType aType = (*anIt)->shapeType();
-    if (aType >= theMinType && aType <= theMaxType)
-      theShapesByType.push_back(*anIt);
-    else
-      theOtherShapes.push_back(*anIt);
-  }
-}
-
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::SplitCompound(
-    const GeomShapePtr& theCompShape,
-    ListOfShape& theUsed,
-    ListOfShape& theNotUsed) const
-{
-  theUsed.clear();
-  theNotUsed.clear();
-
-  MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(theCompShape);
-  if (aFoundIndex == myParentIndices.end())
-    return; // no such shape
-
-  theUsed = mySubshapes[aFoundIndex->second].second;
-  SetOfShape aSubsSet;
-  aSubsSet.insert(theUsed.begin(), theUsed.end());
-
-  for (GeomAPI_ShapeIterator anExp(theCompShape); anExp.more(); anExp.next()) {
-    GeomShapePtr aCurrent = anExp.current();
-    if (aSubsSet.find(aCurrent) == aSubsSet.end())
-      theNotUsed.push_back(aCurrent);
-  }
-}
-
-bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::IsEmpty() const
-{
-  return myObjects.empty();
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::CompoundsOfUnusedObjects(
-    ListOfShape& theDestination) const
-{
-  SetOfShape aUsedObjects = myProcessedObjects;
-  aUsedObjects.insert(myObjects.begin(), myObjects.end());
-
-  for (std::vector<ShapeAndSubshapes>::const_iterator anIt = mySubshapes.begin();
-       anIt != mySubshapes.end(); ++anIt) {
-    MapShapeToParent::const_iterator aParent = myParent.find(anIt->first);
-    if ((aParent == myParent.end() || !aParent->second) &&
-         anIt->first->shapeType() ==  GeomAPI_Shape::COMPOUND) {
-      // this is a top-level compound
-      GeomShapePtr aCompound = collectUnusedSubs(anIt->first, aUsedObjects);
-      // add to destination non-empty compounds only
-      if (aCompound)
-        theDestination.push_back(aCompound);
-    }
-  }
-}
-
-GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::collectUnusedSubs(
-    GeomShapePtr theTopLevelCompound,
-    const SetOfShape& theUsed) const
-{
-  GeomShapePtr aResult = theTopLevelCompound->emptyCopied();
-  bool isResultEmpty = true;
-
-  for (GeomAPI_ShapeIterator aSub(theTopLevelCompound); aSub.more(); aSub.next()) {
-    GeomShapePtr aCurrent = aSub.current();
-    if (theUsed.find(aCurrent) != theUsed.end())
-      continue; // already used
-
-    MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(aCurrent);
-    if (aCurrent->shapeType() > GeomAPI_Shape::COMPOUND ||
-        aFoundIndex == myParentIndices.end()) {
-      bool isAddShape = true;
-      // check compsolid is fully unused in the Boolean operation
-      if (aCurrent->shapeType() == GeomAPI_Shape::COMPSOLID) {
-        for (GeomAPI_ShapeIterator anIt(aCurrent); isAddShape && anIt.more(); anIt.next())
-          isAddShape = theUsed.find(anIt.current()) == theUsed.end();
-      }
-
-      if (isAddShape) { // low-level shape, add it
-        GeomAlgoAPI_ShapeBuilder::add(aResult, aCurrent);
-        isResultEmpty = false;
-      }
-    } else {
-      GeomShapePtr aCompound = collectUnusedSubs(aCurrent, theUsed);
-      if (aCompound) {
-        GeomAlgoAPI_ShapeBuilder::add(aResult, aCompound);
-        isResultEmpty = false;
-      }
-    }
-  }
-  return isResultEmpty ? GeomShapePtr() : aResult;
-}
-
-
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Begin()
-{
-  return Iterator(this);
-}
-
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::End()
-{
-  return Iterator(this, false);
-}
-
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::Iterator(
-    FeaturesPlugin_VersionedBoolean::ObjectHierarchy* theHierarchy, bool isBegin)
-  : myHierarchy(theHierarchy)
-{
-  if (isBegin) {
-    myObject = myHierarchy->myObjects.begin();
-    SkipAlreadyProcessed();
-  } else
-    myObject = myHierarchy->myObjects.end();
-}
-
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::SkipAlreadyProcessed()
-{
-  while (myObject != myHierarchy->myObjects.end() &&
-         myHierarchy->myProcessedObjects.find(*myObject) != myHierarchy->myProcessedObjects.end())
-    ++myObject;
-}
-
-bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator==(
-    const Iterator& theOther) const
-{
-  return myObject == theOther.myObject;
-}
-
-bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator!=(
-    const Iterator& theOther) const
-{
-  return !operator==(theOther);
-}
-
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator&
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator++()
-{
-  ++myObject;
-  SkipAlreadyProcessed();
-  return *this;
-}
-
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator++(int)
-{
-  Iterator aCurrent;
-  aCurrent.myHierarchy = myHierarchy;
-  aCurrent.myObject = myObject;
-
-  // increase iterator
-  operator++();
-
-  return aCurrent;
-}
-
-GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator*() const
-{
-  myHierarchy->myProcessedObjects.insert(*myObject);
-  return *myObject;
 }
