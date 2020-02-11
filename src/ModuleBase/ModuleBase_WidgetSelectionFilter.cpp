@@ -263,7 +263,6 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   std::list<FilterPtr>::const_iterator aIt;
   for (aIt = allFilters.cbegin(); aIt != allFilters.cend(); aIt++) {
     aItems.push_back((*aIt)->name().c_str());
-    myFilters.push_back(aSession->filters()->id(*aIt));
   }
   myFiltersCombo->addItems(aItems);
   connect(myFiltersCombo, SIGNAL(currentIndexChanged(int)), SLOT(onAddFilter(int)));
@@ -346,26 +345,28 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   if (theIndex == 0)
     return;
 
-  std::list<std::string>::iterator aIt;
+  ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
+  std::list<FilterPtr> aFilters = aFactory->filters((GeomAPI_Shape::ShapeType) mySelectionType);
+  FiltersFeaturePtr aFiltersFeature =
+    std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
+
+  std::string aText = myFiltersCombo->itemText(theIndex).toStdString();
+
+  std::list<FilterPtr>::iterator aIt;
   int i;
   std::string aFilter;
-  for (aIt = myFilters.begin(), i = 0; aIt != myFilters.cend(); i++, aIt++) {
-    if (i == (theIndex - 1)) {
-      aFilter = (*aIt);
+  for (aIt = aFilters.begin(), i = 0; aIt != aFilters.cend(); i++, aIt++) {
+    if (aText == (*aIt)->name()) {
+      aFilter = aFactory->id(*aIt);
       break;
     }
   }
-  ModuleBase_FilterItem* aItem = onAddFilter(aFilter);
-  FiltersFeaturePtr aFiltersFeature =
-    std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
   aFiltersFeature->addFilter(aFilter);
-
-  myFiltersCombo->setCurrentIndex(0);
-  myFiltersCombo->removeItem(theIndex);
   updateObject(myFeature);
 
-  if (aItem && (aItem->widgets().size() > 0))
-    aItem->widgets().first()->emitFocusInWidget();
+  QList<ModuleBase_FilterItem*> aList = itemsList();
+  if (!aList.isEmpty() && (aList.last()->widgets().size() > 0))
+    aList.last()->widgets().first()->emitFocusInWidget();
   else
     emitFocusInWidget();
 }
@@ -374,13 +375,6 @@ ModuleBase_FilterItem* ModuleBase_WidgetSelectionFilter::onAddFilter(const std::
 {
   if (theFilter.length() == 0)
     return 0;
-  std::list<std::string>::const_iterator aIt;
-  for (aIt = myUseFilters.cbegin(); aIt != myUseFilters.cend(); aIt++) {
-    if (theFilter == (*aIt))
-      return 0;
-  }
-  myFilters.remove(theFilter);
-  myUseFilters.push_back(theFilter);
   ModuleBase_FilterItem* aItem = new ModuleBase_FilterItem(theFilter, this);
   connect(aItem, SIGNAL(deleteItem(ModuleBase_FilterItem*)),
     SLOT(onDeleteItem(ModuleBase_FilterItem*)));
@@ -404,10 +398,11 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
   myFiltersLayout->removeWidget(theItem);
   theItem->deleteLater();
 
-  myUseFilters.remove(aFilter);
-  myFilters.push_back(aFilter);
-  myFiltersCombo->addItem(ModelAPI_Session::get()->filters()->filter(aFilter)->name().c_str());
-
+  ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
+  if (!aFactory->filter(aFilter)->isMultiple()) {
+    //myFilters.push_back(aFilter);
+    myFiltersCombo->addItem(ModelAPI_Session::get()->filters()->filter(aFilter)->name().c_str());
+  }
   FiltersFeaturePtr aFiltersFeature =
     std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
   aFiltersFeature->removeFilter(aFilter);
@@ -441,8 +436,6 @@ void ModuleBase_WidgetSelectionFilter::onReverseItem(ModuleBase_FilterItem* theI
 
 void ModuleBase_WidgetSelectionFilter::onSelect()
 {
-  if (myUseFilters.size() == 0)
-    return;
   Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
   if (aCtx.IsNull())
     return;
@@ -550,7 +543,8 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
 
 void ModuleBase_WidgetSelectionFilter::updateSelectBtn()
 {
-  mySelectBtn->setEnabled(myUseFilters.size() > 0);
+  FiltersFeaturePtr aFiltersFeature = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
+  mySelectBtn->setEnabled(aFiltersFeature.get() && (aFiltersFeature->filters().size() > 0));
 }
 
 void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
@@ -651,6 +645,12 @@ bool ModuleBase_WidgetSelectionFilter::storeValueCustom()
   return true;
 }
 
+QList<ModuleBase_FilterItem*> ModuleBase_WidgetSelectionFilter::itemsList() const
+{
+  return  myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+}
+
+
 bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
 {
   ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
@@ -662,23 +662,33 @@ bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
     aAttrList->setFilters(aFiltersFeature);
   }
 
+  QList<ModuleBase_FilterItem*> aItemsList = itemsList();
   std::list<std::string> aFilters = aFiltersFeature->filters();
-  std::list<std::string>::const_iterator aIt;
-  for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++) {
-    std::string aStr = (*aIt);
-    ModuleBase_FilterItem* aItem = onAddFilter(aStr);
-    FilterPtr aFilterObj = aFactory->filter(aStr);
-    int aId = myFiltersCombo->findText(aFilterObj->name().c_str());
-    if (aId != -1)
-      myFiltersCombo->removeItem(aId);
 
-    if (aItem) {
-      QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
-      foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
-        aWgt->restoreValue();
+  std::list<std::string>::const_iterator aIt;
+  int i = 0;
+  int aNbItems = aItemsList.size();
+  ModuleBase_FilterItem* aItem = 0;
+  bool isBlocked = myFiltersCombo->blockSignals(true);
+  for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++, i++) {
+    std::string aStr = (*aIt);
+    aItem = 0;
+    if (i >= aNbItems) {
+      aItem = onAddFilter(aStr);
+      FilterPtr aFilterObj = aFactory->filter(aStr);
+      int aId = myFiltersCombo->findText(aFilterObj->name().c_str());
+      if ((aId != -1) && !aFilterObj->isMultiple())
+        myFiltersCombo->removeItem(aId);
+      if (aItem) {
+        QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
+        foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
+          aWgt->restoreValue();
+        }
       }
     }
   }
+  myFiltersCombo->setCurrentIndex(0);
+  myFiltersCombo->blockSignals(isBlocked);
   return true;
 }
 
@@ -698,7 +708,7 @@ void ModuleBase_WidgetSelectionFilter::onObjectUpdated()
   clearCurrentSelection(true);
   updateNumberSelected();
 
-  QList<ModuleBase_FilterItem*> aItemsList = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+  QList<ModuleBase_FilterItem*> aItemsList = itemsList();
   foreach(ModuleBase_FilterItem* aItem, aItemsList) {
     QList<ModuleBase_ModelWidget*> aWidgetsList = aItem->widgets();
     foreach(ModuleBase_ModelWidget* aWidget, aWidgetsList) {
