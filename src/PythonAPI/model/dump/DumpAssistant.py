@@ -44,6 +44,7 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
         ModelHighAPI.ModelHighAPI_Dumper.__init__(self)
         ModelHighAPI.ModelHighAPI_Dumper.setInstance(self)
         self.collectFeatures()
+        self.myEngine = None
 
     ## Collect feature wrappers, which allow dumping (have method dump)
     def collectFeatures(self):
@@ -96,6 +97,19 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
         if aFeatureKind in self.myWrapperNames:
             return self.myWrapperNames[aFeatureKind]
         return std_string()
+
+    ## Exports the dumped variables names to the SHAPERSTUDY
+    def exportVariable(self, theEntry, theVarName):
+        try:
+          if self.myEngine == None:
+            import SHAPERSTUDY_utils
+            aComponent = SHAPERSTUDY_utils.findOrCreateComponent()
+            self.myEngine = SHAPERSTUDY_utils.getEngine()
+          if self.myEngine != 1:
+            self.myEngine.StoreVariableName(theEntry, theVarName)
+        except:
+          self.myEngine = 1 # invalid access
+        pass
 
 # Instance of dumper
 dumper = DumpAssistant

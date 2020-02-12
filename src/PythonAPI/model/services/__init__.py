@@ -29,9 +29,19 @@ from ModelHighAPI import reset
 from ModelHighAPI import addFolder, removeFolder
 from ModelHighAPI import ModelHighAPI_Selection as selection
 from ModelHighAPI import checkPythonDump as checkPythonDump
+from ModelAPI import findPartFeature
 
 # a method used for the python dump of the SHAPER STUDY
 def publishToShaperStudy():
   begin()
   activeDocument().addFeature("PublishToStudy")
   end()
+
+# returns unique identifier of the feature : id of part it belongs to + ":" + id of feature
+def featureStringId(theFeature):
+  aRoot = moduleDocument()
+  aCurrent = theFeature.feature().document()
+  if aRoot and aCurrent:
+    print(str(dir()))
+    return str(findPartFeature(aRoot, aCurrent).data().featureId()) + ":" + str(theFeature.feature().data().featureId())
+  return ""

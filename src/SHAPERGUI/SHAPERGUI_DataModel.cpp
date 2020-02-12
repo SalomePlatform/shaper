@@ -24,6 +24,7 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ExchangePlugin_Dump.h>
 
 #include <LightApp_Study.h>
@@ -199,6 +200,10 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     if (aAttr.get())
       aAttr->setValue(".py");
 
+#ifdef HAVE_SALOME
+    aFeature->boolean(ExchangePlugin_Dump::EXPORT_VARIABLES_ID())->setValue(true);
+#endif
+
     ModelAPI_Session::get()->finishOperation();
 
     if (QFile::exists(aFileName.c_str())) {
@@ -237,4 +242,3 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
   }
   return false;
 }
-
