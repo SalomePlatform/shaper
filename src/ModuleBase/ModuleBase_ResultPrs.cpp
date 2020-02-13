@@ -45,6 +45,7 @@
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <Prs3d_ShadingAspect.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SelectionManager.hxx>
@@ -97,6 +98,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   aDrawer->SetUIsoAspect(myUIsoAspect);
   aDrawer->SetVIsoAspect(myVIsoAspect);
 
+  aDrawer->SetIsoOnPlane(false);
+
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
@@ -116,6 +119,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
     aDrawer->VIsoAspect()->SetNumber(0);
     aDrawer->UIsoAspect()->SetNumber(0);
   }
+  aDrawer->SetIsoOnPlane(false);
+
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
   aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
