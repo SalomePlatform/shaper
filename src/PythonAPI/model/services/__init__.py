@@ -42,6 +42,5 @@ def featureStringId(theFeature):
   aRoot = moduleDocument()
   aCurrent = theFeature.feature().document()
   if aRoot and aCurrent:
-    print(str(dir()))
     return str(findPartFeature(aRoot, aCurrent).data().featureId()) + ":" + str(theFeature.feature().data().featureId())
   return ""

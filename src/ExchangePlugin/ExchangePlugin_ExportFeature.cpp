@@ -575,7 +575,7 @@ bool ExchangePlugin_ExportFeature::isMacro() const
     }
   }
 
-  if (aFormat == "XAO") { // on export to GEOm the selection attribute is filled - this is
+  if (aFormat == "XAO") { // on export to GEOM the selection attribute is filled - this is
                           // an exceptional case where export to XAO feature must be kept
     AttributeSelectionListPtr aList = aThis->selectionList(SELECTION_LIST_ID());
     return !aList->isInitialized() || aList->size() == 0;
