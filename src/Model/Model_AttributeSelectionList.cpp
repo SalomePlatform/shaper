@@ -269,6 +269,16 @@ void Model_AttributeSelectionList::remove(const std::set<int>& theIndices)
   }
 }
 
+void Model_AttributeSelectionList::copyTo(AttributeSelectionListPtr theTarget) const
+{
+  std::shared_ptr<Model_AttributeSelectionList> aTarget =
+    std::dynamic_pointer_cast<Model_AttributeSelectionList>(theTarget);
+  if (aTarget) {
+    copyAttrs(myLab, aTarget->myLab);
+    aTarget->reinit();
+  }
+}
+
 int Model_AttributeSelectionList::size()
 {
   return mySize->Get();

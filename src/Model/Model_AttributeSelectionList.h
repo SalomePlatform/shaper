@@ -66,6 +66,9 @@ public:
   MODEL_EXPORT virtual void append(const std::string& theType, const std::string& theContextName,
                                    const int theIndex);
 
+  /// Copy the selection list to the destination attribute
+  MODEL_EXPORT virtual void copyTo(AttributeSelectionListPtr theTarget) const;
+
   /// Reset temporary stored values
   virtual void removeTemporaryValues();
 

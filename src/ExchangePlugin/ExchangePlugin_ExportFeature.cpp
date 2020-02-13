@@ -111,15 +111,9 @@ void ExchangePlugin_ExportFeature::initAttributes()
   AttributeStringPtr aTypeAttr = string(EXPORT_TYPE_ID());
   if (aTypeAttr->isInitialized() && aTypeAttr->value() == "XAO") {
     AttributeSelectionListPtr aSelList = selectionList(SELECTION_LIST_ID());
-    int aSelListSize = aSelList->size();
     AttributeSelectionListPtr aXAOSelList = selectionList(XAO_SELECTION_LIST_ID());
-    if (aSelListSize > 0 && aXAOSelList->size() == 0) {
-      for (int i = 0; i < aSelListSize; ++i) {
-        AttributeSelectionPtr aSelection = aSelList->value(i);
-        aXAOSelList->append(aSelection->context(), aSelection->value());
-      }
-      aXAOSelList->setSelectionType(aSelList->selectionType());
-    }
+    if (aSelList->size() > 0 && aXAOSelList->size() == 0)
+      aSelList->copyTo(aXAOSelList);
     aSelList->clear();
   }
 }

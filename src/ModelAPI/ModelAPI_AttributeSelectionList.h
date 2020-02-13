@@ -64,6 +64,9 @@ public:
   virtual void append(const std::string& theType, const std::string& theContextName,
                       const int theIndex) = 0;
 
+  /// Copy the selection list to the destination attribute
+  virtual void copyTo(std::shared_ptr<ModelAPI_AttributeSelectionList> theTarget) const = 0;
+
   /// Reset temporary stored values
   virtual void removeTemporaryValues() = 0;
 
