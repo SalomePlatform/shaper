@@ -30,6 +30,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <list>
 #include <map>
 #include <iostream>
@@ -852,13 +853,19 @@ void getColor(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int
 void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int>& theNbLines)
 {
   theNbLines.clear();
-  // get color from the attribute of the result
-  if (theResult.get() != NULL &&
-    theResult->data()->attribute(ModelAPI_Result::ISO_LINES_ID()).get() != NULL) {
-    AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
-    if (aAttr.get() && aAttr->size()) {
-      theNbLines.push_back(aAttr->value(0));
-      theNbLines.push_back(aAttr->value(1));
+  if (theResult->groupName() == ModelAPI_ResultConstruction::group()) {
+    theNbLines.push_back(0);
+    theNbLines.push_back(0);
+  }
+  else {
+    // get color from the attribute of the result
+    if (theResult.get() != NULL &&
+      theResult->data()->attribute(ModelAPI_Result::ISO_LINES_ID()).get() != NULL) {
+      AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+      if (aAttr.get() && aAttr->size()) {
+        theNbLines.push_back(aAttr->value(0));
+        theNbLines.push_back(aAttr->value(1));
+      }
     }
   }
 }

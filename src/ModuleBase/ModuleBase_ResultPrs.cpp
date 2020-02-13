@@ -98,8 +98,6 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   aDrawer->SetUIsoAspect(myUIsoAspect);
   aDrawer->SetVIsoAspect(myVIsoAspect);
 
-  aDrawer->SetIsoOnPlane(false);
-
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
@@ -109,17 +107,11 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   if (aDrawer.IsNull()) {
     if (!ModuleBase_IViewer::DefaultHighlightDrawer.IsNull()) {
       aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
-      Handle(Prs3d_IsoAspect) aUIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, 0);
-      Handle(Prs3d_IsoAspect) aVIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, 0);
-      aDrawer->SetUIsoAspect(aUIsoAspect);
-      aDrawer->SetVIsoAspect(aVIsoAspect);
+      aDrawer->SetUIsoAspect(myUIsoAspect);
+      aDrawer->SetVIsoAspect(myVIsoAspect);
       SetDynamicHilightAttributes(aDrawer);
     }
-  } else {
-    aDrawer->VIsoAspect()->SetNumber(0);
-    aDrawer->UIsoAspect()->SetNumber(0);
   }
-  aDrawer->SetIsoOnPlane(false);
 
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
