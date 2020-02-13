@@ -68,7 +68,7 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
   std::list<ModelHighAPI_Selection> aListOfOneSel;
   aListOfOneSel.push_back(theResult);
   fillAttribute(aListOfOneSel,
-    theFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
+    theFeature->selectionList(ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID()));
   execute();
   apply(); // finish operation to make sure the export is done on the current state of the history
 }
@@ -130,7 +130,7 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
     correctSeparators(aTmpXAOFile);
     theDumper << "exportToXAO(" << aDocName << ", '" << aTmpXAOFile << "'" ;
     AttributeSelectionListPtr aShapeSelected =
-      aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+      aBase->selectionList(ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID());
     if (aShapeSelected->isInitialized() && aShapeSelected->size() == 1) {
       theDumper<<", "<<aShapeSelected->value(0);
     }

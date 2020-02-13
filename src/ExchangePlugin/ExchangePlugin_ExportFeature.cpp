@@ -94,6 +94,8 @@ void ExchangePlugin_ExportFeature::initAttributes()
     ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(),
     ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID(),
+    ModelAPI_AttributeSelectionList::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
@@ -101,6 +103,25 @@ void ExchangePlugin_ExportFeature::initAttributes()
     ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID());
+
+  // to support previous version of document, move the selection list
+  // if the type of export operation is XAO
+  AttributeStringPtr aTypeAttr = string(EXPORT_TYPE_ID());
+  if (aTypeAttr->isInitialized() && aTypeAttr->value() == "XAO") {
+    AttributeSelectionListPtr aSelList = selectionList(SELECTION_LIST_ID());
+    int aSelListSize = aSelList->size();
+    AttributeSelectionListPtr aXAOSelList = selectionList(XAO_SELECTION_LIST_ID());
+    if (aSelListSize > 0 && aXAOSelList->size() == 0) {
+      for (int i = 0; i < aSelListSize; ++i) {
+        AttributeSelectionPtr aSelection = aSelList->value(i);
+        aXAOSelList->append(aSelection->context(), aSelection->value());
+      }
+      aXAOSelList->setSelectionType(aSelList->selectionType());
+    }
+    aSelList->clear();
+  }
 }
 
 void ExchangePlugin_ExportFeature::attributeChanged(const std::string& theID)
@@ -316,7 +337,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   std::list<DocumentPtr> aDocuments; /// documents of Parts selected and used in export
   std::map<DocumentPtr, GeomTrsfPtr> aDocTrsf; /// translation of the part
 
-  AttributeSelectionListPtr aSelection = selectionList(SELECTION_LIST_ID());
+  AttributeSelectionListPtr aSelection = selectionList(XAO_SELECTION_LIST_ID());
   bool aIsSelection = aSelection->isInitialized() && aSelection->size() > 0;
   if (aIsSelection) { // a mode for export to geom result by result
     for(int a = 0; a < aSelection->size(); a++) {
@@ -577,7 +598,7 @@ bool ExchangePlugin_ExportFeature::isMacro() const
 
   if (aFormat == "XAO") { // on export to GEOm the selection attribute is filled - this is
                           // an exceptional case where export to XAO feature must be kept
-    AttributeSelectionListPtr aList = aThis->selectionList(SELECTION_LIST_ID());
+    AttributeSelectionListPtr aList = aThis->selectionList(XAO_SELECTION_LIST_ID());
     return !aList->isInitialized() || aList->size() == 0;
   }
   return true;

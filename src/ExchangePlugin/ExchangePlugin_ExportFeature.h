@@ -72,6 +72,12 @@ public:
     static const std::string MY_SELECTION_LIST_ID("selection_list");
     return MY_SELECTION_LIST_ID;
   }
+  /// attribute name of xao selection list
+  inline static const std::string& XAO_SELECTION_LIST_ID()
+  {
+    static const std::string MY_SELECTION_LIST_ID("xao_selection_list");
+    return MY_SELECTION_LIST_ID;
+  }
   /// attribute name of author for XAO format
   inline static const std::string& XAO_AUTHOR_ID()
   {
