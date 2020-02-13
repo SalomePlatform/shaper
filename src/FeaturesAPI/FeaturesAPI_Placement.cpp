@@ -108,8 +108,16 @@ void FeaturesAPI_Placement::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeBooleanPtr anAttrCentering = aBase->boolean(FeaturesPlugin_Placement::CENTERING_ID());
 
   theDumper << aBase << " = model.addPlacement(" << aDocName << ", "
-            << anAttrObjects << ", " << anAttrStartShape << ", " << anAttrEndShape << ", "
-            << anAttrReverse << ", " << anAttrCentering << ")" << std::endl;
+            << anAttrObjects << ", " << anAttrStartShape << ", " << anAttrEndShape;
+
+  if (anAttrReverse->value())
+    theDumper << ", reverse = " << anAttrReverse;
+  if (anAttrCentering->value())
+    theDumper << ", centering = " << anAttrCentering;
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -118,9 +126,12 @@ PlacementPtr addPlacement(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const ModelHighAPI_Selection& theStartShape,
                           const ModelHighAPI_Selection& theEndShape,
                           const bool theReverseDirection,
-                          const bool theCentering)
+                          const bool theCentering,
+                          const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Placement::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
   return PlacementPtr(new FeaturesAPI_Placement(aFeature,
                                                 theObjects,
                                                 theStartShape,

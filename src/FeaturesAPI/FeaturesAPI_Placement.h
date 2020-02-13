@@ -100,7 +100,8 @@ PlacementPtr addPlacement(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theObjects,
                           const ModelHighAPI_Selection& theStartShape,
                           const ModelHighAPI_Selection& theEndShape,
-                          const bool theReverseDirection = false,
-                          const bool theCentering = false);
+                          const bool reverse = false,
+                          const bool centering = false,
+                          const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Placement_H_

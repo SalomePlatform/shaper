@@ -569,4 +569,16 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test3137_1.py
                Test3137_2.py
                Test3139.py
+               TestPlacement_MultiLevelCompound_v0_1.py
+               TestPlacement_MultiLevelCompound_v0_2.py
+               TestPlacement_MultiLevelCompound_v0_3.py
+               TestPlacement_MultiLevelCompound_v0_4.py
+               TestPlacement_MultiLevelCompound_v0_5.py
+               TestPlacement_MultiLevelCompound_v0_6.py
+               TestPlacement_MultiLevelCompound_v95_1.py
+               TestPlacement_MultiLevelCompound_v95_2.py
+               TestPlacement_MultiLevelCompound_v95_3.py
+               TestPlacement_MultiLevelCompound_v95_4.py
+               TestPlacement_MultiLevelCompound_v95_5.py
+               TestPlacement_MultiLevelCompound_v95_6.py
 )

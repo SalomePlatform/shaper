@@ -48,16 +48,13 @@ void GeomAPI_ShapeHierarchy::addParent(const GeomShapePtr& theShape,
 GeomShapePtr GeomAPI_ShapeHierarchy::parent(const GeomShapePtr& theShape,
                                             bool theMarkProcessed)
 {
-  MapShapeToParent::const_iterator aFound = myParent.find(theShape);
+  MapShapeToShape::const_iterator aFound = myParent.find(theShape);
   GeomShapePtr aParent;
   if (aFound != myParent.end()) {
     aParent = aFound->second;
     if (theMarkProcessed) {
       // mark the parent and all its subs as processed by Boolean algorithm
       markProcessed(aParent);
-      const ListOfShape& aSubs = mySubshapes[myParentIndices[aParent]].second;
-      for (ListOfShape::const_iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt)
-        markProcessed(*anIt);
     }
   }
   return aParent;
@@ -66,12 +63,25 @@ GeomShapePtr GeomAPI_ShapeHierarchy::parent(const GeomShapePtr& theShape,
 void GeomAPI_ShapeHierarchy::markProcessed(const GeomShapePtr& theShape)
 {
   myProcessedObjects.insert(theShape);
+  // mark sub-shapes of the compound as processed too
+  MapShapeToIndex::iterator aFoundInd = myParentIndices.find(theShape);
+  if (aFoundInd != myParentIndices.end()) {
+    const ListOfShape& aSubs = mySubshapes[aFoundInd->second].second;
+    for (ListOfShape::const_iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt)
+      markProcessed(*anIt);
+  }
 }
 
 void GeomAPI_ShapeHierarchy::markProcessed(const ListOfShape& theShapes)
 {
   for (ListOfShape::const_iterator anIt = theShapes.begin(); anIt != theShapes.end(); ++anIt)
     markProcessed(*anIt);
+}
+
+void GeomAPI_ShapeHierarchy::markModified(const GeomShapePtr& theSource,
+                                          const GeomShapePtr& theModified)
+{
+  myModifiedObjects[theSource] = theModified;
 }
 
 void GeomAPI_ShapeHierarchy::objectsByType(
@@ -127,6 +137,40 @@ bool GeomAPI_ShapeHierarchy::empty() const
   return myObjects.empty();
 }
 
+void GeomAPI_ShapeHierarchy::topLevelObjects(ListOfShape& theDestination) const
+{
+  GeomAPI_ShapeHierarchy* aThis = const_cast<GeomAPI_ShapeHierarchy*>(this);
+  SetOfShape aProcessed = myProcessedObjects;
+  aThis->myProcessedObjects.clear();
+
+  iterator anIt = aThis->begin(), aEnd = aThis->end();
+  for (; anIt != aEnd; ++anIt) {
+    GeomShapePtr aShape = *anIt;
+    GeomShapePtr aParent = aThis->parent(aShape);
+    GeomShapePtr aRoot = aParent;
+    while (aParent) {
+      aParent = aThis->parent(aRoot);
+      if (aParent)
+        aRoot = aParent;
+    }
+
+    if (aRoot) {
+      // compose a compund with the modified shapes
+      aShape = collectSubs(aRoot, SetOfShape(), myModifiedObjects);
+    }
+    else {
+      // check the current shape was modified
+      MapShapeToShape::const_iterator aFound = myModifiedObjects.find(aShape);
+      if (aFound != myModifiedObjects.end())
+        aShape = aFound->second;
+    }
+
+    theDestination.push_back(aShape);
+  }
+
+  aThis->myProcessedObjects = aProcessed;
+}
+
 void GeomAPI_ShapeHierarchy::compoundsOfUnusedObjects(
     ListOfShape& theDestination) const
 {
@@ -135,11 +179,11 @@ void GeomAPI_ShapeHierarchy::compoundsOfUnusedObjects(
 
   for (std::vector<ShapeAndSubshapes>::const_iterator anIt = mySubshapes.begin();
        anIt != mySubshapes.end(); ++anIt) {
-    MapShapeToParent::const_iterator aParent = myParent.find(anIt->first);
+    MapShapeToShape::const_iterator aParent = myParent.find(anIt->first);
     if ((aParent == myParent.end() || !aParent->second) &&
          anIt->first->shapeType() ==  GeomAPI_Shape::COMPOUND) {
       // this is a top-level compound
-      GeomShapePtr aCompound = collectUnusedSubs(anIt->first, aUsedObjects);
+      GeomShapePtr aCompound = collectSubs(anIt->first, aUsedObjects);
       // add to destination non-empty compounds only
       if (aCompound)
         theDestination.push_back(aCompound);
@@ -147,28 +191,34 @@ void GeomAPI_ShapeHierarchy::compoundsOfUnusedObjects(
   }
 }
 
-static void addSubShape(GeomShapePtr theTarget, GeomShapePtr theSub)
+static void addSubShape(GeomShapePtr theTarget, GeomShapePtr theSub,
+    const std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator>& theModified)
 {
   if (!theTarget.get() || !theSub.get())
     return;
 
   TopoDS_Shape* aShape = theTarget->implPtr<TopoDS_Shape>();
-  const TopoDS_Shape& aShapeToAdd = theSub->impl<TopoDS_Shape>();
+
+  std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator>::const_iterator
+    aFound = theModified.find(theSub);
+  const TopoDS_Shape& aShapeToAdd =
+      (aFound == theModified.end() ? theSub : aFound->second)->impl<TopoDS_Shape>();
 
   static BRep_Builder aBuilder;
   aBuilder.Add(*aShape, aShapeToAdd);
 }
 
-GeomShapePtr GeomAPI_ShapeHierarchy::collectUnusedSubs(
+GeomShapePtr GeomAPI_ShapeHierarchy::collectSubs(
     GeomShapePtr theTopLevelCompound,
-    const SetOfShape& theUsed) const
+    const SetOfShape& theExcluded,
+    const MapShapeToShape& theModified) const
 {
   GeomShapePtr aResult = theTopLevelCompound->emptyCopied();
   bool isResultEmpty = true;
 
   for (GeomAPI_ShapeIterator aSub(theTopLevelCompound); aSub.more(); aSub.next()) {
     GeomShapePtr aCurrent = aSub.current();
-    if (theUsed.find(aCurrent) != theUsed.end())
+    if (theExcluded.find(aCurrent) != theExcluded.end())
       continue; // already used
 
     MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(aCurrent);
@@ -178,17 +228,17 @@ GeomShapePtr GeomAPI_ShapeHierarchy::collectUnusedSubs(
       // check compsolid is fully unused in the Boolean operation
       if (aCurrent->shapeType() == GeomAPI_Shape::COMPSOLID) {
         for (GeomAPI_ShapeIterator anIt(aCurrent); isAddShape && anIt.more(); anIt.next())
-          isAddShape = theUsed.find(anIt.current()) == theUsed.end();
+          isAddShape = theExcluded.find(anIt.current()) == theExcluded.end();
       }
 
       if (isAddShape) { // low-level shape, add it
-        addSubShape(aResult, aCurrent);
+        addSubShape(aResult, aCurrent, theModified);
         isResultEmpty = false;
       }
     } else {
-      GeomShapePtr aCompound = collectUnusedSubs(aCurrent, theUsed);
+      GeomShapePtr aCompound = collectSubs(aCurrent, theExcluded, theModified);
       if (aCompound) {
-        addSubShape(aResult, aCompound);
+        addSubShape(aResult, aCompound, theModified);
         isResultEmpty = false;
       }
     }

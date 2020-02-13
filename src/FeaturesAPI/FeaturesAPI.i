@@ -42,6 +42,7 @@
 %feature("kwargs") addCut;
 %feature("kwargs") addFuse;
 %feature("kwargs") addPartition;
+%feature("kwargs") addPlacement;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
 %feature("kwargs") addUnion;

@@ -33,12 +33,12 @@
 class GeomAPI_ShapeHierarchy
 {
   typedef std::pair<GeomShapePtr, ListOfShape> ShapeAndSubshapes;
-  typedef std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator> MapShapeToParent;
+  typedef std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator> MapShapeToShape;
   typedef std::map<GeomShapePtr, size_t, GeomAPI_Shape::Comparator> MapShapeToIndex;
   typedef std::set<GeomShapePtr, GeomAPI_Shape::Comparator> SetOfShape;
 
   ListOfShape myObjects; ///< list of objects of some operation
-  MapShapeToParent myParent; ///< refer a shape to compound/compsolid containing it
+  MapShapeToShape myParent; ///< refer a shape to compound/compsolid containing it
   /// indices of compounds/compsolids to keep the order of parent shapes
   /// corresponding to the order of objects
   MapShapeToIndex  myParentIndices;
@@ -46,6 +46,7 @@ class GeomAPI_ShapeHierarchy
   std::vector<ShapeAndSubshapes> mySubshapes;
 
   SetOfShape myProcessedObjects;
+  MapShapeToShape myModifiedObjects;
 
 public:
   /// Add an object of the operation (low-level shape in the hierarchy)
@@ -65,6 +66,9 @@ public:
   /// Mark list ofshapes as already processed
   GEOMAPI_EXPORT void markProcessed(const ListOfShape& theShapes);
 
+  /// Mark the shape as modified and store its image
+  GEOMAPI_EXPORT void markModified(const GeomShapePtr& theSource, const GeomShapePtr& theModified);
+
   /// Split compound/compsolid shape for subshapes selected for operation and the others.
   GEOMAPI_EXPORT void splitCompound(const GeomShapePtr& theCompShape,
                                     ListOfShape& theUsed,
@@ -72,6 +76,9 @@ public:
 
   /// Generates the list of top-level compounds, which exclude the objects of operation.
   GEOMAPI_EXPORT void compoundsOfUnusedObjects(ListOfShape& theDestination) const;
+
+  /// Generates the list of top-level compounds, with modified objects of operation.
+  GEOMAPI_EXPORT void topLevelObjects(ListOfShape& theDestination) const;
 
   /// Return \c true if there is no object in hierarchy
   GEOMAPI_EXPORT bool empty() const;
@@ -84,8 +91,11 @@ public:
       const GeomAPI_Shape::ShapeType theMaxType = GeomAPI_Shape::SHAPE) const;
 
 private:
-  GeomShapePtr collectUnusedSubs(const GeomShapePtr theTopLevelCompound,
-                                 const SetOfShape& theUsed) const;
+  /// Collect subs of a top-level compound, excluding the set of given objects
+  /// and substitute the shapes which were modified
+  GeomShapePtr collectSubs(const GeomShapePtr theTopLevelCompound,
+                           const SetOfShape& theExcluded = SetOfShape(),
+                           const MapShapeToShape& theModified = MapShapeToShape()) const;
 
 public:
   class iterator : public std::iterator<std::forward_iterator_tag, GeomShapePtr>
