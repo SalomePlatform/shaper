@@ -1698,6 +1698,15 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     changeColor(aObjects);
   else if (theId == "ISOLINES_CMD")
     changeIsoLines(aObjects);
+  else if (theId == "SHOW_ISOLINES_CMD") {
+    foreach(ObjectPtr aObj, aObjects) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aResult.get())
+        ModelAPI_Tools::showIsoLines(aResult, !ModelAPI_Tools::isShownIsoLines(aResult));
+    }
+    mySelector->clearSelection();
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
   else if (theId == "DEFLECTION_CMD")
     changeDeflection(aObjects);
   else if (theId == "TRANSPARENCY_CMD")
@@ -3186,10 +3195,11 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
     return;
 
   std::vector<int> aValues;
+  bool isVisible;
   if (theObjects.size() == 1) {
     ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObjects.first());
     if (aRes.get())
-      ModelAPI_Tools::getIsoLines(aRes, aValues);
+      ModelAPI_Tools::getIsoLines(aRes, isVisible, aValues);
     else
       return;
   }
@@ -3233,6 +3243,7 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
         ModelAPI_Tools::setIsoLines(aRes, aValues);
       }
     }
+    mySelector->clearSelection();
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
     aMgr->finishOperation();
     updateCommandStatus();

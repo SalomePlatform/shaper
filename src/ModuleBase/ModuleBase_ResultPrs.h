@@ -119,22 +119,7 @@ public:
   /// Returns True if the original shape is substituted by a corresponded shell
   Standard_EXPORT bool isSubstituted() const { return myIsSubstituted; }
 
-  /// Set number of Iso-lines
-  /// \param theU a number of U Iso-lines
-  /// \param theV a number of V Iso-lines
-  Standard_EXPORT void setIsolinesNumber(int theU, int theV) {
-    myUIsoAspect->SetNumber(theU); myVIsoAspect->SetNumber(theV);
-  }
-
-  /// Returns number of U Iso-lines
-  Standard_EXPORT int UIsoLines() const {
-    return myUIsoAspect->Number();
-  }
-
-  /// Returns number of V Iso-lines
-  Standard_EXPORT int VIsoLines() const {
-    return myVIsoAspect->Number();
-  }
+  Standard_EXPORT void updateIsoLines();
 
   DEFINE_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape)
 

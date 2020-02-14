@@ -31,6 +31,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <list>
 #include <map>
 #include <iostream>
@@ -850,22 +851,30 @@ void getColor(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int
 }
 
 //******************************************************
-void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int>& theNbLines)
+void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult,
+  bool& isVisible, std::vector<int>& theNbLines)
 {
   theNbLines.clear();
+  isVisible = false;
+  if (!theResult.get())
+    return;
   if (theResult->groupName() == ModelAPI_ResultConstruction::group()) {
     theNbLines.push_back(0);
     theNbLines.push_back(0);
   }
   else {
     // get color from the attribute of the result
-    if (theResult.get() != NULL &&
-      theResult->data()->attribute(ModelAPI_Result::ISO_LINES_ID()).get() != NULL) {
-      AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
-      if (aAttr.get() && aAttr->size()) {
+    AttributeIntArrayPtr aAttr = theResult->data()->intArray(ModelAPI_Result::ISO_LINES_ID());
+    if (aAttr.get()) {
+      if (aAttr->size()) {
         theNbLines.push_back(aAttr->value(0));
         theNbLines.push_back(aAttr->value(1));
       }
+    }
+    AttributeBooleanPtr aBoolAttr =
+      theResult->data()->boolean(ModelAPI_Result::SHOW_ISO_LINES_ID());
+    if (aBoolAttr.get()) {
+      isVisible = aBoolAttr->value();
     }
   }
 }
@@ -884,6 +893,31 @@ void setIsoLines(ResultPtr theResult, const std::vector<int>& theIso)
     aAttr->setValue(0, theIso[0]);
     aAttr->setValue(1, theIso[1]);
   }
+}
+
+//******************************************************
+void showIsoLines(std::shared_ptr<ModelAPI_Result> theResult, bool theShow)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::SHOW_ISO_LINES_ID());
+  if (aAttr.get() != NULL) {
+    aAttr->setValue(theShow);
+  }
+}
+
+//******************************************************
+bool isShownIsoLines(std::shared_ptr<ModelAPI_Result> theResult)
+{
+  if (!theResult.get())
+    return false;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::SHOW_ISO_LINES_ID());
+  if (aAttr.get() != NULL) {
+    return aAttr->value();
+  }
+  return false;
 }
 
 //**************************************************************

@@ -242,7 +242,7 @@ MODELAPI_EXPORT void setColor(std::shared_ptr<ModelAPI_Result> theResult,
 * \param[out] theNbLines values of iso-lines
 */
 MODELAPI_EXPORT void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResult,
-  std::vector<int>& theNbLines);
+  bool& isVisible, std::vector<int>& theNbLines);
 
 /*! Set number of iso-lines of the result
 * \param[in] theResult a result object
@@ -250,6 +250,14 @@ MODELAPI_EXPORT void getIsoLines(const std::shared_ptr<ModelAPI_Result>& theResu
 */
 MODELAPI_EXPORT void setIsoLines(std::shared_ptr<ModelAPI_Result> theResult,
   const std::vector<int>& theIso);
+
+/*! Set visibility of Iso lines
+* \param[in] theResult a result object
+* \param[in] theShow is a visibility flag
+*/
+MODELAPI_EXPORT void showIsoLines(std::shared_ptr<ModelAPI_Result> theResult, bool theShow);
+
+MODELAPI_EXPORT bool isShownIsoLines(std::shared_ptr<ModelAPI_Result> theResult);
 
 /*! Returns current transparency in the given result
 * \param theResult a result object

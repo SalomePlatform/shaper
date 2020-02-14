@@ -206,7 +206,15 @@
     </message>
     <message>
         <source>Iso-lines...</source>
-        <translation>Iso-lines...</translation>
+        <translation type="vanished">Iso-lines...</translation>
+    </message>
+    <message>
+        <source>Define Isos...</source>
+        <translation>Définir l&apos;Isos...</translation>
+    </message>
+    <message>
+        <source>Show Isos...</source>
+        <translation>Show Isos...</translation>
     </message>
 </context>
 <context>

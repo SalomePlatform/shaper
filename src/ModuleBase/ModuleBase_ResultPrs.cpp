@@ -88,10 +88,17 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   Color(aColor);
 
   std::vector<int> aIsoValues;
-  ModelAPI_Tools::getIsoLines(myResult, aIsoValues);
-  if (aIsoValues.size() == 0) {
-    aIsoValues.push_back(1);
-    aIsoValues.push_back(1);
+  bool isIsoVisible;
+  ModelAPI_Tools::getIsoLines(myResult, isIsoVisible, aIsoValues);
+  if (isIsoVisible) {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(1);
+      aIsoValues.push_back(1);
+    }
+  }
+  else {
+    aIsoValues.push_back(0);
+    aIsoValues.push_back(0);
   }
   myUIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[0]);
   myVIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[1]);
@@ -468,4 +475,31 @@ void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_Presentatio
     if (thePM->IsImmediateModeOn())
       thePM->AddToImmediateList(aHilightPrs);
   }
+}
+
+
+//********************************************************************
+void ModuleBase_ResultPrs::updateIsoLines()
+{
+  std::vector<int> aIsoValues;
+  bool isIsoVisible;
+  ModelAPI_Tools::getIsoLines(myResult, isIsoVisible, aIsoValues);
+  if (isIsoVisible) {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(1);
+      aIsoValues.push_back(1);
+    }
+  }
+  else {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(0);
+      aIsoValues.push_back(0);
+    }
+    else {
+      aIsoValues[0] = 0;
+      aIsoValues[1] = 0;
+    }
+  }
+  myUIsoAspect->SetNumber(aIsoValues[0]);
+  myVIsoAspect->SetNumber(aIsoValues[1]);
 }
