@@ -91,6 +91,7 @@
 #include <ExchangePlugin_ExportPart.h>
 #include <ExchangePlugin_ImportPart.h>
 #include <ExchangePlugin_Import.h>
+#include <ExchangePlugin_ExportFeature.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -472,38 +473,43 @@ void XGUI_Workshop::initMenu()
 
 
   // Add commands to a file menu
-  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."),
-                                             tr("Export the current document into a native file"),
-                                              QIcon(), QKeySequence(),
-                                              false, "MEN_DESK_FILE");
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
-
-  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."),
+  // Import sub-menu
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Part set..."),
                                               tr("Import native file"),
                                               QIcon(), QKeySequence(),
-                                              false, "MEN_DESK_FILE");
+                                              false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
-  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
-  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Export part..."),
-                                          tr("Export a part of the current document into a file"),
-                                          QIcon(), QKeySequence(),
-                                          false, "MEN_DESK_FILE");
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
-
-  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Import part..."),
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Part..."),
                                           tr("Import structure of a part"),
                                           QIcon(), QKeySequence(),
-                                          false, "MEN_DESK_FILE");
+                                          false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportPart()));
 
-  aAction = salomeConnector()->addDesktopCommand("IMPORT_SHAPE_CMD", tr("Import shape..."),
-    tr("Import shape from a file"),
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_SHAPE_CMD", tr("From CAD format..."),
+    tr("Import shape from a CAD format file"),
     ModuleBase_IconFactory::loadIcon("icons/Exchange/import.png"),
-    QKeySequence(), false, "MEN_DESK_FILE");
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportShape()));
 
-  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+  // Export sub-menu
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Part set..."),
+                                             tr("Export the current document into a native file"),
+                                              QIcon(), QKeySequence(),
+                                              false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Part..."),
+                                          tr("Export a part of the current document into a file"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_SHAPE_CMD", tr("To CAD format..."),
+    tr("Export shape to a CAD format file"),
+    ModuleBase_IconFactory::loadIcon("icons/Exchange/export.png"),
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportShape()));
 
 #else
   // File commands group
@@ -1318,6 +1324,17 @@ void XGUI_Workshop::onImportShape()
         module()->createOperation(ExchangePlugin_Import::ID()));
     myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
     operationMgr()->startOperation(anImportOp);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onExportShape()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anExportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ExportFeature::ID()));
+    myPropertyPanel->updateApplyPlusButton(anExportOp->feature());
+    operationMgr()->startOperation(anExportOp);
   }
 }
 

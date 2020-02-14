@@ -13,14 +13,13 @@
                 tooltip="Select the part to import the document" />
       </feature>
       <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
-               helpfile="importFeature.html"
-               internal="1">
+               helpfile="importFeature.html" internal="1">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
         </file_selector>
       </feature>
       <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png"
-               helpfile="exportFeature.html">
+               helpfile="exportFeature.html" internal="1">
         <source path="export_widget.xml" />
       </feature>
       <feature id="Dump" title="Dump" tooltip="Dump Python script" icon="icons/Exchange/dump.png"

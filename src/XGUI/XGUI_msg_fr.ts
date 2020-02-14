@@ -204,6 +204,10 @@
         <source>Windows</source>
         <translation>Fenêtres</translation>
     </message>
+    <message>
+        <source>Iso-lines...</source>
+        <translation>Iso-lines...</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>
@@ -539,7 +543,7 @@
     </message>
     <message>
         <source>Export native...</source>
-        <translation>Exporter natif...</translation>
+        <translation type="vanished">Exporter natif...</translation>
     </message>
     <message>
         <source>Export the current document into a native file</source>
@@ -547,7 +551,7 @@
     </message>
     <message>
         <source>Import native...</source>
-        <translation>Importer natif...</translation>
+        <translation type="vanished">Importer natif...</translation>
     </message>
     <message>
         <source>Import native file</source>
@@ -667,7 +671,7 @@ Supprimer des objets du panneau à afficher ?</translation>
     </message>
     <message>
         <source>Export part...</source>
-        <translation>Partie export...</translation>
+        <translation type="vanished">Partie export...</translation>
     </message>
     <message>
         <source>Export a part of the current document into a file</source>
@@ -675,11 +679,47 @@ Supprimer des objets du panneau à afficher ?</translation>
     </message>
     <message>
         <source>Import part...</source>
-        <translation>Importer une partie...</translation>
+        <translation type="vanished">Importer une partie...</translation>
     </message>
     <message>
         <source>Import structure of a part</source>
         <translation>Structure d&apos;importation d&apos;une pièce</translation>
+    </message>
+    <message>
+        <source>Part set...</source>
+        <translation>Ensemble de parties...</translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation>Importation</translation>
+    </message>
+    <message>
+        <source>Part...</source>
+        <translation>Partie...</translation>
+    </message>
+    <message>
+        <source>From CAD format...</source>
+        <translation>A partir du format CAO...</translation>
+    </message>
+    <message>
+        <source>Import shape from a CAD format file</source>
+        <translation>Importer une forme à partir d&apos;un fichier au format CAO</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Exporter</translation>
+    </message>
+    <message>
+        <source>To CAD format...</source>
+        <translation>Au format CAO...</translation>
+    </message>
+    <message>
+        <source>Number of Iso-lines</source>
+        <translation>Nombre de Iso-lignes</translation>
+    </message>
+    <message>
+        <source>Export shape to a CAD format file</source>
+        <translation>Exportation de la forme vers un fichier au format CAO</translation>
     </message>
 </context>
 </TS>

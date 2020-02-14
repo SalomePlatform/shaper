@@ -699,9 +699,14 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
 QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTitle,
                                            const QString& theTip, const QIcon& theIcon,
                                            const QKeySequence& theKeys, bool isCheckable,
-                                           const char* theMenuSourceText, const int theMenuPosition)
+                                           const char* theMenuSourceText,
+                                           const QString& theSubMenu,
+                                           const int theMenuPosition,
+                                           const int theSuibMenuPosition)
 {
   int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
+  if (!theSubMenu.isNull())
+    aMenu = createMenu(theSubMenu, aMenu, -1, theSuibMenuPosition);
 
   int aId = getNextCommandId();
   myActionsList.append(aId);
