@@ -179,13 +179,6 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
         std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
           new GeomAlgoAPI_Translation(aBaseShape, anAxis, i*aStep));
 
-        if (!aTranslationAlgo->check()) {
-          setError(aTranslationAlgo->getError());
-          break;
-        }
-
-        aTranslationAlgo->build();
-
         // Checking that the algorithm worked properly.
         if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(
             aTranslationAlgo, getKind(), anError)) {
@@ -378,13 +371,6 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
           double dz = i*aFirstStep*z1/norm1+j*aSecondStep*z2/norm2;
           std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
             new GeomAlgoAPI_Translation(aBaseShape, dx, dy, dz));
-
-          if (!aTranslationAlgo->check()) {
-            setError(aTranslationAlgo->getError());
-            break;
-          }
-
-          aTranslationAlgo->build();
 
           // Checking that the algorithm worked properly.
           if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(

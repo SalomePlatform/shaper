@@ -202,13 +202,6 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
         std::shared_ptr<GeomAlgoAPI_Rotation> aRotationnAlgo(
           new GeomAlgoAPI_Rotation(aBaseShape, anAxis, i*anAngle));
 
-        if (!aRotationnAlgo->check()) {
-          setError(aRotationnAlgo->getError());
-          break;
-        }
-
-        aRotationnAlgo->build();
-
         // Checking that the algorithm worked properly.
         if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationnAlgo, getKind(), anError)) {
           setError(anError);

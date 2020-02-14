@@ -38,16 +38,13 @@ public:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Transform(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                            std::shared_ptr<GeomAPI_Trsf>  theTrsf);
 
-  /// \return the transformation.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Trsf> transformation() const;
+protected:
+  /// \brief Default constructor (to be used in the derived classes)
+  GeomAlgoAPI_Transform() {}
 
-private:
   /// Builds resulting shape.
   void build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
              std::shared_ptr<GeomAPI_Trsf>  theTrsf);
-
-private:
-  std::shared_ptr<GeomAPI_Trsf> myTrsf;
 };
 
 #endif

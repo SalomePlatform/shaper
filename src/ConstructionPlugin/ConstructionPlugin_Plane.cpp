@@ -24,6 +24,7 @@
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_Rotation.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
@@ -399,18 +400,16 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   // Getting angle.
   double anAngle = real(ANGLE())->value();
 
-  GeomAlgoAPI_Rotation aRotationAlgo(aFace, anAxis, anAngle);
-  if (!aRotationAlgo.check()) {
-    setError(aRotationAlgo.getError());
-    return GeomShapePtr();
-  }
-  aRotationAlgo.build();
-  if (!aRotationAlgo.isDone()) {
+  std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(
+      new GeomAlgoAPI_Rotation(aFace, anAxis, anAngle));
+  // Checking that the algorithm worked properly.
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
     setError("Error: Failed to rotate plane");
     return GeomShapePtr();
   }
 
-  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo.shape()));
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo->shape()));
   return aRes;
 }
 

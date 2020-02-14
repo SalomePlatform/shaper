@@ -26,6 +26,8 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Tools.h>
 
+#include <GeomAPI_Ax1.h>
+#include <GeomAPI_Ax2.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
@@ -153,13 +155,6 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
       std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
         new GeomAlgoAPI_Symmetry(aBaseShape, aPoint));
 
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
-
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
         setError(anError);
@@ -239,13 +234,6 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
       std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
         new GeomAlgoAPI_Symmetry(aBaseShape, anAxis));
 
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
-
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
         setError(anError);
@@ -323,13 +311,6 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
     } else {
       std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
         new GeomAlgoAPI_Symmetry(aBaseShape, aPlane));
-
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {

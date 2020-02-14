@@ -123,13 +123,6 @@ void FeaturesPlugin_Scale::performScaleByFactor()
     std::shared_ptr<GeomAlgoAPI_Scale> aScaleAlgo(
       new GeomAlgoAPI_Scale(aBaseShape, aCenterPoint, aScaleFactor));
 
-    if (!aScaleAlgo->check()) {
-      setError(aScaleAlgo->getError());
-      return;
-    }
-
-    aScaleAlgo->build();
-
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aScaleAlgo, getKind(), anError)) {
       setError(anError);
@@ -207,13 +200,6 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
                                                                         aScaleFactorX,
                                                                         aScaleFactorY,
                                                                         aScaleFactorZ));
-
-    if (!aScaleAlgo->check()) {
-      setError(aScaleAlgo->getError());
-      return;
-    }
-
-    aScaleAlgo->build();
 
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aScaleAlgo, getKind(), anError)) {

@@ -27,6 +27,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -169,14 +170,6 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
     } else {
       std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
         new GeomAlgoAPI_Translation(aBaseShape, anAxis, aDistance));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
-
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
         setError(anError);
@@ -249,13 +242,6 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
     } else {
       std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
         new GeomAlgoAPI_Translation(aBaseShape, aDX, aDY, aDZ));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
@@ -342,13 +328,6 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
     } else {
       std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
         new GeomAlgoAPI_Translation(aBaseShape, aFirstPoint, aSecondPoint));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {

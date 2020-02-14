@@ -28,6 +28,7 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -157,14 +158,6 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
       std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(new GeomAlgoAPI_Rotation(aBaseShape,
                                                                                    anAxis,
                                                                                    anAngle));
-
-      if (!aRotationAlgo->check()) {
-        setError(aRotationAlgo->getError());
-        return;
-      }
-
-      aRotationAlgo->build();
-
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
         setError(anError);
@@ -263,14 +256,6 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
                                                                                    aCenterPoint,
                                                                                    aStartPoint,
                                                                                    anEndPoint));
-
-      if (!aRotationAlgo->check()) {
-        setError(aRotationAlgo->getError());
-        return;
-      }
-
-      aRotationAlgo->build();
-
       // Checking that the algorithm worked properly.
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
         setError(anError);
