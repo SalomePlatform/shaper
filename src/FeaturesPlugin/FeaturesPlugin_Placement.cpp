@@ -72,26 +72,9 @@ void FeaturesPlugin_Placement::execute()
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
-  if(anObjectsSelList->size() == 0) {
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    ResultPtr aContext = anObjectAttr->context();
-    if (aContext->groupName() == ModelAPI_ResultPart::group())
-      aParts.push_back(aContext);
-    else {
-      // store full shape hierarchy for the corresponding version only
-      anObjects.addObject(anObject);
-      if (isKeepSubShapes)
-        ModelAPI_Tools::fillShapeHierarchy(anObject, aContext, anObjects);
-    }
-  }
 
   // Verify the start shape
   AttributeSelectionPtr anObjRef = selection(START_SHAPE_ID());

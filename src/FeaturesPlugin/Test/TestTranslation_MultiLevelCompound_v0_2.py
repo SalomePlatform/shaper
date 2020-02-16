@@ -17,17 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from SketchAPI import *
-
 from salome.shaper import model
+
+from GeomAPI import *
+from SketchAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Cylinder_1_1")], model.selection("EDGE", "PartSet/OX"), 20, 2)
-LinearCopy_2 = model.addMultiTranslation(Part_1_doc, [model.selection("COMPOUND", "LinearCopy_1_1")], model.selection("EDGE", "PartSet/OY"), 20, 2)
 Sketch_1 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchEllipse_1 = Sketch_1.addEllipse(11.18033988749894, -50, 22.36067977499789, -50, 10)
 [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_1, SketchLine_2] = SketchEllipse_1.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
@@ -61,38 +59,81 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketc
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Extrusion_1_2"), model.selection("SOLID", "Extrusion_1_3")])
 Compound_2_objects = [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("COMPOUND", "Compound_1_1"), model.selection("SOLID", "Extrusion_1_4")]
 Compound_2 = model.addCompound(Part_1_doc, Compound_2_objects)
-Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_5"), model.selection("SOLID", "Compound_2_1_2_1")], model.selection("FACE", "Compound_2_1_2_1/Modified_Face&Extrusion_1_2/From_Face"), model.selection("FACE", "LinearCopy_2_1_1_1/MF:Translated&Cylinder_1_1/Face_2"), centering = False, keepSubResults = True)
-
 model.end()
 
-# selection of a compsolid part is prohibited
-assert(Placement_1.feature().error() != "")
-
-# change the placement arguments
-model.begin()
-Placement_1.setObjects([model.selection("COMPSOLID", "Compound_2_1_1"), model.selection("SOLID", "Compound_2_1_2_1")])
-model.end()
-
-from GeomAPI import *
-
-model.testNbResults(Placement_1, 1)
-model.testNbSubResults(Placement_1, [3])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.SOLID, [10])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.FACE, [47])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.EDGE, [162])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.VERTEX, [324])
-model.testResultsVolumes(Placement_1, [14319.996])
-
+DX = 15
+DY = 20
+DZ = 25
 TOLERANCE = 1.e-7
-REF_C = GeomAPI_Pnt(10.29508497187, -50, 10)
-midPoint = Placement_1.defaultResult().shape().middlePoint()
-assert(midPoint.distance(REF_C) < TOLERANCE)
 
-REF_SUB = [GeomAPI_Pnt(4.566865353179923, -50, 15),
-           GeomAPI_Pnt(10.29508497, -32.16838976, 10),
-           GeomAPI_Pnt(-20.59016994, -85.663220479, 5)]
-for ind in range(0, len(REF_SUB)):
-    midPoint = Placement_1.result().subResult(ind).resultSubShapePair()[0].shape().middlePoint()
-    assert(midPoint.distance(REF_SUB[ind]) < TOLERANCE)
+model.begin()
+Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_5")], DX, 0, 0)
+model.testNbResults(Translation_1, 1)
+model.testNbSubResults(Translation_1, [0])
+model.testNbSubShapes(Translation_1, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Translation_1, GeomAPI_Shape.FACE, [5])
+model.testNbSubShapes(Translation_1, GeomAPI_Shape.EDGE, [18])
+model.testNbSubShapes(Translation_1, GeomAPI_Shape.VERTEX, [36])
+model.testResultsVolumes(Translation_1, [542.746463956])
+
+refPoint = Extrusion_1.results()[0].subResult(4).resultSubShapePair()[0].shape().middlePoint()
+refPoint.setX(refPoint.x() + DX)
+midPoint = Translation_1.defaultResult().shape().middlePoint()
+assert(midPoint.distance(refPoint) < TOLERANCE)
+
+
+Recover_1 = model.addRecover(Part_1_doc, Translation_1, [Compound_2.result()], True)
+Translation_2 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Recover_1_1_2_1")], 0, DY, 0)
+model.testNbResults(Translation_2, 1)
+model.testNbSubResults(Translation_2, [0])
+model.testNbSubShapes(Translation_2, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Translation_2, GeomAPI_Shape.FACE, [3])
+model.testNbSubShapes(Translation_2, GeomAPI_Shape.EDGE, [6])
+model.testNbSubShapes(Translation_2, GeomAPI_Shape.VERTEX, [12])
+model.testResultsVolumes(Translation_2, [785.39816339745])
+
+refPoint = Recover_1.result().subResult(1).subResult(0).resultSubShapePair()[0].shape().middlePoint()
+refPoint.setY(refPoint.y() + DY)
+midPoint = Translation_2.defaultResult().shape().middlePoint()
+assert(midPoint.distance(refPoint) < TOLERANCE)
+
+
+Recover_2 = model.addRecover(Part_1_doc, Translation_2, [Recover_1.result()], True)
+Translation_3 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Recover_2_1_3")], 0, 0, DZ)
+model.testNbResults(Translation_3, 1)
+model.testNbSubResults(Translation_3, [0])
+model.testNbSubShapes(Translation_3, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Translation_3, GeomAPI_Shape.FACE, [3])
+model.testNbSubShapes(Translation_3, GeomAPI_Shape.EDGE, [6])
+model.testNbSubShapes(Translation_3, GeomAPI_Shape.VERTEX, [12])
+model.testResultsVolumes(Translation_3, [785.39816339745])
+
+refPoint = Recover_2.result().subResult(2).resultSubShapePair()[0].shape().middlePoint()
+refPoint.setZ(refPoint.z() + DZ)
+midPoint = Translation_3.defaultResult().shape().middlePoint()
+assert(midPoint.distance(refPoint) < TOLERANCE)
+
+
+Recover_3 = model.addRecover(Part_1_doc, Translation_3, [Recover_2.result()], True)
+Translation_4 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Recover_3_1_1_1"), model.selection("SOLID", "Recover_3_1_2_2"), model.selection("SOLID", "Recover_3_1_3")], DX, DY, DZ)
+model.testNbResults(Translation_4, 3)
+model.testNbSubResults(Translation_4, [0, 0, 0])
+model.testNbSubShapes(Translation_4, GeomAPI_Shape.SOLID, [1, 1, 1])
+model.testNbSubShapes(Translation_4, GeomAPI_Shape.FACE, [6, 3, 3])
+model.testNbSubShapes(Translation_4, GeomAPI_Shape.EDGE, [24, 6, 6])
+model.testNbSubShapes(Translation_4, GeomAPI_Shape.VERTEX, [48, 12, 12])
+model.testResultsVolumes(Translation_4, [3444.394198615, 785.39816339745, 785.39816339745])
+
+REFERENCE = [Recover_3.result().subResult(0).subResult(0).resultSubShapePair()[0].shape().middlePoint(),
+             Recover_3.result().subResult(1).subResult(1).resultSubShapePair()[0].shape().middlePoint(),
+             Recover_3.result().subResult(2).resultSubShapePair()[0].shape().middlePoint()]
+for res, ref in zip(Translation_4.results(), REFERENCE):
+    ref.setX(ref.x() + DX)
+    ref.setY(ref.y() + DY)
+    ref.setZ(ref.z() + DZ)
+    midPoint = res.resultSubShapePair()[0].shape().middlePoint()
+    assert(midPoint.distance(ref) < TOLERANCE)
+
+model.end()
 
 assert(model.checkPythonDump())

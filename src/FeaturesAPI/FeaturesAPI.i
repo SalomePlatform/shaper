@@ -45,6 +45,7 @@
 %feature("kwargs") addPlacement;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
+%feature("kwargs") addTranslation;
 %feature("kwargs") addUnion;
 
 // shared pointers
@@ -143,6 +144,48 @@
 
 // fix compilation error: 'res*' was not declared in this scope
 %typemap(freearg) const std::pair<std::list<ModelHighAPI_Selection>, bool> & {}
+
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>, const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double> & {
+  ModelHighAPI_Selection* temp_selection;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_selection) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else {
+    $1 = ((PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
+  }
+}
+
+%typemap(in) const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double> & (std::pair<ModelHighAPI_Selection, ModelHighAPI_Double> temp) {
+  ModelHighAPI_Selection* temp_selection;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_selection) {
+      temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(*temp_selection, ModelHighAPI_Double(0.0));
+      if (newmem & SWIG_CAST_NEW_MEMORY) {
+        delete temp_selection;
+      }
+    }
+  } else if (PyFloat_Check($input) || PyLong_Check($input)) {
+    temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(ModelHighAPI_Selection(), ModelHighAPI_Double(PyFloat_AsDouble($input)));
+  } else if (PyUnicode_Check($input)) {
+    temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(ModelHighAPI_Selection(), ModelHighAPI_Double(PyUnicode_AsUTF8($input)));
+  } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+    temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>($1->first, $1->second);
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be selection, ModelHighAPI_Double, float, int or string.");
+    return NULL;
+  }
+  $1 = &temp;
+}
+
+// fix compilation error: 'res*' was not declared in this scope
+%typemap(freearg) const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double> & {}
+
 
 // all supported interfaces
 %include "FeaturesAPI_BooleanCut.h"

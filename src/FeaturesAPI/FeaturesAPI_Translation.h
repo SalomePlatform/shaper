@@ -24,12 +24,12 @@
 
 #include <FeaturesPlugin_Translation.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Selection.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Dumper;
-class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Translation
 /// \ingroup CPPHighAPI
@@ -116,29 +116,21 @@ public:
 /// Pointer on Translation object.
 typedef std::shared_ptr<FeaturesAPI_Translation> TranslationPtr;
 
-/// \ingroup CPPHighAPI
-/// \brief Create Translation feature.
-FEATURESAPI_EXPORT
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theAxisObject,
-                              const ModelHighAPI_Double& theDistance);
+#define DUMMY std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>()
 
 /// \ingroup CPPHighAPI
 /// \brief Create Translation feature.
-FEATURESAPI_EXPORT
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Double& theDx,
-                              const ModelHighAPI_Double& theDy,
-                              const ModelHighAPI_Double& theDz);
-
-/// \ingroup CPPHighAPI
-/// \brief Create Translation feature.
-FEATURESAPI_EXPORT
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theStartPoint,
-                              const ModelHighAPI_Selection& theEndPoint);
+FEATURESAPI_EXPORT TranslationPtr addTranslation(
+    const std::shared_ptr<ModelAPI_Document>& part,
+    const std::list<ModelHighAPI_Selection>& objects,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated1 = DUMMY,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated2 = DUMMY,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated3 = DUMMY,
+    const ModelHighAPI_Selection& axis = ModelHighAPI_Selection(),
+    const ModelHighAPI_Double& distance = ModelHighAPI_Double(0.0),
+    const std::list<ModelHighAPI_Double>& vector = std::list<ModelHighAPI_Double>(),
+    const ModelHighAPI_Selection& startPoint = ModelHighAPI_Selection(),
+    const ModelHighAPI_Selection& endPoint = ModelHighAPI_Selection(),
+    const bool keepSubResults = false );
 
 #endif // FeaturesAPI_Translation_H_

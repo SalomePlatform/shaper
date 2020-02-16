@@ -22,6 +22,8 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -238,6 +240,33 @@ bool FeaturesPlugin_Tools::getShape(const AttributeSelectionListPtr theSelection
     GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, theShapesList);
   } else {
     theShapesList.insert(theShapesList.end(), aBaseFacesList.begin(), aBaseFacesList.end());
+  }
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_Tools::shapesFromSelectionList(
+    const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
+    const bool theStoreFullHierarchy,
+    GeomAPI_ShapeHierarchy& theHierarchy,
+    std::list<ResultPtr>& theParts)
+{
+  int aSize = theSelectionList->size();
+  for (int anObjectsIndex = 0; anObjectsIndex < aSize; anObjectsIndex++) {
+    AttributeSelectionPtr anObjectAttr = theSelectionList->value(anObjectsIndex);
+    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
+    if (!anObject.get()) { // may be for not-activated parts
+      return false;
+    }
+    ResultPtr aContext = anObjectAttr->context();
+    if (aContext->groupName() == ModelAPI_ResultPart::group())
+      theParts.push_back(aContext);
+    else {
+      // store full shape hierarchy for the corresponding version only
+      theHierarchy.addObject(anObject);
+      if (theStoreFullHierarchy)
+        ModelAPI_Tools::fillShapeHierarchy(anObject, aContext, theHierarchy);
+    }
   }
   return true;
 }

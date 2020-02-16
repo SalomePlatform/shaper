@@ -38,7 +38,7 @@ void GeomAlgoAPI_Transform::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                   std::shared_ptr<GeomAPI_Trsf>  theTrsf)
 {
   if (!theSourceShape || !theTrsf) {
-    myError = "Transformation :: incorrect input data";
+    myError = "Transformation :: incorrect input data.";
     return;
   }
 

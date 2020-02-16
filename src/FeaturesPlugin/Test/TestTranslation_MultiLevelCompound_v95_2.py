@@ -17,17 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from SketchAPI import *
-
 from salome.shaper import model
+
+from GeomAPI import *
+from SketchAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Cylinder_1_1")], model.selection("EDGE", "PartSet/OX"), 20, 2)
-LinearCopy_2 = model.addMultiTranslation(Part_1_doc, [model.selection("COMPOUND", "LinearCopy_1_1")], model.selection("EDGE", "PartSet/OY"), 20, 2)
 Sketch_1 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchEllipse_1 = Sketch_1.addEllipse(11.18033988749894, -50, 22.36067977499789, -50, 10)
 [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_1, SketchLine_2] = SketchEllipse_1.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
@@ -61,38 +59,63 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketc
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Extrusion_1_2"), model.selection("SOLID", "Extrusion_1_3")])
 Compound_2_objects = [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("COMPOUND", "Compound_1_1"), model.selection("SOLID", "Extrusion_1_4")]
 Compound_2 = model.addCompound(Part_1_doc, Compound_2_objects)
-Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_5"), model.selection("SOLID", "Compound_2_1_2_1")], model.selection("FACE", "Compound_2_1_2_1/Modified_Face&Extrusion_1_2/From_Face"), model.selection("FACE", "LinearCopy_2_1_1_1/MF:Translated&Cylinder_1_1/Face_2"), centering = False, keepSubResults = True)
-
 model.end()
 
-# selection of a compsolid part is prohibited
-assert(Placement_1.feature().error() != "")
-
-# change the placement arguments
-model.begin()
-Placement_1.setObjects([model.selection("COMPSOLID", "Compound_2_1_1"), model.selection("SOLID", "Compound_2_1_2_1")])
-model.end()
-
-from GeomAPI import *
-
-model.testNbResults(Placement_1, 1)
-model.testNbSubResults(Placement_1, [3])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.SOLID, [10])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.FACE, [47])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.EDGE, [162])
-model.testNbSubShapes(Placement_1, GeomAPI_Shape.VERTEX, [324])
-model.testResultsVolumes(Placement_1, [14319.996])
-
+DX = 15
+DY = 20
+DZ = 25
 TOLERANCE = 1.e-7
-REF_C = GeomAPI_Pnt(10.29508497187, -50, 10)
-midPoint = Placement_1.defaultResult().shape().middlePoint()
-assert(midPoint.distance(REF_C) < TOLERANCE)
+REFERENCE = []
+for ind in range(0, Compound_2.result().numberOfSubs()):
+    p = Compound_2.result().subResult(ind).resultSubShapePair()[0].shape().middlePoint()
+    REFERENCE.append(p)
 
-REF_SUB = [GeomAPI_Pnt(4.566865353179923, -50, 15),
-           GeomAPI_Pnt(10.29508497, -32.16838976, 10),
-           GeomAPI_Pnt(-20.59016994, -85.663220479, 5)]
-for ind in range(0, len(REF_SUB)):
-    midPoint = Placement_1.result().subResult(ind).resultSubShapePair()[0].shape().middlePoint()
-    assert(midPoint.distance(REF_SUB[ind]) < TOLERANCE)
+def assertResult(theFeature):
+    model.testNbResults(theFeature, 1)
+    model.testNbSubResults(theFeature, [3])
+    model.testNbSubShapes(theFeature, GeomAPI_Shape.SOLID, [10])
+    model.testNbSubShapes(theFeature, GeomAPI_Shape.FACE, [47])
+    model.testNbSubShapes(theFeature, GeomAPI_Shape.EDGE, [162])
+    model.testNbSubShapes(theFeature, GeomAPI_Shape.VERTEX, [324])
+    model.testResultsVolumes(theFeature, [14319.99602674256])
+
+    for ind in range(0, theFeature.result().numberOfSubs()):
+        ref = REFERENCE[ind]
+        midPoint = theFeature.result().subResult(ind).resultSubShapePair()[0].shape().middlePoint()
+        assert(midPoint.distance(ref) < TOLERANCE), "Sub-result {}; actual ({}, {}, {}) != expected ({}, {}, {})".format(ind, midPoint.x(), midPoint.y(), midPoint.z(), ref.x(), ref.y(), ref.z())
+
+
+model.begin()
+Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_5")], vector = [DX, 0, 0], keepSubResults = True)
+model.end()
+# selection of a compsolid part is prohibited
+assert(Translation_1.feature().error() != "")
+
+model.begin()
+Translation_1.setMainObjects([model.selection("COMPSOLID", "Compound_2_1_1")])
+REFERENCE[0].setX(REFERENCE[0].x() + DX)
+assertResult(Translation_1)
+
+Translation_2 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_1_1_2_1")], vector = [0, DY, 0], keepSubResults = True)
+REFERENCE[1].setY(REFERENCE[1].y() + DY / 2)
+assertResult(Translation_2)
+
+Translation_3 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_2_1_3")], vector = [0, 0, DZ], keepSubResults = True)
+REFERENCE[2].setZ(REFERENCE[2].z() + DZ)
+assertResult(Translation_3)
+
+Translation_4 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_3_1_1_1"), model.selection("SOLID", "Translation_3_1_2_2"), model.selection("SOLID", "Translation_3_1_3")], vector = [DX, DY, DZ], keepSubResults = True)
+model.end()
+# selection of a compsolid part is prohibited
+assert(Translation_4.feature().error() != "")
+
+model.begin()
+Translation_4.setMainObjects([model.selection("COMPSOLID", "Translation_3_1_1"), model.selection("SOLID", "Translation_3_1_2_2"), model.selection("SOLID", "Translation_3_1_3")])
+REFERENCE = [GeomAPI_Pnt(REFERENCE[0].x() + DX, REFERENCE[0].y() + DY, REFERENCE[0].z() + DZ),
+             GeomAPI_Pnt(REFERENCE[1].x() + DX / 2, REFERENCE[1].y() + DY / 2, REFERENCE[1].z() + DZ / 2),
+             GeomAPI_Pnt(REFERENCE[2].x() + DX, REFERENCE[2].y() + DY, REFERENCE[2].z() + DZ)]
+assertResult(Translation_4)
+
+model.end()
 
 assert(model.checkPythonDump())

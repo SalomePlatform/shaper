@@ -24,7 +24,7 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Translation.h>
+class GeomAPI_Trsf;
 
 /// \class FeaturesPlugin_Translation
 /// \ingroup Plugins
@@ -140,14 +140,17 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
   FeaturesPlugin_Translation();
 
 private:
-  ///Perform the translation using an axis and a distance.
-  void performTranslationByAxisAndDistance();
+  /// Calculate the translation using an axis and a distance.
+  std::shared_ptr<GeomAPI_Trsf> translationByAxisAndDistance();
 
-  ///Perform the translation using three dimensions X, Y and Z
-  void performTranslationByDimensions();
+  /// Calculate the translation using three dimensions X, Y and Z
+  std::shared_ptr<GeomAPI_Trsf> translationByDimensions();
 
-  ///Perform the translation usind two points
-  void performTranslationByTwoPoints();
+  /// Calculate the translation usind two points
+  std::shared_ptr<GeomAPI_Trsf> translationByTwoPoints();
+
+  /// Perform the translation
+  void performTranslation(const std::shared_ptr<GeomAPI_Trsf>& theTrsf);
 };
 
 #endif

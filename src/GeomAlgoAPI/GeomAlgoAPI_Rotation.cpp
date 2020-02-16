@@ -42,7 +42,7 @@ GeomAlgoAPI_Rotation::GeomAlgoAPI_Rotation(std::shared_ptr<GeomAPI_Shape> theSou
   }
 
   GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
-  aTrsf->setRotation(theAxis, theAngle / 180.0 * M_PI);
+  aTrsf->setRotation(theAxis, theAngle);
 
   build(theSourceShape, aTrsf);
 }
