@@ -86,7 +86,7 @@ except myExcept as ec :
 try :
     Scale_20 = shaperpy.makeScale(shape(), pntOrigin, 2.)
 except myExcept as ec :
-    assert(ec.what() == "Scale builder :: source shape does not contain any actual shape.")
+    assert(ec.what() == "Transformation :: source shape does not contain any actual shape.")
 
 try :
     Scale_21 = shaperpy.makeScale(shape(), pntOrigin, 2., 3., 1.)

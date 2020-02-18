@@ -177,19 +177,19 @@ model.testHaveNamingFaces(Scale_17, model, Part_1_doc)
 
 
 model.testNbResults(Scale_6, 0)
-assert(Scale_6.feature().error() == 'Scale builder :: the scale factor is null.')
+assert(Scale_6.feature().error() == 'Error: Scale algorithm failed. Scale builder :: the scale factor is null.')
 
 model.testNbResults(Scale_8, 0)
 assert(Scale_8.feature().error() == 'Attribute "center_point" is not initialized.')
 
 model.testNbResults(Scale_14, 0)
-assert(Scale_14.feature().error() == 'Scale builder :: the scale factor in X is null.')
+assert(Scale_14.feature().error() == 'Error: Scale algorithm failed. Scale builder :: the scale factor in X is null.')
 
 model.testNbResults(Scale_15, 0)
-assert(Scale_15.feature().error() == 'Scale builder :: the scale factor in Y is null.')
+assert(Scale_15.feature().error() == 'Error: Scale algorithm failed. Scale builder :: the scale factor in Y is null.')
 
 model.testNbResults(Scale_16, 0)
-assert(Scale_16.feature().error() == 'Scale builder :: the scale factor in Z is null.')
+assert(Scale_16.feature().error() == 'Error: Scale algorithm failed. Scale builder :: the scale factor in Z is null.')
 
 model.testNbResults(Scale_18, 0)
 assert(Scale_18.feature().error() == 'Attribute "center_point" is not initialized.')

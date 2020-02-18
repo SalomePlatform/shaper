@@ -74,19 +74,19 @@ Symmetry_6 = shaperpy.makeSymmetry(Box_6, planeXOY)
 try :
     Symmetry_7 = shaperpy.makeSymmetry(None, pnt1)
 except myExcept as ec :
-    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try :
     Symmetry_8 = shaperpy.makeSymmetry(None, axZ)
 except myExcept as ec :
-    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try :
     Symmetry_9 = shaperpy.makeSymmetry(None, planeXOY)
 except myExcept as ec :
-    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try :
     Symmetry_10 = shaperpy.makeSymmetry(shape(), pnt1)
 except myExcept as ec :
-    assert(ec.what() == "Symmetry builder :: source shape does not contain any actual shape.")
+    assert(ec.what() == "Transformation :: source shape does not contain any actual shape.")

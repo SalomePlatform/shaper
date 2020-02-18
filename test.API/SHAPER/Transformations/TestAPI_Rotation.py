@@ -74,7 +74,7 @@ except myExcept as ec:
 try:
     Rotation_8 = shaperpy.makeRotation(None, ax1, 180)
 except myExcept as ec:
-    assert(ec.what() == "Rotation builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 Rotation_9 = shaperpy.makeRotation(Box_8, pntOrigin, pnt1, pnt2)
 Rotation_10 = shaperpy.makeRotation(Box_9, pnt3, pnt1, pnt2)
@@ -112,9 +112,9 @@ except myExcept as ec:
 try:
     Rotation_17 = shaperpy.makeRotation(None, pntOrigin, pnt3, pnt2)
 except myExcept as ec:
-    assert(ec.what() == "Rotation builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
     Rotation_18 = shaperpy.makeRotation(shape(), ax1, 450)
 except myExcept as ec:
-    assert(ec.what() == "Rotation builder :: source shape does not contain any actual shape.")
+    assert(ec.what() == "Transformation :: source shape does not contain any actual shape.")

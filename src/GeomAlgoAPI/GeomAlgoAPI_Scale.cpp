@@ -28,6 +28,10 @@ GeomAlgoAPI_Scale::GeomAlgoAPI_Scale(std::shared_ptr<GeomAPI_Shape> theSourceSha
                                      std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
                                      double theScaleFactor)
 {
+  if (!theCenterPoint) {
+    myError = "Scale builder :: center point is not valid.";
+    return;
+  }
   if (fabs(theScaleFactor) < Precision::Confusion()) {
     myError = "Scale builder :: the scale factor is null.";
     return;
@@ -46,6 +50,10 @@ GeomAlgoAPI_Scale::GeomAlgoAPI_Scale(std::shared_ptr<GeomAPI_Shape> theSourceSha
                                      double theScaleFactorY,
                                      double theScaleFactorZ)
 {
+  if (!theCenterPoint) {
+    myError = "Scale builder :: center point is not valid.";
+    return;
+  }
   if (fabs(theScaleFactorX) < Precision::Confusion()) {
     myError = "Scale builder :: the scale factor in X is null.";
     return;
@@ -70,6 +78,11 @@ void GeomAlgoAPI_Scale::buildByDimensions(std::shared_ptr<GeomAPI_Shape> theSour
                                           double                         theScaleFactorY,
                                           double                         theScaleFactorZ)
 {
+  if (!theSourceShape) {
+    myError = "Scale builder :: source shape is not valid.";
+    return;
+  }
+
   const gp_Pnt& aCenterPoint = theCenterPoint->impl<gp_Pnt>();
 
   // Perform the rotation matrix
