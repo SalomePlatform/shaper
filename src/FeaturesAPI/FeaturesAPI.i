@@ -43,6 +43,7 @@
 %feature("kwargs") addFuse;
 %feature("kwargs") addPartition;
 %feature("kwargs") addPlacement;
+%feature("kwargs") addRotation;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
 %feature("kwargs") addTranslation;

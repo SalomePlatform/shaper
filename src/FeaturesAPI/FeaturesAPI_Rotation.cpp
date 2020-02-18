@@ -119,7 +119,7 @@ void FeaturesAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
   if (aCreationMethod == FeaturesPlugin_Rotation::CREATION_METHOD_BY_ANGLE()) {
     AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
     AttributeDoublePtr anAttrAngle = aBase->real(FeaturesPlugin_Rotation::ANGLE_ID());
-    theDumper << ", " << anAttrAxis << ", " << anAttrAngle;
+    theDumper << ", axis = " << anAttrAxis << ", angle = " << anAttrAngle;
   } else if (aCreationMethod == FeaturesPlugin_Rotation::CREATION_METHOD_BY_THREE_POINTS()) {
     AttributeSelectionPtr anAttrCenterPoint =
       aBase->selection(FeaturesPlugin_Rotation::CENTER_POINT_ID());
@@ -127,30 +127,58 @@ void FeaturesAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
       aBase->selection(FeaturesPlugin_Rotation::START_POINT_ID());
     AttributeSelectionPtr anAttrEndPoint =
       aBase->selection(FeaturesPlugin_Rotation::END_POINT_ID());
-    theDumper << ", " << anAttrCenterPoint << ", " << anAttrStartPoint << ", " << anAttrEndPoint;
+    theDumper << ", center = " << anAttrCenterPoint
+              << ", start = " << anAttrStartPoint
+              << ", end = " << anAttrEndPoint;
   }
+
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const ModelHighAPI_Selection& theAxisObject,
-                        const ModelHighAPI_Double& theAngle)
+RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& part,
+                        const std::list<ModelHighAPI_Selection>& objects,
+                        const ModelHighAPI_Selection& axis,
+                        const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& angle,
+                        const ModelHighAPI_Selection& center,
+                        const ModelHighAPI_Selection& start,
+                        const ModelHighAPI_Selection& end,
+                        const bool keepSubResults)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Rotation::ID());
-  return RotationPtr(new FeaturesAPI_Rotation(aFeature, theMainObjects, theAxisObject, theAngle));
-}
+  std::shared_ptr<ModelAPI_Feature> aFeature = part->addFeature(FeaturesAPI_Rotation::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
 
-//==================================================================================================
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const ModelHighAPI_Selection& theCenterPoint,
-                        const ModelHighAPI_Selection& theStartPoint,
-                        const ModelHighAPI_Selection& theEndPoint)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Rotation::ID());
-  return RotationPtr(new FeaturesAPI_Rotation(aFeature, theMainObjects, theCenterPoint,
-                                              theStartPoint, theEndPoint));
+  bool byAxis = false;
+  bool byPoints = false;
+  ModelHighAPI_Selection aPoints[3];
+  if (angle.first.variantType() == ModelHighAPI_Selection::VT_Empty) {
+    if (axis.variantType() == ModelHighAPI_Selection::VT_Empty) {
+      byPoints = true;
+      aPoints[0] = center;
+      aPoints[1] = start;
+      aPoints[2] = end;
+    }
+    else
+      byAxis = true;
+  }
+  else {
+    byPoints = true;
+    aPoints[0] = axis;
+    aPoints[1] = angle.first;
+    aPoints[2] = center;
+  }
+
+
+  RotationPtr aRotation;
+  if (byAxis)
+    aRotation.reset(new FeaturesAPI_Rotation(aFeature, objects, axis, angle.second));
+  else if (byPoints) {
+    aRotation.reset(new FeaturesAPI_Rotation(aFeature, objects,
+                                             aPoints[0], aPoints[1], aPoints[2]));
+  }
+  return aRotation;
 }

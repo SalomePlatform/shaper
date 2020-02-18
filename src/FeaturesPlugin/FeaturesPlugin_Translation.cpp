@@ -185,8 +185,10 @@ GeomTrsfPtr FeaturesPlugin_Translation::translationByTwoPoints()
 //=================================================================================================
 void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
 {
-  if (!theTrsf)
+  if (!theTrsf) {
+    setError("Invalid transformation.");
     return;
+  }
 
   bool isKeepSubShapes = data()->version() == TRANSLATION_VERSION_1;
 
