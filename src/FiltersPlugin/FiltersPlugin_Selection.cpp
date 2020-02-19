@@ -23,25 +23,48 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_FiltersFactory.h>
 #include <ModelAPI_Session.h>
+#include <sstream>
 
 // identifier of the reverse flag of a filter
 static const std::string kReverseAttrID("");
 
-void FiltersPlugin_Selection::addFilter(const std::string theFilterID)
+std::string FiltersPlugin_Selection::addFilter(const std::string theFilterID)
 {
   ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
   FilterPtr aFilter = aFactory->filter(theFilterID);
+
+  std::string aFilterID = theFilterID;
+  if (aFilter->isMultiple()) { // check that there is already such filter, so, increment ID
+    std::list<std::string> aFilters;
+    data()->allGroups(aFilters);
+    for(int anID = 0; true; anID++) {
+      if (anID != 0) {
+        std::ostringstream aStream;
+        aStream<<"_"<<anID<<"_"<<theFilterID;
+        aFilterID = aStream.str();
+      }
+      std::list<std::string>::iterator aFiltersIDs = aFilters.begin();
+      for(; aFiltersIDs != aFilters.end(); aFiltersIDs++) {
+        if (*aFiltersIDs == aFilterID)
+          break;
+      }
+      if (aFiltersIDs == aFilters.end())
+        break;
+    }
+  }
+
   if (aFilter.get()) {
     std::shared_ptr<ModelAPI_AttributeBoolean> aBool =
       std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(data()->addFloatingAttribute(
-        kReverseAttrID, ModelAPI_AttributeBoolean::typeId(), theFilterID));
+        kReverseAttrID, ModelAPI_AttributeBoolean::typeId(), aFilterID));
     aBool->setValue(false); // not reversed by default
     // to add attributes related to the filter
     ModelAPI_FiltersArgs anArgs;
     anArgs.setFeature(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(data()->owner()));
-    anArgs.setFilter(theFilterID);
+    anArgs.setFilter(aFilterID);
     aFilter->initAttributes(anArgs);
   }
+  return aFilterID;
 }
 
 void FiltersPlugin_Selection::removeFilter(const std::string theFilterID)

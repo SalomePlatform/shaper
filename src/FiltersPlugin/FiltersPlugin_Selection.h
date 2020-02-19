@@ -59,7 +59,8 @@ public:
   // methods related to the filters management
 
   /// Adds a filter to the feature. Also initializes arguments of this filter.
-  FILTERS_EXPORT virtual void addFilter(const std::string theFilterID) override;
+  /// Returns the real identifier of the filter.
+  FILTERS_EXPORT virtual std::string addFilter(const std::string theFilterID) override;
 
   /// Removes an existing filter from the feature.
   FILTERS_EXPORT virtual void removeFilter(const std::string theFilterID) override;

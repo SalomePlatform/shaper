@@ -143,12 +143,17 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
   : QWidget(theParent->filtersWidget()), myFilterID(theFilter),
     mySelection(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theParent->feature()))
 {
-  std::string aXmlString =
-      ModelAPI_Session::get()->filters()->filter(theFilter)->xmlRepresentation();
+  FilterPtr aFilter = ModelAPI_Session::get()->filters()->filter(theFilter);
+  std::string aXmlString = aFilter->xmlRepresentation();
   if (aXmlString.length() == 0)
     addItemRow(this);
   else {
-    ModuleBase_WidgetFactory aFactory(aXmlString, theParent->workshop());
+    std::string anAttrPrefix; // this must be added to the attributes names for multiple filters
+    std::string aFilterKind = ModelAPI_Session::get()->filters()->id(aFilter);
+    if (theFilter != aFilterKind) {
+      anAttrPrefix = theFilter.substr(0, theFilter.size() - aFilterKind.size());
+    }
+    ModuleBase_WidgetFactory aFactory(aXmlString, theParent->workshop(), anAttrPrefix);
     Config_ValidatorReader aValidatorReader(aXmlString, true);
     aValidatorReader.setFeatureId(mySelection->getKind());
     aValidatorReader.readAll();

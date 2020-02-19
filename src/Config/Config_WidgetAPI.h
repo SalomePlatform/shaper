@@ -78,7 +78,7 @@ class Config_WidgetAPI
   CONFIG_EXPORT bool getBooleanAttribute(const char* theAttributeName, bool theDefault) const;
 
   /// These fields are accessible for ModuleBase_WidgetFactory only
-  CONFIG_EXPORT Config_WidgetAPI(std::string theRawXml);
+  CONFIG_EXPORT Config_WidgetAPI(std::string theRawXml, const std::string theAttributePrefix = "");
   //! Pass to the next (sibling) node of widget's xml definition. If impossible, returns false
   CONFIG_EXPORT bool toNextWidget();
   //! Pass into the child node of widget's xml definition. If impossible, returns false
@@ -90,6 +90,7 @@ class Config_WidgetAPI
   xmlDocPtr myDoc; //!< Pointer to the root of widget's xml definition
   xmlNodePtr myCurrentNode; //!< Pointer to the current node in the widget's xml definition
   std::string myFeatureId;
+  std::string myAttributePrefix; //!< prefix that must be added to the attribute name
 
   friend class ModuleBase_WidgetFactory;
 };

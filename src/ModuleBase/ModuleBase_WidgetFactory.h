@@ -43,8 +43,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
    /// Constructor
    /// \param theXmlRepresentation content of XML file
    /// \param theWorkshop reference to workshop instance
-  ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
-                           ModuleBase_IWorkshop* theWorkshop);
+   /// \param theAttributePrefix prefix that must be added to the attribute name
+   ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
+                           ModuleBase_IWorkshop* theWorkshop,
+                           const std::string theAttributePrefix = "");
   virtual ~ModuleBase_WidgetFactory();
 
   /// Creates content widget for property panel

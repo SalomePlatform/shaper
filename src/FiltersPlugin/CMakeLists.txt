@@ -193,4 +193,8 @@ ADD_UNIT_TESTS(
   Test2951.py
   Test17924.py
   Test17962.py
+  TestFilter_OnLine_Multi.py
+  TestFilter_OnPlane_Multi.py
+  TestFilter_OnPlaneSide_Multi.py
+  TestFilter_RelativeToSolid_Multi.py
 )

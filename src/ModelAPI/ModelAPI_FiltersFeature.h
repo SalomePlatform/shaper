@@ -33,7 +33,8 @@ class ModelAPI_FiltersFeature: public ModelAPI_Feature
 {
 public:
   /// Adds a filter to the feature. Also initializes arguments of this filter.
-  virtual void addFilter(const std::string theFilterID) = 0;
+  /// Returns the real identifier of the filter.
+  virtual std::string addFilter(const std::string theFilterID) = 0;
 
   /// Removes an existing filter from the feature.
   virtual void removeFilter(const std::string theFilterID) = 0;
