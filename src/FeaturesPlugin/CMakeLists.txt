@@ -599,4 +599,14 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRotation_MultiLevelCompound_v95_2.py
                TestRotation_MultiLevelCompound_v95_3.py
                TestRotation_MultiLevelCompound_v95_4.py
+               TestSymmetry_MultiLevelCompound_v0_1.py
+               TestSymmetry_MultiLevelCompound_v0_2.py
+               TestSymmetry_MultiLevelCompound_v0_3.py
+               TestSymmetry_MultiLevelCompound_v0_4.py
+               TestSymmetry_MultiLevelCompound_v0_5.py
+               TestSymmetry_MultiLevelCompound_v95_1.py
+               TestSymmetry_MultiLevelCompound_v95_2.py
+               TestSymmetry_MultiLevelCompound_v95_3.py
+               TestSymmetry_MultiLevelCompound_v95_4.py
+               TestSymmetry_MultiLevelCompound_v95_5.py
 )

@@ -46,6 +46,7 @@
 %feature("kwargs") addRotation;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
+%feature("kwargs") addSymmetry;
 %feature("kwargs") addTranslation;
 %feature("kwargs") addUnion;
 
