@@ -259,7 +259,7 @@ bool FeaturesPlugin_Tools::shapesFromSelectionList(
       return false;
     }
     ResultPtr aContext = anObjectAttr->context();
-    if (aContext->groupName() == ModelAPI_ResultPart::group())
+    if (aContext && aContext->groupName() == ModelAPI_ResultPart::group())
       theParts.push_back(aContext);
     else {
       // store full shape hierarchy for the corresponding version only

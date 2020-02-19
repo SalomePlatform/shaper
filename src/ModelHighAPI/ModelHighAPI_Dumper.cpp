@@ -21,11 +21,15 @@
 
 #include <Config_PropManager.h>
 
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Dir.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
-#include <GeomAPI_Dir.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_NExplode.h>
 
 #include <GeomDataAPI_Dir.h>
@@ -370,8 +374,10 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
     std::list<ModelGeomAlgo_Shape::SubshapeOfResult> anApproproate;
     if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theShape->shapeType(),
                                                  anApproproate)) {
+      bool isContinue = true;
+      std::list<std::pair<GeomShapePtr, int> > aCenters;
       std::list<ModelGeomAlgo_Shape::SubshapeOfResult>::iterator anApIt = anApproproate.begin();
-      for (; anApIt != anApproproate.end(); ++anApIt) {
+      for (; anApIt != anApproproate.end() && isContinue; ++anApIt) {
         ++aNbPossibleSelections;
 
         // stop if the target shape and result are found
@@ -379,9 +385,41 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
         if (!aCurShape)
           aCurShape = anApIt->myResult->shape();
 
-        if (anApIt->myResult->isSame(theResult) && aCurShape->isSame(theShape))
-          break;
+        if (anApIt->myResult->isSame(theResult)) {
+          if (anApIt->myCenterType == (int)ModelAPI_AttributeSelection::NOT_CENTER)
+            isContinue = !aCurShape->isSame(theShape);
+          else if (theShape->isVertex() && aCurShape->isEdge()) {
+            GeomEdgePtr aCurEdge = aCurShape->edge();
+            GeomVertexPtr aVertex = theShape->vertex();
+            GeomPointPtr aCenter;
+            switch (anApIt->myCenterType) {
+            case (int)ModelAPI_AttributeSelection::CIRCLE_CENTER: {
+                GeomCirclePtr aCirc = aCurEdge->circle();
+                if (aCirc)
+                  aCenter = aCirc->center();
+                break;
+              }
+            case (int)ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS: {
+                GeomEllipsePtr anEllipse = aCurEdge->ellipse();
+                if (anEllipse)
+                  aCenter = anEllipse->firstFocus();
+                break;
+              }
+            case (int)ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS: {
+                GeomEllipsePtr anEllipse = aCurEdge->ellipse();
+                if (anEllipse)
+                  aCenter = anEllipse->secondFocus();
+                break;
+              }
+            }
+            if (aCenter && aCenter->distance(aVertex->point()) < 1.e-7)
+              aCenters.push_back(std::pair<GeomShapePtr, int>(aCurShape, aNbPossibleSelections));
+          }
+        }
       }
+      // passed till the appropriate shape, check the center of circle or a focus of ellipse is selected
+      if (isContinue && !aCenters.empty())
+        aNbPossibleSelections = aCenters.front().second;
     }
   }
   return aNbPossibleSelections;
