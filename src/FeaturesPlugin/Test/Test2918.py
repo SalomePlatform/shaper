@@ -323,6 +323,6 @@ model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.FACE, [47])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.EDGE, [202])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.VERTEX, [404])
-model.testResultsVolumes(FusionFaces_1, [612.7268292882]
+model.testResultsVolumes(FusionFaces_1, [612.7268292882])
 
 assert(model.checkPythonDump())
