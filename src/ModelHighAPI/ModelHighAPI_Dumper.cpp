@@ -417,7 +417,8 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
           }
         }
       }
-      // passed till the appropriate shape, check the center of circle or a focus of ellipse is selected
+      // passed till the appropriate shape, check the center of circle
+      // or a focus of ellipse is selected
       if (isContinue && !aCenters.empty())
         aNbPossibleSelections = aCenters.front().second;
     }
