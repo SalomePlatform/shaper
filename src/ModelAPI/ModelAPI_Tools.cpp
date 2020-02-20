@@ -645,6 +645,7 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
         // check the referred object is a Body
         // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
         bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
+                      aRefIt->second.front().get() &&
                       aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
         if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
             aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
