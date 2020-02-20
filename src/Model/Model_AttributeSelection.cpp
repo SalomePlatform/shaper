@@ -1381,7 +1381,8 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   TDF_Label theAccessLabel,
   std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes)
 {
-  std::set<ResultPtr> aResults; // to avoid duplicates, new context, null if deleted
+  std::list<ResultPtr> aResults; // keep order, new context, null if deleted
+  std::set<ResultPtr> aResultsSet; // to avoid duplicates
   // iterate context and shape, but also if it is sub-shape of main shape, check also it
   TopTools_ListOfShape aContextList;
   aContextList.Append(theContShape);
@@ -1417,23 +1418,32 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       Handle(TNaming_NamedShape) aNewNS;
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
       if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
-        aResults.insert(aModifierObj);
+        if (aResultsSet.find(aModifierObj) == aResultsSet.end()) {
+          aResultsSet.insert(aModifierObj);
+          aResults.push_back(aModifierObj);
+        }
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
-        aResults.insert(ResultPtr());
+        aResults.push_back(ResultPtr());
       } else { // not-processed modification => don't support it
         continue;
       }
     }
   }
   // if there exist context composite and sub-result(s), leave only sub(s)
-  for(std::set<ResultPtr>::iterator aResIter = aResults.begin(); aResIter != aResults.end();) {
+  for(std::list<ResultPtr>::iterator aResIter = aResults.begin(); aResIter != aResults.end();) {
     ResultPtr aParent = ModelAPI_Tools::bodyOwner(*aResIter);
     for(; aParent.get(); aParent = ModelAPI_Tools::bodyOwner(aParent))
-      if (aResults.count(aParent))
+      if (aResultsSet.count(aParent))
         break;
-    if (aParent.get()) { // erase from set, so, restart iteration
-      aResults.erase(aParent);
-      aResIter = aResults.begin();
+    if (aParent.get()) {
+      aResultsSet.erase(aParent);
+      for(std::list<ResultPtr>::iterator anIt = aResults.begin(); anIt != aResults.end(); anIt++) {
+        if (*anIt == aParent) {
+          aResults.erase(anIt);
+          aResIter = aResults.begin(); // erase from set, so, restart iteration
+          break;
+        }
+      }
     } else aResIter++;
   }
 
@@ -1458,7 +1468,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
           continue;
         if (aRefShape->impl<TopoDS_Shape>().IsSame(theContShape)) {
           // add the new context result with the same shape
-          aResults.insert(aRefBody);
+          aResults.push_back(aRefBody);
         }
       }
       if (aResults.empty())
@@ -1468,7 +1478,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   }
   if (myParent && myParent->isMakeCopy()) {
     // check there are copies before the new results, so, make a copy
-    std::set<ResultPtr>::iterator aResIter = aResults.begin();
     std::list<ObjectPtr> aCopyContext;
     std::list<GeomShapePtr> aCopyVals;
     // features between the new and the old: check the "Move" interface to get a copy
@@ -1527,7 +1536,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     return false;
 
   // iterate all results to find further modifications
-  std::set<ResultPtr>::iterator aResIter = aResults.begin();
+  std::list<ResultPtr>::iterator aResIter = aResults.begin();
   for(aResIter = aResults.begin(); aResIter != aResults.end(); aResIter++) {
     if (aResIter->get() != NULL) {
       ResultPtr aNewResObj = *aResIter;
