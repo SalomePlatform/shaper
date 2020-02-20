@@ -197,4 +197,5 @@ ADD_UNIT_TESTS(
   TestFilter_OnPlane_Multi.py
   TestFilter_OnPlaneSide_Multi.py
   TestFilter_RelativeToSolid_Multi.py
+  TestFilter_TopoConnectedFaces_Multi.py
 )

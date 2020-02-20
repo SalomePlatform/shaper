@@ -48,6 +48,10 @@ class FiltersPlugin_TopoConnectedFaces(ModelAPI_Filter):
     """ Supported types of filtered shapes """
     return theType == GeomAPI_Shape.FACE
 
+  def isMultiple(self):
+    """ Returns True if the filter can be used several times within one selection """
+    return True
+
   def isOk(self, theShape, theResult, theArgs):
     """ True if theShape is applicable for the filter """
     selectedShapeAttr = modelAPI_AttributeSelection(theArgs.argument("Shape"))
