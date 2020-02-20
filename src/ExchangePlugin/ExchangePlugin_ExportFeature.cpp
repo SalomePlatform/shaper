@@ -110,11 +110,13 @@ void ExchangePlugin_ExportFeature::initAttributes()
   // if the type of export operation is XAO
   AttributeStringPtr aTypeAttr = string(EXPORT_TYPE_ID());
   if (aTypeAttr->isInitialized() && aTypeAttr->value() == "XAO") {
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true, false);
     AttributeSelectionListPtr aSelList = selectionList(SELECTION_LIST_ID());
     AttributeSelectionListPtr aXAOSelList = selectionList(XAO_SELECTION_LIST_ID());
     if (aSelList->size() > 0 && aXAOSelList->size() == 0)
       aSelList->copyTo(aXAOSelList);
     aSelList->clear();
+    data()->blockSendAttributeUpdated(aWasBlocked, false);
   }
 }
 

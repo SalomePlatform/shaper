@@ -1490,16 +1490,19 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
     if (theBelow)
       continue;
 
-    // if feature is in sub-component, skip it
-    FeaturePtr aCurFeature = feature(aCurLabel);
-    if (isSkippedFeature(aCurFeature))
-      continue;
-
+    // issue #18733: check for the last feature in folder before checking the sub-feature,
+    //               because the folder may end by the feature which is
+    //               neither a sub-feature nor a feature in history.
     if (!aLastFeatureInFolder.IsNull()) {
       if (IsEqual(aCurLabel, aLastFeatureInFolder))
         aLastFeatureInFolder.Nullify(); // the last feature in the folder is achieved
       continue;
     }
+
+    // if feature is in sub-component, skip it
+    FeaturePtr aCurFeature = feature(aCurLabel);
+    if (isSkippedFeature(aCurFeature))
+      continue;
 
     const ObjectPtr& aFolderObj = folder(aCurLabel);
     if (aFolderObj.get()) {
