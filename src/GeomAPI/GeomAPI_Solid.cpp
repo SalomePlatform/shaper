@@ -310,7 +310,7 @@ GeomPointPtr GeomAPI_Solid::middlePoint() const
     return anInnerPoint;
 
   GProp_GProps aProps;
-  BRepGProp::SurfaceProperties(aSolid, aProps, 1.e-4);
+  BRepGProp::VolumeProperties(aSolid, aProps, 1.e-4);
 
   gp_Pnt aPnt = aProps.CentreOfMass();
   anInnerPoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));

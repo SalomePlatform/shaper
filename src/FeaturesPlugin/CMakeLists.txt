@@ -609,4 +609,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestSymmetry_MultiLevelCompound_v95_3.py
                TestSymmetry_MultiLevelCompound_v95_4.py
                TestSymmetry_MultiLevelCompound_v95_5.py
+               TestScale_MultiLevelCompound_v0_1.py
+               TestScale_MultiLevelCompound_v0_2.py
+               TestScale_MultiLevelCompound_v0_3.py
+               TestScale_MultiLevelCompound_v0_4.py
+               TestScale_MultiLevelCompound_v95_1.py
+               TestScale_MultiLevelCompound_v95_2.py
+               TestScale_MultiLevelCompound_v95_3.py
+               TestScale_MultiLevelCompound_v95_4.py
 )

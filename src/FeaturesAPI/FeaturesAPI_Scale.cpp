@@ -130,17 +130,10 @@ void FeaturesAPI_Scale::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrScaleFactorZ;
   }
 
-  theDumper << ")" << std::endl;
-}
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
 
-//==================================================================================================
-ScalePtr addScale(const std::shared_ptr<ModelAPI_Document>& thePart,
-                  const std::list<ModelHighAPI_Selection>& theMainObjects,
-                  const ModelHighAPI_Selection& theCenterPoint,
-                  const ModelHighAPI_Double& theScaleFactor)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Scale::ID());
-  return ScalePtr(new FeaturesAPI_Scale(aFeature, theMainObjects, theCenterPoint, theScaleFactor));
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -149,9 +142,17 @@ ScalePtr addScale(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& theCenterPoint,
                   const ModelHighAPI_Double& theScaleFactorX,
                   const ModelHighAPI_Double& theScaleFactorY,
-                  const ModelHighAPI_Double& theScaleFactorZ)
+                  const ModelHighAPI_Double& theScaleFactorZ,
+                  const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Scale::ID());
-  return ScalePtr(new FeaturesAPI_Scale(aFeature, theMainObjects, theCenterPoint,
-                  theScaleFactorX, theScaleFactorY, theScaleFactorZ));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+  ScalePtr aScale;
+  if (theScaleFactorY.value() == 0 && theScaleFactorZ.value() == 0)
+    aScale.reset(new FeaturesAPI_Scale(aFeature, theMainObjects, theCenterPoint, theScaleFactorX));
+  else
+    aScale.reset(new FeaturesAPI_Scale(aFeature, theMainObjects, theCenterPoint,
+                 theScaleFactorX, theScaleFactorY, theScaleFactorZ));
+  return aScale;
 }

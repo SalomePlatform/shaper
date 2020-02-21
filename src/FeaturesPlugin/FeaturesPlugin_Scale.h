@@ -24,8 +24,6 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Scale.h>
-
 /** \class FeaturesPlugin_Scale
  *  \ingroup Plugins
  *  \brief Feature for changing the scale of an object.
@@ -123,7 +121,7 @@ private:
   /// Perform scale using a central point and a value of the scale.
   void performScaleByFactor();
 
-  /// Perform symmetry using a central point and three dimensions
+  /// Perform scale using a central point and three dimensions
   void performScaleByDimensions();
 };
 

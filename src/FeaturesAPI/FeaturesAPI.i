@@ -44,6 +44,7 @@
 %feature("kwargs") addPartition;
 %feature("kwargs") addPlacement;
 %feature("kwargs") addRotation;
+%feature("kwargs") addScale;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
 %feature("kwargs") addSymmetry;

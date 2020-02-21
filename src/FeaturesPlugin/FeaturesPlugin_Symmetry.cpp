@@ -44,7 +44,7 @@
 
 #include <FeaturesPlugin_Tools.h>
 
-static const std::string SCALE_VERSION_1("v9.5");
+static const std::string SYMMETRY_VERSION_1("v9.5");
 
 //=================================================================================================
 FeaturesPlugin_Symmetry::FeaturesPlugin_Symmetry()
@@ -75,7 +75,7 @@ void FeaturesPlugin_Symmetry::initAttributes()
 
   if (!aSelection->isInitialized()) {
     // new feature, not read from file
-    data()->setVersion(SCALE_VERSION_1);
+    data()->setVersion(SYMMETRY_VERSION_1);
   }
 }
 
@@ -274,7 +274,7 @@ void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
   }
 
   bool isKeepOriginal = boolean(KEEP_ORIGINAL_RESULT())->value();
-  bool isKeepSubShapes = data()->version() == SCALE_VERSION_1;
+  bool isKeepSubShapes = data()->version() == SYMMETRY_VERSION_1;
 
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;

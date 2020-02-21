@@ -18,8 +18,13 @@
 //
 
 #include <FeaturesPlugin_Scale.h>
+#include <FeaturesPlugin_Tools.h>
 
+#include <GeomAPI_Trsf.h>
+
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_Scale.h>
 #include <GeomAlgoAPI_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
@@ -28,7 +33,8 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
-#include <FeaturesPlugin_Tools.h>
+static const std::string SCALE_VERSION_1("v9.5");
+
 
 //=================================================================================================
 FeaturesPlugin_Scale::FeaturesPlugin_Scale()
@@ -57,6 +63,11 @@ void FeaturesPlugin_Scale::initAttributes()
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_Scale::SCALE_FACTOR_Z_ID(),
                        ModelAPI_AttributeDouble::typeId());
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(SCALE_VERSION_1);
+  }
 }
 
 //=================================================================================================
@@ -68,8 +79,7 @@ void FeaturesPlugin_Scale::execute()
   if (aMethodType == FeaturesPlugin_Scale::CREATION_METHOD_BY_FACTOR()) {
     performScaleByFactor();
   }
-
-  if (aMethodType == FeaturesPlugin_Scale::CREATION_METHOD_BY_DIMENSIONS()) {
+  else if (aMethodType == FeaturesPlugin_Scale::CREATION_METHOD_BY_DIMENSIONS()) {
     performScaleByDimensions();
   }
 }
@@ -77,24 +87,15 @@ void FeaturesPlugin_Scale::execute()
 //=================================================================================================
 void FeaturesPlugin_Scale::performScaleByFactor()
 {
+  bool isKeepSubShapes = data()->version() == SCALE_VERSION_1;
+
   // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Scale::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjSelList, isKeepSubShapes, anObjects, aParts))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   // Getting the center point
   std::shared_ptr<GeomAPI_Pnt> aCenterPoint;
@@ -113,15 +114,14 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   // Getting scale factor
   double aScaleFactor = real(FeaturesPlugin_Scale::SCALE_FACTOR_ID())->value();
 
-  // Moving each object.
+  // Collect transformation for each object
   std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end(); ++anObjectsIt) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     std::shared_ptr<GeomAlgoAPI_Scale> aScaleAlgo(
-      new GeomAlgoAPI_Scale(aBaseShape, aCenterPoint, aScaleFactor));
+        new GeomAlgoAPI_Scale(aBaseShape, aCenterPoint, aScaleFactor));
 
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aScaleAlgo, getKind(), anError)) {
@@ -129,18 +129,20 @@ void FeaturesPlugin_Scale::performScaleByFactor()
       break;
     }
 
-    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    anObjects.markModified(aBaseShape, aScaleAlgo->shape());
+    aMakeShapeList->appendAlgo(aScaleAlgo);
+  }
 
-    ListOfShape aShapes;
-    aShapes.push_back(aBaseShape);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                             aShapes,
-                                             ListOfShape(),
-                                             aScaleAlgo,
-                                             aScaleAlgo->shape(),
-                                             "Scaled");
-    setResult(aResultBody, aResultIndex);
-    aResultIndex++;
+  // Build results of the scaling
+  int aResultIndex = 0;
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Scaled");
+    setResult(aResultBody, aResultIndex++);
   }
 
   // Remove the rest results if there were produced in the previous pass.
@@ -150,24 +152,15 @@ void FeaturesPlugin_Scale::performScaleByFactor()
 //=================================================================================================
 void FeaturesPlugin_Scale::performScaleByDimensions()
 {
+  bool isKeepSubShapes = data()->version() == SCALE_VERSION_1;
+
   // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Scale::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjSelList, isKeepSubShapes, anObjects, aParts))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   // Getting the center point
   std::shared_ptr<GeomAPI_Pnt> aCenterPoint;
@@ -188,12 +181,11 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   double aScaleFactorY = real(FeaturesPlugin_Scale::SCALE_FACTOR_Y_ID())->value();
   double aScaleFactorZ = real(FeaturesPlugin_Scale::SCALE_FACTOR_Z_ID())->value();
 
-  // Moving each object.
+  // Collect transformation for each object
   std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end(); ++anObjectsIt) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     std::shared_ptr<GeomAlgoAPI_Scale> aScaleAlgo(new GeomAlgoAPI_Scale(aBaseShape,
                                                                         aCenterPoint,
@@ -207,18 +199,20 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
       break;
     }
 
-    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    anObjects.markModified(aBaseShape, aScaleAlgo->shape());
+    aMakeShapeList->appendAlgo(aScaleAlgo);
+  }
 
-    ListOfShape aShapes;
-    aShapes.push_back(aBaseShape);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                             aShapes,
-                                             ListOfShape(),
-                                             aScaleAlgo,
-                                             aScaleAlgo->shape(),
-                                             "Scaled");
-    setResult(aResultBody, aResultIndex);
-    aResultIndex++;
+  // Build results of the scaling
+  int aResultIndex = 0;
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Scaled");
+    setResult(aResultBody, aResultIndex++);
   }
 
   // Remove the rest results if there were produced in the previous pass.
