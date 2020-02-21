@@ -192,7 +192,7 @@ public:
 
   /// Returns the shape as BRep stream
   GEOMAPI_EXPORT
-  std::string getShapeStream() const;
+  std::string getShapeStream(const bool theWithTriangulation = true) const;
 
   /// Returns intersection of shapes
   GEOMAPI_EXPORT

@@ -40,7 +40,13 @@ if "%BOOST_ROOT_DIR%" == "" (
 
 cd /d %SALOME_ROOT_DIR%\WORK
 call set_env.bat %1
-call "%PDIR%\env_compile.bat"
+
+if %2 == run (
+  call "%PDIR%\env_launch.bat"
+) else (
+  call "%PDIR%\env_compile.bat"
+)
+
 cd /d %ROOT_DIR%
 
 @REM -------------------------

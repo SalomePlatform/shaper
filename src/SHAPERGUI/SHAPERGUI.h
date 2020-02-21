@@ -170,6 +170,8 @@ Q_OBJECT
 
   void resetToolbars();
 
+  void publishToStudy();
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,

@@ -71,6 +71,13 @@ public:
     return MY_WEAK_NAMING_DUMP_ID;
   }
 
+  /// attribute name for boolean flag to export variable names correspondence to another module
+  inline static const std::string& EXPORT_VARIABLES_ID()
+  {
+    static const std::string MY_EXPORT_VARIABLES_ID("export_variables");
+    return MY_EXPORT_VARIABLES_ID;
+  }
+
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_Dump();
   /// Default destructor

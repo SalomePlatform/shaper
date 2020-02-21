@@ -23,6 +23,7 @@
 import ModelAPI
 
 from ConnectorPlugin_ExportFeature import ExportFeature
+from ConnectorPlugin_PublishToStudyFeature import PublishToStudyFeature
 
 ## @ingroup Plugins
 #  The main class for management the construction features as plugin.
@@ -37,6 +38,8 @@ class ConnectorPlugin(ModelAPI.ModelAPI_Plugin):
     def createFeature(self, theFeatureID):
         if theFeatureID == ExportFeature.ID():
             return ExportFeature().__disown__()
+        elif theFeatureID == PublishToStudyFeature.ID():
+            return PublishToStudyFeature().__disown__()
         else:
             print("ConnectorPlugin: No such feature %s" % theFeatureID)
 

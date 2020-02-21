@@ -10,7 +10,7 @@ popd
 @SET SRC_DIR=%ROOT_DIR%\sources
 @SET OCC_LIB_PREFIX=d
 
-call %SRC_DIR%\env_Salome.bat d
+call %SRC_DIR%\env_Salome.bat d comp
 mkdir %ROOT_DIR%\build
 cd %ROOT_DIR%\build
 

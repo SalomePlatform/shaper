@@ -8,7 +8,7 @@ pushd %PARENT_DIR%
 popd
 
 @SET OCC_LIB_PREFIX=d
-call env_Salome.bat d
+call env_Salome.bat d run
 
 rem Variable which is necessary for launching SALOME
 SET SALOME_PLEASE_SETUP_ENVIRONMENT_AS_BEFORE=1

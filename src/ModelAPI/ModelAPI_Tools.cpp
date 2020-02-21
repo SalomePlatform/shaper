@@ -866,4 +866,53 @@ void copyVisualizationAttrs(
   }
 }
 
+std::list<FeaturePtr> referencedFeatures(
+  std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
+  const bool theSortResults)
+{
+  std::set<FeaturePtr> aResSet; // collect in the set initially to avoid duplicates
+  std::list<ResultPtr> allSubRes;
+  allSubRes.push_back(theTarget);
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theTarget);
+  if (aBody.get())
+    allSubs(aBody, allSubRes);
+  std::list<ResultPtr>::iterator aSub = allSubRes.begin();
+  for(; aSub != allSubRes.end(); aSub++) {
+    const std::set<AttributePtr>& aRefs = (*aSub)->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
+    for(; aRef != aRefs.cend(); aRef++) {
+      FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+      if (aFeat.get() && (theFeatureKind.empty() || aFeat->getKind() == theFeatureKind))
+        aResSet.insert(aFeat);
+    }
+  }
+  // add also feature of the target that may be referenced as a whole
+  FeaturePtr aTargetFeature = theTarget->document()->feature(theTarget);
+  const std::set<AttributePtr>& aRefs = aTargetFeature->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
+  for(; aRef != aRefs.cend(); aRef++) {
+    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+    if (aFeat.get() && (theFeatureKind.empty() || aFeat->getKind() == theFeatureKind))
+      aResSet.insert(aFeat);
+  }
+
+  std::list<FeaturePtr> aResList;
+  std::set<FeaturePtr>::iterator aResIter = aResSet.begin();
+  for(; aResIter != aResSet.end(); aResIter++) {
+    if (theSortResults) { // sort results by creation-order
+      std::list<FeaturePtr>::iterator aListIter = aResList.begin();
+      for(; aListIter != aResList.end(); aListIter++) {
+        if ((*aResIter)->document()->isLater(*aListIter, *aResIter))
+          break;
+      }
+      if (aListIter == aResList.end()) // goes to the end
+        aResList.push_back(*aResIter);
+      else
+        aResList.insert(aListIter, *aResIter);
+    } else //just push to the end unsorted
+      aResList.push_back(*aResIter);
+  }
+  return aResList;
+}
+
 } // namespace ModelAPI_Tools

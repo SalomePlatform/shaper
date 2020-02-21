@@ -65,10 +65,13 @@ void ExchangePlugin_Dump::initAttributes()
   data()->addAttribute(GEOMETRIC_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(WEAK_NAMING_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
 
+  data()->addAttribute(EXPORT_VARIABLES_ID(), ModelAPI_AttributeBoolean::typeId());
+
   // default values
   boolean(TOPOLOGICAL_NAMING_DUMP_ID())->setValue(THE_DUMP_NAMING);
   boolean(GEOMETRIC_DUMP_ID())->setValue(THE_DUMP_GEO);
   boolean(WEAK_NAMING_DUMP_ID())->setValue(THE_DUMP_WEAK);
+  boolean(EXPORT_VARIABLES_ID())->setValue(false);
 }
 
 void ExchangePlugin_Dump::execute()
@@ -159,6 +162,14 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
     aDumper->addCustomStorage(aWeakNamingStorage);
   }
 
-  if (!aDumper->process(aDoc, theFileName))
-    setError("An error occured while dumping to " + theFileName);
+  if (!aDumper->process(aDoc, theFileName)) {
+    setError("An error occurred while dumping to " + theFileName);
+  } else {
+    if (boolean(EXPORT_VARIABLES_ID())->value()) {
+      aDumper->exportVariables();
+    }
+  }
+  // clear cashed data after export variables was performed
+  aDumper->clearCustomStorage();
+
 }

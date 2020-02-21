@@ -24,6 +24,7 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ExchangePlugin_Dump.h>
 
 #include <LightApp_Study.h>
@@ -85,6 +86,9 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
 
 bool SHAPERGUI_DataModel::save(QStringList& theFiles)
 {
+  // Publish to study before saving of the data model
+  myModule->publishToStudy();
+
   LightApp_DataModel::save( theFiles );
   XGUI_Workshop* aWorkShop = myModule->workshop();
   std::list<std::string> aFileNames;
@@ -175,6 +179,8 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
   if (!aStudy)
     return false;
 
+  myModule->publishToStudy();
+
   std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->activeDocument();
   ModelAPI_Session::get()->startOperation(ExchangePlugin_Dump::ID());
   FeaturePtr aFeature = aDoc->addFeature(ExchangePlugin_Dump::ID());
@@ -193,6 +199,10 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     aAttr = aFeature->string(ExchangePlugin_Dump::FILE_FORMAT_ID());
     if (aAttr.get())
       aAttr->setValue(".py");
+
+#ifdef HAVE_SALOME
+    aFeature->boolean(ExchangePlugin_Dump::EXPORT_VARIABLES_ID())->setValue(true);
+#endif
 
     ModelAPI_Session::get()->finishOperation();
 
@@ -232,4 +242,3 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
   }
   return false;
 }
-

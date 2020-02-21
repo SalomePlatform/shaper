@@ -648,7 +648,6 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 
   // dump subfeatures and store result to file
   bool isOk = process(theDoc) && myDumpStorage->exportTo(theFileName, myModules);
-  clearCustomStorage();
   return isOk;
 }
 
@@ -1550,4 +1549,25 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   theDumper.dumpPostponed();
 
   return theDumper;
+}
+
+
+void ModelHighAPI_Dumper::exportVariables() const
+{
+  DocumentPtr aRoot = ModelAPI_Session::get()->moduleDocument();
+  EntityNameMap::const_iterator aNameIter = myNames.cbegin();
+  for(; aNameIter != myNames.end(); aNameIter++) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aNameIter->first);
+    if (aFeature.get() && aFeature->document() != aRoot) {
+      FeaturePtr aPartFeat = ModelAPI_Tools::findPartFeature(aRoot, aFeature->document());
+      if (aPartFeat.get()) {
+        int aFeatureId = aFeature->data()->featureId();
+        int aPartId = aPartFeat->data()->featureId();
+        std::ostringstream anEntryStr;
+        anEntryStr<<aPartId<<":"<<aFeatureId;
+        std::string anEntry = anEntryStr.str();
+        exportVariable(anEntry, aNameIter->second.myCurrentName);
+      }
+    }
+  }
 }

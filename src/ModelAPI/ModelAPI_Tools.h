@@ -236,6 +236,15 @@ MODELAPI_EXPORT double getTransparency(const std::shared_ptr<ModelAPI_Result>& t
 MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result> theSource,
                                             std::shared_ptr<ModelAPI_Result> theDest);
 
+/*! Produces list of features that reference to the given target (directly or through sub-results)
+* \param theTarget the referenced result
+* \param theFeatureKind the resulting features filter: the feature kind or all for the empty string
+* \param theSortResults to sort the resulting list of features by the features creation order
+*/
+MODELAPI_EXPORT std::list<std::shared_ptr<ModelAPI_Feature> > referencedFeatures(
+  std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
+  const bool theSortResults);
+
 }
 
 #endif

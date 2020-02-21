@@ -162,7 +162,6 @@ public:
   /// Clear custom storages list
   MODELHIGHAPI_EXPORT
   void clearCustomStorage();
-
   /// Dump given document into the file
   /// \return \c true, if succeed
   MODELHIGHAPI_EXPORT
@@ -346,6 +345,13 @@ public:
   /// Check all objects in theRefList are already dumped
   MODELHIGHAPI_EXPORT
   bool isDumped(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const;
+
+  /// Export variables names to another module (calls exportVariable implemented in python)
+  MODELHIGHAPI_EXPORT virtual void exportVariables() const;
+
+  /// Export one variable name to another module (implemented in python)
+  MODELHIGHAPI_EXPORT virtual void exportVariable(
+    const std::string& theEntry, const std::string& theVarName) const {}
 
 protected:
   /// Dump "setName" command if last entity had user-defined name

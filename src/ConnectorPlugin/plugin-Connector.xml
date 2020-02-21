@@ -7,6 +7,10 @@
         tooltip="Export all results and groups into GEOM module"
         icon="icons/Connector/geom_export.png"
         helpfile="ConnectorPlugin/ConnectorPlugin.html"/>
+      <feature
+        id="PublishToStudy"
+        title="Pyblish to study"
+        internal="1"/>
     </group>
   </workbench>
 </plugin>
