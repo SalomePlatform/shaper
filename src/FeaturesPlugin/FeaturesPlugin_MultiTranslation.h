@@ -22,9 +22,9 @@
 
 #include <FeaturesPlugin.h>
 
-#include <GeomAlgoAPI_Translation.h>
-
 #include <ModelAPI_Feature.h>
+
+class GeomAPI_Dir;
 
 /** \class FeaturesPlugin_MultiTranslation
  *  \ingroup Plugins
@@ -114,11 +114,12 @@ class FeaturesPlugin_MultiTranslation : public ModelAPI_Feature
   FeaturesPlugin_MultiTranslation();
 
 private:
-  /// Perform the multi translation in one direction.
-  void performOneDirection();
-
-  /// Perform the multi translation in two directions.
-  void performTwoDirection();
+  /// Fill axis, number of copies and distance for the given direction.
+  /// \returns \c false in case of errors.
+  bool paramsAlongDirection(const int theIndex,
+                            std::shared_ptr<GeomAPI_Dir>& theDir,
+                            double& theDistance,
+                            int& theQuantity);
 };
 
 #endif // FEATURESPLUGIN_MULTITRANSLATION_H_

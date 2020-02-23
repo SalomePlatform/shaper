@@ -21,6 +21,8 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <GeomDataAPI_Point.h>
+
+#include <sstream>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -50,6 +52,16 @@ double ModelHighAPI_Double::value() const
 {
   // needed for array of double, which supports no text
   return myDouble;
+}
+
+std::string ModelHighAPI_Double::string() const
+{
+  if (myVariantType == VT_STRING)
+    return myString;
+
+  std::ostringstream anOut;
+  anOut << myDouble;
+  return anOut.str();
 }
 
 //--------------------------------------------------------------------------------------

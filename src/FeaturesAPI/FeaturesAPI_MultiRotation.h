@@ -28,12 +28,12 @@
 
 #include <FeaturesPlugin_MultiRotation.h>
 
+#include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
 class ModelHighAPI_Dumper;
-class ModelHighAPI_Integer;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_MultiRotation
@@ -108,15 +108,8 @@ FEATURESAPI_EXPORT
 MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                                   const ModelHighAPI_Selection& theAxis,
-                                  const ModelHighAPI_Integer& theNumber);
-
-/// \ingroup CPPHighAPI
-/// \brief Create MultiRotation feature.
-FEATURESAPI_EXPORT
-MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                  const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                  const ModelHighAPI_Selection& theAxis,
                                   const ModelHighAPI_Double& theStep,
-                                  const ModelHighAPI_Integer& theNumber);
+                                  const ModelHighAPI_Integer& theNumber = ModelHighAPI_Integer(""),
+                                  const bool keepSubResults = false);
 
 #endif // FEATURESAPI_MULTIROTATION_H_

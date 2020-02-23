@@ -55,6 +55,9 @@ public:
   /// Returns a value (must be used only for attributes which support no text)
   MODELHIGHAPI_EXPORT virtual int intValue() const;
 
+  /// Returns a string representation of the value
+  MODELHIGHAPI_EXPORT virtual std::string string() const;
+
 private:
   enum VariantType { VT_INT, VT_STRING } myVariantType;
   int myInt;

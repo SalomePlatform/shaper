@@ -63,6 +63,9 @@ public:
   /// Value of the attribute
   MODELHIGHAPI_EXPORT double value() const;
 
+  /// Returns a string representation of the value
+  MODELHIGHAPI_EXPORT virtual std::string string() const;
+
 private:
   enum VariantType { VT_DOUBLE, VT_STRING } myVariantType;
   double myDouble;

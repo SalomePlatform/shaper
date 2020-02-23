@@ -48,6 +48,8 @@
 #include <math.h>
 #include <iostream>
 
+static const std::string MULTIROTATION_VERSION_1("v9.5");
+
 //=================================================================================================
 FeaturesPlugin_MultiRotation::FeaturesPlugin_MultiRotation()
 {
@@ -78,6 +80,11 @@ void FeaturesPlugin_MultiRotation::initAttributes()
   data()->addAttribute(FeaturesPlugin_MultiRotation::NB_COPIES_RADIAL_ID(),
                        ModelAPI_AttributeInteger::typeId());
 #endif
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(MULTIROTATION_VERSION_1);
+  }
 }
 
 //=================================================================================================
@@ -96,132 +103,128 @@ void FeaturesPlugin_MultiRotation::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_MultiRotation::performRotation1D()
+bool FeaturesPlugin_MultiRotation::paramsOfRotation(std::shared_ptr<GeomAPI_Ax1>& theAxis,
+                                                    double& theAngle,
+                                                    int& theQuantity)
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_MultiRotation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    setError("Error: empty selection list");
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   //Getting axis.
   static const std::string aSelectionError = "Error: The axis shape selection is bad.";
   AttributeSelectionPtr anObjRef = selection(AXIS_ANGULAR_ID());
   GeomShapePtr aShape = anObjRef->value();
-  if (!aShape.get()) {
-    if (anObjRef->context().get()) {
-      aShape = anObjRef->context()->shape();
-    }
-  }
+  if (!aShape.get() && anObjRef->context().get())
+    aShape = anObjRef->context()->shape();
   if (!aShape.get()) {
     setError(aSelectionError);
-    return;
+    return false;
   }
 
   GeomEdgePtr anEdge;
   if (aShape->isEdge())
-  {
     anEdge = aShape->edge();
-  }
-  else if (aShape->isCompound())
-  {
+  else if (aShape->isCompound()) {
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
 
-  if (!anEdge.get())
-  {
+  if (!anEdge.get()) {
     setError(aSelectionError);
-    return;
+    return false;
   }
 
-  std::shared_ptr<GeomAPI_Ax1> anAxis(new GeomAPI_Ax1(anEdge->line()->location(),
-                                                      anEdge->line()->direction()));
+  theAxis.reset(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
 
   // Getting number of copies.
-  int nbCopies =
-    integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID())->value();
-
-  if (nbCopies <=0) {
+  theQuantity = integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID())->value();
+  if (theQuantity <= 0) {
     std::string aFeatureError = "Multirotation builder ";
-    aFeatureError+=":: the number of copies for the angular direction is null or negative.";
+    aFeatureError += ":: the number of copies for the angular direction is null or negative.";
     setError(aFeatureError);
-    return;
+    return false;
   }
 
   // Getting angle
-  double anAngle;
   std::string useAngularStep =
     string(FeaturesPlugin_MultiRotation::USE_ANGULAR_STEP_ID())->value();
-  if (!useAngularStep.empty()) {
-    anAngle = real(FeaturesPlugin_MultiRotation::STEP_ANGULAR_ID())->value();
-  } else {
-    anAngle = 360./nbCopies;
+  if (!useAngularStep.empty())
+    theAngle = real(FeaturesPlugin_MultiRotation::STEP_ANGULAR_ID())->value();
+  else
+    theAngle = 360. / theQuantity;
+  return true;
+}
+
+//=================================================================================================
+void FeaturesPlugin_MultiRotation::performRotation1D()
+{
+  bool isKeepSubShapes = data()->version() == MULTIROTATION_VERSION_1;
+
+  // Getting objects.
+  AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
+  if (anObjectsSelList->size() == 0) {
+    setError("Error: empty selection list");
+    return;
   }
 
-  // Moving each object.
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
+    return;
+
+  // Parameters of rotation.
+  std::shared_ptr<GeomAPI_Ax1> anAxis;
+  double anAngle = 0.0;
+  int nbCopies = 0;
+  if (!paramsOfRotation(anAxis, anAngle, nbCopies))
+    return;
+
+
+  std::string anError;
   int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      for (int i=0; i<nbCopies; i++) {
-        aTrsf->setRotation(anAxis, i*anAngle);
-        ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-        aResultPart->setTrsf(*aContext, aTrsf);
-        setResult(aResultPart, aResultIndex);
-        aResultIndex++;
-      }
-    } else {
-      std::string anError;
-      ListOfShape aListOfShape;
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
-          aListOfRotationAlgo(new GeomAlgoAPI_MakeShapeList);
-
-      for (int i=0; i<nbCopies; i++) {
-        std::shared_ptr<GeomAlgoAPI_Rotation> aRotationnAlgo(
-          new GeomAlgoAPI_Rotation(aBaseShape, anAxis, i*anAngle));
-
-        // Checking that the algorithm worked properly.
-        if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationnAlgo, getKind(), anError)) {
-          setError(anError);
-          break;
-        }
-        aListOfShape.push_back(aRotationnAlgo->shape());
-        aListOfRotationAlgo->appendAlgo(aRotationnAlgo);
-      }
-      std::shared_ptr<GeomAPI_Shape> aCompound =
-        GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aBaseShapes;
-      aBaseShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
-                                               aListOfRotationAlgo, aCompound, "Rotated");
-
-      setResult(aResultBody, aResultIndex);
-      aResultIndex++;
+  // Moving each part.
+  for (std::list<ResultPtr>::iterator aPRes = aParts.begin(); aPRes != aParts.end(); ++aPRes) {
+    ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPRes);
+    std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+    for (int i = 0; i < nbCopies; ++i) {
+      aTrsf->setRotation(anAxis, i * anAngle);
+      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+      aResultPart->setTrsf(anOrigin, aTrsf);
+      setResult(aResultPart, aResultIndex++);
     }
+  }
+
+  // Collect transformations for each object in a part.
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end(); anObjectsIt++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    ListOfShape aListOfShape;
+
+    for (int i = 0; i < nbCopies; i++) {
+      std::shared_ptr<GeomAlgoAPI_Rotation> aRotationnAlgo(
+          new GeomAlgoAPI_Rotation(aBaseShape, anAxis, i * anAngle));
+
+      // Checking that the algorithm worked properly.
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationnAlgo, getKind(), anError)) {
+        setError(anError);
+        break;
+      }
+      aListOfShape.push_back(aRotationnAlgo->shape());
+      aMakeShapeList->appendAlgo(aRotationnAlgo);
+    }
+
+    GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+    anObjects.markModified(aBaseShape, aCompound);
+  }
+
+  // Build results of the operation.
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Rotated");
+    setResult(aResultBody, aResultIndex++);
   }
 
   // Remove the rest results if there were produced in the previous pass.
@@ -251,32 +254,13 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
     aContextes.push_back(anObjectAttr->context());
   }
 
-  //Getting axis.
+  // Parameters of rotation.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
-  std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
-    selection(FeaturesPlugin_MultiRotation::AXIS_ANGULAR_ID());
-  if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
-  } else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
-             anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
-  }
-  if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
-                                                          anEdge->line()->direction()));
-  }
-
-  // Getting number of copies int he angular direction.
-  int nbAngular =
-    integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID())->value();
-
-  if (nbAngular <=0) {
-    std::string aFeatureError = "Multirotation builder ";
-    aFeatureError+=":: the number of copies for the angular direction is null or negative.";
-    setError(aFeatureError);
+  double anAngle = 0.0;
+  int nbCopies = 0;
+  if (!paramsOfRotation(anAxis, anAngle, nbCopies))
     return;
-  }
+
 
   // Getting number of copies int he radial direction.
   int nbRadial =
@@ -287,16 +271,6 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
     aFeatureError+=":: the number of copies for the radial direction is null or negative.";
     setError(aFeatureError);
     return;
-  }
-
-  // Getting angle
-  double anAngle;
-  std::string useAngularStep =
-    string(FeaturesPlugin_MultiRotation::USE_ANGULAR_STEP_ID())->value();
-  if (!useAngularStep.empty()) {
-    anAngle = real(FeaturesPlugin_MultiRotation::STEP_ANGULAR_ID())->value();
-  } else {
-    anAngle = 360./nbAngular;
   }
 
   // Getting step
