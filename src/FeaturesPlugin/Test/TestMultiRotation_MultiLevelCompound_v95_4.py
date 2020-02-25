@@ -19,6 +19,7 @@
 
 from salome.shaper import model
 from GeomAPI import *
+from GeomAlgoAPI import *
 
 model.begin()
 partSet = model.moduleDocument()

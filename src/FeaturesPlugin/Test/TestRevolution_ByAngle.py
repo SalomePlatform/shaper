@@ -40,12 +40,12 @@ SketchCircle_1 = Sketch_1.addCircle(30, 20, 15)
 Revolution_1.setNestedSketch(Sketch_1)
 model.do()
 Shape = Revolution_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, -19.9197187127138, 19.9197187127138, 20)
+checkMiddlePoint(Shape, -20.29227355, 20.29227355, 20)
 
 Revolution_1.setAxis(model.selection("EDGE", "PartSet/OY"))
 model.do()
 Shape = Revolution_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 14.2731178230633, 30, 14.2731178230633)
+checkMiddlePoint(Shape, 14.5229101, 30, 14.5229101)
 
 model.end()
 

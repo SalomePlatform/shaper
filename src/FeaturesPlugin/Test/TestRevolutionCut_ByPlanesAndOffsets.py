@@ -44,12 +44,12 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.result(), Sk
 RevolutionCut_1.setNestedSketch(Sketch_1)
 model.do()
 Shape = RevolutionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5, 5.15948561, 5.15948561)
+checkMiddlePoint(Shape, 5, 4.760371965, 4.760372054)
 
 RevolutionCut_1.setPlanesAndOffsets(model.selection(), 0, model.selection("FACE", "Box_1_1/Bottom"), 3)
 model.do()
 Shape = RevolutionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5, 5.23264, 5.07457446)
+checkMiddlePoint(Shape, 5, 4.7759476985, 4.74444379)
 
 model.end()
 

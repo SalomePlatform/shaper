@@ -49,7 +49,7 @@ ExtrusionFuse_1 = model.addExtrusionFuse(Part_1_doc, [model.selection("FACE", "F
 
 model.do()
 Shape = ExtrusionFuse_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 37.46245068, 23.05267081, 8.52187757)
+checkMiddlePoint(Shape, 42.63716766, 25.85781486, 9.0373214)
 
 model.end()
 

@@ -53,7 +53,7 @@ RevolutionCut_1.setNestedSketch(Sketch_1)
 model.do()
 
 Shape = RevolutionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5.13562827, 5.0, 5.13562827)
+checkMiddlePoint(Shape, 4.81498576, 5.0, 4.81498576)
 
 model.end()
 
