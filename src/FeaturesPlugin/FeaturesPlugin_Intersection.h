@@ -20,11 +20,7 @@
 #ifndef FeaturesPlugin_Intersection_H_
 #define FeaturesPlugin_Intersection_H_
 
-#include "FeaturesPlugin.h"
-
-#include <ModelAPI_Feature.h>
-
-#include <GeomAPI_Shape.h>
+#include "FeaturesPlugin_VersionedBoolean.h"
 
 class GeomAlgoAPI_MakeShape;
 
@@ -35,7 +31,7 @@ class GeomAlgoAPI_MakeShape;
 /// whole objects, compsoilds, solids, shells, faces or edges.
 /// The result is less than the minimal dimension from pair of intersection:
 /// for two solids or two faces it is wire, for the edge and face it is vertex, etc.
-class FeaturesPlugin_Intersection : public ModelAPI_Feature
+class FeaturesPlugin_Intersection : public FeaturesPlugin_VersionedBoolean
 {
 public:
   /// Feature kind.
@@ -67,12 +63,6 @@ public:
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_Intersection();
-
-private:
-  /// Load Naming data structure of the feature to the document.
-  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const ListOfShape& theObjects,
-                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
 };
 
 #endif

@@ -66,14 +66,21 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
 
-  theDumper << aBase << " = model.addIntersection(" << aDocName << ", "
-            << anAttrObjects << ")" << std::endl;
+  theDumper << aBase << " = model.addIntersection(" << aDocName << ", " << anAttrObjects;
+
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                const std::list<ModelHighAPI_Selection>& theObjects)
+                                const std::list<ModelHighAPI_Selection>& theObjects,
+                                const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Intersection::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
   return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects));
 }

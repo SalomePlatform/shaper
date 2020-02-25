@@ -68,7 +68,8 @@ typedef std::shared_ptr<FeaturesAPI_Intersection> IntersectionPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Intersection feature.
 FEATURESAPI_EXPORT
-IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                const std::list<ModelHighAPI_Selection>& theObjects);
+IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& part,
+                                const std::list<ModelHighAPI_Selection>& objects,
+                                const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Intersection_H_

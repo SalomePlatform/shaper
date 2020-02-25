@@ -41,6 +41,7 @@
 %feature("kwargs") addCommon;
 %feature("kwargs") addCut;
 %feature("kwargs") addFuse;
+%feature("kwargs") addIntersection;
 %feature("kwargs") addMultiRotation;
 %feature("kwargs") addMultiTranslation;
 %feature("kwargs") addPartition;

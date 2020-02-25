@@ -26,10 +26,13 @@
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_Intersection.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <sstream>
+
+static const std::string INTERSECTION_VERSION_1("v9.5");
 
 //=================================================================================================
 FeaturesPlugin_Intersection::FeaturesPlugin_Intersection()
@@ -39,28 +42,19 @@ FeaturesPlugin_Intersection::FeaturesPlugin_Intersection()
 //=================================================================================================
 void FeaturesPlugin_Intersection::initAttributes()
 {
-  data()->addAttribute(OBJECT_LIST_ID(),
+  AttributePtr anObjectsAttr = data()->addAttribute(OBJECT_LIST_ID(),
                        ModelAPI_AttributeSelectionList::typeId());
+
+  initVersion(INTERSECTION_VERSION_1, anObjectsAttr, AttributePtr());
 }
 
 //=================================================================================================
 void FeaturesPlugin_Intersection::execute()
 {
-  ListOfShape anObjects;
-
+  GeomAPI_ShapeHierarchy anObjectsHierarchy;
+  ListOfShape aPlanes;
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECT_LIST_ID());
-  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if (!anObject.get()) {
-      return;
-    }
-    anObjects.push_back(anObject);
-  }
-
-  if(anObjects.empty()) {
+  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHierarchy, aPlanes)) {
     setError("Error: Objects or tools are empty.");
     return;
   }
@@ -68,6 +62,7 @@ void FeaturesPlugin_Intersection::execute()
   int aResultIndex = 0;
 
   // Create result.
+  const ListOfShape& anObjects = anObjectsHierarchy.objects();
   GeomMakeShapePtr anIntersectionAlgo(new GeomAlgoAPI_Intersection(anObjects));
 
   // Checking that the algorithm worked properly.
@@ -77,38 +72,32 @@ void FeaturesPlugin_Intersection::execute()
     return;
   }
 
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  aMakeShapeList->appendAlgo(anIntersectionAlgo);
+
+  GeomShapePtr aResShape = anIntersectionAlgo->shape();
+  if (data()->version() == INTERSECTION_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    // and append the result of the FUSE operation
+    aResShape = keepUnusedSubsOfCompound(aResShape, anObjectsHierarchy,
+                                         GeomAPI_ShapeHierarchy(), aMakeShapeList);
+  }
+
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-  loadNamingDS(aResultBody, anObjects, anIntersectionAlgo);
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                           anObjects,
+                                           ListOfShape(),
+                                           aMakeShapeList,
+                                           aResShape);
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
+  FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
+                                          GeomShapePtr(),
+                                          anObjects,
+                                          aMakeShapeList,
+                                          aResShape);
+
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
-}
-
-//=================================================================================================
-void FeaturesPlugin_Intersection::loadNamingDS(ResultBodyPtr theResultBody,
-                                               const ListOfShape& theObjects,
-                                               const GeomMakeShapePtr& theMakeShape)
-{
-  std::shared_ptr<GeomAPI_Shape> aResultShape = theMakeShape->shape();
-
-  if(theObjects.front()->isEqual(aResultShape)) {
-    theResultBody->store(aResultShape, false);
-    return;
-  }
-
-  theResultBody->storeModified(theObjects, aResultShape, theMakeShape);
-
-  const int aShapeTypesNb = 3;
-  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] = {GeomAPI_Shape::VERTEX,
-                                                               GeomAPI_Shape::EDGE,
-                                                               GeomAPI_Shape::FACE };
-  for (ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
-    const GeomShapePtr aShape = *anIt;
-    for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
-      theResultBody->loadModifiedShapes(theMakeShape, aShape, aShapeTypes[anIndex]);
-      theResultBody->loadGeneratedShapes(theMakeShape, aShape, aShapeTypes[anIndex]);
-    }
-  }
 }

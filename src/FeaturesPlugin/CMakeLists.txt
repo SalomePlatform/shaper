@@ -633,4 +633,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestMultiRotation_MultiLevelCompound_v95_2.py
                TestMultiRotation_MultiLevelCompound_v95_3.py
                TestMultiRotation_MultiLevelCompound_v95_4.py
+               TestIntersection_MultiLevelCompound_v0_1.py
+               TestIntersection_MultiLevelCompound_v0_2.py
+               TestIntersection_MultiLevelCompound_v95_1.py
+               TestIntersection_MultiLevelCompound_v95_2.py
 )
