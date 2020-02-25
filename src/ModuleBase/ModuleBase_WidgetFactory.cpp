@@ -77,10 +77,11 @@
 #include <climits>
 
 ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
-                                                   ModuleBase_IWorkshop* theWorkshop)
+                                                   ModuleBase_IWorkshop* theWorkshop,
+                                                   const std::string theAttributePrefix)
     : myWorkshop(theWorkshop)
 {
-  myWidgetApi = new Config_WidgetAPI(theXmlRepresentation);
+  myWidgetApi = new Config_WidgetAPI(theXmlRepresentation, theAttributePrefix);
 }
 
 ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()

@@ -23,6 +23,8 @@
 
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_FiltersFactory.h>
 
 FiltersAPI_Feature::FiltersAPI_Feature(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -57,8 +59,8 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
   FiltersFeaturePtr aBase = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(feature());
   for (std::list<FilterAPIPtr>::const_iterator anIt = theFilters.begin();
        anIt != theFilters.end(); ++anIt) {
-    aBase->addFilter((*anIt)->name());
-    aBase->setReversed((*anIt)->name(), (*anIt)->isReversed());
+    std::string aFilterID = aBase->addFilter((*anIt)->name());
+    aBase->setReversed(aFilterID, (*anIt)->isReversed());
 
     const std::list<FiltersAPI_Argument>& anArgs = (*anIt)->arguments();
     if (!anArgs.empty()) {
@@ -68,7 +70,7 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
       std::list<bool> aBools;
       separateArguments(anArgs, aSelections, aTexts, aBools);
 
-      std::list<AttributePtr> aFilterArgs = aBase->filterArgs((*anIt)->name());
+      std::list<AttributePtr> aFilterArgs = aBase->filterArgs(aFilterID);
       std::list<AttributePtr>::iterator aFIt = aFilterArgs.begin();
       // first boolean argument is always "Reversed" flag
       AttributeBooleanPtr aReversedFlag =
@@ -115,9 +117,12 @@ void FiltersAPI_Feature::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aDocName = theDumper.name(aBase->document());
   theDumper << "model.filters(" << aDocName << ", [";
 
+  ModelAPI_FiltersFactory* aFFactory = ModelAPI_Session::get()->filters();
   std::list<std::string> aFilters = aBase->filters();
   for (std::list<std::string>::iterator aFIt = aFilters.begin(); aFIt != aFilters.end(); ++aFIt) {
-    FiltersAPI_Filter aFilter(*aFIt, aBase->filterArgs(*aFIt));
+    // for multiple filters get original id
+    std::string aFilterKind = aFFactory->id(aFFactory->filter(*aFIt));
+    FiltersAPI_Filter aFilter(aFilterKind, aBase->filterArgs(*aFIt));
     if (aFIt != aFilters.begin())
       theDumper << ", ";
     aFilter.dump(theDumper);

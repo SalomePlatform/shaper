@@ -80,6 +80,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultField.h>
+#include <ModuleBase_IconFactory.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -89,6 +90,8 @@
 
 #include <ExchangePlugin_ExportPart.h>
 #include <ExchangePlugin_ImportPart.h>
+#include <ExchangePlugin_Import.h>
+#include <ExchangePlugin_ExportFeature.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -144,6 +147,9 @@
 #include <QDesktopWidget>
 #include <QProcess>
 #include <QDesktopServices>
+#include <QFormLayout>
+#include <QSpinBox>
+#include <QDialogButtonBox>
 
 #include <iterator>
 
@@ -467,31 +473,43 @@ void XGUI_Workshop::initMenu()
 
 
   // Add commands to a file menu
-  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."),
-                                             tr("Export the current document into a native file"),
-                                              QIcon(), QKeySequence(),
-                                              false, "MEN_DESK_FILE");
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
-
-  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."),
+  // Import sub-menu
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Part set..."),
                                               tr("Import native file"),
                                               QIcon(), QKeySequence(),
-                                              false, "MEN_DESK_FILE");
+                                              false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
-  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
-  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Export part..."),
-                                          tr("Export a part of the current document into a file"),
-                                          QIcon(), QKeySequence(),
-                                          false, "MEN_DESK_FILE");
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
-
-  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Import part..."),
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Part..."),
                                           tr("Import structure of a part"),
                                           QIcon(), QKeySequence(),
-                                          false, "MEN_DESK_FILE");
+                                          false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportPart()));
-  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_SHAPE_CMD", tr("From CAD format..."),
+    tr("Import shape from a CAD format file"),
+    ModuleBase_IconFactory::loadIcon("icons/Exchange/import.png"),
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportShape()));
+
+  // Export sub-menu
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Part set..."),
+                                             tr("Export the current document into a native file"),
+                                              QIcon(), QKeySequence(),
+                                              false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Part..."),
+                                          tr("Export a part of the current document into a file"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_SHAPE_CMD", tr("To CAD format..."),
+    tr("Export shape to a CAD format file"),
+    ModuleBase_IconFactory::loadIcon("icons/Exchange/export.png"),
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Export"), 10, 11);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportShape()));
 
 #else
   // File commands group
@@ -1299,6 +1317,28 @@ void XGUI_Workshop::onImportPart()
 }
 
 //******************************************************
+void XGUI_Workshop::onImportShape()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_Import::ID()));
+    myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
+    operationMgr()->startOperation(anImportOp);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onExportShape()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anExportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ExportFeature::ID()));
+    myPropertyPanel->updateApplyPlusButton(anExportOp->feature());
+    operationMgr()->startOperation(anExportOp);
+  }
+}
+
+//******************************************************
 void XGUI_Workshop::onExportPart()
 {
   if (abortAllOperations()) {
@@ -1656,6 +1696,17 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     moveObjects(theId == "MOVE_SPLIT_CMD");
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
+  else if (theId == "ISOLINES_CMD")
+    changeIsoLines(aObjects);
+  else if (theId == "SHOW_ISOLINES_CMD") {
+    foreach(ObjectPtr aObj, aObjects) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aResult.get())
+        ModelAPI_Tools::showIsoLines(aResult, !ModelAPI_Tools::isShownIsoLines(aResult));
+    }
+    mySelector->clearSelection();
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
   else if (theId == "DEFLECTION_CMD")
     changeDeflection(aObjects);
   else if (theId == "TRANSPARENCY_CMD")
@@ -2337,22 +2388,6 @@ bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
   return false;
 }
 
-//******************************************************
-void setColor(ResultPtr theResult, const std::vector<int>& theColor)
-{
-  if (!theResult.get())
-    return;
-
-  AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-  if (aColorAttr.get() != NULL) {
-    if (!aColorAttr->size()) {
-      aColorAttr->setSize(3);
-    }
-    aColorAttr->setValue(0, theColor[0]);
-    aColorAttr->setValue(1, theColor[1]);
-    aColorAttr->setValue(2, theColor[2]);
-  }
-}
 
 //**************************************************************
 void getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
@@ -2435,40 +2470,16 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
         std::list<ResultPtr> allRes;
         ModelAPI_Tools::allSubs(aBodyResult, allRes);
         for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-          setColor(*aRes, !isRandomColor ? aColorResult : aDlg->getRandomColor());
+          ModelAPI_Tools::setColor(*aRes, !isRandomColor ? aColorResult : aDlg->getRandomColor());
         }
       }
-      setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
+      ModelAPI_Tools::setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
     }
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aMgr->finishOperation();
   updateCommandStatus();
   myViewerProxy->update();
-}
-
-//**************************************************************
-void setDeflection(ResultPtr theResult, const double theDeflection)
-{
-  if (!theResult.get())
-    return;
-
-  AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
-  if (aDeflectionAttr.get() != NULL) {
-    aDeflectionAttr->setValue(theDeflection);
-  }
-}
-
-//**************************************************************
-void setTransparency(ResultPtr theResult, double theTransparency)
-{
-  if (!theResult.get())
-    return;
-
-  AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
-  if (anAttribute.get() != NULL) {
-    anAttribute->setValue(theTransparency);
-  }
 }
 
 //**************************************************************
@@ -2483,10 +2494,10 @@ void setTransparency(double theTransparency, const QObjectPtrList& theObjects)
         ModelAPI_Tools::allSubs(aBodyResult, allRes);
         std::list<ResultPtr>::iterator aRes;
         for(aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-          setTransparency(*aRes, theTransparency);
+          ModelAPI_Tools::setTransparency(*aRes, theTransparency);
         }
       }
-      setTransparency(aResult, theTransparency);
+      ModelAPI_Tools::setTransparency(aResult, theTransparency);
     }
   }
 }
@@ -2574,10 +2585,10 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
         std::list<ResultPtr> allRes;
         ModelAPI_Tools::allSubs(aBodyResult, allRes);
         for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-          setDeflection(*aRes, aDeflection);
+          ModelAPI_Tools::setDeflection(*aRes, aDeflection);
         }
       }
-      setDeflection(aResult, aDeflection);
+      ModelAPI_Tools::setDeflection(aResult, aDeflection);
     }
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
@@ -3176,4 +3187,65 @@ void XGUI_Workshop::onDockSizeChanged()
 void XGUI_Workshop::deactivateCurrentSelector()
 {
   myActiveControlMgr->deactivateSelector(myActiveControlMgr->activeSelector());
+}
+
+void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
+{
+  if (theObjects.isEmpty())
+    return;
+
+  std::vector<int> aValues;
+  bool isVisible;
+  if (theObjects.size() == 1) {
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObjects.first());
+    if (aRes.get())
+      ModelAPI_Tools::getIsoLines(aRes, isVisible, aValues);
+    else
+      return;
+  }
+  if (aValues.size() == 0) {
+    aValues.push_back(1);
+    aValues.push_back(1);
+  }
+
+  if (!abortAllOperations())
+    return;
+
+  QDialog aDlg;
+  aDlg.setWindowTitle(tr("Number of Iso-lines"));
+  QFormLayout* aLayout = new QFormLayout(&aDlg);
+
+  QSpinBox* aUNb = new QSpinBox(&aDlg);
+  aUNb->setValue(aValues[0]);
+  aLayout->addRow("U:", aUNb);
+
+  QSpinBox* aVNb = new QSpinBox(&aDlg);
+  aVNb->setValue(aValues[1]);
+  aLayout->addRow("V:", aVNb);
+
+  QDialogButtonBox* aButtons =
+    new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &aDlg);
+  connect(aButtons, SIGNAL(accepted()), &aDlg, SLOT(accept()));
+  connect(aButtons, SIGNAL(rejected()), &aDlg, SLOT(reject()));
+  aLayout->addRow(aButtons);
+
+  if (aDlg.exec() == QDialog::Accepted) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    QString aDescription = contextMenuMgr()->action("ISOLINES_CMD")->text();
+    aMgr->startOperation(aDescription.toStdString());
+
+    aValues[0] = aUNb->value();
+    aValues[1] = aVNb->value();
+    ResultPtr aRes;
+    foreach(ObjectPtr aObj, theObjects) {
+      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aRes.get()) {
+        ModelAPI_Tools::setIsoLines(aRes, aValues);
+      }
+    }
+    mySelector->clearSelection();
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    aMgr->finishOperation();
+    updateCommandStatus();
+  }
 }

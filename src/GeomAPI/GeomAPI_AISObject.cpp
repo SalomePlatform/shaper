@@ -92,6 +92,7 @@ void GeomAPI_AISObject::createShape(std::shared_ptr<GeomAPI_Shape> theShape)
       aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
     else
       aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
+    aDrawer->SetIsoOnPlane(false);
     setImpl(new Handle(AIS_InteractiveObject)(aShape));
   }
 }

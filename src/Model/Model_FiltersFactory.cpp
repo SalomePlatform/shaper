@@ -40,6 +40,21 @@ struct FilterArgs {
   std::string myFilterID;
 };
 
+/// Returns the filter ID without the filter index
+static std::string pureFilterID(const std::string& theID)
+{
+  // remove from aPure "_" + number + "_" starting part
+  if (theID.size() > 3 && theID[0] == '_') {
+    int aNumDigits = 0;
+    while(theID[aNumDigits + 1] < '9' && theID[aNumDigits + 1] > '0')
+      aNumDigits++;
+    if (aNumDigits && theID[aNumDigits + 1] == '_') {
+      return theID.substr(aNumDigits + 2);
+    }
+  }
+  return theID;
+}
+
 bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature,
                                    ResultPtr theResult,
                                    GeomShapePtr theShape)
@@ -63,7 +78,8 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature,
   theFiltersFeature->data()->allGroups(aGroups);
   for(std::list<std::string>::iterator aGIter = aGroups.begin(); aGIter != aGroups.end(); aGIter++)
   {
-    if (myFilters.find(*aGIter) == myFilters.end())
+    std::string aPureID = pureFilterID(*aGIter);
+    if (myFilters.find(aPureID) == myFilters.end())
       continue;
     std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs;
     theFiltersFeature->data()->attributesOfGroup(*aGIter, anAttrs);
@@ -73,7 +89,7 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature,
       if (anArgID.empty()) { // reverse flag
         std::shared_ptr<ModelAPI_AttributeBoolean> aReverse =
           std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anAttrIter);
-        FilterArgs aFArgs = { myFilters[*aGIter] , aReverse->value() , *aGIter };
+        FilterArgs aFArgs = { myFilters[aPureID] , aReverse->value() , *aGIter };
         aFilters.push_back(aFArgs);
 
       } else {
@@ -113,7 +129,8 @@ std::list<FilterPtr> Model_FiltersFactory::filters(GeomAPI_Shape::ShapeType theT
 
 FilterPtr Model_FiltersFactory::filter(std::string theID)
 {
-  std::map<std::string, FilterPtr>::iterator aFound = myFilters.find(theID);
+  std::string aPureID = pureFilterID(theID);
+  std::map<std::string, FilterPtr>::iterator aFound = myFilters.find(aPureID);
   return aFound == myFilters.end() ? FilterPtr() : aFound->second;
 }
 

@@ -23,6 +23,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <Events_Loop.h>
 
@@ -37,6 +38,8 @@ void ModelAPI_Result::initAttributes()
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
   aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
   aData->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
+  aData->addAttribute(ISO_LINES_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
+  aData->addAttribute(SHOW_ISO_LINES_ID(), ModelAPI_AttributeBoolean::typeId())->setIsArgument(false);
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)

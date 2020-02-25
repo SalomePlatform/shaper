@@ -217,6 +217,9 @@ private:
   /// Add a filter by name
   ModuleBase_FilterItem* onAddFilter(const std::string& theFilter);
 
+  /// Return currently created filter items
+  QList<ModuleBase_FilterItem*> itemsList() const;
+
 private:
   ModuleBase_IWorkshop* myWorkshop;
 
@@ -230,12 +233,6 @@ private:
 
   /// Type of selection mode
   int mySelectionType;
-
-  /// List of non-used filters
-  std::list<std::string> myFilters;
-
-  /// List of used filters
-  std::list<std::string> myUseFilters;
 
   /// Result of filtering
   QList<ModuleBase_ViewerPrsPtr> myValues;

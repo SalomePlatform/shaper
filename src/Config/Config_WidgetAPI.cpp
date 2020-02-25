@@ -26,11 +26,12 @@
 
 #include <string>
 
-Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
+Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml, const std::string theAttributePrefix)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
   myCurrentNode = xmlDocGetRootElement(myDoc);
   myFeatureId = getProperty(_ID);
+  myAttributePrefix = theAttributePrefix;
 }
 
 Config_WidgetAPI::~Config_WidgetAPI()
@@ -119,7 +120,7 @@ std::string Config_WidgetAPI::featureId() const
 
 std::string Config_WidgetAPI::widgetId() const
 {
-  return getProperty(_ID);
+  return myAttributePrefix + getProperty(_ID);
 }
 
 std::string Config_WidgetAPI::widgetIcon() const

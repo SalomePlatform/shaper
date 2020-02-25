@@ -213,6 +213,10 @@ Q_OBJECT
   /// theObjects a list of selected objects
   void changeTransparency(const QObjectPtrList& theObjects);
 
+  /// Change number of iso-lines for the given objects
+  /// theObjects a list of selected objects
+  void changeIsoLines(const QObjectPtrList& theObjects);
+
   /// Show the given features in 3d Viewer
   void showObjects(const QObjectPtrList& theList, bool isVisible);
 
@@ -401,8 +405,14 @@ signals:
   /// Import part structure from a file
   void onImportPart();
 
+  /// Import shape from a file
+  void onImportShape();
+
   /// Export features to a file
   void onExportPart();
+
+  /// Export a shape to a file
+  void onExportShape();
 
 #ifndef HAVE_SALOME
   /// Exit application

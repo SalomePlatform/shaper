@@ -58,6 +58,7 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRep_Builder.hxx>
 #include <TopoDS_Compound.hxx>
+#include <Prs3d_IsoAspect.hxx>
 
 //#define DEBUG_EMPTY_SHAPE
 //#define DEBUG_OPERATION_PRS
@@ -84,6 +85,13 @@ PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
   BRepBuilderAPI_MakeVertex aMaker(aPnt);
   TopoDS_Vertex aVertex = aMaker.Vertex();
   myShapeToPrsMap.Bind(aVertex, NULL);
+
+  Handle(Prs3d_Drawer) aDrawer = Attributes();
+  Handle(Prs3d_IsoAspect) aUIsoAspect = new Prs3d_IsoAspect(myShapeColor, Aspect_TOL_SOLID, 1, 0);
+  Handle(Prs3d_IsoAspect) aVIsoAspect = new Prs3d_IsoAspect(myShapeColor, Aspect_TOL_SOLID, 1, 0);
+  aDrawer->SetUIsoAspect(aUIsoAspect);
+  aDrawer->SetVIsoAspect(aVIsoAspect);
+  aDrawer->SetIsoOnPlane(false);
 }
 
 bool PartSet_OperationPrs::hasShapes()

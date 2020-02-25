@@ -140,6 +140,14 @@ void XGUI_ContextMenuMgr::createActions()
                                            aDesktop);
   addAction("WIREFRAME_CMD", aAction);
 
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/iso_lines.png"), tr("Define Isos..."),
+                                           aDesktop);
+  addAction("ISOLINES_CMD", aAction);
+
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Show Isos..."), aDesktop);
+  aAction->setCheckable(true);
+  addAction("SHOW_ISOLINES_CMD", aAction);
+
   mySeparator1 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator1->setSeparator(true);
 
@@ -302,6 +310,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     //Process Feature
     if (aSelected == 1) { // single selection
       ObjectPtr aObject = aObjects.first();
+      ResultPtr aResult;
+      if (hasResult)
+        aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aObject) {
         if (hasResult && myWorkshop->canBeShaded(aObject)) {
           XGUI_Displayer::DisplayMode aMode = aDisplayer->displayMode(aObject);
@@ -312,10 +323,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
             action("WIREFRAME_CMD")->setEnabled(true);
             action("SHADING_CMD")->setEnabled(true);
           }
+          action("SHOW_ISOLINES_CMD")->setEnabled(true);
+          action("SHOW_ISOLINES_CMD")->setChecked(ModelAPI_Tools::isShownIsoLines(aResult));
+          action("ISOLINES_CMD")->setEnabled(true);
         }
         if (!hasFeature) {
-          bool aHasSubResults = ModelAPI_Tools::hasSubResults(
-                                            std::dynamic_pointer_cast<ModelAPI_Result>(aObject));
+          bool aHasSubResults = ModelAPI_Tools::hasSubResults(aResult);
           if (aHasSubResults) {
             action("HIDE_CMD")->setEnabled(true);
             action("SHOW_CMD")->setEnabled(true);
@@ -352,6 +365,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHOW_ONLY_CMD")->setEnabled(true);
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
+        action("SHOW_ISOLINES_CMD")->setEnabled(false);
+        action("ISOLINES_CMD")->setEnabled(true);
       }
       if (hasFeature && myWorkshop->canMoveFeature()) {
         action("MOVE_CMD")->setEnabled(true);
@@ -541,6 +556,15 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
           action("WIREFRAME_CMD")->setEnabled(true);
           action("SHADING_CMD")->setEnabled(true);
         }
+        action("ISOLINES_CMD")->setEnabled(true);
+
+        if (aPrsList.size() == 1) {
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+          if (aResult.get()) {
+            action("SHOW_ISOLINES_CMD")->setEnabled(true);
+            action("SHOW_ISOLINES_CMD")->setChecked(ModelAPI_Tools::isShownIsoLines(aResult));
+          }
+        }
       }
       action("SHOW_ONLY_CMD")->setEnabled(true);
       action("HIDE_CMD")->setEnabled(true);
@@ -655,6 +679,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
   aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(action("SHOW_ISOLINES_CMD"));
+  aList.append(action("ISOLINES_CMD"));
   aList.append(action("SHOW_FEATURE_CMD"));
   aList.append(mySeparator3);
   aList.append(action("DELETE_CMD"));
@@ -730,6 +756,8 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
   aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(action("SHOW_ISOLINES_CMD"));
+  aList.append(action("ISOLINES_CMD"));
   aList.append(mySeparator3);
   aList.append(action("SET_VIEW_NORMAL_CMD"));
   aList.append(action("SET_VIEW_INVERTEDNORMAL_CMD"));
@@ -783,6 +811,8 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));
       aActions.append(action("TRANSPARENCY_CMD"));
+      aActions.append(action("SHOW_ISOLINES_CMD"));
+      aActions.append(action("ISOLINES_CMD"));
       aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("DELETE_CMD"));
   }

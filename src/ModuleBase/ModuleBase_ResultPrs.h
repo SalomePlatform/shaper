@@ -30,6 +30,7 @@
 #include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
 #include <TopoDS_Compound.hxx>
+#include <Prs3d_IsoAspect.hxx>
 
 #include <QMap>
 
@@ -112,10 +113,13 @@ public:
   /// \return false if parameter is out of [0, 1]
   Standard_EXPORT bool setHiddenSubShapeTransparency(double theTransparency);
 
+  /// Returns the original shape of the presentation
   Standard_EXPORT TopoDS_Shape originalShape() const { return myOriginalShape; }
 
+  /// Returns True if the original shape is substituted by a corresponded shell
   Standard_EXPORT bool isSubstituted() const { return myIsSubstituted; }
 
+  Standard_EXPORT void updateIsoLines();
 
   DEFINE_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape)
 
@@ -171,6 +175,9 @@ private:
   /// selection priority that will be added to the standard
   /// selection priority of the selection entity
   int myAdditionalSelectionPriority;
+
+  Handle(Prs3d_IsoAspect) myUIsoAspect;
+  Handle(Prs3d_IsoAspect) myVIsoAspect;
 };
 
 

@@ -42,6 +42,7 @@ SET(PROJECT_HEADERS
     ExchangePlugin_Dump.h
     ExchangePlugin_ImportPart.h
     ExchangePlugin_ExportPart.h
+    ExchangePlugin_Import.h
 )
 
 SET(PROJECT_SOURCES
@@ -53,6 +54,7 @@ SET(PROJECT_SOURCES
     ExchangePlugin_Dump.cpp
     ExchangePlugin_ImportPart.cpp
     ExchangePlugin_ExportPart.cpp
+    ExchangePlugin_Import.cpp
 )
 
 SET(XML_RESOURCES

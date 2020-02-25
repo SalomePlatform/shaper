@@ -466,6 +466,7 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
           aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
           aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
           aAis->Attributes()->SetDeviationCoefficient(aDeflection);
+          aAis->Attributes()->SetIsoOnPlane(false);
           myHighlights.Append(aAis);
           aContext->Display(aAis, false);
           aContext->Deactivate(aAis);
@@ -480,6 +481,7 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
     aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
     aDeflection = Config_PropManager::real("Visualization", "body_deflection");
     aAis->Attributes()->SetDeviationCoefficient(aDeflection);
+    aAis->Attributes()->SetIsoOnPlane(false);
     myHighlights.Append(aAis);
     aContext->Display(aAis, false);
     aContext->Deactivate(aAis);

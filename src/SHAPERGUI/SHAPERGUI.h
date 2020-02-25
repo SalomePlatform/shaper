@@ -91,10 +91,11 @@ Q_OBJECT
   virtual bool isFeatureOfNested(const QAction* theAction);
 
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
-                                     const QString& theTip, const QIcon& theIcon,
-                                     const QKeySequence& theKeys, bool isCheckable,
-                                     const char* theMenuSourceText,
-                                     const int theMenuPosition = 10);
+    const QString& theTip, const QIcon& theIcon,
+    const QKeySequence& theKeys, bool isCheckable,
+    const char* theMenuSourceText, const QString& theSubMenu = QString(),
+    const int theMenuPosition = 10,
+    const int theSuibMenuPosition = -1) Standard_OVERRIDE;
 
   virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
                                        const int theMenuPosition = 10);

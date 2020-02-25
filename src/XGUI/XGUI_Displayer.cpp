@@ -314,6 +314,11 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       double aTransparency = ModelAPI_Tools::getTransparency(aResult);
       if ((aTransparency >= 0) && (aTransparency != aAISObj->getTransparency()))
         aAISObj->setTransparency(aTransparency);
+
+      // Set Iso-Lines
+      Handle(ModuleBase_ResultPrs) aResPrs = Handle(ModuleBase_ResultPrs)::DownCast(aAISIO);
+      if (!aResPrs.IsNull())
+        aResPrs->updateIsoLines();
     }
     myWorkshop->module()->storeSelection();
 

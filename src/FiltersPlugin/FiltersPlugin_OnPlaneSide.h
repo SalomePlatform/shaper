@@ -41,6 +41,9 @@ public:
   /// Returns true for any type because it supports all selection types
   virtual bool isSupported(GeomAPI_Shape::ShapeType theType) const override;
 
+  /// Returns True if the filter can be used several times within one selection
+  virtual bool isMultiple() const { return true; }
+
   /// This method should contain the filter logic. It returns true if the given shape
   /// is accepted by the filter.
   /// \param theShape the given shape

@@ -33,6 +33,8 @@ In this panel:
 .. centered::
   Filters **Horizontal faces** and **On plane** added to the property panel.
   
+If filter is implemented as "Multiple", several instances of this filter may be added in one selection. Otherwise the added filter is removed from the "Add new filter..." list.
+
 Each filter item can be deleted with help of |delete.icon| button. A filter can be reverced with help of toggle button |plus.icon|/|minus.icon|. Also a filter could have input fields in case
 if the filter has arguments.
 
@@ -73,7 +75,7 @@ By default, the result of Selection feature all selectable entities from all Sha
 
 - **Result type:** Any
 - **Argument:** Any Shape, multiple OR selection accepted
-- **Algorithm:** Returns the shapes which have the similar underlying geometry of the given Shape. Like all faces laying of the same geometrical surface or edges laying of the same geometrical surface or edges laying on the line.
+- **Algorithm:** Returns the shapes which have the similar underlying geometry of the given Shape. Like all faces laying of the same geometrical surface or edges laying on the line.
 
 **On plane side**
 

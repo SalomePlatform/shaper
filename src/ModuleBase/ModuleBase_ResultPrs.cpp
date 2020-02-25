@@ -45,6 +45,7 @@
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <Prs3d_ShadingAspect.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SelectionManager.hxx>
@@ -83,8 +84,26 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   aDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1));
   aDrawer->SetFaceBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1));
 
-  aDrawer->VIsoAspect()->SetNumber(0);
-  aDrawer->UIsoAspect()->SetNumber(0);
+  Quantity_Color aColor;
+  Color(aColor);
+
+  std::vector<int> aIsoValues;
+  bool isIsoVisible;
+  ModelAPI_Tools::getIsoLines(myResult, isIsoVisible, aIsoValues);
+  if (isIsoVisible) {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(1);
+      aIsoValues.push_back(1);
+    }
+  }
+  else {
+    aIsoValues.push_back(0);
+    aIsoValues.push_back(0);
+  }
+  myUIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[0]);
+  myVIsoAspect = new Prs3d_IsoAspect(aColor, Aspect_TOL_SOLID, 1, aIsoValues[1]);
+  aDrawer->SetUIsoAspect(myUIsoAspect);
+  aDrawer->SetVIsoAspect(myVIsoAspect);
 
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
@@ -95,14 +114,12 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   if (aDrawer.IsNull()) {
     if (!ModuleBase_IViewer::DefaultHighlightDrawer.IsNull()) {
       aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
-      aDrawer->VIsoAspect()->SetNumber(0);
-      aDrawer->UIsoAspect()->SetNumber(0);
+      aDrawer->SetUIsoAspect(myUIsoAspect);
+      aDrawer->SetVIsoAspect(myVIsoAspect);
       SetDynamicHilightAttributes(aDrawer);
     }
-  } else {
-    aDrawer->VIsoAspect()->SetNumber(0);
-    aDrawer->UIsoAspect()->SetNumber(0);
   }
+
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
   aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
@@ -127,6 +144,8 @@ void ModuleBase_ResultPrs::SetColor (const Quantity_Color& theColor)
   ViewerData_AISShape::SetColor(theColor);
   myHiddenSubShapesDrawer->ShadingAspect()->SetColor (theColor, myCurrentFacingModel);
   setEdgesDefaultColor();
+  myUIsoAspect->SetColor(theColor);
+  myVIsoAspect->SetColor(theColor);
 }
 
 void ModuleBase_ResultPrs::setEdgesDefaultColor()
@@ -456,4 +475,31 @@ void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_Presentatio
     if (thePM->IsImmediateModeOn())
       thePM->AddToImmediateList(aHilightPrs);
   }
+}
+
+
+//********************************************************************
+void ModuleBase_ResultPrs::updateIsoLines()
+{
+  std::vector<int> aIsoValues;
+  bool isIsoVisible;
+  ModelAPI_Tools::getIsoLines(myResult, isIsoVisible, aIsoValues);
+  if (isIsoVisible) {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(1);
+      aIsoValues.push_back(1);
+    }
+  }
+  else {
+    if (aIsoValues.size() == 0) {
+      aIsoValues.push_back(0);
+      aIsoValues.push_back(0);
+    }
+    else {
+      aIsoValues[0] = 0;
+      aIsoValues[1] = 0;
+    }
+  }
+  myUIsoAspect->SetNumber(aIsoValues[0]);
+  myVIsoAspect->SetNumber(aIsoValues[1]);
 }
