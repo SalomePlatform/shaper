@@ -3219,9 +3219,13 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
   if (!abortAllOperations())
     return;
 
-  QDialog aDlg;
+  XGUI_PropertyDialog aDlg(desktop());
   aDlg.setWindowTitle(tr("Number of Iso-lines"));
-  QFormLayout* aLayout = new QFormLayout(&aDlg);
+
+  QWidget* aIsosWgt = new QWidget(&aDlg);
+  QFormLayout* aLayout = new QFormLayout(aIsosWgt);
+  ModuleBase_Tools::adjustMargins(aLayout);
+  aDlg.setContent(aIsosWgt);
 
   QSpinBox* aUNb = new QSpinBox(&aDlg);
   aUNb->setValue(aValues[0]);
@@ -3230,12 +3234,6 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
   QSpinBox* aVNb = new QSpinBox(&aDlg);
   aVNb->setValue(aValues[1]);
   aLayout->addRow("V:", aVNb);
-
-  QDialogButtonBox* aButtons =
-    new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &aDlg);
-  connect(aButtons, SIGNAL(accepted()), &aDlg, SLOT(accept()));
-  connect(aButtons, SIGNAL(rejected()), &aDlg, SLOT(reject()));
-  aLayout->addRow(aButtons);
 
   if (aDlg.exec() == QDialog::Accepted) {
     SessionPtr aMgr = ModelAPI_Session::get();

@@ -30,7 +30,7 @@
 #include <QDialogButtonBox>
 
 XGUI_DeflectionDialog::XGUI_DeflectionDialog(QWidget* theParent)
-  : QDialog(theParent)
+  : QDialog(theParent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint)
 {
   setWindowTitle(tr("Deflection"));
   QGridLayout* aLay = new QGridLayout(this);

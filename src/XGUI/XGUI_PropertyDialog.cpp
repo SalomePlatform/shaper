@@ -25,7 +25,8 @@
 #include <QGridLayout>
 
 XGUI_PropertyDialog::XGUI_PropertyDialog(QWidget* theParent)
-: QDialog(theParent), myContentWidget(0)
+: QDialog(theParent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint),
+  myContentWidget(0)
 {
   myLayout = new QGridLayout(this);
 

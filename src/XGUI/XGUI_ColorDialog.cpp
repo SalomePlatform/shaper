@@ -30,7 +30,7 @@
 #include <QDialogButtonBox>
 
 XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
-  : QDialog(theParent)
+  : QDialog(theParent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint)
 {
   setWindowTitle(tr("Color"));
   QGridLayout* aLay = new QGridLayout(this);
