@@ -627,7 +627,7 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 - **Angular tolerance** defines defines an angular tolerance for automatic creation of horizontal and vertical constraints;
 - **Default spline weight** defines default weight for B-spline nodes during creation. The default value can be changed by editing of the spline;
 - **Cursor for sketch operation** defines a cursor which indicates a launched sketcher sub-operation.
-- **Create sketch entities by dragging** defines a style of sketche etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects has to be defined by mouse press - mouse move - mouse rellease. Otherwise every point of an object has to be defined by mouse click;
+- **Create sketch entities by dragging** defines a style of sketch etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects have to be defined by mouse press - mouse move - mouse release. Otherwise every point of an object has to be defined by mouse click;
 
    
 .. _viewer_preferences:
