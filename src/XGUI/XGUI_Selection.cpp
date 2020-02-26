@@ -24,7 +24,7 @@
 #include "XGUI_ObjectsBrowser.h"
 
 #ifndef HAVE_SALOME
-#include <AppElements_ViewCube.h>
+#include <AIS_ViewCube.h>
 #endif
 
 #include "ModuleBase_BRepOwner.h"
@@ -203,7 +203,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
   Handle(AIS_InteractiveObject) anIO =
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
 #ifndef HAVE_SALOME
-  Handle(AppElements_ViewCube) aCube = Handle(AppElements_ViewCube)::DownCast(anIO);
+  Handle(AIS_ViewCube) aCube = Handle(AIS_ViewCube)::DownCast(anIO);
   if (!aCube.IsNull())
     return;
 #endif
