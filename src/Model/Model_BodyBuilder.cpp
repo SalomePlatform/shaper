@@ -365,7 +365,8 @@ void Model_BodyBuilder::storeModified(const std::list<GeomShapePtr>& theOldShape
   std::list<GeomShapePtr>::const_iterator anOldIter = theOldShapes.cbegin();
   for(; anOldIter != theOldShapes.cend(); anOldIter++) {
     // compounds may cause crash if call "modified"
-    bool aStore = (*anOldIter)->isCompound() || (*anOldIter)->isShell() || (*anOldIter)->isWire();
+    bool aStore = (*anOldIter)->isCompound() || (*anOldIter)->isShell() || (*anOldIter)->isWire() ||
+		(*anOldIter)->isCompSolid();
     if (!aStore) {
       ListOfShape aNews; // check this old really modifies theNewShape
       theMakeShape->modified(*anOldIter, aNews);

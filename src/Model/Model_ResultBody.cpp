@@ -408,7 +408,7 @@ void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
     for (TopTools_MapOfShape::Iterator anOldIter(anOldSubs); anOldIter.More(); anOldIter.Next()) {
       TopoDS_Shape anOldShape = anOldIter.Value();
       if (anOldShape.ShapeType() == TopAbs_COMPOUND || anOldShape.ShapeType() == TopAbs_SHELL ||
-          anOldShape.ShapeType() == TopAbs_WIRE)
+          anOldShape.ShapeType() == TopAbs_WIRE || anOldShape.ShapeType() == TopAbs_COMPSOLID)
         continue; // container old-shapes are not supported by the history, may cause crash
       GeomShapePtr anOldSub(new GeomAPI_Shape);
       anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldShape));
