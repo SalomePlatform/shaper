@@ -976,7 +976,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   GeomShapePtr anAttrShape = (*anEdgeShapes.begin())->shape();
   std::shared_ptr<SketchPlugin_Feature> aSFeature =
                                 std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
-  if (!aSFeature)
+  if (!aSFeature || aSFeature->isCopy())
     return false;
   SketchPlugin_Sketch* aSketch = aSFeature->sketch();
 
