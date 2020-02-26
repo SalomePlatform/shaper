@@ -592,6 +592,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       aProcessor->mouseReleased(theWnd, theEvent);
   }
   if (MyModeByDrag && aOp) {
+    aViewer->enableMultiselection(true);
     QString aOpId = aOp->id();
     if (aOpId == "Sketch")
       return;
