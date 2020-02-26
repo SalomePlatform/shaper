@@ -24,10 +24,10 @@
 
 #include <FeaturesPlugin_Fillet.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Fillet
@@ -102,14 +102,8 @@ typedef std::shared_ptr<FeaturesAPI_Fillet> FilletPtr;
 FEATURESAPI_EXPORT
 FilletPtr addFillet(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                    const ModelHighAPI_Double& theRadius);
-
-/// \ingroup CPPHighAPI
-/// \brief Create Fillet feature.
-FEATURESAPI_EXPORT
-FilletPtr addFillet(const std::shared_ptr<ModelAPI_Document>& thePart,
-                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
                     const ModelHighAPI_Double& theRadius1,
-                    const ModelHighAPI_Double& theRadius2);
+                    const ModelHighAPI_Double& theRadius2 = ModelHighAPI_Double(-1.0),
+                    const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Fillet_H_

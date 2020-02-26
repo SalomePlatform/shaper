@@ -21,24 +21,17 @@
 #define GeomAlgoAPI_Translation_H_
 
 #include <GeomAlgoAPI.h>
-#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_Transform.h>
 
-#include <GeomAPI_Ax1.h>
-#include <GeomAPI_Shape.h>
+class GeomAPI_Ax1;
+class GeomAPI_Pnt;
 
 /// \class GeomAlgoAPI_Translation
 /// \ingroup DataAlgo
 /// \brief Creates a copy of the object by moving it along the axis.
-class GeomAlgoAPI_Translation : public GeomAlgoAPI_MakeShape
+class GeomAlgoAPI_Translation : public GeomAlgoAPI_Transform
 {
 public:
-  /// Type of translation operation
-  enum MethodType {
-    BY_DISTANCE, ///< Translation by axis and distance
-    BY_DIM,      ///< Translation by dimensions in X, Y and Z
-    BY_POINTS    ///< Translation by two points
-  };
-
   /// \brief Creates an object which is obtained from current object by moving it along the axis.
   /// \param[in] theSourceShape  a shape to be moved.
   /// \param[in] theAxis         movement axis.
@@ -66,23 +59,6 @@ public:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                              std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
                                              std::shared_ptr<GeomAPI_Pnt>   theEndPoint);
-
-  /// Checks if data for the translation execution is OK.
-  GEOMALGOAPI_EXPORT bool check();
-
-  /// Execute the translation.
-  GEOMALGOAPI_EXPORT void build();
-
-private:
-  MethodType myMethodType; /// Type of method used.
-  std::shared_ptr<GeomAPI_Shape> mySourceShape; /// Shape to be moved.
-  std::shared_ptr<GeomAPI_Ax1> myAxis; /// Movement axis.
-  double myDistance; /// Movement distance.
-  double myDx; /// Movement dimension on X.
-  double myDy; /// Movement dimension on Y.
-  double myDz; /// Movement dimension on Z.
-  std::shared_ptr<GeomAPI_Pnt> myStartPoint; /// Movement start point.
-  std::shared_ptr<GeomAPI_Pnt> myEndPoint; /// Movement end point.
 };
 
 #endif

@@ -21,6 +21,7 @@
 #define FeaturesPlugin_Tools_H_
 
 #include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_ShapeHierarchy.h>
 #include <ModelAPI_ResultBody.h>
 
 #include <vector>
@@ -62,6 +63,13 @@ public:
                        const bool theShareTopology,
                        ListOfShape& theShapesList,
                        std::string& theError);
+
+  /// Collect shapes from the attribute and fill the hierarchy or a list of parts
+  static bool shapesFromSelectionList(
+      const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
+      const bool theStoreFullHierarchy,
+      GeomAPI_ShapeHierarchy& theHierarchy,
+      std::list<ResultPtr>& theParts);
 };
 
 #endif /* FeaturesPlugin_Tools_H_ */

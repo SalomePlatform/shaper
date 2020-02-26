@@ -45,12 +45,12 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.result(), Sk
 ExtrusionCut_1.setNestedSketch(Sketch_1)
 model.do()
 Shape = ExtrusionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5, 5.004704015828, 5.02793455788)
+checkMiddlePoint(Shape, 5, 5.08108724844, 4.8653571)
 
 ExtrusionCut_1.setDirection(model.selection("EDGE", "Axis_1"))
 model.do()
 Shape = ExtrusionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5.00027719467643, 4.861055360637628, 5.101882685002874)
+checkMiddlePoint(Shape, 4.99998635, 5.124949186, 4.8821269448)
 
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], -5, [model.selection("SOLID", "ExtrusionCut_1_1")])
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Front"))
@@ -64,7 +64,7 @@ SketchCircle_3 = Sketch_3.addCircle(7, 2, 1.5)
 ExtrusionCut_3.setNestedSketch(Sketch_3)
 model.do()
 Shape = ExtrusionCut_3.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5.15104587473, 4.96021, 4.86946)
+checkMiddlePoint(Shape, 4.826501151, 5.11493472, 4.9839082)
 
 model.end()
 

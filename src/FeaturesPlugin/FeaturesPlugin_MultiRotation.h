@@ -120,6 +120,10 @@ class FeaturesPlugin_MultiRotation : public ModelAPI_Feature
   FeaturesPlugin_MultiRotation();
 
 private:
+  /// Fill axis, number of copies and angle of the rotation.
+  /// \returns \c false in case of errors.
+  bool paramsOfRotation(std::shared_ptr<GeomAPI_Ax1>& theAxis, double& theAngle, int& theQuantity);
+
   /// Perform the multi rotation in one direction.
   void performRotation1D();
 

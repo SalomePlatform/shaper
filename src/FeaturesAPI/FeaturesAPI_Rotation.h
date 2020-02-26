@@ -24,12 +24,12 @@
 
 #include <FeaturesPlugin_Rotation.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Selection.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Dumper;
-class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Rotation
 /// \ingroup CPPHighAPI
@@ -103,21 +103,19 @@ public:
 /// Pointer on Rotation object.
 typedef std::shared_ptr<FeaturesAPI_Rotation> RotationPtr;
 
-/// \ingroup CPPHighAPI
-/// \brief Create Rotation feature.
-FEATURESAPI_EXPORT
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const ModelHighAPI_Selection& theAxisObject,
-                        const ModelHighAPI_Double& theAngle);
+
+#define DUMMY std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>()
 
 /// \ingroup CPPHighAPI
 /// \brief Create Rotation feature.
-FEATURESAPI_EXPORT
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const ModelHighAPI_Selection& theCenterPoint,
-                        const ModelHighAPI_Selection& theStartPoint,
-                        const ModelHighAPI_Selection& theEndPoint);
+FEATURESAPI_EXPORT RotationPtr addRotation(
+    const std::shared_ptr<ModelAPI_Document>& part,
+    const std::list<ModelHighAPI_Selection>& objects,
+    const ModelHighAPI_Selection& axis = ModelHighAPI_Selection(),
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& angle = DUMMY,
+    const ModelHighAPI_Selection& center = ModelHighAPI_Selection(),
+    const ModelHighAPI_Selection& start = ModelHighAPI_Selection(),
+    const ModelHighAPI_Selection& end = ModelHighAPI_Selection(),
+    const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Rotation_H_

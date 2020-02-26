@@ -77,13 +77,16 @@ static const int kFlagDisplayed = 1;
 static const int kFlagDeleted = 2;
 // TDataStd_Integer - 0 if the name of the object is generated automatically,
 //                    otherwise the name is defined by user
-Standard_GUID kUSER_DEFINED_NAME("9c694d18-a83c-4a56-bc9b-8020628a8244");
+static const Standard_GUID kUSER_DEFINED_NAME("9c694d18-a83c-4a56-bc9b-8020628a8244");
 
 // invalid data
 const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
 
 static const Standard_GUID kGroupAttributeGroupID("df64ea4c-fc42-4bf8-ad7e-08f7a54bf1b8");
 static const Standard_GUID kGroupAttributeID("ebdcb22a-e045-455b-9a7f-cfd38d68e185");
+
+// id of attribute to store the version of the feature
+static const Standard_GUID kVERSION_ID("61cdb78a-1ba7-4942-976f-63bea7f4a2b1");
 
 
 Model_Data::Model_Data() : mySendAttributeUpdated(true), myWasChangedButBlocked(false)
@@ -156,6 +159,24 @@ void Model_Data::setName(const std::string& theName)
 bool Model_Data::hasUserDefinedName() const
 {
   return shapeLab().IsAttribute(kUSER_DEFINED_NAME);
+}
+
+std::string Model_Data::version()
+{
+  Handle(TDataStd_Name) aVersionAttr;
+  std::string aVersion;
+  if (shapeLab().FindAttribute(kVERSION_ID, aVersionAttr))
+    aVersion = TCollection_AsciiString(aVersionAttr->Get()).ToCString();
+  return aVersion;
+}
+
+void Model_Data::setVersion(const std::string& theVersion)
+{
+  Handle(TDataStd_Name) aVersionAttr;
+  std::string aVersion;
+  if (!shapeLab().FindAttribute(kVERSION_ID, aVersionAttr))
+    aVersionAttr = TDataStd_Name::Set(shapeLab(), kVERSION_ID, TCollection_ExtendedString());
+  aVersionAttr->Set(theVersion.c_str());
 }
 
 AttributePtr Model_Data::addAttribute(

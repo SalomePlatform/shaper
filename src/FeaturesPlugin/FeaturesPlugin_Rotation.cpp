@@ -25,15 +25,21 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_Rotation.h>
 #include <GeomAlgoAPI_Tools.h>
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_Trsf.h>
 
 #include <FeaturesPlugin_Tools.h>
+
+static const std::string ROTATION_VERSION_1("v9.5");
 
 //=================================================================================================
 FeaturesPlugin_Rotation::FeaturesPlugin_Rotation()
@@ -60,6 +66,11 @@ void FeaturesPlugin_Rotation::initAttributes()
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Rotation::END_POINT_ID(),
                        ModelAPI_AttributeSelection::typeId());
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(ROTATION_VERSION_1);
+  }
 }
 
 //=================================================================================================
@@ -68,37 +79,18 @@ void FeaturesPlugin_Rotation::execute()
   AttributeStringPtr aMethodTypeAttr = string(FeaturesPlugin_Rotation::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
 
-  if (aMethodType == CREATION_METHOD_BY_ANGLE()) {
-    performTranslationByAxisAndAngle();
-  }
+  GeomTrsfPtr aTrsf;
+  if (aMethodType == CREATION_METHOD_BY_ANGLE())
+    aTrsf = rotationByAxisAndAngle();
+  else if (aMethodType == CREATION_METHOD_BY_THREE_POINTS())
+    aTrsf = rotationByThreePoints();
 
-  if (aMethodType == CREATION_METHOD_BY_THREE_POINTS()) {
-    performTranslationByThreePoints();
-  }
+  performRotation(aTrsf);
 }
 
 //=================================================================================================
-void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
+GeomTrsfPtr FeaturesPlugin_Rotation::rotationByAxisAndAngle()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) {
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   //Getting axis.
   static const std::string aSelectionError = "Error: The axis shape selection is bad.";
   AttributeSelectionPtr anObjRef = selection(AXIS_OBJECT_ID());
@@ -110,7 +102,7 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
   }
   if (!aShape.get()) {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   GeomEdgePtr anEdge;
@@ -127,91 +119,21 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
   if (!anEdge.get())
   {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   std::shared_ptr<GeomAPI_Ax1> anAxis (new GeomAPI_Ax1(anEdge->line()->location(),
                                                        anEdge->line()->direction()));
-
-  // Getting angle.
   double anAngle = real(FeaturesPlugin_Rotation::ANGLE_ID())->value();
 
-  // Rotating each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setRotation(anAxis, anAngle);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(new GeomAlgoAPI_Rotation(aBaseShape,
-                                                                                   anAxis,
-                                                                                   anAngle));
-
-      if (!aRotationAlgo->check()) {
-        setError(aRotationAlgo->getError());
-        return;
-      }
-
-      aRotationAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aShapes,
-                                               ListOfShape(),
-                                               aRotationAlgo,
-                                               aRotationAlgo->shape(),
-                                               "Rotated");
-      setResult(aResultBody, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf());
+  aTrsf->setRotation(anAxis, anAngle);
+  return aTrsf;
 }
 
 //=================================================================================================
-void FeaturesPlugin_Rotation::performTranslationByThreePoints()
+GeomTrsfPtr FeaturesPlugin_Rotation::rotationByThreePoints()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) {
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   // Getting the center point and two points (start and end)
   std::shared_ptr<GeomAPI_Pnt> aCenterPoint;
   std::shared_ptr<GeomAPI_Pnt> aStartPoint;
@@ -239,56 +161,73 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
       aStartPoint = GeomAlgoAPI_PointBuilder::point(aStartShape);
       anEndPoint = GeomAlgoAPI_PointBuilder::point(anEndShape);
     }
+
+    if (!aCenterPoint || !aStartPoint || !anEndPoint)
+      return GeomTrsfPtr();
   }
 
-  // Rotating each object.
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf());
+  aTrsf->setRotation(aCenterPoint, aStartPoint, anEndPoint);
+  return aTrsf;
+}
+
+//=================================================================================================
+void FeaturesPlugin_Rotation::performRotation(const GeomTrsfPtr& theTrsf)
+{
+  if (!theTrsf) {
+    setError("Invalid transformation.");
+    return;
+  }
+
+  bool isKeepSubShapes = data()->version() == ROTATION_VERSION_1;
+
+  // Getting objects.
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjSelList, isKeepSubShapes, anObjects, aParts))
+    return;
+
   std::string anError;
   int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-       std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-       aTrsf->setRotation(aCenterPoint, aStartPoint, anEndPoint);
-       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-       aResultPart->setTrsf(*aContext, aTrsf);
-       setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(new GeomAlgoAPI_Rotation(aBaseShape,
-                                                                                   aCenterPoint,
-                                                                                   aStartPoint,
-                                                                                   anEndPoint));
-
-      if (!aRotationAlgo->check()) {
-        setError(aRotationAlgo->getError());
-        return;
-      }
-
-      aRotationAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aShapes,
-                                               ListOfShape(),
-                                               aRotationAlgo,
-                                               aRotationAlgo->shape(),
-                                               "Rotated");
-      setResult(aResultBody, aResultIndex);
-    }
-    aResultIndex++;
+  // Rotating each part.
+  for (std::list<ResultPtr>::iterator aPRes = aParts.begin(); aPRes != aParts.end(); ++aPRes) {
+    ResultPartPtr anOriginal = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPRes);
+    ResultPartPtr aResultPart = document()->copyPart(anOriginal, data(), aResultIndex);
+    aResultPart->setTrsf(anOriginal, theTrsf);
+    setResult(aResultPart, aResultIndex++);
   }
+
+  // Collect transformations for each object in a part.
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  for(GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+      anObjectsIt != anObjects.end(); ++anObjectsIt) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    std::shared_ptr<GeomAlgoAPI_Transform> aRotationAlgo(
+        new GeomAlgoAPI_Transform(aBaseShape, theTrsf));
+
+    // Checking that the algorithm worked properly.
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
+      setError(anError);
+      break;
+    }
+
+    anObjects.markModified(aBaseShape, aRotationAlgo->shape());
+    aMakeShapeList->appendAlgo(aRotationAlgo);
+  }
+
+  // Build results of the rotation.
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Rotated");
+    setResult(aResultBody, aResultIndex++);
+  }
+
+  // Remove the rest results if there were produced in the previous pass.
+  removeResults(aResultIndex);
 }

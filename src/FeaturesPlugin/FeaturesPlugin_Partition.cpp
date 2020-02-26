@@ -58,29 +58,29 @@ FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 void FeaturesPlugin_Partition::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  initVersion(THE_VERSION_1, selectionList(BASE_OBJECTS_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
 void FeaturesPlugin_Partition::execute()
 {
-  ObjectHierarchy anObjects;
+  GeomAPI_ShapeHierarchy anObjects;
   ListOfShape aPlanes;
 
   // Getting objects.
   processAttribute(BASE_OBJECTS_ID(), anObjects, aPlanes);
-  if(anObjects.IsEmpty()) {
+  if(anObjects.empty()) {
     static const std::string aFeatureError = "Error: No objects for partition.";
     setError(aFeatureError);
     return;
   }
 
-  ListOfShape aBaseObjects = anObjects.Objects();
+  ListOfShape aBaseObjects = anObjects.objects();
   aBaseObjects.insert(aBaseObjects.end(), aPlanes.begin(), aPlanes.end());
 
   // resize planes to the bounding box of operated shapes
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
-  resizePlanes(anObjects.Objects(), aPlanes, aMakeShapeList);
+  resizePlanes(anObjects.objects(), aPlanes, aMakeShapeList);
 
   // cut unused solids of composolids from the objects of partition
   ListOfShape aTargetObjects, anUnusedSubs;
@@ -124,8 +124,7 @@ void FeaturesPlugin_Partition::execute()
 
   int aResultIndex = 0;
 
-  int aPartitionVersion = version();
-  if (aPartitionVersion < THE_VERSION_1) {
+  if (data()->version().empty()) {
     // default behaviors of Partition
     if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {
@@ -148,7 +147,7 @@ void FeaturesPlugin_Partition::execute()
     }
 
     GeomShapePtr aResultCompound =
-      keepUnusedSubsOfCompound(aFirstShape, anObjects, ObjectHierarchy(), aMakeShapeList);
+      keepUnusedSubsOfCompound(aFirstShape, anObjects, GeomAPI_ShapeHierarchy(), aMakeShapeList);
 
     if (anIt.more()) {
       if (aResultCompound->shapeType() != GeomAPI_Shape::COMPOUND) {
@@ -235,7 +234,7 @@ static bool cutSubs(ListOfShape& theSubsToCut,
 }
 
 bool FeaturesPlugin_Partition::cutSubs(
-    FeaturesPlugin_Partition::ObjectHierarchy& theHierarchy,
+    GeomAPI_ShapeHierarchy& theHierarchy,
     ListOfShape& theUsed,
     ListOfShape& theNotUsed,
     std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
@@ -244,14 +243,14 @@ bool FeaturesPlugin_Partition::cutSubs(
   theUsed.clear();
   theNotUsed.clear();
 
-  ObjectHierarchy::Iterator anIt = theHierarchy.Begin();
+  GeomAPI_ShapeHierarchy::iterator anIt = theHierarchy.begin();
 
   // compose a set of tools for the CUT operation:
   // find the list of unused subs of the first argument or use itself
   ListOfShape aToolsForUsed, aToolsForUnused;
-  GeomShapePtr aFirstArgument = theHierarchy.Parent(*anIt, false);
+  GeomShapePtr aFirstArgument = theHierarchy.parent(*anIt, false);
   if (aFirstArgument && aFirstArgument->shapeType() == GeomAPI_Shape::COMPSOLID) {
-    theHierarchy.SplitCompound(aFirstArgument, theUsed, aToolsForUsed);
+    theHierarchy.splitCompound(aFirstArgument, theUsed, aToolsForUsed);
     theNotUsed = aToolsForUsed;
   }
   else {
@@ -262,13 +261,13 @@ bool FeaturesPlugin_Partition::cutSubs(
 
   // cut subs
   bool isOk = true;
-  for (++anIt; anIt != theHierarchy.End() && isOk; ++anIt) {
+  for (++anIt; anIt != theHierarchy.end() && isOk; ++anIt) {
     ListOfShape aUsed, aNotUsed;
 
-    GeomShapePtr aParent = theHierarchy.Parent(*anIt, false);
+    GeomShapePtr aParent = theHierarchy.parent(*anIt, false);
     if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
-      aParent = theHierarchy.Parent(*anIt); // get parent once again to mark its subs as processed
-      theHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
+      aParent = theHierarchy.parent(*anIt); // get parent once again to mark its subs as processed
+      theHierarchy.splitCompound(aParent, aUsed, aNotUsed);
     }
     else
       aUsed.push_back(*anIt);

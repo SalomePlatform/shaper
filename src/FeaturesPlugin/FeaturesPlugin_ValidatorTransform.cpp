@@ -21,10 +21,11 @@
 
 #include <Events_InfoMessage.h>
 
-#include "ModelAPI_AttributeSelectionList.h"
-#include "ModelAPI_ResultPart.h"
-#include "ModelAPI_ResultBody.h"
-#include "ModelAPI_Session.h"
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute,
                                                 const std::list<std::string>& theArguments,
@@ -46,6 +47,7 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   DocumentPtr aDocument = theAttribute->owner()->document();
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isPartSetDocument = aDocument == aMgr->moduleDocument();
+  bool isCheckCompsolid = !theAttribute->owner()->data()->version().empty();
 
   std::string anErrorGroupName;
   for(int i = 0; i < aCurSelList->size() && aValid; i++) {
@@ -67,11 +69,14 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
     }
     if (isPartSetDocument) // PartSet document: Result Part is valid
       aValid = aResult->groupName() == ModelAPI_ResultPart::group();
-    else { // Part document: Result CompSolid is valid
+    else { // Part document: Result CompSolid is valid, but the solid in compsolid is forbidden
       aValid = aResult->groupName() == ModelAPI_ResultBody::group();
-      if (aValid) {
-        ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
-        aValid = aComp.get() != NULL;
+      if (aValid && isCheckCompsolid) {
+        ResultBodyPtr aComp = ModelAPI_Tools::bodyOwner(aResult);
+        if (aComp && aComp->shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
+          theError = "Selecting a part of compsolid is forbidden.";
+          return false;
+        }
       }
     }
     if (!aValid)

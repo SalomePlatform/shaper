@@ -4914,6 +4914,13 @@
     </message>
   </context>
   <context>
+    <name>Placement:placement_objects_list:FeaturesPlugin_ValidatorTransform</name>
+    <message>
+      <source>Selecting a part of compsolid is forbidden.</source>
+      <translation>La sélection d'une partie de solide composite est interdite.</translation>
+    </message>
+  </context>
+  <context>
     <name>Placement:Model_FeatureValidator</name>
     <message>
       <source>Attribute "placement_start_shape" is not initialized.</source>

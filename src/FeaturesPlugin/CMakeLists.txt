@@ -64,6 +64,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Copy.h
     FeaturesPlugin_ImportResult.h
     FeaturesPlugin_Defeaturing.h
+    FeaturesPlugin_VersionedChFi.h
 )
 
 SET(PROJECT_SOURCES
@@ -109,6 +110,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Copy.cpp
     FeaturesPlugin_ImportResult.cpp
     FeaturesPlugin_Defeaturing.cpp
+    FeaturesPlugin_VersionedChFi.cpp
 )
 
 SET(XML_RESOURCES
@@ -569,4 +571,89 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test3137_1.py
                Test3137_2.py
                Test2918.py
+               Test3139.py
+               TestPlacement_MultiLevelCompound_v0_1.py
+               TestPlacement_MultiLevelCompound_v0_2.py
+               TestPlacement_MultiLevelCompound_v0_3.py
+               TestPlacement_MultiLevelCompound_v0_4.py
+               TestPlacement_MultiLevelCompound_v0_5.py
+               TestPlacement_MultiLevelCompound_v0_6.py
+               TestPlacement_MultiLevelCompound_v95_1.py
+               TestPlacement_MultiLevelCompound_v95_2.py
+               TestPlacement_MultiLevelCompound_v95_3.py
+               TestPlacement_MultiLevelCompound_v95_4.py
+               TestPlacement_MultiLevelCompound_v95_5.py
+               TestPlacement_MultiLevelCompound_v95_6.py
+               TestTranslation_MultiLevelCompound_v0_1.py
+               TestTranslation_MultiLevelCompound_v0_2.py
+               TestTranslation_MultiLevelCompound_v0_3.py
+               TestTranslation_MultiLevelCompound_v0_4.py
+               TestTranslation_MultiLevelCompound_v0_5.py
+               TestTranslation_MultiLevelCompound_v95_1.py
+               TestTranslation_MultiLevelCompound_v95_2.py
+               TestTranslation_MultiLevelCompound_v95_3.py
+               TestTranslation_MultiLevelCompound_v95_4.py
+               TestTranslation_MultiLevelCompound_v95_5.py
+               TestRotation_MultiLevelCompound_v0_1.py
+               TestRotation_MultiLevelCompound_v0_2.py
+               TestRotation_MultiLevelCompound_v0_3.py
+               TestRotation_MultiLevelCompound_v0_4.py
+               TestRotation_MultiLevelCompound_v95_1.py
+               TestRotation_MultiLevelCompound_v95_2.py
+               TestRotation_MultiLevelCompound_v95_3.py
+               TestRotation_MultiLevelCompound_v95_4.py
+               TestSymmetry_MultiLevelCompound_v0_1.py
+               TestSymmetry_MultiLevelCompound_v0_2.py
+               TestSymmetry_MultiLevelCompound_v0_3.py
+               TestSymmetry_MultiLevelCompound_v0_4.py
+               TestSymmetry_MultiLevelCompound_v0_5.py
+               TestSymmetry_MultiLevelCompound_v95_1.py
+               TestSymmetry_MultiLevelCompound_v95_2.py
+               TestSymmetry_MultiLevelCompound_v95_3.py
+               TestSymmetry_MultiLevelCompound_v95_4.py
+               TestSymmetry_MultiLevelCompound_v95_5.py
+               TestScale_MultiLevelCompound_v0_1.py
+               TestScale_MultiLevelCompound_v0_2.py
+               TestScale_MultiLevelCompound_v0_3.py
+               TestScale_MultiLevelCompound_v0_4.py
+               TestScale_MultiLevelCompound_v95_1.py
+               TestScale_MultiLevelCompound_v95_2.py
+               TestScale_MultiLevelCompound_v95_3.py
+               TestScale_MultiLevelCompound_v95_4.py
+               TestMultiTranslation_MultiLevelCompound_v0_1.py
+               TestMultiTranslation_MultiLevelCompound_v0_2.py
+               TestMultiTranslation_MultiLevelCompound_v0_3.py
+               TestMultiTranslation_MultiLevelCompound_v0_4.py
+               TestMultiTranslation_MultiLevelCompound_v95_1.py
+               TestMultiTranslation_MultiLevelCompound_v95_2.py
+               TestMultiTranslation_MultiLevelCompound_v95_3.py
+               TestMultiTranslation_MultiLevelCompound_v95_4.py
+               TestMultiRotation_MultiLevelCompound_v0_1.py
+               TestMultiRotation_MultiLevelCompound_v0_2.py
+               TestMultiRotation_MultiLevelCompound_v0_3.py
+               TestMultiRotation_MultiLevelCompound_v0_4.py
+               TestMultiRotation_MultiLevelCompound_v95_1.py
+               TestMultiRotation_MultiLevelCompound_v95_2.py
+               TestMultiRotation_MultiLevelCompound_v95_3.py
+               TestMultiRotation_MultiLevelCompound_v95_4.py
+               TestIntersection_MultiLevelCompound_v0_1.py
+               TestIntersection_MultiLevelCompound_v0_2.py
+               TestIntersection_MultiLevelCompound_v95_1.py
+               TestIntersection_MultiLevelCompound_v95_2.py
+               TestFillet_MultiLevelCompound_v0_1.py
+               TestFillet_MultiLevelCompound_v0_2.py
+               TestFillet_MultiLevelCompound_v0_3.py
+               TestFillet_MultiLevelCompound_v0_4.py
+               TestFillet_MultiLevelCompound_v95_1.py
+               TestFillet_MultiLevelCompound_v95_2.py
+               TestFillet_MultiLevelCompound_v95_3.py
+               TestFillet_MultiLevelCompound_v95_4.py
+               TestChamfer_MultiLevelCompound_v0_1.py
+               TestChamfer_MultiLevelCompound_v0_2.py
+               TestChamfer_MultiLevelCompound_v0_3.py
+               TestChamfer_MultiLevelCompound_v0_4.py
+               TestChamfer_MultiLevelCompound_v95_1.py
+               TestChamfer_MultiLevelCompound_v95_2.py
+               TestChamfer_MultiLevelCompound_v95_3.py
+               TestChamfer_MultiLevelCompound_v95_4.py
 )

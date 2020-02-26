@@ -46,7 +46,7 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.result(), Sk
 ExtrusionFuse_1.setNestedSketch(Sketch_1)
 model.do()
 Shape = ExtrusionFuse_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5, 5, 5.421244124)
+checkMiddlePoint(Shape, 5, 5, 5.3457661)
 
 ExtrusionFuse_2 = model.addExtrusionFuse(Part_1_doc, [], model.selection("EDGE", "Axis_1"), model.selection(), 0, model.selection("FACE", "ExtrusionFuse_1_1/Modified_Face&Box_1_1/Left&ExtrusionFuse_1_1/From_Face"), 0, [model.selection("SOLID", "ExtrusionFuse_1_1")])
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Front"))
@@ -57,7 +57,7 @@ SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchCircle_2.center(), 
 ExtrusionFuse_2.setNestedSketch(Sketch_2)
 model.do()
 Shape = ExtrusionFuse_2.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 4.88886637164, 4.89804988224, 2.94104936673)
+checkMiddlePoint(Shape, 4.97994427, 4.995857948, 4.254078314)
 
 model.end()
 

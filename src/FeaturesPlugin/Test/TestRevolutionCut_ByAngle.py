@@ -44,7 +44,7 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.result(), Sk
 RevolutionCut_1.setNestedSketch(Sketch_1)
 model.do()
 Shape = RevolutionCut_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 4.985950242219446, 4.993794269643578, 5.022028013265849)
+checkMiddlePoint(Shape, 5.008053818, 5.07743277, 4.8949827)
 
 RevolutionCut_1.setAxis(model.selection("EDGE", "PartSet/OX"))
 model.do()

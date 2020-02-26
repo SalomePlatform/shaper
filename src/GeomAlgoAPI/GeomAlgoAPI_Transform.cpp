@@ -29,7 +29,6 @@
 //=================================================================================================
 GeomAlgoAPI_Transform::GeomAlgoAPI_Transform(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                              std::shared_ptr<GeomAPI_Trsf>  theTrsf)
-: myTrsf(theTrsf)
 {
   build(theSourceShape, theTrsf);
 }
@@ -38,37 +37,33 @@ GeomAlgoAPI_Transform::GeomAlgoAPI_Transform(std::shared_ptr<GeomAPI_Shape> theS
 void GeomAlgoAPI_Transform::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                   std::shared_ptr<GeomAPI_Trsf>  theTrsf)
 {
-  if(!theSourceShape || !theTrsf) {
+  if (!theSourceShape || !theTrsf) {
+    myError = "Transformation :: incorrect input data.";
     return;
   }
 
   const TopoDS_Shape& aSourceShape = theSourceShape->impl<TopoDS_Shape>();
   const gp_Trsf& aTrsf = theTrsf->impl<gp_Trsf>();
 
-  if(aSourceShape.IsNull()) {
+  if (aSourceShape.IsNull()) {
+    myError = "Transformation :: source shape does not contain any actual shape.";
     return;
   }
 
   BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
-  if(!aBuilder) {
+  if (!aBuilder)
     return;
-  }
-  this->setImpl(aBuilder);
-  this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-  if(aBuilder->IsDone() != Standard_True) {
+  setImpl(aBuilder);
+  setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
+
+  if (aBuilder->IsDone() != Standard_True)
     return;
-  }
+
   TopoDS_Shape aResult = aBuilder->Shape();
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
-  this->setShape(aShape);
-  this->setDone(true);
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Transform::transformation() const
-{
-  return myTrsf;
+  setShape(aShape);
+  setDone(true);
 }

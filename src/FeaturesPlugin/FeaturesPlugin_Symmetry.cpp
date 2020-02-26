@@ -25,7 +25,10 @@
 #include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_Transform.h>
 
+#include <GeomAPI_Ax1.h>
+#include <GeomAPI_Ax2.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
@@ -40,6 +43,8 @@
 #include <ModelAPI_ResultPart.h>
 
 #include <FeaturesPlugin_Tools.h>
+
+static const std::string SYMMETRY_VERSION_1("v9.5");
 
 //=================================================================================================
 FeaturesPlugin_Symmetry::FeaturesPlugin_Symmetry()
@@ -67,6 +72,11 @@ void FeaturesPlugin_Symmetry::initAttributes()
 
   data()->addAttribute(FeaturesPlugin_Symmetry::KEEP_ORIGINAL_RESULT(),
                        ModelAPI_AttributeBoolean::typeId());
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(SYMMETRY_VERSION_1);
+  }
 }
 
 //=================================================================================================
@@ -75,54 +85,23 @@ void FeaturesPlugin_Symmetry::execute()
   AttributeStringPtr aMethodTypeAttr = string(FeaturesPlugin_Symmetry::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
 
-  if (aMethodType == CREATION_METHOD_BY_POINT()) {
-    performSymmetryByPoint();
-  }
+  GeomTrsfPtr aTrsf;
+  if (aMethodType == CREATION_METHOD_BY_POINT())
+    aTrsf = symmetryByPoint();
+  else if (aMethodType == CREATION_METHOD_BY_AXIS())
+    aTrsf = symmetryByAxis();
+  else if (aMethodType == CREATION_METHOD_BY_PLANE())
+    aTrsf = symmetryByPlane();
 
-  if (aMethodType == CREATION_METHOD_BY_AXIS()) {
-    performSymmetryByAxis();
-  }
-
-  if (aMethodType == CREATION_METHOD_BY_PLANE()) {
-    performSymmetryByPlane();
-  }
+  performSymmetry(aTrsf);
 }
 
 //=================================================================================================
-bool FeaturesPlugin_Symmetry::collectSourceObjects(ListOfShape& theSourceShapes,
-                                                   std::list<ResultPtr>& theSourceResults)
+GeomTrsfPtr FeaturesPlugin_Symmetry::symmetryByPoint()
 {
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return false;
-  }
-  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if (!anObject.get()) { // may be for not-activated parts
-      return false;
-    }
-    theSourceShapes.push_back(anObject);
-    theSourceResults.push_back(anObjectAttr->context());
-  }
-  return true;
-}
-
-//=================================================================================================
-void FeaturesPlugin_Symmetry::performSymmetryByPoint()
-{
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  if (!collectSourceObjects(anObjects, aContextes))
-    return;
-
   //Getting point.
   std::shared_ptr<GeomAPI_Pnt> aPoint;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
-    selection(FeaturesPlugin_Symmetry::POINT_OBJECT_ID());
+  AttributeSelectionPtr anObjRef = selection(FeaturesPlugin_Symmetry::POINT_OBJECT_ID());
   if (anObjRef.get() != NULL) {
     GeomShapePtr aShape1 = anObjRef->value();
     if (!aShape1.get()) {
@@ -133,57 +112,14 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
     }
   }
 
-  // Moving each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setSymmetry(aPoint);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      buildResult(anOrigin, aTrsf, aResultIndex);
-    }
-    else {
-      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
-        new GeomAlgoAPI_Symmetry(aBaseShape, aPoint));
-
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setSymmetry(aPoint);
+  return aTrsf;
 }
 
 //=================================================================================================
-void FeaturesPlugin_Symmetry::performSymmetryByAxis()
+GeomTrsfPtr FeaturesPlugin_Symmetry::symmetryByAxis()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  if (!collectSourceObjects(anObjects, aContextes))
-    return;
-
   //Getting axis.
   static const std::string aSelectionError = "Error: The axis shape selection is bad.";
   AttributeSelectionPtr anObjRef = selection(AXIS_OBJECT_ID());
@@ -195,7 +131,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
   }
   if (!aShape.get()) {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   GeomEdgePtr anEdge;
@@ -212,64 +148,19 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
   if (!anEdge.get())
   {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   std::shared_ptr<GeomAPI_Ax1> anAxis (new GeomAPI_Ax1(anEdge->line()->location(),
                                                        anEdge->line()->direction()));
-
-
-  // Moving each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setSymmetry(anAxis);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      buildResult(anOrigin, aTrsf, aResultIndex);
-    }
-    else {
-      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
-        new GeomAlgoAPI_Symmetry(aBaseShape, anAxis));
-
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setSymmetry(anAxis);
+  return aTrsf;
 }
 
 //=================================================================================================
-void FeaturesPlugin_Symmetry::performSymmetryByPlane()
+GeomTrsfPtr FeaturesPlugin_Symmetry::symmetryByPlane()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  if (!collectSourceObjects(anObjects, aContextes))
-    return;
-
   //Getting plane.
   static const std::string aSelectionError = "Error: The plane shape selection is bad.";
   AttributeSelectionPtr anObjRef = selection(PLANE_OBJECT_ID());
@@ -281,7 +172,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   }
   if (!aShape.get()) {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   GeomFacePtr aFace;
@@ -298,84 +189,27 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   if (!aFace.get())
   {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   std::shared_ptr<GeomAPI_Ax2> aPlane(new GeomAPI_Ax2(aFace->getPlane()->location(),
                                                       aFace->getPlane()->direction()));
-
-
-  // Moving each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setSymmetry(aPlane);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      buildResult(anOrigin, aTrsf, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
-        new GeomAlgoAPI_Symmetry(aBaseShape, aPlane));
-
-      if (!aSymmetryAlgo->check()) {
-        setError(aSymmetryAlgo->getError());
-        return;
-      }
-
-      aSymmetryAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setSymmetry(aPlane);
+  return aTrsf;
 }
 
 //=================================================================================================
 void FeaturesPlugin_Symmetry::buildResult(
-  std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
-  std::shared_ptr<GeomAPI_Shape> theBaseShape, int theResultIndex)
+    const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
+    const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
+    std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex)
 {
-  std::shared_ptr<GeomAlgoAPI_MakeShapeList> anAlgoList(new GeomAlgoAPI_MakeShapeList());
-  anAlgoList->appendAlgo(theSymmetryAlgo);
-  // Compose source shape and the result of symmetry.
-  GeomShapePtr aCompound;
-  if (boolean(KEEP_ORIGINAL_RESULT())->value()) {
-    ListOfShape aShapes;
-    // add a copy of a base shape otherwise selection of this base shape is bad (2592)
-    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(theBaseShape));
-    aShapes.push_back(aCopyAlgo->shape());
-    anAlgoList->appendAlgo(aCopyAlgo);
-
-    aShapes.push_back(theSymmetryAlgo->shape());
-    aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-  } else
-    aCompound = theSymmetryAlgo->shape();
-
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
-
-  ListOfShape aBaseShapes;
-  aBaseShapes.push_back(theBaseShape);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
-                                           anAlgoList, aCompound, "Symmetried");
-
-  setResult(aResultBody, theResultIndex);
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
+                                           theAlgo, theTargetShape, "Symmetried");
+  setResult(aResultBody, theResultIndex++);
 }
 
 //=================================================================================================
@@ -387,11 +221,96 @@ void FeaturesPlugin_Symmetry::buildResult(ResultPartPtr theOriginal,
     std::shared_ptr<GeomAPI_Trsf> anIdentity(new GeomAPI_Trsf());
     ResultPartPtr aCopy = document()->copyPart(theOriginal, data(), theResultIndex);
     aCopy->setTrsf(theOriginal, anIdentity);
-    setResult(aCopy, theResultIndex);
-    ++theResultIndex;
+    setResult(aCopy, theResultIndex++);
   }
 
   ResultPartPtr aResultPart = document()->copyPart(theOriginal, data(), theResultIndex);
   aResultPart->setTrsf(theOriginal, theTrsf);
-  setResult(aResultPart, theResultIndex);
+  setResult(aResultPart, theResultIndex++);
+}
+
+//=================================================================================================
+static bool performShapeSymmetry(std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgoList,
+                                 GeomAPI_ShapeHierarchy& theHierarchy,
+                                 GeomShapePtr theBaseShape,
+                                 GeomTrsfPtr theTrsf,
+                                 bool isKeepOriginalResult,
+                                 const std::string& theFeatureKind,
+                                 std::string& theError)
+{
+  std::shared_ptr<GeomAlgoAPI_Transform> aSymmetryAlgo(
+      new GeomAlgoAPI_Transform(theBaseShape, theTrsf));
+
+  // Checking that the algorithm worked properly.
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, theFeatureKind, theError))
+    return false;
+
+  theAlgoList->appendAlgo(aSymmetryAlgo);
+
+  // Compose source shape and the result of symmetry.
+  GeomShapePtr aCompound;
+  if (isKeepOriginalResult) {
+    ListOfShape aShapes;
+    // add a copy of a base shape otherwise selection of this base shape is bad (2592)
+    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(theBaseShape));
+    aShapes.push_back(aCopyAlgo->shape());
+    theAlgoList->appendAlgo(aCopyAlgo);
+
+    aShapes.push_back(aSymmetryAlgo->shape());
+    aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+  }
+  else
+    aCompound = aSymmetryAlgo->shape();
+
+  theHierarchy.markModified(theBaseShape, aCompound);
+  return true;
+}
+
+void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
+{
+  if (!theTrsf) {
+    setError("Invalid transformation.");
+    return;
+  }
+
+  bool isKeepOriginal = boolean(KEEP_ORIGINAL_RESULT())->value();
+  bool isKeepSubShapes = data()->version() == SYMMETRY_VERSION_1;
+
+  // Getting objects.
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjSelList, isKeepSubShapes, anObjects, aParts))
+    return;
+
+  std::string anError;
+  int aResultIndex = 0;
+  // Symmetrying parts.
+  for (std::list<ResultPtr>::iterator aPRes = aParts.begin(); aPRes != aParts.end(); ++aPRes) {
+    ResultPartPtr anOriginal = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPRes);
+    buildResult(anOriginal, theTrsf, aResultIndex);
+  }
+
+  // Collect transformations for each object in a part.
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+       anObjectsIt != anObjects.end(); ++anObjectsIt) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    if (!performShapeSymmetry(aMakeShapeList, anObjects, aBaseShape, theTrsf,
+                              isKeepOriginal, getKind(), anError)) {
+      setError(anError);
+      break;
+    }
+  }
+
+  // Build results of the rotation.
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt)
+    buildResult(aMakeShapeList, anOriginalShapes, *anIt, aResultIndex);
+
+  // Remove the rest results if there were produced in the previous pass.
+  removeResults(aResultIndex);
 }

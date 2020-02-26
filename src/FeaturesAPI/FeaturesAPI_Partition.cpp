@@ -32,12 +32,10 @@ FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feat
 //==================================================================================================
 FeaturesAPI_Partition::FeaturesAPI_Partition(
     const std::shared_ptr<ModelAPI_Feature>& theFeature,
-    const std::list<ModelHighAPI_Selection>& theBaseObjects,
-    const int theVersion)
+    const std::list<ModelHighAPI_Selection>& theBaseObjects)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Partition::VERSION_ID()));
     setBase(theBaseObjects);
   }
 }
@@ -64,13 +62,10 @@ void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
-  AttributeIntegerPtr aVersion =
-    aBase->integer(FeaturesPlugin_Partition::VERSION_ID());
 
   theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects;
 
-  if (aVersion && aVersion->isInitialized() &&
-      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1)
+  if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
@@ -81,8 +76,8 @@ PartitionPtr addPartition(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
                           const bool keepSubResults)
 {
-  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
-                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Partition::ID());
-  return PartitionPtr(new FeaturesAPI_Partition(aFeature, theBaseObjects, aVersion));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+  return PartitionPtr(new FeaturesAPI_Partition(aFeature, theBaseObjects));
 }

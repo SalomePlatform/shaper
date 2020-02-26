@@ -47,7 +47,7 @@ checkMiddlePoint(Shape, 5, 10, 20)
 
 Scale_1.setMainObjects([model.selection("SOLID", "Sphere_1_1")])
 Shape = Scale_1.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 0.0058892, 0, 0)
+checkMiddlePoint(Shape, 0, 0, 0)
 
 model.end()
 

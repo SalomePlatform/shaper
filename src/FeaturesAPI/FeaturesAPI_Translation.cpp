@@ -141,52 +141,91 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
       aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
     AttributeDoublePtr anAttrDistance =
       aBase->real(FeaturesPlugin_Translation::DISTANCE_ID());
-    theDumper << ", " << anAttrAxis << ", " << anAttrDistance;
+    theDumper << ", axis = " << anAttrAxis << ", distance = " << anAttrDistance;
   } else if (aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DIMENSIONS()) {
     AttributeDoublePtr anAttrDx = aBase->real(FeaturesPlugin_Translation::DX_ID());
     AttributeDoublePtr anAttrDy = aBase->real(FeaturesPlugin_Translation::DY_ID());
     AttributeDoublePtr anAttrDz = aBase->real(FeaturesPlugin_Translation::DZ_ID());
-    theDumper << ", " << anAttrDx << ", " << anAttrDy << ", " << anAttrDz;
+    theDumper << ", vector = [" << anAttrDx << ", " << anAttrDy << ", " << anAttrDz << "]";
   } else if (aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_TWO_POINTS()) {
     AttributeSelectionPtr anAttrStartPoint =
       aBase->selection(FeaturesPlugin_Translation::START_POINT_ID());
     AttributeSelectionPtr anAttrEndPoint =
       aBase->selection(FeaturesPlugin_Translation::END_POINT_ID());
-    theDumper << ", " << anAttrStartPoint << ", " << anAttrEndPoint;
+    theDumper << ", startPoint = " << anAttrStartPoint << ", endPoint = " << anAttrEndPoint;
   }
+
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theAxisObject,
-                              const ModelHighAPI_Double& theDistance)
+TranslationPtr addTranslation(
+    const std::shared_ptr<ModelAPI_Document>& part,
+    const std::list<ModelHighAPI_Selection>& objects,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated1,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated2,
+    const std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>& deprecated3,
+    const ModelHighAPI_Selection& axis, const ModelHighAPI_Double& distance,
+    const std::list<ModelHighAPI_Double>& vector,
+    const ModelHighAPI_Selection& startPoint, const ModelHighAPI_Selection& endPoint,
+    const bool keepSubResults)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects,
-                                                    theAxisObject, theDistance));
-}
+  std::shared_ptr<ModelAPI_Feature> aFeature = part->addFeature(FeaturesAPI_Translation::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
 
-//==================================================================================================
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Double& theDx,
-                              const ModelHighAPI_Double& theDy,
-                              const ModelHighAPI_Double& theDz)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, theDx, theDy, theDz));
-}
+  static const int VEC_SIZE = 3;
 
-//==================================================================================================
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theStartPoint,
-                              const ModelHighAPI_Selection& theEndPoint)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects,
-                                                    theStartPoint, theEndPoint));
+  bool byAxis = axis.variantType() != ModelHighAPI_Selection::VT_Empty;
+  bool byVector = vector.size() == VEC_SIZE;
+  bool byPoints = startPoint.variantType() != ModelHighAPI_Selection::VT_Empty &&
+                  endPoint.variantType() != ModelHighAPI_Selection::VT_Empty;
+
+  ModelHighAPI_Selection firstSel, secondSel;
+  ModelHighAPI_Double values[VEC_SIZE];
+  if (byAxis) {
+    firstSel = axis;
+    values[0] = distance;
+  }
+  else if (byVector) {
+    std::list<ModelHighAPI_Double>::const_iterator it = vector.begin();
+    for (ModelHighAPI_Double* vIt = values; it != vector.end(); ++vIt, ++it)
+      *vIt = *it;
+  }
+  else if (byPoints) {
+    firstSel = startPoint;
+    secondSel = endPoint;
+  }
+  else {
+    byVector = deprecated1.first.variantType() == ModelHighAPI_Selection::VT_Empty;
+    if (byVector) {
+      values[0] = deprecated1.second;
+      values[1] = deprecated2.second;
+      values[2] = deprecated3.second;
+    }
+    else {
+      firstSel = deprecated1.first;
+      secondSel = deprecated2.first;
+      values[0] = deprecated2.second;
+      if (secondSel.variantType() == ModelHighAPI_Selection::VT_Empty)
+        byAxis = true;
+      else
+        byPoints = true;
+    }
+  }
+
+  TranslationPtr aTranslation;
+  if (byAxis)
+    aTranslation.reset(new FeaturesAPI_Translation(aFeature, objects, firstSel, values[0]));
+  else if (byVector) {
+    aTranslation.reset(new FeaturesAPI_Translation(aFeature, objects,
+                                                   values[0], values[1], values[2]));
+  }
+  else if (byPoints)
+    aTranslation.reset(new FeaturesAPI_Translation(aFeature, objects, firstSel, secondSel));
+
+  return aTranslation;
 }

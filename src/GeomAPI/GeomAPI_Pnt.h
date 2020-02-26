@@ -23,6 +23,7 @@
 #include <GeomAPI_Interface.h>
 #include <memory>
 
+class GeomAPI_Ax1;
 class GeomAPI_XYZ;
 class GeomAPI_Pnt2d;
 class GeomAPI_Dir;
@@ -95,6 +96,9 @@ class GeomAPI_Pnt : public GeomAPI_Interface
   /// Translates the point along direction theDir on distance theDist
   GEOMAPI_EXPORT
   void translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double theDist);
+
+  /// Rotates the point along axis for the given angle (in degrees)
+  GEOMAPI_EXPORT void rotate(const std::shared_ptr<GeomAPI_Ax1>& theAxis, double theAngle);
 };
 
 //! Pointer on the object

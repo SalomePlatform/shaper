@@ -37,7 +37,7 @@ Partition_1 = model.addPartition(Part_1_doc, [model.selection("COMPOUND", "all-i
 Group_1 = model.addGroup(Part_1_doc, [model.selection("SOLID", (-34.12026714434272, 28.71281409244911, 1.5))])
 Group_1.setName("Group_dechets")
 Group_1.result().setName("Group_dechets")
-Group_2 = model.addGroup(Part_1_doc, [model.selection("SOLID", (-34.12026714434272, 28.71281409244911, 2.35984679315518))])
+Group_2 = model.addGroup(Part_1_doc, [model.selection("SOLID", (-34.12026714434272, 28.71281409244911, 2.554668601838412))])
 Group_2.setName("Group_colis")
 Group_2.result().setName("Group_colis")
 LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("COMPSOLID", (-34.12026714434272, 28.71281409244911, 2.5))], model.selection("EDGE", "PartSet/OX"), "d", "nb", model.selection("EDGE", "PartSet/OY"), "d", "nb")

@@ -60,14 +60,14 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 
-  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
 void FeaturesPlugin_BooleanFuse::execute()
 {
   std::string anError;
-  ObjectHierarchy anObjectsHierarchy, aToolsHierarchy;
+  GeomAPI_ShapeHierarchy anObjectsHierarchy, aToolsHierarchy;
   ListOfShape aPlanes;
 
   bool isSimpleCreation = false;
@@ -90,9 +90,9 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   ListOfShape anObjects, aTools, anEdgesAndFaces;
   // all objects except edges and faces
-  anObjectsHierarchy.ObjectsByType(anEdgesAndFaces, anObjects,
+  anObjectsHierarchy.objectsByType(anEdgesAndFaces, anObjects,
                                    GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
-  aToolsHierarchy.ObjectsByType(anEdgesAndFaces, aTools,
+  aToolsHierarchy.objectsByType(anEdgesAndFaces, aTools,
                                 GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
 
   if ((anObjects.size() + aTools.size() + anEdgesAndFaces.size()) < 2) {
@@ -102,7 +102,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // version of FUSE feature
-  int aFuseVersion = version();
+  const std::string aFuseVersion = data()->version();
 
   // Collecting all solids which will be fused.
   ListOfShape aSolidsToFuse;
@@ -111,20 +111,20 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
-  bool isProcessCompsolid = !isSimpleCreation || aFuseVersion >= THE_VERSION_1;
+  bool isProcessCompsolid = !isSimpleCreation || !aFuseVersion.empty();
   ListOfShape aShapesToAdd;
-  for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
-       isProcessCompsolid && anObjectsIt != anObjectsHierarchy.End();
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjectsHierarchy.begin();
+       isProcessCompsolid && anObjectsIt != anObjectsHierarchy.end();
        ++anObjectsIt) {
     GeomShapePtr anObject = *anObjectsIt;
-    GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
+    GeomShapePtr aParent = anObjectsHierarchy.parent(anObject, false);
 
     if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
       // mark all subs of this parent as precessed to avoid handling twice
-      aParent = anObjectsHierarchy.Parent(anObject);
+      aParent = anObjectsHierarchy.parent(anObject);
 
       ListOfShape aUsed, aNotUsed;
-      anObjectsHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
+      anObjectsHierarchy.splitCompound(aParent, aUsed, aNotUsed);
       aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
     }
   }
@@ -234,7 +234,7 @@ void FeaturesPlugin_BooleanFuse::execute()
     aMakeShapeList->appendAlgo(aUnifyAlgo);
   }
 
-  if (aFuseVersion == THE_VERSION_1) {
+  if (aFuseVersion == BOP_VERSION_9_4()) {
     // merge hierarchies of compounds containing objects and tools
     // and append the result of the FUSE operation
     aShape = keepUnusedSubsOfCompound(aShape, anObjectsHierarchy, aToolsHierarchy, aMakeShapeList);

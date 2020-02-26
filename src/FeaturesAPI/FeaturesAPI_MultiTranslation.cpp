@@ -155,20 +155,10 @@ void FeaturesAPI_MultiTranslation::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrSecondNumber;
   }
 
-  theDumper << ")" << std::endl;
-}
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
 
-//==================================================================================================
-MultiTranslationPtr addMultiTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                        const ModelHighAPI_Selection& theAxisObject,
-                                        const ModelHighAPI_Double& theStep,
-                                        const ModelHighAPI_Integer& theNumber)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    thePart->addFeature(FeaturesAPI_MultiTranslation::ID());
-  return MultiTranslationPtr(new FeaturesAPI_MultiTranslation(aFeature, theMainObjects,
-                                                              theAxisObject, theStep, theNumber));
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -179,13 +169,22 @@ MultiTranslationPtr addMultiTranslation(const std::shared_ptr<ModelAPI_Document>
                                         const ModelHighAPI_Integer& theFirstNumber,
                                         const ModelHighAPI_Selection& theSecondAxisObject,
                                         const ModelHighAPI_Double& theSecondStep,
-                                        const ModelHighAPI_Integer& theSecondNumber)
+                                        const ModelHighAPI_Integer& theSecondNumber,
+                                        const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesAPI_MultiTranslation::ID());
-  return MultiTranslationPtr(new FeaturesAPI_MultiTranslation(aFeature, theMainObjects,
-                                                              theFirstAxisObject, theFirstStep,
-                                                              theFirstNumber,
-                                                              theSecondAxisObject, theSecondStep,
-                                                              theSecondNumber));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+  MultiTranslationPtr aMT;
+  if (theSecondAxisObject.variantType() == ModelHighAPI_Selection::VT_Empty) {
+    aMT.reset(new FeaturesAPI_MultiTranslation(aFeature, theMainObjects,
+        theFirstAxisObject, theFirstStep, theFirstNumber));
+  }
+  else {
+    aMT.reset(new FeaturesAPI_MultiTranslation(aFeature, theMainObjects,
+        theFirstAxisObject, theFirstStep, theFirstNumber,
+        theSecondAxisObject, theSecondStep, theSecondNumber));
+  }
+  return aMT;
 }

@@ -18,6 +18,7 @@
 //
 
 #include<GeomAPI_Pnt.h>
+#include <GeomAPI_Ax1.h>
 #include<GeomAPI_XYZ.h>
 #include<GeomAPI_Pnt2d.h>
 #include<GeomAPI_Dir.h>
@@ -126,4 +127,9 @@ std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const std::shared_ptr<GeomAPI_P
 
   gp_Pnt2d aRes = ProjLib::Project(aPln, *MY_PNT);
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aRes.X(), aRes.Y()));
+}
+
+void GeomAPI_Pnt::rotate(const std::shared_ptr<GeomAPI_Ax1>& theAxis, const double theAngle)
+{
+  MY_PNT->Rotate(theAxis->impl<gp_Ax1>(), theAngle / 180.0 * M_PI);
 }

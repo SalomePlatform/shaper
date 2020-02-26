@@ -24,7 +24,7 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Rotation.h>
+class GeomAPI_Trsf;
 
 /// \class FeaturesPlugin_Rotation
 /// \ingroup Plugins
@@ -119,11 +119,14 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
   FeaturesPlugin_Rotation();
 
 private:
-  ///Perform the rotation using an axis and an angle.
-  void performTranslationByAxisAndAngle();
+  /// Calculate the rotation using an axis and an angle.
+  std::shared_ptr<GeomAPI_Trsf> rotationByAxisAndAngle();
 
-  ///Perform the rotation using a center and two points.
-  void performTranslationByThreePoints();
+  /// Calculate the rotation using a center and two points.
+  std::shared_ptr<GeomAPI_Trsf> rotationByThreePoints();
+
+  /// Perform the transformation
+  void performRotation(const std::shared_ptr<GeomAPI_Trsf>& theTrsf);
 };
 
 #endif

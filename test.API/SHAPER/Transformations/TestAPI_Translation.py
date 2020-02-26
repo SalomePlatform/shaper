@@ -122,19 +122,19 @@ except myExcept as ec:
 try:
     Translation_22 = shaperpy.makeTranslation(None, ax1, 15.)
 except myExcept as ec:
-    assert(ec.what() == "Translation builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
     Translation_23 = shaperpy.makeTranslation(None, 10., 20., 15.)
 except myExcept as ec:
-    assert(ec.what() == "Translation builder :: source shape is not valid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
     Translation_24 = shaperpy.makeTranslation(None, pnt1, pnt2)
 except myExcept as ec:
-    assert(ec.what() == "Translation builder :: source shape is invalid.")
+    assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
     Translation_25 = shaperpy.makeTranslation(shape(), ax1, 15.)
 except myExcept as ec:
-    assert(ec.what() == "Translation builder :: source shape does not contain any actual shape.")
+    assert(ec.what() == "Transformation :: source shape does not contain any actual shape.")

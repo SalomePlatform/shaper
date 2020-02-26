@@ -20,20 +20,13 @@
 #ifndef FeaturesPlugin_Chamfer_H_
 #define FeaturesPlugin_Chamfer_H_
 
-#include "FeaturesPlugin.h"
-
-#include <GeomAPI_Shape.h>
-
-#include <ModelAPI_Feature.h>
-
-class GeomAlgoAPI_MakeShape;
-class GeomAPI_DataMapOfShapeMapOfShapes;
+#include "FeaturesPlugin_VersionedChFi.h"
 
 /// \class FeaturesPlugin_Chamfer
 /// \ingroup Plugins
 /// \brief Feature for applying the Chamfer operations on Solids.
 ///        Supports two distances chamfer and distance-angle chamfer.
-class FeaturesPlugin_Chamfer : public ModelAPI_Feature
+class FeaturesPlugin_Chamfer : public FeaturesPlugin_VersionedChFi
 {
 public:
   /// Feature kind.
@@ -103,9 +96,6 @@ public:
     return MY_ANGLE_ID;
   }
 
-  /// Performs the algorithm and stores results it in the data structure.
-  FEATURESPLUGIN_EXPORT virtual void execute();
-
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
@@ -113,11 +103,15 @@ public:
   FeaturesPlugin_Chamfer();
 
 private:
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
+  /// Return attribute storing the selected objects of the operation.
+  virtual std::shared_ptr<ModelAPI_Attribute> objectsAttribute();
+
+  /// Return name of modified shape prefix name
+  virtual const std::string& modifiedShapePrefix() const;
+
+  /// Run chamfer/fillet operation and returns the modification algorithm if succeed.
+  virtual std::shared_ptr<GeomAlgoAPI_MakeShape>
+      performOperation(const GeomShapePtr& theSolid, const ListOfShape& theEdges);
 };
 
 #endif

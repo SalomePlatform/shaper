@@ -131,15 +131,18 @@ namespace ModelGeomAlgo_Shape
     aSR.mySubshape = theSubshape;
     aSR.myCenterType = theCenterType;
     // compound subshapes from other compounds should be processed as whole results
-    if (aSR.mySubshape && aSR.mySubshape->shapeType() == GeomAPI_Shape::COMPOUND &&
-        !theResult->shape()->isEqual(theSubshape)) {
-      ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
-      for (int i = 0; aResult && i < aResult->numberOfSubs(); ++i) {
-        ResultBodyPtr aSub = aResult->subResult(i);
-        if (aSub->shape()->isEqual(theSubshape)) {
-          aSR.myResult = aSub;
-          aSR.mySubshape = GeomShapePtr();
-          break;
+    if (aSR.mySubshape && aSR.mySubshape->shapeType() <= GeomAPI_Shape::COMPSOLID) {
+      if (theResult->shape()->isEqual(theSubshape))
+        aSR.mySubshape = GeomShapePtr();
+      else {
+        ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
+        for (int i = 0; aResult && i < aResult->numberOfSubs(); ++i) {
+          ResultBodyPtr aSub = aResult->subResult(i);
+          if (aSub->shape()->isEqual(theSubshape)) {
+            aSR.myResult = aSub;
+            aSR.mySubshape = GeomShapePtr();
+            break;
+          }
         }
       }
     }
@@ -271,10 +274,12 @@ namespace ModelGeomAlgo_Shape
       }
     }
 
+    bool processSketch = theSelected.empty() || (theSelected.size() == 1 &&
+        theSelected.front().myCenterType != (int)ModelAPI_AttributeSelection::NOT_CENTER);
     // one more special case: the selected entity is a separated sketch point
     // or an auxiliary sketch edge; they are not included into the sketch result;
     // thus, it is necessary to pass through the sketch sub-features and find selected.
-    if (theSelected.empty() && !aResults.empty() &&
+    if (processSketch && !aResults.empty() &&
        (theShapeType == GeomAPI_Shape::VERTEX || theShapeType == GeomAPI_Shape::EDGE)) {
       CompositeFeaturePtr aCF = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
       std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =

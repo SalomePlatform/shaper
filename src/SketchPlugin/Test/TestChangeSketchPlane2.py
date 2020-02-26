@@ -109,7 +109,7 @@ model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.EDGE, [78])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.VERTEX, [156])
 model.testResultsVolumes(ExtrusionCut_1, [45760.2175339])
 
-checkMiddlePoint(ExtrusionCut_1, 22.06257655, 23.02586034, 15.3487259)
+checkMiddlePoint(ExtrusionCut_1, 21.09174756, 23.41211647, 15.165448698)
 
 # change plane of Fuse's sketch
 model.begin()
@@ -128,7 +128,7 @@ model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.EDGE, [68])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.VERTEX, [136])
 model.testResultsVolumes(ExtrusionCut_1, [45778.45658456])
 
-checkMiddlePoint(ExtrusionCut_1, 22.09235516, 24.3480359, 15.39208928)
+checkMiddlePoint(ExtrusionCut_1, 21.0948367, 23.919988, 15.169366862)
 
 # undo the change
 model.undo()
@@ -149,7 +149,7 @@ model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.EDGE, [97])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.VERTEX, [194])
 model.testResultsVolumes(ExtrusionCut_1, [45338.366732291])
 
-checkMiddlePoint(ExtrusionCut_1, 21.85567065, 23.317063, 15.12788294)
+checkMiddlePoint(ExtrusionCut_1, 21.00046446, 23.51391548, 15.073978)
 
 # undo the change again
 model.undo()
@@ -177,6 +177,6 @@ model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.EDGE, [76])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.VERTEX, [152])
 model.testResultsVolumes(ExtrusionCut_1, [45760.15911273])
 
-checkMiddlePoint(ExtrusionCut_1, 22.09599822, 23.059247963, 15.3232676575)
+checkMiddlePoint(ExtrusionCut_1, 21.08920837, 23.40914618, 15.16787737)
 
 assert(model.checkPythonDump())

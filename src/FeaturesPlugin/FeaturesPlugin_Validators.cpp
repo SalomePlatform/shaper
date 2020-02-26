@@ -913,8 +913,9 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
       }
     }
 
-    ResultBodyPtr aContextOwner = ModelAPI_Tools::bodyOwner(aContext);
-    GeomShapePtr anOwner = aContextOwner.get() ? aContextOwner->shape() : aContext->shape();
+    ResultBodyPtr aContextOwner = ModelAPI_Tools::bodyOwner(aContext, true);
+    GeomShapePtr anOwner = aContext->shape();
+    GeomShapePtr aTopLevelOwner = aContextOwner.get() ? aContextOwner->shape() : anOwner;
 
     if (!anOwner) {
       theError = "Error: wrong feature is selected.";
@@ -928,8 +929,8 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
     }
 
     if (!aBaseSolid)
-      aBaseSolid = anOwner;
-    else if (!aBaseSolid->isEqual(anOwner)) {
+      aBaseSolid = aTopLevelOwner;
+    else if (!aBaseSolid->isEqual(aTopLevelOwner)) {
       theError = "Error: Sub-shapes of different solids have been selected.";
       return false;
     }

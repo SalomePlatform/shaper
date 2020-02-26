@@ -20,6 +20,8 @@
 #include "ModelHighAPI_Integer.h"
 
 #include <ModelAPI_AttributeInteger.h>
+
+#include <sstream>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -59,4 +61,14 @@ int ModelHighAPI_Integer::intValue() const
 {
   // needed for array of integer, which supports no text
   return myInt;
+}
+
+std::string ModelHighAPI_Integer::string() const
+{
+  if (myVariantType == VT_STRING)
+    return myString;
+
+  std::ostringstream anOut;
+  anOut << myInt;
+  return anOut.str();
 }

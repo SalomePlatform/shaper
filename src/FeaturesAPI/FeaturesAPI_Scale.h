@@ -24,10 +24,10 @@
 
 #include <FeaturesPlugin_Scale.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
@@ -110,16 +110,9 @@ FEATURESAPI_EXPORT
 ScalePtr addScale(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                   const ModelHighAPI_Selection& theCenterPoint,
-                  const ModelHighAPI_Double& theScaleFactor);
-
-/// \ingroup CPPHighAPI
-/// \brief Create Scale feature.
-FEATURESAPI_EXPORT
-ScalePtr addScale(const std::shared_ptr<ModelAPI_Document>& thePart,
-                  const std::list<ModelHighAPI_Selection>& theMainObjects,
-                  const ModelHighAPI_Selection& theCenterPoint,
                   const ModelHighAPI_Double& theScaleFactorX,
-                  const ModelHighAPI_Double& theScaleFactorY,
-                  const ModelHighAPI_Double& theScaleFactorZ);
+                  const ModelHighAPI_Double& theScaleFactorY = ModelHighAPI_Double(0.0),
+                  const ModelHighAPI_Double& theScaleFactorZ = ModelHighAPI_Double(0.0),
+                  const bool keepSubResults = false);
 
 #endif // FEATURESAPI_SCALE_H_

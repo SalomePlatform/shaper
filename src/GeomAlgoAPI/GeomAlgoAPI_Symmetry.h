@@ -21,26 +21,19 @@
 #define GEOMALGOAPI_SYMMETRY_H_
 
 #include <GeomAlgoAPI.h>
-#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_Transform.h>
 
-#include <GeomAPI_Pnt.h>
-#include <GeomAPI_Ax1.h>
-#include <GeomAPI_Ax2.h>
+class GeomAPI_Ax1;
+class GeomAPI_Ax2;
+class GeomAPI_Pnt;
 
 /// \class GeomAlgoAPI_Symmetry
 /// \ingroup DataAlgo
 /// \brief Creates a copy of the object by performing a symmetry operation by a point,
 ///        by an axis or by a plane.
-class GeomAlgoAPI_Symmetry : public GeomAlgoAPI_MakeShape
+class GeomAlgoAPI_Symmetry : public GeomAlgoAPI_Transform
 {
 public:
-  /// Type of symmetry operation
-  enum MethodType {
-    BY_POINT, ///< Symmetry by point.
-    BY_AXIS,  ///< Symmetry by axis.
-    BY_PLANE  ///< Symmetry by plane.
-  };
-
   /// \brief Creates an object which is obtained from current object by performing
   ///        a symmetry operation by a point.
   /// \param[in] theSourceShape  the shape to be moved.
@@ -61,19 +54,6 @@ public:
   /// \param[in] thePlane        the symmetry plane.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Symmetry(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Ax2>   thePlane);
-
-  /// Checks if data for the symmetry execution is OK.
-  GEOMALGOAPI_EXPORT bool check();
-
-  /// Execute the symmetry.
-  GEOMALGOAPI_EXPORT void build();
-
-private:
-  MethodType myMethodType; /// Type of method used.
-  std::shared_ptr<GeomAPI_Shape> mySourceShape; /// Shape to be moved.
-  std::shared_ptr<GeomAPI_Pnt> myPoint; /// Reflection point.
-  std::shared_ptr<GeomAPI_Ax1> myAxis; /// Reflection axis.
-  std::shared_ptr<GeomAPI_Ax2> myPlane; /// Reflection plane.
 };
 
 #endif // GEOMALGOAPI_SYMMETRY_H_

@@ -24,10 +24,8 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Symmetry.h>
-#include <GeomAlgoAPI_MakeShapeList.h>
-
 class GeomAPI_Trsf;
+class GeomAlgoAPI_MakeShapeList;
 
 /** \class FeaturesPlugin_Symmetry
  *  \ingroup Plugins
@@ -123,23 +121,23 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   FeaturesPlugin_Symmetry();
 
 private:
-  /// Obtain list of source objects of the mirror
-  bool collectSourceObjects(ListOfShape& theSourceShapes,
-                            std::list<std::shared_ptr<ModelAPI_Result>>& theSourceResults);
+  /// Calculate symmetry with respect to a point.
+  std::shared_ptr<GeomAPI_Trsf> symmetryByPoint();
 
-  /// Perform symmetry with respect to a point.
-  void performSymmetryByPoint();
+  /// Calculate symmetry with respect to an axis.
+  std::shared_ptr<GeomAPI_Trsf> symmetryByAxis();
 
-  /// Perform symmetry with respect to an axis.
-  void performSymmetryByAxis();
+  /// Calculate symmetry with respect to a plane.
+  std::shared_ptr<GeomAPI_Trsf> symmetryByPlane();
 
-  /// Perform symmetry with respect to a plane.
-  void performSymmetryByPlane();
+  /// Perform the transformation
+  void performSymmetry(std::shared_ptr<GeomAPI_Trsf> theTrsf);
 
   /// Create new result on given shapes and the index of result
-  void buildResult(std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
-                   std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                   int theResultIndex);
+  void buildResult(const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
+                   const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
+                   std::shared_ptr<GeomAPI_Shape> theTargetShape,
+                   int& theResultIndex);
 
   /// Create new result for the given part and transformation
   void buildResult(std::shared_ptr<ModelAPI_ResultPart> theOriginal,

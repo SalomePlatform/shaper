@@ -27,15 +27,21 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_Trsf.h>
 
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_Transform.h>
 
 #include <FeaturesPlugin_Tools.h>
+
+static const std::string TRANSLATION_VERSION_1("v9.5");
 
 //=================================================================================================
 FeaturesPlugin_Translation::FeaturesPlugin_Translation()
@@ -68,6 +74,11 @@ void FeaturesPlugin_Translation::initAttributes()
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Translation::END_POINT_ID(),
                        ModelAPI_AttributeSelection::typeId());
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(TRANSLATION_VERSION_1);
+  }
 }
 
 //=================================================================================================
@@ -76,41 +87,20 @@ void FeaturesPlugin_Translation::execute()
   AttributeStringPtr aMethodTypeAttr = string(FeaturesPlugin_Translation::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
 
-  if (aMethodType == CREATION_METHOD_BY_DISTANCE()) {
-    performTranslationByAxisAndDistance();
-  }
+  GeomTrsfPtr aTrsf;
+  if (aMethodType == CREATION_METHOD_BY_DISTANCE())
+    aTrsf = translationByAxisAndDistance();
+  else if (aMethodType == CREATION_METHOD_BY_DIMENSIONS())
+    aTrsf = translationByDimensions();
+  else if (aMethodType == CREATION_METHOD_BY_TWO_POINTS())
+    aTrsf = translationByTwoPoints();
 
-  if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) {
-    performTranslationByDimensions();
-  }
-
-  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS()) {
-    performTranslationByTwoPoints();
-  }
+  performTranslation(aTrsf);
 }
 
 //=================================================================================================
-void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
+GeomTrsfPtr FeaturesPlugin_Translation::translationByAxisAndDistance()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   //Getting axis.
   static const std::string aSelectionError = "Error: The axis shape selection is bad.";
   AttributeSelectionPtr anObjRef = selection(AXIS_OBJECT_ID());
@@ -122,7 +112,7 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
   }
   if (!aShape.get()) {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   GeomEdgePtr anEdge;
@@ -139,171 +129,36 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
   if (!anEdge.get())
   {
     setError(aSelectionError);
-    return;
+    return GeomTrsfPtr();
   }
 
   std::shared_ptr<GeomAPI_Ax1> anAxis(new GeomAPI_Ax1(anEdge->line()->location(),
                                                       anEdge->line()->direction()));
 
-
   // Getting distance.
   double aDistance = real(FeaturesPlugin_Translation::DISTANCE_ID())->value();
 
-  // Moving each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setTranslation(anAxis, aDistance);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
-        new GeomAlgoAPI_Translation(aBaseShape, anAxis, aDistance));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aShapes,
-                                               ListOfShape(),
-                                               aTranslationAlgo,
-                                               aTranslationAlgo->shape(),
-                                               "Translated");
-      setResult(aResultBody, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setTranslation(anAxis, aDistance);
+  return aTrsf;
 }
 
 //=================================================================================================
-void FeaturesPlugin_Translation::performTranslationByDimensions()
+GeomTrsfPtr FeaturesPlugin_Translation::translationByDimensions()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   // Getting dimensions in X, in Y and in Z
   double aDX = real(FeaturesPlugin_Translation::DX_ID())->value();
   double aDY = real(FeaturesPlugin_Translation::DY_ID())->value();
   double aDZ = real(FeaturesPlugin_Translation::DZ_ID())->value();
 
-  // Moving each object.
-  std::string anError;
-  int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
-
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setTranslation(aDX, aDY, aDZ);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
-        new GeomAlgoAPI_Translation(aBaseShape, aDX, aDY, aDZ));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aShapes,
-                                               ListOfShape(),
-                                               aTranslationAlgo,
-                                               aTranslationAlgo->shape(),
-                                               "Translated");
-      setResult(aResultBody, aResultIndex);
-    }
-    aResultIndex++;
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setTranslation(aDX, aDY, aDZ);
+  return aTrsf;
 }
 
 //=================================================================================================
-void FeaturesPlugin_Translation::performTranslationByTwoPoints()
+GeomTrsfPtr FeaturesPlugin_Translation::translationByTwoPoints()
 {
-  // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
-
   // Getting the start point and the end point
   AttributeSelectionPtr aRef1 = data()->selection(FeaturesPlugin_Translation::START_POINT_ID());
   AttributeSelectionPtr aRef2 = data()->selection(FeaturesPlugin_Translation::END_POINT_ID());
@@ -322,53 +177,68 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
     }
   }
 
-  // Moving each object.
+  GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
+  aTrsf->setTranslation(aFirstPoint, aSecondPoint);
+  return aTrsf;
+}
+
+//=================================================================================================
+void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
+{
+  if (!theTrsf) {
+    setError("Invalid transformation.");
+    return;
+  }
+
+  bool isKeepSubShapes = data()->version() == TRANSLATION_VERSION_1;
+
+  // Getting objects.
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
+  AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
+    return;
+
   std::string anError;
   int aResultIndex = 0;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-        anObjectsIt++, aContext++) {
+  // Moving each part.
+  for (std::list<ResultPtr>::iterator aPRes = aParts.begin(); aPRes != aParts.end(); ++aPRes) {
+    ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPRes);
+    ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+    aResultPart->setTrsf(anOrigin, theTrsf);
+    setResult(aResultPart, aResultIndex++);
+  }
+
+  // Collect transformations for each object in a part.
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+
+  for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+    anObjectsIt != anObjects.end(); anObjectsIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    std::shared_ptr<GeomAlgoAPI_Transform> aTransformAlgo(
+        new GeomAlgoAPI_Transform(aBaseShape, theTrsf));
 
-    // Setting result.
-    if (isPart) {
-      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
-      aTrsf->setTranslation(aFirstPoint, aSecondPoint);
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
-        new GeomAlgoAPI_Translation(aBaseShape, aFirstPoint, aSecondPoint));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        return;
-      }
-
-      aTranslationAlgo->build();
-
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
-
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aShapes,
-                                               ListOfShape(),
-                                               aTranslationAlgo,
-                                               aTranslationAlgo->shape(),
-                                               "Translated");
-      setResult(aResultBody, aResultIndex);
+    // Checking that the algorithm worked properly.
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTransformAlgo, getKind(), anError)) {
+      setError(anError);
+      break;
     }
-    aResultIndex++;
+
+    anObjects.markModified(aBaseShape, aTransformAlgo->shape());
+    aMakeShapeList->appendAlgo(aTransformAlgo);
+  }
+
+  // Build results of the operation.
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    //LoadNamingDS
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Translated");
+    setResult(aResultBody, aResultIndex++);
   }
 
   // Remove the rest results if there were produced in the previous pass.

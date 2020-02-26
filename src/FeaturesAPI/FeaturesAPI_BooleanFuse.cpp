@@ -35,13 +35,11 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
 FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const bool theRemoveEdges,
-  const int theVersion)
+  const bool theRemoveEdges)
   : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
     fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
-    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theRemoveEdges, myremoveEdges);
 
@@ -54,13 +52,11 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
   const std::list<ModelHighAPI_Selection>& theToolObjects,
-  const bool theRemoveEdges,
-  const int theVersion)
+  const bool theRemoveEdges)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
-    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
     fillAttribute(theRemoveEdges, myremoveEdges);
@@ -129,8 +125,6 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanFuse::TOOL_LIST_ID());
   AttributeBooleanPtr aRemoveEdges =
     aBase->boolean(FeaturesPlugin_BooleanFuse::REMOVE_INTERSECTION_EDGES_ID());
-  AttributeIntegerPtr aVersion =
-    aBase->integer(FeaturesPlugin_BooleanFuse::VERSION_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects;
 
@@ -142,40 +136,10 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", removeEdges = True";
   }
 
-  if (aVersion && aVersion->isInitialized() &&
-      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1) {
+  if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
-  }
 
   theDumper << ")" << std::endl;
-}
-
-//==================================================================================================
-static BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theObjects,
-                              const bool theRemoveEdges,
-                              const int theVersion)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFuse::ID());
-  return BooleanFusePtr(new FeaturesAPI_BooleanFuse(aFeature,
-                                                    theObjects,
-                                                    theRemoveEdges,
-                                                    theVersion));
-}
-
-//==================================================================================================
-static BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const std::list<ModelHighAPI_Selection>& theToolObjects,
-                              const bool theRemoveEdges,
-                              const int theVersion)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFuse::ID());
-  return BooleanFusePtr(new FeaturesAPI_BooleanFuse(aFeature,
-                                                    theMainObjects,
-                                                    theToolObjects,
-                                                    theRemoveEdges,
-                                                    theVersion));
 }
 
 //==================================================================================================
@@ -185,12 +149,20 @@ BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                        const bool theRemoveEdges,
                        const bool keepSubResults)
 {
-  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
-                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFuse::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+
   bool aRemoveEdges = theRemoveEdges;
   if (theToolObjects.first.empty())
     aRemoveEdges = aRemoveEdges || theToolObjects.second;
-  return theToolObjects.first.empty() ?
-      addFuse(thePart, theMainObjects, aRemoveEdges, aVersion) :
-      addFuse(thePart, theMainObjects, theToolObjects.first, aRemoveEdges, aVersion);
+
+  BooleanFusePtr aFuse;
+  if (theToolObjects.first.empty())
+    aFuse.reset(new FeaturesAPI_BooleanFuse(aFeature, theMainObjects, aRemoveEdges));
+  else {
+    aFuse.reset(new FeaturesAPI_BooleanFuse(aFeature, theMainObjects, theToolObjects.first,
+                                            aRemoveEdges));
+  }
+  return aFuse;
 }

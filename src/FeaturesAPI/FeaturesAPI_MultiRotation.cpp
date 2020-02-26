@@ -23,6 +23,7 @@
 
 #include <FeaturesAPI_MultiRotation.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
@@ -132,6 +133,9 @@ void FeaturesAPI_MultiRotation::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID());
   theDumper << ", " << anAttrNumberAngular;
 
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
   theDumper << ")" << std::endl;
 }
 
@@ -139,23 +143,31 @@ void FeaturesAPI_MultiRotation::dump(ModelHighAPI_Dumper& theDumper) const
 MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                                   const ModelHighAPI_Selection& theAxis,
-                                  const ModelHighAPI_Integer& theNumber)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    thePart->addFeature(FeaturesAPI_MultiRotation::ID());
-  return MultiRotationPtr(new FeaturesAPI_MultiRotation(aFeature, theMainObjects,
-                                                        theAxis, theNumber));
-}
-
-//==================================================================================================
-MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                  const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                  const ModelHighAPI_Selection& theAxis,
                                   const ModelHighAPI_Double& theStep,
-                                  const ModelHighAPI_Integer& theNumber)
+                                  const ModelHighAPI_Integer& theNumber,
+                                  const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesAPI_MultiRotation::ID());
-  return MultiRotationPtr(new FeaturesAPI_MultiRotation(aFeature, theMainObjects,
-                                                        theAxis, theStep, theNumber));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+
+  MultiRotationPtr aResult;
+  if (theNumber.string().empty()) {
+    // rotate for the whole circle
+    double aStepVal = theStep.value();
+    std::string aStepStr = theStep.string();
+    std::ostringstream aStepValAsStr;
+    aStepValAsStr << aStepVal;
+
+    ModelHighAPI_Integer aNumber = aStepStr == aStepValAsStr.str()
+                                 ? ModelHighAPI_Integer(aStepVal)
+                                 : ModelHighAPI_Integer(aStepStr);
+    aResult.reset(new FeaturesAPI_MultiRotation(aFeature, theMainObjects, theAxis, aNumber));
+  }
+  else {
+    aResult.reset(new FeaturesAPI_MultiRotation(aFeature, theMainObjects,
+                                                theAxis, theStep, theNumber));
+  }
+  return aResult;
 }

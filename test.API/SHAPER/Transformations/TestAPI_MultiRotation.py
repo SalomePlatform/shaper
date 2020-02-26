@@ -50,7 +50,7 @@ except myExcept as ec:
 try:
   MultiRotation_4 = shaperpy.makeMultiRotation(None, ax1, 45., 5)
 except myExcept as ec:
-  assert(ec.what() == "Rotation builder :: source shape is not valid.")
+  assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
   MultiRotation_5 = shaperpy.makeMultiRotation(Box_4, None, 45., 5)
@@ -67,7 +67,7 @@ except myExcept as ec:
 try:
   MultiRotation_8 = shaperpy.makeMultiRotation(None, ax1, 5)
 except myExcept as ec:
-  assert(ec.what() == "Rotation builder :: source shape is not valid.")
+  assert(ec.what() == "Transformation :: incorrect input data.")
 
 try:
   MultiRotation_9 = shaperpy.makeMultiRotation(Box_7, None, 5)

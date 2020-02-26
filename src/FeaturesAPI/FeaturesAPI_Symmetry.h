@@ -93,9 +93,10 @@ typedef std::shared_ptr<FeaturesAPI_Symmetry> SymmetryPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Symmetry feature.
 FEATURESAPI_EXPORT
-SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
-                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const ModelHighAPI_Selection& theObject,
-                        bool theKeepOriginal = true);
+SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& part,
+                        const std::list<ModelHighAPI_Selection>& objects,
+                        const ModelHighAPI_Selection& basis,
+                        const bool keepOriginal = true,
+                        const bool keepSubResults = false);
 
 #endif // FEATURESAPI_SYMMETRY_H_

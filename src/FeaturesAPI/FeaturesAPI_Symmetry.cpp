@@ -118,16 +118,24 @@ void FeaturesAPI_Symmetry::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrPlane;
   }
 
-  theDumper << ", " << keepOriginal() << ")" << std::endl;
+  theDumper << ", keepOriginal = " << keepOriginal();
+
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theObject,
-                        bool theKeepOriginal)
+                        const bool theKeepOriginal,
+                        const bool theKeepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Symmetry::ID());
+  if (!theKeepSubResults)
+    aFeature->data()->setVersion("");
   return SymmetryPtr(new FeaturesAPI_Symmetry(
       aFeature, theMainObjects, theObject, theKeepOriginal));
 }

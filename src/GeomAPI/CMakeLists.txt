@@ -70,6 +70,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Torus.h
     GeomAPI_Box.h
     GeomAPI_WireExplorer.h
+    GeomAPI_ShapeHierarchy.h
 )
 
 SET(PROJECT_SOURCES
@@ -118,6 +119,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Torus.cpp
     GeomAPI_Box.cpp
     GeomAPI_WireExplorer.cpp
+    GeomAPI_ShapeHierarchy.cpp
 )
 
 SET(PROJECT_LIBRARIES

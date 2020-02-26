@@ -21,23 +21,17 @@
 #define GeomAlgoAPI_Rotation_H_
 
 #include <GeomAlgoAPI.h>
-#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_Transform.h>
 
-#include <GeomAPI_Ax1.h>
-#include <GeomAPI_Shape.h>
+class GeomAPI_Ax1;
+class GeomAPI_Pnt;
 
 /// \class GeomAlgoAPI_Rotation
 /// \ingroup DataAlgo
 /// \brief Creates a copy of the object by rotating it around the axis.
-class GeomAlgoAPI_Rotation : public GeomAlgoAPI_MakeShape
+class GeomAlgoAPI_Rotation : public GeomAlgoAPI_Transform
 {
 public:
-  /// Type of rotation operation
-  enum MethodType {
-    BY_ANGLE, ///< Rotation by axis and an angle
-    BY_POINTS ///< Rotation by a center and two points
-  };
-
   /// \brief Creates an object which is obtained from current object by rotating it around the axis
   ///        with the angle.
   /// \param[in] theSourceShape  a shape to be rotated.
@@ -57,21 +51,6 @@ public:
                                           std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
                                           std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
                                           std::shared_ptr<GeomAPI_Pnt>   theEndPoint);
-
-  /// Checks if data for the translation execution is OK.
-  GEOMALGOAPI_EXPORT bool check();
-
-  /// Execute the translation.
-  GEOMALGOAPI_EXPORT void build();
-
-private:
-  MethodType myMethodType; /// Type of method used.
-  std::shared_ptr<GeomAPI_Shape> mySourceShape; /// Shape to be rotated.
-  std::shared_ptr<GeomAPI_Ax1> myAxis; /// Rotation axis.
-  double myAngle; /// Rotation angle.
-  std::shared_ptr<GeomAPI_Pnt> myCenterPoint; /// Rotation center point.
-  std::shared_ptr<GeomAPI_Pnt> myStartPoint; /// Rotation start point.
-  std::shared_ptr<GeomAPI_Pnt> myEndPoint; /// Rotation end point.
 };
 
 #endif

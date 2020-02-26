@@ -24,13 +24,13 @@
 
 #include <FeaturesPlugin_MultiTranslation.h>
 
+#include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Selection.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Dumper;
-class ModelHighAPI_Integer;
-class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_MultiTranslation
 /// \ingroup CPPHighAPI
@@ -116,23 +116,15 @@ typedef std::shared_ptr<FeaturesAPI_MultiTranslation> MultiTranslationPtr;
 
 /// \ingroup CPPHighAPI
 /// \brief Create MultiTranslation feature.
-FEATURESAPI_EXPORT
-MultiTranslationPtr addMultiTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                        const ModelHighAPI_Selection& theAxisObject,
-                                        const ModelHighAPI_Double& theStep,
-                                        const ModelHighAPI_Integer& theNumber);
-
-/// \ingroup CPPHighAPI
-/// \brief Create MultiTranslation feature.
-FEATURESAPI_EXPORT
-MultiTranslationPtr addMultiTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                        const ModelHighAPI_Selection& theFirstAxisObject,
-                                        const ModelHighAPI_Double& theFirstStep,
-                                        const ModelHighAPI_Integer& theFirstNumber,
-                                        const ModelHighAPI_Selection& theSecondAxisObject,
-                                        const ModelHighAPI_Double& theSecondStep,
-                                        const ModelHighAPI_Integer& theSecondNumber);
+FEATURESAPI_EXPORT MultiTranslationPtr addMultiTranslation(
+    const std::shared_ptr<ModelAPI_Document>& thePart,
+    const std::list<ModelHighAPI_Selection>& theMainObjects,
+    const ModelHighAPI_Selection& theFirstAxisObject,
+    const ModelHighAPI_Double& theFirstStep,
+    const ModelHighAPI_Integer& theFirstNumber,
+    const ModelHighAPI_Selection& theSecondAxisObject = ModelHighAPI_Selection(),
+    const ModelHighAPI_Double& theSecondStep = ModelHighAPI_Double(),
+    const ModelHighAPI_Integer& theSecondNumber = ModelHighAPI_Integer(),
+    const bool keepSubResults = false);
 
 #endif // FEATURESAPI_MULTITRANSLATION_H_

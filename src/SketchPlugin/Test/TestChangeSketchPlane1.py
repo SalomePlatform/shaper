@@ -61,7 +61,7 @@ model.testNbSubShapes(ExtrusionFuse_1, GeomAPI_Shape.EDGE, [30])
 model.testNbSubShapes(ExtrusionFuse_1, GeomAPI_Shape.VERTEX, [60])
 model.testResultsVolumes(ExtrusionFuse_1, [1028.2743338823])
 
-checkMiddlePoint(ExtrusionFuse_1, 4.96954097, 4.7867868, 5.0160782)
+checkMiddlePoint(ExtrusionFuse_1, 4.972503122, 4.84876717, 5.0145146)
 
 # change plane and check error
 model.begin()
@@ -85,7 +85,7 @@ model.testNbSubShapes(ExtrusionFuse_1, GeomAPI_Shape.EDGE, [30])
 model.testNbSubShapes(ExtrusionFuse_1, GeomAPI_Shape.VERTEX, [60])
 model.testResultsVolumes(ExtrusionFuse_1, [1028.2743338823])
 
-checkMiddlePoint(ExtrusionFuse_1, 4.96954097, 5.2132132, 5.0160782)
+checkMiddlePoint(ExtrusionFuse_1, 4.972503122, 5.15123283, 5.0145146)
 
 # change plane removing features related to external objects
 model.begin()

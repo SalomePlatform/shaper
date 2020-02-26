@@ -44,16 +44,14 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                          const bool theRemoveEdges = false,
-                          const int theVersion = 0);
+                          const bool theRemoveEdges = false);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
                           const std::list<ModelHighAPI_Selection>& theToolObjects,
-                          const bool theRemoveEdges = false,
-                          const int theVersion = 0);
+                          const bool theRemoveEdges = false);
 
   /// Destructor.
   FEATURESAPI_EXPORT

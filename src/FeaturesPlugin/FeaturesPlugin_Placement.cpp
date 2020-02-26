@@ -26,16 +26,22 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_BodyBuilder.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_ShapeIterator.h>
+
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Placement.h>
 #include <GeomAlgoAPI_Transform.h>
 #include <GeomAlgoAPI_Tools.h>
 
 #include <FeaturesPlugin_Tools.h>
+
+static const std::string PLACEMENT_VERSION_1("v9.5");
 
 FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 {
@@ -43,7 +49,6 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 
 void FeaturesPlugin_Placement::initAttributes()
 {
-
   AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
@@ -52,27 +57,24 @@ void FeaturesPlugin_Placement::initAttributes()
   data()->addAttribute(END_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(CENTERING_ID(), ModelAPI_AttributeBoolean::typeId());
+
+  if (!aSelection->isInitialized()) {
+    // new feature, not read from file
+    data()->setVersion(PLACEMENT_VERSION_1);
+  }
 }
 
 void FeaturesPlugin_Placement::execute()
 {
+  bool isKeepSubShapes = data()->version() == PLACEMENT_VERSION_1;
+
   // Getting objects.
-  ListOfShape anObjects;
-  std::list<ResultPtr> aContextes;
+  GeomAPI_ShapeHierarchy anObjects;
+  std::list<ResultPtr> aParts;
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
-  if(anObjectsSelList->size() == 0) {
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   // Verify the start shape
   AttributeSelectionPtr anObjRef = selection(START_SHAPE_ID());
@@ -140,40 +142,45 @@ void FeaturesPlugin_Placement::execute()
   }
   std::shared_ptr<GeomAPI_Trsf> aTrsf = aPlacementAlgo.transformation();
 
-  // Applying transformation to each object.
   int aResultIndex = 0;
   std::string anError;
-  std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
-      anObjectsIt++, aContext++) {
+  for (std::list<ResultPtr>::iterator aPRes = aParts.begin(); aPRes != aParts.end(); ++aPRes) {
+    // Applying transformation to each part.
+    ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPRes);
+    ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+    aResultPart->setTrsf(aContextRes, aTrsf);
+    setResult(aResultPart, aResultIndex++);
+  }
 
-    // for part results just set transformation
-    if (aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group()) {
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(aContextRes, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
-      std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-      std::shared_ptr<GeomAlgoAPI_Transform> aTransformAlgo(new GeomAlgoAPI_Transform(aBaseShape,
-                                                                                      aTrsf));
+  // Collect transformations for each object.
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
 
-      // Checking that the algorithm worked properly.
-      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTransformAlgo, getKind(), anError)) {
-        setError(anError);
-        break;
-      }
+  for(GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
+      anObjectsIt != anObjects.end(); anObjectsIt++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    std::shared_ptr<GeomAlgoAPI_Transform> aTransformAlgo(
+        new GeomAlgoAPI_Transform(aBaseShape, aTrsf));
 
-      //LoadNamingDS
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-      ListOfShape aShapes;
-      aShapes.push_back(aBaseShape);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aShapes, ListOfShape(),
-                                               aTransformAlgo, aTransformAlgo->shape(), "Placed");
-      setResult(aResultBody, aResultIndex);
+    // Checking that the algorithm worked properly.
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTransformAlgo, getKind(), anError)) {
+      setError(anError);
+      break;
     }
-    aResultIndex++;
+
+    anObjects.markModified(aBaseShape, aTransformAlgo->shape());
+    aMakeShapeList->appendAlgo(aTransformAlgo);
+  }
+
+  // Build results of the operation.
+  const ListOfShape& anOriginalShapes = anObjects.objects();
+  ListOfShape aTopLevel;
+  anObjects.topLevelObjects(aTopLevel);
+  for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
+    //LoadNamingDS
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                             aMakeShapeList, *anIt, "Placed");
+    setResult(aResultBody, aResultIndex++);
   }
 
   // Remove the rest results if there were produced in the previous pass.
