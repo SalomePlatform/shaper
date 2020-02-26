@@ -86,6 +86,7 @@ cd /d %ROOT_DIR%
 
 @SET _NO_DEBUG_HEAP=1
 
+@SET VC_VERSION_SHORT=15
 for /f "tokens=1,2*" %%a in ('reg query "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "%VC_VERSION_SHORT%.0" 2^>nul') do set "VSPATH=%%c"
 IF NOT EXIST "%VSPATH%\VC\Auxiliary\Build\vcvarsall.bat" GOTO ERROR1
 
