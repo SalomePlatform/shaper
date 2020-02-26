@@ -365,7 +365,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHOW_ONLY_CMD")->setEnabled(true);
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
-        action("SHOW_ISOLINES_CMD")->setEnabled(false);
+        action("SHOW_ISOLINES_CMD")->setEnabled(true);
         action("ISOLINES_CMD")->setEnabled(true);
       }
       if (hasFeature && myWorkshop->canMoveFeature()) {
