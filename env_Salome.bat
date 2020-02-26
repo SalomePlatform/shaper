@@ -86,19 +86,17 @@ cd /d %ROOT_DIR%
 
 @SET _NO_DEBUG_HEAP=1
 
-if "%VS150COMNTOOLS%" == "" (
-    echo Could not find MS Visual Studio: variable VS150COMNTOOLS is not defined!
-    exit 1
-) else if exist "%VS150COMNTOOLS%\..\IDE\devenv.exe" (
-    set MSVC_EXE="%VS150COMNTOOLS%\..\IDE\devenv.exe"
-) else if exist "%VS150COMNTOOLS%\..\IDE\VCExpress.exe" (
-    set MSVC_EXE="%VS150COMNTOOLS%\..\IDE\VCExpress.exe"
+for /f "tokens=1,2*" %%a in ('reg query "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "%VC_VERSION_SHORT%.0" 2^>nul') do set "VSPATH=%%c"
+IF NOT EXIST "%VSPATH%\VC\Auxiliary\Build\vcvarsall.bat" GOTO ERROR1
+
+if exist "%VSPATH%\Common7\IDE\devenv.exe"  (
+  SET msvc_exe=devenv
+) else if exist "%VSPATH%\Common7\IDE\VCExpress.exe"  (
+  SET msvc_exe=VCExpress
 ) else (
-    echo "Could not find MS Visual Studio in %VS150COMNTOOLS%\..\IDE"
-    echo Check environment variable VS150COMNTOOLS!
-    exit 1
+  GOTO ERROR1
 )
-call "%VS150COMNTOOLS%..\Tools\vsvars32.bat"
+call "%VSPATH%\VC\Auxiliary\Build\vcvarsall.bat" x64 > NUL
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET PATH=%SHAPER_ROOT_DIR%\lib\salome;%PATH%
@@ -106,3 +104,10 @@ REM @SET PYTHONPATH=%SHAPER_ROOT_DIR%\lib\python2.7\site-packages\salome\salome;
 REM @SET PYTHONPATH=%SHAPER_ROOT_DIR%\bin\salome;%PYTHONPATH%
 
 @SET LightAppConfig=%SHAPER_ROOT_DIR%\share\salome\resources\shaper;%GUI_ROOT_DIR%\share\salome\resources\gui
+
+goto END
+
+:ERROR1
+ECHO "Visual Studio environment file is not found."
+
+:END
