@@ -15,6 +15,6 @@ mkdir %ROOT_DIR%\build
 cd %ROOT_DIR%\build
 
 REM Add -DADD_MODELS_TESTS=TRUE to enable test models
-cmake %SRC_DIR% -G "Visual Studio 14 Win64" -DPYTHON_EXECUTABLE=%PYTHONHOME%\python_d.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_DIR%\install
+cmake %SRC_DIR% -G "Visual Studio 15 Win64" -DPYTHON_EXECUTABLE=%PYTHONHOME%\python_d.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_DIR%\install
 
 start "" %MSVC_EXE% SHAPER.sln

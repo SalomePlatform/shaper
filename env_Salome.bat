@@ -16,11 +16,6 @@ if "%SALOME_ROOT_DIR%" == "" (
   set SALOME_ROOT_DIR=%ROOT_DIR%\SALOME
 )
 
-if "%SOLVESPACE_ROOT_DIR%" == "" (
-  SET SOLVESPACE_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\solvespace-2.1
-)
-SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
-
 if "%PLANEGCS_ROOT_DIR%" == "" (
   SET PLANEGCS_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\planegcs-0.18
 )
@@ -41,7 +36,7 @@ if "%BOOST_ROOT_DIR%" == "" (
 cd /d %SALOME_ROOT_DIR%\WORK
 call set_env.bat %1
 
-if %2 == run (
+if "%2" == run (
   call "%PDIR%\env_launch.bat"
 ) else (
   call "%PDIR%\env_compile.bat"
@@ -91,19 +86,19 @@ cd /d %ROOT_DIR%
 
 @SET _NO_DEBUG_HEAP=1
 
-if "%VS140COMNTOOLS%" == "" (
-    echo Could not find MS Visual Studio: variable VS140COMNTOOLS is not defined!
+if "%VS150COMNTOOLS%" == "" (
+    echo Could not find MS Visual Studio: variable VS150COMNTOOLS is not defined!
     exit 1
-) else if exist "%VS140COMNTOOLS%\..\IDE\devenv.exe" (
-    set MSVC_EXE="%VS140COMNTOOLS%\..\IDE\devenv.exe"
-) else if exist "%VS140COMNTOOLS%\..\IDE\VCExpress.exe" (
-    set MSVC_EXE="%VS140COMNTOOLS%\..\IDE\VCExpress.exe"
+) else if exist "%VS150COMNTOOLS%\..\IDE\devenv.exe" (
+    set MSVC_EXE="%VS150COMNTOOLS%\..\IDE\devenv.exe"
+) else if exist "%VS150COMNTOOLS%\..\IDE\VCExpress.exe" (
+    set MSVC_EXE="%VS150COMNTOOLS%\..\IDE\VCExpress.exe"
 ) else (
-    echo "Could not find MS Visual Studio in %VS140COMNTOOLS%\..\IDE"
-    echo Check environment variable VS140COMNTOOLS!
+    echo "Could not find MS Visual Studio in %VS150COMNTOOLS%\..\IDE"
+    echo Check environment variable VS150COMNTOOLS!
     exit 1
 )
-call "%VS140COMNTOOLS%..\Tools\vsvars32.bat"
+call "%VS150COMNTOOLS%..\Tools\vsvars32.bat"
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET PATH=%SHAPER_ROOT_DIR%\lib\salome;%PATH%
