@@ -3194,10 +3194,18 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
   if (theObjects.isEmpty())
     return;
 
+  QList<ResultPtr> aResultList;
+  ResultPtr aRes;
+  foreach(ObjectPtr aObj, theObjects) {
+    aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aRes.get())
+      aResultList.append(aRes);
+  }
+
   std::vector<int> aValues;
   bool isVisible;
-  if (theObjects.size() == 1) {
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObjects.first());
+  if (aResultList.size() == 1) {
+    ResultPtr aRes = aResultList.first();
     if (aRes.get())
       ModelAPI_Tools::getIsoLines(aRes, isVisible, aValues);
     else
@@ -3236,12 +3244,8 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
 
     aValues[0] = aUNb->value();
     aValues[1] = aVNb->value();
-    ResultPtr aRes;
-    foreach(ObjectPtr aObj, theObjects) {
-      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      if (aRes.get()) {
-        ModelAPI_Tools::setIsoLines(aRes, aValues);
-      }
+    foreach(ResultPtr aRes, aResultList) {
+      ModelAPI_Tools::setIsoLines(aRes, aValues);
     }
     mySelector->clearSelection();
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
