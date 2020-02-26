@@ -18,6 +18,7 @@
 //
 
 #include "GeomAlgoAPI_Chamfer.h"
+#include "GeomAlgoAPI_DFLoader.h"
 
 #include <BRep_Tool.hxx>
 #include <BRepFilletAPI_MakeChamfer.hxx>
@@ -87,7 +88,7 @@ void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
   aChamferBuilder->Build();
   if (!aChamferBuilder->IsDone())
     return;
-  const TopoDS_Shape& aResult = aChamferBuilder->Shape();
+  TopoDS_Shape aResult = GeomAlgoAPI_DFLoader::refineResult(aChamferBuilder->Shape());
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));

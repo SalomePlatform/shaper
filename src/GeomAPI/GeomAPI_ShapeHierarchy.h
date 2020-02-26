@@ -60,6 +60,9 @@ public:
   /// Return parent shape for the given, or empty if it is a high-level shape.
   /// By default, the parent and all its subshapes are marked as processed for further skip.
   GEOMAPI_EXPORT GeomShapePtr parent(const GeomShapePtr& theShape, bool theMarkProcessed = true);
+  /// Get root shape for the specified sub-shape.
+  /// By default, the parent and all its subshapes are marked as processed for further skip.
+  GEOMAPI_EXPORT GeomShapePtr root(const GeomShapePtr& theShape, bool theMarkProcessed = true);
 
   /// Mark the shape as already processed
   GEOMAPI_EXPORT void markProcessed(const GeomShapePtr& theShape);
@@ -85,6 +88,8 @@ public:
 
   /// Return list of objects
   const ListOfShape& objects() const { return myObjects; }
+  /// Return list of low-level objects for the parent shape
+  GEOMAPI_EXPORT const ListOfShape& objects(GeomShapePtr theParent) const;
   /// Separate objects of the given range of types and all other objects
   GEOMAPI_EXPORT void objectsByType(ListOfShape& theShapesByType, ListOfShape& theOtherShapes,
       const GeomAPI_Shape::ShapeType theMinType = GeomAPI_Shape::COMPOUND,

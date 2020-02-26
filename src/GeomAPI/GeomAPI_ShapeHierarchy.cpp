@@ -60,6 +60,19 @@ GeomShapePtr GeomAPI_ShapeHierarchy::parent(const GeomShapePtr& theShape,
   return aParent;
 }
 
+GeomShapePtr GeomAPI_ShapeHierarchy::root(const GeomShapePtr& theShape,
+                                          bool theMarkProcessed)
+{
+  GeomShapePtr aParent = parent(theShape, theMarkProcessed);
+  GeomShapePtr aRoot = aParent;
+  while (aParent) {
+    aParent = parent(aRoot, theMarkProcessed);
+    if (aParent)
+      aRoot = aParent;
+  }
+  return aRoot;
+}
+
 void GeomAPI_ShapeHierarchy::markProcessed(const GeomShapePtr& theShape)
 {
   myProcessedObjects.insert(theShape);
@@ -82,6 +95,17 @@ void GeomAPI_ShapeHierarchy::markModified(const GeomShapePtr& theSource,
                                           const GeomShapePtr& theModified)
 {
   myModifiedObjects[theSource] = theModified;
+}
+
+const ListOfShape& GeomAPI_ShapeHierarchy::objects(GeomShapePtr theParent) const
+{
+  MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(theParent);
+  if (aFoundIndex == myParentIndices.end()) {
+    static const ListOfShape THE_DUMMY = ListOfShape();
+    return THE_DUMMY; // no such shape
+  }
+
+  return mySubshapes[aFoundIndex->second].second;
 }
 
 void GeomAPI_ShapeHierarchy::objectsByType(
@@ -146,17 +170,16 @@ void GeomAPI_ShapeHierarchy::topLevelObjects(ListOfShape& theDestination) const
   iterator anIt = aThis->begin(), aEnd = aThis->end();
   for (; anIt != aEnd; ++anIt) {
     GeomShapePtr aShape = *anIt;
-    GeomShapePtr aParent = aThis->parent(aShape);
-    GeomShapePtr aRoot = aParent;
-    while (aParent) {
-      aParent = aThis->parent(aRoot);
-      if (aParent)
-        aRoot = aParent;
-    }
-
+    GeomShapePtr aRoot = aThis->root(aShape);
     if (aRoot) {
-      // compose a compund with the modified shapes
-      aShape = collectSubs(aRoot, SetOfShape(), myModifiedObjects);
+      // check the current shape was modified
+      MapShapeToShape::const_iterator aFound = myModifiedObjects.find(aRoot);
+      if (aFound != myModifiedObjects.end())
+        aShape = aFound->second;
+      else {
+        // compose a compund with the modified shapes
+        aShape = collectSubs(aRoot, SetOfShape(), myModifiedObjects);
+      }
     }
     else {
       // check the current shape was modified

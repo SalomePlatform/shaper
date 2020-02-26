@@ -107,6 +107,9 @@ void FeaturesAPI_Chamfer::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", False, " << anAttrD << ", " << anAttrAngle;
   }
 
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
   theDumper << ")" << std::endl;
 }
 
@@ -123,9 +126,12 @@ ChamferPtr addChamfer(const std::shared_ptr<ModelAPI_Document>& thePart,
                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
                       const bool performDistances,
                       const ModelHighAPI_Double& theVal1,
-                      const ModelHighAPI_Double& theVal2)
+                      const ModelHighAPI_Double& theVal2,
+                      const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Chamfer::ID());
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
   return ChamferPtr(new FeaturesAPI_Chamfer(aFeature, theBaseObjects, performDistances,
                                             theVal1, theVal2));
 }

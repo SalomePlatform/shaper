@@ -17,7 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "GeomAlgoAPI_Fillet.h"
+#include <GeomAlgoAPI_Fillet.h>
+#include <GeomAlgoAPI_DFLoader.h>
 
 #include <BRepFilletAPI_MakeFillet.hxx>
 
@@ -76,7 +77,7 @@ void GeomAlgoAPI_Fillet::build(const GeomShapePtr& theBaseSolid,
   aFilletBuilder->Build();
   if (!aFilletBuilder->IsDone())
     return;
-  const TopoDS_Shape& aResult = aFilletBuilder->Shape();
+  TopoDS_Shape aResult = GeomAlgoAPI_DFLoader::refineResult(aFilletBuilder->Shape());
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));

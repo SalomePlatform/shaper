@@ -112,6 +112,9 @@ void FeaturesAPI_Fillet::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrRadius1 << ", " << anAttrRadius2;
   }
 
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
   theDumper << ")" << std::endl;
 }
 
@@ -126,17 +129,18 @@ void FeaturesAPI_Fillet::execIfBaseNotEmpty()
 
 FilletPtr addFillet(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                    const ModelHighAPI_Double& theRadius)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Fillet::ID());
-  return FilletPtr(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius));
-}
-
-FilletPtr addFillet(const std::shared_ptr<ModelAPI_Document>& thePart,
-                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
                     const ModelHighAPI_Double& theRadius1,
-                    const ModelHighAPI_Double& theRadius2)
+                    const ModelHighAPI_Double& theRadius2,
+                    const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Fillet::ID());
-  return FilletPtr(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius1, theRadius2));
+  if (!keepSubResults)
+    aFeature->data()->setVersion("");
+
+  FilletPtr aFillet;
+  if (theRadius2.value() < 0.0)
+    aFillet.reset(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius1));
+  else
+    aFillet.reset(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius1, theRadius2));
+  return aFillet;
 }

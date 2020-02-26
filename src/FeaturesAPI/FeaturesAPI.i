@@ -38,8 +38,10 @@
 %include "std_shared_ptr.i"
 
 // functions with named parameters
+%feature("kwargs") addChamfer;
 %feature("kwargs") addCommon;
 %feature("kwargs") addCut;
+%feature("kwargs") addFillet;
 %feature("kwargs") addFuse;
 %feature("kwargs") addIntersection;
 %feature("kwargs") addMultiRotation;

@@ -102,6 +102,7 @@ ChamferPtr addChamfer(const std::shared_ptr<ModelAPI_Document>& thePart,
                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
                       const bool performDistances,
                       const ModelHighAPI_Double& theVal1,
-                      const ModelHighAPI_Double& theVal2);
+                      const ModelHighAPI_Double& theVal2,
+                      const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Chamfer_H_
