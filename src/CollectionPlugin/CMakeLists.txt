@@ -163,6 +163,7 @@ ADD_UNIT_TESTS(
                TestGroupMoveAndSplit1.py
                TestGroupMoveAndSplit2.py
                TestGroupMoveAndSplit3.py
+               TestGroupMoveAndSplit4.py
                Test3114.py
                Test18739.py
 )

@@ -64,6 +64,19 @@ static std::string findName(
 
 }
 
+static int getDepth(AttributeSelectionPtr& theAttr) {
+  if (theAttr->contextFeature().get())
+    return 0;
+  ResultBodyPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theAttr->context());
+  if (aRes.get()) {
+    int aDepth = 0;
+    for(aRes = ModelAPI_Tools::bodyOwner(aRes); aRes.get(); aRes = ModelAPI_Tools::bodyOwner(aRes))
+      aDepth++;
+    return aDepth;
+  }
+  return 0;
+}
+
 bool CollectionPlugin_Group::customAction(const std::string& theActionId)
 {
   if (theActionId == "split") {
@@ -87,13 +100,61 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
         }
       }
     }
-
+    // searching for the depth on the results, minimal for all contextes:
+    // groups will be collected at this depth; the root is 0
+    int aMinDepth = -1;
+    std::map<ObjectPtr, int> aStoredDepth;
     AttributeSelectionListPtr aList = selectionList(LIST_ID());
+    for (int a = aList->size() - 1; a >= 0; a--) {
+      AttributeSelectionPtr anAttr = aList->value(a);
+      if (!anAttr->isInvalid() && anAttr->contextObject().get()) {
+        int aDepth = getDepth(anAttr);
+        aStoredDepth[anAttr->contextObject()] = aDepth;
+        if (aMinDepth == -1 || aDepth < aMinDepth)
+          aMinDepth = aDepth;
+      }
+    }
+    // get common fathers at the minimal depth and set index of group to them
+    std::map<ObjectPtr, ObjectPtr> aFathers;
+    std::map<ObjectPtr, int> aFatherGroup;
+    bool aSplitAnyway = false;
+    for(int aCurrentDepth = 0; aCurrentDepth <= aMinDepth; aCurrentDepth++) {
+      aFathers.clear();
+      aFatherGroup.clear();
+      for (int a = aList->size() - 1; a >= 0; a--) {
+        // start from zero (this group index), then from the end - as in the next iteration
+        AttributeSelectionPtr anAttr = aList->value(a);
+        if (!anAttr->isInvalid() && anAttr->contextObject().get()) {
+          ObjectPtr anObj = anAttr->contextObject();
+          int aDepth = aStoredDepth[anObj];
+          if (!aSplitAnyway && aDepth > aCurrentDepth) {
+            ResultBodyPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObj);
+            while (aDepth > aCurrentDepth) {
+              aRes = ModelAPI_Tools::bodyOwner(aRes);
+              aDepth--;
+            }
+            anObj = aRes;
+          }
+          aFathers[anAttr->contextObject()] = anObj;
+          if (aFatherGroup.find(anObj) == aFatherGroup.end()) {
+            int aSize = aFatherGroup.size();
+            aFatherGroup[anObj] = aSize; // the first is zero
+          }
+        }
+      }
+      if (aFatherGroup.size() < aList->size() && aFatherGroup.size() != 1)  // already good
+        break;
+      if (aFatherGroup.size() == aList->size()) // no sence to iterate further
+        break;
+      if (aFatherGroup.size() == 1 && aList->size() > 1 && aCurrentDepth == aMinDepth)
+        aSplitAnyway = true;  // split anyway, better that just move
+    }
+
     std::set<int> aRemoved;
     bool aStay = false; // to indicate that the good attribute found stays in the list
     int anIndex = 1; // index of the name assigned to group-feature and result
     // added in the order: 3 2 1 orig=0, so, keep the results to give names later
-    std::list<ObjectPtr> aResults;
+    std::list<FeaturePtr> aResults;
     for(int aNext = aList->size() - 1; aNext >= 0; aNext--) {
       AttributeSelectionPtr anOldAttr = aList->value(aNext);
       if (anOldAttr->isInvalid() || !anOldAttr->contextObject().get()) {// remove invalids
@@ -104,22 +165,35 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
         aStay = true;
         continue;
       }
+      int aFGroup = aFatherGroup[aFathers[anOldAttr->contextObject()]];
+      if (!aSplitAnyway && aFGroup == 0) // to stay in this first group
+        continue;
+
       aRemoved.insert(aNext);
-      FeaturePtr aNew = aDoc->addFeature(ID(), false);
+      FeaturePtr aNew;
+      if (aSplitAnyway || aFGroup > aResults.size()) {
+        aNew = aDoc->addFeature(ID(), false);
+        aResults.push_front(aNew); // to keep the order
+      } else { // appending in already created new result
+        std::list<FeaturePtr>::reverse_iterator aResIter = aResults.rbegin();
+        for (; aFGroup > 1; aResIter++)
+          aFGroup--;
+        aNew = *aResIter;
+      }
+
       AttributeSelectionListPtr aNewList = aNew->selectionList(LIST_ID());
       aNewList->setSelectionType(aList->selectionType());
       aNewList->append(anOldAttr->contextObject(), anOldAttr->value());
-      aNew->execute();
-      aResults.push_front(aNew); // to keep the order
     }
-    aResults.push_back(data()->owner());
+    aResults.push_back(std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner()));
     // remove all selections except the first
     aList->remove(aRemoved);
     // set names
     if (aResults.size() > 1) { // rename if there are new groups appeared only
-      std::list<ObjectPtr>::iterator aResIter = aResults.begin();
+      std::list<FeaturePtr>::iterator aResIter = aResults.begin();
       for(int aSuffix = 1; aResIter != aResults.end(); aResIter++) {
         FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(*aResIter);
+        aFeat->execute();
         aFeat->data()->setName(findName(name(), aSuffix, aFeatNames));
         if (!aFeat->results().empty() && !results().empty()) {
           int aResSuf = aSuffix - 1;
