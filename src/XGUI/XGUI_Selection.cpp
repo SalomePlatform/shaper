@@ -24,7 +24,7 @@
 #include "XGUI_ObjectsBrowser.h"
 
 #ifndef HAVE_SALOME
-#include <AIS_ViewCube.h>
+#include <AIS_ViewCube.hxx>
 #endif
 
 #include "ModuleBase_BRepOwner.h"
