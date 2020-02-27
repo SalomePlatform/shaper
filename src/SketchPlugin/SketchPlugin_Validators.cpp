@@ -20,6 +20,8 @@
 #include "SketchPlugin_Validators.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_BSpline.h"
+#include "SketchPlugin_BSplinePeriodic.h"
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintDistance.h"
@@ -73,6 +75,13 @@
 #include <cmath>
 
 const double tolerance = 1.e-7;
+
+static bool isSpline(FeaturePtr theFeature)
+{
+  return theFeature && (theFeature->getKind() == SketchPlugin_BSpline::ID() ||
+                        theFeature->getKind() == SketchPlugin_BSplinePeriodic::ID());
+}
+
 
 bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
@@ -171,6 +180,10 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
       theError = "Two segments cannot be tangent";
       return false;
     }
+    else if (isSpline(aRefFea) && isSpline(aOtherFea)) {
+      theError = "Two B-splines cannot be tangent";
+      return false;
+    }
     return true;
   }
   else {
@@ -207,13 +220,15 @@ bool SketchPlugin_PerpendicularAttrValidator::isValid(const AttributePtr& theAtt
     AttributeRefAttrPtr aOtherAttr = anOwner->refattr(aParamA);
     ObjectPtr aOtherObject = aOtherAttr->object();
     FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
-    if (!aOtherFea)
-      return true;
 
     // at least one feature should be a line
     if (aRefFea->getKind() != SketchPlugin_Line::ID() &&
-        aOtherFea->getKind() != SketchPlugin_Line::ID()) {
+        aOtherFea && aOtherFea->getKind() != SketchPlugin_Line::ID()) {
       theError = "At least one feature should be a line";
+      return false;
+    }
+    else if (isSpline(aRefFea) || isSpline(aOtherFea)) {
+      theError = "B-spline is not supported";
       return false;
     }
   }
@@ -294,17 +309,9 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
   std::string aType[2];
   std::list<std::string> anArguments;
   for (int i = 0; i < 2; i++) {
-    ObjectPtr anObject = aRefAttr[i]->object();
-    if (!anObject.get()) {
-      theError = "An empty object is used.";
-      return false;
-    }
-
-    aFeature = ModelAPI_Feature::feature(anObject);
-    if (!aFeature.get()) {
-      theError = "An empty feature is used.";
-      return false;
-    }
+    aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
+    if (!aFeature.get())
+      return true;
 
     aType[i] = aFeature->getKind();
     if (aFeature->getKind() != SketchPlugin_Line::ID() &&

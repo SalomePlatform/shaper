@@ -2099,6 +2099,10 @@
       <source>Two segments cannot be tangent</source>
       <translation>Two segments cannot be tangent</translation>
     </message>
+    <message>
+      <source>Two B-splines cannot be tangent</source>
+      <translation>Two B-splines cannot be tangent</translation>
+    </message>
   </context>
   <context>
     <name>SketchConstraintTangent:ConstraintEntityB:SketchPlugin_TangentAttr</name>

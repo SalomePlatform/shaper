@@ -338,7 +338,8 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection,
             aType = 3;
           else if (aType != 3)
             return false;
-        }
+        } else if (aEdge.isBSpline())
+          return false;
       } else
         return false;
     }
@@ -391,23 +392,15 @@ bool PartSet_SplitSelection::isValid(const ModuleBase_ISelection* theSelection,
 bool PartSet_ProjectionSelection::isValid(const ModuleBase_ISelection* theSelection,
                                      ModuleBase_Operation* theOperation) const
 {
-  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    return isEmptySelectionValid(theOperation);
-  } else {
-    int aCount = shapesNbLines(theSelection);
-    return aCount > 0;
-  }
+  return theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0 &&
+         isEmptySelectionValid(theOperation);
 }
 
 bool PartSet_IntersectionSelection::isValid(const ModuleBase_ISelection* theSelection,
                                      ModuleBase_Operation* theOperation) const
 {
-  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    return isEmptySelectionValid(theOperation);
-  } else {
-    int aCount = shapesNbLines(theSelection);
-    return aCount == 0;
-  }
+  return theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0 &&
+         isEmptySelectionValid(theOperation);
 }
 
 

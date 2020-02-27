@@ -37,6 +37,8 @@
 #include <QToolButton>
 
 
+static const double THE_MIN_WEIGHT = 1.e-7;
+
 PartSet_BSplineWidget::PartSet_BSplineWidget(
     QWidget* theParent,
     const Config_WidgetAPI* theData)
@@ -175,7 +177,7 @@ QGroupBox* PartSet_BSplineWidget::createPoleWidget(BSplinePoleWidgets& thePole,
   thePole.myY = new ModuleBase_LabelValue(aPoleGroupBox, tr("Y"));
   aPoleLay->addWidget(thePole.myY, 1, 0, 1, 3);
   thePole.myWeight = new ModuleBase_ParamSpinBox(aPoleGroupBox);
-  thePole.myWeight->setMinimum(0.0);
+  thePole.myWeight->setMinimum(THE_MIN_WEIGHT);
 
   aPoleLay->addWidget(new QLabel(tr("Weight :"), aPoleGroupBox), 2, 0);
   aPoleLay->addWidget(thePole.myWeight, 2, 1);

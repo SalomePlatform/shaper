@@ -1330,6 +1330,7 @@
                helpfile="equalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select edge" shape_types="edge">
+          <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityB"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>

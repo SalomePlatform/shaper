@@ -346,7 +346,7 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
       if (aCurve.get()) {
         GeomPointPtr aProjPnt;
         if (aFeature->getKind() == SketchPlugin_Circle::ID() ||
-            aFeature->getKind() == SketchPlugin_Arc::ID()) {
+          aFeature->getKind() == SketchPlugin_Arc::ID()) {
           GeomCirclePtr aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurve));
           aProjPnt = aCircle->project(thePnt);
         }
@@ -354,6 +354,8 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
           GeomEllipsePtr anEllipse = GeomEllipsePtr(new GeomAPI_Ellipse(aCurve));
           aProjPnt = anEllipse->project(thePnt);
         }
+        else
+          aProjPnt = aCurve->project(thePnt);
         if (aProjPnt && thePnt->distance(aProjPnt) <= Precision::Confusion())
           aList.push_back(aResObj);
       }
