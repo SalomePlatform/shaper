@@ -46,7 +46,7 @@
       </feature>
 
       <feature id="ImportPart" title="Import part" tooltip="Import features from file" icon="icons/Exchange/import_part.png"
-               helpfile="importPart.html"
+               helpfile="importFeature.html"
                internal="1">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="shaperpart:Part" />
@@ -57,7 +57,7 @@
                 tooltip="Select the part to import the document" />
       </feature>
       <feature id="ExportPart" title="Export part" tooltip="Export structure of the Part to file" icon="icons/Exchange/export_part.png"
-               helpfile="exportPart.html"
+               helpfile="exportFeature.html"
                internal="1">
         <export_file_selector id="file_path"
                               type="save"
