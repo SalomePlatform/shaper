@@ -31,6 +31,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Ellipse2d.h>
 
+#include <GeomDataAPI_Point2DArray.h>
+
 #include <ModelAPI_AttributeInteger.h>
 
 #include <SketchPlugin_Arc.h>
@@ -423,7 +425,7 @@ std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeatureP
 {
   std::set<FeaturePtr> aCoincidences = collectCoincidences(theFeature1, theFeature2);
   // collect points only
-  std::set<AttributePtr> aCoincidentPoints;
+  std::map<FeaturePtr, std::set<AttributePtr> > aCoincidentPoints;
   std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
   for (; aCIt != aCoincidences.end(); ++ aCIt) {
     for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
@@ -435,25 +437,38 @@ std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeatureP
       FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
       if (anOwner == theFeature1 || anOwner == theFeature2) {
         if (anAttr->id() == SketchPlugin_BSplineBase::POLES_ID()) {
-          AttributeIntegerPtr anIndex = (*aCIt)->integer(i == 0 ?
-              SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A() :
-              SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+          AttributePoint2DArrayPtr aPoles =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(anAttr);
+
+          AttributeIntegerPtr anIndex;
+          if (anOwner->getKind() == SketchPlugin_BSpline::ID()) {
+            anIndex = (*aCIt)->integer(i == 0 ?
+                SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A() :
+                SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+          }
           if (anIndex) {
             if (anIndex->value() == 0)
               anAttr = anOwner->attribute(SketchPlugin_BSpline::START_ID());
-            else
+            else if (anIndex->value() + 1 == aPoles->size())
               anAttr = anOwner->attribute(SketchPlugin_BSpline::END_ID());
             if (anAttr)
-              aCoincidentPoints.insert(anAttr);
+              aCoincidentPoints[anOwner].insert(anAttr);
           }
         }
         else if (anAttr->id() != SketchPlugin_Arc::CENTER_ID() &&
                  anAttr->id() != SketchPlugin_Circle::CENTER_ID())
-          aCoincidentPoints.insert(anAttr);
+          aCoincidentPoints[anOwner].insert(anAttr);
       }
     }
   }
-  return aCoincidentPoints;
+
+  std::set<AttributePtr> aBoundaryPoints;
+  if (aCoincidentPoints.size() == 2) {
+    for (std::map<FeaturePtr, std::set<AttributePtr> >::iterator anIt = aCoincidentPoints.begin();
+         anIt != aCoincidentPoints.end(); ++anIt)
+      aBoundaryPoints.insert(anIt->second.begin(), anIt->second.end());
+  }
+  return aBoundaryPoints;
 }
 
 static std::set<AttributePtr> refsToFeatureAndResults(FeaturePtr theFeature)

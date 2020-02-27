@@ -24,6 +24,7 @@
 #include "SketchPlugin_BSplinePeriodic.h"
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintCoincidenceInternal.h"
 #include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_ConstraintTangent.h"
@@ -166,32 +167,81 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
 
   bool isObject = aRefAttr->isObject();
   ObjectPtr anObject = aRefAttr->object();
-  if (isObject && anObject.get()) {
-    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
-
-    AttributeRefAttrPtr aOtherAttr = anAttributeFeature->data()->refattr(aParamA);
-    ObjectPtr aOtherObject = aOtherAttr->object();
-    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
-    if (!aOtherFea)
-      return true;
-
-    if (aRefFea->getKind() == SketchPlugin_Line::ID() &&
-        aOtherFea->getKind() == SketchPlugin_Line::ID()) {
-      theError = "Two segments cannot be tangent";
-      return false;
-    }
-    else if (isSpline(aRefFea) && isSpline(aOtherFea)) {
-      theError = "Two B-splines cannot be tangent";
-      return false;
-    }
-    return true;
-  }
-  else {
+  if (!isObject || !anObject.get()) {
     theError = "It uses an empty object";
     return false;
   }
 
-  return true;
+  FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+  AttributeRefAttrPtr aOtherAttr = anAttributeFeature->data()->refattr(aParamA);
+  ObjectPtr aOtherObject = aOtherAttr->object();
+  FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+  if (!aOtherFea)
+    return true;
+
+  if (aRefFea->getKind() == SketchPlugin_Line::ID() &&
+      aOtherFea->getKind() == SketchPlugin_Line::ID()) {
+    theError = "Two segments cannot be tangent";
+    return false;
+  }
+  else if (isSpline(aRefFea) && isSpline(aOtherFea)) {
+    theError = "Two B-splines cannot be tangent";
+    return false;
+  }
+
+  bool isValid = true;
+  bool hasSpline = isSpline(aRefFea);
+  if (!hasSpline && isSpline(aOtherFea)) {
+    hasSpline = true;
+    std::swap(aRefFea, aOtherFea);
+  }
+  if (hasSpline) {
+    auto isApplicableCoincidence = [](FeaturePtr theFeature, const std::string& theAttrName) {
+      AttributeRefAttrPtr aRefAttr = theFeature->refattr(theAttrName);
+      if (aRefAttr->isObject())
+        return false;
+      AttributePtr anAttr = aRefAttr->attr();
+      FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
+      AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+      if (aPointAttr) {
+        return anOwner->getKind() == SketchPlugin_BSpline::ID() &&
+              (aPointAttr->id() == SketchPlugin_BSpline::START_ID() ||
+               aPointAttr->id() == SketchPlugin_BSpline::END_ID());
+      }
+
+      AttributePoint2DArrayPtr aPntArray =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(anAttr);
+      if (aPntArray) {
+        // check index of the pole
+        AttributeIntegerPtr anIndex = theAttrName == SketchPlugin_Constraint::ENTITY_A() ?
+            theFeature->integer(SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A()) :
+            theFeature->integer(SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+        return anIndex && (anIndex->value() == 0 || anIndex->value() == aPntArray->size() - 1);
+      }
+      return false;
+    };
+
+    isValid = false;
+    AttributePoint2DArrayPtr aBSplinePoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
+        aRefFea->attribute(SketchPlugin_BSplineBase::POLES_ID()));
+    // additional check the B-spline edge and the other edge have a coincident boundary point
+    std::set<FeaturePtr> aCoincidences = SketchPlugin_Tools::findCoincidentConstraints(aRefFea);
+    for (std::set<FeaturePtr>::iterator anIt = aCoincidences.begin();
+         anIt != aCoincidences.end() && !isValid; ++anIt) {
+      std::set<FeaturePtr> aCoinc;
+      if (isApplicableCoincidence(*anIt, SketchPlugin_Constraint::ENTITY_A()))
+        SketchPlugin_Tools::findCoincidences(*anIt, SketchPlugin_Constraint::ENTITY_B(),
+                                             aCoinc, true);
+      else if (isApplicableCoincidence(*anIt, SketchPlugin_Constraint::ENTITY_B()))
+        SketchPlugin_Tools::findCoincidences(*anIt, SketchPlugin_Constraint::ENTITY_A(),
+                                             aCoinc, true);
+
+      isValid = aCoinc.find(aOtherFea) != aCoinc.end();
+    }
+  }
+
+  return isValid;
 }
 
 bool SketchPlugin_PerpendicularAttrValidator::isValid(const AttributePtr& theAttribute,

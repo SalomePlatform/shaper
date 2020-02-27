@@ -120,7 +120,8 @@ std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature)
   std::set<AttributePtr>::const_iterator aIt;
   for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
-    if (aConstrFeature && aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+    if (aConstrFeature && (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+        aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()))
       aCoincident.insert(aConstrFeature);
   }
   return aCoincident;
