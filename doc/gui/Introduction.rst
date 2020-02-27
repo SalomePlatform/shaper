@@ -488,11 +488,13 @@ To call **Preferences** dialog box:
 #. select in the Main Menu *File - > Preferences* item or
 #. use  **Ctrl+P** shortcut.
 
-SHAPER preferences include 4 tabs:
+SHAPER preferences contains the following tabs:
 
 - :ref:`visualization_preferences`;
 - :ref:`plugins_preferences`;
-- :ref:`sketch_preferences`;
+- :ref:`shortcuts_preferences`;
+- :ref:`windows_preferences`.
+- :ref:`sketch_preferences`.
 - :ref:`viewer_preferences`.
 
 Visualization tab is activated by default when **Preferences** dialog box is opened in the active SHAPER module.
@@ -580,7 +582,7 @@ Plugins tab defines folders where plugins and resources are located.
    **Find directory** dialog box
     
    
-.. _sketch_preferences:
+.. _shortcuts_preferences:
    
 Shortcuts tab
 ^^^^^^^^^^^^^
@@ -595,6 +597,8 @@ Shortcuts tab defines shortcut keys for different operations.
    
 - **Add parameter in parameters manager dialog** defines shortcut keys for adding parameter in parameters manager dialog box.
    
+.. _windows_preferences:
+
 Windows tab
 ^^^^^^^^^^^
 
@@ -607,6 +611,8 @@ Windows tab contains definitions for the module windows management.
    Preferences - Windows tab
 
 - **Use HideFaces panel in operation** if the checkbox is checked then HideFaces panel will be launched automatically on launching an operation where using of this panel is considered.
+
+.. _sketch_preferences:
 
 Sketch tab
 ^^^^^^^^^^
