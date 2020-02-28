@@ -212,7 +212,7 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
 
       AttributePoint2DArrayPtr aPntArray =
           std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(anAttr);
-      if (aPntArray) {
+      if (aPntArray && anOwner->getKind() == SketchPlugin_BSpline::ID()) {
         // check index of the pole
         AttributeIntegerPtr anIndex = theAttrName == SketchPlugin_Constraint::ENTITY_A() ?
             theFeature->integer(SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A()) :
