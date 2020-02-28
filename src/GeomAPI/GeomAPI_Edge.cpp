@@ -403,6 +403,7 @@ void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlan
       GeomAPI_ExtremaCurveSurface anExtrema(aCurve, aPlane);
       double aTolerance = BRep_Tool::Tolerance(TopoDS::Edge(aShape));
       if (anExtrema.NbExtrema() > 0 &&
+          !anExtrema.Extrema().IsParallel() &&
           anExtrema.LowerDistance() < aTolerance) {
         // distance is lower than tolerance => tangent case
         gp_Pnt aPntC, aPntS;

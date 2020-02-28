@@ -160,10 +160,10 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
     std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         data()->attribute(NORM_ID()));
 
-    if (!anOrigin || !aNorm)
-      return std::shared_ptr<GeomAPI_Pln>();
+    if (anOrigin.get() && aNorm.get() && anOrigin->isInitialized() && aNorm->isInitialized())
+      return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
 
-    return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
+    return std::shared_ptr<GeomAPI_Pln>();
   }
 
   /// Returns currently defined plane as an object of Ax3

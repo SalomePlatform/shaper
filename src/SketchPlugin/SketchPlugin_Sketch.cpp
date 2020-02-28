@@ -443,7 +443,11 @@ std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::plane(SketchPlugin_Sketch* the
   std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
 
-  return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
+  if (aNorm.get() && aNorm->isInitialized() && anOrigin.get() && anOrigin->isInitialized())
+    return std::shared_ptr<GeomAPI_Ax3>(
+      new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
+
+  return std::shared_ptr<GeomAPI_Ax3>();
 }
 
 bool SketchPlugin_Sketch::customAction(const std::string& theActionId)
