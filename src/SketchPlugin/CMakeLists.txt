@@ -222,6 +222,7 @@ ADD_UNIT_TESTS(
   Test3087_2.py
   Test3132.py
   Test3154.py
+  Test3170.py
   TestArcBehavior.py
   TestBSplineAddPole.py
   TestChangeSketchPlane1.py

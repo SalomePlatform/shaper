@@ -223,6 +223,18 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
     if (anOwner && !anOwner->isExternal())
       aFilletFeatures.insert(anOwner);
   }
+  // remove auxilary entities from set of coincident features
+  if (aFilletFeatures.size() > 2) {
+    std::set<FeaturePtr>::iterator anIt = aFilletFeatures.begin();
+    while (anIt != aFilletFeatures.end()) {
+      if ((*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
+        std::set<FeaturePtr>::iterator aRemoveIt = anIt++;
+        aFilletFeatures.erase(aRemoveIt);
+      }
+      else
+        ++anIt;
+    }
+  }
   if (aFilletFeatures.size() != 2) {
     setError("Error: Selected point does not have two suitable edges for fillet.");
     return false;
