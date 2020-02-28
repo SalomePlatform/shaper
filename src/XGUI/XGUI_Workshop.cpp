@@ -1311,6 +1311,8 @@ void XGUI_Workshop::onImportPart()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ImportPart::ID()));
+    anImportPartOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "importFeature.html");
     myPropertyPanel->updateApplyPlusButton(anImportPartOp->feature());
     operationMgr()->startOperation(anImportPartOp);
   }
@@ -1322,6 +1324,8 @@ void XGUI_Workshop::onImportShape()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_Import::ID()));
+    anImportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "importFeature.html");
     myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
     operationMgr()->startOperation(anImportOp);
   }
@@ -1333,6 +1337,8 @@ void XGUI_Workshop::onExportShape()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anExportOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ExportFeature::ID()));
+    anExportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "exportFeature.html");
     myPropertyPanel->updateApplyPlusButton(anExportOp->feature());
     operationMgr()->startOperation(anExportOp);
   }
@@ -1344,6 +1350,8 @@ void XGUI_Workshop::onExportPart()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anExportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ExportPart::ID()));
+    anExportPartOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "exportFeature.html");
     myPropertyPanel->updateApplyPlusButton(anExportPartOp->feature());
     operationMgr()->startOperation(anExportPartOp);
   }
