@@ -65,9 +65,7 @@ void Model_AttributeSelectionList::append(
   }
 
   if (myIsCashed && !theTemporarily) {
-    ResultPtr aResContext = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
-    if (aResContext.get())
-      myCash[aResContext].push_back(theSubShape);
+    myCash[theContext].push_back(theSubShape);
   }
 
   int aNewTag = mySize->Get() + 1;
@@ -315,7 +313,8 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
             if (!aShapes->get())
               return true;
             ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aContext->first);
-            if (aRes.get() && (*aShapes)->isSame(aRes->shape()))
+            FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aContext->first);
+            if ((aRes.get() && (*aShapes)->isSame(aRes->shape())) || aFeat.get())
               return true;
           } else {
             // we need to call here isSame instead of isEqual to do not check shapes orientation
@@ -442,7 +441,7 @@ void Model_AttributeSelectionList::cashValues(const bool theEnabled)
     for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
       AttributeSelectionPtr anAttr = value(anIndex);
       if (anAttr.get()) {
-        myCash[anAttr->context()].push_back(anAttr->value());
+        myCash[anAttr->contextObject()].push_back(anAttr->value());
       }
     }
   }

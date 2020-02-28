@@ -937,13 +937,15 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      //aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->contextObject());
-      //if (!aFeature.get()) { // Feature can not be found as geometry selection
-        bool aFound = findInSelection(
-          anAttr->contextObject(), anAttr->value(), aGeomSelection, myWorkshop);
-        if (!aFound)
-          anIndicesToBeRemoved.insert(i);
-//      }
+      ObjectPtr aContextObject = anAttr->contextObject();
+      GeomShapePtr aShape;
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aContextObject);
+      if (!aFeature.get())
+        aShape = anAttr->value();
+
+      bool aFound = findInSelection(aContextObject, aShape, aGeomSelection, myWorkshop);
+      if (!aFound)
+        anIndicesToBeRemoved.insert(i);
     }
     isDone = anIndicesToBeRemoved.size() > 0;
     if (isDone)

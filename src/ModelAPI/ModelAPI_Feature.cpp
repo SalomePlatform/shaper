@@ -208,11 +208,13 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
         (*aResIter)->setDisabled(*aResIter, false);
       }
       // update selection for the case something was updated higher in the history
-      // while this feature was disabled
+      // while this feature was disabled, but avoid flushing it immediately and
+      // wait while all the previous features update myIsDisabled flag
+      // (flush will be called by the document)
       static Events_Loop* aLoop = Events_Loop::loop();
       static Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
       static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-      aECreator->sendUpdated(data()->owner(), kUpdatedSel, false);
+      aECreator->sendUpdated(data()->owner(), kUpdatedSel, true);
     }
     return true;
   }

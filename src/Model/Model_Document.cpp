@@ -1505,6 +1505,9 @@ void Model_Document::setCurrentFeature(
   myIsSetCurrentFeature = false;
   // unblock  the flush signals and up them after this
   aLoop->activateFlushes(isActive);
+
+  static Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
+  aLoop->flush(kUpdatedSel);
 }
 
 void Model_Document::setCurrentFeatureUp()

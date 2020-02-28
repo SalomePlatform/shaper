@@ -627,8 +627,7 @@ bool hasObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr =
                          std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    aHasObject = aSelectionListAttr->isInList(aResult, theShape, theTemporarily);
+    aHasObject = aSelectionListAttr->isInList(theObject, theShape, theTemporarily);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr =

@@ -93,11 +93,10 @@ bool GeomAPI_Shape::isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const
 
 bool GeomAPI_Shape::isSame(const std::shared_ptr<GeomAPI_Shape> theShape) const
 {
-  if (!theShape.get())
-    return false;
+  bool isNullShape = !theShape.get() || theShape->isNull();;
   if (isNull())
-    return theShape->isNull();
-  if (theShape->isNull())
+    return isNullShape;
+  if (isNullShape)
     return false;
 
   return MY_SHAPE->IsSame(theShape->impl<TopoDS_Shape>()) == Standard_True;
