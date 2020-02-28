@@ -71,7 +71,7 @@ The following property panel will be opened:
 .. centered::
    **Import property panel**
 
-The **Import to** combobox provides the list of destinations (PartSet, existing Part or a new Part).
+The **Import to** combobox provides the list of destinations (PartSet, one of existing Parts or a new Part).
 
 In this panel it is possible to enter a file name directly or press **'...'** button and browse it with help of import file dialog box:
 
