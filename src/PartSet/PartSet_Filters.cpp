@@ -47,21 +47,26 @@ PartSet_GlobalFilter::PartSet_GlobalFilter(ModuleBase_IWorkshop* theWorkshop)
 Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+  Handle(AIS_InteractiveObject) aAisObj;
+  if (theOwner->HasSelectable()) {
+    aAisObj = Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
+    if (!aAisObj.IsNull()) {
+      aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
+    }
+  }
+  ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
+
+  // Issue #3161: Do not use presentations for non-SHAPER objects
+  if (!anOperation && !aObj.get())
+    return false;
+
   // the shapes from different documents should be provided if there is no started operation
   // in order to show/hide results
   if (anOperation) {
     aValid = false;
     if (ModuleBase_ShapeDocumentFilter::IsOk(theOwner)) {
-      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      if (theOwner->HasSelectable()) {
-        Handle(AIS_InteractiveObject) aAisObj =
-          Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-        if (!aAisObj.IsNull()) {
-          aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
-        }
-      }
-      ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
       if (aObj) {
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
         // result of parts belongs to PartSet document and can be selected only when PartSet
