@@ -205,10 +205,6 @@
         <translation>Fenêtres</translation>
     </message>
     <message>
-        <source>Iso-lines...</source>
-        <translation type="vanished">Iso-lines...</translation>
-    </message>
-    <message>
         <source>Define Isos...</source>
         <translation>Définir l&apos;Isos...</translation>
     </message>
@@ -550,16 +546,8 @@
         <translation>Refaire la dernière commande</translation>
     </message>
     <message>
-        <source>Export native...</source>
-        <translation type="vanished">Exporter natif...</translation>
-    </message>
-    <message>
         <source>Export the current document into a native file</source>
         <translation>Exporter le document actuel dans un fichier natif</translation>
-    </message>
-    <message>
-        <source>Import native...</source>
-        <translation type="vanished">Importer natif...</translation>
     </message>
     <message>
         <source>Import native file</source>
@@ -678,16 +666,8 @@ Supprimer des objets du panneau à afficher ?</translation>
         <translation>Résultats non trouvés</translation>
     </message>
     <message>
-        <source>Export part...</source>
-        <translation type="vanished">Partie export...</translation>
-    </message>
-    <message>
         <source>Export a part of the current document into a file</source>
         <translation>Exporter une partie du document courant dans un fichier</translation>
-    </message>
-    <message>
-        <source>Import part...</source>
-        <translation type="vanished">Importer une partie...</translation>
     </message>
     <message>
         <source>Import structure of a part</source>

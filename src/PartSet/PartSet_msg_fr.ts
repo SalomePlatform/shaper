@@ -8,10 +8,6 @@
         <translation>Poteaux et poids</translation>
     </message>
     <message>
-        <source>B-spline poles and weights</source>
-        <translation type="vanished">Poteaux et poids B-spline</translation>
-    </message>
-    <message>
         <source>Pole %1</source>
         <translation>Pôle %1</translation>
     </message>
@@ -64,14 +60,6 @@
     <message>
         <source>Pole %1</source>
         <translation>Pôle %1</translation>
-    </message>
-    <message>
-        <source>Create control polygon</source>
-        <translation type="vanished"> Créer un polygone de contrôle</translation>
-    </message>
-    <message>
-        <source>Specify if the control polygon should be created</source>
-        <translation type="vanished">Spécifiez si le polygone de contrôle doit être créé</translation>
     </message>
     <message>
         <source>X</source>

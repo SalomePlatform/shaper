@@ -20,10 +20,6 @@
         <translation>Qu’est-ce que c’est</translation>
     </message>
     <message>
-        <source>Inspection tool</source>
-        <translation type="vanished">Outil d&apos;inspection</translation>
-    </message>
-    <message>
         <source>Edit toolbars of the module</source>
         <translation>Editer les barres d&apos;outils du module</translation>
     </message>

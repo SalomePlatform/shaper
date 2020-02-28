@@ -4730,4 +4730,31 @@
     </message>
   </context>
 
+  <context>
+    <name>SketchMacroBSpline:poles</name>
+    <message>
+      <source>Poles and weights</source>
+      <translation>Pôles et poids</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSpline:need_control_poly</name>
+    <message>
+      <source>Create control polygon</source>
+      <translation>Créer un polygone de contrôle</translation>
+    </message>
+    <message>
+      <source>Specify if the control polygon should be created</source>
+      <translation>Précisez si le polygone de contrôle doit être créé</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSpline:poles:SketchPlugin_BSplineValidator</name>
+    <message>
+      <source>Number of B-spline poles should be 2 or more</source>
+      <translation>Le nombre de cannes B doit être de 2 ou plus</translation>
+    </message>
+  </context>
 </TS>
