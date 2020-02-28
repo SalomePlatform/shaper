@@ -105,7 +105,10 @@ void PartSet_BSplineWidget::storePolesAndWeights() const
 
   std::list<BSplinePoleWidgets>::const_iterator anIt = myPoles.begin();
   for (int anIndex = 0; anIt != myPoles.end(); ++anIndex, ++anIt) {
-    aWeightsArray->setValue(anIndex, anIt->myWeight->value());
+    double aWeight = anIt->myWeight->value();
+    if (aWeight < THE_MIN_WEIGHT)
+      aWeight = THE_MIN_WEIGHT;
+    aWeightsArray->setValue(anIndex, aWeight);
   }
 }
 
