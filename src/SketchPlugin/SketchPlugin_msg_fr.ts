@@ -4757,4 +4757,76 @@
       <translation>Le nombre de cannes B doit être de 2 ou plus</translation>
     </message>
   </context>
+
+  <context>
+    <name>SketchMacroBSplinePeriodic:poles</name>
+    <message>
+      <source>Poles and weights</source>
+      <translation>Pôles et poids</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSplinePeriodic:need_control_poly</name>
+    <message>
+      <source>Create control polygon</source>
+      <translation>Créer un polygone de contrôle</translation>
+    </message>
+    <message>
+      <source>Specify if the control polygon should be created</source>
+      <translation>Précisez si le polygone de contrôle doit être créé</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSplinePeriodic:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliaire</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Élément de construction</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSplinePeriodic</name>
+    <message>
+      <source>Create periodic B-spline curve</source>
+      <translation>Créer une courbe périodique de type B-spline</translation>
+    </message>
+    <message>
+      <source>Periodic B-spline</source>
+      <translation>Périodique B-spline</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSpline:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliaire</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Élément de construction</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSpline</name>
+    <message>
+      <source>Create B-spline curve</source>
+      <translation>Créer une courbe B-spline</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchEllipse</name>
+    <message>
+      <source>Create ellipse</source>
+      <translation>Créer une ellipse</translation>
+    </message>
+  </context>
 </TS>
