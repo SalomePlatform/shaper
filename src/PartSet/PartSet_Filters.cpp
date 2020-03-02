@@ -58,9 +58,11 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
 
+#ifdef HAVE_SALOME
   // Issue #3161: Do not use presentations for non-SHAPER objects
   if (!anOperation && !aObj.get())
     return false;
+#endif
 
   // the shapes from different documents should be provided if there is no started operation
   // in order to show/hide results
