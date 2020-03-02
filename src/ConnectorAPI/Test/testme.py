@@ -31,7 +31,7 @@ class SalomeSession(object):
             pass
         sys.argv  = [run_script]
         sys.argv += ["--terminal"]
-        sys.argv += ["--modules=SHAPER,GEOM"]
+        sys.argv += ["--modules=SHAPER,GEOM,SHAPERSTUDY,SMESH"]
         sys.argv += ["%s" % script]
         if sys.platform == 'win32':
             main_module_path = sys.modules['__main__'].__file__
