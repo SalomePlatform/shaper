@@ -12,4 +12,19 @@
       <translation>Exporter vers GEOM</translation>
     </message>
   </context>
+  <context>
+    <name>PublishToStudy</name>
+    <message>
+      <source>Publish to study</source>
+      <translation>Publier pour étudier</translation>
+    </message>
+    <message>
+      <source>Not all PartSet parts are up-to-date, nothing is published. Please, make the last PartSet feature as current.</source>
+      <translation>Toutes les pièces PartSet ne sont pas à jour, rien n'est publié. Veuillez mettre la dernière fonctionnalité PartSet à jour.</translation>
+    </message>
+    <message>
+      <source>For publish to SHAPER-STUDY some Part is not activated</source>
+      <translation>Pour la publication sur SHAPER-STUDY, une partie n'est pas activée</translation>
+    </message>
+  </context>
 </TS>

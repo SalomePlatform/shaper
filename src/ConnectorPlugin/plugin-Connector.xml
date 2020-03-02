@@ -9,7 +9,7 @@
         helpfile="ConnectorPlugin/ConnectorPlugin.html"/>
       <feature
         id="PublishToStudy"
-        title="Pyblish to study"
+        title="Publish to study"
         internal="1"/>
     </group>
   </workbench>
