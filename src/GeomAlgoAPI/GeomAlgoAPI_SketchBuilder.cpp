@@ -165,7 +165,7 @@ bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
 }
 
 // sorts faces (in theAreas list) to make persistent order: by initial shapes edges
-static void sortFaces(TopTools_ListOfShape& theAreas,
+static void sortAreas(TopTools_ListOfShape& theAreas,
   const std::list<std::shared_ptr<GeomAPI_Shape> >& theInitialShapes)
 {
   // collect indices of all edges to operate them quickly
@@ -242,7 +242,7 @@ void GeomAlgoAPI_SketchBuilder::build(
 
   // Collect faces
   TopTools_ListOfShape anAreas = aBB->Modified(aPlnFace);
-  sortFaces(anAreas, theEdges); // sort faces by the edges in them
+  sortAreas(anAreas, theEdges); // sort faces by the edges in them
   TopTools_ListIteratorOfListOfShape anIt(anAreas);
   for (; anIt.More(); anIt.Next()) {
     TopoDS_Face aFace = TopoDS::Face(anIt.Value());
@@ -255,10 +255,16 @@ void GeomAlgoAPI_SketchBuilder::build(
     TopoDS_Face aNewFace;
     aBuilder.MakeFace(aNewFace, aPlane, Precision::Confusion());
 
-    // iterate on wires
+    // sort wires according to the original edges as well as faces
+    TopTools_ListOfShape aWires;
     TopExp_Explorer aWireExp(aFace, TopAbs_WIRE);
-    for (; aWireExp.More(); aWireExp.Next()) {
-      TopoDS_Wire aWire = TopoDS::Wire(aWireExp.Current());
+    for (; aWireExp.More(); aWireExp.Next())
+      aWires.Append(aWireExp.Current());
+    sortAreas(aWires, theEdges);
+
+    // iterate on wires
+    for (TopTools_ListIteratorOfListOfShape aWIt(aWires); aWIt.More(); aWIt.Next()) {
+      TopoDS_Wire aWire = TopoDS::Wire(aWIt.Value());
 
       // to make faces equal on different platforms, we will find
       // a vertex lying on an edge with the lowest index in the list of initial edges
