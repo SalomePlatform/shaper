@@ -155,7 +155,7 @@ public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    return SketchPlugin_MacroBSpline::ID();
+    return SketchPlugin_MacroBSplinePeriodic::ID();
   }
 
   /// Use plugin manager for features creation
