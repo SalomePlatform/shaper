@@ -8,10 +8,6 @@
       <source>Construction</source>
       <translation>Construction</translation>
     </message>
-  </context>
-
-  <context>
-    <name>workshop</name>
     <message>
       <source>Axis</source>
       <translation>Axe</translation>
