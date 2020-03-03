@@ -255,12 +255,17 @@ void GeomAlgoAPI_SketchBuilder::build(
     TopoDS_Face aNewFace;
     aBuilder.MakeFace(aNewFace, aPlane, Precision::Confusion());
 
-    // sort wires according to the original edges as well as faces
+    // sort inner wires according to the original edges as well as faces
     TopTools_ListOfShape aWires;
     TopExp_Explorer aWireExp(aFace, TopAbs_WIRE);
     for (; aWireExp.More(); aWireExp.Next())
       aWires.Append(aWireExp.Current());
-    sortAreas(aWires, theEdges);
+    if (aWires.Size() > 2) {
+      TopoDS_Shape anOuterWire = aWires.First();
+      aWires.RemoveFirst();
+      sortAreas(aWires, theEdges);
+      aWires.Prepend(anOuterWire);
+    }
 
     // iterate on wires
     for (TopTools_ListIteratorOfListOfShape aWIt(aWires); aWIt.More(); aWIt.Next()) {
