@@ -129,7 +129,7 @@
         <source path="fusion_faces_widget.xml"/>
       </feature>
       <feature id="Defeaturing" title="Defeaturing" tooltip="Perform removing faces from solid"
-               icon="icons/Features/defeaturing.png" auto_preview="true" helpfile="defeaturingFeature.html">
+               icon="icons/Features/defeaturing.png" auto_preview="false" helpfile="defeaturingFeature.html">
         <source path="defeaturing_widget.xml"/>
       </feature>
     </group>
