@@ -1718,6 +1718,52 @@ void Model_Document::changeNamingName(const std::string theOldName,
   }
 }
 
+// returns true if names consist of the same sub-elements but with different order.
+// Sub-elements are separated by "-" symbol. First part must be "Face", second at the same place.
+static bool IsExchangedName(const TCollection_ExtendedString& theName1,
+                            const TCollection_ExtendedString& theName2)
+{
+  static const TCollection_ExtendedString aSepStr("-");
+  static const Standard_ExtString aSep = aSepStr.ToExtString();
+  static const TCollection_ExtendedString aWireTail("_wire");
+  if (theName1.Token(aSep, 1) != "Face" || theName2.Token(aSep, 1) != "Face")
+    return false;
+  if (theName1.Token(aSep, 2) != theName2.Token(aSep, 2))
+    return false;
+  // Collect Map of the sub-elements of the first name
+  NCollection_Map<TCollection_ExtendedString> aSubsMap;
+  TCollection_ExtendedString aWireSuffix;
+  int a = 3;
+  for (; true ; a++) {
+    TCollection_ExtendedString aToken = theName1.Token(aSep, a);
+    if (aToken.IsEmpty())
+      break;
+    int aTailPos = aToken.Search(aWireTail);
+    if (aTailPos > 0) {
+      aWireSuffix = aToken.Split(aTailPos - 1);
+    }
+    aSubsMap.Add(aToken);
+  }
+  // check all subs in the second name are in the map
+  for (int a2 = 3; true; a2++) {
+    TCollection_ExtendedString aToken = theName2.Token(aSep, a2);
+    if (aToken.IsEmpty()) {
+      if (a2 != a) // number of sub-elements is not equal
+        return false;
+      break;
+    }
+    int aTailPos = aToken.Search(aWireTail);
+    if (aTailPos > 0) {
+      TCollection_ExtendedString aSuffix = aToken.Split(aTailPos - 1);
+      if (aWireSuffix != aSuffix)
+        return false;
+    }
+    if (!aSubsMap.Contains(aToken))
+      return false;
+  }
+  return true;
+}
+
 TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theContext)
 {
   std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
@@ -1749,13 +1795,19 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
         }
         // copy aSubName to avoid incorrect further processing after its suffix cutting
         TCollection_ExtendedString aSubNameCopy(aSubName);
+        TDF_Label aFaceLabelWithExchangedSubs; // check also exchanged sub-elements of the name
         // searching sub-labels with this name
         TDF_ChildIDIterator aNamesIter(*aLabIter, TDataStd_Name::GetID(), Standard_True);
         for(; aNamesIter.More(); aNamesIter.Next()) {
           Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
           if (aName->Get() == aSubNameCopy)
             return aName->Label();
+          if (aName->Get().Length() == aSubNameCopy.Length() &&
+              IsExchangedName(aName->Get(),  aSubNameCopy))
+            aFaceLabelWithExchangedSubs = aName->Label();
         }
+        if (!aFaceLabelWithExchangedSubs.IsNull())
+          return aFaceLabelWithExchangedSubs;
         // If not found child label with the exact sub-name, then try to find compound with
         // such sub-name without suffix.
         Standard_Integer aSuffixPos = aSubNameCopy.SearchFromEnd('_');
