@@ -65,6 +65,10 @@ class TestHDF(unittest.TestCase):
       aPartFeature = PartSetAPI.PartSetAPI_Part(self.partSet.currentFeature(True))
       aPartsList["Part_{}".format(aPartIndex+1)] = aPartFeature
 
+      self.session.startOperation()
+      self.session.setActiveDocument(self.partSet)
+      self.session.finishOperation()
+
     # check reference data
     exec(open(self.reffile, "rb").read(), globals(), aPartsList)
 
