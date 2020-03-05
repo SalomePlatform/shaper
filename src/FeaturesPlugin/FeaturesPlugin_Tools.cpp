@@ -120,6 +120,13 @@ void FeaturesPlugin_Tools::loadDeletedShapes(ResultBodyPtr theResultBody,
                                      *anIter,
                                      GeomAPI_Shape::FACE,
                                      theResultShapesCompound);
+    // store information about deleted solids because of unittest TestBooleanCommon_SolidsHistory
+    // on OCCT 7.4.0 : common produces modified compsolid, so, move to the end for removed solids
+    // starts to produce whole compsolid
+    theResultBody->loadDeletedShapes(theMakeShape,
+                                     *anIter,
+                                     GeomAPI_Shape::SOLID,
+                                     theResultShapesCompound);
   }
 }
 
