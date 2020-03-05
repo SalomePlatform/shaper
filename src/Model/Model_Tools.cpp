@@ -62,6 +62,8 @@ void Model_Tools::copyAttrs(TDF_Label theSource, TDF_Label theDestination,
     if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
       // create a new attribute if not yet exists in the destination
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
+      if (aTargetAttr->ID() != anAttrIter.Value()->ID())
+        aTargetAttr->SetID(anAttrIter.Value()->ID());
       theDestination.AddAttribute(aTargetAttr);
     }
     // no special relocation, empty map, but self-relocation is on: copy references w/o changes
@@ -126,6 +128,8 @@ void Model_Tools::copyAttrsAndKeepRefsToCoordinates(
     if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
       // create a new attribute if not yet exists in the destination
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
+      if (aTargetAttr->ID() != anAttrIter.Value()->ID())
+        aTargetAttr->SetID(anAttrIter.Value()->ID());
       theDestination.AddAttribute(aTargetAttr);
     }
     anAttrIter.Value()->Paste(aTargetAttr, theRelocTable);

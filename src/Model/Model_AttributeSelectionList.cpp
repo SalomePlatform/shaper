@@ -217,6 +217,8 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
     if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
       // create a new attribute if not yet exists in the destination
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
+      if (aTargetAttr->ID() != anAttrIter.Value()->ID())
+        aTargetAttr->SetID(anAttrIter.Value()->ID());
       theDestination.AddAttribute(aTargetAttr);
     }
     // for named shape copy exact shapes (in NamedShape Paste method the CopyTool is used)
