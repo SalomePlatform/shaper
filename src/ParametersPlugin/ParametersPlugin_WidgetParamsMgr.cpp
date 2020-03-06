@@ -37,6 +37,8 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IViewer.h>
 
 #include <Events_Loop.h>
 #include <Config_PropManager.h>
@@ -178,9 +180,9 @@ void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor,
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent,
-  const Config_WidgetAPI* theData)
+  const Config_WidgetAPI* theData, ModuleBase_IWorkshop* theWorkshop)
   : ModuleBase_ModelDialogWidget(theParent, theData),
-  isUpplyBlocked(false)
+  myWorkshop(theWorkshop), isUpplyBlocked(false)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
 
@@ -857,4 +859,5 @@ void ParametersPlugin_WidgetParamsMgr::onShowPreview()
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->blockAutoUpdate(false);
   aMgr->blockAutoUpdate(true);
+  myWorkshop->viewer()->update();
 }

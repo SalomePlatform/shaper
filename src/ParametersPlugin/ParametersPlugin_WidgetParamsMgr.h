@@ -29,7 +29,7 @@ class QTreeWidgetItem;
 class ParametersPlugin_ItemDelegate;
 class QPushButton;
 class QToolButton;
-
+class ModuleBase_IWorkshop;
 
 /*!
  * \ingroup GUI
@@ -61,7 +61,8 @@ class ParametersPlugin_WidgetParamsMgr : public ModuleBase_ModelDialogWidget
  Q_OBJECT
 public:
   /// Constructs a model widget
-  ParametersPlugin_WidgetParamsMgr(QWidget* theParent, const Config_WidgetAPI* theData);
+  ParametersPlugin_WidgetParamsMgr(QWidget* theParent, const Config_WidgetAPI* theData,
+    ModuleBase_IWorkshop* theWorkshop);
 
   /// Destructs the model widget
   virtual ~ParametersPlugin_WidgetParamsMgr() {}
@@ -157,6 +158,8 @@ private:
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 
   void updateParametersFeatures();
+
+  ModuleBase_IWorkshop* myWorkshop;
 
   ParametersPlugin_TreeWidget* myTable;
   QTreeWidgetItem* myFeatures;

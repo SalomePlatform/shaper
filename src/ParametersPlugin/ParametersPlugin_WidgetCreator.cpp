@@ -38,11 +38,11 @@ ModuleBase_ModelWidget*
   ParametersPlugin_WidgetCreator::createWidgetByType(const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi,
-                                                     ModuleBase_IWorkshop* /*theWorkshop*/)
+                                                     ModuleBase_IWorkshop* theWorkshop)
 {
   ModuleBase_ModelWidget* aModelWidget = 0;
   if (theType == "parameters-manager") {
-    aModelWidget = new ParametersPlugin_WidgetParamsMgr(theParent, theWidgetApi);
+    aModelWidget = new ParametersPlugin_WidgetParamsMgr(theParent, theWidgetApi, theWorkshop);
   }
   return aModelWidget;
 }
