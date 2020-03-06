@@ -1083,7 +1083,7 @@ void PartSet_ObjectFolderNode::update()
     int aNbOfFeatures = aDoc->size(ModelAPI_Feature::group(), true);
     while (aId < myChildren.size()) {
       ModuleBase_ITreeNode* aNode = myChildren.at(aId);
-      if ((aFirst + aId) < aNbOfFeatures) {
+      if ((aId < aNbItems) && ((aFirst + aId) < aNbOfFeatures)) {
         if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
           myChildren.removeAll(aNode);
           delete aNode;

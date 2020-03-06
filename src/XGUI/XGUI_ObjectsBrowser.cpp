@@ -131,7 +131,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
       if (XGUI_Tools::canRename(aObj, aName)) {
         SessionPtr aMgr = ModelAPI_Session::get();
         aMgr->startOperation("Rename");
-        aObj->data()->setName(qPrintable(aName));
+        aObj->data()->setName(aName.toStdString());
         aMgr->finishOperation();
       }
     }
