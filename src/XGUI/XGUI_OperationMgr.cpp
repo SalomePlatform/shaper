@@ -94,9 +94,13 @@ public:
         }
       }
       else if (theEvent->type() == QEvent::KeyPress) {
-        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-        myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-        isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+        if (!qApp->modalWindow()) {
+          if (myOperationMgr->hasOperation()) {
+            QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+          }
+        }
       }
     }
     if (!isAccepted)
@@ -446,7 +450,7 @@ void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation, bool& 
 void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
 {
   ModuleBase_Operation* aCurrentOperation = currentOperation();
-  if (theOperation == aCurrentOperation)
+  if (theOperation && (theOperation == aCurrentOperation))
     theOperation->abort();
   else {
     // it is possible to trigger upper operation(e.g. sketch, current is sketch line)
@@ -723,15 +727,17 @@ bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
       ModuleBase_Operation* aOperation = currentOperation();
       if (!isAccepted && aOperation) {
         ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-        ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
-        if (anActiveWgt)
-        {
-          isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEscape);
-          if (isAccepted) {
-            ModuleBase_OperationFeature* aFOperation =
-              dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-            if (aFOperation)
-              aFOperation->setNeedToBeAborted(true);
+        if (aPanel) {
+          ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
+          if (anActiveWgt)
+          {
+            isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEscape);
+            if (isAccepted) {
+              ModuleBase_OperationFeature* aFOperation =
+                dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+              if (aFOperation)
+                aFOperation->setNeedToBeAborted(true);
+            }
           }
         }
       }
