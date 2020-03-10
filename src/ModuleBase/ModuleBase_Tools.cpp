@@ -764,6 +764,7 @@ void flushUpdated(ObjectPtr theObject)
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_UPDATE_SELECTION));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
   blockUpdateViewer(false);
