@@ -489,7 +489,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
 typedef std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > Storage;
 
 static bool dumpToPython(SessionPtr theSession,
-                         const char* theFilename,
+                         const std::string& theFilename,
                          const checkDumpType theSelectionType,
                          const std::string& theErrorMsgContext)
 {
@@ -516,7 +516,7 @@ static bool dumpToPython(SessionPtr theSession,
 }
 
 static bool checkDump(SessionPtr theSession,
-                      char* theFilename,
+                      const char* theFilename,
                       Storage& theStorage,
                       const std::string& theErrorMsgContext)
 {
@@ -544,20 +544,29 @@ static bool checkDump(SessionPtr theSession,
   return true;
 }
 
-bool checkPythonDump(const checkDumpType theCheckType)
+bool checkPyDump(const std::string& theFilenameNaming,
+                 const std::string& theFilenameGeo,
+                 const std::string& theFilenameWeak,
+                 const checkDumpType theCheckType)
 {
   static const std::string anErrorByNaming("checkPythonDump by naming");
   static const std::string anErrorByGeometry("checkPythonDump by geometry");
   static const std::string anErrorByWeak("checkPythonDump by weak naming");
 
-  static char aFileForNamingDump[] = "./check_dump.py";
-  static char aFileForGeometryDump[] = "./check_dump_geo.py";
-  static char aFileForWeakDump[] = "./check_dump_weak.py";
+#ifdef _DEBUG
+  std::string aFileForNamingDump("./check_dump.py");
+  std::string aFileForGeometryDump("./check_dump_geo.py");
+  std::string aFileForWeakDump("./check_dump_weak.py");
+#else
+  std::string aFileForNamingDump = theFilenameNaming;
+  std::string aFileForGeometryDump = theFilenameGeo;
+  std::string aFileForWeakDump = theFilenameWeak;
+#endif
 
   SessionPtr aSession = ModelAPI_Session::get();
   // dump with the specified types
-  char* aFileName = theCheckType == CHECK_GEOMETRICAL ? aFileForGeometryDump :
-                   (theCheckType == CHECK_WEAK ? aFileForWeakDump : aFileForNamingDump);
+  std::string aFileName = theCheckType == CHECK_GEOMETRICAL ? aFileForGeometryDump :
+                          (theCheckType == CHECK_WEAK ? aFileForWeakDump : aFileForNamingDump);
   if (!dumpToPython(aSession, aFileName, theCheckType, anErrorByNaming))
     return false;
 
@@ -574,14 +583,14 @@ bool checkPythonDump(const checkDumpType theCheckType)
   bool isOk = true;
   if (theCheckType & CHECK_NAMING) {
     // check dump with the selection by names
-    isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
+    isOk = checkDump(aSession, aFileForNamingDump.c_str(), aStore, anErrorByNaming);
   }
   if (theCheckType & CHECK_GEOMETRICAL) {
     // check dump with the selection by geometry
-    isOk = isOk && checkDump(aSession, aFileForGeometryDump, aStore, anErrorByGeometry);
+    isOk = isOk && checkDump(aSession, aFileForGeometryDump.c_str(), aStore, anErrorByGeometry);
   }
   if (theCheckType & CHECK_WEAK) {
-    isOk = isOk && checkDump(aSession, aFileForWeakDump, aStore, anErrorByWeak);
+    isOk = isOk && checkDump(aSession, aFileForWeakDump.c_str(), aStore, anErrorByWeak);
   }
 
   return isOk;

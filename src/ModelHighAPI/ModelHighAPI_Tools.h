@@ -189,7 +189,10 @@ enum checkDumpType {
 /// model must be recreated fully, with all attributes
 /// \returns true if check is well done
 MODELHIGHAPI_EXPORT
-bool checkPythonDump(const checkDumpType theCheckType = CHECK_NAMING_AND_GEOMETRICAL);
+bool checkPyDump(const std::string& theFilenameNaming,
+                 const std::string& theFilenameGeo,
+                 const std::string& theFilenameWeak,
+                 const checkDumpType theCheckType = CHECK_NAMING_AND_GEOMETRICAL);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

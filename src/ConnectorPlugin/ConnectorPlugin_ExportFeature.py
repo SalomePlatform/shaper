@@ -31,15 +31,6 @@ from salome.shaper import model
 
 import os
 
-def getTmpFileName(ext):
-    import tempfile
-    tempdir = tempfile.gettempdir()
-    tmp_file = tempfile.NamedTemporaryFile(suffix=".%s"%ext, prefix='shaper_', dir=tempdir, delete=False)
-    tmp_filename = tmp_file.name
-    if os.name == "nt":
-        tmp_filename.replace("\\", "/")
-    return tmp_filename
-
 ## @ingroup Plugins
 #  Feature to export all shapes and groups into the GEOM module
 class ExportFeature(ModelAPI.ModelAPI_Feature):
@@ -87,7 +78,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
 
               if  not aResult.shape() or aResult.shape().isNull():
                 continue
-              tmpXAOFile = getTmpFileName("xao")
+              tmpXAOFile = model.getTmpFileName("shaper_", ".xao")
               self.tmpXAOFile = tmpXAOFile
               #print "Export to %s"%tmpXAOFile
               exportXAO = ExchangeAPI.exportToXAO(self.Part, tmpXAOFile, model.selection(aResult), "automatic_shaper_export_to_XAO")

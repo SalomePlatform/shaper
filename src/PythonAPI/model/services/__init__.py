@@ -28,7 +28,6 @@ from ModelHighAPI import undo, redo
 from ModelHighAPI import reset
 from ModelHighAPI import addFolder, removeFolder
 from ModelHighAPI import ModelHighAPI_Selection as selection
-from ModelHighAPI import checkPythonDump as checkPythonDump
 from ModelAPI import findPartFeature
 
 # a method used for the python dump of the SHAPER STUDY
@@ -44,3 +43,34 @@ def featureStringId(theFeature):
   if aRoot and aCurrent:
     return str(findPartFeature(aRoot, aCurrent).data().featureId()) + ":" + str(theFeature.feature().data().featureId())
   return ""
+
+
+import os
+
+def getTmpFileName(thePrefix, theSuffix):
+  import tempfile
+  tempdir = tempfile.gettempdir()
+  tmp_file = tempfile.NamedTemporaryFile(suffix=theSuffix, prefix=thePrefix, dir=tempdir, delete=False)
+  tmp_filename = tmp_file.name
+  if os.name == "nt":
+    tmp_filename.replace("\\", "/")
+  tmp_file.close()
+  return tmp_filename
+
+def removeTmpFile(theFilename):
+  try: os.remove(theFilename)
+  except OSError: pass
+
+# Verify the Python dump with generating the auxiliary filenames
+from ModelHighAPI import CHECK_NAMING_AND_GEOMETRICAL
+from ModelHighAPI import checkPyDump
+def checkPythonDump(theDumpMode = CHECK_NAMING_AND_GEOMETRICAL):
+  aPrefix = getTmpFileName("check_dump_", '')
+  aNaming = aPrefix + ".py"
+  aGeo  = aPrefix + "_geo.py"
+  aWeak = aPrefix + "_weak.py"
+  isOk = checkPyDump(aNaming, aGeo, aWeak, theDumpMode)
+  removeTmpFile(aNaming)
+  removeTmpFile(aGeo)
+  removeTmpFile(aWeak)
+  return isOk
