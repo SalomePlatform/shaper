@@ -578,7 +578,8 @@ ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) 
     if (!theIO.IsNull()) {
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(theIO));
     }
-    anObject = myWorkshop->module()->findPresentedObject(anAISObj);
+    if (myWorkshop->module())
+      anObject = myWorkshop->module()->findPresentedObject(anAISObj);
   }
   return anObject;
 }

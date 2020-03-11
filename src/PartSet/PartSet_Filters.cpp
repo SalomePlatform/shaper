@@ -186,7 +186,9 @@ Standard_Boolean
   }
 
   FeaturePtr aFeature = aDocument->feature(aResult);
-  if(!aFeature.get() || aFeature->getKind() != "SketchCircle") {
+  if(!aFeature.get() ||
+    ((aFeature->getKind() != "SketchCircle") &&
+    (aFeature->getKind() != "SketchBSplinePeriodic"))) {
     return Standard_True;
   }
 
