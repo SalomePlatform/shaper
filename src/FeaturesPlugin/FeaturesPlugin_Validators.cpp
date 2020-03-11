@@ -271,9 +271,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
         if(aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
           for(GeomAPI_ShapeIterator anIt(aShape); anIt.more(); anIt.next()) {
             GeomShapePtr aSubShape = anIt.current();
-            if(aSubShape->shapeType() != GeomAPI_Shape::VERTEX
-                && aSubShape->shapeType() != GeomAPI_Shape::EDGE
-                && aSubShape->shapeType() != GeomAPI_Shape::FACE) {
+            if (aSubShape->shapeType() > GeomAPI_Shape::VERTEX ||
+                aSubShape->shapeType() < GeomAPI_Shape::FACE) {
               theError = "Error: Compound should contain only faces, edges or vertices.";
               return false;
             }
