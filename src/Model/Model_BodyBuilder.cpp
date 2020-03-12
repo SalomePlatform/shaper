@@ -936,8 +936,12 @@ int findAmbiguities(const TopoDS_Shape&           theShapeIn,
 //=======================================================================
 void Model_BodyBuilder::loadFirstLevel(GeomShapePtr theShape, const std::string& theName)
 {
-  if(theShape->isNull()) return;
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  GeomShapePtr aShapePtr = shape();
+  if (theShape->isNull() || !aShapePtr.get())
+    return;
+  TopoDS_Shape aShape = shape()->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return;
   std::string aName;
   if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
     TopoDS_Iterator itr(aShape);
