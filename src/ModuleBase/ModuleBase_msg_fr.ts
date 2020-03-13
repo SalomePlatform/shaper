@@ -90,7 +90,7 @@
     </message>
     <message>
         <source>Fourth corner gradient</source>
-        <translation>Quatrième angle</translation>
+        <translation>Quatrième angle de dégradé</translation>
     </message>
     <message>
         <source>Background</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Bord</translation>
+        <translation>Arête</translation>
     </message>
     <message>
         <source>Additional highlighting</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
         <source>Number of rows</source>
-        <translation>Nombre de rangées</translation>
+        <translation>Nombre de lignes</translation>
     </message>
     <message>
         <source>Show Status Bar</source>
@@ -257,24 +257,21 @@
     <name>ModuleBase_WidgetUndoLabel</name>
     <message>
         <source>Undo</source>
-        <translation>Undo</translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Selected objects can be used in Part documents which are not loaded: %1.
-</source>
-        <translation>Les objets sélectionnés peuvent être utilisés dans les documents de pièce non chargés : %1.
-</translation>
+        <source>Selected objects can be used in Part documents which are not loaded: %1.</source>
+        <translation>Les objets sélectionnés peuvent être utilisés dans les documents de pièce non chargés : %1.</translation>
     </message>
     <message>
         <source>Delete features</source>
-        <translation>Supprimer les fonctionnalités</translation>
+        <translation>Supprimer les fonctions</translation>
     </message>
     <message>
-        <source>The following parts will be deleted: %1.
-</source>
+        <source>The following parts will be deleted: %1.</source>
         <translation>Les pièces suivantes seront supprimées : %1.</translation>
     </message>
     <message>

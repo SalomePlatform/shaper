@@ -30,7 +30,7 @@
     </message>
     <message>
       <source>Attribute "variable" is not initialized.</source>
-      <translation>Définir le nom de la variable</translation>
+      <translation>Définir le nom de la variable.</translation>
     </message>
     <message>
       <source>Expression error.</source>
@@ -55,7 +55,11 @@
     <name>Parameter:expression</name>
     <message>
       <source>Please input the expression</source>
-      <translation>S&apos;il vous plaît entrer l&apos;expression</translation>
+      <translation>Veuillez saisir l'expression</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -74,6 +78,10 @@
     <message>
       <source>Please input the parameter name</source>
       <translation>Veuillez saisir le nom du paramètre</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" value is empty.</source>
+      <translation>La valeur de l&apos;attribut &quot;%1&quot; est vide.</translation>
     </message>
   </context>
   <context>
@@ -94,9 +102,6 @@
       <source>Parameters</source>
       <translation>Paramètres</translation>
     </message>
-  </context>
-  <context>
-    <name>ParametersMgr</name>
     <message>
       <source>Add</source>
       <translation>Ajouter</translation>
@@ -111,7 +116,7 @@
     </message>
     <message>
       <source>Features</source>
-      <translation>Caractéristiques</translation>
+      <translation>Fonctions</translation>
     </message>
     <message>
       <source>Insert</source>

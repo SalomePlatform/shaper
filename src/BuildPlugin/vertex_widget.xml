@@ -1,6 +1,6 @@
 <source>
   <multi_selector id="base_objects"
-                  label="Vertices and sketches:"
+                  label="Vertices or sketches:"
                   tooltip="Select vertices or sketch objects or features."
                   shape_types="vertices objects"
                   concealment="true">

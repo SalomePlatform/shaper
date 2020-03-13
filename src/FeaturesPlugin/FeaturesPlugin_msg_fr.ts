@@ -7,7 +7,7 @@
     <name>workshop</name>
     <message>
       <source>Features</source>
-      <translation>Caractéristiques</translation>
+      <translation>Fonctions</translation>
     </message>
     <message>
       <source>Common</source>
@@ -97,6 +97,7 @@
       <source>Union</source>
       <translation>Réunion</translation>
     </message>
+
     <!-- Part menu -->
     <message>
       <source>Angular Copy</source>
@@ -137,7 +138,7 @@
     </message>
     <message>
       <source>Perform boolean common operation with objects</source>
-      <translation>Effectuer l’opération booléenne section avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne Intersection avec des objets</translation>
     </message>
   </context>
   <context>
@@ -172,6 +173,10 @@
       <source>Select objects</source>
       <translation>Sélectionner des objets</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez des objets.</translation>
+    </message>
   </context>
   <context>
     <name>Common:tool_objects</name>
@@ -179,13 +184,10 @@
       <source>Select tools</source>
       <translation>Sélectionnez des outils</translation>
     </message>
-    <context>
-      <name>Common:tool_objects</name>
-      <message>
-        <source>Attribute "%1" is not initialized.</source>
-        <translation>Sélectionnez des outils.</translation>
-      </message>
-    </context>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez des outils.</translation>
+    </message>
     <message>
       <source>Tool objects</source>
       <translation>Objets outils</translation>
@@ -208,7 +210,7 @@
     </message>
     <message>
       <source>Perform boolean cut operation with objects</source>
-      <translation>Effectuer l’opération booléenne découpe avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne découpe avec des objets</translation>
     </message>
   </context>
   <context>
@@ -217,9 +219,6 @@
       <source>Objects not selected.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Cut:FeaturesPlugin_ValidatorBooleanArguments</name>
     <message>
       <source>Tools not selected.</source>
       <translation>Les objets outils ne sont pas sélectionnés.</translation>
@@ -253,11 +252,11 @@
     <name>Defeaturing</name>
     <message>
       <source>Defeaturing</source>
-      <translation>Vaincre</translation>
+      <translation>Supprimer un détail</translation>
     </message>
     <message>
       <source>Faces to remove</source>
-      <translation>Visages à retirer</translation>
+      <translation>Faces à retirer</translation>
     </message>
     <message>
       <source>Select faces</source>
@@ -325,9 +324,6 @@
       <source>Select a base objects</source>
       <translation>Sélectionnez un objet de base</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un objet de base.</translation>
@@ -348,7 +344,7 @@
     <name>Extrusion:from_object</name>
     <message>
       <source>From face</source>
-      <translation>À l’angle</translation>
+      <translation>À la face</translation>
     </message>
     <message>
       <source>&lt;base sketch&gt;</source>
@@ -381,7 +377,7 @@
     <name>Extrusion:to_object</name>
     <message>
       <source>To face</source>
-      <translation>Jusqu’à la face</translation>
+      <translation>Jusqu&apos;à la face</translation>
     </message>
     <message>
       <source>&lt;base sketch&gt;</source>
@@ -421,7 +417,7 @@
     <name>Extrusion:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 
@@ -448,6 +444,10 @@
       <source>To</source>
       <translation>À</translation>
     </message>
+    <message>
+      <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute have empty context.</source>
+      <translation>Erreur : L&apos;objet sélectionné est invalide.</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionCut:CreationMethod</name>
@@ -470,9 +470,6 @@
       <source>Select a sketch face</source>
       <translation>Sélectionnez une face d&apos;esquisse</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une face d&apos;esquisse.</translation>
@@ -497,7 +494,7 @@
     <name>ExtrusionCut:from_object</name>
     <message>
       <source>From face</source>
-      <translation>À l’angle</translation>
+      <translation>À la face</translation>
     </message>
     <message>
       <source>&lt;base sketch&gt;</source>
@@ -542,7 +539,11 @@
     </message>
     <message>
       <source>Objects to Cut</source>
-      <translation>Objets à couper</translation>
+      <translation>Objets à découper</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -553,7 +554,7 @@
     </message>
     <message>
       <source>To face</source>
-      <translation>Jusqu’à la face</translation>
+      <translation>Jusqu&apos;à la face</translation>
     </message>
     <message>
       <source>Bounding plane (select a planar face)</source>
@@ -590,7 +591,7 @@
     <name>ExtrusionCut:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
@@ -598,13 +599,6 @@
     <message>
       <source>Error: Extrusion algorithm failed.</source>
       <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Les objets principaux ne sont pas sélectionnés</translation>
     </message>
   </context>
   <context>
@@ -660,6 +654,10 @@
       <source>Select a sketch face</source>
       <translation>Sélectionnez une face d&apos;esquisse</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets de base.</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionFuse:direction_object</name>
@@ -680,7 +678,7 @@
     <name>ExtrusionFuse:from_object</name>
     <message>
       <source>From face</source>
-      <translation>À l’angle</translation>
+      <translation>À la face</translation>
     </message>
     <message>
       <source>&lt;base sketch&gt;</source>
@@ -727,12 +725,16 @@
       <source>Objects to Fuse</source>
       <translation>Objets à fusionner</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés.</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionFuse:to_object</name>
     <message>
       <source>To face</source>
-      <translation>Jusqu’à la face</translation>
+      <translation>Jusqu&apos;à la face</translation>
     </message>
     <message>
       <source>&lt;base sketch&gt;</source>
@@ -773,14 +775,7 @@
     <name>ExtrusionFuse:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionner des objets de base.</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
@@ -791,20 +786,12 @@
     </message>
   </context>
   <context>
-    <name>ExtrusionFuse:main_objects</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Les objets principaux ne sont pas sélectionnés</translation>
-    </message>
-  </context>
-  <context>
     <name>ExtrusionFuse:to_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
     <message>
       <source>Error: Extrusion algorithm failed.</source>
       <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
     </message>
   </context>
-
 
   <!-- Fillet -->
   <context>
@@ -815,7 +802,7 @@
     </message>
     <message>
       <source>Perform fillet on face or edge</source>
-      <translation>Effectuer un congé sur la face ou le bord</translation>
+      <translation>Effectuer un congé sur la face ou l'arête</translation>
     </message>
   </context>
   <context>
@@ -833,7 +820,7 @@
     <name>Fillet:main_objects</name>
     <message>
       <source>Faces or/and edges</source>
-      <translation>Faces ou/et bords</translation>
+      <translation>Faces ou/et arêtes</translation>
     </message>
     <message>
       <source>Select objects</source>
@@ -880,7 +867,7 @@
     </message>
     <message>
       <source>Perform boolean fuse operation with objects</source>
-      <translation>Effectuer l’opération booléenne fusion avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne fusion avec des objets</translation>
     </message>
   </context>
   <context>
@@ -990,7 +977,7 @@
     </message>
     <message>
       <source>Select objects (compounds, compsolids, solids, shells, faces or edges)</source>
-      <translation>Sélectionner des objets (assemblages, solides composites, coques, faces ou arêtes)</translation>
+      <translation>Sélectionner des objets (ensembles, solides composites, coques, faces ou arêtes)</translation>
     </message>
   </context>
 
@@ -1011,6 +998,14 @@
     <message>
       <source>Error: Attribute "%1" should contain at least %2 items.</source>
       <translation>Erreur : l&apos;attribut &quot;%1&quot; doit contenir au moins %2 éléments.</translation>
+    </message>
+    <message>
+      <source>Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
+      <translation>Erreur: Nombre incorrect d&apos;arguments (2 attendus): id de la liste de sélection et nombre minimal d&apos;objets</translation>
+    </message>
+    <message>
+      <source>Error: Could not get attribute "%1".</source>
+      <translation>Erreur: Objets non sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -1047,6 +1042,10 @@
       <source>Select a base objects</source>
       <translation>Sélectionnez un objet de base</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets de base.</translation>
+    </message>
   </context>
   <context>
     <name>Pipe:binormal</name>
@@ -1058,12 +1057,16 @@
       <source>Select an edge for Bi-Normal</source>
       <translation>Sélectionnez une arête pour Bi-Normal</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le vecteur binormal n'est pas sélectionné.</translation>
+    </message>
   </context>
   <context>
     <name>Pipe:creation_method</name>
     <message>
       <source>Pipe by objects, path and Bi-Normal</source>
-      <translation>Tyau par objets, chemin et Bi-Normal</translation>
+      <translation>Tuyau par objets, chemin et Bi-Normal</translation>
     </message>
     <message>
       <source>Pipe by objects, path and locations</source>
@@ -1102,23 +1105,6 @@
       <source>Select an edge or wire for path</source>
       <translation>Sélectionnez une arête ou un contour pour le chemin</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionner des objets de base.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Le vecteur binormal n&apos;est pas sélectionné</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:path_object</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une arête ou un contour pour le chemin.</translation>
@@ -1159,7 +1145,7 @@
     <name>Recover:method</name>
     <message>
       <source>Concealed compounds</source>
-      <translation>Assemblages cachés</translation>
+      <translation>Ensembles cachés</translation>
     </message>
     <message>
       <source>Concealed results</source>
@@ -1231,7 +1217,7 @@
     <name>Remove_SubShapes</name>
     <message>
       <source>Allows to remove sub-shapes from wires, shells, compsolids and compounds</source>
-      <translation>Permet de supprimer les sous formes de fils, coques, solides composites et assemblages</translation>
+      <translation>Permet de supprimer les sous formes de fils, coques, solides composites et ensembles</translation>
     </message>
     <message>
       <source>Remove Sub-Shapes</source>
@@ -1338,6 +1324,10 @@
       <source>Select an edge for axis</source>
       <translation>Sélectionnez une arête pour l&apos;axe</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L'axe de révolution n'est pas sélectionné.</translation>
+    </message>
   </context>
   <context>
     <name>Revolution:base</name>
@@ -1395,7 +1385,7 @@
     </message>
     <message>
       <source>To angle</source>
-      <translation>Jusqu’à l’angle</translation>
+      <translation>Jusqu&apos;à l&apos;angle</translation>
     </message>
   </context>
   <context>
@@ -1428,21 +1418,26 @@
     <name>Revolution:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
     <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>FromSize = -ToSize et les plans de délimitation coïncident</translation>
+      <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object</name>
     <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments dans le XML (9 attendus).</translation>
+    </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToSize = -FromSize.</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
     </message>
   </context>
 
@@ -1494,6 +1489,10 @@
     <message>
       <source>Select an edge for axis</source>
       <translation>Sélectionnez une arête pour l&apos;axe</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L'axe de révolution n'est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -1548,7 +1547,11 @@
     </message>
     <message>
       <source>Objects to Cut</source>
-      <translation>Objets à couper</translation>
+      <translation>Objets à découper</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -1559,7 +1562,7 @@
     </message>
     <message>
       <source>To angle</source>
-      <translation>Jusqu’à l’angle</translation>
+      <translation>Jusqu&apos;à l&apos;angle</translation>
     </message>
   </context>
   <context>
@@ -1592,21 +1595,7 @@
     <name>RevolutionCut:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Les objets principaux ne sont pas sélectionnés</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 
@@ -1658,6 +1647,10 @@
     <message>
       <source>Select an edge for axis</source>
       <translation>Sélectionnez une arête pour l&apos;axe</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -1714,6 +1707,10 @@
       <source>Objects to Fuse</source>
       <translation>Objets à fusionner</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés.</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionFuse:to_angle</name>
@@ -1723,7 +1720,7 @@
     </message>
     <message>
       <source>To angle</source>
-      <translation>Jusqu’à l’angle</translation>
+      <translation>Jusqu&apos;à l&apos;angle</translation>
     </message>
   </context>
   <context>
@@ -1756,21 +1753,7 @@
     <name>RevolutionFuse:sketch</name>
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Les objets principaux ne sont pas sélectionnés</translation>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 
@@ -1779,7 +1762,7 @@
     <name>Scale</name>
     <message>
       <source>Perform scale objects</source>
-      <translation>Effectuer un changement d’échelle des objets</translation>
+      <translation>Effectuer un changement d&apos;échelle des objets</translation>
     </message>
     <message>
       <source>Scale</source>
@@ -1853,7 +1836,7 @@
     <name>Smash</name>
     <message>
       <source>Perform boolean smash operation with objects</source>
-      <translation>Effectuer l’opération booléenne smash avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne smash avec des objets</translation>
     </message>
     <message>
       <source>Smash</source>
@@ -1865,6 +1848,10 @@
     <message>
       <source>Objects not selected.</source>
       <translation>Objets non sélectionnés.</translation>
+    </message>
+    <message>
+      <source>Tools not selected.</source>
+      <translation>Les objets outils ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -1889,20 +1876,13 @@
       <translation>Objets outils</translation>
     </message>
   </context>
-  <context>
-    <name>Smash:FeaturesPlugin_ValidatorBooleanArguments</name>
-    <message>
-      <source>Tools not selected.</source>
-      <translation>Les objets outils ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
 
   <!-- Split -->
   <context>
     <name>Split</name>
     <message>
       <source>Perform boolean split operation with objects</source>
-      <translation>Effectuer l’opération booléenne division avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne division avec des objets</translation>
     </message>
     <message>
       <source>Split</source>
@@ -1972,11 +1952,28 @@
       <translation>Le résultat est vide</translation>
     </message>
   </context>
+
   <context>
     <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
+    </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToSize = -FromSize.</translation>
+    </message>
+    <message>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
+    </message>
+    <message>
+      <source>To face selection is invalid.</source>
+      <translation>La sélection de la face finale est invalide.</translation>
     </message>
   </context>
   <context>
@@ -1985,6 +1982,26 @@
       <source>Attribute "%1" is not initialized.</source>
       <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
+    <message>
+      <source>Attribute "sketch" is not initialized.</source>
+      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "base" is not initialized.</source>
+      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "direction_object" is not initialized.</source>
+      <translation>L&apos;objet Direction pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "from_object" is not initialized.</source>
+      <translation>L&apos;objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "to_object" is not initialized.</source>
+      <translation>L&apos;objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
   </context>
   <context>
     <name>Extrusion:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
@@ -1992,12 +2009,17 @@
       <source>The object is empty</source>
       <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
-      <source>ToSize = -FromSize.</source>
-      <translation>ToSize = -FromSize.</translation>
+      <source>Error: The attribute with the %1 type is not processed</source>
+      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>Error: Wrong parameters in XML definition for %1 type</source>
+      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
+    </message>
+    <message>
+      <source>Wrong parameters in XML definition for %1 type</source>
+      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
     </message>
   </context>
   <context>
@@ -2006,68 +2028,13 @@
       <source>Error: Validator should be used with 2 parameters for extrusion.</source>
       <translation>Validateur &quot;FeaturesPlugin_ValidatorExtrusionDir&quot; doit être utilisé avec 2 paramètres d&apos;extrusion.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:FeaturesPlugin_ValidatorExtrusionDir</name>
     <message>
       <source>Error: Direction is parallel to one of the selected face or face on selected shell.</source>
       <translation>La direction est parallèle à l&apos;une des faces sélectionnées ou à la face de la coque sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "sketch" is not initialized.</source>
-      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base" is not initialized.</source>
-      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "direction_object" is not initialized.</source>
-      <translation>L&apos;objet Direction pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_object" is not initialized.</source>
-      <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: The attribute with the %1 type is not processed</source>
-      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: Wrong parameters in XML definition for %1 type</source>
-      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Wrong parameters in XML definition for %1 type</source>
-      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
+      <source>Error: Base objects list contains vertex or edge, so attribute "direction_object" can not be used with default value. Select direction for extrusion.</source>
+      <translation>La liste des objets de base contient un sommet ou une arête, ainsi la direction par défaut ne peut pas être utilisée. Sélectionnez la direction d&apos;extrusion.</translation>
     </message>
   </context>
   <context>
@@ -2076,142 +2043,85 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
       <translation>Erreur : attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute have empty context.</source>
       <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
     <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
+      <translation>Référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Objet de direction non sélectionné.</translation>
@@ -2223,16 +2133,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -2244,75 +2148,13 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>Wrong number of validator arguments in xml (expected 9).</source>
-      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>ToSize = -FromSize.</source>
-      <translation>ToSize = -FromSize.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:FeaturesPlugin_ValidatorExtrusionDir</name>
-    <message>
-      <source>Error: Base objects list contains vertex or edge, so attribute "direction_object" can not be used with default value. Select direction for extrusion.</source>
-      <translation>La liste des objets de base contient un sommet ou une arête, ainsi la direction par défaut ne peut pas être utilisée. Sélectionnez la direction d&apos;extrusion.</translation>
     </message>
   </context>
   <context>
@@ -2336,110 +2178,117 @@
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
     </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToSize = -FromSize.</translation>
+    </message>
+    <message>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
+    </message>
+    <message>
+      <source>To face selection is invalid.</source>
+      <translation>La sélection de la face finale est invalide.</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
-      <source> Attribute "base" is not initialized.</source>
+      <source>Attribute "base" is not initialized.</source>
       <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:FeaturesPlugin_ValidatorExtrusionDir</name>
-    <message>
-      <source>Error: Validator should be used with 2 parameters for extrusion.</source>
-      <translation>Validateur &quot;FeaturesPlugin_ValidatorExtrusionDir&quot; doit être utilisé avec 2 paramètres d&apos;extrusion.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:FeaturesPlugin_ValidatorExtrusionDir</name>
-    <message>
-      <source>Error: Direction is parallel to one of the selected face or face on selected shell.</source>
-      <translation>La direction est parallèle à l&apos;une des faces sélectionnées ou à la face de la coque sélectionnée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "sketch" is not initialized.</source>
       <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "direction_object" is not initialized.</source>
       <translation>L&apos;objet Direction pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "from_object" is not initialized.</source>
-      <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+      <translation>L&apos;objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
+      <translation>L&apos;objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "to_offset" is not initialized.</source>
-      <translation>Entrez le décalage &quot;jusqu’à&quot;.</translation>
+      <translation>Entrez le décalage &quot;jusqu&apos;à&quot;.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "main_objects" is not initialized.</source>
       <translation>Les objets à couper ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
+    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants: %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Il fait référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
+    </message>
+  </context>
+  <context>
     <name>ExtrusionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>L&apos;objet n&apos;est pas sélectionné</translation>
+    </message>
     <message>
       <source>Error: The attribute with the %1 type is not processed</source>
       <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Error: Wrong parameters in XML definition for %1 type</source>
       <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Wrong parameters in XML definition for %1 type</source>
       <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:FeaturesPlugin_ValidatorExtrusionDir</name>
+    <message>
+      <source>Error: Validator should be used with 2 parameters for extrusion.</source>
+      <translation>Validateur &quot;FeaturesPlugin_ValidatorExtrusionDir&quot; doit être utilisé avec 2 paramètres d&apos;extrusion.</translation>
+    </message>
+    <message>
+      <source>Error: Direction is parallel to one of the selected face or face on selected shell.</source>
+      <translation>La direction est parallèle à l&apos;une des faces sélectionnées ou à la face de la coque sélectionnée.</translation>
     </message>
   </context>
   <context>
@@ -2448,145 +2297,84 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
-      <translation>Sélectionner des objets de base.</translation>
+      <translation>Erreur : Sélectionner des objets de base.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut</name>
-    <message>
-      <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute have empty context.</source>
-      <translation>L&apos;objet sélectionné est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
     <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
+      <translation>Référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -2595,16 +2383,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -2616,124 +2398,37 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>Wrong number of validator arguments in xml (expected 9).</source>
-      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>ToSize = -FromSize.</source>
-      <translation>ToSize = -FromSize.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
-    </message>
-  </context>
+
   <context>
     <name>Revolution:Model_FeatureValidator</name>
     <message>
       <source>Attribute "axis_object" is not initialized.</source>
       <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "sketch" is not initialized.</source>
+      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "base" is not initialized.</source>
+      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "from_object" is not initialized.</source>
+      <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "to_object" is not initialized.</source>
+      <translation>L&apos;objet destination de la révolution n&apos;est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -2742,61 +2437,29 @@
       <source>The object is empty</source>
       <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml (expected 9).</source>
-      <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
-      <source>ToSize = -FromSize.</source>
-      <translation>ToAngle = -FromAngle.</translation>
+      <source>It has reference to an empty attribute</source>
+      <translation>Référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "sketch" is not initialized.</source>
-      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base" is not initialized.</source>
-      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "axis_object" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_object" is not initialized.</source>
-      <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
     </message>
   </context>
   <context>
@@ -2805,23 +2468,14 @@
       <source>The object is empty</source>
       <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Error: The attribute with the %1 type is not processed</source>
       <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Error: Wrong parameters in XML definition for %1 type</source>
       <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Wrong parameters in XML definition for %1 type</source>
       <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
@@ -2833,145 +2487,57 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;essemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
       <translation>Erreur : attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute have empty context.</source>
       <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
@@ -2980,16 +2546,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -3001,86 +2561,34 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
+
   <context>
     <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromAngle = -ToAngle et les plans englobants coïncident.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_object" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
       <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
       <source>ToSize = -FromSize.</source>
       <translation>ToAngle = -FromAngle.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
       <source>From face selection is invalid.</source>
       <translation>La face de départ sélectionnée est invalide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
       <source>To face selection is invalid.</source>
       <translation>La sélection de la face finale est invalide.</translation>
@@ -3089,64 +2597,132 @@
   <context>
     <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
+      <source>Attribute "axis_object" is not initialized.</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
       <source>Attribute "sketch" is not initialized.</source>
       <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base" is not initialized.</source>
       <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_object" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
+      <translation>L&apos;objet destination de la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>L&apos;objet à couper n&apos;est pas sélectionné.</translation>
     </message>
   </context>
   <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
+    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>L’objet à couper n’est pas sélectionné.</translation>
+      <source>The object is empty</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Il fait référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
     </message>
   </context>
   <context>
     <name>RevolutionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
+    </message>
     <message>
       <source>Error: The attribute with the %1 type is not processed</source>
       <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Error: Wrong parameters in XML definition for %1 type</source>
       <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>Wrong parameters in XML definition for %1 type</source>
       <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:GeomValidators_ZeroOffset</name>
+    <message>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
+    </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToAngle = -FromAngle.</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
+    </message>
+    <message>
+      <source>To face selection is invalid.</source>
+      <translation>La sélection de la face finale est invalide.</translation>
     </message>
   </context>
   <context>
@@ -3155,145 +2731,57 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;essemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
       <translation>Erreur : attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute have empty context.</source>
       <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
@@ -3302,16 +2790,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -3323,89 +2805,95 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionCut:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
-    </message>
-  </context>
+
   <context>
     <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
     <message>
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
     </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToSize = -FromSize.</translation>
+    </message>
+    <message>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
+    </message>
+    <message>
+      <source>To face selection is invalid.</source>
+      <translation>La sélection de la face finale est invalide.</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionFuse:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base" is not initialized.</source>
-      <translation>Les objets de base pour l&apos;extrusion ne sont pas sélectionnés.</translation>
+      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "sketch" is not initialized.</source>
+      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "direction_object" is not initialized.</source>
+      <translation>L&apos;objet Direction pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "from_object" is not initialized.</source>
+      <translation>L&apos;objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "to_object" is not initialized.</source>
+      <translation>L&apos;objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>Les objets à fusionner ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
     <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants: %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Il fait référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
     </message>
   </context>
   <context>
@@ -3414,12 +2902,21 @@
       <source>The object is empty</source>
       <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>The result is empty</source>
-      <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
+      <translation>L&apos;objet n&apos;est pas sélectionné</translation>
+    </message>
+    <message>
+      <source>Error: The attribute with the %1 type is not processed</source>
+      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>Error: Wrong parameters in XML definition for %1 type</source>
+      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
+    </message>
+    <message>
+      <source>Wrong parameters in XML definition for %1 type</source>
+      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
     </message>
   </context>
   <context>
@@ -3428,75 +2925,9 @@
       <source>Error: Validator should be used with 2 parameters for extrusion.</source>
       <translation>Validateur &quot;FeaturesPlugin_ValidatorExtrusionDir&quot; doit être utilisé avec 2 paramètres d&apos;extrusion.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:FeaturesPlugin_ValidatorExtrusionDir</name>
     <message>
       <source>Error: Direction is parallel to one of the selected face or face on selected shell.</source>
       <translation>La direction est parallèle à l&apos;une des faces sélectionnées ou à la face de la coque sélectionnée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "sketch" is not initialized.</source>
-      <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base" is not initialized.</source>
-      <translation>Les objets de base pour l&apos;extrusion ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "direction_object" is not initialized.</source>
-      <translation>L&apos;objet Direction pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_object" is not initialized.</source>
-      <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>Les objets à fusionner ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: The attribute with the %1 type is not processed</source>
-      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: Wrong parameters in XML definition for %1 type</source>
-      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Wrong parameters in XML definition for %1 type</source>
-      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
     </message>
   </context>
   <context>
@@ -3505,145 +2936,84 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
-      <translation>Erreur : attribut vide.</translation>
+      <translation>Erreur : Sélectionner des objets de base.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute have empty context.</source>
-      <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
     <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
+      <translation>Référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
+      <translation>Objet de direction non sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -3652,16 +3022,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -3673,131 +3037,64 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>Wrong number of validator arguments in xml (expected 9).</source>
-      <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>ToSize = -FromSize.</source>
-      <translation>ToSize = -FromSize.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>From face selection is invalid.</source>
-      <translation>La face de départ sélectionnée est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>To face selection is invalid.</source>
-      <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
-    <message>
-      <source>FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>FromSize = -ToSize et les plans de délimitation coïncident.</translation>
-    </message>
-  </context>
+
   <context>
     <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
       <source>FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromAngle = -ToAngle et les plans englobants coïncident.</translation>
     </message>
+    <message>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
+    </message>
+    <message>
+      <source>ToSize = -FromSize.</source>
+      <translation>ToAngle = -FromAngle.</translation>
+    </message>
+    <message>
+      <source>From face selection is invalid.</source>
+      <translation>La face de départ sélectionnée est invalide.</translation>
+    </message>
+    <message>
+      <source>To face selection is invalid.</source>
+      <translation>La sélection de la face finale est invalide.</translation>
+    </message>
   </context>
   <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
+    <name>RevolutionFuset:Model_FeatureValidator</name>
     <message>
       <source>Attribute "axis_object" is not initialized.</source>
       <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "sketch" is not initialized.</source>
+      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "base" is not initialized.</source>
+      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "from_object" is not initialized.</source>
+      <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "to_object" is not initialized.</source>
+      <translation>L&apos;objet destination de la révolution n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>L&apos;objets à fusionner ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -3806,12 +3103,60 @@
       <source>The object is empty</source>
       <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
     </message>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Il fait référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
     </message>
   </context>
   <context>
@@ -3820,12 +3165,21 @@
       <source>The object is empty</source>
       <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
     <message>
       <source>The result is empty</source>
       <translation>L&apos;objet n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Error: The attribute with the %1 type is not processed</source>
+      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>Error: Wrong parameters in XML definition for %1 type</source>
+      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
+    </message>
+    <message>
+      <source>Wrong parameters in XML definition for %1 type</source>
+      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
     </message>
   </context>
   <context>
@@ -3834,89 +3188,17 @@
       <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
       <source>ToSize = -FromSize.</source>
       <translation>ToAngle = -FromAngle.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
       <source>From face selection is invalid.</source>
       <translation>La face de départ sélectionnée est invalide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
       <source>To face selection is invalid.</source>
       <translation>La sélection de la face finale est invalide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "sketch" is not initialized.</source>
-      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base" is not initialized.</source>
-      <translation>L&apos;objet de base pour la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_object" is not initialized.</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_object" is not initialized.</source>
-      <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_object" is not initialized.</source>
-      <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>Les objets à fusionner ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: The attribute with the %1 type is not processed</source>
-      <translation>Erreur : l&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Error: Wrong parameters in XML definition for %1 type</source>
-      <translation>Erreur : paramètres incorrects dans la définition XML pour le type %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>Wrong parameters in XML definition for %1 type</source>
-      <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
     </message>
   </context>
   <context>
@@ -3925,145 +3207,57 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
-      <translation>Le type d’une forme sélectionnée n’est pas acceptable.</translation>
+      <translation>Le type d&apos;une forme sélectionnée n&apos;est pas acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;essemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
       <translation>Erreur : attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute have empty context.</source>
       <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
   <context>
@@ -4072,16 +3266,10 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:from_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
@@ -4093,70 +3281,16 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:to_object:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
       <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;objet est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
-    </message>
-  </context>
+
   <context>
     <name>Boolean</name>
     <message>
@@ -4297,24 +3431,19 @@
       <translation>Sélectionnez des outils.</translation>
     </message>
   </context>
+
   <context>
     <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Attribute \"%1\" should contain at least %2 items.</source>
+      <source>Error: Attribute "%1" should contain at least %2 items.</source>
       <translation>Au moins %2 objets doivent être sélectionnés dans &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
       <source>Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
       <translation>Nombre incorrect de validateurs &quot;GeomValidators_MinObjectsSelected&quot; (2 attendus) : id de la liste de sélection et nombre minimal d&apos;objets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Could not get attribute \"%1\".</source>
+      <source>Error: Could not get attribute "%1".</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
@@ -4328,43 +3457,32 @@
   <context>
     <name>Partition:base_objects:FeaturesPlugin_ValidatorPartitionSelection</name>
     <message>
-      <source>Error: This validator can only work with selection list in \"Partition\" feature.</source>
-      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec une liste de sélection dans la fonctionnalité \"Partition\".</translation>
+      <source>Error: This validator can only work with selection list in "Partition" feature.</source>
+      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec une liste de sélection dans la fonctionnalité &quot;Partition&quot;.</translation>
     </message>
-  </context>
-  <context>
-    <name>Partition:base_objects:FeaturesPlugin_ValidatorPartitionSelection</name>
     <message>
       <source>Error: Only body shapes and construction planes are allowed for selection.</source>
-      <translation>Seuls les formes et les plans de construction sont autorisés pour la sélection.</translation>
+      <translation>Erreur: Seuls les formes et les plans de construction sont autorisés pour la sélection.</translation>
     </message>
   </context>
-  <context>
-    <name>Partition:base_objects:FeaturesPlugin_ValidatorPartitionSelection</name>
-    <message>
-      <source>Error: Only body shapes and construction planes are allowed for selection.</source>
-      <translation>Seuls les formes et les plans de construction sont autorisés pour la sélection.</translation>
-    </message>
-  </context>
+
   <context>
     <name>Pipe:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_objects" is not initialized.</source>
       <translation>L&apos;objet de base pour le tuyau n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
     <message>
       <source>Attribute "binormal" is not initialized.</source>
       <translation>Le vecteur binormal n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
     <message>
       <source>Attribute "path_object" is not initialized.</source>
       <translation>L&apos;objet pour le chemin de canal n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>Attribute "locations_objects" is not initialized.</source>
+      <translation>Emplacements non sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -4373,6 +3491,30 @@
       <source>The object is empty</source>
       <translation>Le vecteur binormal n&apos;est pas sélectionné.</translation>
     </message>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Référence à un attribut vide</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>La forme est vide</translation>
+    </message>
   </context>
   <context>
     <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
@@ -4380,47 +3522,24 @@
       <source>Error: Empty context.</source>
       <translation>L&apos;objet pour le chemin de canal n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
-      <translation>Impossible d&apos;obtenir l&apos;attribut &quot; %1&quot;</translation>
+      <source>Error: This validator can only work with path selector in "Pipe" feature.</source>
+      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec le sélecteur de chemin dans la fonctionnalité "Tuyau".</translation>
+    </message>
+    <message>
+      <source>Error: Local selection of wires not allowed.</source>
+      <translation>Sélection locale des contours non autorisée.</translation>
     </message>
   </context>
   <context>
     <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
+    <message>
+      <source>Error: Could not get "%1" attribute.</source>
+      <translation>Impossible d&apos;obtenir l&apos;attribut &quot;%1&quot;</translation>
+    </message>
     <message>
       <source>Error: Number of locations should be the same as base objects.</source>
       <translation>Le nombre d&apos;emplacements doit être identique à celui des objets de base.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base_objects" is not initialized.</source>
-      <translation>L&apos;objet de base pour le tuyau n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "path_object" is not initialized.</source>
-      <translation>L&apos;objet pour le chemin de canal n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "binormal" is not initialized.</source>
-      <translation>Le vecteur binormal n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "locations_objects" is not initialized.</source>
-      <translation>Emplacements non sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -4429,173 +3548,73 @@
       <source>Error: Validator parameters is empty.</source>
       <translation>Erreur : les paramètres du validateur sont vides.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute contains unacceptable shape.</source>
       <translation>Erreur : l&apos;attribut contient une forme inacceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L’assemblage doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apo;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
       <translation>L&apos;objet de cette esquisse est déjà sélectionné. L&apos;esquisse n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
       <translation>L&apos;esquisse entière avec cet objet est déjà sélectionnée. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Wire with wrong orientation selected.</source>
       <translation>Contour avec mauvaise orientation sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty attribute.</source>
       <translation>Erreur : attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Attribute have empty context.</source>
       <translation>Erreur : l&apos;attribut a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Empty shape selected</source>
       <translation>Erreur : forme vide sélectionnée</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Infinite constructions is not allowed as base.</source>
       <translation>Les constructions infinies ne sont pas autorisées comme base.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
+      <translation>Le type de la forme sélectionnée n&apos;est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
-  <context>
-    <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
-    <message>
-      <source>Error: This validator can only work with path selector in \"Pipe\" feature.</source>
-      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec le sélecteur de chemin dans la fonctionnalité \"Tuyau\".</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
-    <message>
-      <source>Error: Empty context.</source>
-      <translation>L&apos;objet pour le chemin de canal n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
-    <message>
-      <source>Error: Local selection of wires not allowed.</source>
-      <translation>Sélection locale des contours non autorisée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>Le vecteur binormal n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:binormal:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>La forme est vide</translation>
-    </message>
-  </context>
+
   <context>
     <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
     <message>
       <source>Error: Base shape is empty.</source>
       <translation>La forme de base n&apos;est pas sélectionnée.</translation>
+    </message>
+    <message>
+      <source>Error: Could not get "%1" attribute.</source>
+      <translation>Impossible d&apos;obtenir l&apos;attribut &quot; %1&quot;.</translation>
+    </message>
+    <message>
+      <source>Error: Resulting shape is not valid.</source>
+      <translation>La forme résultante n&apos;est pas valide.</translation>
     </message>
   </context>
   <context>
@@ -4604,6 +3623,10 @@
       <source>Error: Context is empty.</source>
       <translation>L&apos;objet sélectionné a un contexte vide.</translation>
     </message>
+    <message>
+      <source>Error: Result construction selected.</source>
+      <translation>Erreur : construction du résultat sélectionnée.</translation>
+    </message>
   </context>
   <context>
     <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
@@ -4611,26 +3634,21 @@
       <source>Error: Empty context.</source>
       <translation>L&apos;objet sélectionné a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
-      <translation>Impossible d&apos;obtenir l&apos;attribut &quot; %1&quot;.</translation>
+      <source>Error: This validator can only work with selection list in "Remove Sub-Shapes" feature.</source>
+      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec la liste de sélection de la fonction "Supprimer les sous-formes".</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
     <message>
-      <source>Error: Base shape is empty.</source>
-      <translation>La forme de base n&apos;est pas sélectionnée.</translation>
+      <source>Error: Could not get "%1" attribute.</source>
+      <translation>Erreur : impossible d&apos;obtenir l&apos;attribut "%1".</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
     <message>
-      <source>Error: Resulting shape is not valid.</source>
-      <translation>La forme résultante n&apos;est pas valide.</translation>
+      <source>Error: Empty base shape.</source>
+      <translation>Forme de base non sélectionnée.</translation>
+    </message>
+    <message>
+      <source>Error: Only sub-shapes of selected shape is allowed for selection.</source>
+      <translation>Seules les sous-formes de la forme sélectionnée sont autorisées pour la sélection.</translation>
     </message>
   </context>
   <context>
@@ -4639,9 +3657,6 @@
       <source>Attribute "base_shape" is not initialized.</source>
       <translation>La forme de base n&apos;est pas sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:Model_FeatureValidator</name>
     <message>
       <source>Attribute "subshapes" is not initialized.</source>
       <translation>Les sous-formes ne sont pas sélectionnées.</translation>
@@ -4653,107 +3668,38 @@
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Il fait référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>L&apos;objet est vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Le résultat est vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>La forme est vide</translation>
     </message>
   </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_BodyShapes</name>
-    <message>
-      <source>Error: Context is empty.</source>
-      <translation>L&apos;objet sélectionné a un contexte vide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_BodyShapes</name>
-    <message>
-      <source>Error: Result construction selected.</source>
-      <translation>Erreur : construction du résultat sélectionnée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
-    <message>
-      <source>Error: This validator can only work with selection list in \"Remove Sub-Shapes\" feature.</source>
-      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec la liste de sélection de la fonction \"Supprimer les sous-formes\".</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
-    <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
-      <translation>Erreur : impossible d&apos;obtenir l&apos;attribut \"%1\".</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
-    <message>
-      <source>Error: Empty context.</source>
-      <translation>L&apos;objet sélectionné a un contexte vide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
-    <message>
-      <source>Error: Empty base shape.</source>
-      <translation>Forme de base non sélectionnée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
-    <message>
-      <source>Error: Only sub-shapes of selected shape is allowed for selection.</source>
-      <translation>Seules les sous-formes de la forme sélectionnée sont autorisées pour la sélection.</translation>
-    </message>
-  </context>
+
   <context>
     <name>Intersection:Model_FeatureValidator</name>
     <message>
       <source>Attribute "main_objects" is not initialized.</source>
       <translation>Les objets principaux ne sont pas sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:Model_FeatureValidator</name>
     <message>
       <source>Attribute "tool_objects" is not initialized.</source>
       <translation>Les objets outils ne sont pas sélectionnés.</translation>
@@ -4765,61 +3711,29 @@
       <source>Error: empty selection.</source>
       <translation>Sélection vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty attribute selection.</source>
       <translation>La sélection d&apos;attribut est vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty selection context.</source>
       <translation>L&apos;objet sélectionné a un contexte vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty feature.</source>
       <translation>Les objets sélectionnés ont une fonctionnalité vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: %1 shape is not allowed for selection.</source>
       <translation>La forme %1 n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty shape.</source>
       <translation>Forme vide sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: selected shape has the wrong type.</source>
       <translation>La forme sélectionnée est du mauvais type.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Intersection:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>Les objets principaux ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Intersection:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "tool_objects" is not initialized.</source>
-      <translation>Les objets outils ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -4828,61 +3742,49 @@
       <source>Error: empty selection.</source>
       <translation>Erreur : sélection vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty attribute selection.</source>
       <translation>Erreur : sélection d&apos;attribut vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty selection context.</source>
       <translation>Erreur : contexte de sélection vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty feature.</source>
       <translation>Erreur : fonctionnalité vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: %1 shape is not allowed for selection.</source>
       <translation>La forme %1 n&apos;est pas autorisée pour la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty shape.</source>
       <translation>Erreur : forme vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: Local selection not allowed.</source>
       <translation>Sélection locale non autorisée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Intersection:main_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: selected shape has the wrong type.</source>
       <translation>La forme sélectionnée est du mauvais type.</translation>
     </message>
   </context>
+
   <context>
     <name>Placement:Model_FeatureValidator</name>
     <message>
       <source>Attribute "placement_end_shape" is not initialized.</source>
       <translation>La forme du placement final n&apos;est pas définie.</translation>
+    </message>
+    <message>
+      <source>Attribute "placement_objects_list" is not initialized.</source>
+      <translation>Les objets à placer ne sont pas sélectionnés.</translation>
+    </message>
+    <message>
+      <source>Attribute "placement_start_shape" is not initialized.</source>
+      <translation>La forme de départ n&apos;est pas définie.</translation>
     </message>
   </context>
   <context>
@@ -4893,129 +3795,65 @@
     </message>
   </context>
   <context>
-    <name>Placement:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "placement_objects_list" is not initialized.</source>
-      <translation>Les objets à placer ne sont pas sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
     <name>Placement:placement_objects_list:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité.</translation>
     </message>
-  </context>
-  <context>
-    <name>Placement:placement_objects_list:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
       <translation>Les objets du groupe %1 peuvent être sélectionnés dans le document %2, mais un objet du groupe %3 est sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Placement:placement_objects_list:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>Selecting a part of compsolid is forbidden.</source>
       <translation>La sélection d'une partie de solide composite est interdite.</translation>
     </message>
   </context>
-  <context>
-    <name>Placement:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "placement_start_shape" is not initialized.</source>
-      <translation>La forme de départ n&apos;est pas définie.</translation>
-    </message>
-  </context>
+
   <context>
     <name>Rotation:Model_FeatureValidator</name>
     <message>
       <source>Attribute "angle" is not initialized.</source>
       <translation>L&apos;angle n&apos;est pas défini.</translation>
     </message>
-  </context>
-  <context>
-    <name>Rotation:Model_FeatureValidator</name>
     <message>
       <source>Attribute "axis_object" is not initialized.</source>
       <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>It has reference to an empty attribute</source>
-      <translation>Il fait référence à un attribut vide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
-      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The result is empty</source>
-      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Rotation:Model_FeatureValidator</name>
     <message>
       <source>Attribute "main_objects" is not initialized.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
   <context>
-    <name>Rotation:Model_FeatureValidator</name>
+    <name>Rotation:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Attribute "axis_object" is not initialized.</source>
+      <source>The object is empty</source>
       <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Rotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "angle" is not initialized.</source>
-      <translation>L&apos;angle n&apos;est pas défini.</translation>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Les objets sélectionnés contiennent un élément avec un type de forme non autorisé.</translation>
+    </message>
+    <message>
+      <source>It has reference to an empty attribute</source>
+      <translation>Il fait référence à un attribut vide.</translation>
+    </message>
+    <message>
+      <source>Shape type is "%1", it should be "%2"</source>
+      <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;.</translation>
+    </message>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité.</translation>
+    </message>
+    <message>
+      <source>The result is empty</source>
+      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
+    </message>
+    <message>
+      <source>The shape is empty</source>
+      <translation>L&apos;axe de rotation n&apos;est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -5024,14 +3862,12 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Rotation:main_objects:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
       <translation>Les objets du groupe %1 peuvent être sélectionnés dans le document %2, mais un objet du groupe %3 est sélectionné.</translation>
     </message>
   </context>
+
   <context>
     <name>Translation:Model_FeatureValidator</name>
     <message>
@@ -5045,51 +3881,26 @@
       <source>The object is empty</source>
       <translation>L&apos;axe de translation n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Il fait référence à un attribut vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;.</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>L&apos;axe de translation n&apos;est pas sélectionné.</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
-    <message>
-      <source>The shape is empty</source>
-      <translation>L&apos;axe de translation n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>L&apos;axe de translation n&apos;est pas sélectionné.</translation>
@@ -5101,23 +3912,18 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Translation:main_objects:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
       <translation>Les objets du groupe %1 peuvent être sélectionnés dans le document %2, mais un objet du groupe %3 est sélectionné.</translation>
     </message>
   </context>
+
   <context>
     <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
+      <source>Error: Could not get "%1" attribute.</source>
       <translation>Impossible d&apos;obtenir l&apos;attribut &quot; %1&quot;.</translation>
     </message>
-  </context>
-  <context>
-    <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
     <message>
       <source>Error: Not all shapes have shared topology.</source>
       <translation>La topologie n&apos;est pas partagée par toutes les formes.</translation>
@@ -5133,12 +3939,9 @@
   <context>
     <name>Union:base_objects:FeaturesPlugin_ValidatorUnionSelection</name>
     <message>
-      <source>Error: This validator can only work with selection list in \"%1\" feature.</source>
-      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec la liste de sélection dans la fonctionnalité \"%1\".</translation>
+      <source>Error: This validator can only work with selection list in "%1" feature.</source>
+      <translation>Erreur : ce validateur ne peut fonctionner qu&apos;avec la liste de sélection dans la fonctionnalité "%1".</translation>
     </message>
-  </context>
-  <context>
-    <name>Union:base_objects:FeaturesPlugin_ValidatorUnionSelection</name>
     <message>
       <source>Error: Whole compsolids not allowed for selection.</source>
       <translation>Solides composites entiers non autorisés pour la sélection.</translation>
@@ -5150,12 +3953,9 @@
       <source>Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
       <translation>Erreur : Nombre d&apos;arguments incorrect (2 attendus): id de la liste de sélection et nombre minimal d&apos;objets</translation>
     </message>
-  </context>
-  <context>
-    <name>Union:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Could not get attribute \"%1\".</source>
-      <translation>Erreur : impossible d&apos;obtenir l&apos;attribut \"%1\".</translation>
+      <source>Error: Could not get attribute "%1".</source>
+      <translation>Erreur : impossible d&apos;obtenir l&apos;attribut "%1".</translation>
     </message>
   </context>
   <context>
@@ -5310,7 +4110,7 @@
     <name>LinearCopy:step_first_dir</name>
     <message>
       <source>Step</source>
-      <translation>Étape</translation>
+      <translation>Pas</translation>
     </message>
     <message>
       <source>Step for the first direction</source>
@@ -5321,7 +4121,7 @@
     <name>LinearCopy:step_second_dir</name>
     <message>
       <source>Step</source>
-      <translation>Étape</translation>
+      <translation>Pas</translation>
     </message>
     <message>
       <source>Step for the second direction</source>
@@ -5352,7 +4152,7 @@
     <name>Measurement:MeasureKind</name>
     <message>
       <source>Angle between edges</source>
-      <translation>Angle entre les bords</translation>
+      <translation>Angle entre les arêtes</translation>
     </message>
     <message>
       <source>Angle by 3 points</source>
@@ -5364,18 +4164,18 @@
     </message>
     <message>
       <source>Edge length</source>
-      <translation>Longueur de bord</translation>
+      <translation>Longueur d&apos;arête</translation>
     </message>
     <message>
       <source>Radius of circular edge, cylindrical surface or sphere</source>
-      <translation>Rayon du bord circulaire, de la surface cylindrique ou de la sphère</translation>
+      <translation>Rayon de l&apos;arête circulaire, de la surface cylindrique ou de la sphère</translation>
     </message>
   </context>
   <context>
     <name>Measurement:angle_from</name>
     <message>
       <source>First edge</source>
-      <translation>Premier bord</translation>
+      <translation>Première arête</translation>
     </message>
     <message>
       <source>Select an edge</source>
@@ -5411,7 +4211,7 @@
     <name>Measurement:angle_point_2</name>
     <message>
       <source>Angle apex</source>
-      <translation>Sommet de l’angle</translation>
+      <translation>Sommet de l&apos;angle</translation>
     </message>
     <message>
       <source>Select a point</source>
@@ -5447,7 +4247,7 @@
     <name>Measurement:angle_to</name>
     <message>
       <source>Second edge</source>
-      <translation>Deuxième bord</translation>
+      <translation>Deuxième arête</translation>
     </message>
     <message>
       <source>Select an edge</source>
@@ -5498,7 +4298,7 @@
     <name>Measurement:edge_for_length</name>
     <message>
       <source>Edge</source>
-      <translation>Bord</translation>
+      <translation>Arête</translation>
     </message>
     <message>
       <source>Select an edge</source>

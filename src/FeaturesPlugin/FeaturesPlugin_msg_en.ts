@@ -243,7 +243,7 @@
   <context>
     <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -433,7 +433,7 @@
   <context>
     <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
   </context>
@@ -664,7 +664,7 @@
   <context>
     <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -797,7 +797,7 @@
   <context>
     <name>ExtrusionCut:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -1119,7 +1119,7 @@
   <context>
     <name>Revolution:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -1266,7 +1266,7 @@
   <context>
     <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
   </context>
@@ -1518,7 +1518,7 @@
   <context>
     <name>RevolutionCut:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -1651,7 +1651,7 @@
   <context>
     <name>RevolutionCut:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -1700,7 +1700,7 @@
   <context>
     <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
   </context>
@@ -1938,7 +1938,7 @@
   <context>
     <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -2071,7 +2071,7 @@
   <context>
     <name>ExtrusionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -2176,7 +2176,7 @@
   <context>
     <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: </source>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
   </context>
@@ -2428,7 +2428,7 @@
   <context>
     <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -2561,7 +2561,7 @@
   <context>
     <name>RevolutionFuse:main_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -2736,7 +2736,7 @@
   <context>
     <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Attribute \"%1\" should contain at least %2 items.</source>
+      <source>Error: Attribute "%1" should contain at least %2 items.</source>
       <translation>At least %2 object(s) should be selected in "%1"</translation>
     </message>
   </context>
@@ -2750,7 +2750,7 @@
   <context>
     <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Could not get attribute \"%1\".</source>
+      <source>Error: Could not get attribute "%1".</source>
       <translation>Objects not selected.</translation>
     </message>
   </context>
@@ -2764,7 +2764,7 @@
   <context>
     <name>Partition:base_objects:FeaturesPlugin_ValidatorPartitionSelection</name>
     <message>
-      <source>Error: This validator can only work with selection list in \"Partition\" feature.</source>
+      <source>Error: This validator can only work with selection list in "Partition" feature.</source>
       <translation></translation>
     </message>
   </context>
@@ -2820,7 +2820,7 @@
   <context>
     <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
+      <source>Error: Could not get "%1" attribute.</source>
       <translation>Could not get "%1" attribute</translation>
     </message>
   </context>
@@ -2960,7 +2960,7 @@
   <context>
     <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
     <message>
-      <source>Error: This validator can only work with path selector in \"Pipe\" feature.</source>
+      <source>Error: This validator can only work with path selector in "Pipe" feature.</source>
       <translation></translation>
     </message>
   </context>
@@ -2995,7 +2995,7 @@
   <context>
     <name>Pipe:binormal:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -3051,7 +3051,7 @@
   <context>
     <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
+      <source>Error: Could not get "%1" attribute.</source>
       <translation>Could not get "%1" attribute.</translation>
     </message>
   </context>
@@ -3100,7 +3100,7 @@
   <context>
     <name>Remove_SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
   </context>
@@ -3149,14 +3149,14 @@
   <context>
     <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
     <message>
-      <source>Error: This validator can only work with selection list in \"Remove Sub-Shapes\" feature.</source>
+      <source>Error: This validator can only work with selection list in "Remove Sub-Shapes" feature.</source>
       <translation></translation>
     </message>
   </context>
   <context>
     <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
+      <source>Error: Could not get "%1" attribute.</source>
       <translation></translation>
     </message>
   </context>
@@ -3415,7 +3415,7 @@
   <context>
     <name>Rotation:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2".</translation>
     </message>
   </context>
@@ -3513,7 +3513,7 @@
   <context>
     <name>Translation:axis_object:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2".</translation>
     </message>
   </context>
@@ -3569,7 +3569,7 @@
   <context>
     <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
     <message>
-      <source>Error: Could not get \"%1\" attribute.</source>
+      <source>Error: Could not get "%1" attribute.</source>
       <translation>Could not get "%1" attribute.</translation>
     </message>
   </context>
@@ -3590,7 +3590,7 @@
   <context>
     <name>Union:base_objects:FeaturesPlugin_ValidatorUnionSelection</name>
     <message>
-      <source>Error: This validator can only work with selection list in \"%1\" feature.</source>
+      <source>Error: This validator can only work with selection list in "%1" feature.</source>
       <translation></translation>
     </message>
   </context>
@@ -3611,7 +3611,7 @@
   <context>
     <name>Union:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Could not get attribute \"%1\".</source>
+      <source>Error: Could not get attribute "%1".</source>
       <translation></translation>
     </message>
   </context>

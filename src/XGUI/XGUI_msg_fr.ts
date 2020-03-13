@@ -118,11 +118,11 @@
     </message>
     <message>
         <source>Show</source>
-        <translation>Afficher</translation>
+        <translation>Voir</translation>
     </message>
     <message>
         <source>Show only</source>
-        <translation>Montrer seulement</translation>
+        <translation>Voir seulement</translation>
     </message>
     <message>
         <source>Hide</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
         <source>Select parent feature</source>
-        <translation>Sélectionner une entité parente</translation>
+        <translation>Sélectionner la fonction parente</translation>
     </message>
     <message>
         <source>TInspector</source>
@@ -217,7 +217,7 @@
     <name>XGUI_DataTree</name>
     <message>
         <source>History change</source>
-        <translation>Changement l&apos;historique</translation>
+        <translation>Changement dans l&apos;historique</translation>
     </message>
 </context>
 <context>
@@ -276,11 +276,11 @@
     </message>
     <message>
         <source>COMPOUND</source>
-        <translation>ASSEMBLAGE</translation>
+        <translation>ENSEMBLE</translation>
     </message>
     <message>
         <source>COMPSOLID</source>
-        <translation>COMPSOLIDE</translation>
+        <translation>SOLIDE COMPOSITE</translation>
     </message>
     <message>
         <source>SOLID</source>
@@ -300,7 +300,7 @@
     </message>
     <message>
         <source>EDGE</source>
-        <translation>BORD</translation>
+        <translation>ARETE</translation>
     </message>
     <message>
         <source>VERTEX</source>
@@ -344,15 +344,15 @@
     </message>
     <message>
         <source>Major radius</source>
-        <translation>Rayon majeur</translation>
+        <translation>Rayon principal</translation>
     </message>
     <message>
         <source>Minor radius</source>
-        <translation>Rayon mineur</translation>
+        <translation>Rayon secondaire</translation>
     </message>
     <message>
         <source>Edge</source>
-        <translation>Bord</translation>
+        <translation>Arête</translation>
     </message>
     <message>
         <source>Start point</source>
@@ -483,7 +483,7 @@
     <name>XGUI_ObjectsBrowser</name>
     <message>
         <source>Part set</source>
-        <translation>Ensemble</translation>
+        <translation>Assemblage</translation>
     </message>
 </context>
 <context>
@@ -607,7 +607,7 @@
     </message>
     <message>
         <source>The document is modified, save before opening another?</source>
-        <translation>Le document est modifié, sauvegarder avant d&apos;en ouvrir un autre ?</translation>
+        <translation>Le document est modifié, sauvegarder avant d&apos;en ouvrir un autre?</translation>
     </message>
     <message>
         <source>Open file</source>
@@ -619,7 +619,7 @@
     </message>
     <message>
         <source>Show object</source>
-        <translation>Montrer l&apos;objet</translation>
+        <translation>Voir l&apos;objet</translation>
     </message>
     <message>
         <source>&apos;%1&apos;
@@ -667,7 +667,7 @@ Supprimer des objets du panneau à afficher ?</translation>
     </message>
     <message>
         <source>Export a part of the current document into a file</source>
-        <translation>Exporter une partie du document courant dans un fichier</translation>
+        <translation>Exporter une pièce du document courant dans un fichier</translation>
     </message>
     <message>
         <source>Import structure of a part</source>
@@ -675,19 +675,19 @@ Supprimer des objets du panneau à afficher ?</translation>
     </message>
     <message>
         <source>Part set...</source>
-        <translation>Ensemble de parties...</translation>
+        <translation>Assemblage...</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation>Importation</translation>
+        <translation>Importer</translation>
     </message>
     <message>
         <source>Part...</source>
-        <translation>Partie...</translation>
+        <translation>Pièce...</translation>
     </message>
     <message>
         <source>From CAD format...</source>
-        <translation>A partir du format CAO...</translation>
+        <translation>À partir du format CAO...</translation>
     </message>
     <message>
         <source>Import shape from a CAD format file</source>
@@ -703,7 +703,7 @@ Supprimer des objets du panneau à afficher ?</translation>
     </message>
     <message>
         <source>Number of Iso-lines</source>
-        <translation>Nombre de Iso-lignes</translation>
+        <translation>Nombre d&apos;Iso-lignes</translation>
     </message>
     <message>
         <source>Export shape to a CAD format file</source>

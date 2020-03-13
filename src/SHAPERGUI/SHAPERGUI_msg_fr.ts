@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Bord</translation>
+        <translation>Arête</translation>
     </message>
     <message>
         <source>Additional highlighting</source>
@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>MEN_DESK_EDIT</source>
-        <translation type="unfinished"></translation>
+        <translation>MEN_DESK_EDIT</translation>
     </message>
 </context>
 <context>
@@ -159,7 +159,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Effacer</translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <source>Delete currently selected toolbar</source>

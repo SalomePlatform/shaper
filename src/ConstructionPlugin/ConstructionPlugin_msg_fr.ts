@@ -12,40 +12,37 @@
       <source>Axis</source>
       <translation>Axe</translation>
     </message>
+    <message>
+      <source>Plane</source>
+      <translation>Plan</translation>
+    </message>
+    <message>
+      <source>Point</source>
+      <translation>Point</translation>
+    </message>
   </context>
+
   <context>
     <name>Axis:CylindricalFace:GeomValidators_Face</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;axe par face fait référence à un type de forme non acceptable. Le type doit être : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:CylindricalFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a face.</source>
-      <translation>L&apos;axe par face ne peut être créé que sur une face</translation>
+      <translation>La forme n&apos;est pas une face.</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:CylindricalFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a plane.</source>
-      <translation>L&apos;axe par face ne peut être créé que sur une face plane</translation>
+      <translation>La forme n&apos;est pas plane.</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:CylindricalFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
-      <translation>L&apos;axe par face ne peut être créé que sur une face cylindrique</translation>
+      <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:CylindricalFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
-      <translation>L&apos;axe par une face ne peut pas être créé sur la face sélectionnée</translation>
+      <translation>La forme n&apos;est pas une face disponible.</translation>
     </message>
   </context>
   <context>
@@ -54,16 +51,10 @@
       <source>Attribute "FirstPoint" is not initialized.</source>
       <translation>Sélectionnez le premier point</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:Model_FeatureValidator</name>
     <message>
       <source>Attribute "SecondPoint" is not initialized.</source>
       <translation>Sélectionnez le deuxième point</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:Model_FeatureValidator</name>
     <message>
       <source>Attribute "CylindricalFace" is not initialized.</source>
       <translation>Sélectionnez la face cylindrique</translation>
@@ -73,21 +64,15 @@
     <name>Axis:FirstPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
-      <translation>Seule la sélection d&apos;attribut peut être utilisée pour le premier point, pas %1</translation>
+      <translation>L&apos;attribut de type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The result is empty</source>
       <translation>Le premier point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>Uses composite construction feature without sub-features.</source>
-      <translation>Le premier point utilise une fonctionnalité de construction composite sans sous-fonctionnalités</translation>
+      <translation>Le premier point utilise une fonction de construction composite sans sous-fonctions.</translation>
     </message>
   </context>
   <context>
@@ -96,44 +81,26 @@
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Le premier point ne contient pas d&apos;élément avec un type de forme acceptable. Le type doit être : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Le premier point ne fait référence à rien</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le premier point fait référence à %1 mais doit être %2</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>Le premier point de type %1 n&apos;est pas pris en charge</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Le premier point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Le premier point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Le premier point fait référence à la forme vide</translation>
@@ -143,21 +110,15 @@
     <name>Axis:SecondPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
-      <translation>Seule la sélection d&apos;attribut peut être utilisée pour le deuxième point, pas %1</translation>
+      <translation>L&apos;attribut de type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The result is empty</source>
       <translation>Le deuxième point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ConstructionComposite</name>
     <message>
       <source>Uses composite construction feature without sub-features.</source>
-      <translation>Le deuxième point utilise une fonctionnalité de construction composite sans sous-fonctionnalités</translation>
+      <translation>Le deuxième point utilise une fonction de construction composite sans sous-fonctions.</translation>
     </message>
   </context>
   <context>
@@ -166,44 +127,26 @@
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Le deuxième point ne contient pas d&apos;élément de type de forme acceptable. Le type doit être : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Le deuxième point ne fait référence à rien</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPointGeomValidators_ShapeType</name>
     <message>
       <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le deuxième point fait référence à %1 mais doit être %2</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>Le deuxième point de type %1 n&apos;est pas pris en charge</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Le deuxième point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Le deuxième point fait référence à un élément non existant</translation>
     </message>
-  </context>
-  <context>
-    <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Le deuxième point fait référence à la forme vide</translation>
@@ -237,6 +180,10 @@
       <source>Select a first point</source>
       <translation>Sélectionnez un premier point</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un premier point.</translation>
+    </message>
   </context>
   <context>
     <name>Axis:SecondPoint</name>
@@ -248,6 +195,10 @@
       <source>Select a second point</source>
       <translation>Sélectionnez un deuxième point</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième point.</translation>
+    </message>
   </context>
   <context>
     <name>Axis:line</name>
@@ -257,6 +208,10 @@
     </message>
     <message>
       <source>Select line.</source>
+      <translation>Sélectionnez une ligne.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une ligne.</translation>
     </message>
   </context>
@@ -299,6 +254,10 @@
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un plan.</translation>
+    </message>
   </context>
   <context>
     <name>Axis:plane1</name>
@@ -309,6 +268,10 @@
     <message>
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un plan.</translation>
     </message>
   </context>
   <context>
@@ -328,6 +291,10 @@
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième face.</translation>
+    </message>
   </context>
   <context>
     <name>Axis:plane2:ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes</name>
@@ -344,6 +311,10 @@
     </message>
     <message>
       <source>Select point.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un point.</translation>
     </message>
   </context>
@@ -404,6 +375,10 @@
       <source>Select a cylindrical object</source>
       <translation>Sélectionnez un objet cylindrique</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet cylindrique.</translation>
+    </message>
   </context>
   <context>
     <name>Axis:DX</name>
@@ -454,96 +429,39 @@
       <translation>Par deux points</translation>
     </message>
   </context>
-  <context>
-    <name>Axis:CylindricalFace</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un objet cylindrique.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Axis:FirstPoint</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un premier point.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Axis:line</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez une ligne.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Axis:plane</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un plan.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Axis:plane1</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un plan.</translation>
-    </message>
-  </context>
 
-  <context>
-    <name>workshop</name>
-    <message>
-      <source>Plane</source>
-      <translation>Plan</translation>
-    </message>
-  </context>
   <context>
     <name>Plane:planeFace:GeomValidators_Face</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>Le plan fait référence à un type de forme non acceptable. Le type doit être : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Plane:planeFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a face.</source>
-      <translation>Le plan ne peut être créé que sur une face</translation>
+      <translation>Le plan ne peut être créé que sur une face.</translation>
     </message>
-  </context>
-  <context>
-    <name>Plane:planeFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a plane.</source>
-      <translation>Le plan ne peut être créé que sur une face plane</translation>
+      <translation>Le plan ne peut être créé que sur une face plane.</translation>
     </message>
-  </context>
-  <context>
-    <name>Plane:planeFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not a cylinder.</source>
-      <translation>Le plan ne peut être créé que sur une face cylindrique</translation>
+      <translation>Le plan ne peut être créé que sur une face cylindrique.</translation>
     </message>
-  </context>
-  <context>
-    <name>Plane:planeFace:GeomValidators_Face</name>
     <message>
       <source>The shape is not an available face.</source>
-      <translation>Le plan ne peut pas être créé sur la face sélectionnée</translation>
+      <translation>Le plan ne peut pas être créé sur la face sélectionnée.</translation>
     </message>
   </context>
   <context>
     <name>Plane:Model_FeatureValidator</name>
     <message>
       <source>Attribute "planeFace" is not initialized.</source>
-      <translation>Sélectionnez la face plane</translation>
+      <translation>Sélectionnez la face plane.</translation>
     </message>
-  </context>
-  <context>
-    <name>Plane:Model_FeatureValidator</name>
     <message>
       <source>Attribute "distance" is not initialized.</source>
-      <translation>Définir la distance</translation>
+      <translation>Définir la distance.</translation>
     </message>
   </context>
   <context>
@@ -578,6 +496,10 @@
       <source>Select line for axis.</source>
       <translation>Sélectionnez la ligne pour l&apos;axe.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la ligne pour l&apos;axe.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:axis:GeomValidators_ShapeType</name>
@@ -609,6 +531,10 @@
     </message>
     <message>
       <source>Select point.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un point.</translation>
     </message>
   </context>
@@ -652,6 +578,10 @@
       <source>Select line.</source>
       <translation>Sélectionnez une ligne.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une ligne.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:line:ConstructionPlugin_ValidatorPlaneLinePoint</name>
@@ -681,6 +611,10 @@
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une face plane.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:plane1</name>
@@ -690,6 +624,10 @@
     </message>
     <message>
       <source>Select a planar face.</source>
+      <translation>Sélectionnez une face plane.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
   </context>
@@ -710,6 +648,10 @@
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une deuxième face plane.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:plane2:ConstructionPlugin_ValidatorPlaneTwoParallelPlanes</name>
@@ -728,6 +670,10 @@
       <source>Select point.</source>
       <translation>Sélectionnez un point.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:point1</name>
@@ -738,6 +684,10 @@
     <message>
       <source>First point.</source>
       <translation>Premier point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un premier point.</translation>
     </message>
   </context>
   <context>
@@ -757,6 +707,10 @@
       <source>Second point.</source>
       <translation>Deuxième point.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième point.</translation>
+    </message>
   </context>
   <context>
     <name>Plane:point2:ConstructionPlugin_ValidatorPlaneThreePoints</name>
@@ -774,6 +728,10 @@
     <message>
       <source>Third point.</source>
       <translation>Troisième point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un troisième point.</translation>
     </message>
   </context>
   <context>
@@ -803,13 +761,6 @@
   </context>
 
   <context>
-    <name>workshop</name>
-    <message>
-      <source>Point</source>
-      <translation>Point</translation>
-    </message>
-  </context>
-  <context>
     <name>Point</name>
     <message>
       <source>Create point</source>
@@ -835,11 +786,15 @@
     <name>Point:edge</name>
     <message>
       <source>Edge</source>
-      <translation>Bord</translation>
+      <translation>Arête</translation>
     </message>
     <message>
       <source>Edge for creating point on it.</source>
       <translation>Arête où créer le point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l&apos;arête de référence.</translation>
     </message>
   </context>
   <context>
@@ -850,7 +805,11 @@
     </message>
     <message>
       <source>edge</source>
-      <translation>bord</translation>
+      <translation>arête</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l&apos;arête pour la projection.</translation>
     </message>
   </context>
   <context>
@@ -863,6 +822,10 @@
       <source>face</source>
       <translation>face</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la face pour la projection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:intersection_line</name>
@@ -874,6 +837,10 @@
       <source>Line for intersection.</source>
       <translation>Ligne d&apos;intersection.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la ligne d'intersection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:intersection_line_1</name>
@@ -884,6 +851,10 @@
     <message>
       <source>First line.</source>
       <translation>Première ligne.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la ligne d'intersection.</translation>
     </message>
   </context>
   <context>
@@ -903,6 +874,10 @@
       <source>Second line.</source>
       <translation>Deuxième ligne.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la ligne d'intersection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:intersection_line_2:ConstructionPlugin_ValidatorPointLines</name>
@@ -921,6 +896,10 @@
       <source>Plane for intersection.</source>
       <translation>Plan d&apos;intersection.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le plan d'intersection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:intersection_plane_1</name>
@@ -931,6 +910,10 @@
     <message>
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le plan d'intersection.</translation>
     </message>
   </context>
   <context>
@@ -943,6 +926,10 @@
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le plan d'intersection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:intersection_plane_3</name>
@@ -953,6 +940,10 @@
     <message>
       <source>Select a planar face.</source>
       <translation>Sélectionnez une face plane.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le plan d'intersection.</translation>
     </message>
   </context>
   <context>
@@ -965,6 +956,10 @@
       <source>Object for center of circle.</source>
       <translation>Objet pour le centre du cercle.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une arête circulaire.</translation>
+    </message>
   </context>
   <context>
     <name>Point:object_for_center_of_gravity</name>
@@ -975,6 +970,10 @@
     <message>
       <source>Object for center of gravity.</source>
       <translation>Objet pour le centre de gravité.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet.</translation>
     </message>
   </context>
   <context>
@@ -998,6 +997,10 @@
       <source>Point for projection.</source>
       <translation>Point de projection.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le point de projection.</translation>
+    </message>
   </context>
   <context>
     <name>Point:ratio</name>
@@ -1014,7 +1017,7 @@
     <name>Point:reverse</name>
     <message>
       <source>Distance from edge end point.</source>
-      <translation>Distance du point final du bord.</translation>
+      <translation>Distance du point final à l'arête.</translation>
     </message>
     <message>
       <source>Reverse</source>
@@ -1043,21 +1046,15 @@
     <name>Point:Model_FeatureValidator</name>
     <message>
       <source>Attribute "x" is not initialized.</source>
-      <translation>Sélectionnez la coordonnée x</translation>
+      <translation>Sélectionnez la coordonnée x.</translation>
     </message>
-  </context>
-  <context>
-    <name>Point:Model_FeatureValidator</name>
     <message>
       <source>Attribute "y" is not initialized.</source>
-      <translation>Sélectionnez la coordonnée y</translation>
+      <translation>Sélectionnez la coordonnée y.</translation>
     </message>
-  </context>
-  <context>
-    <name>Point:Model_FeatureValidator</name>
     <message>
       <source>Attribute "z" is not initialized.</source>
-      <translation>Sélectionnez la coordonnée z</translation>
+      <translation>Sélectionnez la coordonnée z.</translation>
     </message>
   </context>
   <context>
@@ -1110,7 +1107,7 @@
     </message>
     <message>
       <source>By distance on edge</source>
-      <translation>Par distance au bord</translation>
+      <translation>Par distance à l'arête</translation>
     </message>
     <message>
       <source>By geometrical property of object</source>
@@ -1122,7 +1119,7 @@
     </message>
     <message>
       <source>By projection on edge or plane</source>
-      <translation>Par projection sur un bord ou un plan</translation>
+      <translation>Par projection sur une arête ou un plan</translation>
     </message>
   </context>
   <context>
@@ -1190,11 +1187,11 @@
     <name>Point:offset_type</name>
     <message>
       <source>Distance on edge by ratio</source>
-      <translation>Distance au bord par ratio</translation>
+      <translation>Distance à l'arête par ratio</translation>
     </message>
     <message>
       <source>Distance on edge by value</source>
-      <translation>Distance au bord par valeur</translation>
+      <translation>Distance à l'arête par valeur</translation>
     </message>
   </context>
   <context>

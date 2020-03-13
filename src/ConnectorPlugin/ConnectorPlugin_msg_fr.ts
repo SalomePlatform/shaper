@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>Not all PartSet parts are up-to-date, nothing is published. Please, make the last PartSet feature as current.</source>
-      <translation>Toutes les pièces PartSet ne sont pas à jour, rien n'est publié. Veuillez mettre la dernière fonctionnalité PartSet à jour.</translation>
+      <translation>Toutes les pièces de l'assemblage ne sont pas à jour, rien n'est publié. Veuillez mettre la dernière fonctionnalité à jour.</translation>
     </message>
     <message>
       <source>For publish to SHAPER-STUDY some Part is not activated</source>
-      <translation>Pour la publication sur SHAPER-STUDY, une partie n'est pas activée</translation>
+      <translation>Pour la publication sur SHAPER-STUDY, une pièce n'est pas activée</translation>
     </message>
   </context>
 </TS>

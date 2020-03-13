@@ -5,7 +5,7 @@
     <name>PartSet_BSplineWidget</name>
     <message>
         <source>Poles and weights</source>
-        <translation>Poteaux et poids</translation>
+        <translation>Pôles et poids</translation>
     </message>
     <message>
         <source>Pole %1</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Edit...</source>
-        <translation>Modifier...</translation>
+        <translation>Éditer...</translation>
     </message>
     <message>
         <source>Detach</source>
@@ -48,11 +48,11 @@
     </message>
     <message>
         <source>Detach %1</source>
-        <translation>Détachez %1</translation>
+        <translation>Détacher %1</translation>
     </message>
     <message>
         <source>Load all parts</source>
-        <translation>Charger toutes les parties</translation>
+        <translation>Charger toutes les pièces</translation>
     </message>
 </context>
 <context>
@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Apply current feature</source>
-        <translation>Appliquer la fonctionnalité actuelle</translation>
+        <translation>Appliquer la fonction actuelle</translation>
     </message>
     <message>
         <source>Sketch is invalid and will be deleted.
@@ -142,7 +142,7 @@ Erreur : %1</translation>
     </message>
     <message>
         <source>Automatic vertical and horizontal constraints</source>
-        <translation>Automatique des contraintes verticales et horizontales</translation>
+        <translation>Contraintes verticales et horizontales automatiques</translation>
     </message>
     <message>
         <source>Change sketch plane</source>
@@ -158,12 +158,12 @@ Erreur : %1</translation>
     </message>
     <message>
         <source>Show remaining DoFs</source>
-        <translation>Afficher le reste DoFs</translation>
+        <translation>Afficher les DdL restants</translation>
     </message>
     <message>
         <source>The Sketch is created in PartSet.
 It will be necessary to create a Part in order to use this sketch for body creation</source>
-        <translation>L&apos;esquisse est créée dans PartSet.
+        <translation>L&apos;esquisse est créée dans l&apos;assemblage.
 Il sera nécessaire de créer une pièce afin d&apos;utiliser cette esquisse pour la création du corps</translation>
     </message>
     <message>

@@ -14,37 +14,22 @@
       <source>Empty selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Empty shape selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Infinite objects not acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
@@ -57,11 +42,32 @@
       <translation>Objects not selected.</translation>
     </message>
   </context>
+  <context>
+    <name>Edge:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:first_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select the first point</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:second_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select the second point.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Face:BuildPlugin_ValidatorBaseForFace</name>
     <message>
-      <source>Empty attribute \"%1\".</source>
+      <source>Empty attribute "%1".</source>
       <translation>Objects not selected.</translation>
     </message>
     <message>
@@ -93,49 +99,38 @@
     </message>
   </context>
   <context>
+    <name>Face:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
+    </message>
+  </context>
+  <context>
     <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Empty shape selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Infinite objects not acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
@@ -148,44 +143,26 @@
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>The attribute with the %1 type is not processed.</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Objects not selected.</translation>
@@ -198,6 +175,13 @@
       <translation>Objects not selected.</translation>
     </message>
   </context>
+  <context>
+    <name>Shell:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
+    </message>
+  </context>
 
   <context>
     <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
@@ -205,30 +189,18 @@
       <source>Could not get selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Base shape is empty.</source>
       <translation>Base shape not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Empty attribute in list.</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Selected shape has unacceptable type.</source>
       <translation>Selected shape has unacceptable type.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Selected shape is not inside base face.</source>
       <translation>Selected shape is not inside base.</translation>
@@ -238,6 +210,13 @@
     <name>SubShapes:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_shape" is not initialized.</source>
+      <translation>Base shape not selected.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SubShapes:base_shape</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Base shape not selected.</translation>
     </message>
   </context>
@@ -254,44 +233,26 @@
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
       <translation>Base shape should be one of the next type: %1</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation></translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Base shape not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Base shape not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Base shape not selected.</translation>
@@ -304,51 +265,26 @@
       <source>Could not get selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
-    <message>
-      <source>Empty selection list.</source>
-      <translation>Objects not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation>Selected object not valid.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Empty shape selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Infinite objects not acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
@@ -361,16 +297,20 @@
       <translation>Objects not selected.</translation>
     </message>
   </context>
+  <context>
+    <name>Vertex:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Wire:BuildPlugin_ValidatorBaseForWire</name>
     <message>
-      <source>Empty attribute \"%1\".</source>
+      <source>Empty attribute "%1".</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:BuildPlugin_ValidatorBaseForWire</name>
     <message>
       <source>Result wire empty. Probably it has disconnected edges or non-manifold.</source>
       <translation>Result wire empty. Probably it has disconnected edges or non-manifold.</translation>
@@ -396,47 +336,36 @@
       <source>Could not get selection list.</source>
       <translation></translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation></translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation></translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation></translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Infinite objects not acceptable.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Wire:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
   <context>
@@ -460,4 +389,13 @@
       <translation>Points list should contain at least 2 items</translation>
     </message>
   </context>
+
+  <context>
+    <name>Compound:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objects not selected.</translation>
+    </message>
+  </context>
+
 </TS>

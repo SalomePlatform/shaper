@@ -14,11 +14,11 @@
     </message>
     <message>
       <source>Compound</source>
-      <translation>Assemblage</translation>
+      <translation>Ensemble</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation>Bord</translation>
+      <translation>Arête</translation>
     </message>
     <message>
       <source>Face</source>
@@ -58,52 +58,32 @@
     </message>
   </context>
 
-  <!-- Validators -->
-
   <context>
     <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection list.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Impossible d'obtenir la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Liste de sélection vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Impossible d'obtenir la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
-      <translation>Objet sélectionné non valide.</translation>
+      <translation>Le contexte de l'attribut est vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Forme vide sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
@@ -120,20 +100,44 @@
     <name>Edge:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+    <message>
+      <source>Edges or sketches:</source>
+      <translation>Arêtes ou esquisses:</translation>
+    </message>
+    <message>
+      <source>Select edges on sketch or edges objects.</source>
+      <translation>Sélectionner des arêtes sur des d'esquisse ou des objets.</translation>
     </message>
   </context>
   <context>
     <name>Edge:first_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un point de départ</translation>
+      <translation>Sélectionnez un point de départ.</translation>
+    </message>
+    <message>
+      <source>First point</source>
+      <translation>Premier point</translation>
+    </message>
+    <message>
+      <source>Select a first point</source>
+      <translation>Sélectionnez un premier point</translation>
     </message>
   </context>
   <context>
     <name>Edge:second_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième point.</translation>
+    </message>
+    <message>
+      <source>Second point</source>
+      <translation>Deuxième point</translation>
+    </message>
+    <message>
+      <source>Select a second point</source>
       <translation>Sélectionnez un deuxième point</translation>
     </message>
   </context>
@@ -141,7 +145,7 @@
   <context>
     <name>Face:BuildPlugin_ValidatorBaseForFace</name>
     <message>
-      <source>Empty attribute \"%1\".</source>
+      <source>Empty attribute "%1".</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
     <message>
@@ -176,7 +180,15 @@
     <name>Face:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+    <message>
+      <source>Objects:</source>
+      <translation>Objets :</translation>
+    </message>
+    <message>
+      <source>Select edges, wires or faces.</source>
+      <translation>Sélectionnez des arêtes, des contours ou des faces.</translation>
     </message>
   </context>
   <context>
@@ -185,44 +197,26 @@
       <source>Could not get selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation>Objet sélectionné non valide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Forme vide sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
@@ -233,46 +227,28 @@
     <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants: %1</translation>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l'un des suivants: %1</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Objet sélectionné non valide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
-      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité.</translation>
+      <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>L'objet est vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>L'objet est vide</translation>
     </message>
-  </context>
-  <context>
-    <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Objets non sélectionnés.</translation>
@@ -289,7 +265,15 @@
     <name>Shell:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+    <message>
+      <source>Faces and shells:</source>
+      <translation>Faces et coques:</translation>
+    </message>
+    <message>
+      <source>Select faces or shells objects.</source>
+      <translation>Sélectionner des objets faces ou coques.</translation>
     </message>
   </context>
 
@@ -299,33 +283,21 @@
       <source>Could not get selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Base shape is empty.</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Empty attribute in list.</source>
       <translation>Objet sélectionné non valide.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Selected shape has unacceptable type.</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
     <message>
       <source>Selected shape is not inside base face.</source>
-      <translation>La forme sélectionnée n&apos;est pas à l&apos;intérieur de la base.</translation>
+      <translation>La forme sélectionnée n&apos;est pas à l&apos;intérieur de la face de base.</translation>
     </message>
   </context>
   <context>
@@ -334,6 +306,10 @@
       <source>Attribute "base_shape" is not initialized.</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
+    <message>
+      <source>Attribute "subshapes" is not initialized.</source>
+      <translation>Sous-formes non sélectionnées.</translation>
+    </message>
   </context>
   <context>
     <name>SubShapes:base_shape</name>
@@ -341,58 +317,41 @@
       <source>Attribute "%1" is not initialized.</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "subshapes" is not initialized.</source>
-      <translation>Sous-formes non sélectionnées.</translation>
+        <source>Select a shape to modify.</source>
+        <translation>Sélectionnez une forme à modifier.</translation>
+    </message>
+    <message>
+        <source>Shape:</source>
+        <translation>Forme:</translation>
     </message>
   </context>
   <context>
     <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>La forme de base devrait être l’un des types suivants: %1</translation>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>It has reference to an empty attribute</source>
       <translation>Objet sélectionné non valide.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
-      <source>Shape type is \"%1\", it should be \"%2\"</source>
+      <source>Shape type is "%1", it should be "%2"</source>
       <translation>Le type de forme est &quot;%1&quot;, il devrait être &quot;%2&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The result is empty</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>SubShapes:base_shape:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
       <translation>Forme de base non sélectionnée.</translation>
@@ -405,51 +364,26 @@
       <source>Could not get selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
-    <message>
-      <source>Empty selection list.</source>
-      <translation>Objets non sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
       <translation>Objet sélectionné non valide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Forme vide sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
@@ -466,22 +400,27 @@
     <name>Vertex:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+    <message>
+      <source>Select vertices on sketch or vertex objects.</source>
+      <translation>Sélectionnez des sommets dans l'esquisse ou sur des objets.</translation>
+    </message>
+    <message>
+      <source>Vertices or sketches:</source>
+      <translation>Sommets ou esquisses:</translation>
     </message>
   </context>
 
   <context>
     <name>Wire:BuildPlugin_ValidatorBaseForWire</name>
     <message>
-      <source>Empty attribute \"%1\".</source>
+      <source>Empty attribute "%1".</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:BuildPlugin_ValidatorBaseForWire</name>
     <message>
       <source>Result wire empty. Probably it has disconnected edges or non-manifold.</source>
-      <translation>Résultat contour vide. Probablement il possède des bords déconnectés ou non-manifold.</translation>
+      <translation>Résultat contour vide. Probablement il possède des arêtes déconnectées ou non-manifold.</translation>
     </message>
   </context>
   <context>
@@ -497,61 +436,48 @@
       <source>Could not get selection list.</source>
       <translation>Impossible d&apos;obtenir la liste de sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty selection list.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Could not get selection.</source>
       <translation>Impossible d&apos;obtenir la sélection.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Attribute have empty context.</source>
-      <translation>Les attributs ont un contexte vide.</translation>
+      <translation>Le contexte de l'attribut est vide.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Empty shape selected.</source>
       <translation>Forme vide sélectionnée.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
       <source>Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>La forme sélectionnée est dans la sélection locale. Seule la sélection globale est autorisée.</translation>
+    </message>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Aucun élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants: %1</translation>
     </message>
   </context>
   <context>
     <name>Wire:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Objets non sélectionnés.</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l'un des suivants : %1</translation>
+      <source>Segments, wires or sketches:</source>
+      <translation>Segments, contours ou esquisses:</translation>
+    </message>
+    <message>
+      <source>Select edges on sketch, edges or wires objects.</source>
+      <translation>Sélectionner des arêtes de l'esquisse, sur des objets ou des contours.</translation>
     </message>
   </context>
 
@@ -571,17 +497,18 @@
     </message>
   </context>
   <context>
-    <name>Model_Data</name>
-    <message>
-      <source>Error: Result polyline has self-intersections.</source>
-      <translation>La polyligne a des auto-intersections.</translation>
-    </message>
-  </context>
-  <context>
     <name>Polyline</name>
     <message>
       <source>Error: Result polyline has self-intersections.</source>
       <translation>La polyligne a des auto-intersections.</translation>
+    </message>
+    <message>
+      <source>Create a polyline from points</source>
+      <translation>Créer une polyligne à partir de points</translation>
+    </message>
+    <message>
+      <source>Polyline</source>
+      <translation>Polyligne</translation>
     </message>
   </context>
 
@@ -597,6 +524,18 @@
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez le vecteur tangent à la fin de la courbe</translation>
+    </message>
+    <message>
+      <source>Select vector tangent to the end of curve</source>
+      <translation>Sélectionnez le vecteur tangent à la fin de la courbe</translation>
+    </message>
+    <message>
+        <source>&lt;end&gt;</source>
+        <translation>&lt;fin&gt;</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation>Fin</translation>
     </message>
   </context>
 
@@ -617,6 +556,10 @@
       <source>Empty selection list.</source>
       <translation>Liste de sélection vide.</translation>
     </message>
+    <message>
+      <source>Unable to build a solid</source>
+      <translation>Impossible de créer un solide</translation>
+    </message>
   </context>
   <context>
     <name>CompSolid:base_objects</name>
@@ -636,23 +579,16 @@
       <translation>Liste de sélection vide.</translation>
     </message>
   </context>
-  <context>
-    <name>CompSolid:BuildPlugin_ValidatorBaseForSolids</name>
-    <message>
-      <source>Unable to build a solid</source>
-      <translation>Impossible de créer un solide.</translation>
-    </message>
-  </context>
 
   <context>
     <name>Compound</name>
     <message>
       <source>Compound</source>
-      <translation>Assemblage</translation>
+      <translation>Ensemble</translation>
     </message>
     <message>
       <source>Create a compound of objects</source>
-      <translation>Créer un assemblage</translation>
+      <translation>Créer un ensemble</translation>
     </message>
   </context>
   <context>
@@ -665,9 +601,6 @@
       <source>Select any kind of objects.</source>
       <translation>Sélectionnez n&apos;importe quel type d&apos;objets.</translation>
     </message>
-  </context>
-  <context>
-    <name>Compound:base_objects</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionner des objets de base.</translation>
@@ -678,22 +611,22 @@
     <name>Edge</name>
     <message>
       <source>Create edges from sketch edges or other edge objects</source>
-      <translation>Créer des arêtes à partir d&apos;arêtes d&apos;esquisse ou d&apos;autres objets d&apos;arête</translation>
+      <translation>Créer des arêtes à partir d&apos;arêtes d&apos;esquisse ou d&apos;objets arêtes</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation>Bord</translation>
+      <translation>Arête</translation>
     </message>
   </context>
   <context>
-    <name>Edge:base_objects</name>
+    <name>Edge:intersect</name>
     <message>
-      <source>Edges:</source>
-      <translation>Arêtes:</translation>
+      <source>Compute intersections</source>
+      <translation>Calculer les intersections</translation>
     </message>
     <message>
-      <source>Select edges on sketch or edges objects.</source>
-      <translation>Sélectionner des arêtes sur des objets d&apos;esquisse ou d&apos;arêtes.</translation>
+      <source>Divide sketch edges in intersection points.</source>
+      <translation>Divisez les bords d&apos;esquisse en points d&apos;intersection.</translation>
     </message>
   </context>
   <context>
@@ -708,32 +641,10 @@
     </message>
   </context>
   <context>
-    <name>Edge:first_point</name>
-    <message>
-      <source>First point</source>
-      <translation>Premier point</translation>
-    </message>
-    <message>
-      <source>Select a first point</source>
-      <translation>Sélectionnez un premier point</translation>
-    </message>
-  </context>
-  <context>
     <name>Edge:first_point:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The result is empty</source>
       <translation>Le résultat est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Edge:second_point</name>
-    <message>
-      <source>Second point</source>
-      <translation>Deuxième point</translation>
-    </message>
-    <message>
-      <source>Select a second point</source>
-      <translation>Sélectionnez un deuxième point</translation>
     </message>
   </context>
   <context>
@@ -753,17 +664,6 @@
     <message>
       <source>Face</source>
       <translation>Face</translation>
-    </message>
-  </context>
-  <context>
-    <name>Face:base_objects</name>
-    <message>
-      <source>Objects:</source>
-      <translation>Objets:</translation>
-    </message>
-    <message>
-      <source>Select edges, wires or faces.</source>
-      <translation>Sélectionnez des arêtes, des contours ou des faces.</translation>
     </message>
   </context>
 
@@ -821,14 +721,14 @@
     <name>Filling:nb_iter</name>
     <message>
       <source>Nb iter</source>
-      <translation>Nb iter</translation>
+      <translation>Nb d&apos;itér</translation>
     </message>
   </context>
   <context>
     <name>Filling:orientation</name>
     <message>
       <source>Auto-correct edges orientation</source>
-      <translation>Correction automatique de l&apos;orientation des bords</translation>
+      <translation>Correction automatique de l&apos;orientation des arêtes</translation>
     </message>
     <message>
       <source>Use curve information</source>
@@ -836,7 +736,7 @@
     </message>
     <message>
       <source>Use edges orientation</source>
-      <translation>Utiliser l&apos;orientation des bords</translation>
+      <translation>Utiliser l&apos;orientation des arêtes</translation>
     </message>
   </context>
   <context>
@@ -895,21 +795,6 @@
     </message>
   </context>
   <context>
-    <name>Interpolation:tangent_end</name>
-    <message>
-      <source>&lt;end&gt;</source>
-      <translation>&lt;fin&gt;</translation>
-    </message>
-    <message>
-      <source>End</source>
-      <translation>Fin</translation>
-    </message>
-    <message>
-      <source>Select vector tangent to the end of curve</source>
-      <translation>Sélectionnez le vecteur tangent à la fin de la courbe</translation>
-    </message>
-  </context>
-  <context>
     <name>Interpolation:tangent_start</name>
     <message>
       <source>&lt;start&gt;</source>
@@ -932,17 +817,6 @@
     </message>
   </context>
 
-  <context>
-    <name>Polyline</name>
-    <message>
-      <source>Create a polyline from points</source>
-      <translation>Créer une polyligne à partir de points</translation>
-    </message>
-    <message>
-      <source>Polyline</source>
-      <translation>Polyligne</translation>
-    </message>
-  </context>
   <context>
     <name>Polyline:base_objects</name>
     <message>
@@ -970,22 +844,11 @@
     <name>Shell</name>
     <message>
       <source>Create a shell from faces or shells objects</source>
-      <translation>Créer une coque à partir d&apos;objets faces ou coques</translation>
+      <translation>Créer une coque à partir d&apos;objets faces ou d&apos;autres coques</translation>
     </message>
     <message>
       <source>Shell</source>
       <translation>Coque</translation>
-    </message>
-  </context>
-  <context>
-    <name>Shell:base_objects</name>
-    <message>
-      <source>Faces and shells:</source>
-      <translation>Faces et coques:</translation>
-    </message>
-    <message>
-      <source>Select faces or shells objects.</source>
-      <translation>Sélectionner des objets faces ou coques.</translation>
     </message>
   </context>
   <context>
@@ -1049,17 +912,6 @@
     </message>
   </context>
   <context>
-    <name>SubShapes:base_shape</name>
-    <message>
-      <source>Select a shape to modify.</source>
-      <translation>Sélectionnez une forme à modifier.</translation>
-    </message>
-    <message>
-      <source>Shape:</source>
-      <translation>Forme:</translation>
-    </message>
-  </context>
-  <context>
     <name>SubShapes:subshapes</name>
     <message>
       <source>Select shapes on sketch to add.</source>
@@ -1083,14 +935,14 @@
     </message>
   </context>
   <context>
-    <name>Vertex:base_objects</name>
+    <name>Vertex:intersect</name>
     <message>
-      <source>Select vertices on sketch or vertex objects.</source>
-      <translation>Sélectionnez des sommets de l&apos;esquisse ou des objets sommet.</translation>
+      <source>Compute intersections</source>
+      <translation>Calculer les intersections</translation>
     </message>
     <message>
-      <source>Vertices:</source>
-      <translation>Sommets:</translation>
+      <source>Compute intersections of all sketch edges.</source>
+      <translation>Calculez les intersections de toutes les arêtes d&apos;esquisse.</translation>
     </message>
   </context>
 
@@ -1104,6 +956,21 @@
       <source>Wire</source>
       <translation>Contour</translation>
     </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "add_contour" is not initialized.</source>
+      <translation></translation>
+    </message>
+  </context>
+  <context>
+    <name>Wire:intersect</name>
+    <message>
+      <source>Compute intersections</source>
+      <translation>Calculer les intersections</translation>
+    </message>
+    <message>
+      <source>Divide sketch edges in intersection points.</source>
+      <translation>Divisez les bords d&apos;esquisse en points d&apos;intersection.</translation>
+    </message>
   </context>
   <context>
     <name>Wire:add_contour</name>
@@ -1114,17 +981,6 @@
     <message>
       <source>Adds to the list of segments other segments of the sketcher connected to the already selected ones to create a closed contour.</source>
       <translation>Ajoute à la liste des segments d&apos;autres segments de l&apos;esquisse connectés à ceux déjà sélectionnés pour créer un contour fermé.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Wire:base_objects</name>
-    <message>
-      <source>Segments and wires:</source>
-      <translation>Segments et contours:</translation>
-    </message>
-    <message>
-      <source>Select edges on sketch, edges or wires objects.</source>
-      <translation>Sélectionner des arêtes sur des objets d&apos;esquisse, d&apos;arêtes ou de contours.</translation>
     </message>
   </context>
 

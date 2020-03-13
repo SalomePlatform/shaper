@@ -2,33 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
 
+  <!-- Dump -->
   <context>
-    <name>Import:Model_FeatureValidator</name>
+    <name>Dump:file_format</name>
     <message>
-      <source>Attribute "file_path" is not initialized.</source>
-      <translation>Input file name for import</translation>
-    </message>
-  </context>
-  <context>
-    <name>Import:file_path:ExchangePlugin_ImportFormat</name>
-    <message>
-      <source>File name is empty.</source>
-      <translation>Input file name for import</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Specify file to dump.</translation>
     </message>
   </context>
 
+  <!-- Export -->
   <context>
     <name>Export:Model_FeatureValidator</name>
     <message>
       <source>Attribute "file_format" is not initialized.</source>
       <translation>Export file name is not defined</translation>
     </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
     <message>
       <source>Attribute "selection_list" is not initialized.</source>
-      <translation>Objects for export are not selected</translation>
+      <translation>Select the exported shapes</translation>
+    </message>
+    <message>
+      <source>Attribute "file_path" is not initialized.</source>
+      <translation>Define the path of the exported file</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_file_path" is not initialized.</source>
+      <translation>Define the path of the exported XAO file</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_author" is not initialized.</source>
+      <translation>Set the XAO file author</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_geometry_name" is not initialized.</source>
+      <translation>Set the XAO file geometry name</translation>
     </message>
   </context>
   <context>
@@ -46,41 +54,6 @@
     </message>
   </context>
   <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "file_path" is not initialized.</source>
-      <translation>Define the path of the exported file</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "selection_list" is not initialized.</source>
-      <translation>Select the exported shapes</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_file_path" is not initialized.</source>
-      <translation>Define the path of the exported XAO file</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_author" is not initialized.</source>
-      <translation>Set the XAO file author</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_geometry_name" is not initialized.</source>
-      <translation>Set the XAO file geometry name</translation>
-    </message>
-  </context>
-  <context>
     <name>Export:ExchangePlugin_ExportFormat</name>
     <message>
       <source>%1 is not initialized.</source>
@@ -91,9 +64,33 @@
       <translation>Attribute %1 is not a string.</translation>
     </message>
   </context>
-
   <context>
-    <name>Export:ExchangePlugin_ExportPart</name>
+    <name>Export:selection_list</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a set of objects.</translation>
+    </message>
+  </context>
+
+  <!-- Import -->
+  <context>
+    <name>Import:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "file_path" is not initialized.</source>
+      <translation>Input file name for import</translation>
+    </message>
+  </context>
+  <context>
+    <name>Import:file_path:ExchangePlugin_ImportFormat</name>
+    <message>
+      <source>File name is empty.</source>
+      <translation>Input file name for import</translation>
+    </message>
+  </context>
+
+  <!-- Export part -->
+  <context>
+    <name>ExportPart</name>
     <message>
       <source>Cannot save the document.</source>
       <translation>Cannot save the document.</translation>
@@ -116,11 +113,20 @@
     </message>
   </context>
 
+  <!-- Import part -->
   <context>
-    <name>Import:ExchangePlugin_ImportPart</name>
+    <name>ImportPart</name>
     <message>
       <source>Cannot import the document.</source>
       <translation>Cannot import the document.</translation>
     </message>
   </context>
+  <context>
+    <name>ImportPart:target_part</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a target part.</translation>
+    </message>
+  </context>
+
 </TS>

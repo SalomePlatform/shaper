@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</source>
-      <translation>L&apos;ensemble des contraintes conduit à une géométrie dégénérée. Pour résoudre ce problème, vous pouvez annuler votre opération ou supprimer une contrainte ou la géométrie dégénérée..</translation>
+      <translation>L&apos;ensemble des contraintes conduit à une géométrie dégénérée. Pour résoudre ce problème, vous pouvez annuler votre opération ou supprimer une contrainte ou la géométrie dégénérée.</translation>
     </message>
   </context>
 </TS>

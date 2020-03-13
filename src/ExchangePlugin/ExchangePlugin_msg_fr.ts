@@ -6,7 +6,7 @@
     <name>workshop</name>
     <message>
       <source>Dump</source>
-      <translation>Déverser</translation>
+      <translation>Générer un script</translation>
     </message>
     <message>
       <source>Export</source>
@@ -14,15 +14,15 @@
     </message>
     <message>
       <source>Import</source>
-      <translation>Importation</translation>
+      <translation>Importer</translation>
     </message>
     <message>
       <source>Export part</source>
-      <translation>Partie exportation</translation>
+      <translation>Exporter pièce</translation>
     </message>
     <message>
       <source>Import part</source>
-      <translation>Partie importation</translation>
+      <translation>Importer pièce</translation>
     </message>
   </context>
 
@@ -31,11 +31,11 @@
     <name>Dump</name>
     <message>
       <source>Dump</source>
-      <translation>Déverser</translation>
+      <translation>Générer un script</translation>
     </message>
     <message>
       <source>Dump Python script</source>
-      <translation>Déverser dans un script Python</translation>
+      <translation>Générer un script Python</translation>
     </message>
   </context>
   <context>
@@ -49,7 +49,7 @@
     <name>Dump:file_path</name>
     <message>
       <source>Dump to file</source>
-      <translation>Déverser dans un fichier</translation>
+      <translation>Générer un fichier</translation>
     </message>
   </context>
   <context>
@@ -65,63 +65,41 @@
     <name>Export:Model_FeatureValidator</name>
     <message>
       <source>Attribute "file_format" is not initialized.</source>
-      <translation>Le nom du fichier d&apos;export n&apos;est pas défini</translation>
+      <translation>Le nom du fichier d&apos;export n&apos;est pas défini.</translation>
     </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
     <message>
       <source>Attribute "selection_list" is not initialized.</source>
-      <translation>Les objets à exporter ne sont pas sélectionnés</translation>
+      <translation>Les objets à exporter ne sont pas sélectionnés.</translation>
+    </message>
+    <message>
+      <source>Attribute "file_path" is not initialized.</source>
+      <translation>Définir le chemin du fichier exporté.</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_file_path" is not initialized.</source>
+      <translation>Définir le chemin du fichier XAO exporté.</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_author" is not initialized.</source>
+      <translation>Définir l'auteur du fichier XAO.</translation>
+    </message>
+    <message>
+      <source>Attribute "xao_geometry_name" is not initialized.</source>
+      <translation>Définir le nom de la géométrie du fichier XAO.</translation>
     </message>
   </context>
   <context>
     <name>Export:file_path:ExchangePlugin_ExportFormat</name>
     <message>
       <source>File name is empty.</source>
-      <translation>Le nom du fichier d&apos;export n&apos;est pas défini</translation>
+      <translation>Le nom du fichier d&apos;export n&apos;est pas défini.</translation>
     </message>
   </context>
   <context>
     <name>Export:selection_list:GeomValidators_Finite</name>
     <message>
       <source>Infinite result is selected.</source>
-      <translation>Seules les formes finies peuvent être exportées</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "file_path" is not initialized.</source>
-      <translation>Définir le chemin du fichier exporté</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "selection_list" is not initialized.</source>
-      <translation>Les objets à exporter ne sont pas sélectionnés</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_file_path" is not initialized.</source>
-      <translation>Définir le chemin du fichier XAO exporté</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_author" is not initialized.</source>
-      <translation>Définir l&apos;auteur du fichier XAO</translation>
-    </message>
-  </context>
-  <context>
-    <name>Export:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "xao_geometry_name" is not initialized.</source>
-      <translation>Définir le nom de la géométrie du fichier XAO</translation>
+      <translation>Seules les formes finies peuvent être exportées.</translation>
     </message>
   </context>
   <context>
@@ -139,7 +117,7 @@
     <name>Export</name>
     <message>
       <source>Export</source>
-      <translation>Export</translation>
+      <translation>Exporter</translation>
     </message>
     <message>
       <source>Export to file</source>
@@ -168,7 +146,11 @@
     <name>Export:selection_list</name>
     <message>
       <source>Select a set of objects</source>
-      <translation>Sélectionnez un ensemble d&apos;objets</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
     </message>
   </context>
   <context>
@@ -179,7 +161,7 @@
     </message>
     <message>
       <source>Please input the author</source>
-      <translation>S&apos;il vous plaît saisissez l&apos;auteur</translation>
+      <translation>Veuillez saisir l&apos;auteur</translation>
     </message>
   </context>
   <context>
@@ -208,7 +190,7 @@
     </message>
     <message>
       <source>Please input the geometry name</source>
-      <translation>S&apos;il vous plaît entrer le nom de la géométrie</translation>
+      <translation>Veuillez saisir le nom de la géométrie</translation>
     </message>
   </context>
 
@@ -217,21 +199,21 @@
     <name>Import:Model_FeatureValidator</name>
     <message>
       <source>Attribute "file_path" is not initialized.</source>
-      <translation>Nom du fichier d&apos;entrée à importer</translation>
+      <translation>Nom du fichier d&apos;entrée à importer.</translation>
     </message>
   </context>
   <context>
     <name>Import:file_path:ExchangePlugin_ImportFormat</name>
     <message>
       <source>File name is empty.</source>
-      <translation>Nom du fichier d&apos;entrée à importer</translation>
+      <translation>Nom du fichier d&apos;entrée à importer.</translation>
     </message>
   </context>
   <context>
     <name>Import</name>
     <message>
       <source>Import</source>
-      <translation>Importation</translation>
+      <translation>Importer</translation>
     </message>
     <message>
       <source>Import a file</source>
@@ -242,12 +224,54 @@
     <name>Import:file_path</name>
     <message>
       <source>Import file</source>
-      <translation>Importer le fichier</translation>
+      <translation>Importer un fichier</translation>
     </message>
   </context>
 
   <context>
-    <name>Export:ExchangePlugin_ExportPart</name>
+    <name>ImportMacro</name>
+    <message>
+      <source>Import</source>
+      <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Import a file</source>
+      <translation>Importer un fichier</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:target_part</name>
+    <message>
+      <source>Import to</source>
+      <translation>Importer vers</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:file_path</name>
+    <message>
+      <source>Import file</source>
+      <translation>Fichier à importer</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:file_path:ExchangePlugin_ImportFormat</name>
+    <message>
+      <source>File name is empty.</source>
+      <translation>Le nom du fichier est vide.</translation>
+    </message>
+  </context>
+
+  <!-- Export part -->
+  <context>
+    <name>ExportPart</name>
+    <message>
+      <source>Export part</source>
+      <translation>Exporter pièce</translation>
+    </message>
+    <message>
+      <source>Export structure of the Part to file</source>
+      <translation>Exporter la structure de la pièce dans un fichier</translation>
+    </message>
     <message>
       <source>Cannot save the document.</source>
       <translation>Impossible d&apos;enregistrer le document.</translation>
@@ -269,52 +293,44 @@
       <translation>L&apos;exportation du résultat de la pièce est interdite (%1).</translation>
     </message>
   </context>
-
   <context>
-    <name>Import:ExchangePlugin_ImportPart</name>
+    <name>ExportPart:file_path</name>
+    <message>
+      <source>Export file</source>
+      <translation>Fichier à exporter</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportPart:file_path:ExchangePlugin_ExportFormat</name>
+    <message>
+      <source>File name is empty.</source>
+      <translation>Le nom du fichier est vide.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportPart:selection_list</name>
+    <message>
+      <source>Select features or results</source>
+      <translation>Sélectionner les fonctions ou les résultats</translation>
+    </message>
+  </context>
+
+  <!-- Import part -->
+  <context>
+    <name>ImportPart</name>
+    <message>
+      <source>Import part</source>
+      <translation>Importer pièce</translation>
+    </message>
+    <message>
+      <source>Import features from file</source>
+      <translation>Importer des fonctions depuis fichier</translation>
+    </message>
     <message>
       <source>Cannot import the document.</source>
       <translation>Impossible d&apos;importer le document.</translation>
     </message>
   </context>
-
-
-  <context>
-    <name>ExportPart</name>
-    <message>
-      <source>Export part</source>
-      <translation>Partie exportation</translation>
-    </message>
-    <message>
-      <source>Export structure of the Part to file</source>
-      <translation>Structure d'exportation de la partie à classer</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ImportMacro</name>
-    <message>
-      <source>Import</source>
-      <translation>Importation</translation>
-    </message>
-    <message>
-      <source>Import a file</source>
-      <translation>Importer un fichier</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ImportPart</name>
-    <message>
-      <source>Import features from file</source>
-      <translation>Importer les caractéristiques d'un fichier</translation>
-    </message>
-    <message>
-      <source>Import part</source>
-      <translation>Partie importation</translation>
-    </message>
-  </context>
-
   <context>
     <name>ImportPart:file_path:ExchangePlugin_ImportFormat</name>
     <message>
@@ -326,63 +342,19 @@
     <name>ImportPart:target_part</name>
     <message>
       <source>Import to</source>
-      <translation>Importation vers</translation>
+      <translation>Importer vers</translation>
     </message>
-  </context>
-
-  <context>
-    <name>ImportMacro:target_part</name>
     <message>
-      <source>Import to</source>
-      <translation>Importation vers</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la pièce cible.</translation>
     </message>
   </context>
-
   <context>
     <name>ImportPart:file_path</name>
     <message>
       <source>Import file</source>
-      <translation>Fichier d'importation</translation>
+      <translation>Fichier à importer</translation>
     </message>
   </context>
 
-  <context>
-    <name>ImportMacro:file_path</name>
-    <message>
-      <source>Import file</source>
-      <translation>Fichier d'importation</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ImportMacro:file_path:ExchangePlugin_ImportFormat</name>
-    <message>
-      <source>File name is empty.</source>
-      <translation>Le nom du fichier est vide.</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ExportPart:file_path</name>
-    <message>
-      <source>Export file</source>
-      <translation>Fichier d'exportation</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ExportPart:file_path:ExchangePlugin_ExportFormat</name>
-    <message>
-      <source>File name is empty.</source>
-      <translation>Le nom du fichier est vide.</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>ExportPart:selection_list</name>
-    <message>
-      <source>Select features or results</source>
-      <translation>Sélectionner les caractéristiques ou les résultats</translation>
-    </message>
-  </context>
 </TS>

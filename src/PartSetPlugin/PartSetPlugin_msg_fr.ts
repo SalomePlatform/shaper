@@ -42,7 +42,7 @@
     </message>
     <message>
       <source>Remove part</source>
-      <translation>Supprimer une partie</translation>
+      <translation>Supprimer pièce</translation>
     </message>
   </context>
 
