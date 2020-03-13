@@ -12,6 +12,7 @@
 
 import sys
 import os
+import sphinx
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -37,6 +38,12 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
 ]
+try:
+  import sphinx_rtd_theme
+  extensions += ['sphinx_rtd_theme']
+  use_rtd_theme = True
+except:
+  use_rtd_theme = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -106,12 +113,20 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+if use_rtd_theme:
+  html_theme = 'sphinx_rtd_theme'
+else:
+  html_theme = 'default' if sphinx.version_info[:2] < (1,3) else 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+themes_options = {}
+themes_options['classic'] = {
+  'body_max_width':'none',
+  'body_min_width':0,
+}
+html_theme_options = themes_options.get(html_theme, {})
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
