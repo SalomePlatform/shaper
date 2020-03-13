@@ -25,7 +25,4 @@ SET(TEST_NAMES
   TestExportToGEOMWholeFeature
   Test2882
   Test17917
-  TestShaperStudy1
-  TestShaperStudy2
-  TestShaperStudy3
 )
