@@ -48,7 +48,7 @@ PartSet_BSplineWidget::PartSet_BSplineWidget(
   aMainLayout->setContentsMargins(0, 0, 0, 0);
 
   // GroupBox to keep widgets for B-spline poles and weights
-  myPolesGroupBox = new QGroupBox(tr("Poles and weights"), this);
+  myPolesGroupBox = new QGroupBox(translate("Poles and weights"), this);
   aMainLayout->addWidget(myPolesGroupBox);
 
   QVBoxLayout* aLayout = new QVBoxLayout(myPolesGroupBox);
@@ -160,7 +160,7 @@ void PartSet_BSplineWidget::addPoleWidget()
 {
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myPolesWgt->layout());
   int aNbPoles = (int)myPoles.size();
-  QString aPoleStr = tr("Pole %1").arg(aNbPoles + 1);
+  QString aPoleStr = translate("Pole %1").arg(aNbPoles + 1);
 
   myPoles.push_back(BSplinePoleWidgets());
   BSplinePoleWidgets& aPole = myPoles.back();
@@ -182,7 +182,7 @@ QGroupBox* PartSet_BSplineWidget::createPoleWidget(BSplinePoleWidgets& thePole,
   thePole.myWeight = new ModuleBase_ParamSpinBox(aPoleGroupBox);
   thePole.myWeight->setMinimum(THE_MIN_WEIGHT);
 
-  aPoleLay->addWidget(new QLabel(tr("Weight :"), aPoleGroupBox), 2, 0);
+  aPoleLay->addWidget(new QLabel(translate("Weight :"), aPoleGroupBox), 2, 0);
   aPoleLay->addWidget(thePole.myWeight, 2, 1);
   // we should listen textChanged signal as valueChanged do not send when text is modified
   connect(thePole.myWeight, SIGNAL(textChanged(const QString&)),
@@ -190,7 +190,7 @@ QGroupBox* PartSet_BSplineWidget::createPoleWidget(BSplinePoleWidgets& thePole,
 
   thePole.myAddBtn = new QToolButton(aPoleGroupBox);
   thePole.myAddBtn->setIcon(QIcon(":pictures/add.png"));
-  thePole.myAddBtn->setToolTip(tr("Add a new pole after the current"));
+  thePole.myAddBtn->setToolTip(translate("Add a new pole after the current"));
   aPoleLay->addWidget(thePole.myAddBtn, 2, 2);
   connect(thePole.myAddBtn, SIGNAL(clicked(bool)), SLOT(onAddPole()));
 

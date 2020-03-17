@@ -140,6 +140,10 @@
       <translation>Sélectionnez l&apos;axe du cône</translation>
     </message>
     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l&apos;axe du cône</translation>
+    </message>
+    <message>
       <source>axis</source>
       <translation>axe</translation>
     </message>
@@ -240,7 +244,11 @@
     <name>Cylinder:axis</name>
     <message>
       <source>Select the axis of the cylinder</source>
-      <translation>Sélectionnez l&apos;axe du cylindre</translation>
+      <translation>Sélectionnez l&apos;axe du cylindre.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l&apos;axe du cylindre.</translation>
     </message>
     <message>
       <source>axis</source>
@@ -314,7 +322,11 @@
     </message>
     <message>
       <source>Select a center point</source>
-      <translation>Sélectionnez un point central</translation>
+      <translation>Sélectionnez un point central.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point central.</translation>
     </message>
   </context>
   <context>
@@ -344,7 +356,11 @@
     <name>Torus:axis</name>
     <message>
       <source>Select the axis of the torus</source>
-      <translation>Sélectionnez l&apos;axe du tore</translation>
+      <translation>Sélectionnez l&apos;axe du tore.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l&apos;axe du tore.</translation>
     </message>
     <message>
       <source>axis</source>
@@ -355,7 +371,11 @@
     <name>Torus:base_point</name>
     <message>
       <source>Select the center of the torus</source>
-      <translation>Sélectionnez le centre du tore</translation>
+      <translation>Sélectionnez le centre du tore.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le centre du tore.</translation>
     </message>
     <message>
       <source>base_point</source>

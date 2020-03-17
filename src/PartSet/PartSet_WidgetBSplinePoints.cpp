@@ -128,7 +128,7 @@ void PartSet_WidgetBSplinePoints::createNextPoint()
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myGroupBox->layout());
   int row = (int)myXSpin.size();
 
-  QString aPoleStr = tr("Pole %1");
+  QString aPoleStr = translate("Pole %1");
   aPoleStr = aPoleStr.arg(myXSpin.size() + 1);
 
   QGroupBox* aPoleGroupBox = new QGroupBox(aPoleStr, myGroupBox);

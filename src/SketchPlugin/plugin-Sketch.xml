@@ -659,8 +659,8 @@
         <sketch-bspline_selector id="poles"
                                  weights="weights"
                                  reference_attribute="poles_ref"
-                                 title="Poles and weights"
-                                 tooltip="B-spline poles and weights"
+                                 title="Poles"
+                                 tooltip="B-spline poles"
                                  enable_value="enable_by_preferences">
           <validator id="SketchPlugin_BSplineValidator"/>
         </sketch-bspline_selector>
@@ -685,8 +685,8 @@
         <sketch-bspline_selector id="poles"
                                  weights="weights"
                                  reference_attribute="poles_ref"
-                                 title="Poles and weights"
-                                 tooltip="B-spline poles and weights"
+                                 title="Poles"
+                                 tooltip="B-spline poles"
                                  enable_value="enable_by_preferences">
           <validator id="SketchPlugin_BSplineValidator"/>
         </sketch-bspline_selector>

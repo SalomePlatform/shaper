@@ -10,12 +10,20 @@
       <translation>Fonctions</translation>
     </message>
     <message>
+      <source>Chamfer</source>
+      <translation>Chanfrein</translation>
+    </message>
+    <message>
       <source>Common</source>
       <translation>Intersection</translation>
     </message>
     <message>
       <source>Cut</source>
       <translation>Découpe</translation>
+    </message>
+    <message>
+      <source>Defeaturing</source>
+      <translation>Supprimer un détail</translation>
     </message>
     <message>
       <source>Extrusion</source>
@@ -129,6 +137,77 @@
     </message>
   </context>
 
+  <!-- Chamfer -->
+  <context>
+    <name>Chamfer</name>
+    <message>
+      <source>Chamfer</source>
+      <translation>Chanfrein</translation>
+    </message>
+    <message>
+      <source>Perform chamfer on face or edge</source>
+      <translation>Effectuer un chanfrein  sur la face ou l'arête</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:creation_method</name>
+    <message>
+      <source>Two distances</source>
+      <translation>Deux distances</translation>
+    </message>
+    <message>
+      <source>Distance and angle</source>
+      <translation>Distance et angle</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:main_objects</name>
+    <message>
+      <source>Faces or/and edges</source>
+      <translation>Faces ou/et arêtes</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>Sélectionner des objets</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:d1</name>
+    <message>
+      <source>First distance.</source>
+      <translation>Première distance.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:d2</name>
+    <message>
+      <source>Second distance.</source>
+      <translation>Deuxième distance.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:d</name>
+    <message>
+      <source>Distance.</source>
+      <translation>Distance.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Chamfer:angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>Angle</translation>
+    </message>
+    <message>
+      <source>Angle.</source>
+      <translation>Angle.</translation>
+    </message>
+  </context>
+
   <!-- Common -->
   <context>
     <name>Common</name>
@@ -138,14 +217,14 @@
     </message>
     <message>
       <source>Perform boolean common operation with objects</source>
-      <translation>Effectuer l&apos;opération booléenne Intersection avec des objets</translation>
+      <translation>Effectuer l&apos;opération booléenne intersection avec des objets</translation>
     </message>
   </context>
   <context>
     <name>Common:FeaturesPlugin_ValidatorBooleanCommonArguments</name>
     <message>
-      <source>Not enough arguments for Fuse operation.</source>
-      <translation>Pas assez d&apos;arguments pour l&apos;opération Fusionner.</translation>
+      <source>Not enough arguments for Common operation.</source>
+      <translation>Pas assez d&apos;arguments pour l&apos;opération Intersection.</translation>
     </message>
   </context>
   <context>
@@ -155,8 +234,8 @@
       <translation>Simple</translation>
     </message>
     <message>
-      <source>advanced</source>
-      <translation>avancée</translation>
+      <source>Advanced</source>
+      <translation>Avancée</translation>
     </message>
   </context>
   <context>
@@ -260,6 +339,29 @@
     </message>
     <message>
       <source>Select faces</source>
+      <translation>Sélectionnez des faces</translation>
+    </message>
+    <message>
+      <source>Perform removing faces from solid</source>
+      <translation>Effectuer la suppression de faces d&apos;un solide</translation>
+    </message>
+    <message>
+      <source>Error: Defeaturing algorithm failed. Unable to remove the feature</source>
+      <translation>Erreur: l&apos;algorithme de suppression d&apos;un détail a échoué. Impossible de supprimer la fonctionnalité</translation>
+    </message>
+  </context>
+  <context>
+    <name>Defeaturing:main_objects</name>
+    <message>
+      <source>Faces to remove</source>
+      <translation>Faces à retirer</translation>
+    </message>
+    <message>
+      <source>Select faces</source>
+      <translation>Sélectionnez des faces</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez des faces</translation>
     </message>
   </context>
@@ -826,6 +928,10 @@
       <source>Select objects</source>
       <translation>Sélectionner des objets</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets</translation>
+    </message>
   </context>
   <context>
     <name>Fillet:radius1</name>
@@ -941,12 +1047,16 @@
   <context>
     <name>FusionFaces:base_shape</name>
     <message>
+      <source>Shape:</source>
+      <translation>Forme:</translation>
+    </message>
+    <message>
       <source>Select a shape to modify.</source>
       <translation>Sélectionnez une forme à modifier.</translation>
     </message>
     <message>
-      <source>Shape:</source>
-      <translation>Forme:</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une forme à modifier.</translation>
     </message>
   </context>
   <context>
@@ -979,6 +1089,10 @@
       <source>Select objects (compounds, compsolids, solids, shells, faces or edges)</source>
       <translation>Sélectionner des objets (ensembles, solides composites, coques, faces ou arêtes)</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets.</translation>
+    </message>
   </context>
 
   <!-- Partition -->
@@ -991,6 +1105,10 @@
     <message>
       <source>Perform partition operations with solids</source>
       <translation>Effectuer des opérations de partition avec des solides</translation>
+    </message>
+    <message>
+      <source>Error: Partition algorithm failed.</source>
+      <translation>Erreur: l&apos;algorithme de partition a échoué.</translation>
     </message>
   </context>
   <context>
@@ -1133,6 +1251,10 @@
       <source>Select a feature that conceals results.</source>
       <translation>Sélectionnez une fonctionnalité qui cache les résultats.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une fonctionnalité qui cache les résultats.</translation>
+    </message>
   </context>
   <context>
     <name>Recover:base_feature:FeaturesPlugin_ValidatorConcealedResult</name>
@@ -1150,6 +1272,13 @@
     <message>
       <source>Concealed results</source>
       <translation>Résultats cachés</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:recovered</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets à récupérer.</translation>
     </message>
   </context>
 
@@ -1175,6 +1304,10 @@
       <source>Select copied objects</source>
       <translation>Sélectionnez les objets copiés</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets copiés</translation>
+    </message>
   </context>
   <context>
     <name>Recover:number</name>
@@ -1192,7 +1325,7 @@
   <context>
     <name>ImportResult</name>
     <message>
-      <source>ImportResult</source>
+      <source>Import Result</source>
       <translation>Importer le résultat</translation>
     </message>
     <message>
@@ -1208,6 +1341,10 @@
     </message>
     <message>
       <source>Select copied results</source>
+      <translation>Sélectionnez les résultats copiés</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez les résultats copiés</translation>
     </message>
   </context>
@@ -1256,6 +1393,10 @@
       <source>Sub-Shapes to keep:</source>
       <translation>Sous-formes à garder:</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les formes à conserver.</translation>
+    </message>
   </context>
   <context>
     <name>Remove_SubShapes:subshapes_to_keep:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
@@ -1273,6 +1414,10 @@
     <message>
       <source>Sub-Shapes to remove:</source>
       <translation>Sous-formes à supprimer:</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les formes à supprimer.</translation>
     </message>
   </context>
   <context>
@@ -1338,6 +1483,10 @@
     <message>
       <source>Select a base objects</source>
       <translation>Sélectionnez un objet de base</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet de base.</translation>
     </message>
   </context>
   <context>
@@ -1501,6 +1650,10 @@
       <source>Select a sketch face</source>
       <translation>Sélectionnez une face d&apos;esquisse</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet de base.</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionCut:from_angle</name>
@@ -1659,6 +1812,10 @@
       <source>Select a sketch face</source>
       <translation>Sélectionnez une face d&apos;esquisse</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet de base.</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionFuse:from_angle</name>
@@ -1790,6 +1947,10 @@
       <source>Select the center point</source>
       <translation>Sélectionnez le point central</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le point central</translation>
+    </message>
   </context>
   <context>
     <name>Scale:main_objects</name>
@@ -1800,6 +1961,10 @@
     <message>
       <source>Select objects</source>
       <translation>Sélectionner des objets</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objetsю</translation>
     </message>
   </context>
   <context>
@@ -3558,7 +3723,7 @@
     </message>
     <message>
       <source>Error: Compound should contain only faces, edges or vertices.</source>
-      <translation>L&apo;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
+      <translation>L&apos;ensemble doit contenir uniquement des faces, des arêtes ou des sommets.</translation>
     </message>
     <message>
       <source>Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>

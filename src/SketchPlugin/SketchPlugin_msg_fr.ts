@@ -113,6 +113,10 @@
       <translation>Rectangle</translation>
     </message>
     <message>
+      <source>Split</source>
+      <translation>Diviser</translation>
+    </message>
+    <message>
       <source>Tangent</source>
       <translation>Tangente</translation>
     </message>
@@ -881,6 +885,10 @@
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Sélectionnez un point de départ.</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point de départ d&apos;arc.</translation>
+    </message>
   </context>
   <context>
     <name>SketchArc:GeomValidators_Different</name>
@@ -898,13 +906,6 @@
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Le point final n&apos;est pas défini.</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchArc:Model_FeatureValidator:ArcStartPoint</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionnez un point de départ d&apos;arc.</translation>
     </message>
   </context>
   <context>
@@ -2041,14 +2042,6 @@
   </context>
 
   <context>
-    <name>SketchConstraintSplit:ConstraintEntityA:SketchPlugin_SplitValidator</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>Seule la sélection d&apos;attribut peut être utilisée pour la face d&apos;esquisse, pas %1</translation>
-    </message>
-  </context>
-
-  <context>
     <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Double is not initialized.</source>
@@ -3095,6 +3088,17 @@
       <translation>Point tangent</translation>
     </message>
     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:transversal_point</name>
+    <message>
+      <source>Select point on line</source>
+      <translation>Sélectionnez un point sur la ligne</translation>
+    </message>
+    <message>
       <source>Point on the perpendicular line</source>
       <translation>Point sur la perpendiculaire</translation>
     </message>
@@ -3153,6 +3157,21 @@
   </context>
   <context>
     <name>SketchMacroArc:end_point_3</name>
+    <message>
+      <source>End point</source>
+      <translation>Point final</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_4</name>
     <message>
       <source>End point</source>
       <translation>Point final</translation>
@@ -3324,6 +3343,21 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroEllipse:passed_point_1</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point passé.</translation>
+    </message>
+    <message>
+      <source>Passed point</source>
+      <translation>Point passé</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroEllipse:first_point</name>
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
@@ -3336,6 +3370,17 @@
     <message>
       <source>Center point</source>
       <translation>Point central</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:first_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un premier point dans la vue.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
     <message>
       <source>Major axis start point</source>
@@ -3385,10 +3430,6 @@
       <translation>Sélectionnez un deuxième point.</translation>
     </message>
     <message>
-      <source>Major axis end point</source>
-      <translation>Point final du grand axe</translation>
-    </message>
-    <message>
       <source>Major axis point</source>
       <translation>Point du grand axe</translation>
     </message>
@@ -3397,7 +3438,29 @@
       <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroEllipse:second_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un deuxième point.</translation>
+    </message>
+    <message>
+      <source>Major axis end point</source>
+      <translation>Point final du grand axe</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
 
+  <context>
+    <name>SketchEllipse</name>
+    <message>
+      <source>Create ellipse</source>
+      <translation>Créer une ellipse</translation>
+    </message>
+  </context>
   <context>
     <name>SketchEllipse:Auxiliary</name>
     <message>
@@ -3912,6 +3975,13 @@
       <translation>Erreur inconnue.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchSplit:ConstraintEntityA:SketchPlugin_SplitValidator</name>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>Seule la sélection d&apos;attribut peut être utilisée pour la face d&apos;esquisse, pas %1</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchTrim</name>
@@ -3961,15 +4031,97 @@
         <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
     </message>
   </context>
-
   <context>
-    <name>SketchMacroBSpline:poles</name>
+    <name>SketchBSpline:poles</name>
     <message>
       <source>Poles and weights</source>
       <translation>Pôles et poids</translation>
     </message>
+    <message>
+      <source>Pole %1</source>
+      <translation>Pôle %1</translation>
+    </message>
+    <message>
+      <source>Weight :</source>
+      <translation>Poids :</translation>
+    </message>
+    <message>
+      <source>Add a new pole after the current</source>
+      <translation>Ajouter un nouveau pôle après le courant</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchBSpline:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliaire</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Élément de construction</translation>
+    </message>
   </context>
 
+  <context>
+    <name>SketchBSplinePeriodic</name>
+    <message>
+      <source>Number of B-spline poles should be 2 or more</source>
+      <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchBSplinePeriodic:poles</name>
+    <message>
+      <source>Poles and weights</source>
+      <translation>Pôles et poids</translation>
+    </message>
+    <message>
+      <source>Pole %1</source>
+      <translation>Pôle %1</translation>
+    </message>
+    <message>
+      <source>Weight :</source>
+      <translation>Poids :</translation>
+    </message>
+    <message>
+      <source>Add a new pole after the current</source>
+      <translation>Ajouter un nouveau pôle après le courant</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchBSplinePeriodic:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliaire</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Élément de construction</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroBSpline</name>
+    <message>
+      <source>Create B-spline curve</source>
+      <translation>Créer une courbe B-spline</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroBSpline:poles</name>
+    <message>
+      <source>Poles</source>
+      <translation>Pôles</translation>
+    </message>
+    <message>
+      <source>Pole %1</source>
+      <translation>Pôle %1</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un autre point ou appuyez sur ESC.</translation>
+    </message>
+  </context>
   <context>
     <name>SketchMacroBSpline:need_control_poly</name>
     <message>
@@ -3981,7 +4133,6 @@
       <translation>Précisez si le polygone de contrôle doit être créé</translation>
     </message>
   </context>
-
   <context>
     <name>SketchMacroBSpline:poles:SketchPlugin_BSplineValidator</name>
     <message>
@@ -3989,29 +4140,8 @@
       <translation>Le nombre de pôles doit être de 2 ou plus</translation>
     </message>
   </context>
-
   <context>
-    <name>SketchMacroBSplinePeriodic:poles</name>
-    <message>
-      <source>Poles and weights</source>
-      <translation>Pôles et poids</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>SketchMacroBSplinePeriodic:need_control_poly</name>
-    <message>
-      <source>Create control polygon</source>
-      <translation>Créer un polygone de contrôle</translation>
-    </message>
-    <message>
-      <source>Specify if the control polygon should be created</source>
-      <translation>Précisez si le polygone de contrôle doit être créé</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>SketchMacroBSplinePeriodic:Auxiliary</name>
+    <name>SketchMacroBSpline:Auxiliary</name>
     <message>
       <source>Auxiliary</source>
       <translation>Auxiliaire</translation>
@@ -4033,9 +4163,41 @@
       <translation>Périodique B-spline</translation>
     </message>
   </context>
-
   <context>
-    <name>SketchMacroBSpline:Auxiliary</name>
+    <name>SketchMacroBSplinePeriodic:poles</name>
+    <message>
+      <source>Poles</source>
+      <translation>Pôles</translation>
+    </message>
+    <message>
+      <source>Pole %1</source>
+      <translation>Pôle %1</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un autre point ou appuyez sur ESC.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroBSplinePeriodic:poles:SketchPlugin_BSplineValidator</name>
+    <message>
+      <source>Number of B-spline poles should be 2 or more</source>
+      <translation>Le nombre de pôles doit être de 2 ou plus</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroBSplinePeriodic:need_control_poly</name>
+    <message>
+      <source>Create control polygon</source>
+      <translation>Créer un polygone de contrôle</translation>
+    </message>
+    <message>
+      <source>Specify if the control polygon should be created</source>
+      <translation>Précisez si le polygone de contrôle doit être créé</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroBSplinePeriodic:Auxiliary</name>
     <message>
       <source>Auxiliary</source>
       <translation>Auxiliaire</translation>
@@ -4046,19 +4208,4 @@
     </message>
   </context>
 
-  <context>
-    <name>SketchMacroBSpline</name>
-    <message>
-      <source>Create B-spline curve</source>
-      <translation>Créer une courbe B-spline</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>SketchEllipse</name>
-    <message>
-      <source>Create ellipse</source>
-      <translation>Créer une ellipse</translation>
-    </message>
-  </context>
 </TS>

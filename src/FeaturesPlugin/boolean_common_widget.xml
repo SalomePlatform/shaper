@@ -14,7 +14,7 @@
       </multi_selector>
     </box>
     <box id="advanced"
-     title="advanced"
+     title="Advanced"
      icon="icons/Features/bool_fuse_advanced.png">
       <multi_selector id="main_objects"
         label="Main objects"

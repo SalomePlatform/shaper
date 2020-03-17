@@ -480,6 +480,17 @@
       <translation>Sélectionner des arêtes de l'esquisse, sur des objets ou des contours.</translation>
     </message>
   </context>
+  <context>
+    <name>BuildPlugin_Wire</name>
+    <message>
+      <source>Error: Empty selection list.</source>
+      <translation>Erreur: objets non sélectionnés.</translation>
+    </message>
+    <message>
+      <source>Error: Contours already closed or no contours found for selected edges.</source>
+      <translation>Erreur: contours déjà fermés ou aucun contour trouvé pour les arêtes sélectionnées.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Filling:GeomValidators_MinObjectsSelected</name>
