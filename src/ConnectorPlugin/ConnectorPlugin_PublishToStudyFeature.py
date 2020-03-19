@@ -86,11 +86,19 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             EventsAPI.Events_InfoMessage("PublishToStudy", "For publish to SHAPER-STUDY some Part is not activated", self).send()
             break
           aPartFeatureId = aPartSet.feature(aPartRes).data().featureId()
+          # Collects all features of exported results to find results of the same features and extend id.
+          # Map from feature index to index of result. If index is zero (initial), no surrfix to entry is added.
+          aFeaturesIndices = {}
           for aResId in range(aPartDoc.size(model.ModelAPI_ResultBody_group())):
             aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)
             aRes = model.objectToResult(aResObject)
-            aResFeatureId = aPartDoc.feature(aRes).data().featureId()
-            aSSEntry = str(aPartFeatureId) + ":" + str(aResFeatureId)
+            aResFeatureId = str(aPartDoc.feature(aRes).data().featureId())
+            if aResFeatureId in aFeaturesIndices:
+              aFeaturesIndices[aResFeatureId] += 1
+              aResFeatureId += ":" + str(aFeaturesIndices[aResFeatureId])
+            else:
+              aFeaturesIndices[aResFeatureId] = 0
+            aSSEntry = str(aPartFeatureId) + ":" + aResFeatureId
             aSShape = anEngine.FindOrCreateShape(aSSEntry)
             aSShape.SetShapeByStream(aRes.shape().getShapeStream(False))
             if not aSShape.GetSO(): # publish in case it is a new shape

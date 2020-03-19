@@ -1606,6 +1606,15 @@ void ModelHighAPI_Dumper::exportVariables() const
         anEntryStr<<aPartId<<":"<<aFeatureId;
         std::string anEntry = anEntryStr.str();
         exportVariable(anEntry, aNameIter->second.myCurrentName);
+        size_t aSize = aFeature->results().size();
+        if (aSize > 1) { // additional entries for features with more than one result
+          for(int a = 1; a < aSize; a++) {
+            std::ostringstream aResEntryStr;
+            aResEntryStr<<anEntry<<":"<<a;
+            std::string aResEntry = aResEntryStr.str();
+            exportVariable(aResEntry, aNameIter->second.myCurrentName);
+          }
+        }
       }
     }
   }

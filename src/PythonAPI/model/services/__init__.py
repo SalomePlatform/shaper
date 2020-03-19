@@ -37,11 +37,15 @@ def publishToShaperStudy():
   end()
 
 # returns unique identifier of the feature : id of part it belongs to + ":" + id of feature
-def featureStringId(theFeature):
+# the second argument may be the number of result if feature has more than one result (1 corresponds to the second result, etc)
+def featureStringId(theFeature, *theArgs):
   aRoot = moduleDocument()
   aCurrent = theFeature.feature().document()
   if aRoot and aCurrent:
-    return str(findPartFeature(aRoot, aCurrent).data().featureId()) + ":" + str(theFeature.feature().data().featureId())
+    aRes = str(findPartFeature(aRoot, aCurrent).data().featureId()) + ":" + str(theFeature.feature().data().featureId())
+    if len(theArgs) == 1:
+      aRes += ":" + str(theArgs[0])
+    return aRes
   return ""
 
 
