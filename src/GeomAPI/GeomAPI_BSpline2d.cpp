@@ -179,8 +179,24 @@ const bool GeomAPI_BSpline2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> the
                                         const double theTolerance,
                                         double& theParameter) const
 {
-  return GeomLib_Tool::Parameter(MY_BSPLINE, thePoint->impl<gp_Pnt2d>(),
-                                 theTolerance, theParameter) == Standard_True;
+  const gp_Pnt2d& aPoint = thePoint->impl<gp_Pnt2d>();
+  bool isOk = GeomLib_Tool::Parameter(MY_BSPLINE, aPoint,
+                                      theTolerance, theParameter) == Standard_True;
+  if (!isOk) {
+    // Sometimes OCCT's Extrema algorithm cannot find the parameter on B-spline curve
+    // (usually, if the point is near the curve extremity).
+    // Workaround: compute distance to each boundary point
+    isOk = true;
+    double aDistPS = aPoint.Distance(MY_BSPLINE->Poles().First());
+    double aDistPE = aPoint.Distance(MY_BSPLINE->Poles().Last());
+    if (aDistPS < aDistPE && aDistPS < theTolerance)
+      theParameter = MY_BSPLINE->Knots().First();
+    else if (aDistPE < aDistPS && aDistPE < theTolerance)
+      theParameter = MY_BSPLINE->Knots().Last();
+    else
+      isOk = false;
+  }
+  return isOk;
 }
 
 void GeomAPI_BSpline2d::D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

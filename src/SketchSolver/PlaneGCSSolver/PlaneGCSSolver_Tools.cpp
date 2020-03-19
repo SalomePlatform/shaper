@@ -65,6 +65,7 @@
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
 
+#include <GeomAPI_BSpline2d.h>
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Ellipse2d.h>
@@ -360,6 +361,37 @@ std::shared_ptr<GeomAPI_Ellipse2d> PlaneGCSSolver_Tools::ellipse(EntityWrapperPt
 
   return std::shared_ptr<GeomAPI_Ellipse2d>(
       new GeomAPI_Ellipse2d(aCenter, anAxis, anEllipse->getRadMaj(), *anEllipse->radmin));
+}
+
+std::shared_ptr<GeomAPI_BSpline2d> PlaneGCSSolver_Tools::bspline(EntityWrapperPtr theEntity)
+{
+  if (theEntity->type() != ENTITY_BSPLINE)
+    return std::shared_ptr<GeomAPI_BSpline2d>();
+
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEntity);
+  std::shared_ptr<GCS::BSpline> aSpline =
+      std::dynamic_pointer_cast<GCS::BSpline>(anEntity->entity());
+
+  std::list<GeomPnt2dPtr> aPoles;
+  for (GCS::VEC_P::iterator anIt = aSpline->poles.begin(); anIt != aSpline->poles.end(); ++anIt)
+    aPoles.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(*anIt->x, *anIt->y)));
+
+  std::list<double> aWeights;
+  for (GCS::VEC_pD::iterator anIt = aSpline->weights.begin();
+       anIt != aSpline->weights.end(); ++anIt)
+    aWeights.push_back(**anIt);
+
+  std::list<double> aKnots;
+  for (GCS::VEC_pD::iterator anIt = aSpline->knots.begin(); anIt != aSpline->knots.end(); ++anIt)
+    aKnots.push_back(**anIt);
+
+  std::list<int> aMultiplicities;
+  aMultiplicities.assign(aSpline->mult.begin(), aSpline->mult.end());
+
+  return std::shared_ptr<GeomAPI_BSpline2d>(
+         new GeomAPI_BSpline2d(aSpline->degree, aPoles, aWeights,
+                               aKnots, aMultiplicities, aSpline->periodic));
 }
 
 void PlaneGCSSolver_Tools::recalculateArcParameters(EntityWrapperPtr theArc)

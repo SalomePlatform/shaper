@@ -24,6 +24,7 @@
 #include <SketchSolver_ConstraintMovement.h>
 #include <SketchPlugin_Constraint.h>
 
+class GeomAPI_BSpline2d;
 class GeomAPI_Circ2d;
 class GeomAPI_Ellipse2d;
 class GeomAPI_Lin2d;
@@ -88,6 +89,9 @@ namespace PlaneGCSSolver_Tools
   /// \brief Convert entity to ellipse
   /// \return empty pointer if the entity is not an ellipse
   std::shared_ptr<GeomAPI_Ellipse2d> ellipse(EntityWrapperPtr theEntity);
+  /// \brief Convert entity to Bs-pline
+  /// \return empty pointer if the entity is not an ellipse
+  std::shared_ptr<GeomAPI_BSpline2d> bspline(EntityWrapperPtr theEntity);
 
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line

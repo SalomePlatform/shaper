@@ -38,7 +38,32 @@ DeriVector2 BSplineImpl::Value(double u, double du, double* derivparam)
   std::shared_ptr<GeomAPI_XY> aDeriv;
   myCurve->D1(u, aValue, aDeriv);
 
-  return DeriVector2(aValue->x(), aValue->y(), aDeriv->x() * du, aDeriv->y() * du);
+  // calculate the derivative on solver's parameter
+  std::shared_ptr<GeomAPI_Pnt2d> aValueDeriv(new GeomAPI_Pnt2d(0.0, 0.0));
+  bool hasParam = false;
+  std::list<GeomPnt2dPtr> aPolesDeriv;
+  for (GCS::VEC_P::iterator anIt = poles.begin(); anIt != poles.end(); ++anIt) {
+    double x = 0.0, y = 0.0;
+    if (anIt->x == derivparam) {
+      x = 1.0;
+      hasParam = true;
+    }
+    else if (anIt->y == derivparam) {
+      y = 1.0;
+      hasParam = true;
+    }
+	  aPolesDeriv.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(x, y)));
+  }
+  if (hasParam) {
+    // use non-periodic curve, because the most of B-spline coefficients are 0,
+    // thus, it is not necessary to keep original knots and multiplicities to get correct value
+    std::shared_ptr<GeomAPI_BSpline2d> aCurveDeriv(
+        new GeomAPI_BSpline2d(degree, aPolesDeriv, myCachedWeights));
+    aCurveDeriv->D0(u, aValueDeriv);
+  }
+
+  return DeriVector2(aValue->x(), aValue->y(),
+                     aValueDeriv->x() + aDeriv->x() * du, aValueDeriv->y() + aDeriv->y() * du);
 }
 
 DeriVector2 BSplineImpl::CalculateNormal(Point &p, double* derivparam)
@@ -47,20 +72,8 @@ DeriVector2 BSplineImpl::CalculateNormal(Point &p, double* derivparam)
     rebuildCache();
 
   double u = 0.0;
-  if (!myCurve->parameter(GeomPnt2dPtr(new GeomAPI_Pnt2d(*p.x, *p.y)), 1e100, u)) {
-    // Sometimes OCCT's Extrema algorithm cannot find the parameter on B-spline curve
-    // (usually, if the point is near the curve extremity).
-    // Workaround: compute distance to each boundary point
-    double aDistPS = PlaneGCSSolver_Tools::distance(p, poles.front());
-    double aDistPE = PlaneGCSSolver_Tools::distance(p, poles.back());
-    static const double THE_TOLERANCE = 1.e-6;
-    if (aDistPS < aDistPE && aDistPS < THE_TOLERANCE)
-      u = *knots.front();
-    else if (aDistPE < aDistPS && aDistPE < THE_TOLERANCE)
-      u = *knots.back();
-    else
-      return DeriVector2();
-  }
+  if (!myCurve->parameter(GeomPnt2dPtr(new GeomAPI_Pnt2d(*p.x, *p.y)), 1e100, u))
+    return DeriVector2();
 
   std::shared_ptr<GeomAPI_Pnt2d> aValue;
   std::shared_ptr<GeomAPI_XY> aDeriv;

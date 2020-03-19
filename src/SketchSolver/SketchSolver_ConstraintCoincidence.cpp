@@ -24,6 +24,9 @@
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
+#include <GeomAPI_BSpline2d.h>
+#include <GeomAPI_Pnt2d.h>
+
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_AttributeInteger.h>
@@ -270,6 +273,11 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
       std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
           std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
       myAuxValue.reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+      // calculate the parameter of the point on B-spline nearest to the constrained point.
+      GeomPnt2dPtr aPoint = PlaneGCSSolver_Tools::point(theAttributes[0]);
+      std::shared_ptr<GeomAPI_BSpline2d> aSpline = PlaneGCSSolver_Tools::bspline(theAttributes[2]);
+      if (aPoint && aSpline)
+        aSpline->parameter(aPoint, 1.e100, *myAuxValue->scalar());
     }
     else {
       // obtain extremity points of the coincident feature for further checking of multi-coincidence
