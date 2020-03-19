@@ -38,8 +38,7 @@ class GeomDataAPI_Point2DArray;
  * \brief Feature for creation of the new B-spline in Sketch.
  */
 class SketchPlugin_MacroBSpline : public SketchPlugin_SketchEntity,
-                                  public GeomAPI_IPresentable,
-                                  public ModelAPI_IReentrant
+                                  public GeomAPI_IPresentable
 {
 public:
   /// B-spline macro feature kind
@@ -99,10 +98,6 @@ public:
   SKETCHPLUGIN_EXPORT virtual bool isMacro() const {return true;};
 
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const {return false;};
-
-  /// Apply information of the message to current object. It fills reference object,
-  /// tangent type and tangent point refence in case of tangent arc
-  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Use plugin manager for features creation
   SketchPlugin_MacroBSpline();
