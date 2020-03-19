@@ -67,7 +67,7 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "operation_cursor",
     "Cursor for Sketch operation", Config_Prop::Cursor, "0");
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "create_by_dragging",
-    "Create sketch enities by dragging", Config_Prop::Boolean, "false");
+    "Create sketch entities by dragging", Config_Prop::Boolean, "false");
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
