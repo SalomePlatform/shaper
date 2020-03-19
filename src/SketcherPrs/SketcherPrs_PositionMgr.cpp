@@ -188,10 +188,12 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
   gp_Vec aVec;
   std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(theShape);
   if (aShape->isEdge()) {
+    std::shared_ptr<GeomAPI_Edge> anEdge = aShape->edge();
     std::shared_ptr<GeomAPI_Curve> aCurve =
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
 
-    if (aCurve->isCircle() || aCurve->isEllipse()) {
+    if (anEdge->isClosed()) {
+      double aPeriod = aCurve->endParam() - aCurve->startParam();
       Handle(Geom_Curve) aCurv = aCurve->impl<Handle_Geom_Curve>();
       GeomAPI_ProjectPointOnCurve anExtr(theP, aCurv);
       double aParam = anExtr.LowerDistanceParameter();
@@ -205,9 +207,9 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
         // if parameter is near the LastParam, make the vector go inside (reverse)
         double aDelta = aLastParam - aParam;
         while (aDelta < -Precision::Confusion())
-          aDelta += 2. * M_PI;
-        while (aDelta > 2. * M_PI - Precision::Confusion())
-          aDelta -= 2. * M_PI;
+          aDelta += aPeriod;
+        while (aDelta > aPeriod + Precision::Confusion())
+          aDelta -= aPeriod;
         if (fabs(aDelta) < Precision::Confusion())
           aVec.Reverse();
       }
