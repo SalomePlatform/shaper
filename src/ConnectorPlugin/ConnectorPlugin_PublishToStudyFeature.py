@@ -136,6 +136,9 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
                   if aRes:
                     aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
                     aBuilder.RemoveReference(aSO2)
+                # 18884 - remove also the shape object and all sub-objects
+                aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                aBuilder.RemoveObjectWithChildren(aSO)
 
     # Part of the "execute" method: processes the Groups of theRes result publication.
     # If theFields is true, the same is performed for Fields.
