@@ -168,18 +168,23 @@ Handle(V3d_View) theView,
     gp_Pnt EyePoint(XEye, YEye, ZEye);
     gp_Pnt AtPoint(XAt, YAt, ZAt);
 
-    gp_Vec anEyeVec(EyePoint, AtPoint);
-    anEyeVec.Normalize();
+    if (EyePoint.Distance(AtPoint) > gp::Resolution()) {
+      gp_Vec anEyeVec(EyePoint, AtPoint);
+      anEyeVec.Normalize();
 
-    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
+      std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+      gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
 
-    double aDen = anEyeVec * aNormalVec;
-    double aLVec = aDen != 0 ? aVec * aNormalVec / aDen : DBL_MAX;
+      double aDen = anEyeVec * aNormalVec;
+      double aLVec = aDen != 0 ? aVec * aNormalVec / aDen : DBL_MAX;
 
-    gp_Vec aDeltaVec = anEyeVec * aLVec;
-    aVec = aVec - aDeltaVec;
+      gp_Vec aDeltaVec = anEyeVec * aLVec;
+      aVec = aVec - aDeltaVec;
+    }
+else {
+  int qq = 0;
+}
   }
   theX = aVec.X() * aX->x() + aVec.Y() * aX->y() + aVec.Z() * aX->z();
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
