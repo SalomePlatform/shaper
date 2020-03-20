@@ -31,7 +31,6 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_EventReentrantMessage.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -87,58 +86,8 @@ void SketchPlugin_MacroBSpline::execute()
     std::list<FeaturePtr> aControlPoles;
     createControlPolygon(aBSpline, aControlPoles);
     constraintsForPoles(aControlPoles);
-
-    // message to init reentrant operation
-    static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
-    ReentrantMessagePtr aMessage(new ModelAPI_EventReentrantMessage(anId, this));
-    // set here the last pole to make coincidence with the start point of the next B-spline curve
-    aMessage->setCreatedFeature(aControlPoles.back());
-    Events_Loop::loop()->send(aMessage);
   }
 }
-
-// LCOV_EXCL_START
-std::string SketchPlugin_MacroBSpline::processEvent(
-                                              const std::shared_ptr<Events_Message>& theMessage)
-{
-  ReentrantMessagePtr aReentrantMessage =
-      std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
-  if (aReentrantMessage) {
-    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
-    ObjectPtr anObject = aReentrantMessage->selectedObject();
-    AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
-    std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
-
-    if (aClickedPoint) {
-      // fill points list (it consists of 2 points to make editable the second one)
-      AttributePoint2DArrayPtr aPointArrayAttr =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
-      aPointArrayAttr->setSize(2);
-      aPointArrayAttr->setPnt(0, aClickedPoint);
-      aPointArrayAttr->setPnt(1, aClickedPoint);
-
-      // fill weights
-      AttributeDoubleArrayPtr aWeightsArrayAttr = data()->realArray(WEIGHTS_ID());
-      aWeightsArrayAttr->setSize(2);
-      aWeightsArrayAttr->setValue(0, 1.0);
-      aWeightsArrayAttr->setValue(1, 1.0);
-
-      // fill reference attribute
-      AttributeRefAttrListPtr aRefAttrList =
-          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(attribute(REF_POLES_ID()));
-      if (anAttribute) {
-        if (!anAttribute->owner() || !anAttribute->owner()->data()->isValid()) {
-          if (aCreatedFeature && anAttribute->id() == SketchPlugin_Point::COORD_ID())
-            anAttribute = aCreatedFeature->attribute(SketchPlugin_Point::COORD_ID());
-        }
-        aRefAttrList->append(anAttribute);
-      }
-    }
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  }
-  return std::string();
-}
-// LCOV_EXCL_STOP
 
 FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
 {
