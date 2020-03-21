@@ -182,9 +182,6 @@ Handle(V3d_View) theView,
       gp_Vec aDeltaVec = anEyeVec * aLVec;
       aVec = aVec - aDeltaVec;
     }
-else {
-  int qq = 0;
-}
   }
   theX = aVec.X() * aX->x() + aVec.Y() * aX->y() + aVec.Z() * aX->z();
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
