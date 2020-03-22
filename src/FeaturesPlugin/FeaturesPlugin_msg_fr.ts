@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>advanced</source>
-      <translation>avancée</translation>
+      <translation>Avancée</translation>
     </message>
   </context>
   <context>
@@ -1295,7 +1295,7 @@
     </message>
   </context>
   <context>
-    <name>Recover:objects</name>
+    <name>Copy:objects</name>
     <message>
       <source>Sources:</source>
       <translation>Sources:</translation>
@@ -1310,7 +1310,7 @@
     </message>
   </context>
   <context>
-    <name>Recover:number</name>
+    <name>Copy:number</name>
     <message>
       <source>Nb copies</source>
       <translation>Nb de copies</translation>
@@ -1964,7 +1964,7 @@
     </message>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>Sélectionner des objetsю</translation>
+      <translation>Sélectionner des objets.</translation>
     </message>
   </context>
   <context>
@@ -4144,6 +4144,10 @@
       <source>Perform copy and rotate</source>
       <translation>Effectuer une copie et une rotation</translation>
     </message>
+    <message>
+      <source>Angular direction</source>
+      <translation>Direction angulaire</translation>
+    </message>
   </context>
   <context>
     <name>AngularCopy:axis_angular</name>
@@ -4153,6 +4157,10 @@
     </message>
     <message>
       <source>Select an edge for the axis of rotation</source>
+      <translation>Sélectionnez une arête pour l&apos;axe de rotation</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une arête pour l&apos;axe de rotation</translation>
     </message>
   </context>
@@ -4171,6 +4179,10 @@
     </message>
     <message>
       <source>Select objects</source>
+      <translation>Sélectionner des objets</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionner des objets</translation>
     </message>
   </context>
@@ -4208,6 +4220,10 @@
       <source>Perform copy and translate</source>
       <translation>Effectuer la copie et la translation</translation>
     </message>
+    <message>
+      <source>First direction</source>
+      <translation>Première direction</translation>
+    </message>
   </context>
   <context>
     <name>LinearCopy:axis_first_dir</name>
@@ -4217,6 +4233,10 @@
     </message>
     <message>
       <source>Select an edge for the first direction</source>
+      <translation>Sélectionnez une arête pour la première direction</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez une arête pour la première direction</translation>
     </message>
   </context>
@@ -4237,6 +4257,17 @@
       <source>Select an edge for the second direction</source>
       <translation>Sélectionnez une arête pour la deuxième direction</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une arête pour la deuxième direction</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:axis_second_dir:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
   </context>
   <context>
     <name>LinearCopy:main_objects</name>
@@ -4246,6 +4277,10 @@
     </message>
     <message>
       <source>Select objects</source>
+      <translation>Sélectionner des objets</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionner des objets</translation>
     </message>
   </context>
@@ -4511,6 +4546,10 @@
       <source>Select an object</source>
       <translation>Sélectionnez un objet</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la forme cible.</translation>
+    </message>
   </context>
   <context>
     <name>Placement:placement_end_shape:GeomValidators_BodyShapes</name>
@@ -4528,6 +4567,10 @@
     <message>
       <source>Select objects to move</source>
       <translation>Sélectionnez les objets à déplacer</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets à déplacer.</translation>
     </message>
   </context>
   <context>
@@ -4550,6 +4593,10 @@
     <message>
       <source>Select an object</source>
       <translation>Sélectionnez un objet</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la forme de départ.</translation>
     </message>
   </context>
   <context>
@@ -4600,6 +4647,10 @@
       <source>Select an edge for axis</source>
       <translation>Sélectionnez une arête pour l&apos;axe</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une arête pour l&apos;axe</translation>
+    </message>
   </context>
   <context>
     <name>Rotation:center_point</name>
@@ -4609,6 +4660,10 @@
     </message>
     <message>
       <source>Select a center point</source>
+      <translation>Sélectionnez un point central</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un point central</translation>
     </message>
   </context>
@@ -4629,6 +4684,10 @@
       <source>Select an end point</source>
       <translation>Sélectionnez un point d&apos;arrivée</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point d&apos;arrivée</translation>
+    </message>
   </context>
   <context>
     <name>Rotation:end_point:GeomValidators_ConstructionComposite</name>
@@ -4647,6 +4706,10 @@
       <source>Select solid objects</source>
       <translation>Sélectionner des objets solides</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets à déplacer.</translation>
+    </message>
   </context>
   <context>
     <name>Rotation:start_point</name>
@@ -4657,6 +4720,10 @@
     <message>
       <source>Start point</source>
       <translation>Point de départ</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point de départ</translation>
     </message>
   </context>
   <context>
@@ -4704,6 +4771,10 @@
       <source>Select an axis</source>
       <translation>Sélectionnez un axe</translation>
     </message>
+     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez l'axe de symétrie.</translation>
+    </message>
   </context>
   <context>
     <name>Symmetry:axis_object:GeomValidators_ShapeType</name>
@@ -4733,6 +4804,10 @@
       <source>Select solid objects</source>
       <translation>Sélectionner des objets solides</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets.</translation>
+    </message>
   </context>
   <context>
     <name>Symmetry:plane_object</name>
@@ -4743,6 +4818,10 @@
     <message>
       <source>Select a plane</source>
       <translation>Sélectionnez un plan</translation>
+    </message>
+     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le plan de symétrie.</translation>
     </message>
   </context>
   <context>
@@ -4755,7 +4834,11 @@
       <source>Select a point</source>
       <translation>Sélectionnez un point</translation>
     </message>
-  </context>
+     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le point de symétrie.</translation>
+    </message>
+ </context>
   <context>
     <name>Symmetry:point_object:GeomValidators_ShapeType</name>
     <message>
@@ -4856,6 +4939,10 @@
       <source>Select the end point to define the axis</source>
       <translation>Sélectionnez le point final pour définir l&apos;axe</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le point final.</translation>
+    </message>
   </context>
   <context>
     <name>Translation:end_point:GeomValidators_ConstructionComposite</name>
@@ -4874,6 +4961,10 @@
       <source>Select solid objects</source>
       <translation>Sélectionner des objets solides</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les objets à déplacer.</translation>
+    </message>
   </context>
   <context>
     <name>Translation:start_point</name>
@@ -4884,6 +4975,10 @@
     <message>
       <source>Start point</source>
       <translation>Point de départ</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le point de départ.</translation>
     </message>
   </context>
   <context>

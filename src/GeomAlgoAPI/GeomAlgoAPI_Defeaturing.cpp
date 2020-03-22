@@ -54,6 +54,13 @@ void GeomAlgoAPI_Defeaturing::build(const GeomShapePtr& theBaseSolid,
     aDefeaturing->DumpErrors(errors);
     aDefeaturing->DumpWarnings(errors);
     myError = errors.str();
+    // the error string may end by '\n', remove it for correct translation
+    size_t aNbToRemove = 0;
+    for (std::string::reverse_iterator it = myError.rbegin();
+         it != myError.rend() && *it == '\n'; ++it)
+      ++aNbToRemove;
+    if (aNbToRemove > 0)
+      myError = myError.substr(0, myError.size() - aNbToRemove);
     return;
   }
 

@@ -1114,6 +1114,10 @@
       <source>Select list of objects to be rotated</source>
       <translation>Sélectionnez la liste des objets à faire pivoter</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez la liste des objets à faire pivoter</translation>
+    </message>
   </context>
 
   <context>
@@ -1250,6 +1254,10 @@
     <message>
       <source>Select list of objects to be translated</source>
       <translation>Sélectionner la liste des objets à translater</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner la liste des objets à translater.</translation>
     </message>
   </context>
 
@@ -2565,6 +2573,10 @@
   <context>
     <name>SketchConstraintDistanceVertical:ConstraintEntityA</name>
     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+    <message>
       <source>First point</source>
       <translation>Premier point</translation>
     </message>
@@ -2582,6 +2594,10 @@
   </context>
   <context>
     <name>SketchConstraintDistanceVertical:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
     <message>
       <source>Second point</source>
       <translation>Deuxième point</translation>
@@ -3801,6 +3817,10 @@
       <source>Center of rotation</source>
       <translation>Centre de rotation</translation>
     </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le centre de rotation.</translation>
+    </message>
   </context>
   <context>
     <name>SketchMultiRotation:MultiRotationObjects</name>
@@ -3852,6 +3872,10 @@
     <message>
       <source>Start point of translation</source>
       <translation>Point de départ de la translation</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Point de départ de la translation.</translation>
     </message>
   </context>
   <context>
