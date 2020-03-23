@@ -54,6 +54,7 @@
 #include <GeomAPI_Edge.h>
 
 #include <list>
+#include <unordered_map>
 #ifdef _DEBUG
 #include <iostream>
 #endif
@@ -74,7 +75,9 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
   return aCount;
 }
 
-int shapesNbLines(const ModuleBase_ISelection* theSelection)
+typedef std::unordered_map<GeomAbs_CurveType, int> ShapeQuantity;
+
+int shapesNbEdges(const ModuleBase_ISelection* theSelection, ShapeQuantity& theEdges)
 {
   QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   int aCount = 0;
@@ -87,8 +90,8 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
         Standard_Real aStart, aEnd;
         Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
         GeomAdaptor_Curve aAdaptor(aCurve);
-        if (aAdaptor.GetType() == GeomAbs_Line)
-          aCount++;
+        theEdges[aAdaptor.GetType()] += 1;
+        aCount++;
       }
     }
   }
@@ -141,8 +144,11 @@ bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelectio
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return (aNbPoints >= 0 && aNbPoints < 3) &&
+           (aShapes[GeomAbs_Line] == aNbEdges && aNbEdges >= 0 && aNbEdges < 2);
   }
 }
 
@@ -152,8 +158,10 @@ bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount == 1);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && (aShapes[GeomAbs_Line] == aNbEdges && aNbEdges == 1);
   }
 }
 
@@ -163,8 +171,10 @@ bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSel
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && aShapes[GeomAbs_Line] == aNbEdges && aNbEdges > 0 && aNbEdges < 3;
   }
 }
 
@@ -174,8 +184,10 @@ bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelectio
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && aShapes[GeomAbs_Line] == aNbEdges && aNbEdges > 0 && aNbEdges < 3;
   }
 }
 
@@ -185,24 +197,10 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrsPtr> aList =
-      theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    int aCount = 0;
-    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
-      const GeomShapePtr& aShape = aPrs->shape();
-      if (aShape.get() && !aShape->isNull()) {
-        if (aShape->shapeType() == GeomAPI_Shape::EDGE) {
-          const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-          TopoDS_Edge aEdge = TopoDS::Edge(aTDShape);
-          Standard_Real aStart, aEnd;
-          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
-          GeomAdaptor_Curve aAdaptor(aCurve);
-          if (aAdaptor.GetType() == GeomAbs_Circle)
-            aCount++;
-        }
-      }
-    }
-    return (aCount == 1);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && (aShapes[GeomAbs_Circle] == aNbEdges && aNbEdges == 1);
   }
 }
 
@@ -238,9 +236,10 @@ bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelect
     return isEmptySelectionValid(theOperation);
   } else {
     // Coincident can be applied to points and to lines
-    int aCount = shapesNbPoints(theSelection);
-    aCount += shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return (aNbPoints >= 0 && aNbPoints < 3) && (aNbEdges >= 0 && aNbEdges < 2);
   }
 }
 
@@ -250,8 +249,10 @@ bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount == 1);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && (aShapes[GeomAbs_Line] == aNbEdges && aNbEdges == 1);
   }
 }
 
@@ -262,7 +263,9 @@ bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection,
     return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbPoints(theSelection);
-    return aCount > 1;
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aCount > 1 && aNbEdges == 0;
   }
 }
 
@@ -272,29 +275,11 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    if ((aList.size() == 0) || (aList.size() > 2))
-      return false;
-
-    ModuleBase_ViewerPrsPtr aPrs = aList.first();
-    const GeomShapePtr& aShape = aPrs->shape();
-    if (!aShape.get() || aShape->isNull() || aShape->shapeType() != GeomAPI_Shape::EDGE)
-      return false;
-    GeomAPI_Edge aEdge1(aShape);
-
-    if (aList.size() == 2) {
-      // Check second selection
-      aPrs = aList.last();
-      const GeomShapePtr& aShape2 = aPrs->shape();
-      if (!aShape2.get() || aShape2->isNull() || aShape2->shapeType() != GeomAPI_Shape::EDGE)
-        return false;
-      GeomAPI_Edge aEdge2(aShape2);
-
-      if (aEdge1.isLine() && aEdge2.isLine())
-        return false;
-    }
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && (aNbEdges == 1 || (aNbEdges == 2 && aShapes[GeomAbs_Line] == 1));
   }
-  return true;
 }
 
 bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection,
@@ -303,8 +288,10 @@ bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && aShapes[GeomAbs_Line] == aNbEdges && aNbEdges > 0 && aNbEdges < 3;
   }
 }
 
@@ -314,36 +301,13 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrsPtr> aList =
-      theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    int aCount = 0;
-    int aType = 0;
-    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
-      GeomShapePtr aShape = aPrs->shape();
-      if (aShape.get() && aShape->isEdge()) {
-        aCount++;
-        GeomAPI_Edge aEdge(aShape);
-        if (aEdge.isLine()) {
-          if (aCount == 1)
-            aType = 1;
-          else if (aType != 1)
-            return false;
-        } else if (aEdge.isCircle() || aEdge.isArc()) {
-          if (aCount == 1)
-            aType = 2;
-          else if (aType != 2)
-            return false;
-        } else if (aEdge.isEllipse()) {
-          if (aCount == 1)
-            aType = 3;
-          else if (aType != 3)
-            return false;
-        } else if (aEdge.isBSpline())
-          return false;
-      } else
-        return false;
-    }
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && (aNbEdges > 0 && aNbEdges < 3) &&
+           (aShapes[GeomAbs_Line] == aNbEdges ||
+            aShapes[GeomAbs_Circle] == aNbEdges ||
+            aShapes[GeomAbs_Ellipse] == aNbEdges);
   }
 }
 
@@ -353,8 +317,10 @@ bool PartSet_CollinearSelection::isValid(const ModuleBase_ISelection* theSelecti
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbPoints == 0 && aShapes[GeomAbs_Line] == aNbEdges && aNbEdges > 0 && aNbEdges < 3;
   }
 }
 
@@ -363,8 +329,12 @@ bool PartSet_MiddlePointSelection::isValid(const ModuleBase_ISelection* theSelec
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0)
     return isEmptySelectionValid(theOperation);
-  else
-    return shapesNbLines(theSelection) == 1 || shapesNbPoints(theSelection) == 1;
+  else {
+    int aNbPoints = shapesNbPoints(theSelection);
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return (aNbPoints >= 0 && aNbPoints < 3) && (aNbEdges >= 0 && aNbEdges < 2);
+  }
 }
 
 bool PartSet_MultyTranslationSelection::isValid(const ModuleBase_ISelection* theSelection,
@@ -373,8 +343,9 @@ bool PartSet_MultyTranslationSelection::isValid(const ModuleBase_ISelection* the
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return aCount > 0;
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbEdges > 0;
   }
 }
 
@@ -384,8 +355,9 @@ bool PartSet_SplitSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return aCount > 0;
+    ShapeQuantity aShapes;
+    int aNbEdges = shapesNbEdges(theSelection, aShapes);
+    return aNbEdges > 0;
   }
 }
 
