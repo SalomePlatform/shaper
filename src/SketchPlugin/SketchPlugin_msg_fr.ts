@@ -3998,6 +3998,10 @@
       <source>Unknown error.</source>
       <translation>Erreur inconnue.</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Non supporté</translation>
+    </message>
   </context>
   <context>
     <name>SketchSplit:ConstraintEntityA:SketchPlugin_SplitValidator</name>
@@ -4045,6 +4049,10 @@
     <message>
       <source>Unknown error.</source>
       <translation>Erreur inconnue.</translation>
+    </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Non supporté</translation>
     </message>
   </context>
 

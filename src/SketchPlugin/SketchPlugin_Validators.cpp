@@ -1019,6 +1019,13 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   if (!anAttrFeature)
     return aValid;
 
+  // B-splines are not supported by the Split yet
+  if (anAttrFeature->getKind() == SketchPlugin_BSpline::ID() ||
+      anAttrFeature->getKind() == SketchPlugin_BSplinePeriodic::ID()) {
+    theError = "Not supported";
+    return false;
+  }
+
   std::set<ResultPtr> anEdgeShapes;
   ModelGeomAlgo_Shape::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
   if (anEdgeShapes.empty() || anEdgeShapes.size() > 1 /*there case has not existed yet*/)
@@ -1095,6 +1102,13 @@ bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
                                  std::dynamic_pointer_cast<SketchPlugin_Feature>(aBaseFeature);
   if (!aSketchFeature.get() || aSketchFeature->isCopy())
     return aValid;
+
+  // B-splines are not supported by the Trim yet
+  if (aBaseFeature->getKind() == SketchPlugin_BSpline::ID() ||
+      aBaseFeature->getKind() == SketchPlugin_BSplinePeriodic::ID()) {
+    theError = "Not supported";
+    return false;
+  }
 
   // point on feature
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
