@@ -75,7 +75,7 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
   return aCount;
 }
 
-typedef std::unordered_map<GeomAbs_CurveType, int> ShapeQuantity;
+typedef std::unordered_map<int, int> ShapeQuantity;
 
 int shapesNbEdges(const ModuleBase_ISelection* theSelection, ShapeQuantity& theEdges)
 {
@@ -90,7 +90,7 @@ int shapesNbEdges(const ModuleBase_ISelection* theSelection, ShapeQuantity& theE
         Standard_Real aStart, aEnd;
         Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
         GeomAdaptor_Curve aAdaptor(aCurve);
-        theEdges[aAdaptor.GetType()] += 1;
+        theEdges[(int)aAdaptor.GetType()] += 1;
         aCount++;
       }
     }
