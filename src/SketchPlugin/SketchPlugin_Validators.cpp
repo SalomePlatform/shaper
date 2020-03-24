@@ -414,6 +414,15 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
 
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
     ObjectPtr aSelObject = aSelAttr->object(anInd);
+
+    // B-splines are not supported in Mirror yet
+    FeaturePtr aSelFeature = ModelAPI_Feature::feature(aSelObject);
+    if (aSelFeature && (aSelFeature->getKind() == SketchPlugin_BSpline::ID() ||
+        aSelFeature->getKind() == SketchPlugin_BSplinePeriodic::ID())) {
+      theError = "Not supported";
+      return false;
+    }
+
     std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
@@ -521,6 +530,15 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
         break;
     if (anObjIter != anInitialObjects.end())
       continue;
+
+    // B-splines are not supported in Copying features
+    FeaturePtr aSelFeature = ModelAPI_Feature::feature(aSelObject);
+    if (aSelFeature && (aSelFeature->getKind() == SketchPlugin_BSpline::ID() ||
+        aSelFeature->getKind() == SketchPlugin_BSplinePeriodic::ID())) {
+      theError = "Not supported";
+      return false;
+    }
+
     anObjIter = aCopiedObjects.begin();
     for (; anObjIter != aCopiedObjects.end(); anObjIter++)
       if (aSelObject == *anObjIter) {
