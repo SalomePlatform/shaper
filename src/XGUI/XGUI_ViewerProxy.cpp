@@ -296,36 +296,40 @@ void XGUI_ViewerProxy::onMouseDoubleClick(AppElements_ViewWindow* theWnd, QMouse
 
 void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myIs2dMode) {
-    bool aHighlight2d =
-      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d) {
-      if (myShowHighlight)
-        eraseHighlight();
-      else
-        updateHighlight();
-    }
-    else {
-      if (myShowHighlight)
-        updateHighlight();
-      else
-        eraseHighlight();
-    }
-  }
+  if (theEvent->buttons() != Qt::NoButton)
+    eraseHighlight();
   else {
-    bool aHighlight3d =
-      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d) {
-      if (myShowHighlight)
-        eraseHighlight();
-      else
-        updateHighlight();
+    if (myIs2dMode) {
+      bool aHighlight2d =
+        ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
+      if (aHighlight2d) {
+        if (myShowHighlight)
+          eraseHighlight();
+        else
+          updateHighlight();
+      }
+      else {
+        if (myShowHighlight)
+          updateHighlight();
+        else
+          eraseHighlight();
+      }
     }
     else {
-      if (myShowHighlight)
-        updateHighlight();
-      else
-        eraseHighlight();
+      bool aHighlight3d =
+        ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
+      if (aHighlight3d) {
+        if (myShowHighlight)
+          eraseHighlight();
+        else
+          updateHighlight();
+      }
+      else {
+        if (myShowHighlight)
+          updateHighlight();
+        else
+          eraseHighlight();
+      }
     }
   }
   emit mouseMove(theWnd, theEvent);
@@ -546,36 +550,40 @@ void XGUI_ViewerProxy::updateHighlight()
 #ifdef HAVE_SALOME
 void XGUI_ViewerProxy::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myIs2dMode) {
-    bool aHighlight2d =
-      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d) {
-      if (myShowHighlight)
-        eraseHighlight();
-      else
-        updateHighlight();
-    }
-    else {
-      if (myShowHighlight)
-        updateHighlight();
-      else
-        eraseHighlight();
-    }
-  }
+  if (theEvent->buttons() != Qt::NoButton)
+    eraseHighlight();
   else {
-    bool aHighlight3d =
-      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d) {
-      if (myShowHighlight)
-        eraseHighlight();
-      else
-        updateHighlight();
+    if (myIs2dMode) {
+      bool aHighlight2d =
+        ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
+      if (aHighlight2d) {
+        if (myShowHighlight)
+          eraseHighlight();
+        else
+          updateHighlight();
+      }
+      else {
+        if (myShowHighlight)
+          updateHighlight();
+        else
+          eraseHighlight();
+      }
     }
     else {
-      if (myShowHighlight)
-        updateHighlight();
-      else
-        eraseHighlight();
+      bool aHighlight3d =
+        ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
+      if (aHighlight3d) {
+        if (myShowHighlight)
+          eraseHighlight();
+        else
+          updateHighlight();
+      }
+      else {
+        if (myShowHighlight)
+          updateHighlight();
+        else
+          eraseHighlight();
+      }
     }
   }
   emit mouseMove(theWnd, theEvent);
