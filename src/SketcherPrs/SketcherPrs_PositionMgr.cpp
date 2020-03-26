@@ -260,7 +260,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
 
   // Compute shifting vector for a one symbol
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->normal()->impl<gp_Dir>());
-  aShift.Normalize();
+  if (aShift.SquareMagnitude() > Precision::SquareConfusion())
+    aShift.Normalize();
   aShift.Multiply(theStep * 0.8);
 
   // Shift the position coordinate according to position index

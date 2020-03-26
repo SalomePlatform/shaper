@@ -82,3 +82,13 @@ void GeomData_Dir::reinit()
     myIsInitialized = true;
   }
 }
+
+bool GeomData_Dir::isInitialized()
+{
+  // Check once again the direction is initialized.
+  // Use case (bos #18905): draw a sketch, click "Change sketch plane", then abort it.
+  //                        myIsInitialized value is dropped to false, thus recheck.
+  if (!myIsInitialized)
+    myIsInitialized = myLab.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
+  return ModelAPI_Attribute::isInitialized();
+}
