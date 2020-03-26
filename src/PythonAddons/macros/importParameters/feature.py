@@ -5,6 +5,7 @@ Author: Nathalie Gore
 from salome.shaper import model
 from salome.shaper import geom
 import ModelAPI
+import ParametersAPI
 
 class importParameters(model.Feature):
     """Import of Construction points
@@ -38,6 +39,22 @@ class importParameters(model.Feature):
         # Creating the input argument of the feature
         self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
 
+
+# Get existing parameters names
+
+    def existingParameters(self):
+        """ Returns list of already existing parameters names"""
+        aDoc = model.activeDocument()
+        aNbFeatures = aDoc.numInternalFeatures();
+        aNames = []
+        for i in range(aNbFeatures):
+            aParamFeature = aDoc.internalFeature(i);
+            if aParamFeature is not None:
+                if aParamFeature.getKind() == ParametersAPI.ParametersAPI_Parameter.ID():
+                    aNames.append(aParamFeature.name())
+        return aNames
+
+
 # Execution of the Import
 
     def execute(self):
@@ -50,12 +67,15 @@ class importParameters(model.Feature):
 
             # Creating the parameters in the current document
             part = model.activeDocument()
+            aNames = self.existingParameters()
 
             with open(filepath) as file:
                 for line in file:
                     defParameters = line.replace("\n","").split(' ')
                     if len(defParameters) == 2 :
-                        model.addParameter(part, defParameters[0], defParameters[1])
+                        if defParameters[0] not in aNames:
+                            model.addParameter(part, defParameters[0], defParameters[1])
+                            aNames.append(defParameters[0])
                 file.close()
                 return
 
