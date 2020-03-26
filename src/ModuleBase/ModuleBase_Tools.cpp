@@ -456,6 +456,8 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
 {
   if (theShape.IsNull())
     return;
+  if (theDrawer.IsNull())
+    return;
 
   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape());
   aGeomShape->setImpl(new TopoDS_Shape(theShape));

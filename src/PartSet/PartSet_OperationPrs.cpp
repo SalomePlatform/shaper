@@ -92,6 +92,7 @@ PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
   aDrawer->SetUIsoAspect(aUIsoAspect);
   aDrawer->SetVIsoAspect(aVIsoAspect);
   aDrawer->SetIsoOnPlane(false);
+  //aDrawer->SetTypeOfDeflection(Aspect_TOD_ABSOLUTE);
 }
 
 bool PartSet_OperationPrs::hasShapes()
@@ -135,9 +136,7 @@ void PartSet_OperationPrs::Compute(
     // change deviation coefficient to provide more precise circle
     // as there is no result, the shape is processed to correct deviation. To be unified
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
-    Handle(Prs3d_Drawer) aHighlightDrawer = DynamicHilightAttributes();
-    if (!aHighlightDrawer.IsNull())
-      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aHighlightDrawer);
+    ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, DynamicHilightAttributes());
 
     if (myUseAISWidth) {
       Handle(AIS_InteractiveObject) anIO = anIter.Value();

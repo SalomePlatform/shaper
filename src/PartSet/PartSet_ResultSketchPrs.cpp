@@ -71,6 +71,7 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
+  //aDrawer->SetTypeOfDeflection(Aspect_TOD_ABSOLUTE);
 
   // Activate individual repaintng if this is a part of compsolid
   ResultBodyPtr anOwner = ModelAPI_Tools::bodyOwner(myResult);
@@ -105,7 +106,8 @@ void PartSet_ResultSketchPrs::Compute(
   setAuxiliaryPresentationStyle(false);
 
   // change deviation coefficient to provide more precise circle
-  //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), DynamicHilightAttributes());
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
   try {
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }

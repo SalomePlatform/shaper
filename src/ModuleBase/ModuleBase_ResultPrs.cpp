@@ -79,6 +79,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   // Set own free boundaries aspect in order to have free
   // and unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
+  //aDrawer->SetTypeOfDeflection(Aspect_TOD_ABSOLUTE);
   aDrawer->SetUnFreeBoundaryAspect(
     new Prs3d_LineAspect(Quantity_NOC_YELLOW, Aspect_TOL_SOLID, 1));
   aDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1));
@@ -119,6 +120,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
       SetDynamicHilightAttributes(aDrawer);
     }
   }
+  //if (!aDrawer.IsNull())
+  //  aDrawer->SetTypeOfDeflection(Aspect_TOD_ABSOLUTE);
 
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
@@ -260,6 +263,9 @@ void ModuleBase_ResultPrs::Compute(
         aReadyToDisplay = false;
     }
   }
+  // change deviation coefficient to provide more precise circle
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), DynamicHilightAttributes());
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
   try {
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }
