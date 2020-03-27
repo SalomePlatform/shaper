@@ -258,6 +258,8 @@ private:
 
   QDialog* myPartSetMessage;
   QDialog* mySizeMessage;
+
+  GeomPlanePtr myTmpPlane;
 };
 
 #endif

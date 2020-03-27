@@ -332,6 +332,10 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs)
 {
+  // Nullify a temporary remembered plane
+  if (myTmpPlane.get())
+    myTmpPlane.reset();
+
   GeomPlanePtr aPlane = plane();
   if (!aPlane.get())
     return;
@@ -613,6 +617,11 @@ void PartSet_WidgetSketchLabel::onShowPanel()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
+  if (myTmpPlane.get()) {
+    setSketchPlane(myTmpPlane);
+    myTmpPlane.reset();
+  }
+
   ModuleBase_WidgetValidated::deactivate();
   bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
@@ -774,6 +783,7 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     }
 
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    myTmpPlane = PartSet_Tools::sketchPlane(aSketch);
     PartSet_Tools::nullifySketchPlane(aSketch);
 
     Handle(SelectMgr_Filter) aFilter = aModule->selectionFilter(SF_SketchPlaneFilter);
