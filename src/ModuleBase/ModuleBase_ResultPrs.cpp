@@ -21,6 +21,7 @@
 #include "ModuleBase_IViewer.h"
 
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Edge.h>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
@@ -33,6 +34,7 @@
 
 #include <Events_InfoMessage.h>
 #include <Events_Loop.h>
+#include <Config_PropManager.h>
 
 #include <AIS_ColoredDrawer.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -56,6 +58,8 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Edge.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
 
 //*******************************************************************************************
 
@@ -68,8 +72,25 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0),
   myTransparency(1), myIsSubstituted(false)
 {
-  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
+
+  GeomShapePtr aShapePtr = ModelAPI_Tools::shape(theResult);
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+  // Workaround for Sketch subshapes which has no discrete representation
+  // until sketch faces are built and displayed.
+  // Thus, perform discretization of such edges.
+  if (theResult->groupName() == ModelAPI_ResultConstruction::group() &&
+    aShape.ShapeType() == TopAbs_EDGE) {
+    GeomEdgePtr anEdgePtr = GeomEdgePtr(new GeomAPI_Edge(aShapePtr));
+    if (anEdgePtr->isCircle() || anEdgePtr->isArc()) {
+      TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+      TopLoc_Location aLoc;
+      Handle(Poly_Polygon3D) aPoly3D = BRep_Tool::Polygon3D(anEdge, aLoc);
+      if (aPoly3D.IsNull()) {
+        double aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+        BRepMesh_IncrementalMesh(aShape, aDeflection);
+      }
+    }
+  }
   Set(aShape);
 
   // Activate individual repaintng if this is a part of compsolid
