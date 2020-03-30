@@ -78,6 +78,10 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
   SetAutoHilight(anOwner.get() == NULL);
 
   ModuleBase_Tools::setPointBallHighlighting(this);
+
+  // change deviation coefficient to provide more precise circle
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), DynamicHilightAttributes());
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
 }
 
 void PartSet_ResultSketchPrs::Compute(
@@ -105,9 +109,6 @@ void PartSet_ResultSketchPrs::Compute(
 
   setAuxiliaryPresentationStyle(false);
 
-  // change deviation coefficient to provide more precise circle
-  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), DynamicHilightAttributes());
-  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
   try {
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }

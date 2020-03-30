@@ -78,7 +78,7 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
   {
     bool isAccepted = false;
-    if (myIsActive) {
+    if (myIsActive && (!qApp->modalWindow())) {
       if (theEvent->type() == QEvent::KeyRelease) {
         QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
         if (aKeyEvent) {
@@ -94,12 +94,10 @@ public:
         }
       }
       else if (theEvent->type() == QEvent::KeyPress) {
-        if (!qApp->modalWindow()) {
-          if (myOperationMgr->hasOperation()) {
-            QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
-          }
+        if (myOperationMgr->hasOperation()) {
+          QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+          isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
         }
       }
     }
