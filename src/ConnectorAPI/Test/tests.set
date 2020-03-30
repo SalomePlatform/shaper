@@ -25,4 +25,5 @@ SET(TEST_NAMES
   TestExportToGEOMWholeFeature
   Test2882
   Test17917
+  Test18887
 )
