@@ -27,6 +27,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeIntArray.h>
@@ -41,6 +42,7 @@
 #include <ModelAPI_Events.h>
 
 #include <GeomAPI_ShapeHierarchy.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #define RECURSE_TOP_LEVEL 50
 
@@ -1033,6 +1035,52 @@ std::list<FeaturePtr> referencedFeatures(
     FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
     if (aFeat.get() && (theFeatureKind.empty() || aFeat->getKind() == theFeatureKind))
       aResSet.insert(aFeat);
+  }
+  // check also Group-operations that may refer to groups - add them for theFeatureKind "Group"
+  if (theFeatureKind == "Group") {
+    std::set<FeaturePtr> aGroupOperations;
+    for(bool aNeedIterate = true; aNeedIterate; ) {
+      std::set<FeaturePtr>::iterator aResIter = aResSet.begin();
+      for(; aResIter != aResSet.end(); aResIter++) {
+        std::list<ResultPtr>::const_iterator aGroupRes = (*aResIter)->results().cbegin();
+        for(; aGroupRes != (*aResIter)->results().cend(); aGroupRes++) {
+          const std::set<AttributePtr>& aRefs = (*aGroupRes)->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
+          for(; aRef != aRefs.cend(); aRef++) {
+            FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+            if (aFeat.get() && !aGroupOperations.count(aFeat) && !aFeat->results().empty() &&
+                aFeat->firstResult()->groupName() == ModelAPI_ResultGroup::group()) {
+              // iterate results of this group operation because it may be without theTarget shape
+              GeomShapePtr aTargetShape = theTarget->shape();
+              bool anIsIn = false;
+              std::list<ResultPtr>::const_iterator anOpRes = aFeat->results().cbegin();
+              for(; anOpRes != aFeat->results().cend() && !anIsIn; anOpRes++) {
+                GeomShapePtr anOpShape = (*anOpRes)->shape();
+                if (!anOpShape.get() || anOpShape->isNull())
+                  continue;
+                for(GeomAPI_ShapeIterator aSubIt(anOpShape); aSubIt.more(); aSubIt.next()) {
+                  if (aTargetShape->isSubShape(aSubIt.current(), false)) {
+                    anIsIn = true;
+                    break;
+                  }
+                }
+              }
+              if (anIsIn)
+                aGroupOperations.insert(aFeat);
+            }
+          }
+        }
+      }
+      // insert all new group operations into result and if they are, check for next dependencies
+      aNeedIterate = false;
+      std::set<FeaturePtr>::iterator aGroupOpIter = aGroupOperations.begin();
+      for(; aGroupOpIter != aGroupOperations.end(); aGroupOpIter++) {
+        if (aResSet.find(*aGroupOpIter) == aResSet.end()) {
+          aResSet.insert(*aGroupOpIter);
+          aNeedIterate = true;
+        }
+      }
+    }
   }
 
   std::list<FeaturePtr> aResList;
