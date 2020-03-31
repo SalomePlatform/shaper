@@ -645,6 +645,11 @@ std::string GeomAPI_Shape::getShapeStream(const bool theWithTriangulation) const
   if (!theWithTriangulation) { // make a copy of shape without triangulation
     BRepBuilderAPI_Copy aCopy(aShape, Standard_False, Standard_False);
     const TopoDS_Shape& aCopyShape = aCopy.Shape();
+    // make all faces unchecked to make the stream of shapes the same
+    TopExp_Explorer aFaceExp(aCopyShape, TopAbs_FACE);
+    for(; aFaceExp.More(); aFaceExp.Next()) {
+      aFaceExp.Current().TShape()->Checked(Standard_False);
+    }
     BRepTools::Write(aCopyShape, aStream);
   } else {
     BRepTools::Write(aShape, aStream);
