@@ -52,6 +52,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QWindow>
 
 //#define DEBUG_CURRENT_FEATURE
 
@@ -78,26 +79,37 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
   {
     bool isAccepted = false;
-    if (myIsActive && (!qApp->modalWindow())) {
-      if (theEvent->type() == QEvent::KeyRelease) {
-        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-        if (aKeyEvent) {
-          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-          switch (aKeyEvent->key()) {
+
+    if (myIsActive) {
+      // Do not process keys for modal dialogues: all keys has to be processed within the dialog
+      // There is only one exception: ModuleBase_EditorDialog
+      QWindow* aWnd = qApp->modalWindow();
+      QString aName = "NoModal";
+      if (aWnd) {
+        if (!aWnd->objectName().startsWith("ModuleBase_EditorDialog"))
+          aName = aWnd->objectName();
+      }
+      if (aName == "NoModal") {
+        if (theEvent->type() == QEvent::KeyRelease) {
+          QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+          if (aKeyEvent) {
+            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+            switch (aKeyEvent->key()) {
             case Qt::Key_Delete:
               isAccepted = myOperationMgr->onProcessDelete(theObject);
-            break;
+              break;
             default:
               isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
               break;
+            }
           }
         }
-      }
-      else if (theEvent->type() == QEvent::KeyPress) {
-        if (myOperationMgr->hasOperation()) {
-          QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-          isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+        else if (theEvent->type() == QEvent::KeyPress) {
+          if (myOperationMgr->hasOperation()) {
+            QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+          }
         }
       }
     }
