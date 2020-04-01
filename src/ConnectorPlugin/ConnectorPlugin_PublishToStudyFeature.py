@@ -160,7 +160,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aShape = aSelection.value()
             if aShape:
               allShapesList = [] # collect all sub-shapes selected in the group
-              if aShape.shapeType() == 0: # compound
+              if aShape.shapeType() == 0 or aShape.shapeType() != aSelType: # compound or whole res
                 anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
                 while anExplorer.more():
                   allShapesList.append(anExplorer.current())
