@@ -269,19 +269,17 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     QObject* aObj = myWorkshop->objectBrowser()->parent();
     QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
     if (aObjDoc) {
-      QAction* aViewAct = aObjDoc->toggleViewAction();
-      aViewAct->setEnabled(true);
       myWorkshop->objectBrowser()->setVisible(true);
       aObjDoc->setVisible(true);
       desktop()->tabifyDockWidget(aObjDoc, myWorkshop->propertyPanel());
+      aObjDoc->toggleViewAction()->setVisible(true);
     }
 
     if (!myInspectionPanel) {
       myInspectionPanel = myWorkshop->inspectionPanel();
-      QAction* aViewAct = myInspectionPanel->toggleViewAction();
-      connect(aViewAct, SIGNAL(toggled(bool)), this, SLOT(onWhatIs(bool)));
+      connect(myInspectionPanel->toggleViewAction(), SIGNAL(toggled(bool)), this, SLOT(onWhatIs(bool)));
     }
-    myInspectionPanel->toggleViewAction()->setEnabled(true);
+    myInspectionPanel->toggleViewAction()->setVisible(true);
 
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
@@ -389,14 +387,12 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   if (aObjDoc) {
     aObjDoc->setVisible(false);
     myWorkshop->objectBrowser()->setVisible(false);
-    QAction* aViewAct = aObjDoc->toggleViewAction();
-    aViewAct->setEnabled(false);
+    aObjDoc->toggleViewAction()->setVisible(false);
   }
 
   myIsInspectionVisible = myInspectionPanel->isVisible();
   myInspectionPanel->hide();
-  QAction* aViewAct = myInspectionPanel->toggleViewAction();
-  aViewAct->setEnabled(false);
+  myInspectionPanel->toggleViewAction()->setVisible(false);
 
   // the active operation should be stopped for the next activation.
   // There should not be active operation and visualized preview.
