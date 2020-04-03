@@ -46,6 +46,8 @@ void PartSetPlugin_Remove::execute()
       std::set<std::shared_ptr<ModelAPI_Feature> > aRefFeatures;
       aRoot->refsToFeature(aFeature, aRefFeatures);
       if (aRefFeatures.empty()) {
+        // before removing the part make the partSet active document
+        aPManager->setActiveDocument(aRoot);
         aRoot->removeFeature(aFeature);
         // the redisplay signal should be flushed in order to erase the feature presentation
         // in the viewer after removeFeature from the document
