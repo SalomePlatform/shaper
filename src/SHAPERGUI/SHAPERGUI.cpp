@@ -277,7 +277,8 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 
     if (!myInspectionPanel) {
       myInspectionPanel = myWorkshop->inspectionPanel();
-      connect(myInspectionPanel->toggleViewAction(), SIGNAL(toggled(bool)), this, SLOT(onWhatIs(bool)));
+      connect(myInspectionPanel->toggleViewAction(), SIGNAL(toggled(bool)),
+              this, SLOT(onWhatIs(bool)));
     }
     myInspectionPanel->toggleViewAction()->setVisible(true);
 
