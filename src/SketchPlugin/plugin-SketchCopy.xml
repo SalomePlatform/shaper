@@ -1,0 +1,17 @@
+<plugin>
+  <workbench id="Macros">
+    <group id="Sketch">
+      <feature id="SketchCopy"
+               title="Sketch copy"
+               tooltip="Copy sketch and all its elements to the same plane"
+               icon="icons/Sketch/copy.png"
+               helpfile="sketchCopy.html">
+        <feature_selector id="base_sketch"
+                          label="Sketch:"
+                          tooltip="Select a sketch to copy.">
+          <validator id="SketchPlugin_SketchFeatureValidator"/>
+        </feature_selector>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

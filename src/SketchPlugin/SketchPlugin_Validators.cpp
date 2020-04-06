@@ -1800,31 +1800,41 @@ bool SketchPlugin_SketchFeatureValidator::isValid(const AttributePtr& theAttribu
                                                   const std::list<std::string>& theArguments,
                                                   Events_InfoMessage& theError) const
 {
-  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId() &&
+      theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
     theError = "The attribute with the %1 type is not processed";
     theError.arg(theAttribute->attributeType());
     return false;
   }
 
   // check the attribute refers to a sketch feature
+  bool isSketchFeature = false;
   AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  bool isSketchFeature = aRefAttr->isObject();
-  if (isSketchFeature) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-    isSketchFeature = aFeature.get() != NULL;
+  if (aRefAttr) {
+    isSketchFeature = aRefAttr->isObject();
     if (isSketchFeature) {
-      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      isSketchFeature = aSketchFeature.get() != NULL;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      isSketchFeature = aFeature.get() != NULL;
+      if (isSketchFeature) {
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        isSketchFeature = aSketchFeature.get() != NULL;
+      }
+    }
+  }
+  else {
+    AttributeReferencePtr aReference =
+      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    if (aReference) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aReference->value());
+      isSketchFeature = aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID();
     }
   }
 
-  if (isSketchFeature)
-    return true;
-
-  theError = "The object selected is not a sketch feature";
-  return false;
+  if (!isSketchFeature)
+    theError = "The object selected is not a sketch feature";
+  return isSketchFeature;
 }
 
 bool SketchPlugin_MultiRotationAngleValidator::isValid(const AttributePtr& theAttribute,

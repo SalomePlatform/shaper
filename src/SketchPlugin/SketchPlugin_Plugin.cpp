@@ -60,6 +60,7 @@
 #include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_MacroEllipticArc.h>
 #include <SketchPlugin_SketchDrawer.h>
+#include <SketchPlugin_SketchCopy.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -276,6 +277,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_MacroEllipticArc);
   } else if (theFeatureID == SketchPlugin_SketchDrawer::ID()) {
     return FeaturePtr(new SketchPlugin_SketchDrawer);
+  } else if (theFeatureID == SketchPlugin_SketchCopy::ID()) {
+    return FeaturePtr(new SketchPlugin_SketchCopy);
   }
   // feature of such kind is not found
   return FeaturePtr();

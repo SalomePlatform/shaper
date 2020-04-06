@@ -67,6 +67,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Point.h
     SketchPlugin_Projection.h
     SketchPlugin_Sketch.h
+    SketchPlugin_SketchCopy.h
     SketchPlugin_SketchDrawer.h
     SketchPlugin_SketchEntity.h
     SketchPlugin_Split.h
@@ -119,6 +120,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp
     SketchPlugin_Sketch.cpp
+    SketchPlugin_SketchCopy.cpp
     SketchPlugin_SketchDrawer.cpp
     SketchPlugin_SketchEntity.cpp
     SketchPlugin_Split.cpp
@@ -140,6 +142,7 @@ SET(PROJECT_LIBRARIES
 
 SET(XML_RESOURCES
   plugin-Sketch.xml
+  plugin-SketchCopy.xml
   plugin-SketchDrawer.xml
 )
 
@@ -332,6 +335,20 @@ ADD_UNIT_TESTS(
   TestRemoveSketch.py
   TestSignedDistancePointLine.py
   TestSignedDistancePointPoint.py
+  TestSketchCopy01.py
+  TestSketchCopy02.py
+  TestSketchCopy03.py
+  TestSketchCopy04.py
+  TestSketchCopy05.py
+  TestSketchCopy06.py
+  TestSketchCopy07.py
+  TestSketchCopy08.py
+  TestSketchCopy09.py
+  TestSketchCopy10.py
+  TestSketchCopy11.py
+  TestSketchCopy12.py
+  TestSketchCopy13.py
+  TestSketchCopy14.py
   TestSketchDrawer.py
   TestSketchPointLine.py
   TestSnowflake.py

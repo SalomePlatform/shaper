@@ -181,3 +181,4 @@ The plug-in includes the following operations:
    translationFeature.rst
    rotationFeature.rst
    sketchDrawer.rst
+   sketchCopy.rst

@@ -108,3 +108,89 @@ def checkSketchErrorDegenerated(theSketch):
     errorValue = theSketch.solverError().value()
     assert(errorValue != "")
     assert(errorValue.find("degenerated") >= 0)
+
+
+def compareSketches(theReference, theSketch, TOLERANCE = 1.e-5):
+    """ Compare sketches for the sequence of features
+    """
+    errors = ""
+
+    # compare sketches degree of freedom
+    if tools.dof(theReference) != tools.dof(theSketch):
+        errors += "\nError in DoF (actual = {}, expected = {})".format(tools.dof(theSketch), tools.dof(theReference))
+
+    # compare sketch solver error
+    if theReference.solverError().value() != theSketch.solverError().value():
+        errors += "\nError in solver message (actual = '{}', expected = '{}')".format(theSketch.solverError().value(), theReference.solverError().value())
+
+    aRefSketch = featureToCompositeFeature(theReference.feature())
+    anActualSketch = featureToCompositeFeature(theSketch.feature())
+
+    # compare number of subs
+    aRefNbSubs = aRefSketch.numberOfSubs()
+    anActualNbSubs = anActualSketch.numberOfSubs()
+    if aRefNbSubs != anActualNbSubs:
+        errors += "\nError in number of sub-features (actual = {}, expected = {})".format(anActualNbSubs, aRefNbSubs)
+
+    for index in range(min(aRefNbSubs, anActualNbSubs)):
+        aRefFeature = aRefSketch.subFeature(index)
+        aFeature = anActualSketch.subFeature(index)
+        # compare types of subs
+        if aFeature.getKind() != aRefFeature.getKind():
+            errors += "\nWrong sketch feature (actual = '{}', expected = '{}')".format(aFeature.name(), aRefFeature.name())
+            continue
+        # compare attributes
+        aRefAttrs = aRefFeature.data().attributes("")
+        anAttrs = aFeature.data().attributes("")
+        for ref, attr in zip(aRefAttrs, anAttrs):
+            if ref.attributeType() != attr.attributeType():
+                errors += "\nWrong sequence of attributes (feature = '{}', reference = '{}')".format(aFeature.name(), aRefFeature.name())
+            elif not attr.isInitialized() or not ref.isInitialized():
+                if attr.isInitialized() != ref.isInitialized():
+                    errors += "\nAttribute '{}' initialization is different (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), aFeature.name(), aRefFeature.name(), attr.isInitialized(), ref.isInitialized())
+            elif ref.attributeType() == GeomDataAPI_Point2D.typeId():
+                aRefPoint = geomDataAPI_Point2D(ref)
+                aPoint = geomDataAPI_Point2D(attr)
+                if tools.distancePointPoint(aPoint, aRefPoint) > TOLERANCE:
+                    errors += "\nWrong coordinates '{}' (feature = '{}', reference = '{}'): actual = ({}, {}), expected = ({}, {})".format(attr.id(), aFeature.name(), aRefFeature.name(), aPoint.x(), aPoint.y(), aRefPoint.x(), aRefPoint.y())
+            elif ref.attributeType() == GeomDataAPI_Point2DArray.typeId():
+                aRefPoints = geomDataAPI_Point2DArray(ref)
+                aPoints = geomDataAPI_Point2DArray(attr)
+                for pInd in range(aRefPoints.size()):
+                    aRefPoint = aRefPoints.pnt(pInd)
+                    aPoint = aPoints.pnt(pInd)
+                    if tools.distancePointPoint(aPoint, aRefPoint) > TOLERANCE:
+                        errors += "\nWrong coordinates '{}', index {} (feature = '{}', reference = '{}'): actual = ({}, {}), expected = ({}, {})".format(attr.id(), pInd, aFeature.name(), aRefFeature.name(), aPoint.x(), aPoint.y(), aRefPoint.x(), aRefPoint.y())
+            elif ref.attributeType() == ModelAPI_AttributeBoolean.typeId():
+                aRefVal = modelAPI_AttributeBoolean(ref).value()
+                aVal = modelAPI_AttributeBoolean(attr).value()
+                if aVal != aRefVal:
+                    errors += "\nWrong boolean value '{}' (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), aFeature.name(), aRefFeature.name(), aVal, aRefVal)
+            elif ref.attributeType() == ModelAPI_AttributeDouble.typeId():
+                aRefVal = modelAPI_AttributeDouble(ref).value()
+                aVal = modelAPI_AttributeDouble(attr).value()
+                if math.fabs(aVal - aRefVal) > TOLERANCE:
+                    errors += "\nWrong real value '{}' (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), aFeature.name(), aRefFeature.name(), aVal, aRefVal)
+            elif ref.attributeType() == ModelAPI_AttributeDoubleArray.typeId():
+                aRefArray = modelAPI_AttributeDoubleArray(ref)
+                anArray = modelAPI_AttributeDoubleArray(attr)
+                for vInd in range(aRefArray.size()):
+                    aRefVal = aRefArray.value(vInd)
+                    aVal = anArray.value(vInd)
+                    if math.fabs(aVal - aRefVal) > TOLERANCE:
+                        errors += "\nWrong real value '{}' index {} (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), vInd, aFeature.name(), aRefFeature.name(), aVal, aRefVal)
+            elif ref.attributeType() == ModelAPI_AttributeInteger.typeId():
+                aRefVal = modelAPI_AttributeInteger(ref).value()
+                aVal = modelAPI_AttributeInteger(attr).value()
+                if aVal != aRefVal:
+                    errors += "\nWrong integer value '{}' (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), aFeature.name(), aRefFeature.name(), aVal, aRefVal)
+            elif ref.attributeType() == ModelAPI_AttributeIntArray.typeId():
+                aRefArray = modelAPI_AttributeIntArray(ref)
+                anArray = modelAPI_AttributeIntArray(attr)
+                for vInd in range(aRefArray.size()):
+                    aRefVal = aRefArray.value(vInd)
+                    aVal = anArray.value(vInd)
+                    if aVal != aRefVal:
+                        errors += "\nWrong integer value '{}' index {} (feature = '{}', reference = '{}'): actual = {}, expected = {}".format(attr.id(), vInd, aFeature.name(), aRefFeature.name(), aVal, aRefVal)
+
+    return errors

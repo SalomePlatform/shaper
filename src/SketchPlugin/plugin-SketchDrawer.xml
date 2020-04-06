@@ -1,6 +1,6 @@
 <plugin>
   <workbench id="Macros" document="Part">
-    <group id="Samples">
+    <group id="Sketch">
 
       <feature id="SketchDrawer" title="Sketch drawer" tooltip="Creates sketch using elements of selected shape belonging to selected plane"
             icon="icons/Sketch/drawer.png"

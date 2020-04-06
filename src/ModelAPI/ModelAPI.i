@@ -170,6 +170,7 @@
 
 // std::list -> []
 %template(StringList) std::list<std::string>;
+%template(AttributeList) std::list<std::shared_ptr<ModelAPI_Attribute> >;
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(FeatureList) std::list<std::shared_ptr<ModelAPI_Feature> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;

@@ -219,7 +219,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   if (!isRebuild && aResult && aResult->shape() && theID == EXTERNAL_FEATURE_ID()) {
     aResult->setShape(std::shared_ptr<GeomAPI_Edge>());
     if (aProjection)
-      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+      aProjection->selection(EXTERNAL_ID())->setValue(ResultPtr(), GeomShapePtr());
   }
 
   keepCurrentFeature();

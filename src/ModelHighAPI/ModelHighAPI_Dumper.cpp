@@ -332,8 +332,18 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
 
   std::list<FeaturePtr> aFeatures = aDoc1->allFeatures();
   if (aDoc1 != aDoc2) {
+    // Find the position of the part, where its features should be inserted.
+    // It will avoid checking of appropriate elements in partSet after the current part.
+    std::list<FeaturePtr>::iterator aFIt = aFeatures.begin();
+    for (; aFIt != aFeatures.end(); ++aFIt) {
+      ResultPartPtr aPartRes =
+          std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFIt)->lastResult());
+      if (aPartRes && aPartRes->partDoc() == aDoc2)
+        break;
+    }
+
     std::list<FeaturePtr> anAdditionalFeatures = aDoc2->allFeatures();
-    aFeatures.insert(aFeatures.end(), anAdditionalFeatures.begin(), anAdditionalFeatures.end());
+    aFeatures.insert(aFIt, anAdditionalFeatures.begin(), anAdditionalFeatures.end());
   }
 
   CompositeFeaturePtr aLastCompositeFeature;

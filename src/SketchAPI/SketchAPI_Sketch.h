@@ -560,6 +560,8 @@ protected:
 //! Pointer on Sketch object
 typedef std::shared_ptr<SketchAPI_Sketch> SketchPtr;
 
+//--------------------------------------------------------------------------------------
+
 /**\ingroup CPPHighAPI
  * \brief Create Sketch feature
  */
@@ -589,5 +591,13 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
 //--------------------------------------------------------------------------------------
+
+/** \ingroup CPPHighAPI
+ *  \brief Copy sketch with all its sub-features
+ */
+SKETCHAPI_EXPORT
+SketchPtr copySketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const SketchPtr & theSketch);
+
 //--------------------------------------------------------------------------------------
 #endif /* SRC_SKETCHAPI_SKETCHAPI_SKETCH_H_ */

@@ -13,6 +13,10 @@
       <translation>Esquisse</translation>
     </message>
     <message>
+      <source>Sketch copy</source>
+      <translation>Copie d&apos;esquisse</translation>
+    </message>
+    <message>
       <source>Sketch drawer</source>
       <translation>Créer une esquisse à partir d&apos;un contour</translation>
     </message>
@@ -2843,6 +2847,52 @@
     <message>
       <source>Tangent</source>
       <translation>Tangente</translation>
+    </message>
+  </context>
+
+  <!-- SketchCopy -->
+  <context>
+    <name>SketchCopy</name>
+    <message>
+      <source>Sketch copy</source>
+      <translation>Copie s&apos;esquisse</translation>
+    </message>
+    <message>
+      <source>Copy sketch and all its elements to the same plane</source>
+      <translation>Copiez l'esquisse et tous ses éléments dans le même plan</translation>
+    </message>
+    <message>
+      <source>Error: a base feature is not a sketch.</source>
+      <translation>Erreur: une fonction de base n&apos;est pas une esquisse.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCopy:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base_sketch" is not initialized.</source>
+      <translation>Sélectionnez une esquisse à copier.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCopy:base_sketch</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une esquisse à copier.</translation>
+    </message>
+    <message>
+      <source>Select a sketch to copy.</source>
+      <translation>Sélectionnez une esquisse à copier.</translation>
+    </message>
+    <message>
+      <source>Sketch:</source>
+      <translation>Esquisse:</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCopy:base_sketch:SketchPlugin_SketchFeatureValidator</name>
+    <message>
+      <source>The object selected is not a sketch feature</source>
+      <translation>L&apos;objet sélectionné n&apos;est pas une fonction d&apos;esquisse</translation>
     </message>
   </context>
 

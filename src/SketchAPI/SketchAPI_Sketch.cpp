@@ -41,6 +41,7 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_MacroBSpline.h>
+#include <SketchPlugin_SketchCopy.h>
 #include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_Events.h>
@@ -231,6 +232,23 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(new SketchAPI_Sketch(aFeature, thePlaneObject));
+}
+
+//--------------------------------------------------------------------------------------
+SketchPtr copySketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const SketchPtr & theSketch)
+{
+  FeaturePtr aCopyer = thePart->addFeature(SketchPlugin_SketchCopy::ID());
+  aCopyer->reference(SketchPlugin_SketchCopy::BASE_ID())->setValue(theSketch->feature());
+  aCopyer->execute();
+
+  FeaturePtr aNewSketch = thePart->nextFeature(aCopyer);
+
+  // perform removing the macro-feature
+  thePart->removeFeature(aCopyer);
+  apply();
+
+  return SketchPtr(new SketchAPI_Sketch(aNewSketch));
 }
 
 
