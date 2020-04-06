@@ -115,18 +115,14 @@ gp_Pnt PartSet_Tools::convertClickToPoint(QPoint thePoint, Handle(V3d_View) theV
   if (theView.IsNull())
     return gp_Pnt();
 
-  V3d_Coordinate XEye, YEye, ZEye, XAt, YAt, ZAt;
-  theView->Eye(XEye, YEye, ZEye);
-
+  V3d_Coordinate XAt, YAt, ZAt;
   theView->At(XAt, YAt, ZAt);
-  gp_Pnt EyePoint(XEye, YEye, ZEye);
   gp_Pnt AtPoint(XAt, YAt, ZAt);
 
-  if (EyePoint.Distance(AtPoint) < Precision::Confusion())
-    return gp_Pnt();
-
-  gp_Vec EyeVector(EyePoint, AtPoint);
-  gp_Dir EyeDir(EyeVector);
+  double aX, aY, aZ;
+  theView->Proj(aX, aY, aZ);
+  gp_Dir EyeDir(aX, aY, aZ);
+  EyeDir.Reverse();
 
   gp_Pln PlaneOfTheView = gp_Pln(AtPoint, EyeDir);
   Standard_Real X, Y, Z;
