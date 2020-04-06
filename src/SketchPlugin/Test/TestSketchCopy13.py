@@ -18,6 +18,7 @@
 #
 
 from GeomAPI import *
+from SketchAPI import *
 
 from salome.shaper import model
 
