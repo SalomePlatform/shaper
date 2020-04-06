@@ -202,8 +202,14 @@ protected:
   /// \param thePrs a presentation
   bool fillSketchPlaneBySelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
-
+  /// Redefinition of a virtual function
   virtual void showEvent(QShowEvent* theEvent);
+
+  /// Redefinition of a virtual function
+  virtual void hideEvent(QHideEvent* theEvent);
+
+  /// Redefinition of a virtual function
+  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
 
 private slots:
   /// A slot called on set sketch plane view

@@ -561,6 +561,10 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 
 void PartSet_WidgetSketchLabel::activateCustom()
 {
+  QWidget* aTopWidget = window();
+  if (aTopWidget)
+    aTopWidget->installEventFilter(this);
+
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
     bool isBlocked = myAutoConstraints->blockSignals(true);
@@ -597,6 +601,16 @@ void PartSet_WidgetSketchLabel::showEvent(QShowEvent* theEvent)
   QTimer::singleShot(10, this, SLOT(onShowPanel()));
 }
 
+void PartSet_WidgetSketchLabel::hideEvent(QHideEvent* theEvent)
+{
+  ModuleBase_WidgetValidated::hideEvent(theEvent);
+  if (myPartSetMessage->isVisible())
+    myPartSetMessage->hide();
+  if (mySizeMessage->isVisible())
+    mySizeMessage->hide();
+}
+
+
 void PartSet_WidgetSketchLabel::onShowPanel()
 {
   //if (mySizeOfViewWidget->isVisible()) {
@@ -617,6 +631,10 @@ void PartSet_WidgetSketchLabel::onShowPanel()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
+  QWidget* aTopWidget = window();
+  if (aTopWidget)
+    aTopWidget->removeEventFilter(this);
+
   if (myTmpPlane.get()) {
     setSketchPlane(myTmpPlane);
     myTmpPlane.reset();
@@ -850,4 +868,20 @@ void PartSet_WidgetSketchLabel::onShowDOF()
     ModelAPI_EventCreator::get()->sendUpdated(aCompFeature, anEvent);
     Events_Loop::loop()->flush(anEvent);
   }
+}
+
+bool PartSet_WidgetSketchLabel::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theObj == window()) {
+    int aType = theEvent->type();
+    if ((aType == QEvent::Hide) || (aType == QEvent::WindowDeactivate)) {
+      if (myPartSetMessage->isVisible())
+        myPartSetMessage->hide();
+      if (mySizeMessage->isVisible())
+        mySizeMessage->hide();
+    }
+    else if ((aType == QEvent::Show) || (aType == QEvent::WindowActivate))
+      onShowPanel();
+  }
+  return ModuleBase_WidgetValidated::eventFilter(theObj, theEvent);
 }
