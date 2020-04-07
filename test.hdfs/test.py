@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 if __name__ == '__main__':
 
-  from subprocess import Popen
+  import subprocess
   from time import sleep
   import sys, os
 
@@ -17,25 +17,26 @@ if __name__ == '__main__':
   except:
     pass
 
-  proc = Popen([salomeKernelDir + "/bin/salome/runSalome.py", "--modules", "SHAPER,GEOM", "--gui", "--ns-port-log=" + portlogfile, sourceDir + "/test_hdf.py", "args:" + testfile + "," + portlogfile + "," + testlogfile + "," + salomeKernelDir + "," + sourceDir])
-
-  iter = 0
-  while not os.path.exists(portlogfile) and iter < 100:
-    sleep(0.1)
-    iter += 1
-
-  while os.path.exists(portlogfile):
-    sleep(0.1)
-
   isOk = True
+  error = ""
+
+  proc = subprocess.Popen([salomeKernelDir + "/bin/salome/runSalome.py", "--modules", "SHAPER,GEOM", "--gui", "--ns-port-log=" + portlogfile, sourceDir + "/test_hdf.py", "args:" + testfile + "," + portlogfile + "," + testlogfile + "," + salomeKernelDir + "," + sourceDir], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  try:
+    proc.communicate(timeout = 300)
+  except TimeoutExpired:
+    isOk = False
+    proc.kill()
+    out, err = proc.communicate()
+    error = "Killed by CPU limit."
+    print(err)
+
   with open(testlogfile, 'r') as inputFile:
     s = inputFile.read()
     print(s)
-    for line in s:
-      isOk = isOk and s.find("FAIL") < 0
+    isOk = isOk and s.find("FAIL") < 0
   try:
     os.remove(testlogfile)
   except:
     pass
 
-  assert isOk, "Test failed"
+  assert isOk, "Test failed. {}".format(error)
