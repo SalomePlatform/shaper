@@ -867,6 +867,8 @@ void PartSet_WidgetSketchLabel::onShowDOF()
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS);
     ModelAPI_EventCreator::get()->sendUpdated(aCompFeature, anEvent);
     Events_Loop::loop()->flush(anEvent);
+
+    // Transfer focus to the current viewport for correct processing of a key event
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
     if (aViewPort)
       aViewPort->setFocus();
