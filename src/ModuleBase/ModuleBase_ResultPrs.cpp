@@ -86,7 +86,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
       TopLoc_Location aLoc;
       Handle(Poly_Polygon3D) aPoly3D = BRep_Tool::Polygon3D(anEdge, aLoc);
       if (aPoly3D.IsNull()) {
-        double aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+        double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
         BRepMesh_IncrementalMesh(aShape, aDeflection);
       }
     }
@@ -154,6 +154,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
 
   ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), DynamicHilightAttributes());
   ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
+  Attributes()->UpdatePreviousDeviationCoefficient();
 }
 
 //********************************************************************

@@ -454,21 +454,23 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   double aDeflection;
-  if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
-    //FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
-    if (theFeature.get()) {
-      std::list<ResultPtr> aResults = theFeature->results();
-      std::list<ResultPtr>::const_iterator aIt;
-      ResultPtr aRes;
-      Handle(AIS_Shape) aAis;
-      for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
-        aRes = (*aIt);
-        TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
-        if (!aTShape.IsSame(theIgnoreShape)) {
+  if (theFeature.get()) {
+    std::list<ResultPtr> aResults = theFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    ResultPtr aRes;
+    Handle(AIS_InteractiveObject) anAISIO;
+    Handle(AIS_Shape) aAis;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      aRes = (*aIt);
+      TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
+      if (!aTShape.IsSame(theIgnoreShape)) {
+        anAISIO = aDisplayer->getAISObject(aRes)->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAISIO.IsNull()) {
           aAis = new AIS_Shape(aTShape);
           aAis->SetColor(HIGHLIGHT_COLOR);
           aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
-          aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+          aDeflection = anAISIO->Attributes()->DeviationCoefficient();
           aAis->Attributes()->SetDeviationCoefficient(aDeflection);
           aAis->Attributes()->SetIsoOnPlane(false);
           myHighlights.Append(aAis);
@@ -477,18 +479,6 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
         }
       }
     }
-  }
-  else {
-    TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
-    Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
-    aAis->SetColor(HIGHLIGHT_COLOR);
-    aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
-    aDeflection = Config_PropManager::real("Visualization", "body_deflection");
-    aAis->Attributes()->SetDeviationCoefficient(aDeflection);
-    aAis->Attributes()->SetIsoOnPlane(false);
-    myHighlights.Append(aAis);
-    aContext->Display(aAis, false);
-    aContext->Deactivate(aAis);
   }
 }
 
