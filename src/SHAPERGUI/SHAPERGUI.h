@@ -274,6 +274,7 @@ private slots:
 
   bool myIsInspectionVisible;
   QDockWidget* myInspectionPanel;
+  bool myIsFacesPanelVisible;
 
   /// List of registered actions
   QIntList myActionsList;

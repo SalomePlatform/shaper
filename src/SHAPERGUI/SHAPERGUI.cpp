@@ -136,7 +136,7 @@ private:
 SHAPERGUI::SHAPERGUI()
     : LightApp_Module("SHAPER"),
       mySelector(0), myIsOpened(0), myPopupMgr(0), myIsInspectionVisible(false),
-  myInspectionPanel(0), myIsToolbarsModified(false)
+  myInspectionPanel(0), myIsFacesPanelVisible(false), myIsToolbarsModified(false)
 {
   myWorkshop = new XGUI_Workshop(this);
   connect(myWorkshop, SIGNAL(commandStatusUpdated()),
@@ -282,6 +282,11 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     }
     myInspectionPanel->toggleViewAction()->setVisible(true);
 
+    myWorkshop->facesPanel()->toggleViewAction()->setVisible(true);
+    if (myIsFacesPanelVisible)
+      myWorkshop->facesPanel()->show();
+    myWorkshop->propertyPanel()->toggleViewAction()->setVisible(true);
+
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
       application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
@@ -394,6 +399,13 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   myIsInspectionVisible = myInspectionPanel->isVisible();
   myInspectionPanel->hide();
   myInspectionPanel->toggleViewAction()->setVisible(false);
+
+  myIsFacesPanelVisible = myWorkshop->facesPanel()->isVisible();
+  myWorkshop->facesPanel()->hide();
+  myWorkshop->facesPanel()->toggleViewAction()->setVisible(false);
+
+  myWorkshop->propertyPanel()->hide();
+  myWorkshop->propertyPanel()->toggleViewAction()->setVisible(false);
 
   // the active operation should be stopped for the next activation.
   // There should not be active operation and visualized preview.
