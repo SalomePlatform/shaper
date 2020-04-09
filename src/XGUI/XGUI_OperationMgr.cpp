@@ -867,7 +867,7 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     /// processing delete by workshop
     XGUI_ObjectsBrowser* aBrowser = XGUI_Tools::workshop(myWorkshop)->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
-    bool isToDeleteObject = true;
+    bool isToDeleteObject = false;
     XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
     XGUI_ContextMenuMgr* aContextMenuMgr = aWorkshop->contextMenuMgr();
     if (theObject == aBrowser->treeView()) {
