@@ -78,6 +78,9 @@ public:
   /// Current workshop
   ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
 
+  /// Current workshop
+  XGUI_Workshop* xworkshop() const;
+
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;

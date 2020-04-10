@@ -94,6 +94,7 @@ void XGUI_ContextMenuMgr::createActions()
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/rename_edit.png"), tr("Rename"),
                                            aDesktop, this, SLOT(onRename()));
+  aAction->setShortcut(Qt::Key_F2);
   addAction("RENAME_CMD", aAction);
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end.png"),

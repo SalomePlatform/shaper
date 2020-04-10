@@ -210,7 +210,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 {
   mySelector = new XGUI_SelectionMgr(this);
   myModuleConnector = new XGUI_ModuleConnector(this);
-  myOperationMgr = new XGUI_OperationMgr(this, 0);
+  myOperationMgr = new XGUI_OperationMgr(this, myModuleConnector);
   ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   // Has to be defined first in order to get errors and messages from other components
   myEventsListener = new XGUI_WorkshopListener(this);
@@ -272,8 +272,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myViewerProxy = new XGUI_ViewerProxy(this);
   //connect(myViewerProxy, SIGNAL(selectionChanged()),
   //        myActionsMgr,  SLOT(updateOnViewSelection()));
-
-  myOperationMgr->setWorkshop(aWorkshop);
 
   myErrorMgr = new XGUI_ErrorMgr(this, aWorkshop);
 
