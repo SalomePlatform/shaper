@@ -146,6 +146,9 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
+#define FEATURE_ITEM_COLOR "0,0,225"
+
+
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
 {
@@ -250,6 +253,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
     "Dimension color",
     Config_Prop::Color, SKETCH_DIMENSION_COLOR);
+
+  Config_PropManager::registerProp("Visualization", "feature_objectbrowser_color",
+    "Feature items in Object Browser",
+    Config_Prop::Color, FEATURE_ITEM_COLOR);
 
   Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
     "Add parameter in parameters manager dialog",
