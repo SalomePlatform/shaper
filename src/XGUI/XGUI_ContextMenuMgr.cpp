@@ -144,7 +144,7 @@ void XGUI_ContextMenuMgr::createActions()
                                            aDesktop);
   addAction("ISOLINES_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Show Isos..."), aDesktop);
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Show Isos"), aDesktop);
   aAction->setCheckable(true);
   addAction("SHOW_ISOLINES_CMD", aAction);
 

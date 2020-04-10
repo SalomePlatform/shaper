@@ -209,8 +209,8 @@
         <translation>Définir l&apos;Isos...</translation>
     </message>
     <message>
-        <source>Show Isos...</source>
-        <translation>Show Isos...</translation>
+        <source>Show Isos</source>
+        <translation>Show Isos</translation>
     </message>
 </context>
 <context>
