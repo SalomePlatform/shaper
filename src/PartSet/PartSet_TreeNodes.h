@@ -325,6 +325,9 @@ public:
   /// \param theDoc a document where objects were deleted
   /// \param theGroup a name of group where objects were deleted
   virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
+
+  /// Returns the node representation according to theRole.
+  virtual QVariant data(int theColumn, int theRole) const;
 };
 
 

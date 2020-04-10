@@ -40,6 +40,8 @@
 #include <ModelAPI_Folder.h>
 #include <ModelAPI_AttributeReference.h>
 
+#include <Config_PropManager.h>
+
 #include <QBrush>
 #include <QMap>
 
@@ -129,6 +131,13 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
       else
         return QIcon();
     }
+  case Qt::ForegroundRole:
+    if (myObject->groupName() == ModelAPI_Feature::group()) {
+      std::vector<int> aColor =
+        Config_PropManager::color("Visualization", "feature_objectbrowser_color");
+      return QColor(aColor[0], aColor[1], aColor[2]);
+    }
+    break;
   }
   return PartSet_TreeNode::data(theColumn, theRole);
 }
@@ -1199,7 +1208,16 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& /*the
   return aResult;
 }
 
+QVariant PartSet_ObjectFolderNode::data(int theColumn, int theRole) const
+{
+  if (theRole == Qt::ForegroundRole) {
+    std::vector<int> aColor =
+      Config_PropManager::color("Visualization", "feature_objectbrowser_color");
+    return QColor(aColor[0], aColor[1], aColor[2]);
+  }
+  return PartSet_ObjectNode::data(theColumn, theRole);
 
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 QVariant PartSet_StepNode::data(int theColumn, int theRole) const
