@@ -65,8 +65,8 @@ public:
   /// Constructor
   /// \param theParent the parent to be deleted when the parent is deleted
   /// \param theOperationMgr the class to perform deletion
-  XGUI_ShortCutListener(QObject* theParent, XGUI_OperationMgr* theOperationMgr)
-    : QObject(theParent), myOperationMgr(theOperationMgr), myIsActive(false)
+  XGUI_ShortCutListener(XGUI_OperationMgr* theOperationMgr)
+    : QObject(theOperationMgr), myOperationMgr(theOperationMgr), myIsActive(false)
   {
     qApp->installEventFilter(this);
   }
@@ -76,61 +76,68 @@ public:
   void setActive(const bool theIsActive) { myIsActive = theIsActive; }
 
   /// Redefinition of virtual function to process Delete key release
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
-  {
-    bool isAccepted = false;
-
-    if (myIsActive) {
-      // Do not process keys for modal dialogues: all keys has to be processed within the dialog
-      // There is only one exception: ModuleBase_EditorDialog
-      QWindow* aWnd = qApp->modalWindow();
-      QString aName = "NoModal";
-      if (aWnd) {
-        if (!aWnd->objectName().startsWith("ModuleBase_EditorDialog"))
-          aName = aWnd->objectName();
-      }
-      if (aName == "NoModal") {
-        if (theEvent->type() == QEvent::KeyRelease) {
-          QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-          if (aKeyEvent) {
-            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-            switch (aKeyEvent->key()) {
-            case Qt::Key_Delete:
-              isAccepted = myOperationMgr->onProcessDelete(theObject);
-              break;
-            default:
-              isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
-              break;
-            }
-          }
-        }
-        else if (theEvent->type() == QEvent::KeyPress) {
-          if (myOperationMgr->hasOperation()) {
-            QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-            myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
-          }
-        }
-      }
-    }
-    if (!isAccepted)
-      isAccepted = QObject::eventFilter(theObject, theEvent);
-    return isAccepted;
-  }
+  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 private:
   XGUI_OperationMgr* myOperationMgr; /// processor for key event
   bool myIsActive; /// boolean state whether the event filter perform own signal processing
 };
 
+bool XGUI_ShortCutListener::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  bool isAccepted = false;
+
+  if (myIsActive) {
+    // Do not process keys for modal dialogues: all keys has to be processed within the dialog
+    // There is only one exception: ModuleBase_EditorDialog
+    QWindow* aWnd = qApp->modalWindow();
+    QString aName = "NoModal";
+    if (aWnd) {
+      if (!aWnd->objectName().startsWith("ModuleBase_EditorDialog"))
+        aName = aWnd->objectName();
+    }
+    if (aName == "NoModal") {
+      if (theEvent->type() == QEvent::KeyRelease) {
+        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+        if (aKeyEvent) {
+          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+          switch (aKeyEvent->key()) {
+          case Qt::Key_Delete:
+            isAccepted = myOperationMgr->onProcessDelete(theObject);
+            break;
+          case Qt::Key_F2:
+            myOperationMgr->xworkshop()->objectBrowser()->onEditItem();
+            break;
+          default:
+            isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+            break;
+          }
+        }
+      }
+      else if (theEvent->type() == QEvent::KeyPress) {
+        if (myOperationMgr->hasOperation()) {
+          QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+          isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+        }
+      }
+    }
+  }
+  if (!isAccepted)
+    isAccepted = QObject::eventFilter(theObject, theEvent);
+  return isAccepted;
+}
+
+
+
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
-                                     ModuleBase_IWorkshop* theWorkshop)
+  ModuleBase_IWorkshop* theWorkshop)
 : QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false), myActiveMessageBox(0)
 {
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
   /// the actions priority
-  myShortCutListener = new XGUI_ShortCutListener(theParent, this);
+  myShortCutListener = new XGUI_ShortCutListener(this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
@@ -931,4 +938,10 @@ QMessageBox* XGUI_OperationMgr::createInformationBox(const QString& theMessage)
   aMessageBox->setEscapeButton(QMessageBox::No); // operation manager should process Esc key
 
   return aMessageBox;
+}
+
+XGUI_Workshop* XGUI_OperationMgr::xworkshop() const
+{
+  XGUI_ModuleConnector* aConnector = (XGUI_ModuleConnector*) myWorkshop;
+  return aConnector->workshop();
 }
