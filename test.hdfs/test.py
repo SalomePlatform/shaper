@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
   proc = subprocess.Popen([salomeKernelDir + "/bin/salome/runSalome.py", "--modules", "SHAPER,GEOM", "--gui", "--ns-port-log=" + portlogfile, sourceDir + "/test_hdf.py", "args:" + testfile + "," + portlogfile + "," + testlogfile + "," + salomeKernelDir + "," + sourceDir], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   try:
-    proc.communicate(timeout = 300)
+    proc.communicate(timeout = 600)
   except TimeoutExpired:
     isOk = False
     proc.kill()
