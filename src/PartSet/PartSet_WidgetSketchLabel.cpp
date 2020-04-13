@@ -158,15 +158,20 @@ myIsSelection(false)
   ModuleBase_Tools::zeroMargins(aLayout);
 
   QGroupBox* aViewBox = new QGroupBox(tr("Sketcher plane"), this);
-  QVBoxLayout* aViewLayout = new QVBoxLayout(aViewBox);
+  QGridLayout* aViewLayout = new QGridLayout(aViewBox);
 
   myViewInverted = new QCheckBox(tr("Reversed"), aViewBox);
-  aViewLayout->addWidget(myViewInverted);
+  aViewLayout->addWidget(myViewInverted, 0, 0);
+
+  myViewVisible = new QCheckBox(tr("Visible"), aViewBox);
+  myViewVisible->setChecked(true);
+  aViewLayout->addWidget(myViewVisible, 0, 1, Qt::AlignRight);
+  connect(myViewVisible, SIGNAL(toggled(bool)), this, SLOT(onShowViewPlane(bool)));
 
   QPushButton* aSetViewBtn =
     new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
   connect(aSetViewBtn, SIGNAL(clicked(bool)), this, SLOT(onSetPlaneView()));
-  aViewLayout->addWidget(aSetViewBtn);
+  aViewLayout->addWidget(aSetViewBtn, 1, 0, 1, 2);
 
   aLayout->addWidget(aViewBox);
 
@@ -313,7 +318,7 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
   bool aDone = false;
   if (theValues.empty()) {
     // In order to make reselection possible, set empty object and shape should be done
-    setSelectionCustom(std::shared_ptr<ModuleBase_ViewerPrs>(
+    setSelectionCustom(ModuleBase_ViewerPrsPtr(
                               new ModuleBase_ViewerPrs(ObjectPtr(), GeomShapePtr(), NULL)));
     aDone = false;
   }
@@ -359,7 +364,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       }
     }
     aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, isSetSizeOfView);
-    aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    if (myViewVisible->isChecked())
+      aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
   }
   // 2. if the planes were displayed, change the view projection
 
@@ -742,7 +748,7 @@ void PartSet_WidgetSketchLabel::onSetPlaneView()
 
 
 //******************************************************
-QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCircularEdgesInPlane()
+QList<ModuleBase_ViewerPrsPtr> PartSet_WidgetSketchLabel::findCircularEdgesInPlane()
 {
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> aResult;
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
@@ -764,7 +770,7 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCirc
             bool isContains = false;
             // Check that edge is not used.
             // It is possible that the same edge will be taken from different faces
-            foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aResult) {
+            foreach(ModuleBase_ViewerPrsPtr aPrs, aResult) {
               GeomAPI_Edge aUsedEdge(aPrs->shape());
               if (aUsedEdge.isEqual(aEdgeShape)) {
                 isContains = true;
@@ -772,8 +778,7 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCirc
               }
             }
             if (!isContains) {
-              std::shared_ptr<ModuleBase_ViewerPrs>
-                aPrs(new ModuleBase_ViewerPrs(aResObj, aEdgeShape));
+              ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs(aResObj, aEdgeShape));
               aResult.append(aPrs);
             }
           }
@@ -889,4 +894,17 @@ bool PartSet_WidgetSketchLabel::eventFilter(QObject* theObj, QEvent* theEvent)
       onShowPanel();
   }
   return ModuleBase_WidgetValidated::eventFilter(theObj, theEvent);
+}
+
+void PartSet_WidgetSketchLabel::onShowViewPlane(bool toShow)
+{
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (toShow) {
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+  }
+  else {
+    aModule->sketchMgr()->previewSketchPlane()->eraseSketchPlane(myWorkshop, false);
+  }
+  myWorkshop->viewer()->update();
 }
