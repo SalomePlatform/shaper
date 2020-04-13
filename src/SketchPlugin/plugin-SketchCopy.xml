@@ -1,6 +1,6 @@
 <plugin>
-  <workbench id="Macros">
-    <group id="Sketch">
+  <workbench id="Features">
+    <group id="Duplicates">
       <feature id="SketchCopy"
                title="Sketch copy"
                tooltip="Copy sketch and all its elements to the same plane"

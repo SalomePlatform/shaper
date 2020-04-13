@@ -552,6 +552,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test3033.py
                Test3076.py
                Test17909.py
+               TestCopy_ErrorMsg.py
                TestCopyFeature.py
                TestCopyFeatureMoveGroupOfFeature.py
                TestCopyMoveResult.py

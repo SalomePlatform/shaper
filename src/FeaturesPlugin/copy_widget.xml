@@ -5,6 +5,7 @@
                   shape_types="vertices edges wires faces shells compsolids objects"
                   use_choice="false"
                   concealment="false">
+    <validator id="GeomValidators_BodyShapes"/>
   </multi_selector>
   <integervalue id="number"
                 label="Nb copies"

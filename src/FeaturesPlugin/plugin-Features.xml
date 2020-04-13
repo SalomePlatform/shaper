@@ -89,7 +89,7 @@
           <source path="remove_subshapes_widget.xml"/>
       </feature>
     </group>
-    <group id="Collections">
+    <group id="Duplicates">
       <feature id="Recover"
         title="Recover"
         tooltip="Visualize concealed objects"
