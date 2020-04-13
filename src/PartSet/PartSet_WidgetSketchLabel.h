@@ -26,6 +26,7 @@
 
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ViewerFilters.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <GeomAPI_Dir.h>
 
@@ -110,7 +111,7 @@ public:
 
   /// Returns True if the selected presentation can be used for plane definition
   /// \param thePrs a presentation
-  static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  static bool canFillSketch(const ModuleBase_ViewerPrsPtr& thePrs);
 
   /// If widgets has several panels then this method has to show a page which contains information
   /// for current feature. By default does nothing
@@ -152,7 +153,7 @@ protected:
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs);
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -190,17 +191,17 @@ protected:
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
   /// \param theToValidate a validation flag
-  bool setSelectionInternal(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+  bool setSelectionInternal(const QList<ModuleBase_ViewerPrsPtr>& theValues,
                             const bool theToValidate);
 
   /// Erase preview planes, disconnect widget, change the view projection
   /// \param thePrs a selected presentation
-  void updateByPlaneSelected(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  void updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs);
 
   /// Set sketch plane from selected object
   /// \param theFeature a feature of sketch
   /// \param thePrs a presentation
-  bool fillSketchPlaneBySelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  bool fillSketchPlaneBySelection(const ModuleBase_ViewerPrsPtr& thePrs);
 
   /// Redefinition of a virtual function
   virtual void showEvent(QShowEvent* theEvent);
@@ -219,11 +220,17 @@ private slots:
   /// \param theOn a flag show constraints or not
   void onShowConstraint(bool theOn);
 
+  /// A a slot called on "Change sketch plane" check box toggele
   void onChangePlane();
 
+  /// A a slot called on "Show remaining DOFs" check box toggele
   void onShowDOF();
 
+  ///  A a slot called on changing the panel visibility
   void onShowPanel();
+
+  /// A slot which is called on "Visible" plane checkbox toggle
+  void onShowViewPlane(bool);
 
 private:
   /// Set sketch plane by shape
@@ -239,13 +246,14 @@ private:
   * (circles, arcs) which are in pane of of the given sketch
   * \param theSketch - the sketch
   */
-  QList<std::shared_ptr<ModuleBase_ViewerPrs>> findCircularEdgesInPlane();
+  QList<ModuleBase_ViewerPrsPtr> findCircularEdgesInPlane();
 
 private:
   /// class to show/hide preview planes
   PartSet_PreviewPlanes* myPreviewPlanes;
 
   QCheckBox* myViewInverted;
+  QCheckBox* myViewVisible;
   QCheckBox* myRemoveExternal;
   QCheckBox* myShowPoints;
   QCheckBox* myAutoConstraints;
