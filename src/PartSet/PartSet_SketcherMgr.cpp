@@ -517,6 +517,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       if (isRelaunchEditing)
         launchEditing();
+      else {
+        if (myCurrentSelection.size() > 1)
+          aFOperation->propertyPanel()->cleanContent();
+      }
       myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
