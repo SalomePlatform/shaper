@@ -149,6 +149,9 @@ Q_OBJECT
    /// A slot called on Ok button press
   virtual void accept();
 
+protected:
+  virtual void showEvent(QShowEvent* theEvent);
+
 protected slots:
   /// A slot called on Default button press
   void onDefault();

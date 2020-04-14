@@ -295,7 +295,6 @@ ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurc
   createEditors();
 
   myPreferences->retrieve();
-  setMinimumSize(820, 300);
 }
 
 ModuleBase_PreferencesDlg::~ModuleBase_PreferencesDlg()
@@ -456,6 +455,12 @@ void ModuleBase_PreferencesDlg::onDefault()
   // values, stores result in the resource manager and retrieve the preferences
   // items with these values.
   ModuleBase_Preferences::resetConfigPropPreferences(myPreferences);
+}
+
+void ModuleBase_PreferencesDlg::showEvent(QShowEvent* theEvent)
+{
+  QDialog::showEvent(theEvent);
+  adjustSize();
 }
 
 //**********************************************************
