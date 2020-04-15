@@ -359,6 +359,8 @@ void XGUI_SelectionActivate::activateAIS(const Handle(AIS_InteractiveObject)& th
                (theMode == getSelectionMode(TopAbs_WIRE)))
         aPrecision = theIO->Width() + ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer",
            "edge-selection-sensitivity", 2);
+      if (aPrecision <= 0)
+        aPrecision = 2;
       aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
     }
 
