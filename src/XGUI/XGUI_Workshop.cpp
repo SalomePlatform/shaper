@@ -3139,6 +3139,7 @@ void XGUI_Workshop::onAutoApply()
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isBlocked = aMgr->isAutoUpdateBlocked();
   aMgr->blockAutoUpdate(!isBlocked);
+  myDisplayer->updateViewer();
 }
 
 void XGUI_Workshop::updateAutoComputeState()
