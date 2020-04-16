@@ -59,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Shaper python API'
-copyright = '2014-2019 CEA/DEN, EDF R&D'
+copyright = '2014-2020 CEA/DEN, EDF R&D'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
