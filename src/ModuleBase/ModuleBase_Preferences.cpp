@@ -267,7 +267,8 @@ private:
 //**********************************************************
 ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces,
   QWidget* theParent)
-    : QDialog(theParent),
+    : QDialog(theParent,
+      Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
       myIsChanged(false)
 {
   setWindowTitle(tr("Edit preferences"));

@@ -40,11 +40,12 @@
 
 ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId,
                                      const std::string& theDescription) :
-                                     QDialog(theParent->desktop()),
-                                     myId(theId),
-                                     myDescription(theDescription),
-                                     myWorkshop(theParent),
-                                     myActiveWidget(0)
+  QDialog(theParent->desktop(),
+    Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+  myId(theId),
+  myDescription(theDescription),
+  myWorkshop(theParent),
+  myActiveWidget(0)
 {
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
   QString aTitle = ModuleBase_Tools::translate("ModuleBase_Dialog",
