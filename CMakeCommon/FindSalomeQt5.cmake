@@ -32,6 +32,7 @@ SET(QT_DEFINITIONS)
 SET(QT_LIBRARIES)
 # Find Qt5Core to get Qt version
 SET(Qt5_FIND_COMPONENTS QtCore)
+SET(Qt5_OPTIONAL_COMPONENTS)
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(Qt5Core Qt5Core_INCLUDE_DIRS 1 ENVVAR QT5_ROOT_DIR)
 IF(Qt5Core_FOUND)
   LIST(APPEND QT_INCLUDES    ${Qt5Core_INCLUDE_DIRS})
@@ -40,15 +41,22 @@ IF(Qt5Core_FOUND)
   SET(QT_VERSION "${Qt5Core_VERSION}")
 ENDIF()
 
-SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test Sql Sensors Positioning Quick Qml Multimedia MultimediaWidgets WebChannel UiTools)
+# Add mandatory Qt 5 components below
+SET(Qt5_FIND_COMPONENTS Gui Widgets Network Xml OpenGL PrintSupport Help Test)
+# Add optional Qt 5 components below
+SET(Qt5_OPTIONAL_COMPONENTS)
 
 IF ("${QT_VERSION}" VERSION_LESS "5.6.0")
+  # QtWebKit package is used with Qt < 5.6
   LIST(APPEND Qt5_FIND_COMPONENTS WebKit WebKitWidgets)
 ELSE()
-  LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngine WebEngineWidgets)
+  # QtWebEngine package is (optionally) used with Qt >= 5.6
+  # Anyway, not available with Python 3
+  LIST(APPEND Qt5_OPTIONAL_COMPONENTS WebEngineCore WebEngine WebEngineWidgets)
 ENDIF()
 
 IF(NOT WIN32)
+  ## QtX11Extras package is used on Linux only
   LIST(APPEND Qt5_FIND_COMPONENTS X11Extras)
 ENDIF()
 
@@ -58,7 +66,7 @@ FOREACH(_Qt5_COMPONENT_ ${Qt5_FIND_COMPONENTS} ${Qt5_OPTIONAL_COMPONENTS})
   IF(${idx} GREATER -1)
    SET(Salome${_Qt5_COMPONENT}_FIND_QUIETLY TRUE)
   ENDIF()
-  SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(${_Qt5_COMPONENT} ${_Qt5_COMPONENT}_INCLUDE_DIRS 1 ENVVAR QT5_ROOT_DIR)
+  FIND_PACKAGE(${_Qt5_COMPONENT})
   LIST(APPEND QT_INCLUDES    ${${_Qt5_COMPONENT}_INCLUDE_DIRS})
   LIST(APPEND QT_DEFINITIONS ${${_Qt5_COMPONENT}_DEFINITIONS})
   LIST(APPEND QT_LIBRARIES   ${${_Qt5_COMPONENT}_LIBRARIES})
@@ -71,7 +79,7 @@ MARK_AS_ADVANCED(QT_LRELEASE_EXECUTABLE)
 GET_FILENAME_COMPONENT(QT_BINARY_DIR ${QT_LRELEASE_EXECUTABLE} DIRECTORY)
 MARK_AS_ADVANCED(QT_BINARY_DIR)
 
-# This is only needed to correctly detect Qt help generator tool, to workaround an error 
+# This is only needed to correctly detect Qt help generator tool, to workaround an error
 # coming from ParaView detection procedure
 FIND_PROGRAM(QT_HELP_GENERATOR
     qhelpgenerator
@@ -80,7 +88,7 @@ FIND_PROGRAM(QT_HELP_GENERATOR
     DOC "qhelpgenerator used to compile Qt help project files")
 MARK_AS_ADVANCED(QT_HELP_GENERATOR)
 
-IF(Qt5Core_FOUND) 
+IF(Qt5Core_FOUND)
   SALOME_ACCUMULATE_HEADERS(QT_INCLUDES)
   SALOME_ACCUMULATE_ENVIRONMENT(PATH ${LINGUIST_PATH})
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${Qt5Core_LIBRARIES})
