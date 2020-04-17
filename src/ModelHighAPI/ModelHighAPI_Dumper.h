@@ -181,7 +181,7 @@ public:
   /// \return name of the entity
   MODELHIGHAPI_EXPORT
   const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true,
-                          bool theUseEntityName = false);
+                          bool theUseEntityName = false, bool theSetIsDumped = false);
 
   /// Returns name of parent composite feature for specified entity
   MODELHIGHAPI_EXPORT

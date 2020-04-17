@@ -569,7 +569,8 @@ static int toInt(const std::string& theString)
 
 const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
                                              bool theSaveNotDumped,
-                                             bool theUseEntityName)
+                                             bool theUseEntityName,
+                                             bool theSetIsDumped)
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   if (aFound != myNames.end())
@@ -649,6 +650,8 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   // store names of results
   if (aFeature)
     saveResultNames(aFeature);
+
+  myNames[theEntity].myIsDumped = theSetIsDumped;
 
   return myNames[theEntity].myCurrentName;
 }
@@ -772,7 +775,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     // dump features in the document
     bool aRes = process(aSubDoc);
     if (isDumpModelDo)
-      *this << "model.do()\n";
+      *this << "\nmodel.do()\n";
     *this << std::endl;
     return aRes;
   }
@@ -1248,6 +1251,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
+  *myDumpStorage << "\n### Create "<< theEntity->getKind() << "\n";
   *myDumpStorage << name(theEntity);
 
   if (!myNames[theEntity].myIsDumped) {

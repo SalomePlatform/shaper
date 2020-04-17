@@ -194,7 +194,8 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
     return;
 
   const std::string& aSketchName = theDumper.parentName(aBase);
-  theDumper << aBase << " = " << aSketchName << "." << aSetter << "(";
+  theDumper.name(aBase, false, true, true);
+  theDumper << aSketchName << "." << aSetter << "(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
