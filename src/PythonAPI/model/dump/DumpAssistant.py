@@ -58,20 +58,28 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
 
     ## Create wrapper for a given feature and dump it
     def dumpFeature(self, theFeature, theForce):
+        aDumper = None
         aFeatureKind = theFeature.getKind()
         if aFeatureKind in self.myFeatures:
             # Dump only feature created by user (in history).
             # Also dump Export and RemoveResults features (hard-coded here in order not to change the data model).
             # For all other features, just keep their name.
             if theForce or theFeature.isInHistory() or aFeatureKind=="Export" or aFeatureKind=="RemoveResults":
-                self.myFeatures[aFeatureKind](theFeature).dump(self)
+                aDumper = self.myFeatures[aFeatureKind](theFeature)
+                # Dump comment for the operation before the dumping of the feature to improve the readability of a script.
+                if self.dumpCommentBeforeFeature(theFeature):
+                    self.__print__("\n### Create " + theFeature.getKind())
+                    self.newline()
             else:
                 self.name(theFeature)
                 self.clearNotDumped()
         else:
             # Probably the feature is a constraint, try to dump it with SketchAPI_Constraint.
             # In case of theFeature is not a constraint, it will not be dumped.
-            self.myFeatures[SketchAPI.SketchAPI_Constraint.ID()](theFeature).dump(self)
+            self.name(theFeature, False, True, True)
+            aDumper = self.myFeatures[SketchAPI.SketchAPI_Constraint.ID()](theFeature)
+        if aDumper is not None:
+            aDumper.dump(self)
 
     ## Create wrapper for a folder and dump it
     def dumpFolder(self, theFolder):

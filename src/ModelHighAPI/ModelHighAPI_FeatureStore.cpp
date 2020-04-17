@@ -287,8 +287,11 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
         if (isSketchFeatures) {
           // do not control construction features of an ellipse and other
           FeaturePtr aFeature = ModelAPI_Feature::feature(*aL);
-          if (aFeature->getKind() == "SketchConstraintCoincidenceInternal")
-            continue; // skip internal constraints
+          //if (aFeature->getKind() == "SketchConstraintCoincidenceInternal")
+          //  continue; // skip internal constraints
+          std::string aStr = aFeature->getKind().substr(0, 16);
+          if (aStr == "SketchConstraint")
+            continue; // no need to dump and check constraints
         }
         aResList.push_back((*aL)->data()->name());
       } else if (!isSketchFeatures) {

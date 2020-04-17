@@ -569,12 +569,16 @@ static int toInt(const std::string& theString)
 
 const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
                                              bool theSaveNotDumped,
-                                             bool theUseEntityName)
+                                             bool theUseEntityName,
+                                             bool theSetIsDumped)
 {
-  EntityNameMap::const_iterator aFound = myNames.find(theEntity);
-  if (aFound != myNames.end())
+  EntityNameMap::iterator aFound = myNames.find(theEntity);
+  if (aFound != myNames.end()) {
+    // Set dumped flag for postponed constraints which are without names
+    if (!aFound->second.myIsDumped)
+      aFound->second.myIsDumped = theSetIsDumped;
     return aFound->second.myCurrentName;
-
+  }
   // entity is not found, store it
   std::string aName, aKind;
   bool isDefaultName = false;
@@ -649,6 +653,8 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   // store names of results
   if (aFeature)
     saveResultNames(aFeature);
+
+  myNames[theEntity].myIsDumped = theSetIsDumped;
 
   return myNames[theEntity].myCurrentName;
 }
@@ -771,7 +777,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     // dump features in the document
     bool aRes = process(aSubDoc);
     if (isDumpModelDo)
-      *this << "model.do()\n";
+      *this << "\nmodel.do()\n";
     *this << std::endl;
     return aRes;
   }
@@ -1051,6 +1057,16 @@ bool ModelHighAPI_Dumper::isDefaultTransparency(const ResultPtr& theResult) cons
     return true;
   }
   return fabs(anAttribute->value()) < 1.e-12;
+}
+
+bool ModelHighAPI_Dumper::dumpCommentBeforeFeature(const FeaturePtr& theFeature) const
+{
+  // currently, the comment should not be dumped only before the filters
+  FiltersFeaturePtr aFilters = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theFeature);
+  if (aFilters)
+    return false;
+  // all other features should be commented before the dump
+  return true;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -1446,10 +1462,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList)
 {
   static const int aThreshold = 2;
-  static bool aDumpAsIs = false;
+  static int aNbSpaces = 0;
   // if number of elements in the list if greater than a threshold,
   // dump it in a separate line with specific name
-  if (aDumpAsIs || theAttrSelList->size() <= aThreshold) {
+  if (aNbSpaces > 0 || theAttrSelList->size() <= aThreshold) {
     *myDumpStorage << "[";
 
     GeomShapePtr aShape;
@@ -1472,6 +1488,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
       if(isAdded) {
         *myDumpStorage << ", ";
+        // print each attribute on separate line with the appropriate shift
+        if (aNbSpaces > 0) {
+          std::string aSpaces(aNbSpaces + 1, ' ');
+          *myDumpStorage << "\n" << aSpaces;
+        }
       } else {
         isAdded = true;
       }
@@ -1505,9 +1526,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     }
     // reserve dumped buffer and store list "as is"
     myDumpStorage->reserveBuffer();
-    aDumpAsIs = true;
+    aNbSpaces = (int)aListName.size() + 3;
     *this << aListName << " = " << theAttrSelList << "\n";
-    aDumpAsIs = false;
+    aNbSpaces = 0;
     // append reserved data to the end of the current buffer
     myDumpStorage->restoreReservedBuffer();
     *myDumpStorage << aListName;
@@ -1530,6 +1551,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
   myDumpStorage->write(aBuffer.str());
   return *this;
+}
+
+void ModelHighAPI_Dumper::newline()
+{
+  *this << std::endl;
 }
 
 /// Dump std::endl
@@ -1561,6 +1587,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
 
   // store all not-dumped entities first
   std::set<EntityPtr> aNotDumped = theDumper.myNotDumpedEntities;
+  theDumper.clearNotDumped();
   theDumper.myDumpStorage->reserveBuffer();
   std::set<EntityPtr>::const_iterator anIt = aNotDumped.begin();
   for (; anIt != aNotDumped.end(); ++anIt) {

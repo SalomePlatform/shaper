@@ -183,7 +183,7 @@ public:
   /// \return name of the entity
   MODELHIGHAPI_EXPORT
   const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true,
-                          bool theUseEntityName = false);
+                          bool theUseEntityName = false, bool theSetIsDumped = false);
 
   /// Returns name of parent composite feature for specified entity
   MODELHIGHAPI_EXPORT
@@ -244,6 +244,9 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
                                 std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&));
+
+  /// Print std::endl from Python
+  MODELHIGHAPI_EXPORT void newline();
 
   /// Dump GeomAPI_Pnt in the following form:
   /// "GeomAPI_Pnt(X, Y, Z)"
@@ -354,6 +357,10 @@ public:
   /// Export one variable name to another module (implemented in python)
   MODELHIGHAPI_EXPORT virtual void exportVariable(const std::string& /*theEntry*/,
                                                   const std::string& /*theVarName*/) const {}
+
+  /// Returns \c true if the special comment line to improve the readability
+  /// should be printed before the feature of the given kind.
+  MODELHIGHAPI_EXPORT bool dumpCommentBeforeFeature(const FeaturePtr& theFeature) const;
 
 protected:
   /// Dump "setName" command if last entity had user-defined name

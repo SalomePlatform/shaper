@@ -54,6 +54,9 @@
 // directors
 %feature("director") ModelHighAPI_Dumper;
 
+// renamed methods
+%rename(__print__) ModelHighAPI_Dumper::operator<<;
+
 // shared pointers
 %shared_ptr(ModelHighAPI_Interface)
 %shared_ptr(ModelHighAPI_Folder)
