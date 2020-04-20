@@ -449,35 +449,50 @@ bool XGUI_ViewerProxy::canDragByMouse() const
 }
 
 //***************************************
-void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape)
+Handle(AIS_Shape) createPresentation(const TopoDS_Shape& theShape, double theDeviation)
+{
+  Handle(AIS_Shape) aAis = new AIS_Shape(theShape);
+  aAis->SetColor(HIGHLIGHT_COLOR);
+  aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
+  aAis->Attributes()->SetDeviationCoefficient(theDeviation);
+  aAis->Attributes()->SetIsoOnPlane(false);
+  return aAis;
+}
+
+//***************************************
+void XGUI_ViewerProxy::createPresentations(const ResultPtr& theRes, const TopoDS_Shape& theIgnoreShape)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  Handle(AIS_Shape) aAis;
+  Handle(AIS_InteractiveObject) anAISIO;
+  double aDeviation = 0.001;
 
-  double aDeflection;
+  TopoDS_Shape aTShape = theRes->shape()->impl<TopoDS_Shape>();
+  if (!aTShape.IsSame(theIgnoreShape)) {
+    AISObjectPtr aAISPrs = aDisplayer->getAISObject(theRes);
+    if (aAISPrs.get()) {
+      anAISIO = aAISPrs->impl<Handle(AIS_InteractiveObject)>();
+      aDeviation = anAISIO->Attributes()->DeviationCoefficient();
+    }
+    else {
+      aDeviation = Config_PropManager::real("Visualization", "construction_deflection");
+    }
+    aAis = createPresentation(aTShape, aDeviation);
+    myHighlights.Append(aAis);
+    aContext->Display(aAis, false);
+    aContext->Deactivate(aAis);
+  }
+}
+
+
+void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape)
+{
   if (theFeature.get()) {
     std::list<ResultPtr> aResults = theFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    ResultPtr aRes;
-    Handle(AIS_InteractiveObject) anAISIO;
-    Handle(AIS_Shape) aAis;
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
-      aRes = (*aIt);
-      TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
-      if (!aTShape.IsSame(theIgnoreShape)) {
-        anAISIO = aDisplayer->getAISObject(aRes)->impl<Handle(AIS_InteractiveObject)>();
-        if (!anAISIO.IsNull()) {
-          aAis = new AIS_Shape(aTShape);
-          aAis->SetColor(HIGHLIGHT_COLOR);
-          aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
-          aDeflection = anAISIO->Attributes()->DeviationCoefficient();
-          aAis->Attributes()->SetDeviationCoefficient(aDeflection);
-          aAis->Attributes()->SetIsoOnPlane(false);
-          myHighlights.Append(aAis);
-          aContext->Display(aAis, false);
-          aContext->Deactivate(aAis);
-        }
-      }
+      createPresentations((*aIt), theIgnoreShape);
     }
   }
 }

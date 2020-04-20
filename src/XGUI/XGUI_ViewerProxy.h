@@ -217,6 +217,7 @@ private slots:
  private:
    void displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape);
    bool eraseHighlight();
+   void createPresentations(const ResultPtr& theRes, const TopoDS_Shape& theIgnoreShape);
 
 
   XGUI_Workshop* myWorkshop;
