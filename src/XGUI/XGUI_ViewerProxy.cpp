@@ -460,7 +460,8 @@ Handle(AIS_Shape) createPresentation(const TopoDS_Shape& theShape, double theDev
 }
 
 //***************************************
-void XGUI_ViewerProxy::createPresentations(const ResultPtr& theRes, const TopoDS_Shape& theIgnoreShape)
+void XGUI_ViewerProxy::createPresentations(const ResultPtr& theRes,
+  const TopoDS_Shape& theIgnoreShape)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
