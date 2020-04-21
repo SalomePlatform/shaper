@@ -572,10 +572,13 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
                                              bool theUseEntityName,
                                              bool theSetIsDumped)
 {
-  EntityNameMap::const_iterator aFound = myNames.find(theEntity);
-  if (aFound != myNames.end())
+  EntityNameMap::iterator aFound = myNames.find(theEntity);
+  if (aFound != myNames.end()) {
+    // Set dumped flag for postponed constraints which are without names
+    if (!aFound->second.myIsDumped)
+      aFound->second.myIsDumped = theSetIsDumped;
     return aFound->second.myCurrentName;
-
+  }
   // entity is not found, store it
   std::string aName, aKind;
   bool isDefaultName = false;
