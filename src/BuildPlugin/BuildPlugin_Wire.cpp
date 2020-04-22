@@ -122,7 +122,10 @@ void BuildPlugin_Wire::execute()
       for (ListOfShape::const_iterator anIt = anEdges.cbegin(); anIt != anEdges.cend(); ++anIt) {
         std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(*anIt));
         if (anEdgeInList->isEqual(anEdgeInResult)) {
-          aResultBody->modified(anEdgeInList, anEdgeInResult);
+          if (anEdgeInList->isSame(anEdgeInResult))
+            aResultBody->generated(anEdgeInResult, "Edge");
+          else
+            aResultBody->modified(anEdgeInList, anEdgeInResult);
           break;
         }
       }

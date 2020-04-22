@@ -68,6 +68,8 @@
 %shared_ptr(FeaturesAPI_ExtrusionCut)
 %shared_ptr(FeaturesAPI_ExtrusionFuse)
 %shared_ptr(FeaturesAPI_Fillet)
+%shared_ptr(FeaturesAPI_Fillet1D)
+%shared_ptr(FeaturesAPI_Fillet2D)
 %shared_ptr(FeaturesAPI_Intersection)
 %shared_ptr(FeaturesAPI_MultiRotation)
 %shared_ptr(FeaturesAPI_MultiTranslation)

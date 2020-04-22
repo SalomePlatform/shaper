@@ -135,6 +135,10 @@ public:
   GEOMAPI_EXPORT
   void setLastPointTolerance(const double theTolerance);
 
+  GEOMAPI_EXPORT double firstPointTolerance() const;
+
+  GEOMAPI_EXPORT double lastPointTolerance() const;
+
   /// Return middle point on the edge
   GEOMAPI_EXPORT
   virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;

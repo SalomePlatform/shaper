@@ -57,6 +57,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_MultiTranslation.h
     FeaturesPlugin_MultiRotation.h
     FeaturesPlugin_Fillet.h
+    FeaturesPlugin_Fillet1D.h
     FeaturesPlugin_Measurement.h
     FeaturesPlugin_FusionFaces.h
     FeaturesPlugin_RemoveResults.h
@@ -103,6 +104,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_MultiTranslation.cpp
     FeaturesPlugin_MultiRotation.cpp
     FeaturesPlugin_Fillet.cpp
+    FeaturesPlugin_Fillet1D.cpp
     FeaturesPlugin_Measurement.cpp
     FeaturesPlugin_FusionFaces.cpp
     FeaturesPlugin_RemoveResults.cpp
@@ -140,6 +142,7 @@ SET(XML_RESOURCES
   multitranslation_widget.xml
   multirotation_widget.xml
   fillet_widget.xml
+  fillet1d_widget.xml
   measurement_widget.xml
   fusion_faces_widget.xml
   chamfer_widget.xml
@@ -662,4 +665,19 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2817.py
                Test19065.py
                Test19066.py
+               TestFillet1D_ErrorMsg.py
+               TestFillet1D_Vertices_1.py
+               TestFillet1D_Vertices_2.py
+               TestFillet1D_Vertices_3.py
+               TestFillet1D_Vertices_4.py
+               TestFillet1D_Vertices_5.py
+               TestFillet1D_Vertices_6.py
+               TestFillet1D_Vertices_7.py
+               TestFillet1D_Vertices_8.py
+               TestFillet1D_Vertices_9.py
+               TestFillet1D_Wire_1.py
+               TestFillet1D_Wire_2.py
+               TestFillet1D_Wire_3.py
+               TestFillet1D_Wire_4.py
+               TestFillet1D_Wire_5.py
 )

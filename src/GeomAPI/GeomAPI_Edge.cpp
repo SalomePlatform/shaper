@@ -461,6 +461,22 @@ void GeomAPI_Edge::setLastPointTolerance(const double theTolerance)
   BRep_Builder().UpdateVertex(aVLast, theTolerance);
 }
 
+double GeomAPI_Edge::firstPointTolerance() const
+{
+  TopoDS_Edge anEdge = impl<TopoDS_Edge>();
+  TopoDS_Vertex aVFirst, aVLast;
+  TopExp::Vertices(anEdge, aVFirst, aVLast);
+  return BRep_Tool::Tolerance(aVFirst);
+}
+
+double GeomAPI_Edge::lastPointTolerance() const
+{
+  TopoDS_Edge anEdge = impl<TopoDS_Edge>();
+  TopoDS_Vertex aVFirst, aVLast;
+  TopExp::Vertices(anEdge, aVFirst, aVLast);
+  return BRep_Tool::Tolerance(aVLast);
+}
+
 GeomPointPtr GeomAPI_Edge::middlePoint() const
 {
   GeomPointPtr aMiddlePoint;

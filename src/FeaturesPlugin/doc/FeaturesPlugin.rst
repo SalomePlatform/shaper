@@ -19,6 +19,7 @@ Features plug-in provides a set of common topological operations. It implements 
    extrusionCutFeature.rst
    extrusionFeature.rst
    extrusionFuseFeature.rst
+   fillet1dFeature.rst
    filletFeature.rst
    fuseFeature.rst
    fuseFeatureFaces.rst

@@ -116,6 +116,15 @@
       </feature>
     </group>
     <group id="Features">
+      <feature id="Fillet1D"
+               title="1D-fillet"
+               tooltip="Perform fillet on vertices of a wire"
+               icon="icons/Features/fillet1d.png"
+               auto_preview="true"
+               apply_continue="true"
+               helpfile="fillet1dFeature.html">
+        <source path="fillet1d_widget.xml"/>
+      </feature>
       <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge"
                icon="icons/Features/fillet.png" auto_preview="true" helpfile="filletFeature.html">
         <source path="fillet_widget.xml"/>

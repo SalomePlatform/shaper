@@ -50,6 +50,7 @@
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <BRepClass_FaceClassifier.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
+#include <BRepLProp.hxx>
 
 #include <BOPAlgo_Builder.hxx>
 
@@ -853,6 +854,44 @@ std::shared_ptr<GeomAPI_Shape>
   anOuterWire->setImpl(new TopoDS_Shape(aWire));
 
   return anOuterWire;
+}
+
+//==================================================================================================
+static bool boundaryOfEdge(const std::shared_ptr<GeomAPI_Edge> theEdge,
+                          const std::shared_ptr<GeomAPI_Vertex> theVertex,
+                          double& theParam)
+{
+  GeomPointPtr aPoint = theVertex->point();
+  GeomPointPtr aFirstPnt = theEdge->firstPoint();
+  double aFirstPntTol = theEdge->firstPointTolerance();
+  GeomPointPtr aLastPnt = theEdge->lastPoint();
+  double aLastPntTol = theEdge->lastPointTolerance();
+
+  double aFirst, aLast;
+  theEdge->getRange(aFirst, aLast);
+
+  bool isFirst = aPoint->distance(aFirstPnt) <= aFirstPntTol;
+  bool isLast = aPoint->distance(aLastPnt) <= aLastPntTol;
+  if (isFirst)
+    theParam = aFirst;
+  else if (isLast)
+    theParam = aLast;
+
+  return isFirst != isLast;
+}
+
+bool GeomAlgoAPI_ShapeTools::isTangent(const std::shared_ptr<GeomAPI_Edge> theEdge1,
+                                       const std::shared_ptr<GeomAPI_Edge> theEdge2,
+                                       const std::shared_ptr<GeomAPI_Vertex> theTgPoint)
+{
+  double aParE1 = 0, aParE2 = 0;
+  if (!boundaryOfEdge(theEdge1, theTgPoint, aParE1) ||
+      !boundaryOfEdge(theEdge2, theTgPoint, aParE2))
+    return false;
+
+  BRepAdaptor_Curve aC1(theEdge1->impl<TopoDS_Edge>());
+  BRepAdaptor_Curve aC2(theEdge2->impl<TopoDS_Edge>());
+  return BRepLProp::Continuity(aC1, aC2, aParE1, aParE2) >= GeomAbs_G1;
 }
 
 //==================================================================================================

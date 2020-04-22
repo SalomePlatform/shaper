@@ -42,6 +42,10 @@
       <translation>Congé</translation>
     </message>
     <message>
+      <source>1D-fillet</source>
+      <translation>1D-congé</translation>
+    </message>
+    <message>
       <source>Fuse</source>
       <translation>Fusionner</translation>
     </message>
@@ -961,6 +965,121 @@
     <message>
       <source>Fillet radius at end point.</source>
       <translation>Rayon du congé au point final.</translation>
+    </message>
+  </context>
+
+  <!-- 1D-fillet -->
+  <context>
+    <name>Fillet1D</name>
+    <message>
+      <source>1D-fillet</source>
+      <translation>1D-congé</translation>
+    </message>
+    <message>
+      <source>Perform fillet on vertices of a wire</source>
+      <translation>Effectuer un congé sur les sommets d&apos;un contour</translation>
+    </message>
+    <message>
+      <source>Wire has no vertices for fillet.</source>
+      <translation>Le contour n&apos;a pas de sommet pour le congé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_wires</name>
+    <message>
+      <source>Wires</source>
+      <translation>Contours</translation>
+    </message>
+    <message>
+      <source>Select wires</source>
+      <translation>Sélectionnez les contours</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez les contours.</translation>
+    </message>
+    <message>
+      <source>Fillet each sharp corner of the wire</source>
+      <translation>Raccordez chaque coin pointu du contour</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices</name>
+    <message>
+      <source>Vertices</source>
+      <translation>Sommets</translation>
+    </message>
+    <message>
+      <source>Select vertices</source>
+      <translation>Sélectionnez les sommets</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez des sommets sur les contours.</translation>
+    </message>
+    <message>
+      <source>Fillet the specified corners of the wire</source>
+      <translation>Raccorder les coins spécifiés du contour</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices:FeaturesPlugin_ValidatorFillet1DSelection</name>
+    <message>
+      <source>Selected vertex is not a wire corner</source>
+      <translation>Le sommet sélectionné n&apos;est pas un coin de contour</translation>
+    </message>
+    <message>
+      <source>Selected shape is not a vertex</source>
+      <translation>La forme sélectionnée n&apos;est pas un sommet</translation>
+    </message>
+    <message>
+      <source>Selected vertex does not exist in the wire</source>
+      <translation>Le sommet sélectionné n&apos;existe pas dans le contour</translation>
+    </message>
+    <message>
+      <source>Vertex should be shared between 2 edges exactly</source>
+      <translation>Le sommet doit être partagé entre 2 bords exactement</translation>
+    </message>
+    <message>
+      <source>Error: Edges are not planar</source>
+      <translation>Erreur: les arêtes ne sont pas planes</translation>
+    </message>
+    <message>
+      <source>Error: Edges are tangent</source>
+      <translation>Erreur: les bords sont tangents</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:creation_method</name>
+    <message>
+      <source>Wires</source>
+      <translation>Contours</translation>
+    </message>
+    <message>
+      <source>Vertices</source>
+      <translation>Sommets</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>Rayon</translation>
+    </message>
+    <message>
+      <source>Fillet radius</source>
+      <translation>Rayon de congé</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Spécifiez le rayon du congé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
+      <translation>La valeur est trop petite.</translation>
     </message>
   </context>
 

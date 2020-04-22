@@ -177,4 +177,120 @@
       <translation>Ошибка: не все выбранные объекты являются подэлементами твердых тел.</translation>
     </message>
   </context>
+
+  <!-- 1D-fillet -->
+  <context>
+    <name>Fillet1D</name>
+    <message>
+      <source>1D-fillet</source>
+      <translation>1D-сглаживание</translation>
+    </message>
+    <message>
+      <source>Perform fillet on vertices of a wire</source>
+      <translation>Выполнить сглаживание в узлах контура</translation>
+    </message>
+    <message>
+      <source>Wire has no vertices for fillet.</source>
+      <translation>Контур не имеет узлов, подходящих для сглаживания.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_wires</name>
+    <message>
+      <source>Wires</source>
+      <translation>Контуры</translation>
+    </message>
+    <message>
+      <source>Select wires</source>
+      <translation>Выберите контуры</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Выберите контуры.</translation>
+    </message>
+    <message>
+      <source>Fillet each sharp corner of the wire</source>
+      <translation>Сгладить все острые углы контура</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices</name>
+    <message>
+      <source>Vertices</source>
+      <translation>Узлы</translation>
+    </message>
+    <message>
+      <source>Select vertices</source>
+      <translation>Выберите узлы</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Выберите острые углы на контуре.</translation>
+    </message>
+    <message>
+      <source>Fillet the specified corners of the wire</source>
+      <translation>Сгладить выбранные узлы контура</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices:FeaturesPlugin_ValidatorFillet1DSelection</name>
+    <message>
+      <source>Selected vertex is not a wire corner</source>
+      <translation>Выбранный узел не принадлежит контуру</translation>
+    </message>
+    <message>
+      <source>Selected shape is not a vertex</source>
+      <translation>Выбранный объект не является узлом</translation>
+    </message>
+    <message>
+      <source>Selected vertex does not exist in the wire</source>
+      <translation>Выбранный узел не принадлежит контуру</translation>
+    </message>
+    <message>
+      <source>Vertex should be shared between 2 edges exactly</source>
+      <translation>Узел должен примыкать ровно к двум рёбрам</translation>
+    </message>
+    <message>
+      <source>Error: Edges are not planar</source>
+      <translation>Ошибка: рёбра не лежат на одной плоскости</translation>
+    </message>
+    <message>
+      <source>Error: Edges are tangent</source>
+      <translation>Ошибка: рёбра касаются друг друга</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:creation_method</name>
+    <message>
+      <source>Wires</source>
+      <translation>Контуры</translation>
+    </message>
+    <message>
+      <source>Vertices</source>
+      <translation>Узлы</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>Радиус</translation>
+    </message>
+    <message>
+      <source>Fillet radius</source>
+      <translation>Радиус сглаживания</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Задайте радиус сглаживания.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
+      <translation>Значение радиуса слишком мало.</translation>
+    </message>
+  </context>
+
 </TS>

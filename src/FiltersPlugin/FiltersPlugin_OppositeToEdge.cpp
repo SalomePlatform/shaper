@@ -23,6 +23,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_Wire.h>

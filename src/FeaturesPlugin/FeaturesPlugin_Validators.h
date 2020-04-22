@@ -188,6 +188,22 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorFillet1DSelection
+/// \ingroup Validators
+/// \brief Validates selection for 1d-fillet operation.
+class FeaturesPlugin_ValidatorFillet1DSelection : public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for fillet on wire (vertex is a sharp corner).
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /// \class FeaturesPlugin_ValidatorPartitionSelection
 /// \ingroup Validators
 /// \brief Validates selection for partition.

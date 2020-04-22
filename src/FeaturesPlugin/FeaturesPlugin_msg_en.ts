@@ -3629,4 +3629,120 @@
       <translation>Base shape is not selected.</translation>
     </message>
   </context>
+
+  <!-- 1D-fillet -->
+  <context>
+    <name>Fillet1D</name>
+    <message>
+      <source>1D-fillet</source>
+      <translation>1D-fillet</translation>
+    </message>
+    <message>
+      <source>Perform fillet on vertices of a wire</source>
+      <translation>Perform fillet on vertices of a wire</translation>
+    </message>
+    <message>
+      <source>Wire has no vertices for fillet.</source>
+      <translation>Wire has no vertices for fillet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_wires</name>
+    <message>
+      <source>Wires</source>
+      <translation>Wires</translation>
+    </message>
+    <message>
+      <source>Select wires</source>
+      <translation>Select wires</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select wires.</translation>
+    </message>
+    <message>
+      <source>Fillet each sharp corner of the wire</source>
+      <translation>Fillet each sharp corner of the wire</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices</name>
+    <message>
+      <source>Vertices</source>
+      <translation>Vertices</translation>
+    </message>
+    <message>
+      <source>Select vertices</source>
+      <translation>Select vertices</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select vertices on wires.</translation>
+    </message>
+    <message>
+      <source>Fillet the specified corners of the wire</source>
+      <translation>Fillet the specified corners of the wire</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:main_vertices:FeaturesPlugin_ValidatorFillet1DSelection</name>
+    <message>
+      <source>Selected vertex is not a wire corner</source>
+      <translation>Selected vertex is not a wire corner</translation>
+    </message>
+    <message>
+      <source>Selected shape is not a vertex</source>
+      <translation>Selected shape is not a vertex</translation>
+    </message>
+    <message>
+      <source>Selected vertex does not exist in the wire</source>
+      <translation>Selected vertex does not exist in the wire</translation>
+    </message>
+    <message>
+      <source>Vertex should be shared between 2 edges exactly</source>
+      <translation>Vertex should be shared between 2 edges exactly</translation>
+    </message>
+    <message>
+      <source>Error: Edges are not planar</source>
+      <translation>Error: Edges are not planar</translation>
+    </message>
+    <message>
+      <source>Error: Edges are tangent</source>
+      <translation>Error: Edges are tangent</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:creation_method</name>
+    <message>
+      <source>Wires</source>
+      <translation>Wires</translation>
+    </message>
+    <message>
+      <source>Vertices</source>
+      <translation>Vertices</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>Radius</translation>
+    </message>
+    <message>
+      <source>Fillet radius</source>
+      <translation>Fillet radius</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Specify fillet radius.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet1D:radius:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
+      <translation>Value is too small.</translation>
+    </message>
+  </context>
+
 </TS>

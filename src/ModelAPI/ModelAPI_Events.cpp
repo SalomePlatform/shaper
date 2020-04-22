@@ -21,6 +21,7 @@
 #include <ModelAPI_Events.h>
 
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Shape.h>
 
 //#define DEBUG_OBJECT_MOVED_MESSAGE
 #ifdef DEBUG_OBJECT_MOVED_MESSAGE
@@ -383,4 +384,24 @@ void ModelAPI_ObjectMovedMessage::setCurrentPosition(
             << myCurrentPosition->x() - myOriginalPosition->x() << ", "
             << myCurrentPosition->y() - myOriginalPosition->y() << std::endl;
 #endif
+}
+
+
+// =====   ModelAPI_Fillet1DFailedMessage   =====
+ModelAPI_Fillet1DFailedMessage::ModelAPI_Fillet1DFailedMessage(const Events_ID theID,
+                                                               const void* theSender)
+  : Events_Message(theID, theSender)
+{}
+
+ModelAPI_Fillet1DFailedMessage::~ModelAPI_Fillet1DFailedMessage()
+{}
+
+void ModelAPI_Fillet1DFailedMessage::setVertices(const ListOfShape& theVertices)
+{
+  myVertices = theVertices;
+}
+
+const ListOfShape& ModelAPI_Fillet1DFailedMessage::vertices() const
+{
+  return myVertices;
 }
