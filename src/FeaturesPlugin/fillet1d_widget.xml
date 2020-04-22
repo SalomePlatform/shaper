@@ -1,0 +1,40 @@
+<source>
+  <toolbox id="creation_method">
+    <box id="by_wires"
+         title="Wires"
+         tooltip="Fillet each sharp corner of the wire"
+         icon="icons/Features/fillet1d_wire.png">
+      <multi_selector id="main_wires"
+                      label="Wires"
+                      icon=""
+                      tooltip="Select wires"
+                      shape_types="wires"
+                      use_choice="false"
+                      concealment="true">
+        <validator id="PartSet_DifferentObjects"/>
+      </multi_selector>
+    </box>
+    <box id="by_vertices"
+         title="Vertices"
+         tooltip="Fillet the specified corners of the wire"
+         icon="icons/Features/fillet1d_points.png">
+      <multi_selector id="main_vertices"
+                      label="Vertices"
+                      icon=""
+                      tooltip="Select vertices"
+                      shape_types="vertices"
+                      use_choice="false"
+                      concealment="true">
+        <validator id="PartSet_DifferentObjects"/>
+        <validator id="FeaturesPlugin_ValidatorFillet1DSelection"/>
+      </multi_selector>
+    </box>
+  </toolbox>
+  <doublevalue id="radius"
+               label="Radius"
+               tooltip="Fillet radius."
+               min="0"
+               default="0">
+    <validator id="GeomValidators_Positive"/>
+  </doublevalue>
+</source>

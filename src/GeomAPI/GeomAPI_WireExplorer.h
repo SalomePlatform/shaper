@@ -23,7 +23,9 @@
 #include <GeomAPI.h>
 #include <GeomAPI_Interface.h>
 
+class GeomAPI_Edge;
 class GeomAPI_Shape;
+class GeomAPI_Vertex;
 class GeomAPI_Wire;
 
 /** \class GeomAPI_WireExplorer
@@ -53,9 +55,13 @@ public:
   /// if there are no more shapes to explore.
   GEOMAPI_EXPORT void next();
 
-  /// \return the current shape in the exploration or empty pointer
+  /// \return the current edge in the exploration or empty pointer
   /// if this explorer has no more shapes to explore.
-  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Shape> current();
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Edge> current();
+
+  /// \return the current vertex in the exploration or empty pointer
+  /// if this explorer has no more shapes to explore.
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Vertex> currentVertex();
 
   /// Clears the content of the explorer. It will return False on more().
   GEOMAPI_EXPORT void clear();

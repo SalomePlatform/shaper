@@ -18,6 +18,9 @@
 //
 
 #include <GeomAPI_WireExplorer.h>
+
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Vertex.h>
 #include <GeomAPI_Wire.h>
 
 #include <BRepTools_WireExplorer.hxx>
@@ -49,11 +52,19 @@ void GeomAPI_WireExplorer::next()
   MY_EXPLORER->Next();
 }
 
-std::shared_ptr<GeomAPI_Shape> GeomAPI_WireExplorer::current()
+std::shared_ptr<GeomAPI_Edge> GeomAPI_WireExplorer::current()
 {
-  const TopoDS_Shape& aShape = MY_EXPLORER->Current();
-  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape());
-  aGeomShape->setImpl(new TopoDS_Shape(aShape));
+  const TopoDS_Edge& aShape = MY_EXPLORER->Current();
+  std::shared_ptr<GeomAPI_Edge> aGeomShape(new GeomAPI_Edge());
+  aGeomShape->setImpl(new TopoDS_Edge(aShape));
+  return aGeomShape;
+}
+
+std::shared_ptr<GeomAPI_Vertex> GeomAPI_WireExplorer::currentVertex()
+{
+  const TopoDS_Vertex& aShape = MY_EXPLORER->CurrentVertex();
+  std::shared_ptr<GeomAPI_Vertex> aGeomShape(new GeomAPI_Vertex());
+  aGeomShape->setImpl(new TopoDS_Vertex(aShape));
   return aGeomShape;
 }
 

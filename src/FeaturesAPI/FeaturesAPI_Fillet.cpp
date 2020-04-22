@@ -21,19 +21,111 @@
 
 #include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
-////#include <ModelHighAPI_Reference.h>
+#include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
+
+static GeomAPI_Shape::ShapeType typeOfSelection(
+    const std::list<ModelHighAPI_Selection>& theBaseObjects)
+{
+  std::string aType = theBaseObjects.empty() ? "SHAPE" : theBaseObjects.front().shapeType();
+  return GeomAPI_Shape::shapeTypeByStr(aType);
+}
+
+//==================================================================================================
 
 FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& theFeature)
   : ModelHighAPI_Interface(theFeature)
 {
+}
+
+//==================================================================================================
+
+FeaturesAPI_Fillet1D::FeaturesAPI_Fillet1D(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+  : FeaturesAPI_Fillet(theFeature)
+{
   initialize();
 }
 
-FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                       const ModelHighAPI_Double& theRadius)
-  : ModelHighAPI_Interface(theFeature)
+FeaturesAPI_Fillet1D::FeaturesAPI_Fillet1D(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                           const ModelHighAPI_Double& theRadius)
+  : FeaturesAPI_Fillet(theFeature)
+{
+  if (initialize()) {
+    setBase(theBaseObjects);
+    fillAttribute(theRadius, myradius);
+
+    execIfBaseNotEmpty();
+  }
+}
+
+FeaturesAPI_Fillet1D::~FeaturesAPI_Fillet1D()
+{
+}
+
+void FeaturesAPI_Fillet1D::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
+{
+  mybaseWires->clear();
+  mybaseVertices->clear();
+
+  if (typeOfSelection(theBaseObjects) == GeomAPI_Shape::WIRE) {
+    fillAttribute(FeaturesPlugin_Fillet1D::CREATION_BY_WIRES(), mycreationMethod);
+    fillAttribute(theBaseObjects, mybaseWires);
+  }
+  else {
+    fillAttribute(FeaturesPlugin_Fillet1D::CREATION_BY_VERTICES(), mycreationMethod);
+    fillAttribute(theBaseObjects, mybaseVertices);
+  }
+
+  execIfBaseNotEmpty();
+}
+
+void FeaturesAPI_Fillet1D::setRadius(const ModelHighAPI_Double& theRadius)
+{
+  fillAttribute(theRadius, myradius);
+  execIfBaseNotEmpty();
+}
+
+void FeaturesAPI_Fillet1D::execIfBaseNotEmpty()
+{
+  if (mybaseWires->size() > 0 || mybaseVertices->size() > 0)
+    execute();
+}
+
+void FeaturesAPI_Fillet1D::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrObjects;
+  if (creationMethod()->value() == FeaturesPlugin_Fillet1D::CREATION_BY_WIRES())
+    anAttrObjects = aBase->selectionList(FeaturesPlugin_Fillet1D::WIRE_LIST_ID());
+  else if (creationMethod()->value() == FeaturesPlugin_Fillet1D::CREATION_BY_VERTICES())
+    anAttrObjects = aBase->selectionList(FeaturesPlugin_Fillet1D::VERTEX_LIST_ID());
+
+  AttributeDoublePtr anAttrRadius = aBase->real(FeaturesPlugin_Fillet1D::RADIUS_ID());
+
+  theDumper << aBase << " = model.addFillet(" << aDocName << ", " << anAttrObjects
+                                                          << ", " << anAttrRadius;
+
+  if (!aBase->data()->version().empty())
+    theDumper << ", keepSubResults = True";
+
+  theDumper << ")" << std::endl;
+}
+
+//==================================================================================================
+
+FeaturesAPI_Fillet2D::FeaturesAPI_Fillet2D(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+  : FeaturesAPI_Fillet(theFeature)
+{
+  initialize();
+}
+
+FeaturesAPI_Fillet2D::FeaturesAPI_Fillet2D(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                           const ModelHighAPI_Double& theRadius)
+  : FeaturesAPI_Fillet(theFeature)
 {
   if (initialize()) {
     fillAttribute(FeaturesPlugin_Fillet::CREATION_METHOD_SINGLE_RADIUS(), mycreationMethod);
@@ -44,11 +136,11 @@ FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& 
   }
 }
 
-FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                       const ModelHighAPI_Double& theRadius1,
-                                       const ModelHighAPI_Double& theRadius2)
-  : ModelHighAPI_Interface(theFeature)
+FeaturesAPI_Fillet2D::FeaturesAPI_Fillet2D(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                           const ModelHighAPI_Double& theRadius1,
+                                           const ModelHighAPI_Double& theRadius2)
+  : FeaturesAPI_Fillet(theFeature)
 {
   if (initialize()) {
     fillAttribute(FeaturesPlugin_Fillet::CREATION_METHOD_VARYING_RADIUS(), mycreationMethod);
@@ -60,12 +152,11 @@ FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& 
   }
 }
 
-FeaturesAPI_Fillet::~FeaturesAPI_Fillet()
+FeaturesAPI_Fillet2D::~FeaturesAPI_Fillet2D()
 {
 }
 
-//==================================================================================================
-void FeaturesAPI_Fillet::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
+void FeaturesAPI_Fillet2D::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
   mybaseObjects->clear();
   fillAttribute(theBaseObjects, mybaseObjects);
@@ -73,7 +164,7 @@ void FeaturesAPI_Fillet::setBase(const std::list<ModelHighAPI_Selection>& theBas
   execIfBaseNotEmpty();
 }
 
-void FeaturesAPI_Fillet::setRadius(const ModelHighAPI_Double& theRadius)
+void FeaturesAPI_Fillet2D::setRadius(const ModelHighAPI_Double& theRadius)
 {
   fillAttribute(FeaturesPlugin_Fillet::CREATION_METHOD_SINGLE_RADIUS(), mycreationMethod);
   fillAttribute(theRadius, myradius);
@@ -81,8 +172,8 @@ void FeaturesAPI_Fillet::setRadius(const ModelHighAPI_Double& theRadius)
   execIfBaseNotEmpty();
 }
 
-void FeaturesAPI_Fillet::setRadius(const ModelHighAPI_Double& theRadius1,
-                                   const ModelHighAPI_Double& theRadius2)
+void FeaturesAPI_Fillet2D::setRadius(const ModelHighAPI_Double& theRadius1,
+                                     const ModelHighAPI_Double& theRadius2)
 {
   fillAttribute(FeaturesPlugin_Fillet::CREATION_METHOD_VARYING_RADIUS(), mycreationMethod);
   fillAttribute(theRadius1, mystartRadius);
@@ -91,7 +182,7 @@ void FeaturesAPI_Fillet::setRadius(const ModelHighAPI_Double& theRadius1,
   execIfBaseNotEmpty();
 }
 
-void FeaturesAPI_Fillet::dump(ModelHighAPI_Dumper& theDumper) const
+void FeaturesAPI_Fillet2D::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
@@ -118,7 +209,7 @@ void FeaturesAPI_Fillet::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << ")" << std::endl;
 }
 
-void FeaturesAPI_Fillet::execIfBaseNotEmpty()
+void FeaturesAPI_Fillet2D::execIfBaseNotEmpty()
 {
   if (mybaseObjects->size() > 0)
     execute();
@@ -133,14 +224,20 @@ FilletPtr addFillet(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const ModelHighAPI_Double& theRadius2,
                     const bool keepSubResults)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Fillet::ID());
+  GeomAPI_Shape::ShapeType aType = typeOfSelection(theBaseObjects);
+  bool is1D = aType == GeomAPI_Shape::WIRE || aType == GeomAPI_Shape::VERTEX;
+
+  FeaturePtr aFeature =
+      thePart->addFeature(is1D ? FeaturesAPI_Fillet1D::ID() : FeaturesAPI_Fillet2D::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
 
   FilletPtr aFillet;
-  if (theRadius2.value() < 0.0)
-    aFillet.reset(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius1));
+  if (is1D)
+    aFillet.reset(new FeaturesAPI_Fillet1D(aFeature, theBaseObjects, theRadius1));
+  else if (theRadius2.value() < 0.0)
+    aFillet.reset(new FeaturesAPI_Fillet2D(aFeature, theBaseObjects, theRadius1));
   else
-    aFillet.reset(new FeaturesAPI_Fillet(aFeature, theBaseObjects, theRadius1, theRadius2));
+    aFillet.reset(new FeaturesAPI_Fillet2D(aFeature, theBaseObjects, theRadius1, theRadius2));
   return aFillet;
 }

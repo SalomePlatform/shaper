@@ -22,10 +22,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 SET(PROJECT_HEADERS
     GeomAlgoImpl.h
     GEOMAlgo_Splitter.hxx
+    GEOMImpl_Fillet1d.hxx
 )
 
 SET(PROJECT_SOURCES
     GEOMAlgo_Splitter.cxx
+    GEOMImpl_Fillet1d.cxx
 )
 
 SET(PROJECT_LIBRARIES

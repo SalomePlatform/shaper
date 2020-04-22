@@ -75,6 +75,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Circ2dBuilder.h
     GeomAlgoAPI_UnifySameDomain.h
     GeomAlgoAPI_Fillet.h
+    GeomAlgoAPI_Fillet1D.h
     GeomAlgoAPI_SortListOfShapes.h
     GeomAlgoAPI_Filling.h
     GeomAlgoAPI_CurveBuilder.h
@@ -139,6 +140,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Circ2dBuilder.cpp
     GeomAlgoAPI_UnifySameDomain.cpp
     GeomAlgoAPI_Fillet.cpp
+    GeomAlgoAPI_Fillet1D.cpp
     GeomAlgoAPI_SortListOfShapes.cpp
     GeomAlgoAPI_Filling.cpp
     GeomAlgoAPI_CurveBuilder.cpp

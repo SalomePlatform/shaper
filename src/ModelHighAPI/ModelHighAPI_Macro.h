@@ -50,7 +50,7 @@
 // Used in INTERFACE_N for create variable and getter
 #define DEFINE_ATTRIBUTE(NAME, TYPE, COMMENT) \
     COMMENT \
-    std::shared_ptr<TYPE> NAME() const { return VAR_NAME(NAME); } \
+    virtual std::shared_ptr<TYPE> NAME() const { return VAR_NAME(NAME); } \
   protected: \
     std::shared_ptr<TYPE> VAR_NAME(NAME); \
   public:

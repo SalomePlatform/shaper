@@ -30,6 +30,7 @@
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Fillet.h>
+#include <FeaturesPlugin_Fillet1D.h>
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Measurement.h>
 #include <FeaturesPlugin_MultiRotation.h>
@@ -101,6 +102,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorConcealedResult);
   aFactory->registerValidator("FeaturesPlugin_ValidatorFilletSelection",
                               new FeaturesPlugin_ValidatorFilletSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorFillet1DSelection",
+                              new FeaturesPlugin_ValidatorFillet1DSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorCircular",
                               new FeaturesPlugin_ValidatorCircular);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanArguments",
@@ -180,6 +183,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_MultiRotation);
   } else if (theFeatureID == FeaturesPlugin_Fillet::ID()) {
     return FeaturePtr(new FeaturesPlugin_Fillet);
+  } else if (theFeatureID == FeaturesPlugin_Fillet1D::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Fillet1D);
   } else if (theFeatureID == FeaturesPlugin_Measurement::ID()) {
     return FeaturePtr(new FeaturesPlugin_Measurement);
   } else if (theFeatureID == FeaturesPlugin_RemoveResults::ID()) {

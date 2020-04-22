@@ -54,6 +54,7 @@
 #include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_MapShapesAndAncestors.h>
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -931,6 +932,79 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
       aBaseSolid = aTopLevelOwner;
     else if (!aBaseSolid->isEqual(aTopLevelOwner)) {
       theError = "Error: Sub-shapes of different solids have been selected.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorFillet1DSelection::isValid(const AttributePtr& theAttribute,
+                                                        const std::list<std::string>& theArguments,
+                                                        Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!anAttrSelectionList.get()) {
+    // LCOV_EXCL_START
+    theError =
+      "Error: This validator can only work with selection list attributes in \"Fillet\" feature.";
+    return false;
+    // LCOV_EXCL_STOP
+  }
+
+  // check each selected vertex is a sharp corner between adjacent edges,
+  // and these edges are in the same plane
+  std::map<GeomShapePtr, MapShapeToShapes> aWireSubshapes;
+  int aNbSel = anAttrSelectionList->size();
+  for (int ind = 0; ind < aNbSel; ++ind) {
+    AttributeSelectionPtr aCurSel = anAttrSelectionList->value(ind);
+    GeomShapePtr aContext = aCurSel->context()->shape();
+    GeomShapePtr aVertex = aCurSel->value();
+    // check wire already processed, if not, store all vertices and edges, sharing them
+    std::map<GeomShapePtr, MapShapeToShapes>::iterator aProcessed = aWireSubshapes.find(aContext);
+    if (aProcessed == aWireSubshapes.end()) {
+      if (aContext->shapeType() != GeomAPI_Shape::WIRE) {
+        theError = "Selected vertex is not a wire corner";
+        return false;
+      }
+      if (aVertex->shapeType() != GeomAPI_Shape::VERTEX) {
+        theError = "Selected shape it not a vertex";
+        return false;
+      }
+
+      GeomAlgoAPI_MapShapesAndAncestors aMapVE(aContext, GeomAPI_Shape::VERTEX,
+                                                         GeomAPI_Shape::EDGE);
+      aWireSubshapes[aContext] = aMapVE.map();
+      aProcessed = aWireSubshapes.find(aContext);
+    }
+
+    // check the vertex
+    MapShapeToShapes::iterator aFound = aProcessed->second.find(aVertex);
+    if (aFound == aProcessed->second.end()) {
+      theError = "Selected vertex does not exist in the wire";
+      return true;
+    }
+    else if (aFound->second.size() != 2) {
+      theError = "Vertex should be shared between 2 edges exactly";
+      return false;
+    }
+
+    ListOfShape anEdges;
+    anEdges.insert(anEdges.end(), aFound->second.begin(), aFound->second.end());
+    GeomPlanePtr aPlane = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+    if (!aPlane) {
+      theError = "Error: Edges are not planar";
+      return false;
+    }
+
+    GeomEdgePtr anEdge1(new GeomAPI_Edge(anEdges.front()));
+    GeomEdgePtr anEdge2(new GeomAPI_Edge(anEdges.back()));
+    GeomVertexPtr aSharedVertex(new GeomAPI_Vertex(aVertex));
+    if (GeomAlgoAPI_ShapeTools::isTangent(anEdge1, anEdge2, aSharedVertex)) {
+      theError = "Error: Edges are tangent";
       return false;
     }
   }

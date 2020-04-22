@@ -141,6 +141,11 @@ public:
   GEOMALGOAPI_EXPORT static
     std::shared_ptr<GeomAPI_Shape> getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace);
 
+  /// \return \c true if edges are tangent in the specified point
+  GEOMALGOAPI_EXPORT static bool isTangent(const std::shared_ptr<GeomAPI_Edge> theEdge1,
+                                           const std::shared_ptr<GeomAPI_Edge> theEdge2,
+                                           const std::shared_ptr<GeomAPI_Vertex> theTgPoint);
+
   /// \return true if edge is parallel to face.
   GEOMALGOAPI_EXPORT static bool isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
                                             const std::shared_ptr<GeomAPI_Face> theFace);
