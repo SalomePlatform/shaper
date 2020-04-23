@@ -32,7 +32,7 @@
   </toolbox>
   <doublevalue id="radius"
                label="Radius"
-               tooltip="Fillet radius."
+               tooltip="Fillet radius"
                min="0"
                default="0">
     <validator id="GeomValidators_Positive"/>

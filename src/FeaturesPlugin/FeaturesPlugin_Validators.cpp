@@ -971,7 +971,7 @@ bool FeaturesPlugin_ValidatorFillet1DSelection::isValid(const AttributePtr& theA
         return false;
       }
       if (aVertex->shapeType() != GeomAPI_Shape::VERTEX) {
-        theError = "Selected shape it not a vertex";
+        theError = "Selected shape is not a vertex";
         return false;
       }
 
