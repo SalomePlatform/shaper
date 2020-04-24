@@ -735,6 +735,14 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       }
       if (aDoExecute) {
         executeFeature(theFeature);
+        // Tuleap issue #19019: when loading python dump several wires are referred to the same
+        // sketch edge. First wire is concealed by another feature, but the flag is not initialized
+        // for the result. When the next wire is created, it finds wire as a referred feature
+        // instead of sketch edge.
+        // As a result, call synchronization to initialize the concealed flag.
+        Model_Objects* aDocObjects =
+            std::dynamic_pointer_cast<Model_Document>(theFeature->document())->objects();
+        aDocObjects->synchronizeBackRefs();
       } else {
         // store information that this feature must be executed later
         theFeature->data()->execState(ModelAPI_StateMustBeUpdated);

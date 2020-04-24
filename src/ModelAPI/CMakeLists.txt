@@ -255,4 +255,6 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2903.py
                Test3020.py
                Test3116.py
+               Test19019_1.py
+               Test19019_2.py
 )
