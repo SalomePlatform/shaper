@@ -1578,6 +1578,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
 
   // store all not-dumped entities first
   std::set<EntityPtr> aNotDumped = theDumper.myNotDumpedEntities;
+  theDumper.clearNotDumped();
   theDumper.myDumpStorage->reserveBuffer();
   std::set<EntityPtr>::const_iterator anIt = aNotDumped.begin();
   for (; anIt != aNotDumped.end(); ++anIt) {
