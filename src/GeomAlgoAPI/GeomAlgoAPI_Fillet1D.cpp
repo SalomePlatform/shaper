@@ -18,6 +18,8 @@
 //
 
 #include <GeomAlgoAPI_Fillet1D.h>
+
+#include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_MapShapesAndAncestors.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -70,6 +72,13 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
 {
   if (!theBaseWire || theFilletVertices.empty() || theRadius < 0.)
     return;
+
+  // store all edges of a base wire as modified, because they will be rebuild by ShapeFix
+  for (GeomAPI_WireExplorer aWExp(theBaseWire->wire()); aWExp.more(); aWExp.next()) {
+    GeomShapePtr aCurrent = aWExp.current();
+    GeomAlgoAPI_Copy aCopy(aCurrent);
+    myModified[aCurrent].push_back(aCopy.shape());
+  }
 
   GeomAlgoAPI_MapShapesAndAncestors aMapVE(theBaseWire, GeomAPI_Shape::VERTEX,
                                                         GeomAPI_Shape::EDGE);

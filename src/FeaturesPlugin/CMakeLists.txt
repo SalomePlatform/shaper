@@ -670,8 +670,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillet1D_Vertices_6.py
                TestFillet1D_Vertices_7.py
                TestFillet1D_Vertices_8.py
+               TestFillet1D_Vertices_9.py
                TestFillet1D_Wire_1.py
                TestFillet1D_Wire_2.py
                TestFillet1D_Wire_3.py
                TestFillet1D_Wire_4.py
+               TestFillet1D_Wire_5.py
 )

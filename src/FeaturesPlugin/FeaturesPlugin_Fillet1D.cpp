@@ -47,24 +47,25 @@ void FeaturesPlugin_Fillet1D::initAttributes()
 
 void FeaturesPlugin_Fillet1D::execute()
 {
-  MapShapeSubs aWireVertices;
-  if (!baseShapes(aWireVertices))
+  ListOfShape aWires;
+  MapShapeSubs aVertices;
+  if (!baseShapes(aWires, aVertices))
     return;
 
   int aResultIndex = 0;
-  for (MapShapeSubs::iterator anIt = aWireVertices.begin(); anIt != aWireVertices.end(); ++anIt)
-    if (!performFillet(anIt->first, anIt->second, aResultIndex++))
+  for (ListOfShape::iterator anIt = aWires.begin(); anIt != aWires.end(); ++anIt)
+    if (!performFillet(*anIt, aVertices[*anIt], aResultIndex++))
       break;
   removeResults(aResultIndex);
 }
 
-bool FeaturesPlugin_Fillet1D::baseShapes(MapShapeSubs& theWireVertices)
+bool FeaturesPlugin_Fillet1D::baseShapes(ListOfShape& theWires, MapShapeSubs& theWireVertices)
 {
+  std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aProcessedWires;
   std::string aMethod = string(CREATION_METHOD())->value();
   if (aMethod == CREATION_BY_WIRES()) {
     AttributeSelectionListPtr aSelList = selectionList(WIRE_LIST_ID());
 
-    std::set<GeomShapePtr> aProcessedWires;
     int aNbSel = aSelList->size();
     for (int ind = 0; ind < aNbSel; ++ind) {
       AttributeSelectionPtr aCurSel = aSelList->value(ind);
@@ -106,7 +107,8 @@ bool FeaturesPlugin_Fillet1D::baseShapes(MapShapeSubs& theWireVertices)
       }
 
 
-      // keep the sequence of fillet vertices stable
+      // keep the sequence of wires and fillet vertices stable
+      theWires.push_back(aWire);
       for (GeomAPI_WireExplorer anExp(aWire->wire()); anExp.more(); anExp.next()) {
         GeomShapePtr aVertex = anExp.currentVertex();
         if (aFilletVertices.find(aVertex) != aFilletVertices.end())
@@ -121,6 +123,13 @@ bool FeaturesPlugin_Fillet1D::baseShapes(MapShapeSubs& theWireVertices)
       AttributeSelectionPtr aCurSel = aSelList->value(ind);
       GeomShapePtr aWire = aCurSel->context()->shape();
       GeomShapePtr aVertex = aCurSel->value();
+
+      // keep the sequence of wires stable
+      if (aProcessedWires.find(aWire) == aProcessedWires.end()) {
+        theWires.push_back(aWire);
+        aProcessedWires.insert(aWire);
+      }
+
       theWireVertices[aWire].push_back(aVertex);
     }
   }

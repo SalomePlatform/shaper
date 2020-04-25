@@ -46,7 +46,7 @@ model.testNbSubShapes(Fillet1D_1, GeomAPI_Shape.VERTEX, [12])
 model.testResultsVolumes(Fillet1D_1, [0])
 
 ### Create Fillet1D
-Fillet1D_2 = model.addFillet(Part_1_doc, [model.selection("VERTEX", "[Wire_1_1/Edge_4]e[Wire_1_1/Edge_3]e")], 3)
+Fillet1D_2 = model.addFillet(Part_1_doc, [model.selection("VERTEX", "[Fillet1D_1_1/ME:Fillet1D&Wire_1_1/Edge_4]e[Fillet1D_1_1/ME:Fillet1D&Wire_1_1/Edge_3]e")], 3)
 
 model.testHaveNamingByType(Fillet1D_2, model, Part_1_doc, GeomAPI_Shape.VERTEX)
 model.testHaveNamingByType(Fillet1D_2, model, Part_1_doc, GeomAPI_Shape.EDGE)
