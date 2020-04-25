@@ -129,8 +129,6 @@ void SketchAPI_ConstraintAngle::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
 
   const std::string& aSketchName = theDumper.parentName(aBase);
-  //theDumper << aBase << " = " << aSketchName << "." << "setAngle(";
-  theDumper.name(aBase, false, true, true);
   theDumper << aSketchName << "." << "setAngle(";
 
   bool isFirstAttr = true;

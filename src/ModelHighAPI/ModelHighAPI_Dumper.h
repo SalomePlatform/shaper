@@ -243,6 +243,9 @@ public:
   ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
                                 std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&));
 
+  /// Print std::endl from Python
+  MODELHIGHAPI_EXPORT void newline();
+
   /// Dump GeomAPI_Pnt in the following form:
   /// "GeomAPI_Pnt(X, Y, Z)"
   MODELHIGHAPI_EXPORT

@@ -1254,7 +1254,6 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
-  *myDumpStorage << "\n### Create "<< theEntity->getKind() << "\n";
   *myDumpStorage << name(theEntity);
 
   if (!myNames[theEntity].myIsDumped) {
@@ -1454,10 +1453,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList)
 {
   static const int aThreshold = 2;
-  static bool aDumpAsIs = false;
+  static int aNbSpaces = 0;
   // if number of elements in the list if greater than a threshold,
   // dump it in a separate line with specific name
-  if (aDumpAsIs || theAttrSelList->size() <= aThreshold) {
+  if (aNbSpaces > 0 || theAttrSelList->size() <= aThreshold) {
     *myDumpStorage << "[";
 
     GeomShapePtr aShape;
@@ -1480,6 +1479,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
       if(isAdded) {
         *myDumpStorage << ", ";
+        // print each attribute on separate line with the appropriate shift
+        if (aNbSpaces > 0) {
+          std::string aSpaces(aNbSpaces + 1, ' ');
+          *myDumpStorage << "\n" << aSpaces;
+        }
       } else {
         isAdded = true;
       }
@@ -1513,9 +1517,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     }
     // reserve dumped buffer and store list "as is"
     myDumpStorage->reserveBuffer();
-    aDumpAsIs = true;
+    aNbSpaces = (int)aListName.size() + 3;
     *this << aListName << " = " << theAttrSelList << "\n";
-    aDumpAsIs = false;
+    aNbSpaces = 0;
     // append reserved data to the end of the current buffer
     myDumpStorage->restoreReservedBuffer();
     *myDumpStorage << aListName;
@@ -1538,6 +1542,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
   myDumpStorage->write(aBuffer.str());
   return *this;
+}
+
+void ModelHighAPI_Dumper::newline()
+{
+  *this << std::endl;
 }
 
 /// Dump std::endl
