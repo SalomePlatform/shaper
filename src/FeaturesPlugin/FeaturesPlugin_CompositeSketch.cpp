@@ -282,9 +282,30 @@ void storeSubShape(
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
     if (!theResultBody->generated(aSubShape, theName)) {
-      // store from/to shapes as primitives and then store modification of them by the boolean
-      theResultBody->generated(aSubShape, theName, false);
-      theResultBody->loadModifiedShapes(theMakeShape, aSubShape, theType);
+      int aNbSubs = theResultBody->numberOfSubs();
+      if (aNbSubs > 0) {
+        // check the modified shape is in the result body, don't store it if not
+        ListOfShape aNewShapes;
+        theMakeShape->modified(aSubShape, aNewShapes);
+        for (int i = 0; i < aNbSubs; ++i) {
+          ResultBodyPtr aSubRes = theResultBody->subResult(i);
+          GeomShapePtr aShape = aSubRes->shape();
+          ListOfShape::iterator aNewIt = aNewShapes.begin();
+          for (; aNewIt != aNewShapes.end(); ++aNewIt)
+            if (aShape->isSubShape(*aNewIt, false))
+              break;
+          if (aNewIt != aNewShapes.end()) {
+            // store from/to shapes as primitives and then store modification of them by the boolean
+            aSubRes->generated(aSubShape, theName, false);
+            aSubRes->loadModifiedShapes(theMakeShape, aSubShape, theType);
+          }
+        }
+      }
+      else {
+        // store from/to shapes as primitives and then store modification of them by the boolean
+        theResultBody->generated(aSubShape, theName, false);
+        theResultBody->loadModifiedShapes(theMakeShape, aSubShape, theType);
+      }
     }
   }
 }

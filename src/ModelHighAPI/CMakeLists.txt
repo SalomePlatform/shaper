@@ -123,4 +123,5 @@ ADD_UNIT_TESTS(
   TestUndoRedo.py
   Test2488.py
   Test18451.py
+  Test19031.py
 )

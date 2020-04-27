@@ -154,13 +154,19 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
 
   gp_Pnt2d aCenterPoint = anAng->center()->impl<gp_Pnt2d>();
   gp_Pnt2d aFirstPoint, aSecondPoint;
-  if (anAng->angleRadian() > 0.0) {
-    aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
-    aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+  try {
+    if (anAng->angleRadian() > 0.0) {
+      aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+      aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+    }
+    else {
+      aFirstPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+      aSecondPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+    }
   }
-  else {
-    aFirstPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
-    aSecondPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+  catch (...) {
+    // one of angle lines is degenerated, the presentation cannot be shown
+    return false;
   }
 
   if (aData->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value() ==
