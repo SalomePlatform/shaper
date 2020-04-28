@@ -49,7 +49,9 @@ model.do()
 aSession.setActiveDocument(Part_1_doc, False)
 model.end()
 
+import math
+TOLERANCE = 1.e-7
 # check the circle radius value
-assert(SketchCircle_1.radius().value() == 64.9545)
+assert(math.fabs(SketchCircle_1.radius().value() - 64.95456276) < TOLERANCE)
 
 assert(model.checkPythonDump())
