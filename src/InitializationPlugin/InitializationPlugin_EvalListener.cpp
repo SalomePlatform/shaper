@@ -49,12 +49,11 @@
 std::string toStdString(double theValue)
 {
   std::ostringstream sstream;
-  sstream << theValue;
-  size_t aPos = sstream.str().find(".");
-  std::string aPnt = "";
-  if (aPos == std::string::npos)
-    aPnt = ".";
-  return sstream.str() + aPnt;
+  // write value in scientific format with 16 digits,
+  // thus, not check the dot position
+  sstream.precision(16);
+  sstream << std::scientific << theValue;
+  return sstream.str();
 }
 
 std::set<std::string> toSet(const std::list<std::string>& theContainer)
