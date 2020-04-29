@@ -243,6 +243,9 @@ bool Selector_Modify::restore()
 TDF_Label Selector_Modify::restoreByName(std::string theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
+  typedef NCollection_DataMap<TopoDS_Shape, bool, TopTools_ShapeMapHasher> MapOfCompsolids;
+  MapOfCompsolids aWrongSubsCompsolids;
+
   TDF_Label aContext;
   for(size_t anEnd, aStart = 0; aStart != std::string::npos; aStart = anEnd) {
     if (aStart != 0)
@@ -258,14 +261,39 @@ TDF_Label Selector_Modify::restoreByName(std::string theName,
     TDF_Label aSubContext, aValue;
     if (!theNameGenerator->restoreContext(aSubStr, aSubContext, aValue))
       return TDF_Label(); // can not restore
-    if(aSubContext.IsNull() || aValue.IsNull())
+    if (aSubContext.IsNull() || (aValue.IsNull() && theShapeType <= TopAbs_SHELL))
       return TDF_Label(); // can not restore
     if (myFinal.IsNull()) {
       myFinal = aValue;
       aContext = aSubContext;
-    } else
-      myBases.Append(aValue);
+    } else {
+      // This could be a solid in a compsolid, which was not modified by the previous operation,
+      // however, the selected subshape is stored on its sub-label by mistake. Thus, wait until
+      // the end of processing to check whether the subshape is found in another solid.
+      TDF_Label aParent = aSubContext.Father().Father();
+      Handle(TNaming_NamedShape) aNS;
+      if (aParent.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        TopoDS_Shape aShape = aNS->Get();
+        if (aShape.ShapeType() == TopAbs_COMPSOLID) {
+          if (aWrongSubsCompsolids.IsBound(aShape)) {
+            if (!aValue.IsNull())
+              aWrongSubsCompsolids.Bind(aShape, true);
+          } else
+            aWrongSubsCompsolids.Bind(aShape, !aValue.IsNull());
+        }
+      } else if (aValue.IsNull())
+        return TDF_Label();
+
+      if (!aValue.IsNull())
+        myBases.Append(aValue);
+    }
   }
+
+  // check all compsolids are processed and names are resolved
+  for (MapOfCompsolids::Iterator anIt(aWrongSubsCompsolids); anIt.More(); anIt.Next())
+    if (!anIt.Value())
+      return TDF_Label();
+
   return aContext;
 }
 
