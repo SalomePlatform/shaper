@@ -8,4 +8,4 @@ Scale by one common factor
     :linenos:
     :language: python
 
-:download:`Download this script <examples/scalefactor.py  >` 
+:download:`Download this script <examples/scalefactor.py>`

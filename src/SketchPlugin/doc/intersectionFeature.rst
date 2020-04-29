@@ -1,4 +1,4 @@
-.. |intersection.icon|    image:: images/intersection.png
+.. |intersection.icon|    image:: images/Intersection.png
 
 Intersection
 ============

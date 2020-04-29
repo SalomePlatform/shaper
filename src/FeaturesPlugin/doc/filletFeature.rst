@@ -14,13 +14,19 @@ To create a Fillet in the active part:
 
 There are 2 types of fillet:
 
-  .. image:: images/fillet_fixed_radius.png   
-    :align: left
-  fillet by fixed radius
+.. image:: images/fillet_fixed_radius.png   
+   :align: left
+   :height: 24px
 
-  .. image:: images/fillet_var_radius.png   
-    :align: left
-  fillet by variable radius
+fillet by fixed radius
+
+.. image:: images/fillet_var_radius.png   
+   :align: left
+   :height: 24px
+
+fillet by variable radius
+
+--------------------------------------------------------------------------------
 
 Fillet by fixed radius
 ----------------------

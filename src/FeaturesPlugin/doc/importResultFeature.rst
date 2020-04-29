@@ -1,7 +1,7 @@
 .. |import_result_btn.icon|    image:: images/import_result_btn.png
 
 Import Result
-=====
+=============
 
 The Import Result feature allows the user to import one or several results from another Part. If the result of the source-part is
 changed, the part and part result that contains the copy-results will be updated. The feature keeps the

@@ -1,5 +1,5 @@
 .. _sketchLine:
-.. |line.icon|    image:: images/line.png
+.. |line.icon|    image:: images/Line.png
 
 Line
 ====

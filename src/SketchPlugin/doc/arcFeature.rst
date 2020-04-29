@@ -14,19 +14,29 @@ There are 4 algorithms for creation of an Arc:
 
 .. image:: images/arc_base_32x32.png
    :align: left
+   :height: 24px
+
 **By center and two points** creates an arc segment with the given center passing from the start point to the end point on the circle.
 
 .. image:: images/arc_3pt_32x32.png
    :align: left
+   :height: 24px
+
 **By three points** creates an arc segment passing from the start point to end point through another point on the circle.
 
 .. image:: images/arc_tang_32x32.png
    :align: left
+   :height: 24px
+
 **By tangent point and end point** creates an arc segment with the tangent point and the end point.
 
 .. image:: images/arc_perp_32x32.png
    :align: left
+   :height: 24px
+
 **By point on perpendicular line and end point** creates an arc segment perpendicular to a straight line with the start point, connected with boundary of this line, and the end point.
+
+-------------------------------------------------------------------------------------------
 
 By center and two points
 """"""""""""""""""""""""

@@ -1,8 +1,9 @@
 .. _create_sketch_rectangle:
-.. |rectangle.icon|    image:: images/rectangle.png
 
 Rectangle
 =========
+
+.. |rectangle.icon|    image:: images/Rectangle.png
 
 Rectangle feature creates a rectangle by two opposite points in the current Sketch.
 

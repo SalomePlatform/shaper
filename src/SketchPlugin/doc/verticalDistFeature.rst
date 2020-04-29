@@ -17,23 +17,19 @@ Property panel:
 .. image:: images/VerticalDistance_panel.png
    :align: center
 
+.. |location_left| image:: images/location_left.png
+.. |location_auto| image:: images/location_automatic.png
+.. |location_right| image:: images/location_right.png
+
 Input fields:
 
 - **First point** is the first point selected in the view;
 - **Second point** is the second point selected in the view:
 - **Value** is a distance between the objects, can be modified to set the desirable value;
 - **Text location** is a position of the distance value label relating to extension line (in the view):
-   .. image:: images/location_left.png
-      :align: left
-   **Left** inserts text to the left of the distance extension line:
-
-   .. image:: images/location_automatic.png
-      :align: left
-   **Automatic** inserts text in the middle of the distance extension line if it has enough length, otherwise - to the left
-
-   .. image:: images/location_right.png
-      :align: left
-   **Right** inserts text to the right of the distance extension line.
+   | |location_left| **Left** inserts text to the left of the distance extension line:
+   | |location_auto| **Automatic** inserts text in the middle of the distance extension line if it has enough length, otherwise - to the left
+   | |location_right| **Right** inserts text to the right of the distance extension line.
 
 When both objects are selected, the vertical distance value is displayed in the property panel and in the view.
 

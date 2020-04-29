@@ -8,5 +8,4 @@ Create Sub-shapes
     :linenos:
     :language: python
 
-:download:`Download this script <examples/subshapes.py >` 
-   
+:download:`Download this script <examples/subshapes.py>`

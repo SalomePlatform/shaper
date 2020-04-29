@@ -22,19 +22,26 @@ There are three variants of the property panel for Revolution Cut depending on t
 
 .. image:: images/revolution_by_angles.png
    :align: left
+   :height: 24px
+
 **By Angles** revolves objects by specifying angles.
 
 .. image:: images/revolution_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
 .. image:: images/revolution_through_all.png
    :align: left
+   :height: 24px
+
 **Through All** revolves objects by 360 degrees.
 
+--------------------------------------------------------------------------------
 
 By angles
---------
+---------
 
 .. image:: images/RevolutionCut1.png
   :align: center
@@ -127,7 +134,7 @@ The Result of the operation will be a revolved shape:
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_bounding_planes` operation.
 
 Through all
---------
+-----------
 
 .. image:: images/RevolutionCut3.png
   :align: center

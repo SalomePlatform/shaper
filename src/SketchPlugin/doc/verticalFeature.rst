@@ -1,4 +1,4 @@
-.. |vertical.icon|    image:: images/vertical.png
+.. |vertical.icon|    image:: images/Vertical.png
 
 Vertical constraint
 ===================

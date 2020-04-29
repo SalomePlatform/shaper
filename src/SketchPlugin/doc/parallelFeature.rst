@@ -1,4 +1,4 @@
-.. |parallel.icon|    image:: images/parallel.png
+.. |parallel.icon|    image:: images/Parallel.png
 
 Parallel constraint
 ===================

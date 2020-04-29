@@ -1,4 +1,5 @@
 .. |bool_smash.icon|    image:: images/bool_smash.png
+   :height: 16px
 
 Smash
 =====

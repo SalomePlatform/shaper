@@ -8,5 +8,4 @@ Translation by axis and distance
     :linenos:
     :language: python
 
-:download:`Download this script <examples/translationvector.py  >` 
-   
+:download:`Download this script <examples/translationvector.py>`

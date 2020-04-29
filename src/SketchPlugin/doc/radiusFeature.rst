@@ -14,23 +14,18 @@ Property panel:
 
 .. image:: images/Radius_panel.png
    :align: center
+.. |loc_left| image:: images/location_left.png
+.. |loc_auto| image:: images/location_automatic.png
+.. |loc_right| image:: images/location_right.png
 
 Input fields:
 
 - **Circle or Arc** is the circle or arc selected in the view; 
 - **Value** is a radius of the selected object, could be modified to set the desirable value
 - **Text location** is a position of the radius value label relating to extension line (in the view)
-   .. image:: images/location_left.png
-      :align: left
-   **Left** inserts text at the left of the radius extension line.
-
-   .. image:: images/location_automatic.png
-      :align: left
-   **Automatic** inserts text at the middle of the radius extension line if it has enough length, otherwise - to the left.
-
-   .. image:: images/location_right.png
-      :align: left
-   **Right** inserts text to the right of the radius extension line.
+   | |loc_left| **Left** inserts text at the left of the radius extension line.
+   | |loc_auto| **Automatic** inserts text at the middle of the radius extension line if it has enough length, otherwise - to the left.
+   | |loc_right| **Right** inserts text to the right of the radius extension line.
 
 When circle or arc is selected, the radius value is displayed in the property panel and in the view.
 

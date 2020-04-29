@@ -14,12 +14,17 @@ The feature has the following options:
 
 .. image:: images/recover_default_32x32.png
    :align: left
+   :height: 24px
+
 restore only the objects used in the operation
 
 .. image:: images/recover_compound_32x32.png
    :align: left
+   :height: 24px
+
 restore full compound/compsolid if the operation used one or more of its sub-shapes
 
+--------------------------------------------------------------------------------
 
 Recover objects
 ---------------

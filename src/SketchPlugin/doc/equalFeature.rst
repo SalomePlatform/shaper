@@ -1,5 +1,5 @@
 .. _sketchEqual:
-.. |equal.icon|    image:: images/equal.png
+.. |equal.icon|    image:: images/Equal.png
 
 Equal constraint
 ================

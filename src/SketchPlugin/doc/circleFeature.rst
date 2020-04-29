@@ -14,11 +14,17 @@ There are 2 algorithms for creation of a Circle:
 
 .. image:: images/circle_pt_rad_32x32.png
    :align: left
+   :height: 24px
+
 **By center and passed point** creates a circle with the given center passing through the given point.
 
 .. image:: images/circle_3pt_32x32.png
    :align: left
+   :height: 24px
+
 **By three points** creates a circle passing through the given three points.
+
+-------------------------------------------------------------------------------------------
 
 By center and passed point
 """"""""""""""""""""""""""

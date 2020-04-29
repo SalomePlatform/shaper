@@ -1,4 +1,4 @@
-.. |split.icon|    image:: images/split.png
+.. |split.icon|    image:: images/Split.png
 
 Split
 =====

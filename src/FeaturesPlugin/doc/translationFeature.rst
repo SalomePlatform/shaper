@@ -1,5 +1,6 @@
 .. _featureTranslation:
 .. |translation_vector_32x32.icon|    image:: images/translation_vector_32x32.png
+   :height: 16px
 
 Translation
 ===========
@@ -13,17 +14,25 @@ To create a Translation in the active part:
 
 The Vector of translation can be defined in three different ways:
 
-  .. image:: images/translation_vector_32x32.png    
-    :align: left
-  by by axis and distance
+.. image:: images/translation_vector_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/translation_dxyz_32x32.png      
-    :align: left
-  by vector 
+by by axis and distance
 
-  .. image:: images/translation_2pt_32x32.png    
-    :align: left
-  by two points
+.. image:: images/translation_dxyz_32x32.png      
+   :align: left
+   :height: 24px
+
+by vector 
+
+.. image:: images/translation_2pt_32x32.png    
+   :align: left
+   :height: 24px
+
+by two points
+
+--------------------------------------------------------------------------------
 
 Translation by axis and distance
 --------------------------------

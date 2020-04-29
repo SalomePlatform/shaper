@@ -1,7 +1,6 @@
 
 .. _introduction:
 
-
 Introduction to SHAPER
 ======================
 
@@ -38,12 +37,10 @@ A new study contains only a partset with 7 default constructions, which cannot b
 
 Only  points, axis, planes (see  :ref:`constructionPlugin`) and sketches (see  :ref:`sketchPlugin`) can be added into Partset to be used in any part later.
 :ref:`parameter_usage` can be used both in Partset and any Part.
-
-     
+    
 A new Part can be created as described in :ref:`partPlugin`.
 
 Double click or pop-up menu can be used to activate existing document.
-
 
 Application desktop
 -------------------
@@ -56,12 +53,10 @@ The main window of the application consists of the following components:
 - :ref:`toolbar`;    
 - status bar.    
 
-.. image:: images/main_window.png
+.. figure:: images/main_window.png
    :align: center
 
-.. centered::
    Main window of SHAPER module
-
   
 .. _main_menu:
 
@@ -70,10 +65,9 @@ Main menu
 
 Main menu provides access to all commands of the application.
 
-.. image:: images/main_menu.png
+.. figure:: images/main_menu.png
    :align: center
 
-.. centered::
    Main menu
 
 Main menu includes standard Salome items:
@@ -107,10 +101,9 @@ Application toolbar contains:
 - modules toolbar;
 - SHAPER toolbar.
 
-.. image:: images/toolbar.png
+.. figure:: images/toolbar.png
    :align: center
 
-.. centered::
    Toolbars
   
 SHAPER toolbar duplicates the main menu and  provides access to all commands of the application.
@@ -132,8 +125,7 @@ SHAPER toolbar is separated into sections:
 - Macros.  
 
 Visibility of SHAPER toolbar sections is managed using *View -> Toolbar* :ref:`main_menu` item or toolbar pop-up menu.
-   
-  
+
 .. _doc_windows:
 
 Dock windows
@@ -163,12 +155,10 @@ If Object browser is shown at the same side then they will be tabbed.
 
 Each dock window can be closed using **Cross** window button and opened again using a corresponding command from *View - Windows* :ref:`main_menu` or alternatively using pop-up menu.
 
-.. image:: images/popup_menu.png
+.. figure:: images/popup_menu.png
    :align: center
 
-.. centered::
    Pop-up menu for visibility of windows and toolbars
-
 
 .. _object_browser: 
 
@@ -181,12 +171,10 @@ Each document includes standard branches where created objects are placed.
 
 Documents with branches are shown in Tree View.
 
-.. image:: images/object_browser.png
+.. figure:: images/object_browser.png
    :align: center
 
-.. centered::
-   Object browser. Partset active
-
+   **Object browser**: Partset active
 
 Partset includes three branches:
 
@@ -224,33 +212,29 @@ This child result can be restored using **Recover** feature.
 
 Each feature, result, construction, group, field, parameter can be renamed using *Rename* pop-up menu command.
 
-.. image:: images/popup_menu_object_browser_feature.png
+.. figure:: images/popup_menu_object_browser_feature.png
    :align: center
 
-.. centered::
-   Feature pop-up menu
+   **Feature** pop-up menu
 
-.. image:: images/popup_menu_object_browser_result.png
+.. figure:: images/popup_menu_object_browser_result.png
    :align: center
 
-.. centered::
-    Result pop-up menu
+   **Result** pop-up menu
 
-.. image:: images/popup_menu_object_browser_construction.png
+.. figure:: images/popup_menu_object_browser_construction.png
    :align: center
 
-.. centered::
-   Construction pop-up menu
+   **Construction** pop-up menu
 
 The order of features can be changed using *Move to the end* and *Move to the end and split* pop-up menu commands. They work only for Group features. The selected group or several groups will be moved to the end of features list. The *Move to the end and split* also splits the resulting group in several groups: one group per one selection.
 
 Folders can be used to arrange long Tree View for features.
 
-.. image:: images/object_browser_folder.png
+.. figure:: images/object_browser_folder.png
    :align: center
 
-.. centered::
-   Object browser with folder Dome. Part_1 active
+   **Object browser** with folder Dome: Part_1 active
 
 *Insert a folder before* pop-up menu command creates a new empty folder before the selected feature. The folder can be renamed.
 
@@ -264,15 +248,12 @@ Features can be removed from the folder using *Move out before the folder* / *Mo
 
 **Clean history** dialog box shows a list of unused features. After confirmation by click **Yes** button unused features are removed.
 
-.. image:: images/clean_history.png
+.. figure:: images/clean_history.png
    :align: center
 
-.. centered::
    **Clean history** dialog box
 
-
 *Select result* and *Select parent feature* pop-up menu commands help to navigate along Tree View.
-
 
 A feature and its result can be deleted using *Delete* pop-up menu command.
 
@@ -280,11 +261,9 @@ Note that all features using the removed feature and their results will be remov
 
 **Delete feature** dialog box shows the list of features to be removed. After confirmation by click **Yes** button all these features are removed.
 
-
-.. image:: images/delete_feature.png
+.. figure:: images/delete_feature.png
    :align: center
 
-.. centered::
    **Delete feature** dialog box
    
 .. _property_panel:
@@ -292,34 +271,25 @@ Note that all features using the removed feature and their results will be remov
 Property panel
 ^^^^^^^^^^^^^^
 
+.. |ok_btn| image:: images/button_ok.png
+.. |cancel_btn| image:: images/button_cancel.png
+.. |help_btn| image:: images/button_help.png
+
 Property panel consists of two parts:
 
 - controls a container for input of parameters for the current operation;
 - buttons panel containing standard buttons:
  
-  .. image:: images/button_ok.png
-    :align: left
-  **Ok/Apply** executes operation with defined parameters,
+   | |ok_btn| **Ok/Apply** executes operation with defined parameters,
+   | |cancel_btn| **Cancel/Close** calls **Abort operation** dialog box to confirm  operation abort, 
+   | |help_btn| **Help** calls User's guide opened on page describing the current operation.
 
+   .. figure:: images/abort_operation.png
+      :align: center
+     
+      **Abort operation** dialog box
 
-  .. image:: images/button_cancel.png
-   :align: left
-  **Cancel/Close** calls **Abort operation** dialog box to confirm  operation abort, 
-
-  .. image:: images/button_help.png
-   :align: left
-  **Help** calls User's guide opened on page describing the current operation.
-
-.. image:: images/abort_operation.png
-   :align: center
-
-.. centered::
-   **Abort operation** dialog box
-
-
-.. image:: images/button_ok.png
-    :align: left
-**OK/Apply**  button is disabled if not all input parameters are defined or some errors are found. Error is shown as tooltip and in status bar.
+|ok_btn| **OK/Apply**  button is disabled if not all input parameters are defined or some errors are found. Error is shown as tooltip and in status bar.
 
 .. _inspection_panel: 
 
@@ -328,11 +298,10 @@ Inspection panel
 
 Inspection panel provides the list of types and quantities of all topological entities, composing the selected result, construction or feature.
 
-.. image:: images/inspection_panel.png
+.. figure:: images/inspection_panel.png
    :align: center
 
-.. centered::
-   Inspection panel for default Box
+   **Inspection panel** for default Box
 
 **Object** displays name of the selected result, construction  or feature.
 
@@ -340,20 +309,17 @@ Inspection panel provides the list of types and quantities of all topological en
    
 The information about Point, Axis or Edge  additionally shows coordinates of point / end points.
 
-.. image:: images/inspection_panel_line.png
+.. figure:: images/inspection_panel_line.png
    :align: center
 
-.. centered::
-   Inspection panel for Axis
+   **Inspection panel** for Axis
    
-
 The information about  Plane, Face additionally shows coordinates of center point and direction of normal.
 
-.. image:: images/inspection_panel_face.png
+.. figure:: images/inspection_panel_face.png
    :align: center
 
-.. centered::
-   Inspection panel for Face 
+   **Inspection panel** for Face 
 
 .. _hidefaces_panel:
 
@@ -362,11 +328,10 @@ Hide Faces panel
 
 **Hide Faces** panel makes possible to hide temporary faces of any displayed object. **Hide Faces** panel looks like following:
 
-.. image:: images/hide_faces_panel.png
+.. figure:: images/hide_faces_panel.png
    :align: center
 
-.. centered::
-   Hide Faces panel
+   **Hide Faces** panel
 
 - If this panel is activated it "listens" user selection.
 - If a face is selected then its name will be shown in the panel's list and hidden in the viewer. 
@@ -375,7 +340,6 @@ Hide Faces panel
 
 Also it is possible do not to hide faces, but make them transparent. For this purpose **"Transparent"** check-box can be used. Value of the transparency can be changed in **Visualization** tab of **Preferences** dialog box.
 Closing of **Hide Faces** panel restores visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then user has to press **"Esc"** button.
-
 
 .. _python console:
 
@@ -396,11 +360,9 @@ Pop-up menu gives the possibility to:
 - Dump commands from console into the specified file;
 - Start/Stop writing log into the specified file.    
  
-
-.. image:: images/python_console_popup.png
+.. figure:: images/python_console_popup.png
    :align: center
 
-.. centered::
    Pop-up menu of Python console
 
 .. _viewer:
@@ -416,15 +378,12 @@ Each view windows shows its own point of view on the 3D scene.
 
 This point of view can be modified using viewer commands: **Panning**, **Zooming**, **Scaling**, etc.
 
-
-.. image:: images/2_viewers.png
+.. figure:: images/2_viewers.png
    :align: center
 
-.. centered::
    Two view windows
 
 The description of OCC 3D Viewer architecture and functionality is provided in GUI module user's guide in chapter **OCC 3D Viewer**.
-
 
 .. _parameter_usage:
 
@@ -443,10 +402,9 @@ Any argument in features can be defined as parameter or expression containing pa
 
 The list of features using parameters is given in **Parameters** dialog box:
 
- .. image:: images/parameters_feature.png
+ .. figure:: images/parameters_feature.png
    :align: center
 
-.. centered::
    Parameters dialog box
   
 If a parameter value is changed, then all features where it is used are rebuilt.
@@ -457,10 +415,9 @@ However, partset and part can have parameters with the same name. If parameter n
 
 In contrast to features (see :ref:`object_browser`), there is an additional option when parameters are deleted.   
 
-.. image:: images/delete_parameter.png
+.. figure:: images/delete_parameter.png
    :align: center
 
-.. centered::
    Delete parameter
 
 After clicking **Replace** button, the selected parameter is removed but its parent parameters and features are not removed. The deleted parameter is replaced by its value.
@@ -508,11 +465,10 @@ Visualization tab
 
 This tab defines presentation of objects displayed in OCC 3D viewer.
 
-.. image:: images/visualization_preferences.png
+.. figure:: images/visualization_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Visualization tab
+   **Preferences**: Visualization tab
 
 **Input fields**:
 
@@ -543,11 +499,10 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
   
 To redefine any color click on the corresponding line to access **Select color** dialog box
 
-.. image:: images/select_color.png
+.. figure:: images/select_color.png
    :align: center
 
-.. centered::
-   **Select color** dialog box
+   **Preferences**: **Select color** dialog box
    
 Preferences for sketch are applicable  during sketch creation/edition operation.
    
@@ -557,11 +512,10 @@ Plugins tab
 ^^^^^^^^^^^
 Plugins tab defines folders where plugins and resources are located.
 
-.. image:: images/plugins_preferences.png
+.. figure:: images/plugins_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Plugins tab
+   **Preferences**: Plugins tab
 
 **Input fields**:
 
@@ -569,16 +523,14 @@ Plugins tab defines folders where plugins and resources are located.
 
 - **Import initial directory** selects default folder where resources are located. Click on **Open** button opens standard **Find directory** dialog box to navigate to desired folder.
 
-.. image:: images/open_button.png
+.. figure:: images/open_button.png
    :align: center
 
-.. centered::
    **Open** button
 
-.. image:: images/find_directory.png
+.. figure:: images/find_directory.png
    :align: center
 
-.. centered::
    **Find directory** dialog box
     
    
@@ -589,11 +541,10 @@ Shortcuts tab
 
 Shortcuts tab defines shortcut keys for different operations.
 
-.. image:: images/shortcuts_preferences.png
+.. figure:: images/shortcuts_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Shortcuts tab
+   **Preferences**: Shortcuts tab
    
 - **Add parameter in parameters manager dialog** defines shortcut keys for adding parameter in parameters manager dialog box.
    
@@ -604,11 +555,10 @@ Windows tab
 
 Windows tab contains definitions for the module windows management.
 
-.. image:: images/windows_preferences.png
+.. figure:: images/windows_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Windows tab
+   **Preferences**: Windows tab
 
 - **Use HideFaces panel in operation** if the checkbox is checked then HideFaces panel will be launched automatically on launching an operation where using of this panel is considered.
 
@@ -619,11 +569,10 @@ Sketch tab
 
 Sketch tab defines properties of coordinate planes shown for selection of sketch plane when no convenient objects are shown in OCC 3D viewer.
 
-.. image:: images/sketch_preferences.png
+.. figure:: images/sketch_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Sketch tab
+   **Preferences**: Sketch tab
 
 **Input fields**:
 
@@ -634,7 +583,6 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 - **Default spline weight** defines default weight for B-spline nodes during creation. The default value can be changed by editing of the spline;
 - **Cursor for sketch operation** defines a cursor which indicates a launched sketcher sub-operation.
 - **Create sketch entities by dragging** defines a style of sketch etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects have to be defined by mouse press - mouse move - mouse release. Otherwise every point of an object has to be defined by mouse click;
-
    
 .. _viewer_preferences:
    
@@ -643,11 +591,10 @@ Viewer tab
 
 Viewer tab defines selection in OCC 3D viewer properties. 
 
-.. image:: images/viewer_preferences.png
+.. figure:: images/viewer_preferences.png
    :align: center
 
-.. centered::
-   Preferences - Viewer tab   
+   **Preferences**: Viewer tab   
 
 **Input fields**:
 
@@ -662,7 +609,6 @@ Viewer tab defines selection in OCC 3D viewer properties.
   - **Vertex** defines selection  sensitivity for vertices; 
   - **Edge**  defines selection  sensitivity for edges.  
 
-
 .. _toolbars_management:
 
 Toolbars management
@@ -675,10 +621,9 @@ Toolbars management
 To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item. 
 The following dialog box with existing toolbars appears:
 
-.. image:: images/Toolbars.png
+.. figure:: images/Toolbars.png
    :align: center
 
-.. centered::
    **Toolbars** dialog box
 
 **Input fields**:
@@ -691,12 +636,10 @@ The following dialog box with existing toolbars appears:
 - **OK** button closes the dialog box, stores result of tool bars edition and updates Shaper tool bars;
 - **Cancel** button closes the dialog box without modification of tool bars.
 
-.. image:: images/delete_toolbar.png
+.. figure:: images/delete_toolbar.png
    :align: center
 
-.. centered::
-    Warning dialog box
-
+   Warning dialog box
    
 .. _create_toolbar:
 
@@ -705,22 +648,19 @@ The following dialog box with existing toolbars appears:
 
 **Input fields** of **Create toolbar** dialog box:
 
-.. image:: images/create_toolbar.png
+.. figure:: images/create_toolbar.png
    :align: center
 
-.. centered::
    **Create toolbar** dialog box
 
 - **Name of a new toolbar** defines name of the new tool bar. The name of tool bar has to be unique. If user defines a not unique name then a warning appears and a new tooolbar with not unique name is not created;
 - **Ok** button closes the dialog box and add a new tool bar of the module into  **Toolbars** window;
 - **Cancel** button closes the dialog box without addition of a new tool bar.
 
-.. image:: images/name_toolbar.png
+.. figure:: images/name_toolbar.png
    :align: center
 
-.. centered::
    **Warning** dialog box
-   
 
 .. _edit_toolbar:
 
@@ -729,10 +669,9 @@ The following dialog box with existing toolbars appears:
 
 **Input fields** of **Edit toolbar** dialog box:
 
-.. image:: images/EditToolbar.png
+.. figure:: images/EditToolbar.png
    :align: center
 
-.. centered::
    **Edit toolbar** dialog box
 
 - **Toolbar name** non-editable field displays  name of modified tool bar;
@@ -744,5 +683,3 @@ The following dialog box with existing toolbars appears:
 - **Up** and **Down** buttons  change position of selected command in **In the toolbar** window;
 - **Ok** button closes the dialog box, stores result of edition;
 - **Cancel**  button closes the dialog box without modification of tool bar content.
-
-

@@ -8,5 +8,4 @@ Create Chamfer by a distance and an angle
     :linenos:
     :language: python
 
-:download:`Download this script <examples/chamfer2.py >` 
-   
+:download:`Download this script <examples/chamfer2.py>`

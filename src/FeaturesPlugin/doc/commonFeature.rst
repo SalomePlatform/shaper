@@ -1,4 +1,5 @@
 .. |bool_common.icon|    image:: images/bool_common.png
+   :height: 16px
 
 Common
 ======
@@ -14,12 +15,17 @@ There are 2 options for creation of a Common:
 
 .. image:: images/bool_common_simple.png
    :align: left
+   :height: 24px
+
 **Simple** common part between all selected objects.
 
 .. image:: images/bool_common_advanced.png
    :align: left
+   :height: 24px
+
 **Advanced** common part for each object between this object and all tools.
 
+--------------------------------------------------------------------------------
 
 Simple
 ------

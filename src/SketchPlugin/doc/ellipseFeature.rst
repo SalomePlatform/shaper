@@ -14,11 +14,17 @@ There are 2 algorithms for creation of an Ellipse:
 
 .. image:: images/ellipse_cent_rad_32x32.png
    :align: left
+   :height: 24px
+
 **By center and major semi-axes and passing points** creates an ellipse with the given center passing through given points.
 
 .. image:: images/ellipse_axes_32x32.png
    :align: left
+   :height: 24px
+
 **By major axis and passing point** creates an ellipse passing through the given three points.
+
+-------------------------------------------------------------------------------------------
 
 By center and major semi-axes and passing points
 """"""""""""""""""""""""""""""""""""""""""""""""

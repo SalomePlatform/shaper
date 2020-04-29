@@ -1,4 +1,5 @@
 .. |bool_fuse.icon|    image:: images/bool_fuse.png
+   :height: 16px
 
 Fuse
 ====
@@ -14,12 +15,17 @@ There are 2 options for creation of a Fuse:
 
 .. image:: images/bool_fuse_simple.png
    :align: left
+   :height: 24px
+
 **Simple** simply fuses selected objects.
 
 .. image:: images/bool_fuse_advanced.png
    :align: left
+   :height: 24px
+
 **Advanced** fuse with additional functionality for subshapes of compsolids/compounds.
 
+--------------------------------------------------------------------------------
 
 Simple
 ------

@@ -39,7 +39,7 @@ Each filter item can be deleted with help of |delete.icon| button. A filter can 
 if the filter has arguments.
 
 - **Select** button traverces all objects of a current document and selects entities acceptable by currently defined set of filters. All selected entities will be shown in viewer 3d with
-blue semi-transparent color. Any modification in filters clears current selection.
+  blue semi-transparent color. Any modification in filters clears current selection.
 
 - **Number of selected objects** shows number currently selected entities.
 

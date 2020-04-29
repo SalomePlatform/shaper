@@ -18,6 +18,9 @@ The following dialog box with parameter table appears:
 .. centered::
    Parameters dialog box
 
+.. |param_up| image:: images/parameters_up.png
+.. |param_down| image:: images/parameters_down.png
+
 **Input fields**:
 
 - **Name** defines parameter name. Name follows the naming rules of the python language for variables;
@@ -28,14 +31,9 @@ The following dialog box with parameter table appears:
 - **Insert** button adds a new empty string before the selected parameter;
 - **Delete** button removes the selected parameter from the table;   
 - **Modify parameter position** button moves the selected parameter
-    .. image:: images/parameters_up.png
-      :align: left
-    one string higher in the table,
   
-    .. image:: images/parameters_down.png
-      :align: left
-    one string lower in the table.
-
+    | |param_up| one string higher in the table,
+    | |param_down| one string lower in the table.
   
 **TUI Command**: 
 

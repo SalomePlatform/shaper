@@ -12,13 +12,19 @@ To create a Scale in the active part:
 
 Two Scale algorithms are:
 
-  .. image:: images/scale_factor_32x32.png    
-    :align: left
-  by one common factor 
+.. image:: images/scale_factor_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/scale_dimensions_32x32.png    
-    :align: left
-  by different factors along axes
+by one common factor 
+
+.. image:: images/scale_dimensions_32x32.png    
+   :align: left
+   :height: 24px
+
+by different factors along axes
+
+--------------------------------------------------------------------------------
 
 Scale by one common factor
 --------------------------

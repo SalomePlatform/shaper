@@ -1,4 +1,4 @@
-.. |projection.icon|    image:: images/projection.png
+.. |projection.icon|    image:: images/Projection.png
 
 Projection
 ==========

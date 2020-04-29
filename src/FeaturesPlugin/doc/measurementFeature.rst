@@ -18,25 +18,37 @@ To start Measurement in the active part:
 
 The following dimensions can be calculated:
 
-  .. image:: images/meas_length_32x32.png      
-    :align: left
-  edge length 
+.. image:: images/meas_length_32x32.png      
+   :align: left
+   :height: 24px
 
-  .. image:: images/meas_distance_32x32.png    
-    :align: left
-  distance between objects
+edge length 
 
-  .. image:: images/meas_radius_32x32.png    
-    :align: left
-  radius
+.. image:: images/meas_distance_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/meas_angle_32x32.png    
-    :align: left
-  angle between edges  
+distance between objects
 
-  .. image:: images/meas_angle3p_32x32.png    
-    :align: left
-  angle by 3 points  
+.. image:: images/meas_radius_32x32.png    
+   :align: left
+   :height: 24px
+
+radius
+
+.. image:: images/meas_angle_32x32.png    
+   :align: left
+   :height: 24px
+
+angle between edges  
+
+.. image:: images/meas_angle3p_32x32.png    
+   :align: left
+   :height: 24px
+
+angle by 3 points  
+
+--------------------------------------------------------------------------------
 
 Edge length
 -----------

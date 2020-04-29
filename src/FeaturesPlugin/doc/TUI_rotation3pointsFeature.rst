@@ -8,4 +8,4 @@ Rotation by center and points
     :linenos:
     :language: python
 
-:download:`Download this script <examples/rotation2.py >` 
+:download:`Download this script <examples/rotation2.py>`

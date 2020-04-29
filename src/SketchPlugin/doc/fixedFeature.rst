@@ -1,4 +1,4 @@
-.. |fixed.icon|    image:: images/fixed.png
+.. |fixed.icon|    image:: images/Fixed.png
 
 Fixed constraint
 ================

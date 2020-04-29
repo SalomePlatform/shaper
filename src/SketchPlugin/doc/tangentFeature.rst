@@ -1,4 +1,4 @@
-.. |tangent.icon|    image:: images/tangent.png
+.. |tangent.icon|    image:: images/Tangent.png
 
 Tangent constraint
 ==================

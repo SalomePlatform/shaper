@@ -8,4 +8,4 @@ Pipe by object, path and Bi-normal
     :linenos:
     :language: python
 
-:download:`Download this script <examples/pipe_binormal.py >` 
+:download:`Download this script <examples/pipe_binormal.py>`

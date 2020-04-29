@@ -14,20 +14,29 @@ There are 4 algorithms for creation of a Plane:
 
 .. image:: images/plane_by_three_points_32x32.png
    :align: left
+   :height: 24px
+
 **By three points** creates a plane by three points.
 
 .. image:: images/plane_by_line_and_point_32x32.png
    :align: left
+   :height: 24px
+
 **By line and point** creates a plane by a line and a point.
 
 .. image:: images/plane_by_other_plane_32x32.png
    :align: left
+   :height: 24px
+
 **By other plane** creates a plane parallel to another plane.
 
 .. image:: images/plane_by_two_parallel_planes_32x32.png
    :align: left
+   :height: 24px
+
 **By two parallel planes** creates a plane between two parallel planes.
 
+--------------------------------------------------------------------------------
 
 By three points
 ---------------
@@ -111,16 +120,19 @@ By other plane
 A plane is created by selecting an already existing plane (planar face). There are following possibilities to define a new plane:
 
 .. image:: images/plane_by_distance_from_other_24x24.png
+   :height: 24px
    :align: left
 
 By distance from the selected plane.
 
 .. image:: images/plane_by_coincident_to_point_24x24.png
+   :height: 24px
    :align: left
 
 By coincidence with a point.
 
 .. image:: images/plane_by_rotation_24x24.png
+   :height: 24px
    :align: left
 
 By rotation around an edge by a specified angle.

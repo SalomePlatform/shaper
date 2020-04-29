@@ -1,4 +1,4 @@
-.. |mirror.icon|    image:: images/mirror.png
+.. |mirror.icon|    image:: images/Mirror.png
 
 Mirror copy
 ===========

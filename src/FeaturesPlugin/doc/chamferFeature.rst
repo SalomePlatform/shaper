@@ -3,7 +3,7 @@
 .. _featureChamfer:
 
 Chamfer
-======
+=======
 
 **Chamfer** feature creates chamfers on the edges or on the faces of a shape. 
 
@@ -14,13 +14,19 @@ To create a Chamfer in the active part:
 
 There are 2 types of chamfer:
 
-  .. image:: images/chamfer_distances.png   
-    :align: left
-  chamfer by two distances
+.. image:: images/chamfer_distances.png   
+   :align: left
+   :height: 24px
 
-  .. image:: images/chamfer_dist_angle.png   
-    :align: left
-  chamfer by a distance and an angle
+chamfer by two distances
+
+.. image:: images/chamfer_dist_angle.png   
+   :align: left
+   :height: 24px
+
+chamfer by a distance and an angle
+
+--------------------------------------------------------------------------------
 
 Chamfer by two distances
 ------------------------

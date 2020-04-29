@@ -1,5 +1,6 @@
 .. _featureCut:
 .. |bool_cut.icon|    image:: images/bool_cut.png
+   :height: 16px
 
 Cut
 ===

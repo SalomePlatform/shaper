@@ -22,16 +22,23 @@ There are three variants of the property panel for Extrusion Cut depending on th
 
 .. image:: images/extrusion_by_sizes.png
    :align: left
+   :height: 24px
+
 **By Sizes** extrudes objects by specifying sizes.
 
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
 
 .. image:: images/extrusion_through_all.png
    :align: left
+   :height: 24px
+
 **Through All** extrudes base objects through all objects to be cut.
 
+--------------------------------------------------------------------------------
 
 By sizes
 --------

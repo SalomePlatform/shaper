@@ -14,27 +14,41 @@ There are 6 algorithms for creation of an Axis:
 
 .. image:: images/axis_dxyz_32x32.png
    :align: left
+   :height: 24px
+
 **By three dimensions** creates an axis by dimensions along X, Y, Z axes starting form existing origin.
 
 .. image:: images/by_two_points_32x32.png
    :align: left
+   :height: 24px
+
 **By two points** creates an axis using existing points.
 
 .. image:: images/axis_by_line_32x32.png
    :align: left
+   :height: 24px
+
 **By line** creates an axis using a line.
 
-.. image:: images/axis_by_line_32x32.png
+.. image:: images/cylindrical_face_32x32.png
    :align: left
+   :height: 24px
+
 **As an axis of cylindrical face** creates an axis using a cylindrical face.
 
-.. image:: images/axis_by_line_32x32.png
+.. image:: images/axis_by_plane_and_point_32x32.png
    :align: left
+   :height: 24px
+
 **By plane and point** creates an axis using a plane and point.
 
-.. image:: images/axis_by_line_32x32.png
+.. image:: images/axis_by_two_planes_32x32.png
    :align: left
+   :height: 24px
+
 **By two planes** creates an axis as the intersection of two planes.
+
+--------------------------------------------------------------------------------
 
 By three dimensions
 -------------------

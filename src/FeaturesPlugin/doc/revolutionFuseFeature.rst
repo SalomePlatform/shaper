@@ -22,19 +22,26 @@ There are three variants of the property panel for Revolution Fuse depending on 
 
 .. image:: images/revolution_by_angles.png
    :align: left
+   :height: 24px
+
 **By Angles** revolves objects by specifying angles.
 
 .. image:: images/revolution_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
 .. image:: images/revolution_through_all.png
    :align: left
+   :height: 24px
+
 **Through All** revolves objects by 360 degrees.
 
+--------------------------------------------------------------------------------
 
 By angles
---------
+---------
 
 .. image:: images/RevolutionFuse1.png
   :align: center

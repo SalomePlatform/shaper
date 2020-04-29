@@ -12,17 +12,25 @@ To create a Symmetry in the active part:
 
 Symmetrical copy of an Object can be mirrored in three different ways:
 
-  .. image:: images/symmetry_point_32x32.png    
-    :align: left
-  through a Point of symmetry 
+.. image:: images/symmetry_point_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/symmetry_axis_32x32.png      
-    :align: left
-  through an Axis of symmetry  
+through a Point of symmetry 
 
-  .. image:: images/symmetry_plane_32x32.png    
-    :align: left
-  through a Plane of symmetry 
+.. image:: images/symmetry_axis_32x32.png      
+   :align: left
+   :height: 24px
+
+through an Axis of symmetry  
+
+.. image:: images/symmetry_plane_32x32.png    
+   :align: left
+   :height: 24px
+
+through a Plane of symmetry 
+
+--------------------------------------------------------------------------------
 
 Symmetry through a Point of symmetry
 ------------------------------------

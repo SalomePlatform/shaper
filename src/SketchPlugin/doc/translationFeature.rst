@@ -18,18 +18,16 @@ Property panel:
 .. centered::
    Linear copy
 
+
+.. |single_value| image:: images/translate_32x32.png
+.. |full_value| image:: images/translate_full_32x32.png
+
 Input fields:
 
 - **Segments** is the list of segments (lines, circles, arcs) selected in the view.
 - **Single value/Full value** option:
-
-  .. image:: images/translate_32x32.png
-     :align: left
-  **Single value**: step of translation is equal to the distance between the start and the end point.
-
-  .. image:: images/translate_full_32x32.png
-     :align: left
-  **Full value**: distance from the originals to the farthest copies is equal to the distance between the start and the end point.
+   | |single_value| **Single value**: step of translation is equal to the distance between the start and the end point.
+   | |full_value| **Full value**: distance from the originals to the farthest copies is equal to the distance between the start and the end point.
 - **Start point** is the initial point of translation vector.
 - **End point** is the terminal point of translation vector.
 - **Total number of objects** is the total number of objects including the original one.

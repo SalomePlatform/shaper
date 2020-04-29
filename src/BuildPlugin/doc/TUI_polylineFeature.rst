@@ -8,5 +8,5 @@ Create Polyline
     :linenos:
     :language: python
 
-:download:`Download this script <examples/polyline.py >` 
-   
+:download:`Download this script <examples/polyline.py>`
+

@@ -18,35 +18,26 @@ Property panel:
 .. image:: images/Angle_panel.png
    :align: center
 
+.. |angle_direct| image:: images/angle_direct.png
+.. |angle_complement| image:: images/angle_complementary.png
+.. |angle_backward| image:: images/angle_backward.png
+.. |loc_left| image:: images/location_left.png
+.. |loc_auto| image:: images/location_automatic.png
+.. |loc_right| image:: images/location_right.png
+
 Input fields:
 
 - **Line 1** is the first line selected in the view;
 - **Line 2** is the second line selected in the view;
 - **Value** is an angle between the lines, can be modified to set the desirable value;
 - **Angle type** is a type of angle measurement:
-   .. image:: images/angle_direct.png
-      :align: left
-   **Direct** is the least angle between two lines;
-
-   .. image:: images/angle_complementary.png
-      :align: left
-   **Complementary** is 180°- Direct angle between two lines;
-
-   .. image:: images/angle_backward.png
-      :align: left
-   **Backward** is 360°- Direct angle between two lines.
+   | |angle_direct| **Direct** is the least angle between two lines;
+   | |angle_complement| **Complementary** is 180°- Direct angle between two lines;
+   | |angle_backward| **Backward** is 360°- Direct angle between two lines.
 - **Text location** is the position of the angle value label relatively to the angle line (in the view):
-   .. image:: images/location_left.png
-      :align: left
-   **Left** inserts text to the left of the angle line;
-
-   .. image:: images/location_automatic.png
-      :align: left
-   **Automatic** inserts text it the middle of the angle line if it has enough length, otherwise - to the left;
-
-   .. image:: images/location_right.png
-      :align: left
-   **Right** inserts text to the right of the angle line.
+   | |loc_left| **Left** inserts text to the left of the angle line;
+   | |loc_auto| **Automatic** inserts text it the middle of the angle line if it has enough length, otherwise - to the left;
+   | |loc_right| **Right** inserts text to the right of the angle line.
 
 When both lines are selected, the angle value is displayed in the property panel and in the view.
 

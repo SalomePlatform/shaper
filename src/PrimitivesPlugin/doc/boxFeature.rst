@@ -1,8 +1,9 @@
 .. _box_feature:
-.. |box.icon|    image:: images/box.png
 
 Box
 ===
+
+.. |box.icon|    image:: images/box.png
 
 Box feature creates a box solid.
 
@@ -13,14 +14,19 @@ To create a Box in the active part:
 
 There are 2 algorithms for creation of a Box:
 
-.. image:: images/box_2pt_32x32.png
-   :align: left
-**By dimensions** 
-
 .. image:: images/box_dxyz_32x32.png
    :align: left
+   :height: 24px
+
+**By dimensions** 
+
+.. image:: images/box_2pt_32x32.png
+   :align: left
+   :height: 24px
+
 **By two points** 
 
+--------------------------------------------------------------------------------
 
 By dimensions
 -------------
@@ -74,6 +80,7 @@ Input fields:
     :param object: First vertex of diagonal.
     :param object: Second vertex of diagonal.
     :return: Result object.
+
 **Arguments**:   Part + 2 selected points (opposite vertices of the box)
 
 Result

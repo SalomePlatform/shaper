@@ -1,4 +1,4 @@
-.. |trim.icon|    image:: images/trim.png
+.. |trim.icon|    image:: images/Trim.png
 
 Trim
 ====
@@ -39,6 +39,7 @@ The selected segment is highlighted in the view:
     :param object: Line, arc or circle.
     :param object: Position point.
     :return: Result object.
+
 **Arguments**:   feature (line, arc or circle) and position point (a point on or closest to the segment to remove)
 
 Result

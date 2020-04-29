@@ -1,10 +1,11 @@
 
 .. _sketchPlugin:
-.. |SketchButton.icon|    image:: images/SketchButton.png
 
 
 Sketch plug-in
 ================
+
+.. |SketchButton.icon|    image:: images/SketchButton.png
 
 Sketch plug-in includes features for creation of 2D shapes.
 

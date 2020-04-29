@@ -8,5 +8,4 @@ Create Chamfer by distances
     :linenos:
     :language: python
 
-:download:`Download this script <examples/chamfer1.py >` 
-   
+:download:`Download this script <examples/chamfer1.py>`

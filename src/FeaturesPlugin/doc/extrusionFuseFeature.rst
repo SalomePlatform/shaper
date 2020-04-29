@@ -1,7 +1,7 @@
 .. |extrusion_fuse_btn.icon|    image:: images/extrusion_fuse_btn.png
 
 Extrusion Fuse
-=============
+==============
 
 Extrusion Fuse feature extrudes selected objects along their normals or the selected axis and fuses the result with other objects.
 
@@ -22,16 +22,23 @@ There are three variants of the property panel for Extrusion Fuse depending on t
 
 .. image:: images/extrusion_by_sizes.png
    :align: left
+   :height: 24px
+
 **By Sizes** extrudes objects by specifying sizes.
 
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
 
 .. image:: images/extrusion_through_all.png
    :align: left
+   :height: 24px
+
 **Through All** extrudes base objects to pass through all objects fuse with.
 
+--------------------------------------------------------------------------------
 
 By sizes
 --------

@@ -1,5 +1,5 @@
 .. _sketchLength:
-.. |length.icon|    image:: images/length.png
+.. |length.icon|    image:: images/Length.png
 
 Length constraint
 =================
@@ -16,22 +16,18 @@ Property panel:
 .. image:: images/Length_panel.png
    :align: center
 
+.. |location_left| image:: images/location_left.png
+.. |location_auto| image:: images/location_automatic.png
+.. |location_right| image:: images/location_right.png
+
 Input fields:
 
 - **Line** is the the line object selected in the view;
 - **Value** is a line length, can be modified to set the desirable value;
 - **Text location** is a position of the length value label relating to extension line (in the view):
-   .. image:: images/location_left.png
-      :align: left
-   **Left** inserts text to the left of the length extension line;
-
-   .. image:: images/location_automatic.png
-      :align: left
-   **Automatic** inserts text in the middle of the length extension line if it has enough length, otherwise - to the left;
-
-   .. image:: images/location_right.png
-      :align: left
-   **Right** inserts text to the right of the length extension line.
+   | |location_left| **Left** inserts text to the left of the length extension line;
+   | |location_auto| **Automatic** inserts text in the middle of the length extension line if it has enough length, otherwise - to the left;
+   | |location_right| **Right** inserts text to the right of the length extension line.
 
 When the line is selected, the length value is displayed in the property panel and in the view.
 

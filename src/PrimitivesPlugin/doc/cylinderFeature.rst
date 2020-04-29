@@ -14,11 +14,17 @@ There are 2 algorithms for creation of a Cylinder:
 
 .. image:: images/cylinder_32x32.png
    :align: left
+   :height: 24px
+
 **Cylinder** creates a cylinder.
 
 .. image:: images/cylinder_portion_32x32.png
    :align: left
+   :height: 24px
+
 **Portion of cylinder** creates one segment of a cylinder.
+
+--------------------------------------------------------------------------------
 
 Cylinder
 --------

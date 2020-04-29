@@ -15,23 +15,35 @@ There are 5 algorithms for creation of a Point:
 
 .. image:: images/point_by_xyz_32x32.png
    :align: left
+   :height: 24px
+
 **By X,Y,Z** creates a point by three coordinates.
 
 .. image:: images/point_by_distance_on_edge_32x32.png
    :align: left
+   :height: 24px
+
 **By distance on edge** creates a point on an edge.
 
 .. image:: images/point_by_projection_32x32.png
    :align: left
+   :height: 24px
+
 **By projection on edge or plane** creates a point by projecting an existing point on an edge or plane.
 
 .. image:: images/point_by_intersection_32x32.png
    :align: left
+   :height: 24px
+
 **By intersection of objects** creates a point by intersection of planes or/ and edges.
 
 .. image:: images/point_by_geometrical_property_32x32.png
    :align: left
+   :height: 24px
+
 **By geometrical property of object** creates a point in COG or center of arc or circle.
+
+--------------------------------------------------------------------------------
 
 By X,Y,Z
 --------

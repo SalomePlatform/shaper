@@ -1,4 +1,4 @@
-.. |fillet.icon|    image:: images/fillet.png
+.. |fillet.icon|    image:: images/Fillet.png
 
 Fillet
 ======

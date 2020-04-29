@@ -22,12 +22,17 @@ There are two variants of the property panel for Extrusion depending on the chos
 
 .. image:: images/extrusion_by_sizes.png
    :align: left
+   :height: 24px
+
 **By Sizes** extrudes objects by specifying sizes.
 
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Faces** extrudes objects by specifying bounding faces/planes and offsets.
 
+--------------------------------------------------------------------------------
 
 By sizes
 --------

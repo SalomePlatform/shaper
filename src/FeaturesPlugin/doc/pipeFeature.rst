@@ -12,17 +12,25 @@ To create a Pipe in the active part:
 
 Pipe can be created in three different ways:
 
-  .. image:: images/pipe_simple_32x32.png    
-    :align: left
-  by object and path 
+.. image:: images/pipe_simple_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/pipe_binormal_32x32.png      
-    :align: left
-  by object, path and Bi-normal  
+by object and path 
 
-  .. image:: images/pipe_locations_32x32.png    
-    :align: left
-  by object, path and locations 
+.. image:: images/pipe_binormal_32x32.png      
+   :align: left
+   :height: 24px
+
+by object, path and Bi-normal  
+
+.. image:: images/pipe_locations_32x32.png    
+   :align: left
+   :height: 24px
+
+by object, path and locations 
+
+--------------------------------------------------------------------------------
 
 Pipe by object and path
 -----------------------

@@ -2,7 +2,7 @@
 .. |SketchDrawer.icon|    image:: images/SketchDrawer.png
 
 Sketch Drawer
-=========
+=============
 
 Sketch Drawer featrure is a macro-feature, i.e. it is removed after its execution.
 It allows simplify creation of sketches basing on existing models without referencing to

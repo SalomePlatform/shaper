@@ -13,13 +13,19 @@ To create a Rotation in the active part:
 
 Two rotation algorithms are:
 
-  .. image:: images/rotation_axis_32x32.png      
-    :align: left
-  by axis and angle 
+.. image:: images/rotation_axis_32x32.png      
+   :align: left
+   :height: 24px
 
-  .. image:: images/rotation_3pt_32x32.png    
-    :align: left
-  by center and 2 points
+by axis and angle 
+
+.. image:: images/rotation_3pt_32x32.png    
+   :align: left
+   :height: 24px
+
+by center and 2 points
+
+--------------------------------------------------------------------------------
 
 Rotation by axis and angle
 --------------------------

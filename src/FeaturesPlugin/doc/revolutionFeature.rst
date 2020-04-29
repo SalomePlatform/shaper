@@ -22,15 +22,20 @@ There are two variants of the property panel for Revolution depending on the cho
 
 .. image:: images/revolution_by_angles.png
    :align: left
+   :height: 24px
+
 **By Angles** revolves objects by specifying angles.
 
 .. image:: images/revolution_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
+--------------------------------------------------------------------------------
 
 By angles
---------
+---------
 
 .. image:: images/Revolution1.png
   :align: center

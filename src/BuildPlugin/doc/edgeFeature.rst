@@ -14,12 +14,17 @@ The options to create edges:
 
 .. image:: images/edge_by_segments_32x32.png
    :align: left
+   :height: 24px
+
 **By edges** creates edges using already existing edges in other shapes or full sketches.
 
 .. image:: images/edge_by_points_32x32.png
    :align: left
+   :height: 24px
+
 **By points** creates segment between two points.
 
+--------------------------------------------------------------------------------
 
 By edges
 --------

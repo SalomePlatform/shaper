@@ -1,4 +1,5 @@
 .. |bool_split.icon|    image:: images/bool_split.png
+   :height: 16px
 
 Split
 =====

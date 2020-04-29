@@ -1,4 +1,4 @@
-.. |point.icon|    image:: images/point.png
+.. |point.icon|    image:: images/Point.png
 
 Point
 =====

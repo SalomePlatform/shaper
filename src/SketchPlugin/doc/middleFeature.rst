@@ -1,4 +1,4 @@
-.. |middlepoint.icon|    image:: images/middlepoint.png
+.. |middlepoint.icon|    image:: images/MiddlePoint.png
 
 Middle point constraint
 =======================
