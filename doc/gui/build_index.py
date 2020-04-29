@@ -22,62 +22,87 @@
 ## and prepares building of help documentation by sphinx
 ###
 
+import argparse
 import os
-import sys
+import os.path as osp
+import re
 import shutil
+import sys
 from xml.dom.minidom import parse
 
-aBuildDir = sys.argv[1]
-aSourcesDir = sys.argv[2]
-aSrcPath = aSourcesDir + os.sep + "../../src"
-
-aConfigPath = aSrcPath + os.sep + "Config/plugins.xml.in"
-
-def findDir(theConfFile):
+def find_dir(src_path, cfg_file):
     """Find a name of a directory where the given config file exists"""
-    aSrcList = os.listdir(aSrcPath)
-    for aDir in aSrcList:
-        aPath = aSrcPath + os.sep + aDir
-        aConfPath = aPath + os.sep + theConfFile
-        if os.path.isdir(aPath) and (os.path.exists(aConfPath) or os.path.exists(aConfPath + ".in")):
-            return aDir
+    entities = os.listdir(src_path)
+    for entity in entities:
+        path = osp.join(src_path, entity)
+        cfg_path = osp.join(path, cfg_file)
+        if not osp.isdir(path):
+            continue
+        if not osp.exists(cfg_path) and not osp.exists(cfg_path + '.in'):
+            continue
+        if osp.exists(osp.join(path, 'doc')):
+            return osp.join(path, 'doc')
     return None
 
-## Find accessible plugins from plugins.xml configuration file
-aPluginList = []
-# A map to avoid duplication of plugins
-aPluginsMap = {}
-aDomObj = parse(aConfigPath)
-aPluginsList = aDomObj.getElementsByTagName("plugin")
-for plugin in aPluginsList:
-    aLibName = plugin.getAttribute("library")
-    if not aLibName:
-        aLibName = plugin.getAttribute("script")
-    aConfigFile = plugin.getAttribute("configuration")
+def main(src_dir, build_dir):
+    """Main function"""
+    src_path = osp.realpath(osp.join(src_dir, *[os.pardir]*2, 'src'))
+    config_file = osp.join(src_path, 'Config', 'plugins.xml.in')
 
-    if aLibName and aConfigFile and not aLibName in aPluginsMap:
-        aPluginsMap[aLibName] = True
-        aLibDir = findDir(aConfigFile)
-        if not aLibDir is None:
-            aPluginDocDir = aSrcPath + os.sep + aLibDir + os.sep + "doc"
-            if os.path.exists(aPluginDocDir):
-                ## Copy all files to a building directory
-                aDocDist = aBuildDir + os.sep + aLibName
-                if os.path.exists(aDocDist):
-                    shutil.rmtree(aDocDist)
-                shutil.copytree(aPluginDocDir, aDocDist)
-                aPluginList.append(aLibName)
+    ## Find accessible plugins from plugins.xml configuration file
+    processed = []
 
-## Modify index.rst file accordingly
-aIndexFile = open(aSourcesDir + os.sep + "index.rst.in", 'r')
-aIndexLines = aIndexFile.readlines()
-aIndexFile.close()
+    indices = []
+    tui_scripts = []
 
-## Add list of plugins after toctree directive
-aIndexLines.append('\n')
-for aLibName in aPluginList:
-    aIndexLines.append("   " + aLibName + "/" + aLibName + ".rst\n")
+    doc = parse(config_file)
+    plugins = doc.getElementsByTagName('plugin')
+    for plugin in plugins:
+        plugin_name = plugin.getAttribute('library')
+        if not plugin_name:
+            plugin_name = plugin.getAttribute('script')
+        if not plugin_name or plugin_name in processed:
+            continue
+        config = plugin.getAttribute('configuration')
+        if not config:
+            continue
+        lib_dir = find_dir(src_path, config)
+        if lib_dir:
+            ## Copy plugin's documenation folder to the build directory
+            dist_dir = osp.join(build_dir, plugin_name)
+            if osp.exists(dist_dir):
+                shutil.rmtree(dist_dir)
+            shutil.copytree(lib_dir, dist_dir)
+            ## Collect index file
+            indices.append(osp.join(plugin_name, plugin_name + '.rst'))
+            ## Collect TUI scripts
+            tui_files = sorted(f for f in os.listdir(lib_dir) if \
+                                   osp.isfile(osp.join(lib_dir, f)) and re.match('TUI_.*\.rst', f))
+            tui_scripts += [osp.join('..', plugin_name, i) for i in tui_files]
+            ## Mark plugin as processed
+            processed.append(plugin_name)
 
-aNewIndex = open(aBuildDir + os.sep + "index.rst", 'w')
-aNewIndex.writelines(aIndexLines)
-aNewIndex.close()
+    ## Generate index file
+    in_file = osp.join(src_dir, 'index.rst.in')
+    out_file = osp.join(build_dir, 'index.rst')
+    with open(in_file, 'r') as fin, open(out_file, 'w') as fout:
+        lines = fin.readlines()
+        idx = lines.index('<insert here>\n')
+        lines = lines[:idx] + ['   {}\n'.format(i) for i in indices] + lines[idx+1:]
+        fout.writelines(lines)
+
+    ## Generate TUI scripts index
+    in_file = osp.join(src_dir, 'TUI_scripts.rst.in')
+    out_file = osp.join(build_dir, 'General', 'TUI_scripts.rst')
+    with open(in_file, 'r') as fin, open(out_file, 'w') as fout:
+        lines = fin.readlines()
+        idx = lines.index('<insert here>\n')
+        lines = lines[:idx] + ['   {}\n'.format(i) for i in tui_scripts] + lines[idx+1:]
+        fout.writelines(lines)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate index file from source directory')
+    parser.add_argument('build_dir', help='build directory')
+    parser.add_argument('src_dir', help='source directory')
+    args = parser.parse_args()
+    sys.exit(main(args.src_dir, args.build_dir))
