@@ -386,11 +386,18 @@ bool buildSketchWires(FeaturePtr theSketchFeature, GeomShapePtr theSketchShape, 
         aStartV = aEndV;
       }
       else {
-        // both vertices are found => close the loop
+        // both vertices are found
         aFoundStart->second->push_back(anEdge);
         if (aFoundStart->second != aFoundEnd->second) {
+          // different wires => merge segments
           aFoundStart->second->insert(aFoundStart->second->end(),
               aFoundEnd->second->begin(), aFoundEnd->second->end());
+          for (MapVertexWire::iterator it = aMapVW.begin(); it != aMapVW.end(); ++it)
+            if (it != aFoundEnd && it->second == aFoundEnd->second) {
+              // another boundary of the wire, change link to the whole result
+              it->second = aFoundStart->second;
+              break;
+            }
           aNewWires.erase(aFoundEnd->second);
         }
         aMapVW.erase(aFoundStart);
