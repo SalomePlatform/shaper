@@ -8,7 +8,7 @@ Welcome to SHAPER documentation!
 
 .. toctree::
    :titlesonly:
-   :maxdepth: 3
+   :maxdepth: 2
 
    General/Introduction.rst
    General/Tutorial.rst

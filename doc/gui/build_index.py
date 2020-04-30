@@ -78,7 +78,18 @@ def main(src_dir, build_dir):
             ## Collect TUI scripts
             tui_files = sorted(f for f in os.listdir(lib_dir) if \
                                    osp.isfile(osp.join(lib_dir, f)) and re.match('TUI_.*\.rst', f))
-            tui_scripts += [osp.join('..', plugin_name, i) for i in tui_files]
+            if tui_files:
+                tui_list_file = osp.join(dist_dir, 'TUI_examples.rst')
+                with open(tui_list_file, 'w') as flist:
+                    flist.write('.. _tui_{}:\n\n'.format(plugin_name.lower()))
+                    title = plugin_name.replace('Plugin', ' plug-in')
+                    flist.write('{}\n'.format(title))
+                    flist.write('{}\n\n'.format('='*len(title)))
+                    flist.write('.. toctree::\n')
+                    flist.write('   :titlesonly:\n')
+                    flist.write('   :maxdepth: 1\n\n')
+                    flist.writelines(['   {}\n'.format(i) for i in tui_files])
+                tui_scripts.append(osp.join('..', plugin_name, 'TUI_examples.rst'))
             ## Mark plugin as processed
             processed.append(plugin_name)
 
