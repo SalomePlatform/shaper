@@ -323,11 +323,11 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       if (!aResPrs.IsNull())
         aResPrs->updateIsoLines();
     }
-    myWorkshop->module()->storeSelection();
+    //myWorkshop->module()->storeSelection();
 
-#ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
-    myWorkshop->selector()->deselectPresentation(aAISIO);
-#endif
+//#ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
+    //myWorkshop->selector()->deselectPresentation(aAISIO);
+//#endif
 
     if (aContext->IsDisplayed(aAISIO))
       aContext->Redisplay(aAISIO, false);
@@ -339,7 +339,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       #endif
 
       //if (aNeedToRestoreSelection)
-    myWorkshop->module()->restoreSelection();
+    //myWorkshop->module()->restoreSelection();
 
     aRedisplayed = true;
     #ifdef DEBUG_FEATURE_REDISPLAY
