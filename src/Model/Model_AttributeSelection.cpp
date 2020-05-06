@@ -1987,8 +1987,6 @@ ResultPtr Model_AttributeSelection::newestContext(
   const ResultPtr theCurrent, const GeomShapePtr theValue)
 {
   ResultPtr aResult = theCurrent;
-  if (!std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult).get())
-    return aResult; // construction, groups and other results are not propagated (#19019)
   GeomShapePtr aSelectedShape = theValue.get() ? theValue : theCurrent->shape();
   std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
@@ -2073,6 +2071,10 @@ ResultPtr Model_AttributeSelection::newestContext(
             aFindNewContext = true; // continue searching further
             break;
           }
+        }
+        if (!aFindNewContext && !aResults.empty()) {
+          // #19019 : result is concealed by object that contains no such sub-shape
+          return theCurrent;
         }
       }
     }
