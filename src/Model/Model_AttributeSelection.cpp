@@ -1987,6 +1987,8 @@ ResultPtr Model_AttributeSelection::newestContext(
   const ResultPtr theCurrent, const GeomShapePtr theValue)
 {
   ResultPtr aResult = theCurrent;
+  if (!std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult).get())
+    return aResult; // construction, groups and other results are not propagated (#19019)
   GeomShapePtr aSelectedShape = theValue.get() ? theValue : theCurrent->shape();
   std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
