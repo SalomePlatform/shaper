@@ -72,6 +72,7 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_SelectionManager.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
 
 #include <StdSelect_ViewerSelector3d.hxx>
 
@@ -128,6 +129,7 @@ XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop), myNeedUpdate(false),
   myViewerBlockedRecursiveCount(0), myContextId(0)
 {
+  BRepMesh_IncrementalMesh::SetParallelDefault(Standard_True);
 }
 
 //**************************************************************
@@ -206,7 +208,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
     int aDispMode = isShading? Shading : Wireframe;
     anAISIO->SetDisplayMode(aDispMode);
-    aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, aDispMode, 0, false, AIS_DS_Displayed);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
@@ -703,7 +705,7 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!aContext.IsNull() && !anAISIO.IsNull()) {
-    aContext->Display(anAISIO, theDisplayMode, 0, false/*update viewer*/, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, theDisplayMode, 0, false/*update viewer*/, AIS_DS_Displayed);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
@@ -1058,7 +1060,6 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
                         0 /*wireframe*/,
                         -1 /* selection mode */,
                         Standard_True /* update viewer*/,
-                        Standard_False /* allow decomposition */,
                         AIS_DS_Displayed /* xdisplay status */);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(aTrihedron);
