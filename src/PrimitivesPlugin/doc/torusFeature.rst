@@ -12,10 +12,9 @@ To create a Torus in the active part:
 
 The following property panel appears.
 
-.. image:: images/Torus.png
-  :align: center
+.. figure:: images/Torus.png
+   :align: center
 
-.. centered::
    Torus
 
 Input fields:
@@ -42,10 +41,9 @@ Result
 
 An example is shown below.
 
-.. image:: images/Torus_res.png
-	   :align: center
+.. figure:: images/Torus_res.png
+   :align: center
 		   
-.. centered::
    Torus created  
 
 **See Also** a sample TUI Script of :ref:`tui_create_torus` operation.

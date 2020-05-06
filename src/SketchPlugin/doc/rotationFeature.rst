@@ -13,10 +13,9 @@ To create an Angular copy in the active Sketch:
 
 Property panel:
 
-.. image:: images/Rotation_panel.png
-  :align: center
+.. figure:: images/Rotation_panel.png
+   :align: center
 
-.. centered::
    Angular copy
 
 .. |full_angle| image:: images/angle_up_full_32x32.png
@@ -54,10 +53,9 @@ Created Angular copy appears in the view.
 | The original and an angular copy objects are marked with a special sign.
 | Copy objects are drawn with a thinner line.
 
-.. image:: images/Rotation_res.png
-	   :align: center
+.. figure:: images/Rotation_res.png
+   :align: center
 
-.. centered::
    Created angular copy
 
 **See Also** a sample TUI Script of :ref:`tui_create_rotation` operation.

@@ -12,10 +12,9 @@ To Remove Sub-Shapes in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/RemoveSubShapes.png
+.. figure:: images/RemoveSubShapes.png
   :align: center
 
-.. centered::
   Remove Sub-Shapes
 
 .. |by_removing| image:: images/remove_subshapes_32x32.png
@@ -63,10 +62,9 @@ Result
 
 The Result of the operation will be a shape without removed sub-shapes:
 
-.. image:: images/remove_subshapes_result.png
-	   :align: center
+.. figure:: images/remove_subshapes_result.png
+   :align: center
 
-.. centered::
    **Remove Sub-Shapes**
 
 **See Also** a sample TUI Script of :ref:`tui_create_remove_subshapes` operation.

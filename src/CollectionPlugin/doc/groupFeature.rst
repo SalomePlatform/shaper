@@ -13,10 +13,9 @@ To create a Group in the active part:
 
 The following property panel appears. 
 
-.. image:: images/group_property_panel.png
+.. figure:: images/group_property_panel.png
   :align: center
 
-.. centered::
   Create a group
 
 .. |group_vertices| image:: images/group_property_panel_vertice.png
@@ -59,10 +58,9 @@ Result
 
 Created Group appears in the view.
 
-.. image:: images/group_res.png
-	   :align: center
+.. figure:: images/group_res.png
+   :align: center
 
-.. centered::
    Created group
 
 **See Also** a sample TUI Script of :ref:`tui_create_group` operation.

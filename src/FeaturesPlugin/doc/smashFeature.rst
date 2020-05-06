@@ -13,11 +13,10 @@ To create a Smash in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Smash.png
-  :align: center
+.. figure:: images/Smash.png
+   :align: center
 
-.. centered::
-  **Smash operation**
+   **Smash operation**
 
 - **Main Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be smashed by tool objects.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be cut from
@@ -40,10 +39,9 @@ Result
 
 The Result of the operation will be a shape which is a smash of tool objects from main objects:
 
-.. image:: images/CreatedSmash.png
-	   :align: center
+.. figure:: images/CreatedSmash.png
+   :align: center
 
-.. centered::
    **Smash created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_smash` operation.

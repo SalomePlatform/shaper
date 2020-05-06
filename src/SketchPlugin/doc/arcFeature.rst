@@ -12,25 +12,25 @@ To add a new Arc to the Sketch:
 
 There are 4 algorithms for creation of an Arc:
 
-.. image:: images/arc_base_32x32.png
+.. figure:: images/arc_base_32x32.png
    :align: left
    :height: 24px
 
 **By center and two points** creates an arc segment with the given center passing from the start point to the end point on the circle.
 
-.. image:: images/arc_3pt_32x32.png
+.. figure:: images/arc_3pt_32x32.png
    :align: left
    :height: 24px
 
 **By three points** creates an arc segment passing from the start point to end point through another point on the circle.
 
-.. image:: images/arc_tang_32x32.png
+.. figure:: images/arc_tang_32x32.png
    :align: left
    :height: 24px
 
 **By tangent point and end point** creates an arc segment with the tangent point and the end point.
 
-.. image:: images/arc_perp_32x32.png
+.. figure:: images/arc_perp_32x32.png
    :align: left
    :height: 24px
 
@@ -41,7 +41,7 @@ There are 4 algorithms for creation of an Arc:
 By center and two points
 """"""""""""""""""""""""
 
-.. image:: images/Arc_panel_base.png
+.. figure:: images/Arc_panel_base.png
    :align: center
 
 Click in the view once to set the center point, then move the mouse and click a second time to set the start point
@@ -67,7 +67,7 @@ and finally move the mouse and click a third time to set the last passed point.
 By three points
 """""""""""""""
 
-.. image:: images/Arc_panel_3pt.png
+.. figure:: images/Arc_panel_3pt.png
    :align: center
 
 Click in the view once to set the start point, then move the mouse and click a second time to set the end point
@@ -92,7 +92,7 @@ and finally move the mouse and click a third time to set the passed point.
 By tangent point and end point
 """"""""""""""""""""""""""""""
 
-.. image:: images/Arc_panel_tang.png
+.. figure:: images/Arc_panel_tang.png
    :align: center
 
 Select a point on segment in the view to set the tangent point, then move the mouse and click to set the end point.
@@ -115,7 +115,7 @@ The tangent point by itself is a start point. The edge on which it lies will be 
 By point on perpendicular line and end point
 """"""""""""""""""""""""""""""""""""""""""""
 
-.. image:: images/Arc_panel_perp.png
+.. figure:: images/Arc_panel_perp.png
    :align: center
 
 Select a point on a straight segment in the view to set the start point, then move the mouse and click to set the end point.
@@ -141,10 +141,9 @@ Result
 
 Created arc appears in the view.
 
-.. image:: images/Arc_res.png
-	   :align: center
+.. figure:: images/Arc_res.png
+   :align: center
 
-.. centered::
    Arc created
 
 **See Also** a sample TUI Script of :ref:`tui_create_arc` operation.

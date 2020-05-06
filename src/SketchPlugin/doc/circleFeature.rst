@@ -12,13 +12,13 @@ To add a new Circle to the Sketch:
 
 There are 2 algorithms for creation of a Circle:
 
-.. image:: images/circle_pt_rad_32x32.png
+.. figure:: images/circle_pt_rad_32x32.png
    :align: left
    :height: 24px
 
 **By center and passed point** creates a circle with the given center passing through the given point.
 
-.. image:: images/circle_3pt_32x32.png
+.. figure:: images/circle_3pt_32x32.png
    :align: left
    :height: 24px
 
@@ -29,7 +29,7 @@ There are 2 algorithms for creation of a Circle:
 By center and passed point
 """"""""""""""""""""""""""
 
-.. image:: images/Circle_panel_pt_rad.png
+.. figure:: images/Circle_panel_pt_rad.png
    :align: center
 
 Click in the view once to set the center point, then move the mouse and click a second time to set the passed point.
@@ -51,7 +51,7 @@ Click in the view once to set the center point, then move the mouse and click a 
 By three points
 """""""""""""""
 
-.. image:: images/Circle_panel_3pt.png
+.. figure:: images/Circle_panel_3pt.png
    :align: center
 
 Click in the view once to set the first passed point, then move the mouse and click a second time to set the second passed point
@@ -77,7 +77,7 @@ Property panel in edition context
 
 The following property panel appears when the user selects an existing circle.
 
-.. image:: images/Circle_panel_edit.png
+.. figure:: images/Circle_panel_edit.png
    :align: center
 
 Note that the edition property panel does not show the used creation algorithm.
@@ -92,10 +92,9 @@ Result
 
 Created circle appears in the view.
 
-.. image:: images/Circle_res.png
-	   :align: center
+.. figure:: images/Circle_res.png
+   :align: center
 
-.. centered::
    Circle created
 
 **See Also** a sample TUI Script of :ref:`tui_create_circle` operation.

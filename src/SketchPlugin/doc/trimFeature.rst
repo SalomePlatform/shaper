@@ -14,10 +14,9 @@ To create a Trim in the active Sketch:
 
 Property panel:
 
-.. image:: images/Trim_panel.png
-  :align: center
+.. figure:: images/Trim_panel.png
+   :align: center
 
-.. centered::
    Trim
 
 Input fields:
@@ -26,10 +25,9 @@ Input fields:
 
 The selected segment is highlighted in the view:
 
-.. image:: images/Trim_segment_sel.png
+.. figure:: images/Trim_segment_sel.png
    :align: center
 
-.. centered::
    The segment to remove
 
 **TUI Command**:
@@ -47,10 +45,9 @@ Result
 
 Created Trim appears in the view.
 
-.. image:: images/Trim_res.png
-	   :align: center
+.. figure:: images/Trim_res.png
+   :align: center
 
-.. centered::
    Created trim
 
 **See Also** a sample TUI Script of :ref:`tui_create_trim` operation.

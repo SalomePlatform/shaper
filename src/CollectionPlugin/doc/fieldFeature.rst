@@ -16,10 +16,9 @@ To create a Field in the active part:
 
 The following property panel appears. 
 
-.. image:: images/field_property_panel.png
+.. figure:: images/field_property_panel.png
   :align: center
 
-.. centered::
   Create a field
 
 Input fields:
@@ -57,16 +56,15 @@ Input fields:
 
 When a field is created then its result in data tree looks like following.
 
-.. image:: images/field_steps_tree.png
+.. figure:: images/field_steps_tree.png
   :align: center
 
-.. centered::
   Result of created field with two steps.
   
 It consists of a Field result object and steps as sub-objects. Only one object can be displayed at one moment: field or one of its step. Field result presentation repersents entities used for the Field definition.
 Step presentation shows field entities and values defined on them. For example a step defined on faces with double values looks like following.
 
-.. image:: images/step_faces_double.png
+.. figure:: images/step_faces_double.png
   :align: center
 
 Color bar for displayed step is shown only if the setep is selected in **Object Browser**. Desirable parameters of the Color bar (position, number of intervals, text color) can be defined in **Preferences** dialog box.

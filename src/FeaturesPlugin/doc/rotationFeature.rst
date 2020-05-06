@@ -13,13 +13,13 @@ To create a Rotation in the active part:
 
 Two rotation algorithms are:
 
-.. image:: images/rotation_axis_32x32.png      
+.. figure:: images/rotation_axis_32x32.png      
    :align: left
    :height: 24px
 
 by axis and angle 
 
-.. image:: images/rotation_3pt_32x32.png    
+.. figure:: images/rotation_3pt_32x32.png    
    :align: left
    :height: 24px
 
@@ -30,11 +30,10 @@ by center and 2 points
 Rotation by axis and angle
 --------------------------
 
-.. image:: images/Rotation1.png
-  :align: center
+.. figure:: images/Rotation1.png
+   :align: center
 
-.. centered::
-  Rotation by axis and angle property panel
+   Rotation by axis and angle property panel
 
 Input fields:
 
@@ -57,10 +56,9 @@ Result
 
 Result of operation is a rotated initial shape.
 
-.. image:: images/rotation_axis.png
+.. figure:: images/rotation_axis.png
    :align: center
 
-.. centered::
    Rotation by axis and angle
 
 **See Also** a sample TUI Script of :ref:`tui_rotation_axis` operation.
@@ -68,11 +66,10 @@ Result of operation is a rotated initial shape.
 Rotation by center and points
 -----------------------------
 
-.. image:: images/Rotation2.png
-  :align: center
+.. figure:: images/Rotation2.png
+   :align: center
 
-.. centered::
-  Rotation by center and 2 points property panel
+   Rotation by center and 2 points property panel
 
 Input fields:
 
@@ -96,10 +93,9 @@ Result
 
 Result of operation is a rotated initial shape.
 
-.. image:: images/rotation_3points.png
+.. figure:: images/rotation_3points.png
    :align: center
 
-.. centered::
    Rotation by center and 2 points
 
 **See Also** a sample TUI Script of :ref:`tui_rotation_3points` operation.

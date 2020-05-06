@@ -12,7 +12,7 @@ To add a new Elliptic Arc to the Sketch:
 
 The following property panel appears:
 
-.. image:: images/elliptic_arc_panel.png
+.. figure:: images/elliptic_arc_panel.png
    :align: center
 
 Click in the view to set the center point, then move the mouse and click a second time to set a point of a one semi-axis, then click to set a starting point of the arc and then to set an end point of the arc.
@@ -37,10 +37,9 @@ Result
 
 Created elliptic arc appears in the view.
 
-.. image:: images/elliptic_arc_result.png
-	   :align: center
+.. figure:: images/elliptic_arc_result.png
+   :align: center
 
-.. centered::
    Elliptic arc created
 
 **See Also** a sample TUI Script of :ref:`tui_create_elliptic_arc` operation.

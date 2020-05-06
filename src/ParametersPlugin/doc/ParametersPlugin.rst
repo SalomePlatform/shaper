@@ -10,10 +10,6 @@ The Parameters plug-in includes the following features:
    :titlesonly:
    :maxdepth: 1
 
-   managerFeature.rst
    parameterFeature.rst
+   managerFeature.rst
 
-
-
-
-   	      

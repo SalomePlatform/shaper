@@ -75,7 +75,7 @@ Main menu includes standard Salome items:
 - File;
 - Edit;
 - View;
-- Tools;   
+- Tools;
 - Window;
 - Help;
     
@@ -86,11 +86,10 @@ and items specific for SHAPER module:
 - Construction (see :ref:`constructionPlugin`);
 - Build (see :ref:`buildPlugin`);
 - Primitives (see :ref:`primitivesPlugin`);
-- GDML (see :ref:`gdmlPlugin`);
 - Features (see :ref:`featuresPlugin`);  
 - Macros. 
 
- .. _toolbar:  
+ .. _toolbar:
 
 SHAPER toolbar
 --------------
@@ -105,7 +104,7 @@ Application toolbar contains:
    :align: center
 
    Toolbars
-  
+
 SHAPER toolbar duplicates the main menu and  provides access to all commands of the application.
 
 SHAPER toolbar is separated into sections:
@@ -120,9 +119,9 @@ SHAPER toolbar is separated into sections:
 - GDML;
 - Features;
 - Boolean;
-- Collections;    
-- Fillet;  
-- Macros.  
+- Collections;
+- Fillet;
+- Macros.
 
 Visibility of SHAPER toolbar sections is managed using *View -> Toolbar* :ref:`main_menu` item or toolbar pop-up menu.
 

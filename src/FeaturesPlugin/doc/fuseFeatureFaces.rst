@@ -12,11 +12,10 @@ To perform **Fuse Faces** in the active part:
 
 The following property panel appears:
 
-.. image:: images/FuseFaces.png 
-  :align: center
+.. figure:: images/FuseFaces.png 
+   :align: center
 
-.. centered::
-  **Fuse Faces**  property panel
+   **Fuse Faces**  property panel
 
 Input fields:  
 
@@ -35,10 +34,9 @@ Result
 
 The Result of the operation will be a shape with eliminated edges:
 
-.. image:: images/CreatedFuseFaces.png
-	   :align: center
+.. figure:: images/CreatedFuseFaces.png
+   :align: center
 
-.. centered::
    Shape before and after operation **Fuse Faces**
 
 **See Also** a sample TUI Script of :ref:`tui_create_fuse_faces` operation.

@@ -14,13 +14,13 @@ To create a Fillet in the active part:
 
 There are 2 types of fillet:
 
-.. image:: images/fillet_fixed_radius.png   
+.. figure:: images/fillet_fixed_radius.png   
    :align: left
    :height: 24px
 
 fillet by fixed radius
 
-.. image:: images/fillet_var_radius.png   
+.. figure:: images/fillet_var_radius.png   
    :align: left
    :height: 24px
 
@@ -33,11 +33,10 @@ Fillet by fixed radius
 
 The  property panel is shown below.
 
-.. image:: images/FilletFixed.png
-  :align: center
+.. figure:: images/FilletFixed.png
+   :align: center
 
-.. centered::
-  Fillet by fixed radius property panel
+   Fillet by fixed radius property panel
 
 Input fields:
 
@@ -58,10 +57,9 @@ Result
 
 Result of **Fillet by fixed radius** is shown below.
 
-.. image:: images/fillet_fix_rad.png
+.. figure:: images/fillet_fix_rad.png
    :align: center
 
-.. centered::
    Fillet by fixed radius
 
 **See Also** a sample TUI Script of :ref:`tui_create_fillet1` operation.
@@ -71,11 +69,10 @@ Fillet by variable radius
 
 Alternatively, there is a possibility to create a fillet with a variable radius.
 
-.. image:: images/FilletVarious.png
-  :align: center
+.. figure:: images/FilletVarious.png
+   :align: center
 
-.. centered::
-  Fillet by variable radius
+   Fillet by variable radius
 
 Input fields:
 
@@ -98,10 +95,9 @@ Result
 
 Result of **Fillet by variable radius** is shown below.
 
-.. image:: images/fillet_var_rad.png
+.. figure:: images/fillet_var_rad.png
    :align: center
 
-.. centered::
    Fillet by variable radius
 
 **See Also** a sample TUI Script of :ref:`tui_create_fillet2` operation.

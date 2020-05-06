@@ -12,10 +12,9 @@ To create an interpolation in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Interpolation.png
+.. figure:: images/Interpolation.png
   :align: center
 
-.. centered::
   Create an interpolation
 
 Select one or several vertices or points in the viewer.
@@ -55,10 +54,9 @@ Result
 
 The result of the operation will be a curve created from the selected shapes:
 
-.. image:: images/CreateInterpolation.png
+.. figure:: images/CreateInterpolation.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_interpolation` operation.

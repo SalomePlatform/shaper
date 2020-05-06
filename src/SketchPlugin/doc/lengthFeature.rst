@@ -13,7 +13,7 @@ To create a Length constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Length_panel.png
+.. figure:: images/Length_panel.png
    :align: center
 
 .. |location_left| image:: images/location_left.png
@@ -36,10 +36,9 @@ When creating the constraint, after selection of a line for the first time:
 - drag the length presentation in the view to the desired position and click once;
 - set desirable length value in the input field in the view and press **Enter** or just press **Enter** to keep the current length.
 
-.. image:: images/Length_field_view.png
+.. figure:: images/Length_field_view.png
    :align: center
 
-.. centered::
    Length input in the view
 
 **TUI Command**:
@@ -55,10 +54,9 @@ Result
 
 Created Length appears in the view.
 
-.. image:: images/Length_res.png
-	   :align: center
+.. figure:: images/Length_res.png
+   :align: center
 
-.. centered::
    Length created
 
 **See Also** a sample TUI Script of :ref:`tui_create_length` operation.

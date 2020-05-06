@@ -14,7 +14,7 @@ To create a Vertical Distance constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/VerticalDistance_panel.png
+.. figure:: images/VerticalDistance_panel.png
    :align: center
 
 .. |location_left| image:: images/location_left.png
@@ -38,10 +38,9 @@ When creating the constraint, after selection of two objects for the first time:
 - drag the Vertical distance presentation in the view to the desired position and click once;
 - set desirable vertical distance value in the input field in the view and press **Enter** or just press **Enter** to keep the current distance.
 
-.. image:: images/VerticalDistance_field_view.png
+.. figure:: images/VerticalDistance_field_view.png
    :align: center
 
-.. centered::
    Vertical Distance input in the view
 
 **TUI Command**:
@@ -58,10 +57,9 @@ Result
 
 Created Vertical Distance appears in the view.
 
-.. image:: images/VerticalDistance_res.png
-	   :align: center
+.. figure:: images/VerticalDistance_res.png
+   :align: center
 
-.. centered::
    Vertical Distance created
 
 **See Also** a sample TUI Script of :ref:`tui_create_vdistance` operation.

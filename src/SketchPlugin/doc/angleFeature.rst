@@ -15,7 +15,7 @@ To create an Angle constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Angle_panel.png
+.. figure:: images/Angle_panel.png
    :align: center
 
 .. |angle_direct| image:: images/angle_direct.png
@@ -46,10 +46,9 @@ When creating the constraint, after selection of two lines at the first time:
 - drag the angle presentation in the view to the desired position and click once;
 - set desirable angle value in the input field in the view and press **Enter** or just press **Enter** to keep the current angle
 
-.. image:: images/Angle_field_view.png
+.. figure:: images/Angle_field_view.png
    :align: center
 
-.. centered::
    Angle input in the view
 
 **TUI Commands**:
@@ -68,10 +67,9 @@ Result
 
 Created Angle appears in the view.
 
-.. image:: images/Angle_res.png
-	   :align: center
+.. figure:: images/Angle_res.png
+   :align: center
 
-.. centered::
    Angle created
 
 **See Also** a sample TUI Script of :ref:`tui_create_angle` operation.

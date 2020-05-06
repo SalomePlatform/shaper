@@ -14,13 +14,13 @@ To create a Chamfer in the active part:
 
 There are 2 types of chamfer:
 
-.. image:: images/chamfer_distances.png   
+.. figure:: images/chamfer_distances.png   
    :align: left
    :height: 24px
 
 chamfer by two distances
 
-.. image:: images/chamfer_dist_angle.png   
+.. figure:: images/chamfer_dist_angle.png   
    :align: left
    :height: 24px
 
@@ -33,11 +33,10 @@ Chamfer by two distances
 
 The  property panel is shown below.
 
-.. image:: images/ChamferDistances.png
-  :align: center
+.. figure:: images/ChamferDistances.png
+   :align: center
 
-.. centered::
-  Chamfer by two distances property panel
+   Chamfer by two distances property panel
 
 Input fields:
 
@@ -61,10 +60,9 @@ Result
 
 Result of **Chamfer by two distances** is shown below.
 
-.. image:: images/chamfer_res_distances.png
+.. figure:: images/chamfer_res_distances.png
    :align: center
 
-.. centered::
    Chamfer by two distances
 
 **See Also** a sample TUI Script of :ref:`tui_create_chamfer1` operation.
@@ -74,11 +72,10 @@ Chamfer by a distance and an angle
 
 Alternatively, there is a possibility to create a chamfer with a distance and an angle.
 
-.. image:: images/ChamferDistAngle.png
-  :align: center
+.. figure:: images/ChamferDistAngle.png
+   :align: center
 
-.. centered::
-  Chamfer by a distance and an angle
+   Chamfer by a distance and an angle
 
 Input fields:
 
@@ -102,10 +99,9 @@ Result
 
 Result of **Chamfer by a distance and an angle** is shown below.
 
-.. image:: images/chamfer_res_dist_angle.png
+.. figure:: images/chamfer_res_dist_angle.png
    :align: center
 
-.. centered::
    Chamfer by a distance and an angle
 
 **See Also** a sample TUI Script of :ref:`tui_create_chamfer2` operation.

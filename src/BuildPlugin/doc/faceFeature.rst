@@ -13,10 +13,9 @@ To create a face in the active part:
 
 The following property panel will be opened:
    
-.. image:: images/Face.png
+.. figure:: images/Face.png
   :align: center
 
-.. centered::
   Create a face
   
 Select one or several faces in viewer. Additionally, a face can be build by a closed wire or a set of edges composing a closed wire.
@@ -40,10 +39,9 @@ Result
 
 The result of the operation will be a set of faces created from the selected shapes:
 
-.. image:: images/CreateFace.png
+.. figure:: images/CreateFace.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_face` operation.

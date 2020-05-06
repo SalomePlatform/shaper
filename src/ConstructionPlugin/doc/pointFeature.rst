@@ -13,31 +13,31 @@ Point is a construction object and it can be created in a part or in a partset. 
 
 There are 5 algorithms for creation of a Point:
 
-.. image:: images/point_by_xyz_32x32.png
+.. figure:: images/point_by_xyz_32x32.png
    :align: left
    :height: 24px
 
 **By X,Y,Z** creates a point by three coordinates.
 
-.. image:: images/point_by_distance_on_edge_32x32.png
+.. figure:: images/point_by_distance_on_edge_32x32.png
    :align: left
    :height: 24px
 
 **By distance on edge** creates a point on an edge.
 
-.. image:: images/point_by_projection_32x32.png
+.. figure:: images/point_by_projection_32x32.png
    :align: left
    :height: 24px
 
 **By projection on edge or plane** creates a point by projecting an existing point on an edge or plane.
 
-.. image:: images/point_by_intersection_32x32.png
+.. figure:: images/point_by_intersection_32x32.png
    :align: left
    :height: 24px
 
 **By intersection of objects** creates a point by intersection of planes or/ and edges.
 
-.. image:: images/point_by_geometrical_property_32x32.png
+.. figure:: images/point_by_geometrical_property_32x32.png
    :align: left
    :height: 24px
 
@@ -48,10 +48,9 @@ There are 5 algorithms for creation of a Point:
 By X,Y,Z
 --------
 
-.. image:: images/Point1.png
+.. figure:: images/Point1.png
    :align: center
-	
-.. centered::
+
    **By X,Y,Z coordinates**
 
 A point is created by X, Y, and Z coordinates.
@@ -71,10 +70,9 @@ Result
 
 The Result of the operation will be a construction point:
 
-.. image:: images/CreatePoint1.png
-	   :align: center
+.. figure:: images/CreatePoint1.png
+   :align: center
 
-.. centered::
    **Point by coordinates**
 
 **See Also** a sample TUI Script of :ref:`tui_create_point_xyz` operation.
@@ -82,10 +80,9 @@ The Result of the operation will be a construction point:
 By distance on edge
 -------------------
 
-.. image:: images/Point2.png
+.. figure:: images/Point2.png
    :align: center
-	
-.. centered::
+
    **Along an edge**
 
 To create a point, select an edge in a viewer and define a distance along the edge, where point will be defined. This distance can be defined by an absolute value or by a relative one as a ratio to the edge length. The direction of the edge can be reversed by the corresponding check-box.
@@ -106,10 +103,9 @@ Result
 
 The Result of the operation will be a construction point created on edge:
 
-.. image:: images/CreatePoint2.png
-	   :align: center
+.. figure:: images/CreatePoint2.png
+   :align: center
 
-.. centered::
    **Point created on edge**
 
 **See Also** a sample TUI Script of :ref:`tui_create_point_edge` operation.
@@ -121,18 +117,16 @@ To create a point by projection it is necessary to select an existing point or w
 
 **On an edge:**
 
-.. image:: images/Point3.png
+.. figure:: images/Point3.png
    :align: center
-	
-.. centered::
+
    **By projection on an edge**
 
 **On a plane:**
 
-.. image:: images/Point3-1.png
+.. figure:: images/Point3-1.png
    :align: center
-	
-.. centered::
+
    **By projection on a plane**
 
 
@@ -152,10 +146,9 @@ Result
 
 The Result of the operation will be a construction point created by projection on a plane or an edge:
 
-.. image:: images/CreatePoint3.png
-	   :align: center
+.. figure:: images/CreatePoint3.png
+   :align: center
 
-.. centered::
    **Point created by projection on a plane**
 
 **See Also** a sample TUI Script of :ref:`tui_create_point_projection` operation.
@@ -167,28 +160,25 @@ A point can be created by intersection of selected objects:
 
 **Two edges**
 
-.. image:: images/Point4.png
+.. figure:: images/Point4.png
    :align: center
-	
-.. centered::
+
    **Intersection of edges**
 
 **Edge and plane**
 
-.. image:: images/Point4-1.png
+.. figure:: images/Point4-1.png
    :align: center
-	
-.. centered::
+
    **Intersection of and edge and a plane**
 
 In this case it is possible to define an offset from a plane along the plane normal for the created point.
 
 **Three planes**
 
-.. image:: images/Point4-2.png
+.. figure:: images/Point4-2.png
    :align: center
-	
-.. centered::
+
    **Intersection of three planes**
 
 The new point will be defined by intersection of the selected objects.
@@ -209,10 +199,9 @@ Result
 
 The Result of the operation will be a construction point created by intersection of objects:
 
-.. image:: images/CreatePoint4.png
-	   :align: center
+.. figure:: images/CreatePoint4.png
+   :align: center
 
-.. centered::
    **Point created by intersection of axis**
 
 **See Also** a sample TUI Script of :ref:`tui_create_point_intersection` operation.
@@ -224,18 +213,16 @@ It is possible to use the following property of selected object:
 
 **A center of gravity**
 
-.. image:: images/Point5.png
+.. figure:: images/Point5.png
    :align: center
-	
-.. centered::
+
    **By center of gravity**
 
 **A center of circle or arc**
 
-.. image:: images/Point5-1.png
+.. figure:: images/Point5-1.png
    :align: center
-	
-.. centered::
+
    **By center of a circle**
    
 To create a point, select a desirable object.
@@ -253,10 +240,9 @@ Result
 
 The Result of the operation will be a construction point defined by object property:
 
-.. image:: images/CreatePoint5.png
-	   :align: center
+.. figure:: images/CreatePoint5.png
+   :align: center
 
-.. centered::
    **Point created in COG of a cylinder**
 
 **See Also** a sample TUI Script of :ref:`tui_create_point_object` operation.

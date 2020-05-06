@@ -19,10 +19,9 @@ To add a new set of points:
 
 The following property panel appears:
 
-.. image:: images/compoundVerticesPanel.png
-  :align: center
+.. figure:: images/compoundVerticesPanel.png
+   :align: center
 
-.. centered::
    set of Points
 
 Select your points file and define a separator if it's different that " " in your points file
@@ -32,8 +31,7 @@ Result
 
 A resulting compound will contain the points 
 
-.. image:: images/compoundVertices.png
-	   :align: center
+.. figure:: images/compoundVertices.png
+   :align: center
 
-.. centered::
    Points

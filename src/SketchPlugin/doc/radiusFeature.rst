@@ -12,8 +12,9 @@ To create a Radius constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Radius_panel.png
+.. figure:: images/Radius_panel.png
    :align: center
+
 .. |loc_left| image:: images/location_left.png
 .. |loc_auto| image:: images/location_automatic.png
 .. |loc_right| image:: images/location_right.png
@@ -34,10 +35,9 @@ When creating the constraint, after selection of the circle or arc at the first 
 - drag the radius presentation in the view to the desired position and click once;
 - set desirable radius value in the input field in the view and press **Enter** or just press **Enter** to keep the current radius.
 
-.. image:: images/Radius_field_view.png
+.. figure:: images/Radius_field_view.png
    :align: center
 
-.. centered::
    Radius input in the view
 
 **TUI Command**:
@@ -53,10 +53,9 @@ Result
 
 Created Radius appears in the view.
 
-.. image:: images/Radius_res.png
-	   :align: center
+.. figure:: images/Radius_res.png
+   :align: center
 
-.. centered::
    Radius created
 
 **See Also** a sample TUI Script of :ref:`tui_create_radius` operation.

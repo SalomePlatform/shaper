@@ -13,10 +13,9 @@ To create a Polyline in the active part:
 
 The following property panel appears.
 
-.. image:: images/Polyline.png
+.. figure:: images/Polyline.png
   :align: center
 
-.. centered::
   Polyline property panel
 
 Input fields:
@@ -37,10 +36,9 @@ Result
 """"""
 The result of the operation is a closed or open Polyline.
 
-.. image:: images/CreatePolyline.png
+.. figure:: images/CreatePolyline.png
    :align: center
 
-.. centered::
    Polyline
 
 **See Also** a sample TUI Script of :ref:`tui_create_polyline` operation.

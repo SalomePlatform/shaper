@@ -14,7 +14,7 @@ To create a Distance constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Distance_panel.png
+.. figure:: images/Distance_panel.png
    :align: center
 
 .. |location_left| image:: images/location_left.png
@@ -39,10 +39,9 @@ When creating a constraint after selection of two objects for the first time:
 - drag the distance presentation in the view to the desired position and click once;
 - set the desirable distance value in the input field and press **Enter** or just press **Enter** to keep the current distance.
 
-.. image:: images/Distance_field_view.png
+.. figure:: images/Distance_field_view.png
    :align: center
 
-.. centered::
    Distance input in the view
 
 **TUI Command**:
@@ -60,10 +59,9 @@ Result
 
 Created Distance appears in the view.
 
-.. image:: images/Distance_res.png
-	   :align: center
+.. figure:: images/Distance_res.png
+   :align: center
 
-.. centered::
    Distance created
 
 **See Also** a sample TUI Script of :ref:`tui_create_distance` operation.

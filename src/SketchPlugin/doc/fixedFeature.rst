@@ -14,7 +14,7 @@ To create a Fixed constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Fixed_panel.png
+.. figure:: images/Fixed_panel.png
    :align: center
 
 Input fields:
@@ -41,10 +41,9 @@ Result
 
 Created Fixed constraint appears in the view.
 
-.. image:: images/Fixed_res.png
-	   :align: center
+.. figure:: images/Fixed_res.png
+   :align: center
 
-.. centered::
    Created fixed constraint 
 
 **See Also** a sample TUI Script of :ref:`tui_create_fixed` operation.

@@ -12,10 +12,9 @@ To create a solid in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Solid.png
+.. figure:: images/Solid.png
   :align: center
 
-.. centered::
   Create a solid
   
 Select one or several faces in the viewer. The selected faces have to define a closed volume.
@@ -37,10 +36,9 @@ Result
 
 The result of the operation will be a solid created from the selected shapes:
 
-.. image:: images/CreateSolid.png
+.. figure:: images/CreateSolid.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_solid` operation.

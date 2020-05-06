@@ -1,5 +1,5 @@
 
-  .. _tui_create_intersection:
+  .. _tui_create_sketch_intersection:
 
 Create Intersection
 ===================

@@ -14,11 +14,10 @@ To perform a Cut operationin the active part:
 
 The following property panel will be opened:
 
-.. image:: images/boolean_cut_property_panel.png
-  :align: center
+.. figure:: images/boolean_cut_property_panel.png
+   :align: center
 
-.. centered::
-  **Cut operation**
+   **Cut operation**
 
 - **Main Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be cut by tool objects.
   Any kind of shape can be selected, including subshapes of compsolids/compounds.
@@ -42,26 +41,23 @@ Result
 
 A result shape which is a cut by tool objects from main object, will be produced for each selected object:
 
-.. image:: images/CreatedCut.png
+.. figure:: images/CreatedCut.png
    :align: center
 
-.. centered::
    **Created cut**
 
 If a subsolid (yellow wireframe) of a compsolid was selected:
 
-.. image:: images/boolean_cut_subsolids_arguments.png
+.. figure:: images/boolean_cut_subsolids_arguments.png
    :align: center
 
-.. centered::
    **Cut arguments**
 
 it will be cut in the result and not selected subsolids will be added to it:
 
-.. image:: images/boolean_cut_subsolids_result.png
+.. figure:: images/boolean_cut_subsolids_result.png
    :align: center
 
-.. centered::
    **Cut subsolid result**
 
 

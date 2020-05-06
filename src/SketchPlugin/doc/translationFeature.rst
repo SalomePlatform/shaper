@@ -12,10 +12,9 @@ To create a Linear copy in the active Sketch:
 
 Property panel:
 
-.. image:: images/Linear_panel.png
-  :align: center
+.. figure:: images/Linear_panel.png
+   :align: center
 
-.. centered::
    Linear copy
 
 
@@ -52,10 +51,9 @@ Created Linear copy appears in the view.
 | The original and a linear copy objects are marked with a special sign.
 | Copy objects are drawn with a thinner line.
 
-.. image:: images/Linear_res.png
-	   :align: center
+.. figure:: images/Linear_res.png
+   :align: center
 
-.. centered::
    Linear copy created
 
 **See Also** a sample TUI Script of :ref:`tui_create_translation` operation.

@@ -12,10 +12,9 @@ To perform a boolean operation Intersection in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/intersection_property_panel.png
-  :align: center
+.. figure:: images/intersection_property_panel.png
+   :align: center
 
-.. centered::
    **Intersection operation**
 
 **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected.
@@ -33,10 +32,9 @@ Result
 
 The Result of the operation will be a shape which is an intersection of selected objects:
 
-.. image:: images/CreatedIntersection.png
-	   :align: center
+.. figure:: images/CreatedIntersection.png
+   :align: center
 
-.. centered::
    **Intersection created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_intersection` operation.

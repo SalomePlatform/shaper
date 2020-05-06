@@ -18,10 +18,9 @@ To create a Copy in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/ImportResult.png
-  :align: center
+.. figure:: images/ImportResult.png
+   :align: center
 
-.. centered::
    **Import result operation**
 
 Here it is necessary to select one or several objects. It is only possible to import results from Parts placed before the
@@ -45,10 +44,9 @@ Result
 
 The Result of the operation will be copy of one or several results selected in another part located in the same place:
 
-.. image:: images/CreatedImportResult.png
-	   :align: center
+.. figure:: images/CreatedImportResult.png
+   :align: center
 
-.. centered::
    **Import result created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_import_result` operation.

@@ -12,27 +12,26 @@ To perform a Revolution Cut in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/StartSketch.png
-  :align: center
+.. figure:: images/StartSketch.png
+   :align: center
 
-.. centered::
-  Start sketch
+   Start sketch
 
 There are three variants of the property panel for Revolution Cut depending on the chosen option:
 
-.. image:: images/revolution_by_angles.png
+.. figure:: images/revolution_by_angles.png
    :align: left
    :height: 24px
 
 **By Angles** revolves objects by specifying angles.
 
-.. image:: images/revolution_by_bounding_planes.png
+.. figure:: images/revolution_by_bounding_planes.png
    :align: left
    :height: 24px
 
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
-.. image:: images/revolution_through_all.png
+.. figure:: images/revolution_through_all.png
    :align: left
    :height: 24px
 
@@ -43,11 +42,10 @@ There are three variants of the property panel for Revolution Cut depending on t
 By angles
 ---------
 
-.. image:: images/RevolutionCut1.png
-  :align: center
+.. figure:: images/RevolutionCut1.png
+   :align: center
 
-.. centered::
-  Revolution Cut: definition by angles
+   Revolution Cut: definition by angles
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -81,10 +79,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_cut_by_angles_result.png
-	   :align: center
+.. figure:: images/revolution_cut_by_angles_result.png
+   :align: center
 
-.. centered::
    **Revolution Cut created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_angles` operation.
@@ -92,11 +89,10 @@ The Result of the operation will be a revolved shape:
 By bounding planes
 ------------------
 
-.. image:: images/RevolutionCut2.png
-  :align: center
+.. figure:: images/RevolutionCut2.png
+   :align: center
 
-.. centered::
-  Revolution Cut: definition by bounding planes
+   Revolution Cut: definition by bounding planes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -125,10 +121,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_cut_by_bounding_planes_result.png
-	   :align: center
+.. figure:: images/revolution_cut_by_bounding_planes_result.png
+   :align: center
 
-.. centered::
    **Revolution Cut created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_bounding_planes` operation.
@@ -136,11 +131,10 @@ The Result of the operation will be a revolved shape:
 Through all
 -----------
 
-.. image:: images/RevolutionCut3.png
-  :align: center
+.. figure:: images/RevolutionCut3.png
+   :align: center
 
-.. centered::
-  Revolution Cut: revolving through all the space
+   Revolution Cut: revolving through all the space
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -161,10 +155,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_cut_through_all_result.png
-	   :align: center
+.. figure:: images/revolution_cut_through_all_result.png
+   :align: center
 
-.. centered::
    **Revolution Cut created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_through_all` operation.

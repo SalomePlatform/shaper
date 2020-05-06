@@ -1,5 +1,7 @@
 .. |extrusion_btn.icon|    image:: images/extrusion_btn.png
 
+.. _featureExtrusion:
+
 Extrusion
 =========
 
@@ -12,21 +14,20 @@ To perform Extrusion in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/StartSketch.png
-  :align: center
+.. figure:: images/StartSketch.png
+   :align: center
 
-.. centered::
-  Start sketch
+   Start sketch
 
 There are two variants of the property panel for Extrusion depending on the chosen option:
 
-.. image:: images/extrusion_by_sizes.png
+.. figure:: images/extrusion_by_sizes.png
    :align: left
    :height: 24px
 
 **By Sizes** extrudes objects by specifying sizes.
 
-.. image:: images/extrusion_by_bounding_planes.png
+.. figure:: images/extrusion_by_bounding_planes.png
    :align: left
    :height: 24px
 
@@ -37,11 +38,10 @@ There are two variants of the property panel for Extrusion depending on the chos
 By sizes
 --------
 
-.. image:: images/Extrusion1.png
-  :align: center
+.. figure:: images/Extrusion1.png
+   :align: center
 
-.. centered::
-  Extrusion: definition by sizes
+   Extrusion: definition by sizes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
@@ -87,10 +87,9 @@ Result
 
 The Result of the operation will be an extruded shape:
 
-.. image:: images/extrusion_by_sizes_result.png
-	   :align: center
+.. figure:: images/extrusion_by_sizes_result.png
+   :align: center
 
-.. centered::
    **Created Extrusion**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_by_sizes` operation.
@@ -98,11 +97,10 @@ The Result of the operation will be an extruded shape:
 By bounding faces
 ------------------
 
-.. image:: images/Extrusion2.png
-  :align: center
+.. figure:: images/Extrusion2.png
+   :align: center
 
-.. centered::
-  Extrusion: definition by bounding faces
+   Extrusion: definition by bounding faces
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** if selected, it will be direction of extrusion, otherwise objects normals will be used.
@@ -142,10 +140,9 @@ Result
 
 The Result of the operation will be an extruded shape:
 
-.. image:: images/extrusion_by_bounding_planes_result.png
-	   :align: center
+.. figure:: images/extrusion_by_bounding_planes_result.png
+   :align: center
 
-.. centered::
    **Created Extrusion**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_by_bounding_planes` operation.

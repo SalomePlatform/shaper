@@ -14,13 +14,13 @@ To create a Box in the active part:
 
 There are 2 algorithms for creation of a Box:
 
-.. image:: images/box_dxyz_32x32.png
+.. figure:: images/box_dxyz_32x32.png
    :align: left
    :height: 24px
 
 **By dimensions** 
 
-.. image:: images/box_2pt_32x32.png
+.. figure:: images/box_2pt_32x32.png
    :align: left
    :height: 24px
 
@@ -33,7 +33,7 @@ By dimensions
 
 Box is created by dimensions along X, Y, Z axis starting from the origin.
 
-.. image:: images/Box_dimensions.png
+.. figure:: images/Box_dimensions.png
    :align: center
 
 Input fields:
@@ -55,8 +55,8 @@ Result
 
 A solid box based on the origin of coordinates and with edges parallel to the coordinate axes.
 
-.. image:: images/Box1.png
-	   :align: center
+.. figure:: images/Box1.png
+   :align: center
 
 **See Also** a sample TUI Script of a :ref:`tui_create_boxdim` operation.
 
@@ -65,8 +65,8 @@ By two points
 
 Box is created by two points of the box diagonal.
 
-.. image:: images/Box_2points.png
-	 :align: center
+.. figure:: images/Box_2points.png
+   :align: center
 
 Input fields:
 
@@ -88,10 +88,9 @@ Result
 
 A solid box based on two points and with edges parallel to the coordinate axes.
 
-.. image:: images/Box2.png
-	   :align: center
+.. figure:: images/Box2.png
+   :align: center
 		   
-.. centered::
    Created boxes
 
 **See Also** a sample TUI Script of :ref:`tui_create_boxpnt` operation.

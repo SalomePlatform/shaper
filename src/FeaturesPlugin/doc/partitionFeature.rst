@@ -12,10 +12,9 @@ To perform a Partition in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Partition.png
-  :align: center
+.. figure:: images/Partition.png
+   :align: center
 
-.. centered::
    **Partition operation**
 
 **Base Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be partitioned.
@@ -33,10 +32,9 @@ Result
 
 The Result of the operation will be a shape which is a partition of selected objects:
 
-.. image:: images/CreatedPartition.png
-	   :align: center
+.. figure:: images/CreatedPartition.png
+   :align: center
 
-.. centered::
    **Partition created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_partition` operation.

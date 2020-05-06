@@ -12,10 +12,9 @@ To create a wire in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Wire.png
+.. figure:: images/Wire.png
   :align: center
 
-.. centered::
   Create a wire
   
 Select one or several edges in the viewer. For automatic selection of a closed contour starting from the selected edge it is necessary to press **Add contour** button.
@@ -41,10 +40,9 @@ Result
 
 The result of the operation will be a wire created from the selected shapes:
 
-.. image:: images/CreateWire.png
+.. figure:: images/CreateWire.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_wire` operation.

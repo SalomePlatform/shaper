@@ -1,5 +1,5 @@
-.. |plus.icon|  image:: images/add.png
-.. |minus.icon|  image:: images/reverce.png
+.. |plus.icon|    image:: images/add.png
+.. |minus.icon|   image:: images/reverce.png
 .. |delete.icon|  image:: images/delete.png
 
 
@@ -15,10 +15,9 @@ Filters plug-in provides a collection of filters used Filters property panel (fo
 
 Selection by filters panel looks like following:
 
-.. image:: images/selection_by_filters.png
+.. figure:: images/selection_by_filters.png
   :align: center
 
-.. centered::
   Selection by filters property panel
 
 In this panel:
@@ -27,10 +26,9 @@ In this panel:
 
 - **Add new filter** combo box. It contains accessible filters according to the selection mode. When user selects an item from this combo box a filter item appears in **Filters** panel like in the following example:
 
-.. image:: images/selection_by_filters_added.png
+.. figure:: images/selection_by_filters_added.png
   :align: center
 
-.. centered::
   Filters **Horizontal faces** and **On plane** added to the property panel.
   
 If filter is implemented as "Multiple", several instances of this filter may be added in one selection. Otherwise the added filter is removed from the "Add new filter..." list.

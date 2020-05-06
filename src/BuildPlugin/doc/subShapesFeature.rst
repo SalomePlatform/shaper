@@ -15,10 +15,9 @@ To create Sub-shapes in the active part:
 
 The following property panel appears.
 
-.. image:: images/SubShapes.png
+.. figure:: images/SubShapes.png
   :align: center
 
-.. centered::
   Sub-shapes property panel
 
 Input fields:
@@ -39,10 +38,9 @@ Result
 """"""
 The result replaces the original shape with its copy with added/removed sub-shapes.
 
-.. image:: images/CreateSubShapes.png
+.. figure:: images/CreateSubShapes.png
    :align: center
 
-.. centered::
    Sub-shapes
 
 **See Also** a sample TUI Script of :ref:`tui_create_subshape` operation.

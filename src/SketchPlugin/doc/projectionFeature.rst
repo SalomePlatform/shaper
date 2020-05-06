@@ -13,10 +13,9 @@ To create a Projection in the active Sketch:
 
 Property panel:
 
-.. image:: images/Projection_panel.png
-  :align: center
+.. figure:: images/Projection_panel.png
+   :align: center
 
-.. centered::
    Projection
 
 Input fields:
@@ -43,10 +42,9 @@ Result
 
 Created Projection appears in the view.
 
-.. image:: images/Projection_res.png
-	   :align: center
+.. figure:: images/Projection_res.png
+   :align: center
 
-.. centered::
    Created projection (purple line)
 
 **See Also** a sample TUI Script of :ref:`tui_create_projection` operation.

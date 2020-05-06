@@ -15,10 +15,9 @@ To start a Sketch Copy operation:
 
 The following property panel appears:
 
-.. image:: images/SketchCopy_panel.png
-  :align: center
+.. figure:: images/SketchCopy_panel.png
+   :align: center
 
-.. centered::
    Sketch copy panel
 
 Select a sketch feature to copy. On Apply button press the copied sketch will be created in the Object Browser tree.

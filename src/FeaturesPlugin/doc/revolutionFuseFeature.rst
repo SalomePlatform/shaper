@@ -12,27 +12,26 @@ To perform Revolution Fuse in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/StartSketch.png
-  :align: center
+.. figure:: images/StartSketch.png
+   :align: center
 
-.. centered::
-  Start sketch
+   Start sketch
   
 There are three variants of the property panel for Revolution Fuse depending on the chosen option:
 
-.. image:: images/revolution_by_angles.png
+.. figure:: images/revolution_by_angles.png
    :align: left
    :height: 24px
 
 **By Angles** revolves objects by specifying angles.
 
-.. image:: images/revolution_by_bounding_planes.png
+.. figure:: images/revolution_by_bounding_planes.png
    :align: left
    :height: 24px
 
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
-.. image:: images/revolution_through_all.png
+.. figure:: images/revolution_through_all.png
    :align: left
    :height: 24px
 
@@ -43,11 +42,10 @@ There are three variants of the property panel for Revolution Fuse depending on 
 By angles
 ---------
 
-.. image:: images/RevolutionFuse1.png
-  :align: center
+.. figure:: images/RevolutionFuse1.png
+   :align: center
 
-.. centered::
-  Revolution Fuse: definition by angles
+   Revolution Fuse: definition by angles
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -81,10 +79,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_fuse_by_angles_result.png
-	   :align: center
+.. figure:: images/revolution_fuse_by_angles_result.png
+   :align: center
 
-.. centered::
    **Revolution Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_by_angles` operation.
@@ -92,11 +89,10 @@ The Result of the operation will be a revolved shape:
 By bounding planes
 ------------------
 
-.. image:: images/RevolutionFuse2.png
-  :align: center
+.. figure:: images/RevolutionFuse2.png
+   :align: center
 
-.. centered::
-  Revolution Fuse: definition by bounding planes
+   Revolution Fuse: definition by bounding planes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -125,10 +121,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_fuse_by_bounding_planes_result.png
-	   :align: center
+.. figure:: images/revolution_fuse_by_bounding_planes_result.png
+   :align: center
 
-.. centered::
    **Revolution Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_by_bounding_planes` operation.
@@ -136,11 +131,10 @@ The Result of the operation will be a revolved shape:
 Through All
 -----------
 
-.. image:: images/RevolutionFuse3.png
-  :align: center
+.. figure:: images/RevolutionFuse3.png
+   :align: center
 
-.. centered::
-  Revolution Fuse: definition by bounding planes
+   Revolution Fuse: definition by bounding planes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -161,10 +155,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_fuse_through_all_result.png
-	   :align: center
+.. figure:: images/revolution_fuse_through_all_result.png
+   :align: center
 
-.. centered::
    **Revolution Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_through_all` operation.

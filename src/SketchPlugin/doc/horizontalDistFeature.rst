@@ -14,7 +14,7 @@ To create a Horizontal Distance constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/HorizontalDistance_panel.png
+.. figure:: images/HorizontalDistance_panel.png
    :align: center
 
 .. |location_left| image:: images/location_left.png
@@ -38,10 +38,9 @@ When creating the constraint, after selection of two objects for the first time:
 - drag the horizontal distance presentation in the view to the desired position and click once;
 - set desirable horizontal distance value in the input field in the view and press **Enter** or just press **Enter** to keep the current distance.
 
-.. image:: images/HorizontalDistance_field_view.png
+.. figure:: images/HorizontalDistance_field_view.png
    :align: center
 
-.. centered::
    Horizontal Distance input in the view
 
 **TUI Command**:
@@ -58,10 +57,9 @@ Result
 
 Created Horizontal Distance appears in the view.
 
-.. image:: images/HorizontalDistance_res.png
-	   :align: center
+.. figure:: images/HorizontalDistance_res.png
+   :align: center
 
-.. centered::
    Horizontal Distance created
 
 **See Also** a sample TUI Script of :ref:`tui_create_hdistance` operation.

@@ -12,10 +12,9 @@ To create a compsolid in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Compsolid.png
+.. figure:: images/Compsolid.png
   :align: center
 
-.. centered::
   Create a compsolid
 
 Select one or several shapes in the viewer.
@@ -37,10 +36,9 @@ Result
 
 The result of the operation will be a compsolid created from the selected shapes:
 
-.. image:: images/CreateCompsolid.png
+.. figure:: images/CreateCompsolid.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_compsolid` operation.

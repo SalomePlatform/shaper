@@ -17,10 +17,9 @@ To add a new Rectangle to the Sketch:
 
 The following property panel appears:
 
-.. image:: images/Rectangle_panel.png
-  :align: center
+.. figure:: images/Rectangle_panel.png
+   :align: center
 
-.. centered::
    Rectangle
 
 Click in the view once to set the first corner, then move the mouse and click a second time to set the opposite corner.
@@ -43,10 +42,9 @@ Result
 
 Created rectangle appears in the view.
 
-.. image:: images/Rectangle_res.png
-	   :align: center
+.. figure:: images/Rectangle_res.png
+   :align: center
 
-.. centered::
    Rectangle created
 
 **See Also** a sample TUI Script of :ref:`tui_create_rectangle` operation.
