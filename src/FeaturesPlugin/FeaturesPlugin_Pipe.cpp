@@ -357,8 +357,10 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
         ListOfShape aV1History, aV2History;
         thePipeAlgo->generated(aV1, aV1History);
         thePipeAlgo->generated(aV2, aV2History);
-        aResultBody->generated(aV1, aV1History.front());
-        aResultBody->generated(aV2, aV2History.front());
+        if (!aV1History.empty())
+          aResultBody->generated(aV1, aV1History.front());
+        if (!aV2History.empty())
+          aResultBody->generated(aV2, aV2History.front());
       }
       case GeomAPI_Shape::FACE:
       case GeomAPI_Shape::SHELL: {

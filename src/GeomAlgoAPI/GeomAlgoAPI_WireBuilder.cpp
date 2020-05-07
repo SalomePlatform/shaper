@@ -24,27 +24,102 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <Geom_Curve.hxx>
+#include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Wire.hxx>
 #include <TopExp_Explorer.hxx>
+
+#include <cmath>
+#include <map>
+#include <set>
+
+class SetOfEdges
+{
+  class DoubleCompare {
+  public:
+    bool operator() (const double d1, const double d2) const {
+      return d1 + Precision::Confusion() < d2;
+    }
+  };
+
+  typedef std::map<double, std::set<double, DoubleCompare>, DoubleCompare> ParamMap;
+  std::map<Handle(Geom_Curve), ParamMap> myShapes;
+
+public:
+  bool add(const TopoDS_Shape& theEdge)
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(theEdge);
+    if (anEdge.IsNull())
+      return true;
+
+    double aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+
+    bool isAdded = true;
+    std::map<Handle(Geom_Curve), ParamMap>::iterator
+        aFound = myShapes.find(aCurve);
+    if (aFound == myShapes.end())
+      myShapes[aCurve][aFirst].insert(aLast);
+    else {
+      ParamMap::iterator aFoundPar = aFound->second.find(aFirst);
+      if (aFoundPar == aFound->second.end())
+        aFound->second[aFirst].insert(aLast);
+      else if (aFoundPar->second.find(aLast) == aFoundPar->second.end())
+        aFoundPar->second.insert(aLast);
+      else
+        isAdded = false;
+    }
+    return isAdded;
+  }
+
+  static bool isEqual(const TopoDS_Shape& theShape1, const TopoDS_Shape& theShape2)
+  {
+    const TopoDS_Edge& anEdge1 = TopoDS::Edge(theShape1);
+    const TopoDS_Edge& anEdge2 = TopoDS::Edge(theShape2);
+    if (anEdge1.IsNull() || anEdge2.IsNull())
+      return false;
+
+    double aFirst1, aLast1;
+    Handle(Geom_Curve) aCurve1 = BRep_Tool::Curve(anEdge1, aFirst1, aLast1);
+    double aFirst2, aLast2;
+    Handle(Geom_Curve) aCurve2 = BRep_Tool::Curve(anEdge2, aFirst2, aLast2);
+    return aCurve1 == aCurve2 && fabs(aFirst1 - aFirst2) < Precision::Confusion() &&
+                                 fabs(aLast1 - aLast2) < Precision::Confusion();
+  }
+};
 
 //=================================================================================================
 GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
 {
   TopTools_ListOfShape aListOfEdges;
+  SetOfEdges aProcessedEdges;
 
   ListOfShape::const_iterator anIt = theShapes.cbegin();
   for(; anIt != theShapes.cend(); ++anIt) {
-    const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
+    TopoDS_Shape aShape = (*anIt)->impl<TopoDS_Shape>();
     switch(aShape.ShapeType()) {
       case TopAbs_EDGE: {
-        aListOfEdges.Append(aShape);
+        aShape.Orientation(TopAbs_FORWARD);
+        if (aProcessedEdges.add(aShape))
+          aListOfEdges.Append(aShape);
         break;
       }
       case TopAbs_WIRE: {
         for(TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
-          aListOfEdges.Append(anExp.Current());
+          TopoDS_Shape anEdge = anExp.Current();
+          anEdge.Orientation(TopAbs_FORWARD);
+          // if the edge was already processed, remove it to keep original order of the current wire
+          if (!aProcessedEdges.add(anEdge)) {
+            for (TopTools_ListIteratorOfListOfShape anIt(aListOfEdges); anIt.More(); anIt.Next())
+              if (SetOfEdges::isEqual(anEdge, anIt.Value())) {
+                aListOfEdges.Remove(anIt);
+                break;
+              }
+          }
+          aListOfEdges.Append(anEdge);
         }
         break;
       }
