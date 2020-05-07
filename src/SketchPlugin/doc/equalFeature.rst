@@ -1,5 +1,5 @@
 .. _sketchEqual:
-.. |equal.icon|    image:: images/equal.png
+.. |equal.icon|    image:: images/Equal.png
 
 Equal constraint
 ================
@@ -14,7 +14,7 @@ To create an Equal constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Equal_panel.png
+.. figure:: images/Equal_panel.png
    :align: center
 
 Input fields:
@@ -40,10 +40,9 @@ Result
 
 Created Equal constraint appears in the view.
 
-.. image:: images/Equal_res.png
-	   :align: center
+.. figure:: images/Equal_res.png
+   :align: center
 
-.. centered::
    Created equal constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_equal` operation.

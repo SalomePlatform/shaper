@@ -1,4 +1,4 @@
-.. |fillet.icon|    image:: images/fillet.png
+.. |fillet.icon|    image:: images/Fillet.png
 
 Fillet
 ======
@@ -13,10 +13,9 @@ To create a Fillet in the active Sketch:
 
 Property panel:
 
-.. image:: images/Fillet_panel.png
-  :align: center
+.. figure:: images/Fillet_panel.png
+   :align: center
 
-.. centered::
    Fillet
 
 Input fields:
@@ -43,10 +42,9 @@ Result
 
 Created Fillet appears in the view.
 
-.. image:: images/Fillet_res.png
-	   :align: center
+.. figure:: images/Fillet_res.png
+   :align: center
 
-.. centered::
    Created fillet
 
 **See Also** a sample TUI Script of :ref:`tui_create_fillet` operation.

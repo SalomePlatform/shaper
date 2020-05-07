@@ -12,37 +12,50 @@ Axis is a construction object and it can be created in a part or in a partset. T
 
 There are 6 algorithms for creation of an Axis:
 
-.. image:: images/axis_dxyz_32x32.png
+.. figure:: images/axis_dxyz_32x32.png
    :align: left
+   :height: 24px
+
 **By three dimensions** creates an axis by dimensions along X, Y, Z axes starting form existing origin.
 
-.. image:: images/by_two_points_32x32.png
+.. figure:: images/by_two_points_32x32.png
    :align: left
+   :height: 24px
+
 **By two points** creates an axis using existing points.
 
-.. image:: images/axis_by_line_32x32.png
+.. figure:: images/axis_by_line_32x32.png
    :align: left
+   :height: 24px
+
 **By line** creates an axis using a line.
 
-.. image:: images/axis_by_line_32x32.png
+.. figure:: images/cylindrical_face_32x32.png
    :align: left
+   :height: 24px
+
 **As an axis of cylindrical face** creates an axis using a cylindrical face.
 
-.. image:: images/axis_by_line_32x32.png
+.. figure:: images/axis_by_plane_and_point_32x32.png
    :align: left
+   :height: 24px
+
 **By plane and point** creates an axis using a plane and point.
 
-.. image:: images/axis_by_line_32x32.png
+.. figure:: images/axis_by_two_planes_32x32.png
    :align: left
+   :height: 24px
+
 **By two planes** creates an axis as the intersection of two planes.
+
+--------------------------------------------------------------------------------
 
 By three dimensions
 -------------------
 
-.. image:: images/Axis1.png
+.. figure:: images/Axis1.png
    :align: center
-	
-.. centered::
+
    **By dX, dY, dZ values**
 
 An axis is defined by dX, dY and dZ values of a vector.
@@ -62,10 +75,9 @@ Result
 
 The Result of the operation will be an axis defined by vector from origin:
 
-.. image:: images/CreatedAxis1.png
-	   :align: center
+.. figure:: images/CreatedAxis1.png
+   :align: center
 
-.. centered::
    **Axis by three dimensions**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_xyz` operation.
@@ -74,10 +86,9 @@ The Result of the operation will be an axis defined by vector from origin:
 By two points
 -------------
 
-.. image:: images/Axis2.png
+.. figure:: images/Axis2.png
    :align: center
-	
-.. centered::
+
    **By two points**
 
 An axis is defined by two points or vertices.
@@ -98,10 +109,9 @@ Result
 
 The Result of the operation will be an axis based on two points:
 
-.. image:: images/CreatedAxis2.png
-	   :align: center
+.. figure:: images/CreatedAxis2.png
+   :align: center
 
-.. centered::
    **Axis by two points**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_points` operation.
@@ -110,10 +120,9 @@ The Result of the operation will be an axis based on two points:
 By line
 -------
 
-.. image:: images/Axis3.png
+.. figure:: images/Axis3.png
    :align: center
-	
-.. centered::
+
    **By a line**
 
 An axis is defined by a linear edge.
@@ -131,10 +140,9 @@ Result
 
 The Result of the operation will be an axis based on the selected line:
 
-.. image:: images/CreatedAxis3.png
-	   :align: center
+.. figure:: images/CreatedAxis3.png
+   :align: center
 
-.. centered::
    **Axis by line**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_line` operation.
@@ -143,10 +151,9 @@ The Result of the operation will be an axis based on the selected line:
 As an axis of cylindrical face
 ------------------------------
 
-.. image:: images/Axis4.png
+.. figure:: images/Axis4.png
    :align: center
-	
-.. centered::
+
    **By a cylinder**
 
 An axis is defined by a cylindrical face. Axis of the cylinder will be an axis object.
@@ -164,10 +171,9 @@ Result
 
 The Result of the operation will be an axis of the selected cylinder:
 
-.. image:: images/CreatedAxis4.png
-	   :align: center
+.. figure:: images/CreatedAxis4.png
+   :align: center
 
-.. centered::
    **Axis cylindrical face**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_cylinder` operation.
@@ -176,10 +182,9 @@ The Result of the operation will be an axis of the selected cylinder:
 By plane and point
 ------------------
 
-.. image:: images/Axis5.png
+.. figure:: images/Axis5.png
    :align: center
-	
-.. centered::
+
    **By a plane and point**
 
 An axis is defined by a point or vertex and plane (or planar face) as a normal from the point to the plane.
@@ -198,10 +203,9 @@ Result
 
 The Result of the operation will be an axis:
 
-.. image:: images/CreatedAxis5.png
-	   :align: center
+.. figure:: images/CreatedAxis5.png
+   :align: center
 
-.. centered::
    **Axis by plane and point**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_plane` operation.
@@ -210,10 +214,9 @@ The Result of the operation will be an axis:
 By two planes
 -------------
 
-.. image:: images/Axis6.png
+.. figure:: images/Axis6.png
    :align: center
-	
-.. centered::
+
    **By two planes**
 
 An axis is defined by two planes. The intersection of the planes defines an axis. It is possible to define offset for axis definition from both planes.
@@ -236,10 +239,9 @@ Result
 
 The Result of the operation will be an axis:
 
-.. image:: images/CreatedAxis6.png
-	   :align: center
+.. figure:: images/CreatedAxis6.png
+   :align: center
 
-.. centered::
    **Axis by two planes**
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_twoplanes` operation.

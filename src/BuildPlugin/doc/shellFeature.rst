@@ -12,10 +12,9 @@ To create a shell in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Shell.png
+.. figure:: images/Shell.png
   :align: center
 
-.. centered::
   Create a shell
   
 Select one or several faces in the viewer. Additionally, it is allowed to select a whole sketch result from the object browser. In this case, the result shell will contain faces corresponding to all smallest closed contours of the sketch.
@@ -37,10 +36,9 @@ Result
 
 The result of the operation will be a shell created from the selected shapes:
 
-.. image:: images/CreateShell.png
+.. figure:: images/CreateShell.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_shell` operation.

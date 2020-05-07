@@ -1,4 +1,4 @@
-.. |point.icon|    image:: images/point.png
+.. |point.icon|    image:: images/Point.png
 
 Point
 =====
@@ -12,10 +12,9 @@ To add a new Point to the Sketch:
 
 The following property panel appears:
 
-.. image:: images/Point_panel.png
-  :align: center
+.. figure:: images/Point_panel.png
+   :align: center
 
-.. centered::
    Point
 
 Clicking in the view creates a point preview. If an existing object is clicked, a constraint for
@@ -36,10 +35,9 @@ Result
 
 Created point appears in the view.
 
-.. image:: images/Point_res.png
-	   :align: center
+.. figure:: images/Point_res.png
+   :align: center
 
-.. centered::
    Point created
 
 **See Also** a sample TUI Script of :ref:`tui_create_point` operation.

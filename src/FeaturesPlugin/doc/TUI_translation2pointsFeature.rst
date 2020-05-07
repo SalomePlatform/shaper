@@ -8,4 +8,4 @@ Translation by 2 points
     :linenos:
     :language: python
 
-:download:`Download this script <examples/translation2points.py >` 
+:download:`Download this script <examples/translation2points.py>`

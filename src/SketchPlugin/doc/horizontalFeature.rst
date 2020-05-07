@@ -12,7 +12,7 @@ To create a Horizontal constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Horizontal_panel.png
+.. figure:: images/Horizontal_panel.png
    :align: center
 
 Input fields:
@@ -34,10 +34,9 @@ Result
 
 Created Horizontal constraint appears in the view.
 
-.. image:: images/Horizontal_res.png
-	   :align: center
+.. figure:: images/Horizontal_res.png
+   :align: center
 
-.. centered::
    Horizontal constraint created
 
 **See Also** a sample TUI Script of :ref:`tui_create_horizontal` operation.

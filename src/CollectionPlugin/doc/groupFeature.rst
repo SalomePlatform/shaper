@@ -1,7 +1,4 @@
-.. |shape_group.icon|    image:: images/shape_group.png
-.. |plus.icon|  image:: images/add.png
-.. |minus.icon|  image:: images/reverce.png
-.. |delete.icon|  image:: images/delete.png
+.. |shape_group.icon| image:: images/shape_group.png
 
 .. _groupPage:
 
@@ -16,32 +13,28 @@ To create a Group in the active part:
 
 The following property panel appears. 
 
-.. image:: images/group_property_panel.png
+.. figure:: images/group_property_panel.png
   :align: center
 
-.. centered::
   Create a group
+
+.. |group_vertices| image:: images/group_property_panel_vertice.png
+.. |group_edges| image:: images/group_property_panel_edge.png
+.. |group_faces| image:: images/group_property_panel_face.png
+.. |group_solids| image:: images/group_property_panel_solid.png
 
 Input fields:
 
 - **Name** defines the name of the group, by default, it is **Group_n**.
 - **Type** buttons select geometrical entities to be included in group:
   
-    .. image:: images/group_property_panel_vertice.png
-         :align: left
-    Vertices;
-  
-    .. image:: images/group_property_panel_edge.png
-         :align: left
-    Edges;
+    |group_vertices| Vertices;
 
-    .. image:: images/group_property_panel_face.png
-         :align: left
-    Faces;
+    |group_edges| Edges;
 
-    .. image:: images/group_property_panel_solid.png
-         :align: left	       
-    Solids;
+    |group_faces| Faces;
+
+    |group_solids| Solids;
  
 - The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection. To delete entities from the list, select them and call pop-up menu *Delete* item.
 
@@ -65,10 +58,9 @@ Result
 
 Created Group appears in the view.
 
-.. image:: images/group_res.png
-	   :align: center
+.. figure:: images/group_res.png
+   :align: center
 
-.. centered::
    Created group
 
 **See Also** a sample TUI Script of :ref:`tui_create_group` operation.

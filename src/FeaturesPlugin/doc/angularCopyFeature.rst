@@ -13,11 +13,10 @@ To create an Angular copy in the active part:
 
 The following property panel appears.
 
-.. image:: images/angularcopy.png
-  :align: center
+.. figure:: images/angularcopy.png
+   :align: center
 
-.. centered::
-  Angular copy property panel
+   Angular copy property panel
 
 Input fields:
 
@@ -41,10 +40,9 @@ Result
 """"""
 Result of cylinder rotation is a compound.
 
-.. image:: images/angularcopycyl.png
+.. figure:: images/angularcopycyl.png
    :align: center
 
-.. centered::
    Angular copy
 
 **See Also** a sample TUI Script of :ref:`tui_create_angularcopy` operation.  

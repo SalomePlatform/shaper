@@ -1,4 +1,4 @@
-.. |middlepoint.icon|    image:: images/middlepoint.png
+.. |middlepoint.icon|    image:: images/MiddlePoint.png
 
 Middle point constraint
 =======================
@@ -12,7 +12,7 @@ To create a Middle point in the active Sketch:
 
 Property panel:
 
-.. image:: images/Middlepoint_panel.png
+.. figure:: images/Middlepoint_panel.png
    :align: center
 
 Input fields:
@@ -38,10 +38,9 @@ Result
 
 Created Middle point constraint appears in the view.
 
-.. image:: images/Middlepoint_res.png
-	   :align: center
+.. figure:: images/Middlepoint_res.png
+   :align: center
 
-.. centered::
    Created middle point constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_middle` operation.

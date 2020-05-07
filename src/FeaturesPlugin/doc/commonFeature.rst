@@ -1,4 +1,7 @@
 .. |bool_common.icon|    image:: images/bool_common.png
+   :height: 16px
+
+.. _featureCommon:
 
 Common
 ======
@@ -12,22 +15,26 @@ To perform a Common operation in the active part:
 
 There are 2 options for creation of a Common:
 
-.. image:: images/bool_common_simple.png
+.. figure:: images/bool_common_simple.png
    :align: left
+   :height: 24px
+
 **Simple** common part between all selected objects.
 
-.. image:: images/bool_common_advanced.png
+.. figure:: images/bool_common_advanced.png
    :align: left
+   :height: 24px
+
 **Advanced** common part for each object between this object and all tools.
 
+--------------------------------------------------------------------------------
 
 Simple
 ------
 
-.. image:: images/boolean_common_simple_property_panel.png
+.. figure:: images/boolean_common_simple_property_panel.png
    :align: center
 
-.. centered::
    **Simple**
 
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
@@ -47,10 +54,9 @@ Result
 
 The Result of the operation will be a shape which is a common for all selected shapes:
 
-.. image:: images/CreatedCommon.png
-	   :align: center
+.. figure:: images/CreatedCommon.png
+   :align: center
 
-.. centered::
    **Common created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_common` operation.
@@ -58,10 +64,9 @@ The Result of the operation will be a shape which is a common for all selected s
 Advanced
 --------
 
-.. image:: images/boolean_common_advanced_property_panel.png
+.. figure:: images/boolean_common_advanced_property_panel.png
    :align: center
 
-.. centered::
    **Advanced**
 
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
@@ -85,10 +90,9 @@ Result
 
 For each selected object, the common part between this object and all tools will be found:
 
-.. image:: images/boolean_common_result.png
-	   :align: center
+.. figure:: images/boolean_common_result.png
+   :align: center
 
-.. centered::
    **Created common**
 
 **See Also** a sample TUI Script of :ref:`tui_create_common` operation.

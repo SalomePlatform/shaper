@@ -11,10 +11,9 @@ To create a Group Addition in the active part:
 
 The following property panel appears. 
 
-.. image:: images/group_addition_property_panel.png
+.. figure:: images/group_addition_property_panel.png
   :align: center
 
-.. centered::
   Create a group addition operation
 
 Input fields:

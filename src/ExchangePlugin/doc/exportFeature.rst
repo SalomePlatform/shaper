@@ -11,10 +11,9 @@ Export PartSet
 To export the full study in SHAPER native format (``*.shaper``) select in the Main Menu *File -> Export -> Part Set...* item.
 The **Export file** dialog will be opened:
 
-.. image:: images/ExportNativeFileDlg.png
+.. figure:: images/ExportNativeFileDlg.png
    :align: center
-	
-.. centered::
+
    **Dialog box for export to SHAPER native format**
 
 Specify file name and press **Save** button to export the file. **Cancel** button cancels the operation.
@@ -28,18 +27,16 @@ To export results in binary format (``*.shaperpart``) select in the Main Menu *F
 
 The following property panel will be opened:
 
-.. image:: images/ExportPart_panel.png
+.. figure:: images/ExportPart_panel.png
    :align: center
-	
-.. centered::
+
    **Export Part property panel**
 
 The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box:
 
-.. image:: images/ExportPartFileDlg.png
+.. figure:: images/ExportPartFileDlg.png
    :align: center
-	
-.. centered::
+
    **Dialog box to export part of the model**
 
 Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.
@@ -77,18 +74,16 @@ To export objects to a file select in the Main Menu *File -> Export -> To CAD  f
 
 The following property panel will be opened:
 
-.. image:: images/Export_panel.png
+.. figure:: images/Export_panel.png
    :align: center
-	
-.. centered::
+
    **Export property panel**
 
 In this panel, it is necessary to select desirable format of export file. It can be **'BREP, STEP, IGES'** or **'XAO'**. In case of first choice the format of exported file will be defined according to file extension. The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box:
 
-.. image:: images/ExportFileDlg.png
+.. figure:: images/ExportFileDlg.png
    :align: center
-	
-.. centered::
+
    **Dialog box tp export in CAD-neutral format**
 
 Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.

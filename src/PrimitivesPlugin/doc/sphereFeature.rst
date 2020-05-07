@@ -12,10 +12,9 @@ To create a Sphere in the active part:
 
 The following property panel appears.
 
-.. image:: images/Sphere.png
-  :align: center
+.. figure:: images/Sphere.png
+   :align: center
 
-.. centered::
    Sphere property panel
    
 Input fields:
@@ -37,10 +36,9 @@ Result
 
 An example is shown below.
 
-.. image:: images/Sphere_res.png
-	   :align: center
+.. figure:: images/Sphere_res.png
+   :align: center
 		   
-.. centered::
    Sphere created  
 
 **See Also** a sample TUI Script of :ref:`tui_create_sphere` operation.

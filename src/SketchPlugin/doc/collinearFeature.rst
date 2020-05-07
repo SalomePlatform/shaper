@@ -12,7 +12,7 @@ To create a Collinear constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Collinear_panel.png
+.. figure:: images/Collinear_panel.png
    :align: center
 
 Input fields:
@@ -36,10 +36,9 @@ Result
 
 Created Collinear constraint appears in the view.
 
-.. image:: images/Collinear_res.png
-	   :align: center
+.. figure:: images/Collinear_res.png
+   :align: center
 
-.. centered::
    Created collinear constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_collinear` operation.

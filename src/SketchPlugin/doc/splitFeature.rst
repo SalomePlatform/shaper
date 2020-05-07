@@ -1,4 +1,4 @@
-.. |split.icon|    image:: images/split.png
+.. |split.icon|    image:: images/Split.png
 
 Split
 =====
@@ -14,10 +14,9 @@ To create a Split in the active Sketch:
 
 Property panel:
 
-.. image:: images/Split_panel.png
-  :align: center
+.. figure:: images/Split_panel.png
+   :align: center
 
-.. centered::
    Split
 
 Input fields:
@@ -26,10 +25,9 @@ Input fields:
 
 The selected segment is highlighted in the view:
 
-.. image:: images/Split_segment_sel.png
+.. figure:: images/Split_segment_sel.png
    :align: center
 
-.. centered::
    The segment to split off
 
 **TUI Command**:
@@ -45,10 +43,9 @@ Result
 
 Created Split appears in the view.
 
-.. image:: images/Split_res.png
-	   :align: center
+.. figure:: images/Split_res.png
+   :align: center
 
-.. centered::
    Created split 
 
 **See Also** a sample TUI Script of :ref:`tui_create_split` operation.

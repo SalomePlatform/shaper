@@ -6,9 +6,11 @@
 Welcome to SHAPER documentation!
 ==================================
 
-- :ref:`introduction`
-- :ref:`tutorial`
-
 .. toctree::
    :titlesonly:
-   :maxdepth: 3
+   :maxdepth: 2
+
+   General/Introduction.rst
+   General/Tutorial.rst
+<insert here>
+   General/TUI_scripts.rst

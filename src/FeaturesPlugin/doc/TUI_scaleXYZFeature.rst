@@ -8,4 +8,4 @@ Scale by different factors along axes
     :linenos:
     :language: python
 
-:download:`Download this script <examples/scaleXYZ.py >` 
+:download:`Download this script <examples/scaleXYZ.py>`

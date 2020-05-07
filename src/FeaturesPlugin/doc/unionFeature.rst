@@ -12,10 +12,9 @@ To create a Union in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Union.png
-  :align: center
+.. figure:: images/Union.png
+   :align: center
 
-.. centered::
    **Union operation**
 
 Here it is necessary to select some objects. Only faces with shared edges or solids with shared faces are allowed for selection.
@@ -37,10 +36,9 @@ Result
 
 The Result of the operation will be a shape which is a union of selected objects:
 
-.. image:: images/CreatedUnion.png
-	   :align: center
+.. figure:: images/CreatedUnion.png
+   :align: center
 
-.. centered::
    **Union created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_union` operation.

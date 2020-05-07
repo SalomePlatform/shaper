@@ -8,5 +8,4 @@ Fuse Faces
     :linenos:
     :language: python
 
-:download:`Download this script <examples/fuse_faces.py >` 
-   
+:download:`Download this script <examples/fuse_faces.py>`

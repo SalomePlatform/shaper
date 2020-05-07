@@ -9,18 +9,16 @@ To create an Ellipsoid in the active part:
 #. select in the Main Menu *GDML - > Ellipsoid* item  or
 #. click **Ellipsoid** button in the toolbar.
 
-.. image:: images/ellips_btn.png
+.. figure:: images/ellips_btn.png
    :align: center
 
-.. centered::
    **Ellipsoid**  button 
 
 The following property panel will be opened:
 
-.. image:: images/Ellipsoid.png
+.. figure:: images/Ellipsoid.png
    :align: center
 	
-.. centered::
    **Ellipsoid property panel**
 
 The property panel contains an image, which explains the meaning of input values:
@@ -40,10 +38,9 @@ Result
 
 The Result of the operation will be a SOLID.
 
-.. image:: images/CreatedEllipsoid.png
+.. figure:: images/CreatedEllipsoid.png
 	   :align: center
 		   
-.. centered::
    Ellipsoid created
 
 **See Also** a sample TUI Script of :ref:`tui_create_ellipsoid` operation.

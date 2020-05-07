@@ -8,4 +8,4 @@ Symmetry through an Axis of symmetry
     :linenos:
     :language: python
 
-:download:`Download this script <examples/symmetryaxis.py >` 
+:download:`Download this script <examples/symmetryaxis.py>`

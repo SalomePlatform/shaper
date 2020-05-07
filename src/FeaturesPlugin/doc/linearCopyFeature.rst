@@ -12,11 +12,10 @@ To create a Linear copy in the active part:
 
 The following property panel appears.
 
-.. image:: images/LinearCopy.png
-  :align: center
+.. figure:: images/LinearCopy.png
+   :align: center
 
-.. centered::
-  Linear copy property panel
+   Linear copy property panel
 
 Input fields:
 
@@ -51,10 +50,9 @@ Result
 """"""
 Result of operation is a compound.
 
-.. image:: images/linearcopyres.png
+.. figure:: images/linearcopyres.png
    :align: center
 
-.. centered::
    Linear copy
 
 **See Also** a sample TUI Script of :ref:`tui_create_linearcopy` operation.

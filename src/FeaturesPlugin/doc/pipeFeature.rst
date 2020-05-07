@@ -12,28 +12,35 @@ To create a Pipe in the active part:
 
 Pipe can be created in three different ways:
 
-  .. image:: images/pipe_simple_32x32.png    
-    :align: left
-  by object and path 
+.. figure:: images/pipe_simple_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/pipe_binormal_32x32.png      
-    :align: left
-  by object, path and Bi-normal  
+by object and path 
 
-  .. image:: images/pipe_locations_32x32.png    
-    :align: left
-  by object, path and locations 
+.. figure:: images/pipe_binormal_32x32.png      
+   :align: left
+   :height: 24px
+
+by object, path and Bi-normal  
+
+.. figure:: images/pipe_locations_32x32.png    
+   :align: left
+   :height: 24px
+
+by object, path and locations 
+
+--------------------------------------------------------------------------------
 
 Pipe by object and path
 -----------------------
 
 Base Objects are extruded along the Path Object so that the angle between the normal vector to the base shape and the tangent to the path remain constant at any point of the given path. 
 
-.. image:: images/Pipe1.png
-  :align: center
+.. figure:: images/Pipe1.png
+   :align: center
 
-.. centered::
-  Pipe by object and path property panel
+   Pipe by object and path property panel
 
 Input fields:
 
@@ -54,10 +61,9 @@ Result
 
 Result of extrusion of an arc along another arc.
 
-.. image:: images/simplePipe.png
+.. figure:: images/simplePipe.png
    :align: center
 
-.. centered::
    Pipe by object and path
 
 **See Also** a sample TUI Script of ref:`tui_simple_pipe` operation.
@@ -67,11 +73,10 @@ Pipe by object, path and Bi-normal
 
 The pipe is generated to preserve the constant angle between the normal vector to the base shape and the BiNormal vector at any point of the given path. 
 
-.. image:: images/Pipe2.png
-  :align: center
-
-.. centered::
-  Pipe by object, path and Bi-normal property panel
+.. figure:: images/Pipe2.png
+   :align: center
+ 
+   Pipe by object, path and Bi-normal property panel
 
 Input fields:
 
@@ -94,10 +99,9 @@ Result
 
 Result of extrusion of a rectangular face along  arc.
 
-.. image:: images/binormalPipe.png
+.. figure:: images/binormalPipe.png
    :align: center
 
-.. centered::
    Pipe by object, path and Bi-normal
 
 **See Also** a sample TUI Script of :ref:`tui_binormal_pipe` operation.
@@ -107,11 +111,10 @@ Pipe by object, path and locations
 
 The pipe is generated to preserve selected profiles at the specified locations along the path.
 
-.. image:: images/Pipe3.png
-  :align: center
+.. figure:: images/Pipe3.png
+   :align: center
 
-.. centered::
-  Pipe by object, path and locations property panel
+   Pipe by object, path and locations property panel
 
 Input fields:
 
@@ -134,10 +137,9 @@ Result
 
 Result of extrusion of 3 circles along arc with specified locations.
 
-.. image:: images/locationPipe.png
+.. figure:: images/locationPipe.png
    :align: center
 
-.. centered::
    Pipe by object, path and locations
 
 **See Also** a sample TUI Script of :ref:`tui_locations_pipe` operation.

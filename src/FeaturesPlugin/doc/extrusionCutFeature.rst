@@ -12,35 +12,40 @@ To perform Extrusion Cut in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/StartSketch.png
-  :align: center
+.. figure:: images/StartSketch.png
+   :align: center
 
-.. centered::
-  Start sketch
+   Start sketch
 
 There are three variants of the property panel for Extrusion Cut depending on the chosen option:
 
-.. image:: images/extrusion_by_sizes.png
+.. figure:: images/extrusion_by_sizes.png
    :align: left
+   :height: 24px
+
 **By Sizes** extrudes objects by specifying sizes.
 
-.. image:: images/extrusion_by_bounding_planes.png
+.. figure:: images/extrusion_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
 
-.. image:: images/extrusion_through_all.png
+.. figure:: images/extrusion_through_all.png
    :align: left
+   :height: 24px
+
 **Through All** extrudes base objects through all objects to be cut.
 
+--------------------------------------------------------------------------------
 
 By sizes
 --------
 
-.. image:: images/ExtrusionCut1.png
-  :align: center
+.. figure:: images/ExtrusionCut1.png
+   :align: center
 
-.. centered::
-  Extrusion Cut: definition by sizes
+   Extrusion Cut: definition by sizes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
@@ -91,10 +96,9 @@ Result
 
 The Result of the operation will be an extruded shape:
 
-.. image:: images/extrusion_cut_by_sizes_result.png
-	   :align: center
+.. figure:: images/extrusion_cut_by_sizes_result.png
+   :align: center
 
-.. centered::
    **Created Extrusion Cut**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_cut_by_sizes` operation.
@@ -102,11 +106,10 @@ The Result of the operation will be an extruded shape:
 By bounding planes
 ------------------
 
-.. image:: images/ExtrusionCut2.png
-  :align: center
+.. figure:: images/ExtrusionCut2.png
+   :align: center
 
-.. centered::
-  Extrusion Cut: definition by bounding planes
+   Extrusion Cut: definition by bounding planes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
@@ -146,10 +149,9 @@ Result
 
 The Result of the operation will be an extruded shape:
 
-.. image:: images/extrusion_cut_by_bounding_planes_result.png
-	   :align: center
+.. figure:: images/extrusion_cut_by_bounding_planes_result.png
+   :align: center
 
-.. centered::
    **Created Extrusion Cut**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_cut_by_bounding_planes` operation.
@@ -157,11 +159,10 @@ The Result of the operation will be an extruded shape:
 Through all
 -----------
 
-.. image:: images/ExtrusionCut3.png
-  :align: center
+.. figure:: images/ExtrusionCut3.png
+   :align: center
 
-.. centered::
-  Extrusion Cut: definition through all objects
+   Extrusion Cut: definition through all objects
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
@@ -189,10 +190,9 @@ Result
 
 The Result of the operation will be an extruded shape:
 
-.. image:: images/extrusion_cut_through_all_result.png
-	   :align: center
+.. figure:: images/extrusion_cut_through_all_result.png
+   :align: center
 
-.. centered::
    **Created Extrusion Cut**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_cut_through_all` operation.

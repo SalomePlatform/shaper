@@ -1,5 +1,6 @@
 .. _featureTranslation:
 .. |translation_vector_32x32.icon|    image:: images/translation_vector_32x32.png
+   :height: 16px
 
 Translation
 ===========
@@ -13,26 +14,33 @@ To create a Translation in the active part:
 
 The Vector of translation can be defined in three different ways:
 
-  .. image:: images/translation_vector_32x32.png    
-    :align: left
-  by by axis and distance
+.. figure:: images/translation_vector_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/translation_dxyz_32x32.png      
-    :align: left
-  by vector 
+by by axis and distance
 
-  .. image:: images/translation_2pt_32x32.png    
-    :align: left
-  by two points
+.. figure:: images/translation_dxyz_32x32.png      
+   :align: left
+   :height: 24px
+
+by vector 
+
+.. figure:: images/translation_2pt_32x32.png    
+   :align: left
+   :height: 24px
+
+by two points
+
+--------------------------------------------------------------------------------
 
 Translation by axis and distance
 --------------------------------
 
-.. image:: images/Translation2.png
-  :align: center
+.. figure:: images/Translation2.png
+   :align: center
 
-.. centered::
-  Translation by axis and distance property panel
+   Translation by axis and distance property panel
 
 Input fields:
 
@@ -55,10 +63,9 @@ Result
 
 The result of operation is a shifted initial shape.
 
-.. image:: images/translation_XYZ.png
+.. figure:: images/translation_XYZ.png
    :align: center
 
-.. centered::
    Translation by axis and distance
 
 **See Also** a sample TUI Script of a :ref:`tui_translation_vector` operation.
@@ -66,11 +73,10 @@ The result of operation is a shifted initial shape.
 Translation by vector
 ---------------------
 
-.. image:: images/Translation1.png
-  :align: center
+.. figure:: images/Translation1.png
+   :align: center
 
-.. centered::
-  Translation by vector property panel
+   Translation by vector property panel
 
 Input fields:
 
@@ -93,10 +99,9 @@ Result
 
 The result of operation is a shifted initial shape.
 
-.. image:: images/translation_vector.png
+.. figure:: images/translation_vector.png
    :align: center
 
-.. centered::
    Translation by vector
 
 **See Also** a sample TUI Script of :ref:`tui_translation_DXDYDZ` operation.
@@ -105,11 +110,10 @@ The result of operation is a shifted initial shape.
 Translation by two points
 -------------------------
 
-.. image:: images/Translation3.png
-  :align: center
+.. figure:: images/Translation3.png
+   :align: center
 
-.. centered::
-  Translation by two points property panel
+   Translation by two points property panel
 
 Input fields:
 
@@ -132,10 +136,9 @@ Result
 
 The result of operation is a shifted initial shape.
 
-.. image:: images/translation_2points.png
+.. figure:: images/translation_2points.png
    :align: center
 
-.. centered::
    Translation by two points
 
 **See Also** a sample TUI Script of :ref:`tui_translation_2points` operation.

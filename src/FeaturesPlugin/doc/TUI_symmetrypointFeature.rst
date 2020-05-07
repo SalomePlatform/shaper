@@ -8,4 +8,4 @@ Symmetry through a Point of symmetry
     :linenos:
     :language: python
 
-:download:`Download this script <examples/symmetrypoint.py >` 
+:download:`Download this script <examples/symmetrypoint.py>`

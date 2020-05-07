@@ -12,24 +12,29 @@ To create a Scale in the active part:
 
 Two Scale algorithms are:
 
-  .. image:: images/scale_factor_32x32.png    
-    :align: left
-  by one common factor 
+.. figure:: images/scale_factor_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/scale_dimensions_32x32.png    
-    :align: left
-  by different factors along axes
+by one common factor 
+
+.. figure:: images/scale_dimensions_32x32.png    
+   :align: left
+   :height: 24px
+
+by different factors along axes
+
+--------------------------------------------------------------------------------
 
 Scale by one common factor
 --------------------------
 
 Scale by one common factor scales the entire object without modification the geometry of the shape: dimensions change evenly in all three orthogonal directions.
 
-.. image:: images/Scale1.png
-  :align: center
+.. figure:: images/Scale1.png
+   :align: center
 
-.. centered::
-  Scale by one common factor property panel
+   Scale by one common factor property panel
 
 Input fields:
 
@@ -52,10 +57,9 @@ Result
 
 Result of operation is transformed initial shape shown in wireframe mode together  with initial shape in shading mode.
 
-.. image:: images/Scale_common_factor.png
+.. figure:: images/Scale_common_factor.png
    :align: center
 
-.. centered::
    Scale by one common factor
 
 **See Also** a sample TUI Script of :ref:`tui_Scale_common_factor` operation.  
@@ -65,11 +69,10 @@ Scale by different factors along axes
 
 Scale by different factors along axes is a general transformation, which can modify the geometry, for example, a sphere can be transformed into an ellipsoid.
 
-.. image:: images/Scale2.png
-  :align: center
+.. figure:: images/Scale2.png
+   :align: center
 
-.. centered::
-  Scale: define by different factors property panel
+   Scale: define by different factors property panel
 
 Input fields:
 
@@ -92,10 +95,9 @@ Result
 
 Result of operation is transformed initial shape.
 
-.. image:: images/Scale_XYZ.png
+.. figure:: images/Scale_XYZ.png
    :align: center
 
-.. centered::
    Scale by different factors
 
 **See Also** a sample TUI Script of :ref:`tui_Scale_XYZ` operation.

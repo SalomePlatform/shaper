@@ -9,18 +9,16 @@ To create a Cone segment in the active part:
 #. select in the Main Menu *GDML - > Cone segment* item  or
 #. click **Cone segment** button in the toolbar.
 
-.. image:: images/cone_btn.png
+.. figure:: images/cone_btn.png
    :align: center
 
-.. centered::
    **Cone segment**  button 
 
 The following property panel will be opened:
 
-.. image:: images/Cone_panel.png
+.. figure:: images/Cone_panel.png
    :align: center
 	
-.. centered::
    **Cone property panel**
 
 The property panel contains an image which explains the meaning of input values:
@@ -40,10 +38,9 @@ Result
 
 The Result of the operation will be a SOLID.
 
-.. image:: images/CreatedCone.png
+.. figure:: images/CreatedCone.png
 	   :align: center
 		   
-.. centered::
    Cone created
 
 **See Also** a sample TUI Script of :ref:`tui_create_conesegment` operation.

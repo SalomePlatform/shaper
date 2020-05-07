@@ -8,4 +8,4 @@ Rotation by axis and angle
     :linenos:
     :language: python
 
-:download:`Download this script <examples/rotation1.py >` 
+:download:`Download this script <examples/rotation1.py>`

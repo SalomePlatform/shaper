@@ -2,7 +2,7 @@
   .. _tui_create_torus:
 
 Create / Torus
-=============
+==============
 
 .. literalinclude:: examples/torus.py
     :linenos:

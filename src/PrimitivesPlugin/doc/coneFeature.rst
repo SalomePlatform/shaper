@@ -12,10 +12,9 @@ To create a Cone in the active part:
 
 The following property panel appears.
 
-.. image:: images/Cone.png
-  :align: center
+.. figure:: images/Cone.png
+   :align: center
 
-.. centered::
    Cone property panel
 
 Input fields:
@@ -46,10 +45,9 @@ If both radii are non-zero, then the cone will be truncated.
 
 If the radii are equal, the Cylinder will be created instead of cone.
 
-.. image:: images/Cone_res.png
-	   :align: center
+.. figure:: images/Cone_res.png
+   :align: center
 		   
-.. centered::
    Cone created  
 
 **See Also** a sample TUI Script of :ref:`tui_create_cone` operation.

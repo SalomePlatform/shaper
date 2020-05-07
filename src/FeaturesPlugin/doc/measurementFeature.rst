@@ -18,36 +18,47 @@ To start Measurement in the active part:
 
 The following dimensions can be calculated:
 
-  .. image:: images/meas_length_32x32.png      
-    :align: left
-  edge length 
+.. figure:: images/meas_length_32x32.png      
+   :align: left
+   :height: 24px
 
-  .. image:: images/meas_distance_32x32.png    
-    :align: left
-  distance between objects
+edge length 
 
-  .. image:: images/meas_radius_32x32.png    
-    :align: left
-  radius
+.. figure:: images/meas_distance_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/meas_angle_32x32.png    
-    :align: left
-  angle between edges  
+distance between objects
 
-  .. image:: images/meas_angle3p_32x32.png    
-    :align: left
-  angle by 3 points  
+.. figure:: images/meas_radius_32x32.png    
+   :align: left
+   :height: 24px
+
+radius
+
+.. figure:: images/meas_angle_32x32.png    
+   :align: left
+   :height: 24px
+
+angle between edges  
+
+.. figure:: images/meas_angle3p_32x32.png    
+   :align: left
+   :height: 24px
+
+angle by 3 points  
+
+--------------------------------------------------------------------------------
 
 Edge length
 -----------
 
 The length can be measured for straight or curved edge built on two points. 
 
-.. image:: images/Measurement1.png
-  :align: center
+.. figure:: images/Measurement1.png
+   :align: center
 
-.. centered::
-  Edge length
+   Edge length
 
 Input fields:
 
@@ -69,11 +80,10 @@ Distance between objects
 
 **Distance between objects** calculates minimal distance for any pair of shapes: vertex, edge, face, solid.
 
- .. image:: images/Measurement2.png
-  :align: center
+ .. figure:: images/Measurement2.png
+   :align: center
 
-.. centered::
-  Distance between objects
+   Distance between objects
 
 Input fields:
 
@@ -93,11 +103,10 @@ Radius
 
 **Radius** calculates radius for circular edge or cylindrical face. 
 
-.. image:: images/Measurement3.png
-  :align: center
+.. figure:: images/Measurement3.png
+   :align: center
 
-.. centered::
-  Radius
+   Radius
 
 Input fields:
 
@@ -117,11 +126,10 @@ Angle between edges
 
 **Angle between edges** calculates angle between the selected pair of edges in the point of intersection. If there are several points of intersection, then angles are calculated in all points.
 
-.. image:: images/Measurement4.png
-  :align: center
+.. figure:: images/Measurement4.png
+   :align: center
 
-.. centered::
-  Angle between edges
+   Angle between edges
 
 Input fields:
 
@@ -141,11 +149,10 @@ Angle by 3 points
 
 **Angle by 3 points** calculates angle between the selected three points. The second point is in the corner of the angle.
 
-.. image:: images/Measurement5.png
-  :align: center
+.. figure:: images/Measurement5.png
+   :align: center
 
-.. centered::
-  Angle by 3 points
+   Angle by 3 points
 
 Input fields:
 

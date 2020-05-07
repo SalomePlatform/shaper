@@ -1,4 +1,5 @@
 .. |bool_fuse.icon|    image:: images/bool_fuse.png
+   :height: 16px
 
 Fuse
 ====
@@ -12,22 +13,26 @@ To perform Fuse in the active part:
 
 There are 2 options for creation of a Fuse:
 
-.. image:: images/bool_fuse_simple.png
+.. figure:: images/bool_fuse_simple.png
    :align: left
+   :height: 24px
+
 **Simple** simply fuses selected objects.
 
-.. image:: images/bool_fuse_advanced.png
+.. figure:: images/bool_fuse_advanced.png
    :align: left
+   :height: 24px
+
 **Advanced** fuse with additional functionality for subshapes of compsolids/compounds.
 
+--------------------------------------------------------------------------------
 
 Simple
 ------
 
-.. image:: images/boolean_fuse_simple_property_panel.png
+.. figure:: images/boolean_fuse_simple_property_panel.png
    :align: center
 
-.. centered::
    **Simple**
 
 - **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
@@ -49,10 +54,9 @@ Result
 
 The Result of the operation will be a single shape which is a fuse of selected objects:
 
-.. image:: images/CreatedFuse.png
-	   :align: center
+.. figure:: images/CreatedFuse.png
+   :align: center
 
-.. centered::
    **Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_fuse` operation.
@@ -60,10 +64,9 @@ The Result of the operation will be a single shape which is a fuse of selected o
 Advanced
 --------
 
-.. image:: images/boolean_fuse_advanced_property_panel.png
+.. figure:: images/boolean_fuse_advanced_property_panel.png
    :align: center
 
-.. centered::
    **Advanced**
 
 - **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
@@ -89,10 +92,9 @@ Result
 
 The Result of the operation will be a single shape which is a fuse of selected objects and tools:
 
-.. image:: images/boolean_fuse_result.png
-	   :align: center
+.. figure:: images/boolean_fuse_result.png
+   :align: center
 
-.. centered::
    **Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_fuse` operation.

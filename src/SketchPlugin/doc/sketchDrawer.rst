@@ -2,7 +2,7 @@
 .. |SketchDrawer.icon|    image:: images/SketchDrawer.png
 
 Sketch Drawer
-=========
+=============
 
 Sketch Drawer featrure is a macro-feature, i.e. it is removed after its execution.
 It allows simplify creation of sketches basing on existing models without referencing to
@@ -19,10 +19,9 @@ To add a new Sketch Drawing:
 
 The following property panel appears:
 
-.. image:: images/SketchDrawer_panel.png
-  :align: center
+.. figure:: images/SketchDrawer_panel.png
+   :align: center
 
-.. centered::
    Sketch drawer
 
 Click in the view once to set the whole original model, then click a second time to set the
@@ -46,8 +45,7 @@ constrained. So, it is just a helper for the sketch creation, not universal tool
 sketch creation normally user must edit this sketch to input reasonable constraints and
 parametrization, or remove not needed constraints or sketch lements.
 
-.. image:: images/SketchDrawer_res.png
-	   :align: center
+.. figure:: images/SketchDrawer_res.png
+   :align: center
 
-.. centered::
    Drawn sketch

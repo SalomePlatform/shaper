@@ -12,18 +12,16 @@ It is possible to dump the current study state into a Python script. To dump a s
 
 The following property panel will be opened:
 
-.. image:: images/Dump_panel.png
+.. figure:: images/Dump_panel.png
    :align: center
-	
-.. centered::
+
    **Dump property panel**
 
 In this panel it is necessary to enter a file name directly or press **'...'** button and browse it with help of dump file dialog box:
 
-.. image:: images/DumpFileDlg.png
+.. figure:: images/DumpFileDlg.png
    :align: center
-	
-.. centered::
+
    **Dump file dialog box**
   
 **Apply** button writes the dump file.

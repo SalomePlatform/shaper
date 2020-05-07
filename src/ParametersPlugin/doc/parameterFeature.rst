@@ -1,5 +1,6 @@
-.. _parameter:
 .. |expression.icon|    image:: images/expression.png
+
+.. _parameter:
 
 Create parameter
 ================
@@ -14,10 +15,9 @@ To create a parameter in the active partset or part:
 
 The following property panel appears.
    
-.. image:: images/parameter.png
+.. figure:: images/parameter.png
    :align: center
 
-.. centered::
    Parameter property panel
 
 **Input fields**:
@@ -48,8 +48,7 @@ Result
 
 The created parameter and its current value are displayed in the Object Browser, in a special section **Parameters**. 
 
-.. image:: images/object_browser_parameter.png
+.. figure:: images/object_browser_parameter.png
    :align: center
 
-.. centered::
    **Parameter** in object browser

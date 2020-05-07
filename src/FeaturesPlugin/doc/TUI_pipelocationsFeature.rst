@@ -8,4 +8,4 @@ Pipe by object, path and locations
     :linenos:
     :language: python
 
-:download:`Download this script <examples/pipe_locations.py >` 
+:download:`Download this script <examples/pipe_locations.py>`

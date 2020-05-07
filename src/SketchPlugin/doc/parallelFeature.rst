@@ -1,4 +1,4 @@
-.. |parallel.icon|    image:: images/parallel.png
+.. |parallel.icon|    image:: images/Parallel.png
 
 Parallel constraint
 ===================
@@ -12,7 +12,7 @@ To create a Parallel constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Parallel_panel.png
+.. figure:: images/Parallel_panel.png
    :align: center
 
 Input fields:
@@ -35,10 +35,9 @@ Result
 
 Created Parallel constraint appears in the view.
 
-.. image:: images/Parallel_res.png
-	   :align: center
+.. figure:: images/Parallel_res.png
+   :align: center
 
-.. centered::
    Created parallel constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_parallel` operation.

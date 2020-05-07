@@ -1,5 +1,7 @@
 .. |revolution_btn.icon|    image:: images/revolution_btn.png
 
+.. _featureRevolution:
+
 Revolution
 ==========
 
@@ -12,31 +14,34 @@ To perform a Revolution in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/StartSketch.png
-  :align: center
+.. figure:: images/StartSketch.png
+   :align: center
 
-.. centered::
-  Start sketch
+   Start sketch
 
 There are two variants of the property panel for Revolution depending on the chosen option:
 
-.. image:: images/revolution_by_angles.png
+.. figure:: images/revolution_by_angles.png
    :align: left
+   :height: 24px
+
 **By Angles** revolves objects by specifying angles.
 
-.. image:: images/revolution_by_bounding_planes.png
+.. figure:: images/revolution_by_bounding_planes.png
    :align: left
+   :height: 24px
+
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
 
+--------------------------------------------------------------------------------
 
 By angles
---------
+---------
 
-.. image:: images/Revolution1.png
-  :align: center
+.. figure:: images/Revolution1.png
+   :align: center
 
-.. centered::
-  Revolution: definition by angles
+   Revolution: definition by angles
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -67,10 +72,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_by_angles_result.png
-	   :align: center
+.. figure:: images/revolution_by_angles_result.png
+   :align: center
 
-.. centered::
    **Revolution created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_by_angles` operation.
@@ -78,11 +82,10 @@ The Result of the operation will be a revolved shape:
 By bounding planes
 ------------------
 
-.. image:: images/Revolution2.png
-  :align: center
+.. figure:: images/Revolution2.png
+   :align: center
 
-.. centered::
-  Revolution: definition by bounding planes
+   Revolution: definition by bounding planes
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
 - **Axis** - axis of revolution.
@@ -109,10 +112,9 @@ Result
 
 The Result of the operation will be a revolved shape:
 
-.. image:: images/revolution_by_bounding_planes_result.png
-	   :align: center
+.. figure:: images/revolution_by_bounding_planes_result.png
+   :align: center
 
-.. centered::
    **Revolution created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_by_bounding_planes` operation.

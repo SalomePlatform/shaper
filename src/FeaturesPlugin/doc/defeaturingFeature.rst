@@ -12,11 +12,10 @@ To create a Defeaturing in the active part:
 
 After that select one or more faces of solids to suppress them. The Defeaturing works with faces from comsolids and compounds of solids as well.
 
-.. image:: images/defeaturing_property_panel.png
-  :align: center
+.. figure:: images/defeaturing_property_panel.png
+   :align: center
 
-.. centered::
-  Defeaturing property panel
+   Defeaturing property panel
 
 Input field:
 
@@ -35,10 +34,9 @@ Result
 
 Result of **Defeaturing** is shown below.
 
-.. image:: images/defeaturing_result.png
+.. figure:: images/defeaturing_result.png
    :align: center
 
-.. centered::
    Defeaturing operation
 
 **See Also** a sample TUI Script of :ref:`tui_defeaturing` operation.

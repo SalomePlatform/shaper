@@ -17,10 +17,9 @@ To create a Copy in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Copy.png
-  :align: center
+.. figure:: images/Copy.png
+   :align: center
 
-.. centered::
    **Copy operation**
 
 Here it is necessary to select some objects. Only results and sub-results and their sub-shapes located in the folder **Results** can be selected and copied.
@@ -44,10 +43,9 @@ Result
 
 The Result of the operation will be one or several copies of the selected shapes located in the same place:
 
-.. image:: images/CreatedCopy.png
-	   :align: center
+.. figure:: images/CreatedCopy.png
+   :align: center
 
-.. centered::
    **Copy created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_copy` operation.
