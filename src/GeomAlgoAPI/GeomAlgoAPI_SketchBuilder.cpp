@@ -220,6 +220,10 @@ void GeomAlgoAPI_SketchBuilder::build(
   // Use General Fuse algorithm to prepare all subfaces, bounded by given list of edges
   BOPAlgo_Builder* aBB = new BOPAlgo_Builder;
   aBB->AddArgument(aPlnFace);
+  // Set fuzzy value for BOP, because PlaneGCS can solve the set of constraints with
+  // the precision up to 1e-5 if the sketch contains arcs.
+  static const double THE_FUZZY_TOL = 1.e-5;
+  aBB->SetFuzzyValue(THE_FUZZY_TOL);
 
   setImpl(aBB);
   setBuilderType(OCCT_BOPAlgo_Builder);
