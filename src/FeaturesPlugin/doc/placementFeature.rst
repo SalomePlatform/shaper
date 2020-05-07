@@ -10,10 +10,9 @@ Placement defines position of an object relatively to another object. To make a 
 
 The following property panel will be opened:
 
-.. image:: images/Placement.png
-  :align: center
+.. figure:: images/Placement.png
+   :align: center
 
-.. centered::
    **Placement operation**
 
 In this property panel, it is necessary to:
@@ -48,10 +47,9 @@ Result
 
 The Result of the operation will be a new placement of selected objects:
 
-.. image:: images/CreatedPlacement.png
-	   :align: center
+.. figure:: images/CreatedPlacement.png
+   :align: center
 
-.. centered::
    **Placement created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_placement` operation.

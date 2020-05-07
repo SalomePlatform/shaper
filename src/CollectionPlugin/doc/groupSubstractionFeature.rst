@@ -11,10 +11,9 @@ To create a Group Substraction in the active part:
 
 The following property panel appears. 
 
-.. image:: images/group_substraction_property_panel.png
+.. figure:: images/group_substraction_property_panel.png
   :align: center
 
-.. centered::
   Create a group substraction operation
 
 Input fields:

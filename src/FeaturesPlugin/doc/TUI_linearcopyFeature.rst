@@ -8,4 +8,4 @@ Create Linear copy
     :linenos:
     :language: python
 
-:download:`Download this script <examples/linearcopy.py  >`  
+:download:`Download this script <examples/linearcopy.py>`

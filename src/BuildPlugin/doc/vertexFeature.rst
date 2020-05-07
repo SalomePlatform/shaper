@@ -12,10 +12,9 @@ To create vertices in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Vertex.png
+.. figure:: images/Vertex.png
   :align: center
 
-.. centered::
   Create vertices
 
 Select one or several vertices in the viewer. It is also possible to select a whole sketch result or feature in the object browser, then all start and end points of the sketch segments will be added into result. Checkbox **Compute intersections** forces to include intersection vertices of edges of the selected sketch.
@@ -38,10 +37,9 @@ Result
 
 The result of the operation will be a set of vertices created from the selected shapes:
 
-.. image:: images/CreateVertex.png
+.. figure:: images/CreateVertex.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_vertex` operation.

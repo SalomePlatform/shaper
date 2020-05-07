@@ -12,22 +12,26 @@ To create edges in the active part:
 
 The options to create edges:
 
-.. image:: images/edge_by_segments_32x32.png
+.. figure:: images/edge_by_segments_32x32.png
    :align: left
+   :height: 24px
+
 **By edges** creates edges using already existing edges in other shapes or full sketches.
 
-.. image:: images/edge_by_points_32x32.png
+.. figure:: images/edge_by_points_32x32.png
    :align: left
+   :height: 24px
+
 **By points** creates segment between two points.
 
+--------------------------------------------------------------------------------
 
 By edges
 --------
 
-.. image:: images/Edge.png
+.. figure:: images/Edge.png
   :align: center
 
-.. centered::
   Create by edges
 
 Select one or several edges in the viewer. Also, the full sketch can be selected. In this case, all edges of the sketch will be processed.
@@ -51,10 +55,9 @@ Result
 
 The result of the operation will be a set of edges created from the selected shapes:
 
-.. image:: images/CreateEdge.png
+.. figure:: images/CreateEdge.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_edge` operation.
@@ -63,10 +66,9 @@ The result of the operation will be a set of edges created from the selected sha
 By two points
 -------------
 
-.. image:: images/EdgeByTwoPoints.png
+.. figure:: images/EdgeByTwoPoints.png
   :align: center
 
-.. centered::
   Create by points
 
 Select two points in the viewer.
@@ -89,10 +91,9 @@ Result
 
 The result of the operation will be a segment bounded by selected points:
 
-.. image:: images/CreateEdgeByPoints.png
+.. figure:: images/CreateEdgeByPoints.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_segment` operation.

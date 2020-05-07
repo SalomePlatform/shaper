@@ -1,4 +1,4 @@
-.. |vertical.icon|    image:: images/vertical.png
+.. |vertical.icon|    image:: images/Vertical.png
 
 Vertical constraint
 ===================
@@ -12,7 +12,7 @@ To create a Vertical constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Vertical_panel.png
+.. figure:: images/Vertical_panel.png
    :align: center
 
 Input fields:
@@ -34,10 +34,9 @@ Result
 
 Created Vertical constraint appears in the view.
 
-.. image:: images/Vertical_res.png
-	   :align: center
+.. figure:: images/Vertical_res.png
+   :align: center
 
-.. centered::
    Vertical constraint created
 
 **See Also** a sample TUI Script of :ref:`tui_create_vertical` operation.

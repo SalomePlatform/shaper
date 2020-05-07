@@ -12,10 +12,9 @@ To create a filling in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Filling.png
+.. figure:: images/Filling.png
   :align: center
 
-.. centered::
   Create a filling
 
 Select two or more edges in the viewer.
@@ -39,10 +38,9 @@ Result
 
 The result of the operation will be a set of faces created from the selected shapes:
 
-.. image:: images/CreateFilling.png
+.. figure:: images/CreateFilling.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_filling` operation.

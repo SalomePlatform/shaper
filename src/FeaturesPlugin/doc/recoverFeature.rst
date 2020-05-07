@@ -12,22 +12,26 @@ To recover in the active part:
 
 The feature has the following options:
 
-.. image:: images/recover_default_32x32.png
+.. figure:: images/recover_default_32x32.png
    :align: left
+   :height: 24px
+
 restore only the objects used in the operation
 
-.. image:: images/recover_compound_32x32.png
+.. figure:: images/recover_compound_32x32.png
    :align: left
+   :height: 24px
+
 restore full compound/compsolid if the operation used one or more of its sub-shapes
 
+--------------------------------------------------------------------------------
 
 Recover objects
 ---------------
 
-.. image:: images/recover_mode_default.png
+.. figure:: images/recover_mode_default.png
    :align: center
 
-.. centered::
    Recover objects used in operation
 
 - **Feature** field contains one of the previous operations;
@@ -47,10 +51,9 @@ Result
 
 Result of restoring the shape used in Split operation in compsolid is a single solid.
 
-.. image:: images/recover_res_default.png
+.. figure:: images/recover_res_default.png
    :align: center
 
-.. centered::
    Recover a solid
 
 **See also** a sample TUI script of ref:`tui_recover_default` operation.
@@ -59,10 +62,9 @@ Result of restoring the shape used in Split operation in compsolid is a single s
 Recover top-level objects
 -------------------------
 
-.. image:: images/recover_mode_compound.png
+.. figure:: images/recover_mode_compound.png
    :align: center
 
-.. centered::
    Recover top-level compounds/compsolids of objects used in operation
 
 - **Feature** field contains one of the previous operations;
@@ -83,10 +85,9 @@ Result
 
 Result of restoring the shape used in Split operation in compsolid is a full compsolid.
 
-.. image:: images/recover_res_compound.png
+.. figure:: images/recover_res_compound.png
    :align: center
 
-.. centered::
    Recover a compsolid
 
 **See also** a sample TUI script of ref:`tui_recover_compound` operation.

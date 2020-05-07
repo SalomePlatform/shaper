@@ -13,7 +13,7 @@ To create a Coincident constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Coincident_panel.png
+.. figure:: images/Coincident_panel.png
    :align: center
 
 Input fields:
@@ -38,10 +38,9 @@ Result
 
 Created Coincident constraint appears in the view.
 
-.. image:: images/Coincident_res.png
-	   :align: center
+.. figure:: images/Coincident_res.png
+   :align: center
 
-.. centered::
    Created coincident constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_coincident` operation.

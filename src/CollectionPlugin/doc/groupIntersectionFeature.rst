@@ -11,10 +11,9 @@ To create a Group Intersection in the active part:
 
 The following property panel appears. 
 
-.. image:: images/group_intersection_property_panel.png
+.. figure:: images/group_intersection_property_panel.png
   :align: center
 
-.. centered::
   Create a group intersection operation
 
 Input fields:

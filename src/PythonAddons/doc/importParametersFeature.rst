@@ -14,10 +14,9 @@ To import parameters:
 
 The following property panel appears:
 
-.. image:: images/importParametersPanel.png
-  :align: center
+.. figure:: images/importParametersPanel.png
+   :align: center
 
-.. centered::
    Import Parameters
 
 

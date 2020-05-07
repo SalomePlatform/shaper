@@ -1,5 +1,5 @@
 .. _sketchLine:
-.. |line.icon|    image:: images/line.png
+.. |line.icon|    image:: images/Line.png
 
 Line
 ====
@@ -13,10 +13,9 @@ To add a new Line to the Sketch:
 
 The following property panel appears:
 
-.. image:: images/Line_panel.png
-  :align: center
+.. figure:: images/Line_panel.png
+   :align: center
 
-.. centered::
    Line
 
 Pick 2 points (start and end) in the view to create a Line. If an existing object is clicked, a constraint for the point will be created automatically.
@@ -38,10 +37,9 @@ Result
 
 Created line appears in the view.
 
-.. image:: images/Line_res.png
-	   :align: center
+.. figure:: images/Line_res.png
+   :align: center
 
-.. centered::
    Line created
 
 **See Also** a sample TUI Script of :ref:`tui_create_line` operation.

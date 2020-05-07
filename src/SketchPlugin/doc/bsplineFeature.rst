@@ -21,7 +21,7 @@ To add a periodic B-spline to the Sketch:
 Creation of B-spline curve
 """"""""""""""""""""""""""
 
-.. image:: images/bspline_creation_panel.png
+.. figure:: images/bspline_creation_panel.png
    :align: center
 
 Click in the view to specify the control polygon of B-spline curve. The curve will be shown after the second point is initialized. To stop adding new poles, click **Esc** button or **Apply** the operation.
@@ -46,17 +46,15 @@ Result
 
 Created B-spline curve appears in the view.
 
-.. image:: images/bspline_result.png
-	   :align: center
+.. figure:: images/bspline_result.png
+   :align: center
 
-.. centered::
    Non-periodic B-spline created
 
 
-.. image:: images/bspline_periodic_result.png
-	   :align: center
+.. figure:: images/bspline_periodic_result.png
+   :align: center
 
-.. centered::
    Periodic B-spline created
 
 **See Also** a sample TUI Script of :ref:`tui_create_bspline` operation.
@@ -65,10 +63,9 @@ Created B-spline curve appears in the view.
 Modification of B-spline curve
 """"""""""""""""""""""""""""""
 
-.. image:: images/bspline_modification_panel.png
+.. figure:: images/bspline_modification_panel.png
    :align: center
 
-.. centered::
    Modification panel for B-spline curve
 
 The following options are provided to modify the already created B-spline curve:

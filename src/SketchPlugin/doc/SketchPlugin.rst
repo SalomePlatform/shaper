@@ -1,10 +1,11 @@
 
 .. _sketchPlugin:
-.. |SketchButton.icon|    image:: images/SketchButton.png
 
 
 Sketch plug-in
 ================
+
+.. |SketchButton.icon|    image:: images/SketchButton.png
 
 Sketch plug-in includes features for creation of 2D shapes.
 
@@ -24,7 +25,7 @@ To create a Sketch:
 
 First define a plane for the sketch:
 
-.. image:: images/PlaneDefinition.png
+.. figure:: images/PlaneDefinition.png
    :align: center
 
 - specify plane size (equal to 25 in the example above);
@@ -32,16 +33,15 @@ First define a plane for the sketch:
 
 Note that coordinate planes will be suggested for selection if no convenient objects for plane selection are displayed in the viewer:
 
-.. image:: images/CoordinatePlanes.png
+.. figure:: images/CoordinatePlanes.png
    :align: center
 
 After the plane for sketch is selected, the following property panel will be opened:
 
-.. image:: images/SketchPanel.png
+.. figure:: images/SketchPanel.png
    :align: center
 
-.. centered::
-  Sketch general panel
+   Sketch general panel
 
 - **Reversed** check box - allows reversing the sketch plane normal;
 - **Set plane view** button - switches the viewer to the top view for the sketch plane;
@@ -105,19 +105,17 @@ The goal of constraints creation is to fix sketch geometry, i.e. set degrees of 
 
 If all degrees of freedom are eliminated, the sketch is fixed and displayed with green color.
 
-.. image:: images/Sketch_fixed.png
+.. figure:: images/Sketch_fixed.png
    :align: center
 
-.. centered::
-  Fixed Sketch
+   Fixed Sketch
 
 If any degrees of freedom remain unsolved, the sketch is under-constrained and displayed with red color.
 
-.. image:: images/Sketch_underconstrained.png
+.. figure:: images/Sketch_underconstrained.png
    :align: center
 
-.. centered::
-  Underconstrained Sketch
+   Underconstrained Sketch
 
 The plug-in includes the following constraints:
 
@@ -148,11 +146,10 @@ Overconstraned state
 
 Sketcher comes into overconstrained state when an extra constraint was defined. The following picture shows an example of the overconstrained state:
 
-.. image:: images/Overconstrained.png
+.. figure:: images/Overconstrained.png
    :align: center
 
-.. centered::
-  Overconstrained Sketch
+   Overconstrained Sketch
 
 When Sketcher gets this state then:
 

@@ -1,4 +1,4 @@
-.. |mirror.icon|    image:: images/mirror.png
+.. |mirror.icon|    image:: images/Mirror.png
 
 Mirror copy
 ===========
@@ -12,10 +12,9 @@ To create a Mirror copy in the active Sketch:
 
 Property panel:
 
-.. image:: images/Mirror_panel.png
-  :align: center
+.. figure:: images/Mirror_panel.png
+   :align: center
 
-.. centered::
    Mirror copy
 
 Input fields:
@@ -39,10 +38,9 @@ Created Mirror copy appears in the view.
 | The original and the mirror copy objects are marked with a special sign.
 | Copy object is drawn with a thinner line.
 
-.. image:: images/Mirror_res.png
-	   :align: center
+.. figure:: images/Mirror_res.png
+   :align: center
 
-.. centered::
    Mirror copy created
 
 **See Also** a sample TUI Script of :ref:`tui_create_mirror` operation.

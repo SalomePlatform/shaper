@@ -13,26 +13,21 @@ To create an Angular copy in the active Sketch:
 
 Property panel:
 
-.. image:: images/Rotation_panel.png
-  :align: center
+.. figure:: images/Rotation_panel.png
+   :align: center
 
-.. centered::
    Angular copy
+
+.. |full_angle| image:: images/angle_up_full_32x32.png
+.. |single_angle| image:: images/angle_up_32x32.png
 
 Input fields:
 
 - **Segments** is the list of segments (lines, circles, arcs) selected in the view;
 - **Center of rotation** is the center point selected in the view;
 - **Full angle/Single angle** option:
-
-  .. image:: images/angle_up_full_32x32.png
-     :align: left
-  **Full angle**: angle step of rotation is equal to the defined angle divided by the number of copies (total number minus one).
-
-  .. image:: images/angle_up_full_32x32.png
-     :align: left
-  **Single angle**: angle step of rotation is equal to the defined angle.
-
+   | |full_angle| **Full angle**: angle step of rotation is equal to the defined angle divided by the number of copies (total number minus one).
+   | |single_angle| **Single angle**: angle step of rotation is equal to the defined angle.
 - **Angle** is the angle of rotation.
 - **Reversed** defines rotation direction. If checked - in a clockwise direction, otherwise - in a counterclockwise direction.
 - **Total number of objects** is the total number of objects including the original one.
@@ -58,10 +53,9 @@ Created Angular copy appears in the view.
 | The original and an angular copy objects are marked with a special sign.
 | Copy objects are drawn with a thinner line.
 
-.. image:: images/Rotation_res.png
-	   :align: center
+.. figure:: images/Rotation_res.png
+   :align: center
 
-.. centered::
    Created angular copy
 
 **See Also** a sample TUI Script of :ref:`tui_create_rotation` operation.

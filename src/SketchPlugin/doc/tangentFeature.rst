@@ -1,4 +1,4 @@
-.. |tangent.icon|    image:: images/tangent.png
+.. |tangent.icon|    image:: images/Tangent.png
 
 Tangent constraint
 ==================
@@ -12,7 +12,7 @@ To create a Tangent in the active Sketch:
 
 Property panel:
 
-.. image:: images/Tangent_panel.png
+.. figure:: images/Tangent_panel.png
    :align: center
 
 Input fields:
@@ -37,10 +37,9 @@ Result
 
 Created Tangent constraint appears in the view.
 
-.. image:: images/Tangent_res.png
-	   :align: center
+.. figure:: images/Tangent_res.png
+   :align: center
 
-.. centered::
    Created tangent constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_tangent` operation.

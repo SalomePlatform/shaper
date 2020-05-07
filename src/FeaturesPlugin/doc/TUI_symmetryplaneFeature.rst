@@ -8,4 +8,4 @@ Symmetry through a Plane of symmetry
     :linenos:
     :language: python
 
-:download:`Download this script <examples/symmetryplane.py >` 
+:download:`Download this script <examples/symmetryplane.py>`

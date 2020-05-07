@@ -45,7 +45,7 @@ except:
   use_rtd_theme = False
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = [os.path.join('@CMAKE_CURRENT_SOURCE_DIR@','templates')]
+#templates_path = [os.path.join('@CMAKE_CURRENT_SOURCE_DIR@','templates')]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -110,12 +110,16 @@ themes_options['classic'] = {
   'body_max_width':'none',
   'body_min_width':0,
 }
+themes_options['sphinx_rtd_theme'] = {
+  'prev_next_buttons_location':'both',
+}
+
 html_theme_options = themes_options.get(html_theme, {})
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [os.path.join('@CMAKE_CURRENT_BINARY_DIR@','static')]
+#html_static_path = [os.path.join('@CMAKE_CURRENT_BINARY_DIR@','static')]
 
 
 # -- Options for HTMLHelp output ------------------------------------------

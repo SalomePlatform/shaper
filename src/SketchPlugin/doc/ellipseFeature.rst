@@ -12,18 +12,24 @@ To add a new Ellipse to the Sketch:
 
 There are 2 algorithms for creation of an Ellipse:
 
-.. image:: images/ellipse_cent_rad_32x32.png
+.. figure:: images/ellipse_cent_rad_32x32.png
    :align: left
+   :height: 24px
+
 **By center and major semi-axes and passing points** creates an ellipse with the given center passing through given points.
 
-.. image:: images/ellipse_axes_32x32.png
+.. figure:: images/ellipse_axes_32x32.png
    :align: left
+   :height: 24px
+
 **By major axis and passing point** creates an ellipse passing through the given three points.
+
+-------------------------------------------------------------------------------------------
 
 By center and major semi-axes and passing points
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-.. image:: images/ellipse_panel_pt_rad.png
+.. figure:: images/ellipse_panel_pt_rad.png
    :align: center
 
 Click in the view once to set the center point, then move the mouse and click to set a point of a first semi-axis, then again move the mouse to set a point of a second semi-axis.
@@ -44,7 +50,7 @@ Click in the view once to set the center point, then move the mouse and click to
 By major axis and passing point
 """""""""""""""""""""""""""""""
 
-.. image:: images/ellipse_panel_3pt.png
+.. figure:: images/ellipse_panel_3pt.png
    :align: center
 
 Click in the view once to set a first point of a first axis, then move the mouse and click to set a second point of the first axis, then again move the mouse to set a point of a second semi-axis.
@@ -67,10 +73,9 @@ Result
 
 Created ellipse appears in the view.
 
-.. image:: images/ellipse_result.png
-	   :align: center
+.. figure:: images/ellipse_result.png
+   :align: center
 
-.. centered::
    Ellipse created
 
 

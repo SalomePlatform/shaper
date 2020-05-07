@@ -12,21 +12,26 @@ To create a Cylinder in the active part:
 
 There are 2 algorithms for creation of a Cylinder:
 
-.. image:: images/cylinder_32x32.png
+.. figure:: images/cylinder_32x32.png
    :align: left
+   :height: 24px
+
 **Cylinder** creates a cylinder.
 
-.. image:: images/cylinder_portion_32x32.png
+.. figure:: images/cylinder_portion_32x32.png
    :align: left
+   :height: 24px
+
 **Portion of cylinder** creates one segment of a cylinder.
+
+--------------------------------------------------------------------------------
 
 Cylinder
 --------
 
-.. image:: images/Cylinder.png
+.. figure:: images/Cylinder.png
    :align: center
 	
-.. centered::
    **Cylinder** property panel
 
 Input fields:
@@ -53,10 +58,9 @@ Result
 
 An example is shown below.
 
-.. image:: images/Cylinder1.png
-	   :align: center
+.. figure:: images/Cylinder1.png
+   :align: center
 		   
-.. centered::
    Cylinder  
 
 **See Also** a sample TUI Script of :ref:`tui_create_cylinder` operation.
@@ -64,10 +68,9 @@ An example is shown below.
 Portion of cylinder
 -------------------
 
-.. image:: images/Portion_cylinder.png
-	   :align: center
+.. figure:: images/Portion_cylinder.png
+   :align: center
 		   
-.. centered::
    **Portion of cylinder**  property panel 
 
 Input fields for ***Portion of cylinder** tab include **Angle** defining a portion of cylinder.
@@ -89,10 +92,9 @@ Result
 
 An example is shown below.
 
-.. image:: images/Cylinder2.png
-	   :align: center
+.. figure:: images/Cylinder2.png
+   :align: center
 		   
-.. centered::
    Portion of cylinder  
 
 **See Also** a sample TUI Script of :ref:`tui_create_cylportion` operation.

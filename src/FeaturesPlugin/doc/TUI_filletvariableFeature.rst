@@ -8,5 +8,4 @@ Create Fillet by variable radius
     :linenos:
     :language: python
 
-:download:`Download this script <examples/fillet2.py >` 
-   
+:download:`Download this script <examples/fillet2.py>`

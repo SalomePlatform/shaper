@@ -12,26 +12,33 @@ To create a Symmetry in the active part:
 
 Symmetrical copy of an Object can be mirrored in three different ways:
 
-  .. image:: images/symmetry_point_32x32.png    
-    :align: left
-  through a Point of symmetry 
+.. figure:: images/symmetry_point_32x32.png    
+   :align: left
+   :height: 24px
 
-  .. image:: images/symmetry_axis_32x32.png      
-    :align: left
-  through an Axis of symmetry  
+through a Point of symmetry 
 
-  .. image:: images/symmetry_plane_32x32.png    
-    :align: left
-  through a Plane of symmetry 
+.. figure:: images/symmetry_axis_32x32.png      
+   :align: left
+   :height: 24px
+
+through an Axis of symmetry  
+
+.. figure:: images/symmetry_plane_32x32.png    
+   :align: left
+   :height: 24px
+
+through a Plane of symmetry 
+
+--------------------------------------------------------------------------------
 
 Symmetry through a Point of symmetry
 ------------------------------------
 
-.. image:: images/symmetryPoint.png
-  :align: center
+.. figure:: images/symmetryPoint.png
+   :align: center
 
-.. centered::
-  Symmetry through a Point of symmetry property panel
+   Symmetry through a Point of symmetry property panel
 
 Input fields:
 
@@ -54,10 +61,9 @@ Result
 
 The result of operation is a mirrored initial shape with **Create a copy** = *True*.
 
-.. image:: images/symmetryPointres.png
+.. figure:: images/symmetryPointres.png
    :align: center
 
-.. centered::
    Symmetry through a Point of symmetry
 
 **See Also** a sample TUI Script of :ref:`tui_symmetry_point` operation.
@@ -65,11 +71,10 @@ The result of operation is a mirrored initial shape with **Create a copy** = *Tr
 Symmetry through an Axis of symmetry
 ------------------------------------
 
-.. image:: images/symmetryAxis.png
-  :align: center
+.. figure:: images/symmetryAxis.png
+   :align: center
 
-.. centered::
-  Symmetry through an Axis of symmetry property panel
+   Symmetry through an Axis of symmetry property panel
 
 Input fields:
 
@@ -92,10 +97,9 @@ Result
 
 The result of operation is a mirrored initial shape with **Create a copy** = *False*.
 
-.. image:: images/symmetryAxisres.png
+.. figure:: images/symmetryAxisres.png
    :align: center
 
-.. centered::
    Symmetry through an Axis of symmetry
 
 **See Also** a sample TUI Script of :ref:`tui_symmetry_axis` operation.  
@@ -103,11 +107,10 @@ The result of operation is a mirrored initial shape with **Create a copy** = *Fa
 Symmetry through a Plane of symmetry
 ------------------------------------
 
-.. image:: images/symmetryPlane.png
-  :align: center
+.. figure:: images/symmetryPlane.png
+   :align: center
 
-.. centered::
-  Symmetry through a Plane of symmetry property panel
+   Symmetry through a Plane of symmetry property panel
 
 Input fields:
 
@@ -130,10 +133,9 @@ Result
 
 The result of operation is a mirrored initial shape with **Create a copy** = *False*.
 
-.. image:: images/symmetryPlaneres.png
+.. figure:: images/symmetryPlaneres.png
    :align: center
 
-.. centered::
    Symmetry through a Plane of symmetry
 
 **See Also** a sample TUI Script of :ref:`tui_symmetry_plane` operation.   

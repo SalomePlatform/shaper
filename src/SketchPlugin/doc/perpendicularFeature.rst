@@ -14,7 +14,7 @@ To create a Perpendicular constraint in the active Sketch:
 
 Property panel:
 
-.. image:: images/Perpendicular_panel.png
+.. figure:: images/Perpendicular_panel.png
    :align: center
 
 Input fields:
@@ -39,10 +39,9 @@ Result
 
 Created Perpendicular constraint appears in the view.
 
-.. image:: images/Perpendicular_res.png
-           :align: center
+.. figure:: images/Perpendicular_res.png
+   :align: center
 
-.. centered::
    Created perpendicular constraint
 
 **See Also** a sample TUI Script of :ref:`tui_create_perpendicular` operation.

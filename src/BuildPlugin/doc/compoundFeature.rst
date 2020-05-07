@@ -12,10 +12,9 @@ To create a compound in the active part:
 
 The following property panel will be opened:
 
-.. image:: images/Compound.png
+.. figure:: images/Compound.png
   :align: center
 
-.. centered::
   Create a compound
 
 Select one or several shapes in the viewer. The selected shapes can be of any type (vertex, edge, face, etc.)
@@ -37,10 +36,9 @@ Result
 
 The result of the operation will be a compound created from the selected shapes:
 
-.. image:: images/CreateCompound.png
+.. figure:: images/CreateCompound.png
   :align: center
 
-.. centered::
   Result of the operation.
 
 **See Also** a sample TUI Script of :ref:`tui_create_compound` operation.
