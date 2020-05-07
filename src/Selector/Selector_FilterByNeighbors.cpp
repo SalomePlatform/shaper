@@ -194,7 +194,9 @@ bool Selector_FilterByNeighbors::select(
   myContext = theContextLab;
   // searching by neighbors
   std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
-  for(int aLevel = 1; true; aLevel++) {
+  // # 19071 : moving through all levels may be too long, in practice there are no more than 2 or 3
+  // levels real cases, so, make it "5" as maximum possible
+  for(int aLevel = 1; aLevel < 5; aLevel++) {
     TopTools_MapOfShape aNewNB;
     findNeighbors(theContext, theValue, aLevel, aNewNB);
     if (aNewNB.Extent() == 0) { // there are no neighbors of the given level, stop iteration

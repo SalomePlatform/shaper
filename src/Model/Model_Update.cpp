@@ -911,6 +911,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
     std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
+    // #19071 : avoid sending of update event in cycle
+    bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
     for(int a = aSel->size() - 1; a >= 0; a--) {
       std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
@@ -935,6 +937,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
         }
       }
     }
+    if (!aWasBlocked)
+      theFeature->data()->blockSendAttributeUpdated(false);
   }
 
   if (aState != ModelAPI_StateDone)
