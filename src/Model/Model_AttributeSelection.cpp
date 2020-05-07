@@ -2032,6 +2032,7 @@ ResultPtr Model_AttributeSelection::newestContext(
     if (allRes.empty())
       allRes.push_back(aResult);
 
+    bool aFoundReferernce = false;
     for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
       ResultPtr aResCont = *aSub;
       ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
@@ -2065,6 +2066,7 @@ ResultPtr Model_AttributeSelection::newestContext(
         for (; aResIter != aResults.end(); aResIter++) {
           if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
             continue;
+          aFoundReferernce = true;
           GeomShapePtr aShape = (*aResIter)->shape();
           if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
             aResult = *aResIter; // found new context (produced from this) with same subshape
@@ -2072,11 +2074,12 @@ ResultPtr Model_AttributeSelection::newestContext(
             break;
           }
         }
-        if (!aFindNewContext && !aResults.empty()) {
-          // #19019 : result is concealed by object that contains no such sub-shape
-          return theCurrent;
-        }
       }
+    }
+    if (aFoundReferernce && !aFindNewContext &&
+        aResult->groupName() != ModelAPI_ResultConstruction::group()) {
+      // #19019 : result is concealed by object that contains no such sub-shape
+      return theCurrent;
     }
   }
   // if compsolid is context, try to take sub-solid as context: like in GUI and scripts
