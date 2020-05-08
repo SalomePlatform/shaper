@@ -19,6 +19,8 @@
 
 #include "Selector_NExplode.h"
 
+#include <GeomAPI_Pnt.h>
+
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
@@ -34,7 +36,7 @@
 #include <vector>
 #include <algorithm>
 
-static std::pair<double, double> ShapeToDouble (const TopoDS_Shape& S)
+static std::pair<gp_Pnt, double> ShapeToDouble (const TopoDS_Shape& S)
 {
   // Computing of CentreOfMass
   gp_Pnt GPoint;
@@ -59,8 +61,7 @@ static std::pair<double, double> ShapeToDouble (const TopoDS_Shape& S)
     Len = GPr.Mass();
   }
 
-  double dMidXYZ = GPoint.X() * 999.0 + GPoint.Y() * 99.0 + GPoint.Z() * 0.9;
-  return std::make_pair(dMidXYZ, Len);
+  return std::make_pair(GPoint, Len);
 }
 
 /*!
@@ -68,7 +69,7 @@ static std::pair<double, double> ShapeToDouble (const TopoDS_Shape& S)
 */
 struct CompareShapes : public std::binary_function<TopoDS_Shape, TopoDS_Shape, bool>
 {
-  typedef NCollection_DataMap<TopoDS_Shape, std::pair<double, double> > DataMapOfShapeDouble;
+  typedef NCollection_DataMap<TopoDS_Shape, std::pair<gp_Pnt, double> > DataMapOfShapeDouble;
 
   CompareShapes(DataMapOfShapeDouble* theCashMap) : myMap(theCashMap) {}
 
@@ -88,17 +89,19 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
     myMap->Bind(theShape2, ShapeToDouble(theShape2));
   }
 
-  std::pair<double, double> val1 = myMap->Find(theShape1);
-  std::pair<double, double> val2 = myMap->Find(theShape2);
+  const std::pair<gp_Pnt, double>& val1 = myMap->Find(theShape1);
+  const std::pair<gp_Pnt, double>& val2 = myMap->Find(theShape2);
 
-  double tol = Precision::Confusion();
+  double tol = 10.0 * Precision::Confusion();
   bool exchange = Standard_False;
 
-  double dMidXYZ = val1.first - val2.first;
-  if (dMidXYZ >= tol) {
+  // compare coordinates of center points
+  GeomPointPtr aPnt1(new GeomAPI_Pnt(val1.first.X(), val1.first.Y(), val1.first.Z()));
+  GeomPointPtr aPnt2(new GeomAPI_Pnt(val2.first.X(), val2.first.Y(), val2.first.Z()));
+  if (aPnt2->isLess(aPnt1, tol)) {
     exchange = Standard_True;
   }
-  else if (Abs(dMidXYZ) < tol) {
+  else if (!aPnt1->isLess(aPnt2, tol)) {
     double dLength = val1.second - val2.second;
     if (dLength >= tol) {
       exchange = Standard_True;

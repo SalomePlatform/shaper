@@ -81,7 +81,8 @@ class GeomAPI_Pnt : public GeomAPI_Interface
   /// In case of X's are equal, if Y is less than other.
   /// If Y's are equal too, compare Z's.
   GEOMAPI_EXPORT
-  bool isLess(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
+  bool isLess(const std::shared_ptr<GeomAPI_Pnt>& theOther,
+              const double theTolerance = 1.e-7) const;
 
   /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
   GEOMAPI_EXPORT

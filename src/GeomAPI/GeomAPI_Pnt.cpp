@@ -85,15 +85,16 @@ bool GeomAPI_Pnt::isEqual(const std::shared_ptr<GeomAPI_Pnt>& theOther) const
   return distance(theOther) < Precision::Confusion();
 }
 
-bool GeomAPI_Pnt::isLess(const std::shared_ptr<GeomAPI_Pnt>& theOther) const
+bool GeomAPI_Pnt::isLess(const std::shared_ptr<GeomAPI_Pnt>& theOther,
+                         const double theTolerance) const
 {
-  if (MY_PNT->X() + Precision::Confusion() < theOther->x())
+  if (MY_PNT->X() + theTolerance < theOther->x())
     return true;
-  else if (MY_PNT->X() < theOther->x() + Precision::Confusion()) {
-    if (MY_PNT->Y() + Precision::Confusion() < theOther->y())
+  else if (MY_PNT->X() < theOther->x() + theTolerance) {
+    if (MY_PNT->Y() + theTolerance < theOther->y())
       return true;
-    else if (MY_PNT->Y() < theOther->y() + Precision::Confusion() &&
-             MY_PNT->Z() + Precision::Confusion() < theOther->z())
+    else if (MY_PNT->Y() < theOther->y() + theTolerance &&
+             MY_PNT->Z() + theTolerance < theOther->z())
       return true;
   }
   return false;
