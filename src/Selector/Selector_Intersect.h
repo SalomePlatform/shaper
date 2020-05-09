@@ -32,6 +32,7 @@ class Selector_Intersect: public Selector_AlgoWithSubs
 {
   TopAbs_ShapeEnum myShapeType; ///< type of this shape
   int myWeakIndex; ///< weak index in case intersection produces several shapes
+  bool myRecomputeWeakIndex; ///< if the index is stored with old (unstable) order, recompute it
 public:
   /// Initializes the selection of this kind
   SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue);

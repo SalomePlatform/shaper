@@ -27,7 +27,7 @@
 #include <TNaming_Iterator.hxx>
 #include <TDataStd_Integer.hxx>
 
-Selector_WeakName::Selector_WeakName() : Selector_Algo()
+Selector_WeakName::Selector_WeakName() : Selector_Algo(), myRecomputeWeakIndex(false)
 {
 }
 
@@ -88,9 +88,11 @@ bool Selector_WeakName::restore()
 TDF_Label Selector_WeakName::restoreByName(std::string theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
-  std::string aWeakIndex = theName.substr(pureWeakNameID().size());
+  size_t aFoundWeak = theName.find(oldPureWeakNameID());
+  std::string aWeakIndex = theName.substr(aFoundWeak + oldPureWeakNameID().size());
   std::size_t aContextPosition = aWeakIndex.find("_");
   myWeakIndex = atoi(aWeakIndex.c_str());
+  myRecomputeWeakIndex = aFoundWeak == 0;
   myShapeType = theShapeType;
   TDF_Label aContext;
   if (aContextPosition != std::string::npos) { // context is also defined
@@ -116,8 +118,9 @@ bool Selector_WeakName::solve(const TopoDS_Shape& theContext)
     }
   }
   if (!aContext.IsNull()) {
-    Selector_NExplode aNexp(aContext, myShapeType);
+    Selector_NExplode aNexp(aContext, myShapeType, myRecomputeWeakIndex);
     TopoDS_Shape aResult = aNexp.shape(myWeakIndex);
+    myRecomputeWeakIndex = false;
     if (!aResult.IsNull()) {
       Selector_Algo::store(aResult);
       return true;

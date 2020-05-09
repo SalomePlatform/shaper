@@ -33,10 +33,22 @@
 #include <TopExp_Explorer.hxx>
 #include <TopTools_MapOfShape.hxx>
 
-#include <vector>
 #include <algorithm>
 
-static std::pair<gp_Pnt, double> ShapeToDouble (const TopoDS_Shape& S)
+static void dummy(gp_Pnt& thePoint)
+{
+  // do nothing (new approach to order shapes)
+}
+
+static void pointToDouble(gp_Pnt& thePoint)
+{
+  // old approach to order shapes
+  double dMidXYZ = thePoint.X() * 999.0 + thePoint.Y() * 99.0 + thePoint.Z() * 0.9;
+  thePoint.SetCoord(dMidXYZ, 0.0, 0.0);
+}
+
+static std::pair<gp_Pnt, double> ShapeToDouble (const TopoDS_Shape& S,
+                                                void (*convertPoint)(gp_Pnt&))
 {
   // Computing of CentreOfMass
   gp_Pnt GPoint;
@@ -61,6 +73,7 @@ static std::pair<gp_Pnt, double> ShapeToDouble (const TopoDS_Shape& S)
     Len = GPr.Mass();
   }
 
+  (*convertPoint)(GPoint);
   return std::make_pair(GPoint, Len);
 }
 
@@ -71,22 +84,24 @@ struct CompareShapes : public std::binary_function<TopoDS_Shape, TopoDS_Shape, b
 {
   typedef NCollection_DataMap<TopoDS_Shape, std::pair<gp_Pnt, double> > DataMapOfShapeDouble;
 
-  CompareShapes(DataMapOfShapeDouble* theCashMap) : myMap(theCashMap) {}
+  CompareShapes(DataMapOfShapeDouble* theCashMap, void (*convertPoint)(gp_Pnt&))
+    : myMap(theCashMap), myConvertPoint(convertPoint) {}
 
   bool operator() (const TopoDS_Shape& lhs, const TopoDS_Shape& rhs);
 
   DataMapOfShapeDouble* myMap;
+  void (*myConvertPoint)(gp_Pnt&);
 };
 
 bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
   const TopoDS_Shape& theShape2)
 {
   if (!myMap->IsBound(theShape1)) {
-    myMap->Bind(theShape1, ShapeToDouble(theShape1));
+    myMap->Bind(theShape1, ShapeToDouble(theShape1, myConvertPoint));
   }
 
   if (!myMap->IsBound(theShape2)) {
-    myMap->Bind(theShape2, ShapeToDouble(theShape2));
+    myMap->Bind(theShape2, ShapeToDouble(theShape2, myConvertPoint));
   }
 
   const std::pair<gp_Pnt, double>& val1 = myMap->Find(theShape1);
@@ -139,60 +154,68 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
   return !exchange;
 }
 
-Selector_NExplode::Selector_NExplode(const TopoDS_ListOfShape& theShapes)
+Selector_NExplode::Selector_NExplode(const TopoDS_ListOfShape& theShapes, const bool theOldOrder)
+  : myToBeReordered(theOldOrder)
 {
-  std::vector<TopoDS_Shape> aShapesVec;
-
   for(TopoDS_ListOfShape::Iterator anIter(theShapes); anIter.More(); anIter.Next()) {
-      aShapesVec.push_back(anIter.Value());
+    mySorted.push_back(anIter.Value());
   }
 
   CompareShapes::DataMapOfShapeDouble aCash;
-  CompareShapes shComp(&aCash);
-  std::stable_sort(aShapesVec.begin(), aShapesVec.end(), shComp);
-
-  std::vector<TopoDS_Shape>::const_iterator anIter = aShapesVec.begin();
-  for (; anIter != aShapesVec.end(); ++anIter) {
-    mySorted.Append(*anIter);
-  }
+  CompareShapes shComp(&aCash, theOldOrder ? pointToDouble : dummy);
+  std::stable_sort(mySorted.begin(), mySorted.end(), shComp);
 }
 
-Selector_NExplode::Selector_NExplode(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
+Selector_NExplode::Selector_NExplode(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType,
+                                     const bool theOldOrder)
+  : myToBeReordered(theOldOrder)
 {
-  std::vector<TopoDS_Shape> aShapesVec;
   TopTools_MapOfShape anAdded; // to avoid same shapes duplication
   for(TopExp_Explorer anExp(theShape, theType); anExp.More(); anExp.Next()) {
     if (anAdded.Add(anExp.Current()))
-     aShapesVec.push_back(anExp.Current());
+      mySorted.push_back(anExp.Current());
   }
 
   CompareShapes::DataMapOfShapeDouble aCash;
-  CompareShapes shComp(&aCash);
-  std::stable_sort(aShapesVec.begin(), aShapesVec.end(), shComp);
-
-  std::vector<TopoDS_Shape>::const_iterator anIter = aShapesVec.begin();
-  for (; anIter != aShapesVec.end(); ++anIter) {
-    mySorted.Append(*anIter);
-  }
+  CompareShapes shComp(&aCash, theOldOrder ? pointToDouble : dummy);
+  std::stable_sort(mySorted.begin(), mySorted.end(), shComp);
 }
 
 
 int Selector_NExplode::index(const TopoDS_Shape& theSubShape)
 {
-  TopoDS_ListOfShape::Iterator anIter(mySorted);
-  for(int anIndex = 1; anIter.More(); anIter.Next(), anIndex++) {
-    if (anIter.Value().IsSame(theSubShape))
+  // reorder if necessary
+  reorder();
+
+  std::vector<TopoDS_Shape>::iterator anIter = mySorted.begin();
+  for(int anIndex = 1; anIter != mySorted.end(); anIter++, anIndex++) {
+    if ((*anIter).IsSame(theSubShape))
       return anIndex;
   }
   return -1; // not found
 }
 
-TopoDS_Shape Selector_NExplode::shape(const int theIndex)
+TopoDS_Shape Selector_NExplode::shape(int& theIndex)
 {
-  TopoDS_ListOfShape::Iterator anIter(mySorted);
-  for(int anIndex = 1; anIter.More(); anIter.Next(), anIndex++) {
-    if (anIndex == theIndex)
-      return anIter.Value();
+  std::vector<TopoDS_Shape>::iterator anIter = mySorted.begin();
+  for(int anIndex = 1; anIter != mySorted.end(); anIter++, anIndex++) {
+    if (anIndex == theIndex) {
+      TopoDS_Shape aShape = *anIter;
+      if (myToBeReordered)
+        theIndex = index(aShape);
+      return aShape;
+    }
   }
   return TopoDS_Shape(); // not found
+}
+
+void Selector_NExplode::reorder()
+{
+  if (!myToBeReordered)
+    return;
+
+  myToBeReordered = false;
+  CompareShapes::DataMapOfShapeDouble aCash;
+  CompareShapes shComp(&aCash, dummy);
+  std::stable_sort(mySorted.begin(), mySorted.end(), shComp);
 }

@@ -40,6 +40,7 @@
 Selector_Modify::Selector_Modify() : Selector_Algo()
 {
   myWeakIndex = -1; // no index by default
+  myRecomputeWeakIndex = false;
 }
 
 // adds to theResult all labels that contain initial shapes for theValue located in theFinal
@@ -253,9 +254,13 @@ TDF_Label Selector_Modify::restoreByName(std::string theName,
     anEnd = theName.find('&', aStart);
     std::string aSubStr =
       theName.substr(aStart, anEnd == std::string::npos ? anEnd : anEnd - aStart);
-    if (aSubStr.find(weakNameID()) == 0) { // weak name identifier
-      std::string aWeakIndex = aSubStr.substr(weakNameID().size());
-      myWeakIndex = atoi(aWeakIndex.c_str());
+    size_t aFoundOldWeak = aSubStr.find(oldWeakNameID());
+    size_t aFoundNewWeak = aFoundOldWeak != std::string::npos ?
+                           aSubStr.find(weakNameID()) :
+                           aFoundOldWeak;
+    if (aFoundOldWeak == 0 || aFoundNewWeak == 0) { // weak name identifier
+      std::string aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());      myWeakIndex = atoi(aWeakIndex.c_str());
+      myRecomputeWeakIndex = aFoundOldWeak == 0;
       continue;
     }
     TDF_Label aSubContext, aValue;
@@ -310,8 +315,9 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
           aCommon.Append(aNewShape);
       }
     }
-    Selector_NExplode aNexp(aCommon);
+    Selector_NExplode aNexp(aCommon, myRecomputeWeakIndex);
     aResult = aNexp.shape(myWeakIndex);
+    myRecomputeWeakIndex = false;
   } else { // standard case
     TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
     findModificationResult(aFinalsCommon);
@@ -319,8 +325,9 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
       aResult = aFinalsCommon.First();
       findNewVersion(theContext, aResult);
     } else if (aFinalsCommon.Extent() > 1 && myWeakIndex > 0) {
-      Selector_NExplode aNExp(aFinalsCommon);
+      Selector_NExplode aNExp(aFinalsCommon, myRecomputeWeakIndex);
       aResult = aNExp.shape(myWeakIndex);
+      myRecomputeWeakIndex = false;
       findNewVersion(theContext, aResult);
     } else if (aFinalsCommon.Extent() > 1 && geometricalNaming()) {// if same geometry - compound
       TopoDS_ListOfShape::Iterator aCommonIter(aFinalsCommon);

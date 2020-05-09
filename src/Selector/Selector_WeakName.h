@@ -31,6 +31,7 @@ class Selector_WeakName: public Selector_Algo
 {
   TopAbs_ShapeEnum myShapeType; ///< type of this shape
   int myWeakIndex; ///< weak index in case modification produces several shapes
+  bool myRecomputeWeakIndex; ///< if the index is stored with old (unstable) order, recompute it
   TDF_Label myContext; ///< context shape label
 public:
   /// Initializes the selection of this kind

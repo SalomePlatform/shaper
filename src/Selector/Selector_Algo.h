@@ -148,16 +148,28 @@ protected:
     static const Standard_GUID kSHAPE_TYPE("864b3267-cb9d-4107-bf58-c3ce1775b171");
     return kSHAPE_TYPE;
   }
+  /// old string identifier of the weak name in modification or intersection types of algorithm
+  static const std::string& oldWeakNameID()
+  {
+    static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+    return kWEAK_NAME_IDENTIFIER;
+  }
+  /// old string identifier of the pure weak name
+  static const std::string& oldPureWeakNameID()
+  {
+    static const std::string kPURE_WEAK_NAME_IDENTIFIER = "_weak_name_";
+    return kPURE_WEAK_NAME_IDENTIFIER;
+  }
   /// string identifier of the weak name in modification or intersection types of algorithm
   static const std::string& weakNameID()
   {
-    static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+    static const std::string kWEAK_NAME_IDENTIFIER = std::string("new_") + oldWeakNameID();
     return kWEAK_NAME_IDENTIFIER;
   }
   /// string identifier of the pure weak name
   static const std::string& pureWeakNameID()
   {
-    static const std::string kPURE_WEAK_NAME_IDENTIFIER = "_weak_name_";
+    static const std::string kPURE_WEAK_NAME_IDENTIFIER = std::string("_new") + oldPureWeakNameID();
     return kPURE_WEAK_NAME_IDENTIFIER;
   }
   /// Stores the type of an algorithm in the data tree (in myLab)

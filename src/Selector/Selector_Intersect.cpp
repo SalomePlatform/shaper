@@ -36,6 +36,7 @@
 Selector_Intersect::Selector_Intersect() : Selector_AlgoWithSubs()
 {
   myWeakIndex = -1; // no index by default
+  myRecomputeWeakIndex = false;
 }
 
 // returns the sub-shapes of theSubType which belong to all theShapes (so, common or intersection)
@@ -190,9 +191,14 @@ TDF_Label Selector_Intersect::restoreByName(std::string theName,
     size_t anEndPos = theName.find(']', aStart + 1);
     if (anEndPos != std::string::npos) {
       std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
-      if (aSubStr.find(weakNameID()) == 0) { // weak name identifier
-        std::string aWeakIndex = aSubStr.substr(weakNameID().size());
+      size_t aFoundOldWeak = aSubStr.find(oldWeakNameID());
+      size_t aFoundNewWeak = aFoundOldWeak != std::string::npos ?
+                             aSubStr.find(weakNameID()) :
+                             aFoundOldWeak;
+      if (aFoundOldWeak == 0 || aFoundNewWeak == 0) { // weak name identifier
+        std::string aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());
         myWeakIndex = atoi(aWeakIndex.c_str());
+        myRecomputeWeakIndex = aFoundOldWeak == 0;
         continue;
       }
       TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
@@ -245,8 +251,9 @@ bool Selector_Intersect::solve(const TopoDS_Shape& theContext)
   commonShapes(aSubSelectorShapes, myShapeType, aCommon);
   if (aCommon.Extent() != 1) {
     if (myWeakIndex != -1) {
-      Selector_NExplode aNexp(aCommon);
+      Selector_NExplode aNexp(aCommon, myRecomputeWeakIndex);
       aResult = aNexp.shape(myWeakIndex);
+      myRecomputeWeakIndex = false;
     } else if (geometricalNaming() && aCommon.Extent() > 1) {
       // check results are on the same geometry, create compound
       TopoDS_ListOfShape::Iterator aCommonIter(aCommon);

@@ -23,7 +23,8 @@
 #include "Selector.h"
 
 #include <TopoDS_Shape.hxx>
-#include <TopoDS_ListOfShape.hxx>
+
+#include <vector>
 
 /// \class Selector_NExplode
 /// \ingroup DataModel
@@ -34,17 +35,26 @@ class Selector_NExplode
 {
  public:
    /// \brief Initializes the sorted list of shapes by the shapes list.
-   SELECTOR_EXPORT Selector_NExplode(const TopoDS_ListOfShape& theShapes);
+   SELECTOR_EXPORT Selector_NExplode(const TopoDS_ListOfShape& theShapes,
+                                     const bool theOldOrder = false);
    /// \brief Initializes the sorted list of shapes by the context shape and type of sub-shapes.
-   SELECTOR_EXPORT Selector_NExplode(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType);
+   SELECTOR_EXPORT Selector_NExplode(const TopoDS_Shape& theShape,
+                                     const TopAbs_ShapeEnum theType,
+                                     const bool theOldOrder = false);
 
    /// Returns an index (started from one) of sub-shape in the sorted list. Returns 0 if not found.
    SELECTOR_EXPORT int index(const TopoDS_Shape& theSubShape);
    /// Returns a shape by an index (started from one). Returns null if not found.
-   SELECTOR_EXPORT TopoDS_Shape shape(const int theIndex);
+   /// Recompute the index if the old order was used. The value will contain the new ordered index.
+   SELECTOR_EXPORT TopoDS_Shape shape(int& theIndex);
+
+private:
+  /// Reorder list of shapes.
+  void reorder();
 
 protected:
-  TopoDS_ListOfShape mySorted; ///< keep the ordered list of shapes
+  std::vector<TopoDS_Shape> mySorted; ///< keep the ordered list of shapes
+  bool myToBeReordered; ///< the list has to be reordered
 };
 
 #endif

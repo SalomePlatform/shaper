@@ -431,7 +431,8 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
     }
   } else if (theName[0] == '(') { // filter by neighbors
     aResult = new Selector_FilterByNeighbors;
-  } else if (theName.find(pureWeakNameID()) == 0) { // weak naming identifier
+  } else if (theName.find(pureWeakNameID()) == 0 ||
+             theName.find(oldPureWeakNameID()) == 0) { // weak naming identifier
     aResult = new Selector_WeakName;
   } else if (theName.find('&') != std::string::npos) { // modification
     aResult = new Selector_Modify;

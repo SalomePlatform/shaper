@@ -36,6 +36,7 @@ class Selector_Modify: public Selector_Algo
   TDF_Label myFinal; ///< final label of the primitive or generation, where the value is
   TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
   int myWeakIndex; ///< weak index in case modification produces several shapes
+  bool myRecomputeWeakIndex; ///< if the index is stored with old (unstable) order, recompute it
 public:
   /// Initializes the selection of this kind by list of named shapes where the modification results
   /// are presented and the selected value.
