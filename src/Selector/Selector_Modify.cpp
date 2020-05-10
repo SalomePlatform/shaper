@@ -259,7 +259,8 @@ TDF_Label Selector_Modify::restoreByName(std::string theName,
                            aSubStr.find(weakNameID()) :
                            aFoundOldWeak;
     if (aFoundOldWeak == 0 || aFoundNewWeak == 0) { // weak name identifier
-      std::string aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());      myWeakIndex = atoi(aWeakIndex.c_str());
+      std::string aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());
+      myWeakIndex = atoi(aWeakIndex.c_str());
       myRecomputeWeakIndex = aFoundOldWeak == 0;
       continue;
     }
