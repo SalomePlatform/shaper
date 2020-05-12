@@ -97,6 +97,7 @@
 %shared_ptr(ModelAPI_ResultField)
 %shared_ptr(ModelAPI_ResultParameter)
 %shared_ptr(ModelAPI_ResultCompSolid)
+%shared_ptr(ModelAPI_ObjectUpdatedMessage)
 
 %typecheck(SWIG_TYPECHECK_POINTER) const ModelAPI_AttributeTables::Value {
   $1 = (PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input) || PyBool_Check($input)) ? 1 : 0;
