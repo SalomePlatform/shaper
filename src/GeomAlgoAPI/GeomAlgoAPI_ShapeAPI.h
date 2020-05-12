@@ -28,6 +28,10 @@
 
 #include <GeomAlgoAPI_Exception.h>
 
+#ifdef WIN32
+#pragma warning(disable : 4290)
+#endif
+
 namespace GeomAlgoAPI_ShapeAPI
 {
 /**\class GeomAlgoAPI_ShapeAPI

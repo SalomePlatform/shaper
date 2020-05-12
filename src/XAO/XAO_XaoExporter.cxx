@@ -222,7 +222,7 @@ namespace {
     {
         // export the shape in the XAO file
         std::string txtShape = xaoGeometry->getShapeString();
-        xmlNodePtr cdata = xmlNewCDataBlock(doc, BAD_CAST txtShape.c_str(), txtShape.size());
+        xmlNodePtr cdata = xmlNewCDataBlock(doc, BAD_CAST txtShape.c_str(), (int)txtShape.size());
         xmlAddChild(shape, cdata);
     }
     else

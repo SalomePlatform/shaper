@@ -413,7 +413,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
       Handle(SelectBasics_EntityOwner) aBasicsOwner = anEntity->BaseSensitive()->OwnerId();
       if (!aBasicsOwner.IsNull())
-        aBasicsOwner->Set(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
+        aBasicsOwner->SetPriority(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
     }
   }
 }
@@ -441,10 +441,8 @@ bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selectio
 	 anIt.More();
 	 anIt.Next()) {
       Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
-      Handle(SelectMgr_EntityOwner) anOwner =
-        Handle(SelectMgr_EntityOwner)
-        ::DownCast(anEntity->BaseSensitive()->OwnerId());
-      anOwner->Set(this);
+      Handle(SelectMgr_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
+      anOwner->SetSelectable(this);
     }
 
     return true;

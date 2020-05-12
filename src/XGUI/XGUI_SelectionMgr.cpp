@@ -173,7 +173,7 @@ void XGUI_SelectionMgr::deselectPresentation(const Handle(AIS_InteractiveObject)
   NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (aResultOwners);
   Handle(SelectMgr_EntityOwner) anOwner;
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
+    anOwner = anOwnersIt.Value();
     if (!anOwner.IsNull())
       aContext->AddOrRemoveSelected(anOwner, false);
   }

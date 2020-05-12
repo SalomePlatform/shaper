@@ -161,7 +161,7 @@ MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& theP
     aStepValAsStr << aStepVal;
 
     ModelHighAPI_Integer aNumber = aStepStr == aStepValAsStr.str()
-                                 ? ModelHighAPI_Integer(aStepVal)
+                                 ? ModelHighAPI_Integer((int)aStepVal)
                                  : ModelHighAPI_Integer(aStepStr);
     aResult.reset(new FeaturesAPI_MultiRotation(aFeature, theMainObjects, theAxis, aNumber));
   }

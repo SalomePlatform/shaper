@@ -137,7 +137,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
           }
           aFathers[anAttr->contextObject()] = anObj;
           if (aFatherGroup.find(anObj) == aFatherGroup.end()) {
-            int aSize = aFatherGroup.size();
+            int aSize = (int)aFatherGroup.size();
             aFatherGroup[anObj] = aSize; // the first is zero
           }
         }

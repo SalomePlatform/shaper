@@ -93,7 +93,7 @@ namespace XAO
          */
         const int count() const
         {
-            return m_elements.size();
+            return (int)m_elements.size();
         }
 
         /**

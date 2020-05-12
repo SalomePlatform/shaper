@@ -453,8 +453,7 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
       Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
       if (anEntity.IsNull())
         continue;
-       Handle(SelectMgr_EntityOwner) anOwner =
-        Handle(SelectMgr_EntityOwner)::DownCast(anEntity->BaseSensitive()->OwnerId());
+       Handle(SelectMgr_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
       if (!anOwner.IsNull())
         theOwners.Add(anOwner);
     }

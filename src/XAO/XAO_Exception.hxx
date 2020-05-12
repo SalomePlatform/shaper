@@ -24,6 +24,10 @@
 #include "XAO.hxx"
 #include <exception>
 
+#ifdef WIN32
+#pragma warning(disable : 4275) // for std::exception
+#endif
+
 namespace XAO
 {
     /**

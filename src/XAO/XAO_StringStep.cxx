@@ -100,7 +100,7 @@ throw (XAO_Exception)
 void StringStep::setValues(const std::vector<std::string>& values)
 throw (XAO_Exception)
 {
-    checkNbValues(values.size());
+    checkNbValues((int)values.size());
 
     for (int i = 0; i < m_nbElements; ++i)
     {
@@ -115,7 +115,7 @@ void StringStep::setElement(const int& element, const std::vector<std::string>& 
 throw (XAO_Exception)
 {
     checkElementIndex(element);
-    checkNbComponents(elements.size());
+    checkNbComponents((int)elements.size());
 
     for (int i = 0; i < m_nbComponents; ++i)
         m_values[element][i] = elements[i];
@@ -125,7 +125,7 @@ void StringStep::setComponent(const int& component, const std::vector<std::strin
 throw (XAO_Exception)
 {
     checkElementIndex(component);
-    checkNbElements(components.size());
+    checkNbElements((int)components.size());
 
     for (int i = 0; i < m_nbElements; ++i)
         m_values[i][component] = components[i];

@@ -28,6 +28,7 @@
 #include "XAO_Step.hxx"
 
 #ifdef WIN32
+#pragma warning(disable:4251) // std::vector needs dll-interface
 #pragma warning(disable:4290) // Warning Exception ...
 #endif
 

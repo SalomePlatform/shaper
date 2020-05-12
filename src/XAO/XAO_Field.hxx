@@ -139,7 +139,7 @@ namespace XAO
          * Gets the number of the steps.
          * @return the number of steps.
          */
-        const int countSteps() const { return m_steps.size(); }
+        const int countSteps() const { return (int)m_steps.size(); }
 
         /**
          * Gets the name of a component.

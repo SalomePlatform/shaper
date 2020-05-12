@@ -38,6 +38,7 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopExp_Explorer.hxx>
 #include <Prs3d_Root.hxx>
+#include <Graphic3d_Text.hxx>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_FieldStepPrs, ViewerData_AISShape);
@@ -221,8 +222,6 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
       gp_Pnt aCenter;
       if (computeMassCenter(aShape, aCenter)) {
-        Graphic3d_Vertex aVertex(aCenter.X(), aCenter.Y(), aCenter.Z());
-
         Handle(Graphic3d_AspectText3d) anAspectText3d = new Graphic3d_AspectText3d();
         anAspectText3d->SetStyle(Aspect_TOST_ANNOTATION);
         anAspectText3d->SetColor(aLabelColor);
@@ -230,7 +229,10 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 
         int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
         QString aString = aValues.at(i);
-        aGroup->Text(aString.toUtf8().constData(), aVertex, aT);
+        Handle(Graphic3d_Text) aText = new Graphic3d_Text(aT);
+        aText->SetText(aString.toUtf8().constData());
+        aText->SetPosition(aCenter);
+        aGroup->AddText(aText);
       }
     }
   }

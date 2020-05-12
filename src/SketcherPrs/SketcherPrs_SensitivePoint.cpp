@@ -60,8 +60,7 @@ Standard_Boolean SketcherPrs_SensitivePoint::Matches(SelectBasics_SelectingVolum
 
 gp_Pnt SketcherPrs_SensitivePoint::Point() const
 {
-  const Handle(SelectMgr_EntityOwner)& anOwner =
-    Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
+  const Handle(SelectMgr_EntityOwner)& anOwner = OwnerId();
   const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
     Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
   return aSymbPrs->pointsArray()->Vertice(myId);
@@ -76,8 +75,7 @@ Handle(Select3D_SensitiveEntity) SketcherPrs_SensitivePoint::GetConnected()
 gp_Pnt SketcherPrs_SensitivePoint::CenterOfGeometry() const
 {
 #ifdef DEBUG_SENSITIVE_TO_BE_CORRECTED
-  const Handle(SelectMgr_EntityOwner)& anOwner =
-    Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
+  const Handle(SelectMgr_EntityOwner)& anOwner = OwnerId();
   const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
     Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
   if (aSymbPrs->pointsArray()->VertexNumber() < myId)
@@ -89,8 +87,7 @@ gp_Pnt SketcherPrs_SensitivePoint::CenterOfGeometry() const
 Select3D_BndBox3d SketcherPrs_SensitivePoint::BoundingBox()
 {
 #ifdef DEBUG_SENSITIVE_TO_BE_CORRECTED
-  const Handle(SelectMgr_EntityOwner)& anOwner =
-    Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
+  const Handle(SelectMgr_EntityOwner)& anOwner = OwnerId();
   const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
     Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
   if (aSymbPrs->pointsArray()->VertexNumber() < myId)

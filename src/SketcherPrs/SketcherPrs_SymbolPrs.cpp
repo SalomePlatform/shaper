@@ -185,7 +185,8 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
       aSizedMap->InitTrash(aPixMap->Format(), aWidth, aHeigh);
       for (Standard_Size i = 0; i < aWidth; i++) {
         for (Standard_Size j = 0; j < aHeigh; j++) {
-          aSizedMap->SetPixelColor(int(i), int(j), aPixMap->PixelColor(i / aRatio, j / aRatio));
+          aSizedMap->SetPixelColor(int(i), int(j),
+              aPixMap->PixelColor(int(i / aRatio), int(j / aRatio)));
         }
       }
       aPixMap = aSizedMap;

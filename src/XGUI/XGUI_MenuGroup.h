@@ -26,6 +26,10 @@
 #include <list>
 #include <memory>
 
+#ifdef WIN32
+#pragma warning(disable : 4251) // std::string needs dll-interface
+#endif
+
 class Config_FeatureMessage;
 
 /**

@@ -446,7 +446,7 @@ bool XGUI_SelectionActivate::activate(const Handle(AIS_InteractiveObject)& theIO
 
   // loading the interactive object allowing the decomposition
   if (aTColModes.IsEmpty() || !aHasValidMode) {
-    aContext->Load(theIO, -1, true);
+    aContext->Load(theIO);
     Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
     if (!aTrihedron.IsNull()) {
       // Workaround for Trihedron. It should be loaded using the next Load method to

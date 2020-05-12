@@ -1099,7 +1099,7 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   /// OCCT: to write about the problem that active owners method returns one owner several times
   QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
+    anOwner = anOwnersIt.Value();
     if (aSelectedIds.contains((size_t)anOwner.get()))
       continue;
     aSelectedIds.append((size_t)anOwner.get());

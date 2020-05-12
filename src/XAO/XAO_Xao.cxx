@@ -71,7 +71,7 @@ Xao::~Xao()
 
 const int Xao::countGroups() const
 {
-    return m_groups.size();
+    return (int)m_groups.size();
 }
 
 Group* Xao::getGroup(const int& index)
@@ -117,7 +117,7 @@ bool Xao::removeGroup(Group* group)
 
 const int Xao::countFields() const
 {
-    return m_fields.size();
+    return (int)m_fields.size();
 }
 
 const XAO::Type Xao::getFieldType(const int& index)

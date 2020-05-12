@@ -101,7 +101,7 @@ throw (XAO_Exception)
 void IntegerStep::setValues(const std::vector<int>& values)
 throw (XAO_Exception)
 {
-    checkNbValues(values.size());
+    checkNbValues((int)values.size());
 
     for (int i = 0; i < m_nbElements; ++i)
     {
@@ -116,7 +116,7 @@ void IntegerStep::setElement(const int& element, const std::vector<int>& element
 throw (XAO_Exception)
 {
     checkElementIndex(element);
-    checkNbComponents(elements.size());
+    checkNbComponents((int)elements.size());
 
     for (int i = 0; i < m_nbComponents; ++i)
         m_values[element][i] = elements[i];
@@ -126,7 +126,7 @@ void IntegerStep::setComponent(const int& component, const std::vector<int>& com
 throw (XAO_Exception)
 {
     checkElementIndex(component);
-    checkNbElements(components.size());
+    checkNbElements((int)components.size());
 
     for (int i = 0; i < m_nbElements; ++i)
         m_values[i][component] = components[i];

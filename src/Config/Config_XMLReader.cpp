@@ -161,7 +161,7 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
 void Config_XMLReader::readAll()
 {
   if (isFromMemory) {
-    myXmlDoc = xmlParseMemory(myRootFileName.c_str(), myRootFileName.length());
+    myXmlDoc = xmlParseMemory(myRootFileName.c_str(), (int)myRootFileName.length());
     xmlNodePtr aRoot = xmlDocGetRootElement(myXmlDoc);
     readRecursively(aRoot);
     return;
