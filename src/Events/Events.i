@@ -43,14 +43,9 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
-%include "std_shared_ptr.i"
 
 // directors
 %feature("director") Events_Listener;
-
-%shared_ptr(Events_InfoMessage)
-%shared_ptr(Events_Message)
-%shared_ptr(Events_MessageGroup)
 
 // all supported interfaces
 %include "Events_Message.h"

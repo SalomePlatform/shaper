@@ -97,7 +97,6 @@
 %shared_ptr(ModelAPI_ResultField)
 %shared_ptr(ModelAPI_ResultParameter)
 %shared_ptr(ModelAPI_ResultCompSolid)
-%shared_ptr(ModelAPI_ObjectUpdatedMessage)
 
 %typecheck(SWIG_TYPECHECK_POINTER) const ModelAPI_AttributeTables::Value {
   $1 = (PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input) || PyBool_Check($input)) ? 1 : 0;
@@ -197,7 +196,11 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_ResultGroup) shared_ptr_cast<ModelAPI_ResultGroup, ModelAPI_Result>;
 %template(modelAPI_ResultField) shared_ptr_cast<ModelAPI_ResultField, ModelAPI_Result>;
 
-%template(messageToUpdatedMessage) shared_ptr_cast<ModelAPI_ObjectUpdatedMessage, Events_Message>;
+%inline %{
+  ModelAPI_ObjectUpdatedMessage* messageToUpdatedMessage(std::shared_ptr<Events_Message> msg) {
+    return static_cast<ModelAPI_ObjectUpdatedMessage*>(msg.get());
+  }
+%}
 
 // Attribute casts
 %template(modelAPI_AttributeDocRef)        shared_ptr_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
