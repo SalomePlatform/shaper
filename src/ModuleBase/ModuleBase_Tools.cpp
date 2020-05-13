@@ -1126,7 +1126,7 @@ QString translate(const std::string& theContext, const std::string& theMessage)
   return aMessage;
 }
 
-void setPointBallHighlighting(AIS_Shape* theAIS)
+void setPointBallHighlighting(AIS_InteractiveObject* theAIS)
 {
   static Handle(Image_AlienPixMap) aPixMap;
   if(aPixMap.IsNull()) {

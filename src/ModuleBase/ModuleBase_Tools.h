@@ -370,7 +370,7 @@ QString MODULEBASE_EXPORT translate(const std::string& theContext, const std::st
 
 /// Set Highlighting of points as a Ball shape
 /// \param theAIS - the presentation
-void MODULEBASE_EXPORT setPointBallHighlighting(AIS_Shape* theAIS);
+void MODULEBASE_EXPORT setPointBallHighlighting(AIS_InteractiveObject* theAIS);
 
 /// Creates a parameter from a given string
 /// \theText a text wit equation
