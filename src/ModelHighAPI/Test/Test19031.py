@@ -360,11 +360,11 @@ Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Extrusion_1_1_
 model.end()
 
 model.testNbResults(Fillet_1, 1)
-model.testNbSubResults(Fillet_1, [16])
-model.testNbSubShapes(Fillet_1, GeomAPI_Shape.SOLID, [16])
-model.testNbSubShapes(Fillet_1, GeomAPI_Shape.FACE, [141])
-model.testNbSubShapes(Fillet_1, GeomAPI_Shape.EDGE, [656])
-model.testNbSubShapes(Fillet_1, GeomAPI_Shape.VERTEX, [1312])
-model.testResultsVolumes(Fillet_1, [867199.579792])
+model.testNbSubResults(Fillet_1, [15])
+model.testNbSubShapes(Fillet_1, GeomAPI_Shape.SOLID, [15])
+model.testNbSubShapes(Fillet_1, GeomAPI_Shape.FACE, [134])
+model.testNbSubShapes(Fillet_1, GeomAPI_Shape.EDGE, [624])
+model.testNbSubShapes(Fillet_1, GeomAPI_Shape.VERTEX, [1248])
+model.testResultsVolumes(Fillet_1, [867199.641696438])
 
 assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))
