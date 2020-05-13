@@ -51,10 +51,12 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
     ${OpenCASCADE_ApplicationFramework_LIBRARIES}
     GeomAPI
+    GeomAlgoAPI
 )
 SET(PROJECT_INCLUDES
   ${OpenCASCADE_INCLUDE_DIR}
   ../GeomAPI
+  ../GeomAlgoAPI
 )
 
 

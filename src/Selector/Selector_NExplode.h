@@ -24,7 +24,9 @@
 
 #include <TopoDS_Shape.hxx>
 
-#include <vector>
+#include <memory>
+
+class GeomAlgoAPI_NExplode;
 
 /// \class Selector_NExplode
 /// \ingroup DataModel
@@ -48,12 +50,8 @@ class Selector_NExplode
    /// Recompute the index if the old order was used. The value will contain the new ordered index.
    SELECTOR_EXPORT TopoDS_Shape shape(int& theIndex);
 
-private:
-  /// Reorder list of shapes.
-  void reorder();
-
 protected:
-  std::vector<TopoDS_Shape> mySorted; ///< keep the ordered list of shapes
+  std::shared_ptr<GeomAlgoAPI_NExplode> mySorted; ///< keep the ordered list of shapes
   bool myToBeReordered; ///< the list has to be reordered
 };
 

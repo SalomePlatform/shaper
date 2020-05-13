@@ -24,6 +24,8 @@
 
 #include <GeomAPI_Shape.h>
 
+#include <vector>
+
 /// \class GeomAlgoAPI_NExplode
 /// \ingroup DataAlgo
 /// \brief Sort shapes by their centers of mass, using formula X*999 + Y*99 + Z*0.9.
@@ -31,18 +33,33 @@
 /// Used for getting index of sub0shape in WeakNaming algorithm.
 class GeomAlgoAPI_NExplode
 {
- public:
+public:
+  /// Different orders of shape explosion
+  enum ShapeOrder {
+    ORDER_BY_HASH_VALUE,  ///< kept for compatibility
+    ORDER_BY_MIDDLE_POINT ///< modern approach comparing middle points of shapes
+  };
+
+public:
    /// \brief Initializes the sorted list of shapes by the context shape and type of sub-shapes.
-   GEOMALGOAPI_EXPORT GeomAlgoAPI_NExplode(
-     const GeomShapePtr theContext, const GeomAPI_Shape::ShapeType theShapeType);
+   GEOMALGOAPI_EXPORT GeomAlgoAPI_NExplode(const GeomShapePtr theContext,
+                                           const GeomAPI_Shape::ShapeType theShapeType,
+                                           const ShapeOrder theOrder = ORDER_BY_MIDDLE_POINT);
+
+   /// \brief Initializes the sorted list of shapes.
+   GEOMALGOAPI_EXPORT GeomAlgoAPI_NExplode(const ListOfShape& theShapes,
+                                           const ShapeOrder theOrder = ORDER_BY_MIDDLE_POINT);
 
    /// Returns an index (started from one) of sub-shape in the sorted list. Returns 0 if not found.
    GEOMALGOAPI_EXPORT int index(const GeomShapePtr theSubShape);
    /// Returns a shape by an index (started from one). Returns null if not found.
    GEOMALGOAPI_EXPORT GeomShapePtr shape(const int theIndex);
 
+   /// Reorder the shapes
+   GEOMALGOAPI_EXPORT void reorder(const ShapeOrder theNewOrder);
+
 protected:
-  ListOfShape mySorted;
+  std::vector<GeomShapePtr> mySorted;
 };
 
 #endif

@@ -19,150 +19,176 @@
 
 #include "GeomAlgoAPI_NExplode.h"
 
-#include <TopoDS_Shape.hxx>
-#include <BRep_Tool.hxx>
-#include <TopoDS.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
-#include <NCollection_DataMap.hxx>
-#include <Precision.hxx>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_ShapeExplorer.h>
+
 #include <Bnd_Box.hxx>
+#include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopTools_MapOfShape.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
+#include <Precision.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
 
-#include <vector>
 #include <algorithm>
+#include <set>
+#include <unordered_map>
 
-static std::pair<double, double> ShapeToDouble (const TopoDS_Shape& S)
+namespace NExplodeTools
 {
-  // Computing of CentreOfMass
-  gp_Pnt GPoint;
-  double Len;
-
-  if (S.ShapeType() == TopAbs_VERTEX) {
-    GPoint = BRep_Tool::Pnt(TopoDS::Vertex(S));
-    Len = (double)S.Orientation();
+  void dummy(gp_Pnt&)
+  {
+    // do nothing (new approach to order shapes)
   }
-  else {
-    GProp_GProps GPr;
-    if (S.ShapeType() == TopAbs_EDGE || S.ShapeType() == TopAbs_WIRE) {
-      BRepGProp::LinearProperties(S, GPr);
-    }
-    else if (S.ShapeType() == TopAbs_FACE || S.ShapeType() == TopAbs_SHELL) {
-      BRepGProp::SurfaceProperties(S, GPr);
+
+  void pointToDouble(gp_Pnt& thePoint)
+  {
+    // old approach to order shapes
+    double dMidXYZ = thePoint.X() * 999.0 + thePoint.Y() * 99.0 + thePoint.Z() * 0.9;
+    thePoint.SetCoord(dMidXYZ, 0.0, 0.0);
+  }
+
+  std::pair<GeomPointPtr, double> ShapeToDouble(const GeomShapePtr& theShape,
+                                                void(*convertPoint)(gp_Pnt&))
+  {
+    // Computing of CentreOfMass
+    gp_Pnt GPoint;
+    double Len;
+
+    TopoDS_Shape S = theShape->impl<TopoDS_Shape>();
+    if (S.ShapeType() == TopAbs_VERTEX) {
+      GPoint = BRep_Tool::Pnt(TopoDS::Vertex(S));
+      Len = (double)S.Orientation();
     }
     else {
-      BRepGProp::VolumeProperties(S, GPr);
+      GProp_GProps GPr;
+      if (S.ShapeType() == TopAbs_EDGE || S.ShapeType() == TopAbs_WIRE) {
+        BRepGProp::LinearProperties(S, GPr);
+      }
+      else if (S.ShapeType() == TopAbs_FACE || S.ShapeType() == TopAbs_SHELL) {
+        BRepGProp::SurfaceProperties(S, GPr);
+      }
+      else {
+        BRepGProp::VolumeProperties(S, GPr);
+      }
+      GPoint = GPr.CentreOfMass();
+      Len = GPr.Mass();
     }
-    GPoint = GPr.CentreOfMass();
-    Len = GPr.Mass();
+
+    (*convertPoint)(GPoint);
+    GeomPointPtr aMidPoint(new GeomAPI_Pnt(GPoint.X(), GPoint.Y(), GPoint.Z()));
+    return std::make_pair(aMidPoint, Len);
   }
 
-  double dMidXYZ = GPoint.X() * 999.0 + GPoint.Y() * 99.0 + GPoint.Z() * 0.9;
-  return std::make_pair(dMidXYZ, Len);
+  /*!
+  * \brief Sort shapes in the list by their coordinates.
+  */
+  struct CompareShapes : public std::binary_function<TopoDS_Shape, TopoDS_Shape, bool>
+  {
+    typedef std::unordered_map<GeomShapePtr,
+                               std::pair<GeomPointPtr, double>,
+                               GeomAPI_Shape::Hash,
+                               GeomAPI_Shape::Equal > DataMapOfShapeDouble;
+
+    CompareShapes(void(*convertPoint)(gp_Pnt&))
+      : myConvertPoint(convertPoint) {}
+
+    bool operator() (const GeomShapePtr& lhs, const GeomShapePtr& rhs);
+
+    DataMapOfShapeDouble myMap;
+    void(*myConvertPoint)(gp_Pnt&);
+  };
 }
 
-/*!
-* \brief Sort shapes in the list by their coordinates.
-*/
-struct CompareShapes : public std::binary_function<TopoDS_Shape, TopoDS_Shape, bool>
+bool NExplodeTools::CompareShapes::operator() (const GeomShapePtr& lhs, const GeomShapePtr& rhs)
 {
-  typedef NCollection_DataMap<TopoDS_Shape, std::pair<double, double> > DataMapOfShapeDouble;
-
-  CompareShapes(DataMapOfShapeDouble* theCashMap) : myMap(theCashMap) {}
-
-  bool operator() (const TopoDS_Shape& lhs, const TopoDS_Shape& rhs);
-
-  DataMapOfShapeDouble* myMap;
-};
-
-bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
-  const TopoDS_Shape& theShape2)
-{
-  if (!myMap->IsBound(theShape1)) {
-    myMap->Bind(theShape1, ShapeToDouble(theShape1));
+  if (myMap.find(lhs) == myMap.end()) {
+    myMap[lhs] = ShapeToDouble(lhs, myConvertPoint);
   }
 
-  if (!myMap->IsBound(theShape2)) {
-    myMap->Bind(theShape2, ShapeToDouble(theShape2));
+  if (myMap.find(rhs) == myMap.end()) {
+    myMap[rhs] = ShapeToDouble(rhs, myConvertPoint);
   }
 
-  std::pair<double, double> val1 = myMap->Find(theShape1);
-  std::pair<double, double> val2 = myMap->Find(theShape2);
+  const std::pair<GeomPointPtr, double>& val1 = myMap.at(lhs);
+  const std::pair<GeomPointPtr, double>& val2 = myMap.at(rhs);
 
-  double tol = Precision::Confusion();
+  double tol = 10.0 * Precision::Confusion();
   bool exchange = Standard_False;
 
-  double dMidXYZ = val1.first - val2.first;
-  if (dMidXYZ >= tol) {
+  // compare coordinates of center points
+  if (val2.first->isLess(val1.first, tol)) {
     exchange = Standard_True;
   }
-  else if (Abs(dMidXYZ) < tol) {
+  else if (!val1.first->isLess(val2.first, tol)) {
     double dLength = val1.second - val2.second;
     if (dLength >= tol) {
       exchange = Standard_True;
     }
-    else if (Abs(dLength) < tol && theShape1.ShapeType() <= TopAbs_FACE) {
+    else if (Abs(dLength) < tol && lhs->shapeType() <= GeomAPI_Shape::FACE) {
       // equal values possible on shapes such as two halves of a sphere and
       // a membrane inside the sphere
-      Bnd_Box box1,box2;
-      BRepBndLib::Add(theShape1, box1);
+      Bnd_Box box1, box2;
+      BRepBndLib::Add(lhs->impl<TopoDS_Shape>(), box1);
       if (!box1.IsVoid()) {
-        BRepBndLib::Add(theShape2, box2);
+        BRepBndLib::Add(rhs->impl<TopoDS_Shape>(), box2);
         Standard_Real dSquareExtent = box1.SquareExtent() - box2.SquareExtent();
         if (dSquareExtent >= tol) {
           exchange = Standard_True;
         }
         else if (Abs(dSquareExtent) < tol) {
-          Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax, val1, val2;
+          Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax, value1, value2;
           box1.Get(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-          val1 = (aXmin+aXmax)*999.0 + (aYmin+aYmax)*99.0 + (aZmin+aZmax)*0.9;
+          value1 = (aXmin + aXmax)*999.0 + (aYmin + aYmax)*99.0 + (aZmin + aZmax)*0.9;
           box2.Get(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-          val2 = (aXmin+aXmax)*999.0 + (aYmin+aYmax)*99.0 + (aZmin+aZmax)*0.9;
-          if ((val1 - val2) >= tol) {
+          value2 = (aXmin + aXmax)*999.0 + (aYmin + aYmax)*99.0 + (aZmin + aZmax)*0.9;
+          if (value1 - value2 >= tol) {
             exchange = Standard_True;
           }
-          else // compare adresses if shapes are geometrically equal
-            exchange = theShape1.TShape().get() > theShape2.TShape().get();
+          else { // compare adresses if shapes are geometrically equal
+            exchange = lhs->impl<TopoDS_Shape>().TShape().get() >
+                       rhs->impl<TopoDS_Shape>().TShape().get();
+          }
         }
       }
-    } else // compare adresses if shapes are geometrically equal
-      exchange = theShape1.TShape().get() > theShape2.TShape().get();
+    }
+    else { // compare adresses if shapes are geometrically equal
+      exchange = lhs->impl<TopoDS_Shape>().TShape().get() >
+                 rhs->impl<TopoDS_Shape>().TShape().get();
+     }
   }
 
   //return val1 < val2;
   return !exchange;
 }
 
-GeomAlgoAPI_NExplode::GeomAlgoAPI_NExplode(
-  const GeomShapePtr theContext, const GeomAPI_Shape::ShapeType theShapeType)
+GeomAlgoAPI_NExplode::GeomAlgoAPI_NExplode(const GeomShapePtr theContext,
+                                           const GeomAPI_Shape::ShapeType theShapeType,
+                                           const ShapeOrder theOrder)
 {
-  std::vector<TopoDS_Shape> aShapesVec;
-
-  const TopoDS_Shape& aContext = theContext->impl<TopoDS_Shape>();
-  TopExp_Explorer anExp(aContext, (TopAbs_ShapeEnum)theShapeType);
-  TopTools_MapOfShape aMapShape;
-  for(; anExp.More(); anExp.Next()) {
-    if (aMapShape.Add(anExp.Current()))
-      aShapesVec.push_back(anExp.Current());
+  std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aMapShape;
+  GeomAPI_ShapeExplorer anExp(theContext, theShapeType);
+  for (; anExp.more(); anExp.next()) {
+    GeomShapePtr aCurrent = anExp.current();
+    if (aMapShape.find(aCurrent) == aMapShape.end()) {
+      mySorted.push_back(aCurrent);
+      aMapShape.insert(aCurrent);
+    }
   }
+  reorder(theOrder);
+}
 
-  CompareShapes::DataMapOfShapeDouble aCash;
-  CompareShapes shComp(&aCash);
-  std::stable_sort(aShapesVec.begin(), aShapesVec.end(), shComp);
-
-  std::vector<TopoDS_Shape>::const_iterator anIter = aShapesVec.begin();
-  for (; anIter != aShapesVec.end(); ++anIter) {
-    GeomShapePtr aShapePtr(new GeomAPI_Shape);
-    aShapePtr->setImpl<TopoDS_Shape>(new TopoDS_Shape(*anIter));
-    mySorted.push_back(aShapePtr);
-  }
+GeomAlgoAPI_NExplode::GeomAlgoAPI_NExplode(const ListOfShape& theShapes,
+                                           const ShapeOrder theOrder)
+  : mySorted(theShapes.begin(), theShapes.end())
+{
+  reorder(theOrder);
 }
 
 int GeomAlgoAPI_NExplode::index(const GeomShapePtr theSubShape)
 {
-  ListOfShape::iterator anIter = mySorted.begin();
+  std::vector<GeomShapePtr>::iterator anIter = mySorted.begin();
   for(int anIndex = 1; anIter != mySorted.end(); anIter++, anIndex++) {
     if ((*anIter)->isSame(theSubShape))
       return anIndex;
@@ -172,10 +198,17 @@ int GeomAlgoAPI_NExplode::index(const GeomShapePtr theSubShape)
 
 GeomShapePtr GeomAlgoAPI_NExplode::shape(const int theIndex)
 {
-  ListOfShape::iterator anIter = mySorted.begin();
+  std::vector<GeomShapePtr>::iterator anIter = mySorted.begin();
   for(int anIndex = 1; anIter != mySorted.end(); anIter++, anIndex++) {
     if (anIndex == theIndex)
       return *anIter;
   }
   return GeomShapePtr(); // not found
+}
+
+void GeomAlgoAPI_NExplode::reorder(const ShapeOrder theNewOrder)
+{
+  NExplodeTools::CompareShapes shComp(
+      theNewOrder == ORDER_BY_HASH_VALUE ? NExplodeTools::pointToDouble : NExplodeTools::dummy);
+  std::stable_sort(mySorted.begin(), mySorted.end(), shComp);
 }
