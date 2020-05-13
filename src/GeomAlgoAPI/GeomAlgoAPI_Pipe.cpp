@@ -35,6 +35,7 @@
 #include <Geom_Line.hxx>
 #include <gp_Lin.hxx>
 #include <NCollection_List.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -417,6 +418,31 @@ gp_Trsf getPathToBaseTranslation(const TopoDS_Shape& theBase, const TopoDS_Shape
   if (aDist.IsDone() && aDist.Value() > Precision::Confusion()) {
     gp_Pnt aPntBase = aDist.PointOnShape1(1);
     gp_Pnt aPntPath = aDist.PointOnShape2(1);
+    // get the end point on the path nearest to the found point,
+    // because the path is almost usually started from the one of the sections
+    if (!BRep_Tool::IsClosed(thePath)) {
+      TopoDS_Wire aPathWire = TopoDS::Wire(thePath);
+      if (!aPathWire.IsNull()) {
+        TopoDS_Vertex aV1, aV2;
+        TopExp::Vertices(aPathWire, aV1, aV2);
+
+        gp_Pnt aStart = BRep_Tool::Pnt(aV1);
+        gp_Pnt anEnd = BRep_Tool::Pnt(aV2);
+
+        // compare 3 distances
+        double aDistToStart = aPntBase.Distance(aStart);
+        double aDistToEnd = aPntBase.Distance(anEnd);
+        double aMinDist = aPntBase.Distance(aPntPath);
+
+        static const double THE_THRESHOLD = 0.01; // threshold for distance ratio
+        double aDeltaStart = Abs(aDistToStart - aMinDist);
+        double aDeltaEnd = Abs(aDistToEnd - aMinDist);
+        if (aDeltaStart < THE_THRESHOLD * aDeltaEnd)
+          aPntPath = aStart;
+        else if (aDeltaEnd < THE_THRESHOLD * aDeltaStart)
+          aPntPath = anEnd;
+      }
+    }
     aTranslation.SetTranslation(aPntPath, aPntBase);
   }
 

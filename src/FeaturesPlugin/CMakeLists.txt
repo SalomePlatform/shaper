@@ -659,5 +659,6 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestChamfer_MultiLevelCompound_v95_4.py
                Test18836.py
                Test2817.py
+               Test19065.py
                Test19066.py
 )
