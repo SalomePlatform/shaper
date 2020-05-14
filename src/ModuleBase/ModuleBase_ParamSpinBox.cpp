@@ -81,6 +81,17 @@ void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
   theList.removeDuplicates();
   theList.sort();
   myCompleterModel->setStringList(theList);
+
+  QAbstractItemView* aPopup = myCompleter->popup();
+  QFontMetrics aMetric = aPopup->fontMetrics();
+  int aWidth = 0;
+  QRect aRect;
+  foreach(QString aStr, theList) {
+    aRect = aMetric.boundingRect(aStr);
+    if (aRect.width() > aWidth)
+      aWidth = aRect.width();
+  }
+  aPopup->setMinimumWidth(aWidth + 25);
 }
 
 /*!
