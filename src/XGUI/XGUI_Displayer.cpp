@@ -160,6 +160,8 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
         aScreen->setViewScale(getViewScale());
       }
       anAIS = aPrs->getAISObject(anAIS);
+      if (anAIS.get())
+        myWorkshop->module()->customizePresentation(theObject, anAIS);
     } else {
       anAIS = myWorkshop->module()->createPresentation(theObject);
       isShading = true;

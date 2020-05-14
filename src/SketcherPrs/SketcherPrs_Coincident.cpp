@@ -34,6 +34,7 @@
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 
+#include <AIS_InteractiveContext.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Prs3d_PointAspect.hxx>
@@ -48,8 +49,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketch)
 : AIS_InteractiveObject(), myConstraint(theConstraint), mySketch(theSketch),
-  myPoint(gp_Pnt(0.0, 0.0, 0.0)), myIsCustomColor(false)
+  myPoint(gp_Pnt(0.0, 0.0, 0.0))
 {
+  SetColor(Quantity_NOC_BLACK);
 }
 
 bool SketcherPrs_Coincident::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -137,18 +139,19 @@ void SketcherPrs_Coincident::Compute(
       }
     }
   }
-  Quantity_Color aExternalColor = aIsEdge ? Quantity_NOC_BLACK : Quantity_NOC_YELLOW;
-  Quantity_Color aInternalColor = aIsEdge ? Quantity_NOC_YELLOW : Quantity_NOC_BLACK;
+  Quantity_Color aMainColor;
+  Color(aMainColor);
+  Quantity_Color aExternalColor = aIsEdge ? aMainColor : Quantity_NOC_YELLOW;
+  Quantity_Color aInternalColor = aIsEdge ? Quantity_NOC_YELLOW : aMainColor;
 
   int aRatio = SketcherPrs_Tools::pixelRatio();
 
   // Create the presentation as a combination of standard point markers
-  bool aCustomColor = myIsCustomColor;
   // The external yellow contour
   Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2. * aRatio);
-  aPtA->SetColor(!aCustomColor ? aExternalColor : myCustomColor);
+  aPtA->SetColor(aExternalColor);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -160,7 +163,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(aIsEdge ? Aspect_TOM_STAR : Aspect_TOM_RING1);
   aPtA->SetScale(1. * aRatio);
-  aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
+  aPtA->SetColor(aInternalColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -168,7 +171,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_POINT);
   aPtA->SetScale(5. * aRatio);
-  aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
+  aPtA->SetColor(aInternalColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -182,24 +185,4 @@ void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)&
                                             const Standard_Integer aMode)
 {
   // There is no selection of coincident - a point is selected instead of coincidence
-}
-
-void SketcherPrs_Coincident::SetColor(const Quantity_NameOfColor aCol)
-{
-  SetColor(Quantity_Color(aCol));
-}
-
-void SketcherPrs_Coincident::SetColor(const Quantity_Color &aCol)
-{
-  hasOwnColor=Standard_True;
-}
-
-void SketcherPrs_Coincident::SetCustomColor(const std::vector<int>& theColor)
-{
-  myIsCustomColor = !theColor.empty();
-  if (myIsCustomColor)
-    myCustomColor = Quantity_Color(theColor[0] / 255., theColor[1] / 255.,
-                                   theColor[2] / 255., Quantity_TOC_RGB);
-  else
-    myCustomColor = Quantity_Color();
 }

@@ -1195,8 +1195,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   workshop()->selectionActivate()->updateSelectionFilters();
   workshop()->selectionActivate()->updateSelectionModes();
 
-  Events_Loop::loop()->flush(EVENT_DISP);
   Events_Loop::loop()->flush(EVENT_ATTR);
+  Events_Loop::loop()->flush(EVENT_DISP);
 
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 
@@ -2283,22 +2283,23 @@ std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
   PartSet_OverconstraintListener* aOCListener = myModule->overconstraintListener();
   std::string aKind = theFeature->getKind();
 
+  if (aOCListener->isConflictingObject(theObject)) {
+    return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+  }
+  if (aOCListener->isFullyConstrained()) {
+    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
+  }
   if (isDistanceKind(aKind)) {
-    if (aOCListener->isConflictingObject(theObject))
-      return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
     return Config_PropManager::color("Visualization", "sketch_dimension_color");
   }
+  if (aKind == SketchPlugin_ConstraintCoincidence::ID())
+    return std::vector<int>(3, 0);
+
   if (isExternal(theFeature))
     return Config_PropManager::color("Visualization", "sketch_external_color");
   if (isConstruction)
     return Config_PropManager::color("Visualization", "sketch_auxiliary_color");
 
-  if (aOCListener->isFullyConstrained()) {
-    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
-  }
-  else if (aOCListener->isConflictingObject(theObject)) {
-    return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
-  }
   return Config_PropManager::color("Visualization", "sketch_entity_color");
 }
 

@@ -284,13 +284,17 @@ void PartSet_OverconstraintListener::redisplayObjects(
   static Events_Loop* aLoop = Events_Loop::loop();
 
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_VISUAL_ATTRIBUTES);
+  static Events_ID EVENT_REDISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
 
   std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
-  for (; anIt != aLast; anIt++)
-    aECreator->sendUpdated(*anIt, EVENT_DISP);
-
+  for (; anIt != aLast; anIt++) {
+    ObjectPtr aObj = *anIt;
+    aECreator->sendUpdated(aObj, EVENT_DISP);
+    aECreator->sendUpdated(aObj, EVENT_REDISP);
+  }
   aLoop->flush(EVENT_DISP);
+  aLoop->flush(EVENT_REDISP);
 }
 
 PartSet_Module* PartSet_OverconstraintListener::module() const
