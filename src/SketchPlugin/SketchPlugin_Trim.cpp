@@ -76,9 +76,6 @@
 
 static const double PI = 3.141592653589793238463;
 
-static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
-static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
-
 SketchPlugin_Trim::SketchPlugin_Trim()
 {
 }

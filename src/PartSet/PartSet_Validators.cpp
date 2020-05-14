@@ -683,8 +683,6 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
 
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
@@ -715,13 +713,13 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
         AttributePtr aAR = aRAttr->attr();
         if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
           aCoinList.insert(aConstrFeature);
-          QList<bool> anIsAttributes;
-          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                          anIsAttributes);
-          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                          anIsAttributes);
+        QList<bool> anIsAttributes;
+        PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                        anIsAttributes);
+        PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                        anIsAttributes);
       }
     }
     // if there is no coincidence then it is not valid

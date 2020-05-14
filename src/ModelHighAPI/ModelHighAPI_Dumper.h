@@ -91,6 +91,8 @@ public:
     MODELHIGHAPI_EXPORT DumpStorage(const DumpStorage& theOther);
     MODELHIGHAPI_EXPORT const DumpStorage& operator=(const DumpStorage& theOther);
 
+    virtual ~DumpStorage() {}
+
     void setFilenameSuffix(const std::string& theSuffix) { myFilenameSuffix = theSuffix; }
 
   protected:

@@ -210,7 +210,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     QObjectPtrList aCreated;
     std::set<ObjectPtr>::const_iterator aIt;
-    bool aRebuildAll = false;
     for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
       ObjectPtr aObj = (*aIt);
       if (aObj->groupName() == ModelAPI_ResultField::group()) {

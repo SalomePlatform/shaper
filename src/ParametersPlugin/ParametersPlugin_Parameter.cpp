@@ -150,7 +150,7 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
     theError = aProcessMessage->error();
     // compare the list of parameters to store if changed
     AttributeRefListPtr aParams = reflist(ARGUMENTS_ID());
-    bool aDifferent = aParams->size() != aParamsList.size();
+    bool aDifferent = aParams->size() != (int)aParamsList.size();
     if (!aDifferent) {
       std::list<ResultParameterPtr>::const_iterator aNewIter = aParamsList.begin();
       std::list<ObjectPtr> anOldList = aParams->list();

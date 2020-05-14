@@ -409,9 +409,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aModule)
     aModule->onViewTransformed();
 
-  // 6. Update sketcher actions
-  XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();
-
   myWorkshop->updateCommandStatus();
   aWorkshop->selector()->clearSelection();
   myWorkshop->viewer()->update();

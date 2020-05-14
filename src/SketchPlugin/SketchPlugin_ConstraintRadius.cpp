@@ -76,27 +76,6 @@ void SketchPlugin_ConstraintRadius::execute()
       ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
   if (aFeature) {
-    double aRadius = 0;
-    std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-    if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
-      AttributeDoublePtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-          aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
-      if (anAttribute)
-        aRadius = anAttribute->value();
-    } else if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
-          GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-          GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
-      if (aCenterAttr && aStartAttr)
-        aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
-    }
-    //std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-    //    ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    //if(!aValueAttr->isInitialized()) {
-    //  aValueAttr->setValue(aRadius);
-    //}
-
     // the value should to be computed here,
     // not in the getAISObject in order to change the model value
     // inside the object transaction. This is important for creating a constraint by preselection.

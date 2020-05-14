@@ -374,6 +374,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       theMakeShapes.push_back(aMakeShapeList);
       break;
     }
+    default: // [to avoid compilation warnings]
+      break;
   }
 
   return true;

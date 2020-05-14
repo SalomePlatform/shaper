@@ -413,7 +413,6 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
   //load result
   theResultBody->store(theGeomShape);
 
-  int aTag(1);
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS);
 }

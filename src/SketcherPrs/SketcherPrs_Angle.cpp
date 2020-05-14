@@ -54,11 +54,15 @@ extern void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
-  SketchPlugin_Sketch* theSketcher)
-: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
+                                     SketchPlugin_Sketch* theSketcher)
+: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)),
+  myConstraint(theConstraint),
   mySketcher(theSketcher),
-  myFirstPoint(gp_Pnt(0,0,0)), myCenterPoint(gp_Pnt(1,0,0)), mySecondPoint(gp_Pnt(0,1,0)),
-  myValue(90., false, ""), myFlyOutPoint(0, 0.5, 0)
+  myFirstPoint(gp_Pnt(0,0,0)),
+  mySecondPoint(gp_Pnt(0,1,0)),
+  myCenterPoint(gp_Pnt(1, 0, 0)),
+  myFlyOutPoint(0, 0.5, 0),
+  myValue(90., false, "")
 {
   myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);

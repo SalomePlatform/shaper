@@ -104,14 +104,14 @@ void Model_ResultField::updateSteps()
 {
   // Update Array of steps
   int aNbSteps = stepsSize();
-  if (mySteps.size() != aNbSteps) {
-    while(mySteps.size() > aNbSteps) {
+  if ((int)mySteps.size() != aNbSteps) {
+    while((int)mySteps.size() > aNbSteps) {
       //delete mySteps.back();
       mySteps.pop_back();
     }
-    while(mySteps.size() < aNbSteps) {
+    while((int)mySteps.size() < aNbSteps) {
       mySteps.push_back(FieldStepPtr(new Model_ResultField::Model_FieldStep(this,
-        int(mySteps.size()))));
+        (int)mySteps.size())));
     }
   }
 }
@@ -146,7 +146,7 @@ std::string Model_ResultField::textLine(int theLine) const
 // LCOV_EXCL_START
 std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> Model_ResultField::step(int theId) const
 {
-  if (theId < mySteps.size()) {
+  if (theId < (int)mySteps.size()) {
     return mySteps[theId];
   }
   return NULL;

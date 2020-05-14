@@ -158,6 +158,8 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
                 case Prs3d_DP_ZAxis:
                   aDir = anAxis.Direction();
                   break;
+                default: // [to avoid compilation warning]
+                  break;
                 }
                 gp_Lin aLine(aTrihedron->Component()->Location(), aDir);
                 return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());

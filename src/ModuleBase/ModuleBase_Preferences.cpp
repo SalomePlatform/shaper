@@ -153,7 +153,6 @@ void ModuleBase_Preferences::resetConfigPropPreferences(SUIT_PreferenceMgr* theP
 void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId)
 {
   SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
-  bool isResModified = false;
 
   // Make a Tab from each section
   std::list<std::string> aSections = Config_PropManager::getSections();
@@ -169,10 +168,9 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
       // check that the property is defined
       QString aSection(aProp->section().c_str());
       QString aName(aProp->name().c_str());
-      if (!aResMgr->hasValue(aSection, aName)) {
+      if (!aResMgr->hasValue(aSection, aName))
         aResMgr->setValue(aSection, aName, QString(aProp->value().c_str()));
-        isResModified = true;
-      }
+
       // Add item
       if (aProp->type() != Config_Prop::Disabled) {
         SUIT_PreferenceMgr::PrefItemType aPrefType = SUIT_PreferenceMgr::Auto;
@@ -227,6 +225,8 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
             thePref->setItemProperty("indexes", aIndicesList, anId);
             thePref->setItemProperty("icons", aIconsList, anId);
           }
+          break;
+        default: // [to avoid compilation warnings]
           break;
         }
       }

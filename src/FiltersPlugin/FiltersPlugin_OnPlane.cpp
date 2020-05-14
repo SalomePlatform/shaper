@@ -41,6 +41,8 @@ bool FiltersPlugin_OnPlane::isSupported(GeomAPI_Shape::ShapeType theType) const
   case GeomAPI_Shape::EDGE:
   case GeomAPI_Shape::VERTEX:
     return true;
+  default: // [to avoid compilation warning]
+    break;
   }
   return false;
 }

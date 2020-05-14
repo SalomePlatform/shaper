@@ -375,6 +375,8 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
       aShapeType = shapeTypeByStr(aType);
       break;
     }
+    default:
+      break; // do nothing [to avoid compilation warning]
   }
 
   return aShapeType;
@@ -419,7 +421,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
      }
   }
   // store the model features information: iterate all features
-  int anObjectsCount = 0; // stores the number of compared features for this document to compare
+  size_t anObjectsCount = 0; // stores the number of compared features for this document to compare
   std::set<std::string> aProcessed; // processed features names (that are in the current document)
 
   // process all objects (features and folders)

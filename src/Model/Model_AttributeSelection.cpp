@@ -146,8 +146,6 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
       isDegeneratedEdge = BRep_Tool::Degenerated(TopoDS::Edge(aSubShape)) == Standard_True;
   }
   if (!theContext.get() || isDegeneratedEdge) {
-    // to keep the reference attribute label
-    TDF_Label aRefLab = myRef.myRef->Label();
     aSelLab.ForgetAllAttributes(true);
     myRef.myRef = TDF_Reference::Set(aSelLab.Father(), aSelLab.Father());
     if (aToUnblock)
@@ -231,6 +229,8 @@ void Model_AttributeSelection::setValueCenter(
       if (!anUpdated)
         anUpdated = !aSelLab.IsAttribute(kELLIPSE_CENTER2);
       TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER2);
+      break;
+    default: // [to avoid compilation warning]
       break;
     }
     if (anUpdated)
@@ -1690,7 +1690,6 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
   if (!aPairIter.More())
     return;
   TopoDS_Shape aNewCShape = aPairIter.NewShape();
-  bool anIterate = true;
   // trying to update also the sub-shape selected
   GeomShapePtr aSubShape = value();
   if (aSubShape.get() && aSubShape->isEqual(aContext->shape()))

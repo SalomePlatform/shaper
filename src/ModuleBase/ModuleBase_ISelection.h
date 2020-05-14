@@ -42,9 +42,11 @@ class SelectMgr_EntityOwner;
 /// A selection can be obtained as from a viewer as from Object browser in various forms
 class MODULEBASE_EXPORT ModuleBase_ISelection
 {
- public:
-   /// Types of the selection place, where the selection is obtained
-   enum SelectionPlace { Browser, Viewer, AllControls };
+public:
+  /// Types of the selection place, where the selection is obtained
+  enum SelectionPlace { Browser, Viewer, AllControls };
+
+  virtual ~ModuleBase_ISelection() {}
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations

@@ -121,7 +121,6 @@ bool ModuleBase_ToolBox::isOffToolBoxParent(ModuleBase_ModelWidget* theWidget)
     while (aParent) {
       QStackedWidget* aStackedWidget = dynamic_cast<QStackedWidget*>(aParent);
       if (aStackedWidget) {
-        int anIndex = aStackedWidget->currentIndex();
         isOffToolBox = aStackedWidget->currentWidget() != aWidget;
         break;
       }

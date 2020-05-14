@@ -246,7 +246,7 @@ private:
         continue; // already processed
       theCoincidences.insert(*aCIt);
       // iterate on coincident attributes
-      for (int i = 0, aPtInd = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+      for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
         AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
         if (aRefAttr && !aRefAttr->isObject())
         {

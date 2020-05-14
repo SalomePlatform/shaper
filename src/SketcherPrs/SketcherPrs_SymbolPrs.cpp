@@ -119,9 +119,10 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketcher)
- : AIS_InteractiveObject(), myConstraint(theConstraint),
-   myIsCustomColor(false),
-   mySketcher(theSketcher)
+ : AIS_InteractiveObject(),
+   myConstraint(theConstraint),
+   mySketcher(theSketcher),
+   myIsCustomColor(false)
 {
   SetAutoHilight(Standard_False);
 }
@@ -229,8 +230,6 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
-  gp_Pnt aP1 = aPnt1->impl<gp_Pnt>();
-  gp_Pnt aP2 = aPnt2->impl<gp_Pnt>();
 
   // Draw line by two points
   Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments(2, 1);

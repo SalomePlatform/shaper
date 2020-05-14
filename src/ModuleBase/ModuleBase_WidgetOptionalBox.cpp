@@ -44,9 +44,9 @@ ModuleBase_WidgetOptionalBox::ModuleBase_WidgetOptionalBox(QWidget* theParent,
   myGroupBox(0),
   myGroupBoxLayout(0),
   myCheckGroup(0),
-  myCheckGroupLayout(0),
-  myCheckContent(0),
   myCheckGroupBtn(0),
+  myCheckContent(0),
+  myCheckGroupLayout(0),
   myEnableOnCheck(true)
 {
   myToolTip = theData->widgetTooltip();

@@ -448,10 +448,7 @@ void PartSet_SketcherReentrantMgr::onVertexSelected()
 
 void PartSet_SketcherReentrantMgr::onAfterValuesChangedInPropertyPanel()
 {
-
   if (isInternalEditActive()) {
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                       (myWorkshop->currentOperation());
     ModuleBase_ModelWidget* aWidget = (ModuleBase_ModelWidget*)sender();
     if (!aWidget->isModifiedInEdit().empty())
       restartOperation();
@@ -534,9 +531,9 @@ bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePrevi
         QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
         for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
           if (aWidgets[i]->attributeID() == thePreviousAttributeID) {
-          /// workaround for the same attributes used in different stacked widgets(attribute types)
-          if (ModuleBase_ToolBox::isOffToolBoxParent(aWidgets[i]))
-            continue;
+            // workaround for the same attributes used in different stacked widgets(attribute types)
+            if (ModuleBase_ToolBox::isOffToolBoxParent(aWidgets[i]))
+              continue;
             aPreviousAttributeWidget = aWidgets[i];
           }
         }

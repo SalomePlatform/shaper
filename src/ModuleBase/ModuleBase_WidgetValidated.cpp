@@ -328,8 +328,6 @@ bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribu
 //********************************************************************
 bool ModuleBase_WidgetValidated::isFilterActivated() const
 {
-  bool isActivated = false;
-
   Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 

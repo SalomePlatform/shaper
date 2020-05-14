@@ -153,7 +153,6 @@ bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const GeomShapePtr& theWire)
   }
 
   // Check intersections between edges pair-wise
-  int aNbEdges = (int)anEdges.size();
   std::list<GeomShapePtr>::const_iterator anEdgesIt = anEdges.begin();
   for (int i = 0; anEdgesIt != anEdges.end(); ++anEdgesIt, i++) {
     GeomEdgePtr anEdge1(new GeomAPI_Edge(*anEdgesIt));

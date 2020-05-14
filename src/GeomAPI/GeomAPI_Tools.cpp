@@ -32,8 +32,6 @@ GeomShapePtr GeomAPI_Tools::getTypedShape(const GeomShapePtr& theShape)
 
   GeomShapePtr aTypedShape = theShape;
 
-  GeomAPI_Shape::ShapeType aType = theShape->shapeType();
-
   switch (theShape->shapeType()) {
   case GeomAPI_Shape::VERTEX:
     aTypedShape = GeomShapePtr(new GeomAPI_Vertex(theShape));
@@ -46,6 +44,8 @@ GeomShapePtr GeomAPI_Tools::getTypedShape(const GeomShapePtr& theShape)
     break;
   case GeomAPI_Shape::WIRE:
     aTypedShape = GeomShapePtr(new GeomAPI_Wire(theShape));
+    break;
+  default:
     break;
   }
 

@@ -1119,6 +1119,8 @@ QList<ActionInfo>
         i--;
       }
       break;
+    default: // [to avoid compilation warning]
+      break;
     }
   }
   return aList;

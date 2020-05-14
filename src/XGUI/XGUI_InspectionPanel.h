@@ -57,7 +57,7 @@ class GeomAPI_Box;
 class ModuleBase_PageWidget;
 
 /// Internal name of property panel widget
-const static char* INSPECTION_PANEL = "inspection_panel_dock";
+MAYBE_UNUSED const static char* INSPECTION_PANEL = "inspection_panel_dock";
 
 /**
 * \ingroup GUI

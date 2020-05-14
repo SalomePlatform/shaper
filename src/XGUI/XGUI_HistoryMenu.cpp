@@ -68,7 +68,10 @@ void XGUI_HistoryMenu::setHistory(const QList<ActionInfo>& theActions)
 {
   myHistoryList->clear();
   foreach(ActionInfo anAct, theActions) {
-    QListWidgetItem* anItem = new QListWidgetItem(anAct.icon, anAct.text, myHistoryList);
+#ifdef _DEBUG
+    QListWidgetItem* anItem =
+#endif
+      new QListWidgetItem(anAct.icon, anAct.text, myHistoryList);
   }
 }
 

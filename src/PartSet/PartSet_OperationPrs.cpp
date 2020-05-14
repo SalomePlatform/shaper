@@ -123,7 +123,6 @@ void PartSet_OperationPrs::Compute(
   thePresentation->Clear();
   bool aReadyToDisplay = !myShapeToPrsMap.IsEmpty();
 
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
   // create presentations on the base of the shapes
   BRep_Builder aBuilder;
@@ -144,7 +143,6 @@ void PartSet_OperationPrs::Compute(
         int aWidth = anIO->Width();
         /// workaround for zero width. Else, there will be a crash
         if (aWidth == 0) { // width returns of TSolid shape is zero
-          bool isDisplayed = !anIO->GetContext().IsNull();
           aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
         }
         setWidth(aDrawer, aWidth);
@@ -244,8 +242,8 @@ void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorksho
                               GeomShapePtr theGeomShape,
                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
-  // VSV: Do not use isVisible checking because it can be used when state "Show Only" is ON
+  //XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
+  //// VSV: Do not use isVisible checking because it can be used when state "Show Only" is ON
   //if (XGUI_Displayer::isVisible(aDisplayer, theObject)) {
     if (theGeomShape.get()) {
       if (theObjectShapes.contains(theObject))
@@ -363,8 +361,6 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
 
   if (!theFeature.get())
     return;
-
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
 
   std::list<ResultPtr> aResults;
   ModelAPI_Tools::allResults(theFeature, aResults);

@@ -229,17 +229,24 @@ void XGUI_SelectionActivate::activateObjects(const QIntList& theModes,
     return;
 
   AIS_ListIteratorOfListOfInteractive aLIt;
+#ifdef _DEBUG
   bool isActivationChanged = false;
+#endif
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()) {
     anAISIO = aLIt.Value();
-    if (activate(anAISIO, false))
+    if (activate(anAISIO, false)) {
+#ifdef _DEBUG
       isActivationChanged = true;
+#endif
+    }
   }
 
   for(aLIt.Initialize(aPrsListToBeDeactivated); aLIt.More(); aLIt.Next()) {
     anAISIO = aLIt.Value();
     deactivateAIS(anAISIO);
+#ifdef _DEBUG
     isActivationChanged = true;
+#endif
   }
 }
 
@@ -423,7 +430,7 @@ bool XGUI_SelectionActivate::activate(const Handle(AIS_InteractiveObject)& theIO
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
     aHasValidMode = aHasValidMode || aMode != -1;
-    int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
+    //int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
     if (!myActiveSelectionModes.contains(aMode)) {
       deactivateAIS(theIO, aMode);
       isDeactivated = true;

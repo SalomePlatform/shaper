@@ -60,11 +60,6 @@ static std::string toStdString(double theValue)
   return sstream.str() + aPnt;
 }
 
-static std::set<std::string> toSet(const std::list<std::string>& theContainer)
-{
-  return std::set<std::string>(theContainer.begin(), theContainer.end());
-}
-
 //------------------------------------------------------------------------------
 
 ParametersPlugin_EvalListener::ParametersPlugin_EvalListener()
@@ -76,7 +71,7 @@ ParametersPlugin_EvalListener::ParametersPlugin_EvalListener()
       ModelAPI_ReplaceParameterMessage::eventId()
   };
 
-  for (int i = 0; i < sizeof(anEvents_IDs)/sizeof(anEvents_IDs[0]); ++i)
+  for (unsigned long long i = 0; i < sizeof(anEvents_IDs)/sizeof(anEvents_IDs[0]); ++i)
     aLoop->registerListener(this, anEvents_IDs[i], NULL, true);
 }
 

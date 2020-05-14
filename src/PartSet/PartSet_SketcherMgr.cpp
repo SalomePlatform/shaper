@@ -170,10 +170,17 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 }
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
-  : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
-    myDragDone(false), myIsMouseOverWindow(false),
-    myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false)
+  : QObject(theModule),
+    myModule(theModule),
+    myIsEditLaunching(false),
+    myIsDragging(false),
+    myDragDone(false),
+    myIsMouseOverWindow(false),
+    myIsMouseOverViewProcessed(true),
+    myIsPopupMenuActive(false),
+    myPreviousUpdateViewerEnabled(true),
+    myExternalPointsMgr(0),
+    myNoDragMoving(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -681,7 +688,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 #endif
 
     Handle(V3d_View) aView = theWnd->v3dView();
-    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     Point aMousePnt;
     get2dPoint(theWnd, theEvent, aMousePnt);
 
@@ -1185,7 +1191,6 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   qDebug(QString("startSketch: %1, %2").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
-  bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
   aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
   Handle(SelectMgr_Filter) aFilter = myModule->selectionFilter(SF_SketchPlaneFilter);
@@ -1501,8 +1506,6 @@ bool PartSet_SketcherMgr::canDisplayConstraint(const FeaturePtr& theFeature,
 
   std::string aKind = theFeature->getKind();
   if (aConstrIds.contains(QString(aKind.c_str()))) {
-    bool isTypedConstraint = false;
-
     switch (theState) {
       case PartSet_Tools::Dimensional: {
         bool isDistance = isDistanceKind(aKind);
@@ -1752,8 +1755,6 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   std::map<AttributePtr, int> aSelectedAttributes = anInfo.myAttributes;
   std::set<ResultPtr> aSelectedResults = anInfo.myResults;
 
-  ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
@@ -1824,13 +1825,13 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
       // result owners are put in the list of selection only if local selected shapes were not
       // found
       if (aSelectedResults.find(aResult) != aSelectedResults.end()) {
-        for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
+        for (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
           Handle(StdSelect_BRepOwner) anOwner =
-            Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
-          if ( anOwner.IsNull() || !anOwner->HasShape() || theOwnersToSelect.FindIndex(anOwner))
+              Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
+          if (anOwner.IsNull() || !anOwner->HasShape() || theOwnersToSelect.FindIndex(anOwner))
             continue;
-            // select whole result
-            theOwnersToSelect.Add(anOwner);
+          // select whole result
+          theOwnersToSelect.Add(anOwner);
         }
       }
     }
@@ -1864,8 +1865,8 @@ void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                            (getCurrentOperation());
   if (aFOperation) {
-    if (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-        isNestedSketchOperation(aFOperation) &&
+    if ((PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
+         isNestedSketchOperation(aFOperation)) &&
         thePreviousState == ModuleBase_ModelWidget::ModifiedInPP) {
       FeaturePtr aFeature = aFOperation->feature();
       visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
@@ -1923,9 +1924,6 @@ void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
 
   if (isEditOperation || !theFeature.get())
     return;
-
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
 
   // 1. change visibility of the object itself, here the presentable object is processed,
   // e.g. constraints features
@@ -2065,8 +2063,6 @@ void PartSet_SketcherMgr::updateBySketchParameters(
     case PartSet_Tools::Geometrical:
     case PartSet_Tools::Dimensional: {
       if (aPrevState != theState) {
-        ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-        XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
         int aNumberOfSubs = myCurrentSketch->numberOfSubs();
         for (int i = 0; i < aNumberOfSubs; i++) {
           FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
@@ -2091,6 +2087,8 @@ void PartSet_SketcherMgr::updateBySketchParameters(
       }
     }
     break;
+    default: // [to avoid compilation warning]
+      break;
   }
 }
 
@@ -2279,7 +2277,6 @@ bool isIncludeToResult(const ObjectPtr& theObject)
 std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
   const FeaturePtr& theFeature, bool isConstruction) const
 {
-  static const QStringList& aConstrIds = constraintsIdList();
   PartSet_OverconstraintListener* aOCListener = myModule->overconstraintListener();
   std::string aKind = theFeature->getKind();
 

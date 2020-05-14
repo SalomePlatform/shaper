@@ -243,7 +243,7 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
     GeomShapePtr aSectedEdges = aPaveFiller.shape();
 
-    int anEdgesNum = 0;
+    size_t anEdgesNum = 0;
     for(GeomAPI_ShapeExplorer
         anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       anEdgesNum++;

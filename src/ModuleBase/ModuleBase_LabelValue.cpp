@@ -28,7 +28,7 @@
 ModuleBase_LabelValue::ModuleBase_LabelValue(QWidget* theParent, const QString& theText,
                                              const QString& theToolTip, const QString& theIcon,
                                              int thePrecision)
-: QWidget(theParent), myPrecision(thePrecision), myValue(0)
+: QWidget(theParent), myValue(0), myPrecision(thePrecision)
 {
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   aLayout->setContentsMargins(2, 0, 0, 0);

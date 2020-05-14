@@ -276,7 +276,6 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
   for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
       anIter(aMapSA); anIter.More(); anIter.Next()) {
-    const TopoDS_Shape& aShape = anIter.Key();
     TopTools_ListOfShape& aListOfShape = anIter.ChangeValue();
     if(aListOfShape.IsEmpty()) {
       continue;
@@ -598,7 +597,6 @@ std::list<std::shared_ptr<GeomAPI_Pnt> >
   Standard_Real aYArr[2] = {aBndBox.CornerMin().Y(), aBndBox.CornerMax().Y()};
   Standard_Real aZArr[2] = {aBndBox.CornerMin().Z(), aBndBox.CornerMax().Z()};
   std::list<std::shared_ptr<GeomAPI_Pnt> > aResultPoints;
-  int aNum = 0;
   for(int i = 0; i < 2; i++) {
     for(int j = 0; j < 2; j++) {
       for(int k = 0; k < 2; k++) {
@@ -1057,7 +1055,7 @@ static TopoDS_Wire fixParametricGaps(const TopoDS_Wire& theWire)
 {
   TopoDS_Wire aFixedWire;
   Handle(Geom_Curve) aPrevCurve;
-  double aPrevLastParam = 0.0;
+  double aPrevLastParam = -Precision::Infinite();
 
   BRep_Builder aBuilder;
   aBuilder.MakeWire(aFixedWire);
@@ -1067,7 +1065,7 @@ static TopoDS_Wire fixParametricGaps(const TopoDS_Wire& theWire)
     TopoDS_Edge anEdge = aWExp.Current();
     double aFirst, aLast;
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-    if (aCurve == aPrevCurve) {
+    if (aCurve == aPrevCurve && Abs(aFirst - aPrevLastParam) > Precision::Confusion()) {
       // if parametric gap occurs, create new edge based on the copied curve
       aCurve = Handle(Geom_Curve)::DownCast(aCurve->Copy());
       TopoDS_Vertex aV1, aV2;

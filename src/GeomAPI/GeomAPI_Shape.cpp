@@ -227,9 +227,9 @@ bool GeomAPI_Shape::isConnectedTopology() const
         // (if shapes are connected, vertices are connected for sure)
         TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
         for(; !aConnected && anExp2.More(); anExp2.Next()) {
-          NCollection_List<TopoDS_Shape>::Iterator aNotIter(aNotVertices);
-          for(; aNotIter.More(); aNotIter.Next()) {
-            if (aNotIter.Value().IsSame(anExp2.Current())) {
+          NCollection_List<TopoDS_Shape>::Iterator aNotVIter(aNotVertices);
+          for(; aNotVIter.More(); aNotVIter.Next()) {
+            if (aNotVIter.Value().IsSame(anExp2.Current())) {
               aConnected = true;
               break;
             }
@@ -551,8 +551,6 @@ GeomAPI_Shape::Orientation GeomAPI_Shape::orientation() const
 
 void GeomAPI_Shape::setOrientation(const GeomAPI_Shape::Orientation theOrientation)
 {
-  TopAbs_Orientation anOrientation = MY_SHAPE->Orientation();
-
   switch(theOrientation) {
     case FORWARD:  MY_SHAPE->Orientation(TopAbs_FORWARD);  break;
     case REVERSED: MY_SHAPE->Orientation(TopAbs_REVERSED); break;

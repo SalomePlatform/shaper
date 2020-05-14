@@ -65,14 +65,14 @@
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent),
+    myPanelPage(NULL),
     myActiveWidget(NULL),
     myPreselectionWidget(NULL),
     myInternalActiveWidget(NULL),
-    myPanelPage(NULL),
     myOperationMgr(theMgr)
 {
   setWindowTitle(tr("Property Panel"));
-  QAction* aViewAct = toggleViewAction();
+  MAYBE_UNUSED QAction* aViewAct = toggleViewAction();
   setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 

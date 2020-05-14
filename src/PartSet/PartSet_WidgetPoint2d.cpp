@@ -106,43 +106,21 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   myGroupBox = new QGroupBox(aPageName, theParent);
   myGroupBox->setFlat(false);
 
-  bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
+#ifdef _DEBUG
+  bool aAcceptVariables =
+#endif
+    theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
 
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
   ModuleBase_Tools::adjustMargins(aGroupLay);
   aGroupLay->setSpacing(2);
   aGroupLay->setColumnStretch(1, 1);
-  {
-    QLabel* aLabel = new QLabel(myGroupBox);
 
-    myXSpin = new ModuleBase_LabelValue(myGroupBox, tr("X"));
-    //ModuleBase_ParamSpinBox(myGroupBox);
-    //myXSpin->setAcceptVariables(aAcceptVariables);
-    //myXSpin->setMinimum(-DBL_MAX);
-    //myXSpin->setMaximum(DBL_MAX);
-    //myXSpin->setToolTip(tr("X"));
-    aGroupLay->addWidget(myXSpin, 0, 1);
+  myXSpin = new ModuleBase_LabelValue(myGroupBox, tr("X"));
+  aGroupLay->addWidget(myXSpin, 0, 1);
+  myYSpin = new ModuleBase_LabelValue(myGroupBox, tr("Y"));
+  aGroupLay->addWidget(myYSpin, 1, 1);
 
-    //connect(myXSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
-    //myXSpin->setValueEnabled(isValueEnabled());
-  }
-  {
-    //QLabel* aLabel = new QLabel(myGroupBox);
-    //aLabel->setText(tr("Y "));
-    //aGroupLay->addWidget(aLabel, 1, 0);
-
-    myYSpin = new ModuleBase_LabelValue(myGroupBox, tr("Y"));
-    //ModuleBase_ParamSpinBox(myGroupBox);
-    //myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
-    //myYSpin->setAcceptVariables(aAcceptVariables);
-    //myYSpin->setMinimum(-DBL_MAX);
-    //myYSpin->setMaximum(DBL_MAX);
-    //myYSpin->setToolTip(tr("Y"));
-    aGroupLay->addWidget(myYSpin, 1, 1);
-
-    //connect(myYSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
-    //myYSpin->setValueEnabled(isValueEnabled());
-  }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(myGroupBox);
@@ -155,8 +133,6 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
 bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
 {
-  bool aValid = true;
-
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule->sketchReentranceMgr()->isInternalEditActive())
     return true; /// when internal edit is started a new feature is created. I has not results, AIS
@@ -662,7 +638,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       }
     }
     if (!anExternal) {
-      bool isProcessed = false;
       GeomPnt2dPtr aPnt = PartSet_Tools::getPnt2d(aView, aShape, mySketch);
       if (aPnt && isFeatureContainsPoint(myFeature, aPnt->x(), aPnt->y())) {
         // when the point is selected, the coordinates of the point should be set into the attribute

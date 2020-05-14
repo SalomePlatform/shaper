@@ -137,6 +137,8 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
               return QIcon(":icons/group_face.png");
             case GeomAPI_Shape::SOLID:
               return QIcon(":icons/group_solid.png");
+            default: // [to avoid compilation warning]
+              break;
             }
           }
           ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
@@ -151,6 +153,8 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
         case GeomAPI_Shape::WIRE:      return QIcon(":pictures/wire.png");
         case GeomAPI_Shape::EDGE:      return QIcon(":pictures/edge.png");
         case GeomAPI_Shape::VERTEX:    return QIcon(":pictures/vertex.png");
+        default: // [to avoid compilation warning]
+          break;
       }
     }
   }

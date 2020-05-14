@@ -393,20 +393,16 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
         }
       }
       else {
-        bool isSet = false;
         // 1. apply the selection to controls
         for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
           aWgt = (*aWIt);
           if (!aWgt->canAcceptFocus())
             continue;
           aPropertyPanel->setPreselectionWidget(aWgt);
-          if (myPreSelection.empty() || !aWgt->setSelection(myPreSelection, true)) {
-            isSet = false;
+          if (myPreSelection.empty() || !aWgt->setSelection(myPreSelection, true))
             break;
-          } else {
-            isSet = true;
+          else
             aFilledWgt = aWgt;
-          }
         }
       }
       aPropertyPanel->setPreselectionWidget(NULL);

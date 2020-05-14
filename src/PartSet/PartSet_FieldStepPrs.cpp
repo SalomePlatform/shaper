@@ -119,6 +119,8 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
       case ModelAPI_AttributeTables::INTEGER:
         aFieldStepData << aVal.myInt;
         break;
+      default: // [to avoid compilation warning]
+        break;
       }
     }
   }
@@ -256,7 +258,6 @@ QList<double> PartSet_FieldStepPrs::booleanValues() const
     }
   }
   QList<double> aShapeData;
-  double aRangeMin = aFieldStepData.first(), aRangeMax = aFieldStepData.last();
   for (int aRow = 0; aRow < aRows - 1; aRow++) {
     double aNorm = 0;
     int aBaseIndex = aRow * aCols;

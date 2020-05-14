@@ -177,12 +177,9 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     case GeomAPI_Shape::COMPOUND: {
       aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
     }
+    default: // [to avoid compilation warnings]
+      break;
   }
-
-  int aLateralIndex = 1;
-  int aBaseEdgeIndex = 1;
-  int aVertexIndex = 1;
-  int aBaseVertexIndex = 1;
 
   if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
@@ -252,6 +249,8 @@ void FeaturesPlugin_CompositeSketch::storeShapes(
       aShapeTypeToExplore = GeomAPI_Shape::COMPOUND;
       break;
     }
+    default: // [to avoid compilation warnings]
+      break;
   }
 
   // Store shapes.

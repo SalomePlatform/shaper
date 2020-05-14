@@ -525,7 +525,6 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   if (aPrsList.size() > 0) {
     bool isVisible = false;
-    bool isShading = false;
     bool canBeShaded = false;
     bool hasPlanar = false;
     ObjectPtr aObject;
@@ -536,9 +535,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
       GeomShapePtr aShape = aPrs->shape();
       if (aObject->isDisplayed()) {
         isVisible = true;
-        canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
-        isShading =
-          (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);
+        canBeShaded = aDisplayer->canBeShaded(aObject);
       }
       if (aShape.get()) {
         if (aShape->isPlanar()) {

@@ -273,7 +273,6 @@ bool Selector_FilterByNeighbors::restore()
     myNBLevel.push_back(anArray->Value(anIndex));
   }
   // restore sub-selectors
-  bool aSubResult = true;
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
     Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {
@@ -282,7 +281,7 @@ bool Selector_FilterByNeighbors::restore()
       // some selector fails, try to use rest selectors, myNBLevel becomes negative: unused
       if (myNBLevel.size() > list().size()) {
         std::list<int>::iterator aListIter = myNBLevel.begin();
-        for(int a = 0; a < list().size(); a++)
+        for(size_t a = 0; a < list().size(); a++)
           aListIter++;
         *aListIter = -*aListIter;
         list().push_back(NULL);

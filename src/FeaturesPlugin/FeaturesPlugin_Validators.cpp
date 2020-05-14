@@ -546,8 +546,7 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
 // LCOV_EXCL_STOP
   }
 
-  std::list<std::string>::const_iterator
-    anArgsIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anArgsIt = theArguments.begin();
 
   AttributePtr aCheckAttribute = theFeature->attribute(*anArgsIt);
   ++anArgsIt;
@@ -1135,7 +1134,6 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
   }
 
   for(int anIndex = 0; anIndex < aBaseObjectsAttrList->size(); ++anIndex) {
-    bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aBaseObjectsAttrList->value(anIndex);
     ResultPtr aContext = anAttrSelectionInList->context();
     if (!aContext.get()) {
@@ -1686,7 +1684,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
 
   int anObjectsNb = 0, aToolsNb = 0;
 
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
 
   bool isAllInSameCompSolid = true;
   ResultBodyPtr aCompSolid;
@@ -1736,8 +1734,6 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
       }
     }
   }
-
-  anIt++;
 
   if (anObjectsNb + aToolsNb < 2) {
     theError = "Not enough arguments for Fuse operation.";
@@ -1840,9 +1836,8 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
 
   int anObjectsNb = 0, aToolsNb = 0;
 
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
 
-  bool isAllInSameCompSolid = true;
   ResultBodyPtr aCompSolid;
 
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);

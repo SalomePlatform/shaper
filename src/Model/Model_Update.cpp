@@ -227,7 +227,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   static Events_Loop* aLoop = Events_Loop::loop();
-  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+  //static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
@@ -265,7 +265,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         }
       }
       processFeatures();
-      myIsPreviewBlocked = myIsPreviewBlocked;
+      myIsPreviewBlocked = aPreviewBlockedState;
     }
   }
 

@@ -81,11 +81,11 @@ std::string getShapeTypeDescription(const GeomValidators_ShapeType::TypeOfShape&
   if (MyShapeTypes.size() != 0) {
     std::map<std::string, GeomValidators_ShapeType::TypeOfShape>::const_iterator
       anIt = MyShapeTypes.begin(), aLast = MyShapeTypes.end();
-    for (; anIt != aLast; anIt++) {
-      if (anIt->second == theType)
+    for (; anIt != aLast; anIt++)
+      if (anIt->second == theType) {
         aValue = anIt->first;
         break;
-    }
+      }
   }
   return aValue;
 }

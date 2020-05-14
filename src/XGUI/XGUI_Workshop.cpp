@@ -200,13 +200,13 @@ static QString MyImportPartFilter(QObject::tr("Part files (*.shaperpart);;All fi
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
       myModule(NULL),
-      mySalomeConnector(theConnector),
-      myPropertyPanel(0),
-      myInspectionPanel(0),
-      myFacesPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0)
-      //myViewerSelMode(TopAbs_FACE)
+      myPropertyPanel(0),
+      myFacesPanel(0),
+      myDisplayer(0),
+      mySalomeConnector(theConnector),
+      //myViewerSelMode(TopAbs_FACE),
+      myInspectionPanel(0)
 {
   mySelector = new XGUI_SelectionMgr(this);
   myModuleConnector = new XGUI_ModuleConnector(this);
@@ -595,13 +595,11 @@ void XGUI_Workshop::onStartWaiting()
 //******************************************************
 void XGUI_Workshop::onAcceptActionClicked()
 {
-  QAction* anAction = dynamic_cast<QAction*>(sender());
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
-      //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
       myOperationMgr->commitOperation();
     }
   }
@@ -610,7 +608,6 @@ void XGUI_Workshop::onAcceptActionClicked()
 //******************************************************
 void XGUI_Workshop::onAcceptPlusActionClicked()
 {
-  QAction* anAction = dynamic_cast<QAction*>(sender());
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -2802,7 +2799,6 @@ void XGUI_Workshop::setNormalView(bool toInvert)
     aFace->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
 
     Handle(V3d_View) aView = myViewerProxy->activeView();
-    double aScale = aView->Scale();
     aView->SetAt(aPos->x(), aPos->y(), aPos->z());
     aView->SetProj(aNormal->x(), aNormal->y(), aNormal->z());
     Bnd_Box aBox;
@@ -2815,7 +2811,7 @@ void XGUI_Workshop::setNormalView(bool toInvert)
 void XGUI_Workshop::registerValidators() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  MAYBE_UNUSED ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
 
 //**************************************************************
@@ -3145,7 +3141,6 @@ void XGUI_Workshop::onAutoApply()
 void XGUI_Workshop::updateAutoComputeState()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
 #ifdef HAVE_SALOME
 //  QAction* aUpdateCmd;
 //  QList<QAction*> aCommands = mySalomeConnector->commandList();
@@ -3158,6 +3153,7 @@ void XGUI_Workshop::updateAutoComputeState()
 //  aUpdateCmd->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
 //    QIcon(":pictures/autoapply_start.png"));
 #else
+  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
   AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
   AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
   aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :

@@ -233,6 +233,8 @@ void GeomAlgoAPI_MakeShape::initialize()
       myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
       break;
     }
+    default:
+      break;
   }
 
   if(myMap.get()) {

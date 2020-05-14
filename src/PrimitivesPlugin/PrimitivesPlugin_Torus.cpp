@@ -182,7 +182,6 @@ void PrimitivesPlugin_Torus::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Torus> the
 
   // Insert to faces
   // Naming for faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theTorusAlgo->getCreatedFaces();
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();

@@ -674,7 +674,6 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
   bool isFeatureDefaultName = myNames[theFeature].myIsDefault;
 
   // Save only names of results which is not correspond to default feature name
-  const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr> allRes;
   ModelAPI_Tools::allResults(theFeature, allRes);
   for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
@@ -1618,7 +1617,7 @@ void ModelHighAPI_Dumper::exportVariables() const
         exportVariable(anEntry, aNameIter->second.myCurrentName);
         size_t aSize = aFeature->results().size();
         if (aSize > 1) { // additional entries for features with more than one result
-          for(int a = 1; a < aSize; a++) {
+          for(size_t a = 1; a < aSize; a++) {
             std::ostringstream aResEntryStr;
             aResEntryStr<<anEntry<<":"<<a;
             std::string aResEntry = aResEntryStr.str();

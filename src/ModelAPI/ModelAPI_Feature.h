@@ -254,6 +254,8 @@ typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
 //! over this feature.
 class ModelAPI_FeatureCopyInterface {
 public:
+  virtual ~ModelAPI_FeatureCopyInterface() {}
+
   /// An algorithm to update the moved feature by the separate Copy feature
   /// \param theContext the original context object
   /// \param theValue the original shape

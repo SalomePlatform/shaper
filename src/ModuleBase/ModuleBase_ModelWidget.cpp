@@ -52,11 +52,11 @@
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   const Config_WidgetAPI* theData)
   : QWidget(theParent),
+  myWidgetValidator(0),
   myIsEditing(false),
   myState(Stored),
   myIsValueStateBlocked(false),
-  myFlushUpdateBlocked(false),
-  myWidgetValidator(0)
+  myFlushUpdateBlocked(false)
 {
 #ifdef DEBUG_WIDGET_INSTANCE
   qDebug("ModuleBase_ModelWidget::ModuleBase_ModelWidget");

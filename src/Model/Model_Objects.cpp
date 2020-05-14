@@ -49,6 +49,10 @@
 #include <TDF_LabelMap.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
+// for TDF_Label map usage
+static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
+static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
+
 int kUNDEFINED_FEATURE_INDEX = -1;
 
 static const std::string& groupNameFoldering(const std::string& theGroupID,
@@ -619,9 +623,6 @@ ObjectPtr Model_Objects::object(const std::string& theGroupID,
     return ObjectPtr();
   createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
-  const std::vector<ObjectPtr>& aVec = myHistory[theGroupID];
-  //if (aVec.size() <= theIndex)
-  //  return aVec[aVec.size() - 1]; // too high index requested (to avoid crash in #2360)
   return aGroupID.empty() ? myHistory[theGroupID][theIndex] : myHistory[aGroupID][theIndex];
 }
 
@@ -809,11 +810,11 @@ void Model_Objects::synchronizeFeatures(
     return;
   // after all updates, sends a message that groups of features were created or updated
   Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID aDispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  //static Events_ID aDispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID aCreateEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
+  static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+  static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   bool isActive = aLoop->activateFlushes(false);
 
@@ -1826,7 +1827,7 @@ std::string Model_Objects::featureResultGroup(FeaturePtr theFeature)
     if (aLabIter.More()) {
       TDF_Label anArgLab = aLabIter.Value();
       Handle(TDataStd_Comment) aGroup;
-      if (aLabIter.Value().FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
+      if (anArgLab.FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
         return TCollection_AsciiString(aGroup->Get()).ToCString();
       }
     }
@@ -1885,7 +1886,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
         if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
-          if (aResIndex <= theFeature->results().size()) { // to avoid crash if previous execute
+          if (aResIndex <= (int)theFeature->results().size()) { // to avoid crash if previous execute
             // for index = 0 erases result
             std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
             if (!aNewP->data()->isDeleted()) {
@@ -2103,7 +2104,6 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::internalFeature(const int theIn
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
 {
   return TDF_LabelMapHasher::HashCode(theLab, theUpper);
-
 }
 Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 {

@@ -47,9 +47,9 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   : QAbstractSpinBox(theParent),
   myIsEquation(false),
   myAcceptVariables(true),
-  mySingleStep(1),
   myMinimum(-DBL_MAX),
-  myMaximum(DBL_MAX)
+  myMaximum(DBL_MAX),
+  mySingleStep(1)
 {
   myCompleter = new QCompleter(this);
   myCompleter->setWidget(lineEdit());

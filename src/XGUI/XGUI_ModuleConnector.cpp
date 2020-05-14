@@ -124,7 +124,6 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
 
 void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
   XGUI_ObjectsBrowser* aBrowser = myWorkshop->objectBrowser();
   if (theValues.isEmpty()) {
     myWorkshop->selector()->clearSelection();

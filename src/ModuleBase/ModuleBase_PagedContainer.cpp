@@ -34,7 +34,7 @@ static QMap<std::string, std::string> defaultValues;
 ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myIsFocusOnCurrentPage(false), myIsFirst(true), myRemeberChoice(true)
+  myRemeberChoice(true), myIsFocusOnCurrentPage(false), myIsFirst(true)
 {
   // it is not obligatory to be ignored when property panel tries to activate next active widget
   // but if focus is moved to this control, it can accept it.

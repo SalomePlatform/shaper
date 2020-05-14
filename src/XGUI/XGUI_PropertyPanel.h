@@ -36,22 +36,22 @@ class ModuleBase_PageWidget;
 class XGUI_OperationMgr;
 
 /// Internal name of property panel widget
-const static char* PROP_PANEL = "property_panel_dock";
+MAYBE_UNUSED const static char* PROP_PANEL = "property_panel_dock";
 
 /// Internal name of Ok button
-const static char* PROP_PANEL_OK = "property_panel_ok";
+MAYBE_UNUSED const static char* PROP_PANEL_OK = "property_panel_ok";
 
 /// Internal name of Ok button
-const static char* PROP_PANEL_OK_PLUS = "property_panel_ok_plus";
+MAYBE_UNUSED const static char* PROP_PANEL_OK_PLUS = "property_panel_ok_plus";
 
 /// Internal name of Cancel button
-const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
+MAYBE_UNUSED const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 
 /// Internal name of Help button
-const static char* PROP_PANEL_HELP = "property_panel_help";
+MAYBE_UNUSED const static char* PROP_PANEL_HELP = "property_panel_help";
 
 /// Internal name of Preview button
-const static char* PROP_PANEL_PREVIEW = "property_panel_preview";
+MAYBE_UNUSED const static char* PROP_PANEL_PREVIEW = "property_panel_preview";
 
 /**
 * \ingroup GUI

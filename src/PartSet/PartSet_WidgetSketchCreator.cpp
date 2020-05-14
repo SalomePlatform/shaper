@@ -288,8 +288,6 @@ bool PartSet_WidgetSketchCreator::isSelectionMode() const
 bool PartSet_WidgetSketchCreator::hasSubObjects() const
 {
   bool aHasSubObjects = false;
-
-  bool aCanSetFocus = true;
   CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if (aComposite.get())
     aHasSubObjects = aComposite->numberOfSubs() > 0;
@@ -379,7 +377,6 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   }
   // manually deactivation because the widget was not activated as has no focus acceptin controls
   deactivate();
-  bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
   // start edit operation for the sketch

@@ -88,12 +88,12 @@ void updateHiddenShapes(Handle(ModuleBase_ResultPrs) thePrs, const TopoDS_ListOf
 
 //********************************************************************
 XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, XGUI_Workshop* theWorkshop)
-  : QDockWidget(theParent), myIsActive(false), myWorkshop(theWorkshop)
+  : QDockWidget(theParent), myWorkshop(theWorkshop), myIsActive(false)
 {
   setWindowTitle(tr("Hide Faces"));
   setObjectName("Hide Faces");
 
-  QAction* aViewAct = toggleViewAction();
+  MAYBE_UNUSED QAction* aViewAct = toggleViewAction();
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
@@ -469,7 +469,6 @@ bool XGUI_FacesPanel::processDelete()
   if (aSelectedIds.empty())
     return false;
 
-  bool isModified = false;
   std::set<ModuleBase_ViewerPrsPtr> aRestored;
   std::set<int>::const_iterator anIt;
   for (anIt = aSelectedIds.begin(); anIt != aSelectedIds.end(); anIt++) {
@@ -477,7 +476,6 @@ bool XGUI_FacesPanel::processDelete()
     if (aRestored.find(aPrs) == aRestored.end()) {
       aRestored.insert(aPrs);
       myItems.remove(*anIt);
-      isModified = true;
     }
   }
   std::map<ObjectPtr, TopoDS_ListOfShape> anObjectToShapes;

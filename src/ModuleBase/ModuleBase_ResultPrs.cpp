@@ -69,8 +69,11 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 //********************************************************************
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
-  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0),
-  myTransparency(1), myIsSubstituted(false)
+  : ViewerData_AISShape(TopoDS_Shape()),
+    myResult(theResult),
+    myIsSubstituted(false),
+    myTransparency(1),
+    myAdditionalSelectionPriority(0)
 {
 
   GeomShapePtr aShapePtr = ModelAPI_Tools::shape(theResult);
@@ -199,8 +202,6 @@ void ModuleBase_ResultPrs::setEdgesDefaultColor()
 //********************************************************************
 void ModuleBase_ResultPrs::setSubShapeHidden(const TopoDS_ListOfShape& theShapes)
 {
-  bool isModified = false;
-
   TopoDS_Compound aCompound;
   BRep_Builder aBBuilder;
   aBBuilder.MakeCompound (aCompound);

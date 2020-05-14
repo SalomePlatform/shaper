@@ -122,8 +122,6 @@ void BuildPlugin_SubShapes::execute()
   }
 
   // Store result.
-  const int aModVertexTag = 1;
-  const int aModEdgeTag = 2;
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape);
   aResultBody->loadModifiedShapes(aBuilder, aBaseShape, GeomAPI_Shape::EDGE);

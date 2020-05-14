@@ -274,7 +274,7 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
 
   // Store generated edges/faces.
   GeomAPI_Shape::ShapeType aBaseShapeType = theBaseShape->shapeType();
-  GeomAPI_Shape::ShapeType aShapeTypeToExplode;
+  GeomAPI_Shape::ShapeType aShapeTypeToExplode = GeomAPI_Shape::SHAPE;
 
   switch(aBaseShapeType) {
     case GeomAPI_Shape::VERTEX: {
@@ -303,6 +303,8 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
     case GeomAPI_Shape::COMPOUND: {
       aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
     }
+    default:
+      return; // unsupported type of shape
   }
 
   if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX ||
@@ -344,7 +346,7 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
   {
     GeomShapePtr aBaseShape = *anIter;
     GeomAPI_Shape::ShapeType aBaseShapeType = aBaseShape->shapeType();
-    GeomAPI_Shape::ShapeType aShapeTypeToExplode;
+    GeomAPI_Shape::ShapeType aShapeTypeToExplode = GeomAPI_Shape::SHAPE;
     switch(aBaseShapeType) {
       case GeomAPI_Shape::VERTEX: {
         aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
@@ -367,6 +369,8 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
         aShapeTypeToExplode = GeomAPI_Shape::EDGE;
         break;
       }
+      default:
+        return; // unsupported type of shape
     }
     aResultBody->loadGeneratedShapes(thePipeAlgo, aBaseShape, aShapeTypeToExplode);
   }
@@ -414,6 +418,8 @@ void FeaturesPlugin_Pipe::storeShapes(ResultBodyPtr theResultBody,
       aShapeTypeToExplore = GeomAPI_Shape::COMPOUND;
       break;
     }
+    default:
+      return; // unsupported type of shape
   }
 
   // Store shapes.

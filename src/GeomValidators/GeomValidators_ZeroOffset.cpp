@@ -46,7 +46,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   }
 // LCOV_EXCL_STOP
 
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
 
   std::string aSelectedMethod;
   if(theFeature->string(*anIt)) {

@@ -200,7 +200,7 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
     anError = "Unsupported format: " + aFormatName;
   }
 
-  if (!anError.empty()) {
+  if (!aResult || !anError.empty()) {
     setError("An error occurred while exporting " + theFileName + ": " + anError);
     return;
   }

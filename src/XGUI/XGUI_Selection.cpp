@@ -358,7 +358,6 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
     return aPresentations;
 
   QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
     if (!anOwner.IsNull()) {

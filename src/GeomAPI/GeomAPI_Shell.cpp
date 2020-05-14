@@ -97,8 +97,8 @@ std::shared_ptr<GeomAPI_Cylinder> GeomAPI_Shell::getCylinder() const
 
   GeomPointPtr aLocation;
   GeomDirPtr anAxis;
-  double aRadius;
-  double aHeight;
+  double aRadius = 0.0;
+  double aHeight = 0.0;
 
   for (TopExp_Explorer anExp(impl<TopoDS_Shape>(), TopAbs_FACE); anExp.More(); anExp.Next()) {
     GeomFacePtr aFace(new GeomAPI_Face);
@@ -175,8 +175,8 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
 
   GeomPointPtr anApex;
   GeomDirPtr anAxis;
-  double aSemiAngle, aTanSemiAngle;
-  double aHeight1, aHeight2;
+  double aSemiAngle = 0.0, aTanSemiAngle = 0.0;
+  double aHeight1 = 0.0, aHeight2 = 0.0;
 
   for (TopExp_Explorer anExp(impl<TopoDS_Shape>(), TopAbs_FACE); anExp.More(); anExp.Next()) {
     GeomFacePtr aFace(new GeomAPI_Face);
@@ -210,7 +210,7 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
 
       double aSign = anAxis->dot(aCurCone->axis());
       double aCurSemiAngle = aCurCone->semiAngle();
-      double aTanCurSemiAngle = Tan(aSemiAngle);
+      double aTanCurSemiAngle = Tan(aCurSemiAngle);
 
       double aH = aCurCone->radius1() / aTanCurSemiAngle * aSign;
       if (aH < aHeight1)

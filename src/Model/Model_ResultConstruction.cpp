@@ -440,7 +440,6 @@ void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
   aBuilder.Generated(theShape);
   theDocument->addNamingName(theShapeLabel, theName);
   // set new faces to the labels
-  int aCurrentTag = 1;
   NCollection_List<TopoDS_Face>::Iterator anUnordered(theUnorderedFaces);
   for (int aCurrentTag = 1; !theFacesOrder.IsEmpty() || anUnordered.More(); aCurrentTag++) {
     TopoDS_Face aFaceToPut;

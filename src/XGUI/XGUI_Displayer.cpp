@@ -126,8 +126,10 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 
 //**************************************************************
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-: myWorkshop(theWorkshop), myNeedUpdate(false),
-  myViewerBlockedRecursiveCount(0), myContextId(0)
+: myWorkshop(theWorkshop),
+  myViewerBlockedRecursiveCount(0),
+  myContextId(0),
+  myNeedUpdate(false)
 {
   BRepMesh_IncrementalMesh::SetParallelDefault(Standard_True);
 }
@@ -1144,7 +1146,7 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
           Handle(AIS_Shape) anOwnerPresentation =
                             Handle(AIS_Shape)::DownCast(anOwner->Selectable());
           const TopoDS_Shape& aPresentationShape = anOwnerPresentation->Shape();
-          if (aParameterShape.IsSame(anOwnerPresentation->Shape()) &&
+          if (aParameterShape.IsSame(aPresentationShape) &&
               !aCompsolidPresentations.Contains(anOwnerPresentation))
             aCompsolidPresentations.Add(anOwnerPresentation);
         }

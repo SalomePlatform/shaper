@@ -52,13 +52,13 @@ const QString INVALID_VALUE = "invalid_action";
 
 XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop)
   : ModuleBase_IErrorMgr(theParent),
+    myWorkshop(theWorkshop),
     myErrorDialog(0),
     myErrorLabel(0),
-    myWorkshop(theWorkshop),
-    myAcceptAllToolTip(""),
-    myAcceptAllStatusTip(""),
     myAcceptToolTip(""),
-    myAcceptStatusTip("")
+    myAcceptAllToolTip(""),
+    myAcceptStatusTip(""),
+    myAcceptAllStatusTip("")
 {
 }
 
@@ -69,7 +69,6 @@ XGUI_ErrorMgr::~XGUI_ErrorMgr()
 void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
 {
   //update Ok Action and header of property panel if the current operation started for the feature
-  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                       (workshop()->operationMgr()->currentOperation());
   if (aFOperation && aFOperation->feature() == theFeature) {
@@ -144,7 +143,6 @@ bool XGUI_ErrorMgr::isApplyEnabled() const
 
 void XGUI_ErrorMgr::storeInitialActionValues()
 {
-  ModuleBase_ModelWidget* anActiveWidget = activeWidget();
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
   myAcceptAllToolTip = anAcceptAllAction->toolTip();

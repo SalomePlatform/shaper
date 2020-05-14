@@ -140,7 +140,7 @@ bool PartSet_BSplineWidget::restoreValueCustom()
       aData->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributeDoubleArrayPtr aWeights = aData->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
 
-  while (myPoles.size() < aPoles->size())
+  while ((int)myPoles.size() < aPoles->size())
     addPoleWidget();
 
   std::list<BSplinePoleWidgets>::iterator anIt = myPoles.begin();

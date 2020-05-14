@@ -424,7 +424,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   gp_Vec aVecPos;
   // If number of angle less then number of symbols then each symbol can be placed
   // directly inside of the angle
-  if (aAngles.size() >= aPos[1] && !aVectors.empty()) {
+  if ((int)aAngles.size() >= aPos[1] && !aVectors.empty()) {
     int aId = aPos[0];
     aVecPos = *(std::next(aVectors.begin(), aId));
 
@@ -439,9 +439,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   double aAng;
   std::list<double>::const_iterator aItAng;
 
-  double aAngPos;
   bool aHasPlace = false;
-  //int aIntId = 0; // a position inside a one sector
   while (aPosCount < aPos[1]) {
     for (aItAng = aAngles.cbegin(), aItVec = aVectors.cbegin();
          aItAng != aAngles.cend(); ++aItAng, ++aItVec) {
@@ -451,9 +449,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
 
       if ((!aHasPlace) && (aPosCount >= (aPos[0] + 1))) {
         aHasPlace = true;
-        aAngPos = (*aItAng);
         aVecPos = (*aItVec);
-        //aIntId = aPos[0] - (aPosCount - Nb);
       }
     }
     if (aPosCount < aPos[1]) {

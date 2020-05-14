@@ -62,8 +62,6 @@ XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
 
 bool XGUI_ColorDialog::isRandomColor() const
 {
-  int anId = myButtonGroup->checkedId();
-
   return myButtonGroup->checkedId() == 1;
 }
 
