@@ -335,6 +335,8 @@ Q_OBJECT
   /// The method updates a Color Scale object in the viewer
   void updateColorScaleVisibility();
 
+  void showHelpPage(const QString& thePage) const;
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
@@ -494,7 +496,7 @@ private:
   void onPreviewActionClicked();
 
   /// Called on help button clicked in the property panel.
-  void onHelpActionClicked();
+  void onHelpActionClicked() const;
 
   //! The slot is called only once on resizing of Object Browser
   void onDockSizeChanged();

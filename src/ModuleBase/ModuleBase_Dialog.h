@@ -44,8 +44,7 @@ public:
   /// \param theParent a workshop object instance
   /// \param theId an Id of a feature
   /// \param theDescription an XML description of the feature
-  ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId,
-                    const std::string& theDescription);
+  ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const std::string& theDescription);
 
   /// Redefinition of virtual method
   virtual void accept();
@@ -54,12 +53,15 @@ protected:
   /// Redefinition of virtual method
   virtual void showEvent(QShowEvent* theEvent);
 
+private slots:
+  void onHelpRequest();
+
 private:
   /// Initialising of the widget
   void initializeWidget(ModuleBase_ModelWidget* theWidget);
 
   /// Id of the feature
-  QString myId;
+  std::string myId;
 
   /// XML description of the feature
   std::string myDescription;
@@ -78,6 +80,8 @@ private:
 
   /// Buttons of the dialog
   QDialogButtonBox* myButtonsBox;
+
+  std::string myHelpPage;
 };
 
 #endif

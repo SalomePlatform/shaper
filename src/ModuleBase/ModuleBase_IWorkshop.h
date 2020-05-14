@@ -161,6 +161,9 @@ Q_OBJECT
   //! Returns current state of cancel button
   virtual bool isCancelEnabled() const = 0;
 
+  //! Show help of a current operation
+  virtual void showHelpPage(const QString& thePage) const = 0;
+
 signals:
   /// Signal selection changed.
   void selectionChanged();

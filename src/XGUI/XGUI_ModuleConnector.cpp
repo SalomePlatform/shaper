@@ -261,3 +261,8 @@ bool XGUI_ModuleConnector::isCancelEnabled() const
   }
   return isEnabled;
 }
+
+void XGUI_ModuleConnector::showHelpPage(const QString& thePage) const
+{
+  workshop()->showHelpPage(thePage);
+}

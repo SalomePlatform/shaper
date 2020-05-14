@@ -639,16 +639,22 @@ void XGUI_Workshop::onPreviewActionClicked()
 
 
 //******************************************************
-void XGUI_Workshop::onHelpActionClicked()
+void XGUI_Workshop::onHelpActionClicked() const
 {
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
     ModuleBase_Operation* aOperation = anOperationMgr->currentOperation();
     if (aOperation) {
-      QString aHelpPage = aOperation->helpFileName();
-      if (!aHelpPage.isEmpty()) {
-        QString aDocDir;
-        const QChar aSep = QDir::separator();
+      showHelpPage(aOperation->helpFileName());
+    }
+  }
+}
+
+void XGUI_Workshop::showHelpPage(const QString& thePage) const
+{
+  if (!thePage.isEmpty()) {
+    QString aDocDir;
+    const QChar aSep = QDir::separator();
 //        QString platform;
 //        SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
 //#ifdef WIN32
@@ -659,21 +665,19 @@ void XGUI_Workshop::onHelpActionClicked()
 //        QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
 
 #ifdef HAVE_SALOME
-        QString aDir(getenv("SHAPER_ROOT_DIR"));
-        if (!aDir.isEmpty()) {
-          aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
-            "salome" + aSep + "gui" + aSep + "SHAPER";
-        }
+    QString aDir(getenv("SHAPER_ROOT_DIR"));
+    if (!aDir.isEmpty()) {
+      aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
+        "salome" + aSep + "gui" + aSep + "SHAPER";
+    }
 #else
-        QString aDir(getenv("CADBUILDER_ROOT_DIR"));
-        aDocDir = aDir + aSep + "doc" + aSep + "gui";
+    QString aDir(getenv("CADBUILDER_ROOT_DIR"));
+    aDocDir = aDir + aSep + "doc" + aSep + "gui";
 #endif
-        QString aFileName = aDocDir + aSep + aHelpPage;
-        if (QFile::exists(aFileName)) {
-          QUrl aUrl = QUrl::fromLocalFile(aFileName);
-          QDesktopServices::openUrl(aUrl);
-        }
-      }
+    QString aFileName = aDocDir + aSep + thePage;
+    if (QFile::exists(aFileName)) {
+      QUrl aUrl = QUrl::fromLocalFile(aFileName);
+      QDesktopServices::openUrl(aUrl);
     }
   }
 }

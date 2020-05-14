@@ -95,7 +95,7 @@ void ModuleBase_IModule::launchModal(const QString& theCmdId)
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(theCmdId.toStdString());
 
-  ModuleBase_Dialog aDlg(myWorkshop, theCmdId, aXmlCfg);
+  ModuleBase_Dialog aDlg(myWorkshop, aXmlCfg);
   if (aDlg.exec() == QDialog::Accepted)
     aMgr->finishOperation();
   else

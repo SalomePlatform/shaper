@@ -145,6 +145,9 @@ Q_OBJECT
   //! Returns current state of cancel button
   virtual bool isCancelEnabled() const;
 
+  //! Show help of a current operation
+  virtual void showHelpPage(const QString& thePage) const;
+
 private:
   QObjectPtrList activeObjects(const QObjectPtrList& theObjList) const;
 

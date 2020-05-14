@@ -38,15 +38,20 @@
 #include <QPushButton>
 
 
-ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId,
-                                     const std::string& theDescription) :
+ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent,
+  const std::string& theDescription) :
   QDialog(theParent->desktop(),
     Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-  myId(theId),
   myDescription(theDescription),
   myWorkshop(theParent),
   myActiveWidget(0)
 {
+  Config_WidgetAPI aApi(myDescription, "");
+  myId = aApi.getProperty("id");
+
+  std::shared_ptr<Config_FeatureMessage> aFeatureInfo = myWorkshop->featureInfo(myId.c_str());
+  myHelpPage = aFeatureInfo->helpFileName();
+
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
   QString aTitle = ModuleBase_Tools::translate("ModuleBase_Dialog",
       aFactory.widgetAPI()->getProperty(FEATURE_TEXT));
@@ -56,7 +61,7 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
 
-  myFeature = aDoc->addFeature(myId.toStdString());
+  myFeature = aDoc->addFeature(myId);
   if (!myFeature.get())
     return;
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -65,7 +70,6 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   aLayout->setContentsMargins(0, 0, 0, 0);
   aLayout->setSpacing(1);
-  //setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
 
   ModuleBase_PageWidget* aPage = new ModuleBase_PageWidget(this);
   aLayout->addWidget(aPage);
@@ -81,14 +85,17 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   ModuleBase_Tools::adjustMargins(aBtnLayout);
 
   myButtonsBox = new QDialogButtonBox(
-    QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, aFrame);
+    QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help,
+    Qt::Horizontal, aFrame);
   aBtnLayout->addWidget(myButtonsBox);
 
   myButtonsBox->button(QDialogButtonBox::Ok)->setIcon(QIcon(":pictures/button_ok.png"));
   myButtonsBox->button(QDialogButtonBox::Cancel)->setIcon(QIcon(":pictures/button_cancel.png"));
+  myButtonsBox->button(QDialogButtonBox::Help)->setIcon(QIcon(":pictures/button_help.png"));
 
   connect(myButtonsBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(myButtonsBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(myButtonsBox, SIGNAL(helpRequested()), this, SLOT(onHelpRequest()));
 
   foreach (ModuleBase_ModelWidget* aWidget, myWidgets) {
     initializeWidget(aWidget);
@@ -121,4 +128,9 @@ void ModuleBase_Dialog::accept()
       return;
   }
   QDialog::accept();
+}
+
+void ModuleBase_Dialog::onHelpRequest()
+{
+  myWorkshop->showHelpPage(myHelpPage.c_str());
 }
