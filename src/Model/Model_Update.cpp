@@ -913,6 +913,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
     // #19071 : avoid sending of update event in cycle
     bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
+    // list to keep the shared pointers while update is blocked (in messages raw poiters are used)
+    std::list<AttributeSelectionPtr> anAttrList;
     for(int a = aSel->size() - 1; a >= 0; a--) {
       std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
@@ -921,6 +923,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
         // update argument only if the referenced object is ready to use
         if (aContext.get() && !aContext->isDisabled()) {
           if (isReason(theFeature, aContext)) {
+            anAttrList.push_back(aSelAttr);
             if (!aSelAttr->update()) {
               bool isObligatory = !aFactory->isNotObligatory(
                 theFeature->getKind(), theFeature->data()->id(aSel)) &&
