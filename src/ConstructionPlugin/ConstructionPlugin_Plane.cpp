@@ -46,6 +46,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <cfloat>
+
 
 static GeomShapePtr faceByThreeVertices(const std::shared_ptr<GeomAPI_Vertex> theV1,
                                         const std::shared_ptr<GeomAPI_Vertex> theV2,
