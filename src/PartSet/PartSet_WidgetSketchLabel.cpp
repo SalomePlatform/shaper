@@ -39,6 +39,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -510,8 +511,19 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 {
   bool isOwnerSet = false;
 
-  const GeomShapePtr& aShape = thePrs->shape();
+  GeomShapePtr aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
+
+  if (!aShape.get() || aShape->isNull()) {
+    if (thePrs->object() && (feature() != thePrs->object())) {
+      if (thePrs->object()->groupName() == ModelAPI_ResultConstruction::group()) {
+        ResultConstructionPtr aConstruction =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(thePrs->object());
+        if (aConstruction.get())
+          aShape = aConstruction->shape();
+      }
+    }
+  }
 
   if (aShape.get() && !aShape->isNull()) {
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -519,39 +531,41 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
     isOwnerSet = aDir.get();
   }
   if (thePrs->object() && (feature() != thePrs->object())) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
-    DataPtr aData = feature()->data();
-    AttributeSelectionPtr aSelAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr.get()) {
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
-      if (aRes.get()) {
-        GeomShapePtr aShapePtr;
-        if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
-          aShapePtr = ModelAPI_Tools::shape(aRes);
+    if (thePrs->object()->groupName() != ModelAPI_ResultConstruction::group()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+      DataPtr aData = feature()->data();
+      AttributeSelectionPtr aSelAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+      if (aSelAttr.get()) {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
+        if (aRes.get()) {
+          GeomShapePtr aShapePtr;
+          if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
+            aShapePtr = ModelAPI_Tools::shape(aRes);
+          }
+          else { // selection happens in OB browser
+            aShapePtr = aShape;
+          }
+          if (aShapePtr.get() && aShapePtr->isFace()) {
+            const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
+            setSketchPlane(aTDShape);
+            aSelAttr->setValue(aRes, aShapePtr);
+            isOwnerSet = true;
+          }
         }
-        else { // selection happens in OB browser
-          aShapePtr = aShape;
-        }
-        if (aShapePtr.get() && aShapePtr->isFace()) {
-          const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
-          setSketchPlane(aTDShape);
-          aSelAttr->setValue(aRes, aShapePtr);
-          isOwnerSet = true;
-        }
-      }
-      else {
-        aSelAttr->setValue(aFeature, GeomShapePtr());
-        GeomShapePtr aShape = aSelAttr->value();
-        if (!aShape.get() && aSelAttr->contextFeature().get() &&
-          aSelAttr->contextFeature()->firstResult().get()) {
-          aShape = aSelAttr->contextFeature()->firstResult()->shape();
-        }
-        if (aShape.get() && aShape->isPlanar()) {
-          const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-          setSketchPlane(aTDShape);
-          isOwnerSet = true;
+        else {
+          aSelAttr->setValue(aFeature, GeomShapePtr());
+          GeomShapePtr aShape = aSelAttr->value();
+          if (!aShape.get() && aSelAttr->contextFeature().get() &&
+            aSelAttr->contextFeature()->firstResult().get()) {
+            aShape = aSelAttr->contextFeature()->firstResult()->shape();
+          }
+          if (aShape.get() && aShape->isPlanar()) {
+            const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+            setSketchPlane(aTDShape);
+            isOwnerSet = true;
+          }
         }
       }
     }
