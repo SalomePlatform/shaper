@@ -1886,7 +1886,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
         if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
-          if (aResIndex <= (int)theFeature->results().size()) { // to avoid crash if previous execute
+          if (aResIndex <= (int)theFeature->results().size()) {// to avoid crash if previous execute
             // for index = 0 erases result
             std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
             if (!aNewP->data()->isDeleted()) {

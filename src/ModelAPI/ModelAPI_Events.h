@@ -85,9 +85,11 @@ MAYBE_UNUSED static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
 /// To preview the current feature in the viewer (to compute the result)
 MAYBE_UNUSED static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
 /// To block automatic recomputation of any feature (by the GUI button press)
-MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_DISABLE = "DisableAutomaticRecomputation";
+MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_DISABLE
+                                                         = "DisableAutomaticRecomputation";
 /// To unblock block automatic recomputation (default state: the GUI button unpressed)
-MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_ENABLE = "EnableAutomaticRecomputation";
+MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_ENABLE
+                                                         = "EnableAutomaticRecomputation";
 
 /// Event ID that solver has conflicting constraints (comes with ModelAPI_SolverFailedMessage)
 MAYBE_UNUSED static const char * EVENT_SOLVER_FAILED = "SolverFailed";
