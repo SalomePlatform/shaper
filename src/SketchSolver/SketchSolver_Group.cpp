@@ -335,8 +335,9 @@ bool SketchSolver_Group::resolveConstraints()
         }
       }
 
-      // show degrees of freedom only if the degenerated geometry appears
-      if (aResult == PlaneGCSSolver_Solver::STATUS_DEGENERATED)
+      // show degrees of freedom only if the degenerated geometry appears,
+      // or if DoF is not computed yet
+      if (aResult == PlaneGCSSolver_Solver::STATUS_DEGENERATED || myDOF < 0)
         computeDoF();
     }
 
