@@ -1225,14 +1225,17 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
   // until redo of all possible objects happens
   bool isUpdateEnabled = myDisplayer->enableUpdateViewer(false);
 
+  int aTimes = theTimes;
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation()) {
     XGUI_OperationMgr* aOpMgr = operationMgr();
     /// this is important for nested operations
     /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
-    if (aOpMgr->canStopOperation(aOpMgr->currentOperation()))
+    if (aOpMgr->canStopOperation(aOpMgr->currentOperation())) {
       aOpMgr->abortOperation(aOpMgr->currentOperation());
+      aTimes--;
+    }
     else
     {
       myDisplayer->enableUpdateViewer(isUpdateEnabled);
@@ -1243,7 +1246,7 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
   std::list<std::string> anActionList = theActionType == ActionUndo ? aMgr->undoList()
     : aMgr->redoList();
   std::list<std::string>::const_iterator aIt = anActionList.cbegin();
-  for (int i = 0; (i < theTimes) && (aIt != anActionList.cend()); ++i, ++aIt) {
+  for (int i = 0; (i < aTimes) && (aIt != anActionList.cend()); ++i, ++aIt) {
     if (theActionType == ActionUndo)
       aMgr->undo();
     else
