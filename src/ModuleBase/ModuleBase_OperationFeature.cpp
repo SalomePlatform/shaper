@@ -209,10 +209,10 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
         std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
                                std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
         for (int i = 0, aNb = aCurSelList->size(); i < aNb && !aFoundObject; i++) {
-          ObjectPtr anObject = aCurSelList->object(i);
-          FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-          if (aFeature.get()) {
-            aFoundObject = anObjectFeature == aFeature;
+          ObjectPtr aCurObj = aCurSelList->object(i);
+          FeaturePtr aCurFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aCurObj);
+          if (aCurFeat.get()) {
+            aFoundObject = anObjectFeature == aCurFeat;
           }
         }
       }

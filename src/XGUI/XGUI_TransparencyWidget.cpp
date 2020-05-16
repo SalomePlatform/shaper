@@ -26,7 +26,8 @@
 #include <QLabel>
 #include <QSlider>
 
-XGUI_TransparencyWidget::XGUI_TransparencyWidget(QWidget* theParent, const QString& theLabelText)
+XGUI_TransparencyWidget::XGUI_TransparencyWidget(QWidget* theParent,
+                                                 const QString& /*theLabelText*/)
   : QWidget(theParent)
 {
   QVBoxLayout* aLay = new QVBoxLayout(this);

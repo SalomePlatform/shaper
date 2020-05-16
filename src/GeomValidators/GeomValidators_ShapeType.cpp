@@ -63,7 +63,8 @@ GeomValidators_ShapeType::TypeOfShape
     MyShapeTypes["compound"]  = Compound;
   }
   std::string aType = std::string(theType.c_str());
-  std::transform(aType.begin(), aType.end(), aType.begin(), ::tolower);
+  std::transform(aType.begin(), aType.end(), aType.begin(),
+                 [](char c) { return static_cast<char>(::tolower(c)); });
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
     return MyShapeTypes[aType];
 
@@ -113,9 +114,8 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
   }
   if (!aValid && theError.empty()) {
     std::string aTypes;
-    std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
     // returns true if the attribute satisfies at least one of given arguments
-    for (; anIt != aLast; anIt++) {
+    for (anIt = theArguments.begin(); anIt != aLast; anIt++) {
       if (!aTypes.empty())
         aTypes += ", ";
       aTypes += *anIt;
@@ -169,12 +169,12 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
         theError = "It has reference to an empty attribute";
       }
       else {
-        std::string anAttributeType = aRefAttr->attributeType();
-        aValid = anAttributeType == GeomDataAPI_Point2D::typeId();
+        std::string anAttrType = aRefAttr->attributeType();
+        aValid = anAttrType == GeomDataAPI_Point2D::typeId();
         if (!aValid) {
 // LCOV_EXCL_START
           theError = "Shape type is \"%1\", it should be \"%2\"";
-          theError.arg(anAttributeType).arg(getShapeTypeDescription(theShapeType));
+          theError.arg(anAttrType).arg(getShapeTypeDescription(theShapeType));
 // LCOV_EXCL_STOP
         }
       }

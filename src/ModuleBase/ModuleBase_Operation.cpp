@@ -159,7 +159,7 @@ void ModuleBase_Operation::onValuesChanged()
   myIsModified = true;
 }
 
-void ModuleBase_Operation::onValueStateChanged(int thePreviousState)
+void ModuleBase_Operation::onValueStateChanged(int /*thePreviousState*/)
 {
   if (propertyPanel()) {
     ModuleBase_ModelWidget* aWidget = propertyPanel()->activeWidget();

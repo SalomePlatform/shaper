@@ -298,7 +298,7 @@ namespace {
     }
   }
 
-  void exportStep(Step* step, Field* field, xmlNodePtr nodeSteps)
+  void exportStep(Step* step, Field* /*field*/, xmlNodePtr nodeSteps)
   {
     xmlNodePtr nodeStep = xmlNewChild(nodeSteps, 0, C_TAG_STEP, 0);
     xmlNewProp(nodeStep, C_ATTR_STEP_NUMBER, BAD_CAST XaoUtils::intToString(step->getStep()).c_str());
@@ -378,7 +378,7 @@ namespace {
     xaoObject->setGeometry(geometry);
   }
 
-  void parseShapeNode(xmlDocPtr doc, xmlNodePtr shapeNode, Geometry* geometry)
+  void parseShapeNode(xmlDocPtr /*doc*/, xmlNodePtr shapeNode, Geometry* geometry)
   {
     if (geometry->getFormat() == XAO::BREP)
     {

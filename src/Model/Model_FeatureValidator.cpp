@@ -32,7 +32,7 @@
 #include <memory>
 
 bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::list<std::string>& theArguments,
+                                     const std::list<std::string>& /*theArguments*/,
                                      Events_InfoMessage& theError) const
 {
   static Model_ValidatorsFactory* aValidators =

@@ -34,6 +34,11 @@
   #include "Events_Loop.h"
   #include "Events_Message.h"
   #include "Events_MessageGroup.h"
+
+  #ifdef _MSC_VER
+  # pragma warning(disable: 4456) // declaration of variable hides previous local declaration
+  # pragma warning(disable: 4459) // declaration of variable hides global declaration
+  #endif
 %}
 
 

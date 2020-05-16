@@ -240,7 +240,7 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                            const SelectMgr_SequenceOfOwner& theOwners)
+                                            const SelectMgr_SequenceOfOwner& /*theOwners*/)
 {
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
   aSelectionPrs->Clear();
@@ -255,7 +255,7 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
                                   const Handle(PrsMgr_PresentationManager3d)& thePM,
                                   const Handle(Prs3d_Drawer)& theStyle,
-                                  const Handle(SelectMgr_EntityOwner)& theOwner)
+                                  const Handle(SelectMgr_EntityOwner)& /*theOwner*/)
 {
   thePM->Color(this, theStyle);
 
@@ -270,9 +270,9 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::Compute(
-                const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                const Handle(PrsMgr_PresentationManager3d)& /*thePresentationManager*/,
                 const Handle(Prs3d_Presentation)& thePresentation,
-                const Standard_Integer theMode)
+                const Standard_Integer /*theMode*/)
 {
   if (!plane().get())
     return;

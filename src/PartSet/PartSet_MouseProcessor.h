@@ -24,6 +24,10 @@
 
 #include <memory>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 class ModuleBase_IViewWindow;
 class ModuleBase_ViewerPrs;
 class QMouseEvent;

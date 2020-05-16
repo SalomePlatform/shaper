@@ -438,7 +438,6 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
   AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
   if (aCompFeature->numberOfSubs() > 0) {
     // set the sub feature to attribute selection list and check whether sketch is valid
-    SessionPtr aMgr = ModelAPI_Session::get();
     const static std::string aNestedOpID("Set Sketch result into Selection list");
     aMgr->startOperation(aNestedOpID, false); // false to not attach to Extrusion operation
     setSketchObjectToList(aCompFeature, anAttrList);
@@ -512,7 +511,6 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
                                     (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
       ResultPtr aRes = aSelAttr.get() ? aSelAttr->context() : ResultPtr();
       if (aRes.get()) {
-        SessionPtr aMgr = ModelAPI_Session::get();
         ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
         AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
         std::string aValidatorID;

@@ -528,8 +528,8 @@ bool Model_Document::save(
         if (!aDocName.empty()) {
           // just copy file
           TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
-          OSD_Path aPath(aSubPath);
-          OSD_File aFile(aPath);
+          OSD_Path aCopyPath(aSubPath);
+          OSD_File aFile(aCopyPath);
           if (aFile.Exists()) {
             TCollection_AsciiString aDestinationDir(DocFileName(theDirName, aDocName));
             OSD_Path aDestination(aDestinationDir);
@@ -764,7 +764,7 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
   aDelta = theDoc->GetUndos().Last();
   TDF_LabelList aDeltaList;
   aDelta->Labels(aDeltaList); // it clears list, so, use new one and then append to the result
-  for(TDF_ListIteratorOfLabelList aListIter(aDeltaList); aListIter.More(); aListIter.Next()) {
+  if (!aDeltaList.IsEmpty()) {
     return false;
   }
   // add also label of the modified attributes

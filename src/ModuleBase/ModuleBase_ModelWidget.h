@@ -34,6 +34,10 @@
 
 #include <memory>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 class Config_WidgetAPI;
 class Events_InfoMessage;
 class ModuleBase_IPropertyPanel;

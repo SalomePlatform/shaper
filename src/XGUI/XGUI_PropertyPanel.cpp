@@ -365,15 +365,15 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
           }
         }
         else if (anItem->layout()) {
-          QLayout* aLayout = anItem->layout();
-          for (int i = 0, aCount = aLayout->count(); i < aCount; i++) {
-            QLayoutItem* anItem = aLayout->itemAt(i);
-            QWidget* aWidget = anItem ? anItem->widget() : 0;
-            if (aWidget) {
-              if (aWidget->isVisible()) {
-                if (aWidget->focusPolicy() != Qt::NoFocus)
-                  theWidgets.append(aWidget);
-                findDirectChildren(aWidget, theWidgets, false);
+          QLayout* anItemLayout = anItem->layout();
+          for (int it = 0, cnt = anItemLayout->count(); it < cnt; it++) {
+            QLayoutItem* aCurItem = anItemLayout->itemAt(it);
+            QWidget* aCurWidget = aCurItem ? aCurItem->widget() : 0;
+            if (aCurWidget) {
+              if (aCurWidget->isVisible()) {
+                if (aCurWidget->focusPolicy() != Qt::NoFocus)
+                  theWidgets.append(aCurWidget);
+                findDirectChildren(aCurWidget, theWidgets, false);
               }
             }
             else {

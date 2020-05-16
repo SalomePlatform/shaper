@@ -893,10 +893,8 @@ void Model_Objects::synchronizeFeatures(
               ModelAPI_Tools::allResults(aFeature, aResults);
               std::list<ResultPtr>::iterator aResIter = aResults.begin();
               for(; aResIter != aResults.end(); aResIter++) {
-                std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
-                  (*aResIter)->data()->attributes("");
-                std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-                for(; anAttr != anAttrs.end(); anAttr++)
+                anAttrs = (*aResIter)->data()->attributes("");
+                for(anAttr = anAttrs.begin(); anAttr != anAttrs.end(); anAttr++)
                   (*anAttr)->reinit();
               }
             }
@@ -1189,7 +1187,7 @@ TDF_Label Model_Objects::resultLabel(
 
 bool Model_Objects::hasCustomName(DataPtr theFeatureData,
                                   ResultPtr theResult,
-                                  int theResultIndex,
+                                  int /*theResultIndex*/,
                                   std::string& theParentName) const
 {
   ResultBodyPtr aBodyRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theFeatureData->owner());

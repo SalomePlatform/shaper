@@ -21,7 +21,7 @@
 
 #include <ModelAPI_AttributeSelectionList.h>
 
-bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType theType) const
+bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType /*theType*/) const
 {
   return true;
 }
@@ -35,8 +35,8 @@ bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape, const ResultPtr
   if (!aList.get())
     return false;
   for (int i = 0; i < aList->size(); i++) {
-    AttributeSelectionPtr aAttr = aList->value(i);
-    GeomShapePtr aGeom = aAttr->value();
+    AttributeSelectionPtr aCurAttr = aList->value(i);
+    GeomShapePtr aGeom = aCurAttr->value();
     if (aGeom && aGeom->isSubShape(theShape))
       return true;
   }

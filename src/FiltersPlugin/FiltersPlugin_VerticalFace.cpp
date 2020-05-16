@@ -33,7 +33,7 @@ bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) c
 }
 
 bool FiltersPlugin_VerticalFace::isOk(const GeomShapePtr& theShape, const ResultPtr&,
-                                      const ModelAPI_FiltersArgs& theArgs) const
+                                      const ModelAPI_FiltersArgs& /*theArgs*/) const
 {
   static const double THE_TOLERANCE = 1.e-7;
 

@@ -28,6 +28,10 @@
 #include <string>
 #include <memory>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 class ModuleBase_ModelWidget;
 class ModuleBase_PageBase;
 class ModuleBase_IWorkshop;
@@ -52,7 +56,7 @@ public:
   /// Returns a container of possible page types, which this creator can process
   /// The default implementation is empty
   /// \param theTypes a list of type names
-  virtual void panelTypes(std::set<std::string>& theTypes) {}
+  virtual void panelTypes(std::set<std::string>& /*theTypes*/) {}
 
   /// Returns a container of possible page types, which this creator can process
   /// The default implementation is empty

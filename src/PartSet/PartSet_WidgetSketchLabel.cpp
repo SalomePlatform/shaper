@@ -486,8 +486,6 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
   }
   // check plane or planar face of any non-sketch object
   if (aCanFillSketch) {
-    std::shared_ptr<GeomAPI_Face> aGeomFace;
-
     GeomShapePtr aGeomShape = thePrs->shape();
     if ((!aGeomShape.get() || aGeomShape->isNull()) && aResult.get()) {
       aGeomShape = aResult->shape();
@@ -540,13 +538,13 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
       }
       else {
         aSelAttr->setValue(aFeature, GeomShapePtr());
-        GeomShapePtr aShape = aSelAttr->value();
-        if (!aShape.get() && aSelAttr->contextFeature().get() &&
+        GeomShapePtr aSelShape = aSelAttr->value();
+        if (!aSelShape.get() && aSelAttr->contextFeature().get() &&
           aSelAttr->contextFeature()->firstResult().get()) {
-          aShape = aSelAttr->contextFeature()->firstResult()->shape();
+          aSelShape = aSelAttr->contextFeature()->firstResult()->shape();
         }
-        if (aShape.get() && aShape->isPlanar()) {
-          const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        if (aSelShape.get() && aSelShape->isPlanar()) {
+          const TopoDS_Shape& aTDShape = aSelShape->impl<TopoDS_Shape>();
           setSketchPlane(aTDShape);
           isOwnerSet = true;
         }

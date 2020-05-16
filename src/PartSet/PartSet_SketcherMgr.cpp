@@ -519,12 +519,12 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
         launchEditing();
       myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSPFeature.get() &&
-          (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
-           aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
-          DataPtr aData = aSPFeature->data();
+        if (aSketchFeature.get() &&
+           (aSketchFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
+            aSketchFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
+          DataPtr aData = aSketchFeature->data();
           AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
           std::shared_ptr<GeomDataAPI_Point2D> aFPAttr =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
@@ -1171,9 +1171,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 #ifdef DEBUG_SKETCHER_ENTITIES
     anInfo.append(ModuleBase_Tools::objectInfo(aFeature));
 #endif
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    std::list<ResultPtr> aFeatResults = aFeature->results();
+    for (aIt = aFeatResults.begin(); aIt != aFeatResults.end(); ++aIt) {
       if ((*aIt)->isDisplayed())
         // Display object if it was created outside of GUI
         aECreator->sendUpdated((*aIt), EVENT_DISP);
@@ -1712,7 +1711,7 @@ bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* t
             anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
           }
           if (anAIS.get() != NULL) {
-            Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+            anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
 
             if (!anAISIO.IsNull()) {
               Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
@@ -1786,10 +1785,10 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   }
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     ResultPtr aResult = *aIt;
-    AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
-    if (aAISObj.get() == NULL)
+    AISObjectPtr aResAISObj = aDisplayer->getAISObject(aResult);
+    if (aResAISObj.get() == NULL)
       continue;
-    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+    Handle(AIS_InteractiveObject) anAISIO = aResAISObj->impl<Handle(AIS_InteractiveObject)>();
 
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
@@ -2011,8 +2010,8 @@ void PartSet_SketcherMgr::storeSelection(const SelectionType theType,
       std::list<ResultPtr> aResults = aFeature->results();
       std::list<ResultPtr>::const_iterator aIt;
       for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-        ResultPtr aResult = *aIt;
-        getAttributesOrResults(anOwner, aFeature, aSketch, aResult,
+        ResultPtr aCurResult = *aIt;
+        getAttributesOrResults(anOwner, aFeature, aSketch, aCurResult,
           anInfo.myAttributes, anInfo.myResults, anInfo.myLocalSelectedShapes);
       }
     }
@@ -2225,9 +2224,9 @@ void PartSet_SketcherMgr::processEvent(const std::shared_ptr<Events_Message>& th
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
       if (aFeature.get()) {
         std::list<ResultPtr> aRes = aFeature->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        for (aIt = aRes.cbegin(); aIt != aRes.cend(); ++aIt) {
-          ModuleBase_ViewerPrsPtr aPrsPtr(new ModuleBase_ViewerPrs(*aIt));
+        std::list<ResultPtr>::const_iterator aRIt;
+        for (aRIt = aRes.cbegin(); aRIt != aRes.cend(); ++aRIt) {
+          ModuleBase_ViewerPrsPtr aPrsPtr(new ModuleBase_ViewerPrs(*aRIt));
           aPrsList.append(aPrsPtr);
         }
       }
@@ -2359,8 +2358,8 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
     //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
   }
   if (isCopy(aFeature) && !isIncludeToResult(aFeature)) {
-    double aWidth = thePrs->width();
-    thePrs->setWidth(aWidth / 2.5);
+    double aPrsWidth = thePrs->width();
+    thePrs->setWidth(aPrsWidth / 2.5);
   }
 
   double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
@@ -2397,10 +2396,10 @@ void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
       for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
         aRes = (*aIt);
         if (aRes->isDisplayed()) {
-          FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
-          if (aFeature.get()) {
+          FeaturePtr aCurFeature = ModelAPI_Feature::feature(aRes);
+          if (aCurFeature.get()) {
             std::shared_ptr<SketchPlugin_Feature> aSPFeature =
-              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+                std::dynamic_pointer_cast<SketchPlugin_Feature>(aCurFeature);
             if (aSPFeature.get()) {
               bool isAxiliary =
                 aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();

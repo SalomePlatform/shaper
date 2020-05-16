@@ -144,9 +144,9 @@ void BuildPlugin_Wire::execute()
 
     for (ListOfShape::iterator aWIt = aWires.begin(); aWIt != aWires.end(); ++aWIt) {
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      ListOfShape aSketches;
-      aSketches.push_back(anIt->second);
-      aResultBody->storeModified(aSketches, *aWIt, aMakeShapeList);
+      ListOfShape aSketch;
+      aSketch.push_back(anIt->second);
+      aResultBody->storeModified(aSketch, *aWIt, aMakeShapeList);
       aResultBody->loadModifiedShapes(aMakeShapeList, anIt->second, GeomAPI_Shape::EDGE);
       setResult(aResultBody, aResultIndex);
       ++aResultIndex;

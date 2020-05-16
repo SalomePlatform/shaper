@@ -167,7 +167,7 @@ void PartSet_ExternalObjectsMgr::removeExternal(const CompositeFeaturePtr& theSk
 
 void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject,
                                                       const CompositeFeaturePtr& /*theSketch*/,
-                                                      const FeaturePtr& theFeature,
+                                                      const FeaturePtr& /*theFeature*/,
                                                       ModuleBase_IWorkshop* theWorkshop)
 {
   if (theObject.get()) {

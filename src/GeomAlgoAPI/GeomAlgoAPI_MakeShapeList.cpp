@@ -86,14 +86,14 @@ const GeomShapePtr GeomAlgoAPI_MakeShapeList::shape() const
 void GeomAlgoAPI_MakeShapeList::generated(const GeomShapePtr theOldShape,
                                           ListOfShape& theNewShapes)
 {
-  result(theOldShape,  GeomAlgoAPI_MakeShapeList::Generated, theNewShapes);
+  result(theOldShape, theNewShapes);
 }
 
 //==================================================================================================
 void GeomAlgoAPI_MakeShapeList::modified(const GeomShapePtr theOldShape,
                                          ListOfShape& theNewShapes)
 {
-  result(theOldShape, GeomAlgoAPI_MakeShapeList::Modified, theNewShapes);
+  result(theOldShape, theNewShapes);
 }
 
 //==================================================================================================
@@ -114,7 +114,6 @@ bool GeomAlgoAPI_MakeShapeList::isDeleted(const GeomShapePtr theOldShape)
 
 //==================================================================================================
 void GeomAlgoAPI_MakeShapeList::result(const GeomShapePtr theOldShape,
-                                       OperationType theOperationType,
                                        ListOfShape& theNewShapes)
 {
   if(myListOfMakeShape.empty()) {

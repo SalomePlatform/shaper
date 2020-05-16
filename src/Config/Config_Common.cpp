@@ -208,7 +208,7 @@ bool getParametersInfo(xmlNodePtr theNode, std::string& outPropertyId,
     std::stringstream aPropStringStream(aPropString);
     char COMMA_DELIM = ',';
     std::string aParameter;
-    while (std::getline(aPropStringStream, aParameter, ',')) {
+    while (std::getline(aPropStringStream, aParameter, COMMA_DELIM)) {
       outValidatorParameters.push_back(aParameter);
     }
   }
@@ -285,6 +285,7 @@ bool getBooleanAttribute(xmlNodePtr theNode, const char* theAttributeName, bool 
 CONFIG_EXPORT std::string normalize(const std::string& theString)
 {
   std::string result = theString;
-  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+  std::transform(result.begin(), result.end(), result.begin(),
+                 [](char c) { return static_cast<char>(::tolower(c)); });
   return result;
 }

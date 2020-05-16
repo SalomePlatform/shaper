@@ -98,9 +98,8 @@ bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape, const ResultPtr&,
     if (aFace->isPlanar()) {
       GeomPlanePtr aPln = aFace->getPlane();
       for (int i = 0; i < aList->size(); i++) {
-        AttributeSelectionPtr aAttr = aList->value(i);
-        GeomShapePtr aGeom = aAttr->value();
-        GeomPlanePtr aPlane = getPlane(aAttr);
+        AttributeSelectionPtr aCurAttr = aList->value(i);
+        GeomPlanePtr aPlane = getPlane(aCurAttr);
         if (aPlane->isCoincident(aPln))
           return true;
       }

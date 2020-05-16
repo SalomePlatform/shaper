@@ -228,9 +228,9 @@ void PartSet_OperationPrs::addValue(const ObjectPtr& theObject, const GeomShapeP
 
     GeomShapePtr aShape = theShape;
     if (!aShape.get()) {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      if (aResult.get())
-        aShape = aResult->shape();
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      if (aRes.get())
+        aShape = aRes->shape();
     }
     if (!isSubObject(theObject, theFeature))
       appendShapeIfVisible(theWorkshop, theObject, aShape, theObjectShapes);
@@ -320,19 +320,19 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
       ObjectPtr anObject;
       GeomShapePtr aShape;
       if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
-        AttributeRefAttrPtr anAttr =
+        AttributeRefAttrPtr aRefAttr =
           std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
-        if (anAttr->isObject()) {
-          anObject = anAttr->object();
+        if (aRefAttr->isObject()) {
+          anObject = aRefAttr->object();
         }
         else {
-          AttributePtr anAttribute = anAttr->attr();
-          aShape = PartSet_Tools::findShapeBy2DPoint(anAttribute, theWorkshop);
+          AttributePtr anAttr = aRefAttr->attr();
+          aShape = PartSet_Tools::findShapeBy2DPoint(anAttr, theWorkshop);
           // the distance point is not found if the point is selected in the 2nd time
           // TODO: after debug, this check can be removed
           if (!aShape.get())
             continue;
-          anObject = anAttr->attr()->owner();
+          anObject = anAttr->owner();
         }
       }
       if (anAttrType == ModelAPI_AttributeSelection::typeId()) {

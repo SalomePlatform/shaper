@@ -137,7 +137,8 @@ void ParametersPlugin_Parameter::execute()
     setError("Expression error.", false);
 }
 
-double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
+double ParametersPlugin_Parameter::evaluate(const std::string& /*theExpression*/,
+                                            std::string& theError)
 {
   FeaturePtr aMyPtr = std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner());
   std::shared_ptr<ModelAPI_ParameterEvalMessage> aProcessMessage =

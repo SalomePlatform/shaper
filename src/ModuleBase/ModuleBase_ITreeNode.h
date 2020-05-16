@@ -31,6 +31,10 @@
 #include <QIcon>
 #include <QVariant>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 class ModuleBase_ITreeNode;
 class ModuleBase_IWorkshop;
 

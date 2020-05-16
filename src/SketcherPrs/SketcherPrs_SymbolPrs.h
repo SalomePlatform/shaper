@@ -126,11 +126,12 @@ protected:
   /// Redefine this function in order to add additiona lines of constraint base
   /// \param thePrs a presentation
   /// \param theColor a color of additiona lines
-  virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const {}
+  virtual void drawLines(const Handle(Prs3d_Presentation)& /*thePrs*/,
+                         Quantity_Color /*theColor*/) const {}
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updateIfReadyToDisplay(double theStep, bool withColor) const { return true; }
+  virtual bool updateIfReadyToDisplay(double /*theStep*/, bool /*withColor*/) const { return true; }
 
   /// Draw a shape into the given presentation scene
   /// \param theShape the shape to draw

@@ -454,11 +454,11 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   else if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr anAttr =
+    AttributeSelectionPtr anAttrSel =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-    ResultPtr aContext = anAttr->context();
-    FeaturePtr aContextFeature = anAttr->contextFeature();
-    GeomShapePtr aShape = anAttr->value();
+    ResultPtr aContext = anAttrSel->context();
+    FeaturePtr aContextFeature = anAttrSel->contextFeature();
+    GeomShapePtr aShape = anAttrSel->value();
 
     // Check selection attributes
     anAttrs = aFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
@@ -499,9 +499,9 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   else if (anAttrType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr anAttr =
+    AttributeReferencePtr anAttrRef =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
-    ObjectPtr anObject = anAttr->value();
+    ObjectPtr anObject = anAttrRef->value();
     // Check selection attributes
     anAttrs = aFeature->data()->attributes(ModelAPI_AttributeReference::typeId());
     if (anAttrs.size() > 0) {
@@ -517,8 +517,8 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             return false;
           }
         }
-        return true;
       }
+      return true;
     }
   }
   else if(anAttrType == ModelAPI_AttributeSelectionList::typeId()) {

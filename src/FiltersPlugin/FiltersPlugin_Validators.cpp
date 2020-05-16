@@ -25,7 +25,7 @@
 #include <ModelAPI_Session.h>
 
 bool FiltersPlugin_ShapeTypeValidator::isValid(const AttributePtr& theAttribute,
-                                               const std::list<std::string>& theArguments,
+                                               const std::list<std::string>& /*theArguments*/,
                                                Events_InfoMessage& theError) const
 {
   if (!theAttribute)

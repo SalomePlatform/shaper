@@ -90,6 +90,10 @@
 
 #include <set>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4702)
+#endif
+
 /// defines the local context mouse selection sensitivity
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
@@ -1038,9 +1042,9 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
     ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
     for (; anIt != aLast; ++anIt) {
-      AISObjectPtr aAISObj = getAISObject(*anIt);
-      if (aAISObj.get() != NULL) {
-        Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      AISObjectPtr aCurAISObj = getAISObject(*anIt);
+      if (aCurAISObj.get() != NULL) {
+        Handle(AIS_InteractiveObject) anAIS = aCurAISObj->impl<Handle(AIS_InteractiveObject)>();
         if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
           thePresentations.Add(anAIS);
       }

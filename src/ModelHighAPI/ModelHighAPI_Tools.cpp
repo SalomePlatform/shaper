@@ -277,8 +277,8 @@ GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
 {
   GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
 
-  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(),
-                 theShapeTypeStr.begin(), ::tolower);
+  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(), theShapeTypeStr.begin(),
+                 [](char c) { return static_cast<char>(::tolower(c)); });
 
   if(theShapeTypeStr == "compound") {
     aShapeType = GeomAPI_Shape::COMPOUND;
@@ -386,7 +386,8 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
 ModelAPI_AttributeTables::ValueType valueTypeByStr(const std::string& theValueTypeStr)
 {
   std::string aType = theValueTypeStr;
-  std::transform(aType.begin(), aType.end(), aType.begin(), ::tolower);
+  std::transform(aType.begin(), aType.end(), aType.begin(),
+                 [](char c) { return static_cast<char>(::tolower(c)); });
   if (aType == "boolean")
     return ModelAPI_AttributeTables::BOOLEAN;
   else if (aType == "integer")
@@ -546,10 +547,15 @@ static bool checkDump(SessionPtr theSession,
   return true;
 }
 
-bool checkPyDump(const std::string& theFilenameNaming,
-                 const std::string& theFilenameGeo,
-                 const std::string& theFilenameWeak,
-                 const checkDumpType theCheckType)
+bool checkPyDump(
+#ifdef _DEBUG
+  const std::string&, const std::string&, const std::string&,
+#else
+  const std::string& theFilenameNaming,
+  const std::string& theFilenameGeo,
+  const std::string& theFilenameWeak,
+#endif
+  const checkDumpType theCheckType)
 {
   static const std::string anErrorByNaming("checkPythonDump by naming");
   static const std::string anErrorByGeometry("checkPythonDump by geometry");

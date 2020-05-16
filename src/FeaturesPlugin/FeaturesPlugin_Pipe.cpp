@@ -302,6 +302,7 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
     }
     case GeomAPI_Shape::COMPOUND: {
       aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
+      break;
     }
     default:
       return; // unsupported type of shape

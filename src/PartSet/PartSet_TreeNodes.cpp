@@ -296,8 +296,8 @@ void PartSet_ObjectNode::update()
       aNode = myChildren.takeLast();
       delete aNode;
     }
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aNode->update();
+    foreach(ModuleBase_ITreeNode* aChildNode, myChildren) {
+      aChildNode->update();
     }
   }
   else {
@@ -351,8 +351,8 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
         }
       }
     }
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aResult.append(aNode->objectCreated(theObjects));
+    foreach(ModuleBase_ITreeNode* aChildNode, myChildren) {
+      aResult.append(aChildNode->objectCreated(theObjects));
     }
   }
   return aResult;
@@ -389,10 +389,10 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(
         aResult.append(this);
       int i = 0;
       ObjectPtr aBody;
-      foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      foreach(ModuleBase_ITreeNode* aChildNode, myChildren) {
         aBody = subObject(i);
-        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
-        aResult.append(aNode->objectsDeleted(theDoc, theGroup));
+        ((PartSet_ObjectNode*)aChildNode)->setObject(aBody);
+        aResult.append(aChildNode->objectsDeleted(theDoc, theGroup));
         i++;
       }
     }
@@ -1119,7 +1119,7 @@ void PartSet_ObjectFolderNode::update()
   }
 }
 
-QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& theObjects)
+QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& /*theObjects*/)
 {
   QTreeNodesList aResult;
   int aFirst = -1, aLast = -1;
@@ -1153,8 +1153,8 @@ QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& the
   return aResult;
 }
 
-QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDoc,
-  const QString& theGroup)
+QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& /*theDoc*/,
+  const QString& /*theGroup*/)
 {
   QTreeNodesList aResult;
   int aFirst = -1, aLast = -1;

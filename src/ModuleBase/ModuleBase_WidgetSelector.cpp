@@ -215,7 +215,7 @@ bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPr
 
   if (aValid) {
     // In order to avoid selection of the same object
-    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    aResult = myWorkshop->selection()->getResult(thePrs);
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aResult);
     aValid = aSelectedFeature != myFeature;
   }

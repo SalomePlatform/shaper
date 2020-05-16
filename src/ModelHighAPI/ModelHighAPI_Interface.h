@@ -96,7 +96,7 @@ public:
 
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT
-  virtual void dump(ModelHighAPI_Dumper& theDumper) const {}
+  virtual void dump(ModelHighAPI_Dumper& /*theDumper*/) const {}
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature; ///< feature of this interface

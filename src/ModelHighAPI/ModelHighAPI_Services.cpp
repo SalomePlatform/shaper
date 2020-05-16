@@ -98,9 +98,9 @@ std::shared_ptr<ModelAPI_Result> standardPlane(const std::string & theName){
 //--------------------------------------------------------------------------------------
 void begin()
 {
-  static size_t aTransactionID = 0;
-  static size_t aNbTransactions = -1;
-  size_t aNbUndo = ModelAPI_Session::get()->undoList().size();
+  static int aTransactionID = 0;
+  static int aNbTransactions = -1;
+  int aNbUndo = (int)ModelAPI_Session::get()->undoList().size();
   if (aNbUndo != aNbTransactions) {
     // the last transaction was not empty, thus increase the ID
     aNbTransactions = aNbUndo;

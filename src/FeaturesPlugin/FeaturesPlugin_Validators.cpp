@@ -62,6 +62,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 //==================================================================================================
 bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
@@ -433,7 +437,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
         return false;
       }
 
-      GeomShapePtr aContextShape = aContext->shape();
+      aContextShape = aContext->shape();
       if(aShape->isEqual(aContextShape)) {
         // Whole construction selected. Check that it have faces.
         if(aConstruction->facesNum() > 0) {
@@ -1559,16 +1563,16 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if(!aContext.get()) {
-      FeaturePtr aContFeat = anAttrSelection->contextFeature();
-      if (!aContFeat.get() || !aContFeat->results().size() ||
-          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+    if (aContext.get()) {
+      aFeature = ModelAPI_Feature::feature(aContext);
+    } else {
+      aFeature = anAttrSelection->contextFeature();
+      if (!aFeature.get() || !aFeature->results().size() ||
+          aFeature->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
         theError = "Error: Empty selection context.";
         return false;
       }
     }
-    FeaturePtr aFeature = anAttrSelection->contextFeature().get() ?
-      anAttrSelection->contextFeature() : ModelAPI_Feature::feature(aContext);
     if (!aFeature.get()) {
       theError = "Error: empty feature.";
       return false;

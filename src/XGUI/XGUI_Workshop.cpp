@@ -1037,8 +1037,6 @@ void XGUI_Workshop::openFile(const QString& theDirectory)
 #ifdef _DEBUG
   bool aNewPart = Config_PropManager::boolean("Plugins", "create_part_by_start");
   if (aNewPart) {
-
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
     if (aSize > 0 ) {
       ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), 0);
@@ -2255,8 +2253,8 @@ std::list<FeaturePtr> allFeatures(const DocumentPtr& theDocument)
           std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
       if (aResultPart.get() && aResultPart->partDoc().get()) {
         // Recursion
-        std::list<FeaturePtr> anAllFeatures = allFeatures(aResultPart->partDoc());
-        aResultList.insert(aResultList.end(), anAllFeatures.begin(), anAllFeatures.end());
+        std::list<FeaturePtr> aPartFeatures = allFeatures(aResultPart->partDoc());
+        aResultList.insert(aResultList.end(), aPartFeatures.begin(), aPartFeatures.end());
       }
     }
 
@@ -3210,9 +3208,9 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
   std::vector<int> aValues;
   bool isVisible;
   if (aResultList.size() == 1) {
-    ResultPtr aRes = aResultList.first();
-    if (aRes.get())
-      ModelAPI_Tools::getIsoLines(aRes, isVisible, aValues);
+    ResultPtr aResult = aResultList.first();
+    if (aResult.get())
+      ModelAPI_Tools::getIsoLines(aResult, isVisible, aValues);
     else
       return;
   }
@@ -3247,8 +3245,8 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
 
     aValues[0] = aUNb->value();
     aValues[1] = aVNb->value();
-    foreach(ResultPtr aRes, aResultList) {
-      ModelAPI_Tools::setIsoLines(aRes, aValues);
+    foreach(ResultPtr aResult, aResultList) {
+      ModelAPI_Tools::setIsoLines(aResult, aValues);
     }
     mySelector->clearSelection();
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));

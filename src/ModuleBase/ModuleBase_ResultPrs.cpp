@@ -421,7 +421,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
 
 //********************************************************************
 bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                                 const Standard_Integer theMode)
+                                                 const Standard_Integer /*theMode*/)
 {
   if (Shape().ShapeType() == TopAbs_VERTEX) {
     const TopoDS_Shape& aShape = Shape();

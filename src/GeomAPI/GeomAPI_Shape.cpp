@@ -469,7 +469,8 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
 
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeTypeByStr(std::string theType)
 {
-  std::transform(theType.begin(), theType.end(), theType.begin(), ::toupper);
+  std::transform(theType.begin(), theType.end(), theType.begin(),
+                 [](char c) { return static_cast<char>(::toupper(c)); });
   if (theType == "COMPOUND" || theType == "COMPOUNDS")
     return COMPOUND;
   if (theType == "COMPSOLID" || theType == "COMPSOLIDS")

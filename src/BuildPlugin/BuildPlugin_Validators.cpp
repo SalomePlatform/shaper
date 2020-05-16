@@ -460,8 +460,8 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
 
 //=================================================================================================
 bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttribute,
-                                                      const std::list<std::string>& theArguments,
-                                                      Events_InfoMessage& theError) const
+                                                    const std::list<std::string>& /*theArguments*/,
+                                                    Events_InfoMessage& theError) const
 {
   // Get base objects list.
   if (theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {

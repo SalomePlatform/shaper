@@ -75,6 +75,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 const double tolerance = 1.e-7;
 
 static bool isSpline(FeaturePtr theFeature)

@@ -159,7 +159,7 @@ public:
   /// Dump std::endl
   friend
   DumpStorageBuffer& operator<<(DumpStorageBuffer& theBuffer,
-                                std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&))
+                                std::basic_ostream<char>& (*)(std::basic_ostream<char>&))
   {
     theBuffer.write("\n");
     return theBuffer;
@@ -633,10 +633,10 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       int aFullIndex = 0;
       NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
       for (; aFIt != myFeatureCount.end(); ++aFIt) {
-        std::map<std::string, std::pair<int, int> >::const_iterator aFound =
+        std::map<std::string, std::pair<int, int> >::const_iterator aFoundKind =
           aFIt->second.find(aKind);
-        if (aFound != aFIt->second.end())
-          aFullIndex += aFound->second.first;
+        if (aFoundKind != aFIt->second.end())
+          aFullIndex += aFoundKind->second.first;
       }
       aDefaultName << aKind << "_" << aFullIndex;
     }

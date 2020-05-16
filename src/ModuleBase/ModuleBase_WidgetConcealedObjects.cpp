@@ -168,7 +168,7 @@ void ModuleBase_WidgetConcealedObjects::addViewRow(
   }
 }
 
-void ModuleBase_WidgetConcealedObjects::onItemToggled(bool theState)
+void ModuleBase_WidgetConcealedObjects::onItemToggled(bool /*theState*/)
 {
   emit valuesChanged();
   updateObject(myFeature);

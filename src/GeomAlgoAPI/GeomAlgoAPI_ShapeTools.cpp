@@ -297,8 +297,8 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
           aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
         for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
-            anIter(aMapSA); anIter.More(); anIter.Next()) {
-          TopTools_ListOfShape& aTempListOfShape = anIter.ChangeValue();
+            anIter2(aMapSA); anIter2.More(); anIter2.Next()) {
+          TopTools_ListOfShape& aTempListOfShape = anIter2.ChangeValue();
           if(aTempListOfShape.IsEmpty()) {
             continue;
           } else if(aTempListOfShape.Size() == 1 && aTempListOfShape.First() == aTempShape) {
@@ -872,8 +872,7 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
 //==================================================================================================
 std::list<std::shared_ptr<GeomAPI_Vertex> > GeomAlgoAPI_ShapeTools::intersect(
-  const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace,
-  const bool thePointsOutsideFace)
+  const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace)
 {
   std::list<std::shared_ptr<GeomAPI_Vertex> > aResult;
   if(!theEdge.get() || !theFace.get()) {

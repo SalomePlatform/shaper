@@ -68,4 +68,11 @@
   #include <string>
   #include <list>
 
+  #ifdef _MSC_VER
+  # pragma warning(disable: 4456) // declaration of variable hides previous local declaration
+  # pragma warning(disable: 4459) // declaration of variable hides global declaration
+  # pragma warning(disable: 4701) // potentially uninitialized local variable
+  # pragma warning(disable: 4703) // potentially uninitialized local pointer variable
+  #endif
+
 #endif /* SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_ */

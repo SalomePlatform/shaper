@@ -304,8 +304,7 @@ std::list<std::shared_ptr<GeomAPI_Vertex> >
     }
   }
 
-  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace,
-    aPlaneSelection->context()->groupName() == ModelAPI_ResultConstruction::group());
+  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace);
 }
 
 //==================================================================================================

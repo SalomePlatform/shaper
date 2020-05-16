@@ -352,8 +352,8 @@ public:
   MODELHIGHAPI_EXPORT virtual void exportVariables() const;
 
   /// Export one variable name to another module (implemented in python)
-  MODELHIGHAPI_EXPORT virtual void exportVariable(
-    const std::string& theEntry, const std::string& theVarName) const {}
+  MODELHIGHAPI_EXPORT virtual void exportVariable(const std::string& /*theEntry*/,
+                                                  const std::string& /*theVarName*/) const {}
 
 protected:
   /// Dump "setName" command if last entity had user-defined name

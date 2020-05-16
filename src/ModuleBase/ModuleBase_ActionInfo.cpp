@@ -29,6 +29,7 @@ ModuleBase_ActionInfo::ModuleBase_ActionInfo()
 ModuleBase_ActionInfo::ModuleBase_ActionInfo(const QString &theText)
 {
   initDefault();
+  text = theText;
 }
 
 ModuleBase_ActionInfo::ModuleBase_ActionInfo(const QIcon & theIcon, const QString &theText)

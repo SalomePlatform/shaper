@@ -466,9 +466,9 @@ void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
     // all operation from the current to triggered should also be aborted
     // operations over the parameter one are not aborted(e.g. extrusion cut, sketch abort)
     while(hasOperation()) {
-      ModuleBase_Operation* aCurrentOperation = currentOperation();
-      aCurrentOperation->abort();
-      if(theOperation == aCurrentOperation)
+      ModuleBase_Operation* aCurOperation = currentOperation();
+      aCurOperation->abort();
+      if(theOperation == aCurOperation)
         break;
     }
   }

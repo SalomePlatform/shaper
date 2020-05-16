@@ -222,7 +222,7 @@ void Model_ResultConstruction::setInfinite(const bool theInfinite)
   }
 }
 
-int Model_ResultConstruction::facesNum(const bool theUpdateNaming)
+int Model_ResultConstruction::facesNum(const bool /*theUpdateNaming*/)
 {
   int aResult = 0;
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
@@ -294,8 +294,8 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       TopExp_Explorer anExp(aShape, TopAbs_VERTEX);
       for(int anIndex = 1; anExp.More(); anExp.Next(), anIndex++) {
         TDF_Label aSubLab = aShapeLab.FindChild(anIndex);
-        TNaming_Builder aBuilder(aSubLab);
-        aBuilder.Generated(anExp.Current());
+        TNaming_Builder aSubBuilder(aSubLab);
+        aSubBuilder.Generated(anExp.Current());
         std::string aVertexName = aMyName + "_" + (anIndex == 1 ? "StartVertex" : "EndVertex");
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);

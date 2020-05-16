@@ -396,7 +396,6 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           // Check is selection continuous
           XGUI_DataModel* aModel = myWorkshop->objectBrowser()->dataModel();
           DocumentPtr aDoc = aMgr->activeDocument();
-          std::list<FeaturePtr> aFeatures = aSelMgr->getSelectedFeatures();
 
           bool isContinuos = true;
           if (aSelected > 1) {

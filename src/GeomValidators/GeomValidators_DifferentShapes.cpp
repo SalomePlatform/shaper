@@ -30,7 +30,7 @@
 
 //=================================================================================================
 bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
-                                      const std::list<std::string>& theArguments,
+                                      const std::list<std::string>& /*theArguments*/,
                                       Events_InfoMessage& theError) const
 {
   bool isValid = false;

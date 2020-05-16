@@ -111,9 +111,9 @@ bool hasEdge(ModelAPI_Feature* theConstraint)
 
 
 void SketcherPrs_Coincident::Compute(
-  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  const Handle(PrsMgr_PresentationManager3d)& /*thePresentationManager*/,
   const Handle(Prs3d_Presentation)& thePresentation,
-  const Standard_Integer theMode)
+  const Standard_Integer /*theMode*/)
 {
   gp_Pnt aPoint;
   bool aReadyToDisplay = readyToDisplay(myConstraint, mySketch->coordinatePlane(), aPoint);
@@ -181,8 +181,8 @@ void SketcherPrs_Coincident::Compute(
 }
 
 
-void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                            const Standard_Integer aMode)
+void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)& /*theSelection*/,
+                                              const Standard_Integer /*theMode*/)
 {
   // There is no selection of coincident - a point is selected instead of coincidence
 }

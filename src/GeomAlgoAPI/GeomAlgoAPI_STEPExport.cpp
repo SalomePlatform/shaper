@@ -29,7 +29,7 @@
 #include <Interface_Static.hxx>
 
 bool STEPExport(const std::string& theFileName,
-                const std::string& theFormatName,
+                const std::string& /*theFormatName*/,
                 const std::shared_ptr<GeomAPI_Shape>& theShape,
                 std::string& theError)
 {

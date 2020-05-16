@@ -94,7 +94,7 @@ void SketchPlugin_MacroEllipticArc::execute()
   Events_Loop::loop()->send(aMessage);
 }
 
-void SketchPlugin_MacroEllipticArc::attributeChanged(const std::string& theID)
+void SketchPlugin_MacroEllipticArc::attributeChanged(const std::string& /*theID*/)
 {
   static const int NB_POINTS = 4;
   std::string aPointAttrName[NB_POINTS] = { CENTER_ID(),

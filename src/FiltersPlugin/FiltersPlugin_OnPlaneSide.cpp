@@ -27,7 +27,7 @@
 #include <GeomAPI_XYZ.h>
 
 
-bool FiltersPlugin_OnPlaneSide::isSupported(GeomAPI_Shape::ShapeType theType) const
+bool FiltersPlugin_OnPlaneSide::isSupported(GeomAPI_Shape::ShapeType /*theType*/) const
 {
   return true;
 }

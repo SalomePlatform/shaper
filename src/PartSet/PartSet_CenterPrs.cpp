@@ -75,7 +75,7 @@ void PartSet_CenterPrs::drawPoint(const Handle(Prs3d_Presentation)& thePrs,
 }
 
 void PartSet_CenterPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& PM,
-                                        const SelectMgr_SequenceOfOwner& Seq)
+                                        const SelectMgr_SequenceOfOwner& /*Seq*/)
 {
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( PM );
   aSelectionPrs->Clear();
@@ -89,7 +89,7 @@ void PartSet_CenterPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3
 
 void PartSet_CenterPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                               const Handle(Prs3d_Drawer)& theStyle,
-                                              const Handle(SelectMgr_EntityOwner)& theOwner)
+                                              const Handle(SelectMgr_EntityOwner)& /*theOwner*/)
 {
   Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
   aHilightPrs->Clear();

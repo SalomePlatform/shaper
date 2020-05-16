@@ -234,7 +234,6 @@ static bool isInResults(AttributeSelectionListPtr theSelection,
 {
   // collect all results into a cashed set
   if (theCashedResults.empty()) {
-    std::list<ResultPtr> aResults;
     std::list<ResultPtr>::const_iterator aRes = theResults.cbegin();
     for(; aRes != theResults.cend(); aRes++) {
       if (theCashedResults.count(*aRes))
@@ -511,8 +510,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
               int anElementID = 0;
               if (!isWholePart) {
                 // element index actually is the ID of the selection
-                AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
-                int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+                AttributeSelectionPtr aSel = aSelectionList->value(aRow - 1);
+                int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSel->value());
                 if (aReferenceID == 0) // selected value does not found in the exported shape
                   continue;
 

@@ -743,8 +743,6 @@ QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
 {
-  QString aShapeTypeName;
-
   int idx = 0;
   foreach (QString aShapeTypeName, myShapeTypes) {
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
@@ -794,10 +792,10 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
     for (int i = 0; i < aRefAttrListAttr->size(); i++) {
-      AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
+      AttributePtr anAttr = aRefAttrListAttr->attribute(i);
       QString aName;
-      if (anAttribute.get()) {
-        std::string anAttrName = ModuleBase_Tools::generateName(anAttribute, myWorkshop);
+      if (anAttr.get()) {
+        std::string anAttrName = ModuleBase_Tools::generateName(anAttr, myWorkshop);
         aName = QString::fromStdString(anAttrName);
       }
       else {
@@ -910,9 +908,9 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       if (!anObject.get())
         continue;
       TopoDS_Shape aShape;
-      AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
-      if (anAttribute.get()) {
-        GeomShapePtr aGeomShape = ModuleBase_Tools::getShape(anAttribute, myWorkshop);
+      AttributePtr anAttr = aRefAttrListAttr->attribute(i);
+      if (anAttr.get()) {
+        GeomShapePtr aGeomShape = ModuleBase_Tools::getShape(anAttr, myWorkshop);
         theValues.append(std::shared_ptr<ModuleBase_ViewerPrs>(
                new ModuleBase_ViewerPrs(anObject, aGeomShape, NULL)));
       }
@@ -983,8 +981,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     for (int i = 0; i < aRefAttrListAttr->size(); i++) {
       bool aFound = false;
       if (aRefAttrListAttr->isAttribute(i)) {
-        AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
-        aFound = anAttributes.find(anAttribute) != anAttributes.end();
+        AttributePtr anAttr = aRefAttrListAttr->attribute(i);
+        aFound = anAttributes.find(anAttr) != anAttributes.end();
       }
       else {
         aFound = findInSelection(aRefAttrListAttr->object(i), GeomShapePtr(), aGeomSelection,

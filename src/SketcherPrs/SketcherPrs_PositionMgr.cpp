@@ -487,10 +487,10 @@ void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* theP
         aToDel.push_back(aIt->first);
       else {
         // Reindex objects positions in order to avoid spaces
-        PositionsMap::iterator aIt;
+        PositionsMap::iterator aPMIt;
         int i = 0;
-        for (aIt = aPosMap.begin(); aIt != aPosMap.end(); aIt++, i++)
-          aIt->second = i;
+        for (aPMIt = aPosMap.begin(); aPMIt != aPosMap.end(); aPMIt++, i++)
+          aPMIt->second = i;
       }
     }
   }

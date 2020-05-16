@@ -397,14 +397,14 @@ void XGUI_FacesPanel::processSelection()
     // It can happen in case of groups selection
     QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator aIt;
     for (aIt = myItems.cbegin(); aIt != myItems.cend(); aIt++) {
-      ModuleBase_ViewerPrsPtr aPrs = aIt.value();
-      ObjectPtr aObject = aPrs->object();
-      ResultGroupPtr aResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObject);
-      if (aResGroup.get())
+      ModuleBase_ViewerPrsPtr aCurPrs = aIt.value();
+      ObjectPtr aObject = aCurPrs->object();
+      ResultGroupPtr aCurResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObject);
+      if (aCurResGroup.get())
         continue;
       if (anObjectToShapes.find(aObject) != anObjectToShapes.end()) {
         TopoDS_ListOfShape aShapes = anObjectToShapes[aObject];
-        GeomShapePtr aShapePtr = aPrs->shape();
+        GeomShapePtr aShapePtr = aCurPrs->shape();
         if (aShapes.Contains(aShapePtr->impl<TopoDS_Shape>())) {
           aToRemove.insert(aIt.key());
         }
@@ -647,14 +647,14 @@ void XGUI_FacesPanel::onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS)
           // corresponded faces have been restored
           for (aSIt = aObjectToShapes.begin(); aSIt != aObjectToShapes.end(); aSIt++) {
             TopoDS_ListOfShape aShapes = aSIt->second;
-            Handle(ModuleBase_ResultPrs) aPrs = aObjectToPrs[aSIt->first];
-            TopoDS_ListOfShape aAlreadyHidden = aPrs->hiddenSubShapes();
+            Handle(ModuleBase_ResultPrs) aResPrs = aObjectToPrs[aSIt->first];
+            TopoDS_ListOfShape aAlreadyHidden = aResPrs->hiddenSubShapes();
             TopoDS_ListOfShape::Iterator aShPIt(aShapes);
             for (; aShPIt.More(); aShPIt.Next()) {
               if (aAlreadyHidden.Contains(aShPIt.Value()))
                 aAlreadyHidden.Remove(aShPIt.Value());
             }
-            aPrs->setSubShapeHidden(aAlreadyHidden);
+            aResPrs->setSubShapeHidden(aAlreadyHidden);
             aObjects.insert(aSIt->first);
           }
           aIdsToRem.insert(aIt.key());
@@ -665,7 +665,6 @@ void XGUI_FacesPanel::onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS)
           if (aPIt != aObjectToPrs.end()) {
             ObjectPtr aObj = aPIt->first;
             if (aObj == theObject) {
-              Handle(ModuleBase_ResultPrs) aPrs = aPIt->second;
               TopoDS_ListOfShape aShapes = aObjectToShapes[aObj];
               aHideShapes.Append(aShapes);
               aObjects.insert(aObj);

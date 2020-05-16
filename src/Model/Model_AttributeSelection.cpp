@@ -366,9 +366,9 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
             std::size_t aPartEnd = aSubShapeName.find('/');
             if (aPartEnd != std::string::npos && aPartEnd != aSubShapeName.rfind('/')) {
               std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
-              int anIndex;
+              int anInd;
               std::string aType; // to reuse already existing selection the type is not needed
-              return aPart->shapeInPart(aNameInPart, aType, anIndex);
+              return aPart->shapeInPart(aNameInPart, aType, anInd);
             }
           }
         }
@@ -557,7 +557,7 @@ void Model_AttributeSelection::split(
     aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
     setValue(theContext, aSubSh);
     for(aSub.Next(); aSub.More(); aSub.Next()) {
-      GeomShapePtr aSubSh(new GeomAPI_Shape);
+      aSubSh.reset(new GeomAPI_Shape);
       aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
       myParent->append(theContext, aSubSh);
     }
@@ -752,7 +752,7 @@ static std::map<ModelAPI_AttributeSelection::CenterType, std::string>& centersMa
 
 std::string Model_AttributeSelection::namingName(const std::string& theDefaultName)
 {
-  std::string aName("");
+  std::string aName;
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
 
@@ -761,7 +761,6 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     GeomShapePtr aShape = value();
     if (!aShape.get() && context().get())
       aShape = context()->shape();
-    std::string aName;
     if (aShape.get()) {
       aName = aShape->shapeTypeStr();
       if (myParent) {
@@ -1252,8 +1251,7 @@ void Model_AttributeSelection::computeValues(
     NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
     TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
     for(; aContIter.More(); aContIter.Next()) {
-      TopExp_Explorer aSubExp(aContIter.Key(), aValType);
-      for(; aSubExp.More(); aSubExp.Next()) {
+      for(aSubExp.Init(aContIter.Key(), aValType); aSubExp.More(); aSubExp.Next()) {
         if (!aSubs.IsBound(aSubExp.Current())) {
           aSubs.Bind(aSubExp.Current(), TopTools_MapOfShape());
         }
@@ -1703,10 +1701,8 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
   TopTools_ListOfShape aValShapes;
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
-    std::set<ResultPtr> allContexts, aSkippedContext;
-    std::list<ResultPtr>::iterator aNewContext = aNewContexts.begin();
-    for(; aNewContext != aNewContexts.end(); aNewContext++)
-      allContexts.insert(*aNewContext);
+    std::set<ResultPtr> allContexts(aNewContexts.begin(), aNewContexts.end());
+    std::set<ResultPtr> aSkippedContext;
 
     // if there exist context composite and sub-result(s), leave only sub(s)
     std::set<ResultPtr>::iterator aResIter = allContexts.begin();
@@ -1914,7 +1910,7 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
     if (theName.find(aDoc->kind()) == 0) { // remove the document identifier from name if exists
       aSubShapeName = theName.substr(aDoc->kind().size() + 1);
       aName = aSubShapeName;
-      std::string::size_type n = aName.find('/');
+      n = aName.find('/');
       if (n != std::string::npos) {
         aName = aName.substr(0, n);
       }

@@ -57,10 +57,7 @@ GeomShapePtr BuildPlugin_Solid::getSingleSubshape(const GeomShapePtr& theCompoun
 {
   if (theCompound->shapeType() == GeomAPI_Shape::COMPOUND) {
     GeomAPI_ShapeIterator anIt(theCompound);
-    GeomShapePtr aFoundSub;
-    for (; anIt.more() && !aFoundSub; anIt.next()) {
-      return anIt.current();
-    }
+    return anIt.current();
   }
   return theCompound;
 }

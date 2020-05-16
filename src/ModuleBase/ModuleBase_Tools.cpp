@@ -412,7 +412,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
       hasCompositeOwner |= (ModelAPI_Tools::bodyOwner(aResult) != NULL);
 
     if (!hasResultInHistory && aResult.get()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      aFeature = ModelAPI_Feature::feature(aResult);
       hasResultInHistory = aFeature.get() && aFeature->isInHistory();
     }
 

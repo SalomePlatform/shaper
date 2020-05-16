@@ -137,8 +137,8 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
       aToShape =  anAttrSel->context()->shape();
     }
     if (aToShape->isCompound()) {
-      GeomAPI_ShapeIterator anIt(aToShape);
-      aToShape = anIt.current();
+      GeomAPI_ShapeIterator aSIt(aToShape);
+      aToShape = aSIt.current();
     }
   }
   anIt++;
@@ -156,8 +156,8 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
       aFromShape = anAttrSel->context()->shape();
     }
     if (aFromShape->isCompound()) {
-      GeomAPI_ShapeIterator anIt(aFromShape);
-      aFromShape = anIt.current();
+      GeomAPI_ShapeIterator aSIt(aFromShape);
+      aFromShape = aSIt.current();
     }
   }
   anIt++;

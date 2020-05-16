@@ -359,7 +359,7 @@ bool allDocumentsActivated(std::string& theNotActivatedNames)
 }
 
 bool removeFeaturesAndReferences(const std::set<FeaturePtr>& theFeatures,
-                                 const bool theFlushRedisplay,
+                                 const bool /*theFlushRedisplay*/,
                                  const bool theUseComposite,
                                  const bool theUseRecursion)
 {
@@ -469,10 +469,10 @@ void findReferences(const std::set<FeaturePtr>& theFeatures,
       }
       else { // filter references to skip composition features of the current feature
         std::set<FeaturePtr> aFilteredFeatures;
-        std::set<FeaturePtr>::const_iterator anIt = aSelRefFeatures.begin(),
-                                             aLast = aSelRefFeatures.end();
-        for (; anIt != aLast; anIt++) {
-          FeaturePtr aCFeature = *anIt;
+        std::set<FeaturePtr>::const_iterator aRefIt = aSelRefFeatures.begin(),
+                                             aRefLast = aSelRefFeatures.end();
+        for (; aRefIt != aRefLast; aRefIt++) {
+          FeaturePtr aCFeature = *aRefIt;
           CompositeFeaturePtr aComposite =
             std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCFeature);
           if (aComposite.get() && aComposite->isSub(aFeature))
@@ -543,7 +543,7 @@ void findAllReferences(const std::set<FeaturePtr>& theFeatures,
     aResultRefList.insert(aMainRefList.begin(), aMainRefList.end());
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = *anIt;
-      int aRecLevel = 0;
+      aRecLevel = 0;
 #ifdef DEBUG_REMOVE_FEATURES_RECURSE
       std::cout << " Ref: " << getFeatureInfo(aFeature) << std::endl;
 #endif
@@ -1044,10 +1044,10 @@ std::list<FeaturePtr> referencedFeatures(
       for(; aResIter != aResSet.end(); aResIter++) {
         std::list<ResultPtr>::const_iterator aGroupRes = (*aResIter)->results().cbegin();
         for(; aGroupRes != (*aResIter)->results().cend(); aGroupRes++) {
-          const std::set<AttributePtr>& aRefs = (*aGroupRes)->data()->refsToMe();
-          std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
-          for(; aRef != aRefs.cend(); aRef++) {
-            FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+          const std::set<AttributePtr>& aGroupRefs = (*aGroupRes)->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRefIt = aGroupRefs.cbegin();
+          for(; aRefIt != aGroupRefs.cend(); aRefIt++) {
+            FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
             if (aFeat.get() && !aGroupOperations.count(aFeat) && !aFeat->results().empty() &&
                 aFeat->firstResult()->groupName() == ModelAPI_ResultGroup::group()) {
               // iterate results of this group operation because it may be without theTarget shape

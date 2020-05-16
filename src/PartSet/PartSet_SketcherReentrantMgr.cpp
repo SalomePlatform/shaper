@@ -188,8 +188,8 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
         }
       } else {
         // processing mouse move in active widget of restarted operation
-        ModuleBase_ModelWidget* anActiveWidget = module()->activeWidget();
-        PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
+        ModuleBase_ModelWidget* anActiveWdg = module()->activeWidget();
+        PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWdg);
         if (aProcessor)
           aProcessor->mouseMoved(theWnd, theEvent);
       }

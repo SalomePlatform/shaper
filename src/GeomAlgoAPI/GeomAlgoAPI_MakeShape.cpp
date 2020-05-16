@@ -257,7 +257,6 @@ void GeomAlgoAPI_MakeShape::initialize()
 void GeomAlgoAPI_MakeShape::prepareNamingFaces()
 {
   long long index = 1;
-  GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
     GeomShapePtr aFace = anExp.current();
     myCreatedFaces["Face_" + std::to_string(index++)] = aFace;

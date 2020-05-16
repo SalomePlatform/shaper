@@ -67,7 +67,7 @@ std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::addFeature(std
 }
 
 //=================================================================================================
-int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
+int FeaturesPlugin_CompositeSketch::numberOfSubs(bool /*forTree*/) const
 {
   ObjectPtr aObj = data()->reference(SKETCH_ID())->value();
   return aObj.get() ? 1 : 0;
@@ -75,7 +75,7 @@ int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
 
 //=================================================================================================
 std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex,
-                                                                             bool forTree)
+                                                                             bool /*forTree*/)
 {
   FeaturePtr aSubFeature;
   if(theIndex == 0) {

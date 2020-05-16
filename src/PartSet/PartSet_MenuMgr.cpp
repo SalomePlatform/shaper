@@ -173,8 +173,8 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
 
         // Find coincident in these coordinates
         ObjectPtr aObj = aPrsList.first()->object();
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-        FeaturePtr aCoincident = PartSet_Tools::findFirstCoincidence(aFeature, aSelPnt);
+        FeaturePtr aCoincident =
+            PartSet_Tools::findFirstCoincidence(ModelAPI_Feature::feature(aObj), aSelPnt);
         // If we have coincidence then add Detach menu
         if (aCoincident.get() != NULL) {
           QList<FeaturePtr> aCoins;
@@ -192,8 +192,8 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
             theMenuActions[anIndex++] = aSubMenu->menuAction();
             QAction* aAction;
             int i = 0;
-            foreach (FeaturePtr aCoins, myCoinsideLines) {
-              QString anItemText = aCoins->data()->name().c_str();
+            foreach (FeaturePtr aCoinsL, myCoinsideLines) {
+              QString anItemText = aCoinsL->data()->name().c_str();
 #ifdef _DEBUG
               if (anIsAttributes[i])
                 anItemText += " [attribute]";

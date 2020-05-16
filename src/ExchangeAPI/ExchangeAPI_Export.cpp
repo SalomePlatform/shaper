@@ -181,7 +181,7 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
 
 ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
   const std::string & theFilePath, const ModelHighAPI_Selection& theSelectedShape,
-  const std::string & theAuthor, const std::string & theGeometryName)
+  const std::string & /*theAuthor*/, const std::string & /*theGeometryName*/)
 {
   apply(); // finish previous operation to make sure all previous operations are done
   std::shared_ptr<ModelAPI_Feature> aFeature =

@@ -105,7 +105,7 @@ protected:
 
   /// The virtual function is reimplemented in order to avoid extra increasing of value by StepBy
   /// method
-  virtual void timerEvent(QTimerEvent *event) {}
+  virtual void timerEvent(QTimerEvent* /*event*/) {}
 
   virtual StepEnabled stepEnabled() const { return StepUpEnabled | StepDownEnabled; }
 

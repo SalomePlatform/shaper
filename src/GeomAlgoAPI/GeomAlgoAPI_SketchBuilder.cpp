@@ -202,7 +202,7 @@ static void sortAreas(TopTools_ListOfShape& theAreas,
 
 void GeomAlgoAPI_SketchBuilder::build(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-    const std::shared_ptr<GeomAPI_Dir>& theDirX,
+    const std::shared_ptr<GeomAPI_Dir>& /*theDirX*/,
     const std::shared_ptr<GeomAPI_Dir>& theNorm,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges)
 {

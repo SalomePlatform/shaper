@@ -46,7 +46,7 @@ IMPLEMENT_STANDARD_RTTIEXT(PartSet_FieldStepPrs, ViewerData_AISShape);
 #define POINT_SIZE 8
 
 
-void emptyDeleter(ModelAPI_ResultField* theF)
+void emptyDeleter(ModelAPI_ResultField* /*theF*/)
 {
   // Do nothing
 }

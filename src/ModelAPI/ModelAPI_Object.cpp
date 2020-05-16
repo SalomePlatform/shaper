@@ -57,7 +57,7 @@ std::shared_ptr<ModelAPI_Document> ModelAPI_Object::document() const
   return myDoc;
 }
 
-void ModelAPI_Object::attributeChanged(const std::string& theID)
+void ModelAPI_Object::attributeChanged(const std::string& /*theID*/)
 {
 }
 

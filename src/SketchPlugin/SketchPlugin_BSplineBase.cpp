@@ -108,7 +108,8 @@ bool SketchPlugin_BSplineBase::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }
 
-void SketchPlugin_BSplineBase::attributeChanged(const std::string& theID) {
+void SketchPlugin_BSplineBase::attributeChanged(const std::string& /*theID*/)
+{
 }
 
 bool SketchPlugin_BSplineBase::customAction(const std::string& theActionId)

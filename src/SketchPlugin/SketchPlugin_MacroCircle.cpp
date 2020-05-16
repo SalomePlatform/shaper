@@ -126,7 +126,6 @@ std::string SketchPlugin_MacroCircle::processEvent(
   std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =
         std::dynamic_pointer_cast<SketchPlugin_MacroArcReentrantMessage>(theMessage);
   if (aReentrantMessage.get()) {
-    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
     std::string aCircleType = aReentrantMessage->typeOfCreation();
 
     string(CIRCLE_TYPE())->setValue(aCircleType);
@@ -289,10 +288,10 @@ void SketchPlugin_MacroCircle::fillByThreePoints()
       aCircBuilder.addPassingPoint(aPassedPoint);
     else {
       aCircBuilder.addTangentCurve(aTangentCurve);
-      AttributePoint2DPtr aPassedPoint =
+      AttributePoint2DPtr aPassedPointAttr =
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr);
-      if (aPassedPoint)
-        aCircBuilder.setClosestPoint(aPassedPoint->pnt());
+      if (aPassedPointAttr)
+        aCircBuilder.setClosestPoint(aPassedPointAttr->pnt());
     }
   }
 
