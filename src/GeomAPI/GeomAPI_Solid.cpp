@@ -174,7 +174,6 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Solid::getCone() const
   GeomPointPtr anApex;
   GeomDirPtr anAxis;
   double aSemiAngle = 0.0;
-  double aHeight = 0.0;
 
   GeomPlanePtr aCaps[2];
 
@@ -205,7 +204,6 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Solid::getCone() const
         else
           anAxis = aCurCone->axis();
         aSemiAngle = aCurCone->semiAngle();
-        aHeight = aCurCone->height();
         isCone = true;
       }
     }

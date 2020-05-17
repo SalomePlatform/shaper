@@ -733,7 +733,6 @@ void PartSet_Tools::sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite
   if (!theComposite.get())
     return;
 
-  static Events_Loop* aLoop = Events_Loop::loop();
   int aNumberOfSubs = theComposite->numberOfSubs();
   for (int i = 0; i < aNumberOfSubs; i++) {
     FeaturePtr aSubFeature = theComposite->subFeature(i);

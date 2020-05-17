@@ -502,13 +502,15 @@ bool Selector_Algo::findNewVersion(const TopoDS_Shape& theContext, TopoDS_Shape&
         TopoDS_Shape aNextModification = aBaseIter.Shape();
         if (aNextModification.IsNull())
           continue;
-        if (isInContext(theContext, aNextModification))
+        if (isInContext(theContext, aNextModification)) {
           // don't add vertices generated from edges
           if (aNextModification.ShapeType() <= theResult.ShapeType())
             aResultShapes.Add(aNextModification);
-        else if (findNewVersion(theContext, aNextModification))
+        }
+        else if (findNewVersion(theContext, aNextModification)) {
           if (aNextModification.ShapeType() <= theResult.ShapeType())
             aResultShapes.Add(aNextModification);
+        }
       }
     }
     if (aResultShapes.IsEmpty())

@@ -20,11 +20,7 @@
 #ifndef CONFIG_KEYWORDS_H_
 #define CONFIG_KEYWORDS_H_
 
-#if defined __GNUC__ || defined __clang__
-#define MAYBE_UNUSED __attribute__((unused))
-#else
-#define MAYBE_UNUSED
-#endif
+#include <Config_def.h>
 
 /*
  * Hardcoded xml entities of plugin-*.xml
