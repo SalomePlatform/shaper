@@ -1161,20 +1161,21 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
 
   AttributeSelectionPtr aFeatureAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<SketchPlugin_Feature> aSketchFeature;
   if (aFeatureAttr.get()) {
     GeomShapePtr aVal = aFeatureAttr->value();
     ResultPtr aRes = aFeatureAttr->context();
     if (aVal && aVal->isVertex())
-      return true; // vertex is always could be projected
-    if (aVal && aVal->isEdge()) {
-      anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
+      aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aVal));
+    else if (aVal && aVal->isEdge()) {
+      anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aVal));
     } else if(aRes && aRes->shape()) {
       if (aRes->shape()->isVertex())
-        return true; // vertex is always could be projected
+        aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aRes->shape()));
       else if (aRes->shape()->isEdge())
-        anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+        anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aRes->shape()));
     }
 
     // try to convert result to sketch feature
@@ -1183,7 +1184,7 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
         std::dynamic_pointer_cast<SketchPlugin_Feature>(ModelAPI_Feature::feature(aRes));
     }
   }
-  if (!anEdge) {
+  if (!aVertex && !anEdge) {
     theError = "The attribute %1 should be an edge or vertex";
     theError.arg(theAttribute->id());
     return false;
@@ -1215,7 +1216,9 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   std::shared_ptr<GeomAPI_Pnt> anOrigin = aPlane->location();
 
   bool aValid = true;
-  if (anEdge->isLine()) {
+  if (aVertex)
+    aValid = true; // vertex is always could be projected
+  else if (anEdge->isLine()) {
     std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
     std::shared_ptr<GeomAPI_Dir> aLineDir = aLine->direction();
     double aDot = fabs(aNormal->dot(aLineDir));
