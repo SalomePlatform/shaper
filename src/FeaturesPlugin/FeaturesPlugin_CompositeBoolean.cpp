@@ -289,7 +289,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         {
           GeomShapePtr aSolidInCompSolid = aCompSolidIt.current();
           ListOfShape::iterator aUseIt = aUsedShapes.begin();
-          for(; aUseIt != aUsedShapes.end(); anIt++) {
+          for(; aUseIt != aUsedShapes.end(); aUseIt++) {
             if(aSolidInCompSolid->isEqual(*aUseIt)) {
               break;
             }
