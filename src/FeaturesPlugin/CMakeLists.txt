@@ -154,6 +154,7 @@ SET(TEXT_RESOURCES
     FeaturesPlugin_msg_ru.ts
 )
 
+SOURCE_GROUP ("XML Files" FILES ${XML_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
 

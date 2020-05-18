@@ -41,6 +41,8 @@ SET(XML_RESOURCES
   ellipsoid_widget.xml
 )
 
+SOURCE_GROUP ("XML Files" FILES ${XML_RESOURCES})
+
 INCLUDE_DIRECTORIES(
   ../ModelAPI
   ../GeomAPI

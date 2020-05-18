@@ -67,6 +67,9 @@ SET(TEXT_RESOURCES
     ExchangePlugin_msg_fr.ts
 )
 
+SOURCE_GROUP ("XML Files" FILES ${XML_RESOURCES})
+SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
+
 SET(PROJECT_LIBRARIES
     Events
     Config
@@ -77,7 +80,6 @@ SET(PROJECT_LIBRARIES
     GeomValidators
     XAOShaper
 )
-SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
 # default dump approaches (will be set if not initialized)
 SET(PYTHONDUMP_NAMING ON  CACHE BOOL "Dump named references to shapes")
