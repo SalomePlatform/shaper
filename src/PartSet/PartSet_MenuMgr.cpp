@@ -173,8 +173,8 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
 
         // Find coincident in these coordinates
         ObjectPtr aObj = aPrsList.first()->object();
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-        FeaturePtr aCoincident = PartSet_Tools::findFirstCoincidence(aFeature, aSelPnt);
+        FeaturePtr aCoincident =
+            PartSet_Tools::findFirstCoincidence(ModelAPI_Feature::feature(aObj), aSelPnt);
         // If we have coincidence then add Detach menu
         if (aCoincident.get() != NULL) {
           QList<FeaturePtr> aCoins;
@@ -192,8 +192,8 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
             theMenuActions[anIndex++] = aSubMenu->menuAction();
             QAction* aAction;
             int i = 0;
-            foreach (FeaturePtr aCoins, myCoinsideLines) {
-              QString anItemText = aCoins->data()->name().c_str();
+            foreach (FeaturePtr aCoinsL, myCoinsideLines) {
+              QString anItemText = aCoinsL->data()->name().c_str();
 #ifdef _DEBUG
               if (anIsAttributes[i])
                 anItemText += " [attribute]";
@@ -285,7 +285,6 @@ void addRefCoincidentFeatures(const std::set<AttributePtr>& theRefList,
       std::shared_ptr<GeomAPI_Pnt2d> aPnt = PartSet_Tools::getCoincedencePoint(aConstrFeature);
       if (aPnt.get() == NULL)
         return;
-      gp_Pnt aP = aPnt->impl<gp_Pnt>();
       if (theRefPnt->isEqual(aPnt) && (!theOutList.contains(aConstrFeature))) {
         theOutList.append(aConstrFeature);
       }
@@ -317,11 +316,9 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
   if (aToDelFeatures.size() > 0) {
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
     XGUI_Workshop* aWorkshop = aConnector->workshop();
-    ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
 
     ModuleBase_Operation* anOpAction =
       new ModuleBase_Operation(tr("Detach %1").arg(aLine->data()->name().c_str()), myModule);
-    bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
     XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
@@ -384,7 +381,6 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
   XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
   if (isUseTransaction) {
     anOpAction = new ModuleBase_Operation(anAction->text(), myModule);
-    bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
 
     bool isCommitted;
     if (!anOpMgr->canStartOperation(anOpAction->id(), isCommitted))
@@ -518,7 +514,6 @@ void PartSet_MenuMgr::onActivateAllParts()
 
   DocumentPtr aDoc = aMgr->moduleDocument();
   int aNbParts = aDoc->size(ModelAPI_ResultPart::group());
-  bool isActivated = false;
   QList<ResultPartPtr> aPartsToLoad;
   for (int i = 0; i < aNbParts; i++) {
     ObjectPtr aObj = aDoc->object(ModelAPI_ResultPart::group(), i);

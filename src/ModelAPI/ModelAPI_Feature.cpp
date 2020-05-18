@@ -156,10 +156,6 @@ void ModelAPI_Feature::erase()
     document()->setCurrentFeatureUp();
   }
 
-  static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-
   while (!myResults.empty()) {  // remove one by one with messages
     std::shared_ptr<ModelAPI_Result> aRes = *(myResults.begin());
     aRes->setDisabled(aRes, true); // to avoid activation of the Part result
@@ -247,7 +243,7 @@ bool ModelAPI_Feature::isStable()
   return myIsStable;
 }
 
-bool ModelAPI_Feature::customAction(const std::string& theActionId)
+bool ModelAPI_Feature::customAction(const std::string& /*theActionId*/)
 {
   return false;
 }

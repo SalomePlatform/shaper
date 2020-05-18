@@ -410,9 +410,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aModule)
     aModule->onViewTransformed();
 
-  // 6. Update sketcher actions
-  XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();
-
   myWorkshop->updateCommandStatus();
   aWorkshop->selector()->clearSelection();
   myWorkshop->viewer()->update();
@@ -490,8 +487,6 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
   }
   // check plane or planar face of any non-sketch object
   if (aCanFillSketch) {
-    std::shared_ptr<GeomAPI_Face> aGeomFace;
-
     GeomShapePtr aGeomShape = thePrs->shape();
     if ((!aGeomShape.get() || aGeomShape->isNull()) && aResult.get()) {
       aGeomShape = aResult->shape();
@@ -556,13 +551,13 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
         }
         else {
           aSelAttr->setValue(aFeature, GeomShapePtr());
-          GeomShapePtr aShape = aSelAttr->value();
-          if (!aShape.get() && aSelAttr->contextFeature().get() &&
+          GeomShapePtr aSelShape = aSelAttr->value();
+          if (!aSelShape.get() && aSelAttr->contextFeature().get() &&
             aSelAttr->contextFeature()->firstResult().get()) {
-            aShape = aSelAttr->contextFeature()->firstResult()->shape();
+            aSelShape = aSelAttr->contextFeature()->firstResult()->shape();
           }
-          if (aShape.get() && aShape->isPlanar()) {
-            const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+          if (aSelShape.get() && aSelShape->isPlanar()) {
+            const TopoDS_Shape& aTDShape = aSelShape->impl<TopoDS_Shape>();
             setSketchPlane(aTDShape);
             isOwnerSet = true;
           }

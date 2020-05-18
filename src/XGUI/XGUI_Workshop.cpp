@@ -200,13 +200,13 @@ static QString MyImportPartFilter(QObject::tr("Part files (*.shaperpart);;All fi
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
       myModule(NULL),
-      mySalomeConnector(theConnector),
-      myPropertyPanel(0),
-      myInspectionPanel(0),
-      myFacesPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0)
-      //myViewerSelMode(TopAbs_FACE)
+      myPropertyPanel(0),
+      myFacesPanel(0),
+      myDisplayer(0),
+      mySalomeConnector(theConnector),
+      //myViewerSelMode(TopAbs_FACE),
+      myInspectionPanel(0)
 {
   mySelector = new XGUI_SelectionMgr(this);
   myModuleConnector = new XGUI_ModuleConnector(this);
@@ -595,13 +595,11 @@ void XGUI_Workshop::onStartWaiting()
 //******************************************************
 void XGUI_Workshop::onAcceptActionClicked()
 {
-  QAction* anAction = dynamic_cast<QAction*>(sender());
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
-      //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
       myOperationMgr->commitOperation();
     }
   }
@@ -610,7 +608,6 @@ void XGUI_Workshop::onAcceptActionClicked()
 //******************************************************
 void XGUI_Workshop::onAcceptPlusActionClicked()
 {
-  QAction* anAction = dynamic_cast<QAction*>(sender());
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -1044,8 +1041,6 @@ void XGUI_Workshop::openFile(const QString& theDirectory)
 #ifdef _DEBUG
   bool aNewPart = Config_PropManager::boolean("Plugins", "create_part_by_start");
   if (aNewPart) {
-
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
     if (aSize > 0 ) {
       ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), 0);
@@ -2265,8 +2260,8 @@ std::list<FeaturePtr> allFeatures(const DocumentPtr& theDocument)
           std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
       if (aResultPart.get() && aResultPart->partDoc().get()) {
         // Recursion
-        std::list<FeaturePtr> anAllFeatures = allFeatures(aResultPart->partDoc());
-        aResultList.insert(aResultList.end(), anAllFeatures.begin(), anAllFeatures.end());
+        std::list<FeaturePtr> aPartFeatures = allFeatures(aResultPart->partDoc());
+        aResultList.insert(aResultList.end(), aPartFeatures.begin(), aPartFeatures.end());
       }
     }
 
@@ -2809,7 +2804,6 @@ void XGUI_Workshop::setNormalView(bool toInvert)
     aFace->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
 
     Handle(V3d_View) aView = myViewerProxy->activeView();
-    double aScale = aView->Scale();
     aView->SetAt(aPos->x(), aPos->y(), aPos->z());
     aView->SetProj(aNormal->x(), aNormal->y(), aNormal->z());
     Bnd_Box aBox;
@@ -2822,7 +2816,7 @@ void XGUI_Workshop::setNormalView(bool toInvert)
 void XGUI_Workshop::registerValidators() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  MAYBE_UNUSED ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
 
 //**************************************************************
@@ -3152,7 +3146,6 @@ void XGUI_Workshop::onAutoApply()
 void XGUI_Workshop::updateAutoComputeState()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
 #ifdef HAVE_SALOME
 //  QAction* aUpdateCmd;
 //  QList<QAction*> aCommands = mySalomeConnector->commandList();
@@ -3165,6 +3158,7 @@ void XGUI_Workshop::updateAutoComputeState()
 //  aUpdateCmd->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
 //    QIcon(":pictures/autoapply_start.png"));
 #else
+  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
   AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
   AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
   aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
@@ -3221,9 +3215,9 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
   std::vector<int> aValues;
   bool isVisible;
   if (aResultList.size() == 1) {
-    ResultPtr aRes = aResultList.first();
-    if (aRes.get())
-      ModelAPI_Tools::getIsoLines(aRes, isVisible, aValues);
+    ResultPtr aResult = aResultList.first();
+    if (aResult.get())
+      ModelAPI_Tools::getIsoLines(aResult, isVisible, aValues);
     else
       return;
   }
@@ -3258,8 +3252,8 @@ void XGUI_Workshop::changeIsoLines(const QObjectPtrList& theObjects)
 
     aValues[0] = aUNb->value();
     aValues[1] = aVNb->value();
-    foreach(ResultPtr aRes, aResultList) {
-      ModelAPI_Tools::setIsoLines(aRes, aValues);
+    foreach(ResultPtr aResult, aResultList) {
+      ModelAPI_Tools::setIsoLines(aResult, aValues);
     }
     mySelector->clearSelection();
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));

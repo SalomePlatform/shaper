@@ -93,8 +93,8 @@ void FeaturesPlugin_VersionedChFi::execute()
                                              aMakeShapeList, *anIt, aPrefix);
     setResult(aResultBody, aResultIndex++);
 
-    for (ListOfShape::iterator anIt = anEdges.begin(); anIt != anEdges.end(); ++anIt) {
-      GeomShapePtr aBase = *anIt;
+    for (ListOfShape::iterator aEIt = anEdges.begin(); aEIt != anEdges.end(); ++aEIt) {
+      GeomShapePtr aBase = *aEIt;
       // Store new faces generated from edges and vertices
       aResultBody->loadGeneratedShapes(aMakeShapeList, aBase, GeomAPI_Shape::EDGE, aPrefix, true);
     }

@@ -35,10 +35,6 @@
 #include <set>
 #include <vector>
 
-// for TDF_Label map usage
-static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
-static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
-
 extern int kUNDEFINED_FEATURE_INDEX;
 
 /**\class Model_Objects
@@ -192,7 +188,7 @@ class Model_Objects
   DocumentPtr owner() {return myDoc;}
 
   //! Deletes all managed features with emitting of corresponded signal
-  ~Model_Objects();
+  virtual ~Model_Objects();
 
  protected:
 

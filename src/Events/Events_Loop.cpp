@@ -200,9 +200,12 @@ void Events_Loop::flush(const Events_ID& theID)
       // TODO: Stabilization fix. Check later.
       if(myFlushed.find(theID.myID) != myFlushed.end()) {
         myFlushed.erase(myFlushed.find(theID.myID));
-      } else {
+      }
+#ifdef _DEBUG
+      else {
         bool aProblem = true;
       }
+#endif
     }
     // send accumulated messages to "groupListeners"
     std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID =

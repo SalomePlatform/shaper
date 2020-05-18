@@ -46,7 +46,8 @@ bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& 
       continue;
     }
     std::string aFormats = anArg.substr(0, aSepPos);
-    std::transform(aFormats.begin(), aFormats.end(), aFormats.begin(), toupper);
+    std::transform(aFormats.begin(), aFormats.end(), aFormats.begin(),
+                   [](char c) { return static_cast<char>(::toupper(c)); });
     std::list<std::string> aFormatList = ExchangePlugin_Tools::split(aFormats, '|');
     outFormats.insert(outFormats.end(), aFormatList.begin(), aFormatList.end());
   }
@@ -85,7 +86,8 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
   ExchangePlugin_FormatValidator::parseFormats(theArguments, aFormats);
   std::list<std::string>::const_iterator itFormats = aFormats.begin();
   size_t aFileNameLen = aFileName.length();
-  std::transform(aFileName.begin(), aFileName.end(), aFileName.begin(), toupper);
+  std::transform(aFileName.begin(), aFileName.end(), aFileName.begin(),
+                 [](char c) { return static_cast<char>(::toupper(c)); });
   // Is file name ends with the format
   for (; itFormats != aFormats.end(); ++itFormats) {
     std::string aFormat = "." + *itFormats;

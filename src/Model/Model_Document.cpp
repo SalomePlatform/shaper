@@ -104,8 +104,11 @@ static const int TAG_EXTERNAL_CONSTRUCTIONS = 5;
 static const Standard_GUID kEXTERNAL_SHAPE_REF("9aa5dd14-6d34-4a8d-8786-05842fd7bbbd");
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
-    : myID(theID), myKind(theKind), myIsActive(false), myIsSetCurrentFeature(false),
-      myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
+    : myID(theID),
+      myKind(theKind),
+      myDoc(new TDocStd_Document("BinOcaf")),  // binary OCAF format
+      myIsActive(false),
+      myIsSetCurrentFeature(false)
 {
 #ifdef TINSPECTOR
   CDF_Session::CurrentSession()->Directory()->Add(myDoc);
@@ -386,7 +389,6 @@ bool Model_Document::importPart(const char* theFileName,
     TDF_LabelList anAllNewFeatures;
     // Perform the copying twice for correct references:
     // 1. copy labels hierarchy and fill the relocation table
-    TDF_Label aMain = myDoc->Main();
     for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
       TDF_Label aCurrentLab = anIt.Value();
       Handle(TDataStd_Comment) aFeatureID;
@@ -526,8 +528,8 @@ bool Model_Document::save(
         if (!aDocName.empty()) {
           // just copy file
           TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
-          OSD_Path aPath(aSubPath);
-          OSD_File aFile(aPath);
+          OSD_Path aCopyPath(aSubPath);
+          OSD_File aFile(aCopyPath);
           if (aFile.Exists()) {
             TCollection_AsciiString aDestinationDir(DocFileName(theDirName, aDocName));
             OSD_Path aDestination(aDestinationDir);
@@ -762,7 +764,7 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
   aDelta = theDoc->GetUndos().Last();
   TDF_LabelList aDeltaList;
   aDelta->Labels(aDeltaList); // it clears list, so, use new one and then append to the result
-  for(TDF_ListIteratorOfLabelList aListIter(aDeltaList); aListIter.More(); aListIter.Next()) {
+  if (!aDeltaList.IsEmpty()) {
     return false;
   }
   // add also label of the modified attributes
@@ -990,7 +992,7 @@ bool Model_Document::isOperation() const
 bool Model_Document::isModified()
 {
   // is modified if at least one operation was committed and not undone
-  return myTransactions.size() != myTransactionSave || isOperation();
+  return (int)myTransactions.size() != myTransactionSave || isOperation();
 }
 
 bool Model_Document::canUndo()
@@ -1928,7 +1930,7 @@ ResultPtr Model_Document::findByName(
   }
   if (aNumInHistory) {
     std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(aName);
-    if (aFind != myNamingNames.end() && aFind->second.size() > aNumInHistory) {
+    if (aFind != myNamingNames.end() && (int)aFind->second.size() > aNumInHistory) {
       std::list<TDF_Label>::reverse_iterator aLibIt = aFind->second.rbegin();
       for(; aNumInHistory != 0; aNumInHistory--)
         aLibIt++;

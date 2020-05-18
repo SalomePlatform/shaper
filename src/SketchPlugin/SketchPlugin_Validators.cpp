@@ -75,6 +75,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 const double tolerance = 1.e-7;
 
 static bool isSpline(FeaturePtr theFeature)
@@ -157,8 +161,6 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
 
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   FeaturePtr anAttributeFeature =
     std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
@@ -255,8 +257,6 @@ bool SketchPlugin_PerpendicularAttrValidator::isValid(const AttributePtr& theAtt
   }
 
   std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr =
@@ -447,8 +447,6 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
 
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   FeaturePtr aConstraint = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttrA = aConstraint->data()->refattr(aParamA);
@@ -823,8 +821,6 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
 
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   FeaturePtr anAttributeFeature =
     std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());

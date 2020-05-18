@@ -34,7 +34,7 @@ static QMap<std::string, std::string> defaultValues;
 ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myIsFocusOnCurrentPage(false), myIsFirst(true), myRemeberChoice(true)
+  myRemeberChoice(true), myIsFocusOnCurrentPage(false), myIsFirst(true)
 {
   // it is not obligatory to be ignored when property panel tries to activate next active widget
   // but if focus is moved to this control, it can accept it.
@@ -48,9 +48,10 @@ ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
 }
 
 int ModuleBase_PagedContainer::addPage(ModuleBase_PageBase* thePage,
-                                      const QString& theName, const QString& theCaseId,
-                                      const QPixmap& theIcon,
-                                      const QString& theTooltip)
+                                       const QString& /*theName*/,
+                                       const QString& theCaseId,
+                                       const QPixmap& /*theIcon*/,
+                                       const QString& /*theTooltip*/)
 {
   if (!myPages.count()) {
     setDefaultValue(theCaseId.toStdString());

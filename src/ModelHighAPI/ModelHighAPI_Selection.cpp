@@ -102,6 +102,8 @@ void ModelHighAPI_Selection::fillAttribute(
       theAttribute->selectSubShape(
         myWeakNamingPair.first, myWeakNamingPair.second.first, myWeakNamingPair.second.second);
       break;
+    case VT_Filtering:
+      break; // do nothing [to avoid compilation warning]
   }
 
   if (theAttribute->isInvalid()) {
@@ -178,6 +180,8 @@ std::string ModelHighAPI_Selection::shapeType() const
                                                myResultSubShapePair.first->shape()->shapeTypeStr();
   case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
   case VT_TypeInnerPointPair: return myTypeInnerPointPair.first;
+  default:
+    break; // do nothing [to avoid compilation warning]
   }
 
   return "SHAPE";

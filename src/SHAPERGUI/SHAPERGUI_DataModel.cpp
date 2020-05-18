@@ -68,7 +68,6 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( myModule->application()->activeStudy() );
   QString aNewTmpDir = aStudy->GetTmpDir("", false).c_str();
 
-  bool isDone = true;
   QDir aDir(aTmpDir);
   QStringList aFiles = aDir.entryList(QDir::Files);
   QStringList::const_iterator anIt = aFiles.begin(), aLast = aFiles.end();

@@ -87,7 +87,10 @@ PartSet_WidgetBSplinePoints::PartSet_WidgetBSplinePoints(QWidget* theParent,
   myBox->setFlat(false);
   aMainLayout->addWidget(myBox);
 
-  bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
+#ifdef _DEBUG
+  bool aAcceptVariables =
+#endif
+    theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
 
   // B-spline weights attribute
   myWeightsAttr = theData->getProperty("weights");
@@ -167,8 +170,6 @@ void PartSet_WidgetBSplinePoints::removeLastPoint()
 
 bool PartSet_WidgetBSplinePoints::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
 {
-  bool aValid = true;
-
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule->sketchReentranceMgr()->isInternalEditActive())
     return true; // when internal edit is started a new feature is created. I has not results, AIS
@@ -359,7 +360,7 @@ bool PartSet_WidgetBSplinePoints::restoreValueCustom()
   AttributeDoubleArrayPtr aWeightsArray = aData->realArray(myWeightsAttr);
 
   if (aPointArray->isInitialized()) {
-    while (myXSpin.size() < aPointArray->size())
+    while ((int)myXSpin.size() < aPointArray->size())
       createNextPoint();
 
     std::vector<ModuleBase_LabelValue*>::iterator aXIt = myXSpin.begin();

@@ -364,7 +364,6 @@
 
 
 %typemap(in) const std::list<int> & (std::list<int> temp) {
-  int newmem = 0;
   if (PySequence_Check($input)) {
     for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
       PyObject * item = PySequence_GetItem($input, i);
@@ -384,7 +383,6 @@
 }
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::list<int>, const std::list<int>& {
-  int newmem = 0;
   if (PySequence_Check($input)) {
     for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
       PyObject * item = PySequence_GetItem($input, i);
@@ -403,7 +401,6 @@
 
 
 %typemap(in) const std::list<double> & (std::list<double> temp) {
-  int newmem = 0;
   if (PyTuple_Check($input)) {
     for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
       PyObject * item = PySequence_GetItem($input, i);
@@ -423,7 +420,6 @@
 }
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::list<double>, const std::list<double>& {
-  int newmem = 0;
   if (PyTuple_Check($input)) {
     for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
       PyObject * item = PySequence_GetItem($input, i);

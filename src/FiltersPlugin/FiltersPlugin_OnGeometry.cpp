@@ -35,10 +35,10 @@ bool FiltersPlugin_OnGeometry::isOk(const GeomShapePtr& theShape, const ResultPt
   if (!aList.get())
     return false;
   for (int i = 0; i < aList->size(); i++) {
-    AttributeSelectionPtr aAttr = aList->value(i);
-    GeomShapePtr aGeom = aAttr->value();
+    AttributeSelectionPtr aCurAttr = aList->value(i);
+    GeomShapePtr aGeom = aCurAttr->value();
     if (!aGeom)
-      aGeom = aAttr->context()->shape();
+      aGeom = aCurAttr->context()->shape();
     if (aGeom && aGeom->isSameGeometry(theShape))
       return true;
   }

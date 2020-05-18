@@ -222,11 +222,12 @@ std::list<ResultPtr> getFreePoints(const CompositeFeaturePtr& theSketch)
       bool aIsFree = true;
       for(int aKind = 0; aIsFree && aKind < 2; aKind++) { // 0 for feature, 1 for result
         ObjectPtr aReferenced = aCurrent;
-        if (aKind == 1)
+        if (aKind == 1) {
           if (!aCurrent->results().empty())
             aReferenced = aCurrent->firstResult();
           else
             break;
+        }
         const std::set<AttributePtr>& aRefs = aReferenced->data()->refsToMe();
         std::set<AttributePtr>::iterator aRIt = aRefs.begin();
         for (; aRIt != aRefs.end(); ++aRIt) {

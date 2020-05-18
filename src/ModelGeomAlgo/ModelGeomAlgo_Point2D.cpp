@@ -386,7 +386,7 @@ std::string doubleToString(double theValue)
 {
   std::string aValueStr;
   char aBuf[50];
-  int n = sprintf(aBuf, "%g", theValue);
+  sprintf(aBuf, "%g", theValue);
   aValueStr = std::string(aBuf);
   return aValueStr;
 }

@@ -34,6 +34,8 @@
 class MODULEBASE_EXPORT ModuleBase_IconFactory
 {
 public:
+  virtual ~ModuleBase_IconFactory() {}
+
   /// Returns icons factory instance
   static ModuleBase_IconFactory* get();
 

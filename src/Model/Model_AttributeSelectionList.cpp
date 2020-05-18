@@ -301,7 +301,7 @@ static bool isIn(GeomShapePtr theInList, GeomShapePtr theShape) {
 
 bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
-                                            const bool theTemporarily)
+                                            const bool /*theTemporarily*/)
 {
   if (myIsCashed) { // the cashing is active
     if (theContext.get()) {

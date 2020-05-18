@@ -185,8 +185,7 @@ static void copyRefList(AttributeRefListPtr theOld,
 }
 
 static void copySelection(AttributeSelectionPtr theOld,
-                          AttributeSelectionPtr theNew,
-                          MapEntities& theMapOldNew)
+                          AttributeSelectionPtr theNew)
 {
   theNew->selectValue(theOld);
 }
@@ -215,8 +214,7 @@ void copyAttribute(AttributePtr theOld, AttributePtr theNew, MapEntities& theMap
   }
   else if (theNew->attributeType() == ModelAPI_AttributeSelection::typeId()) {
     copySelection(std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theOld),
-                  std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theNew),
-                  theMapOldNew);
+                  std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theNew));
   }
 }
 

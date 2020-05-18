@@ -115,8 +115,8 @@ void reorder(Handle(TColgp_HArray1OfPnt)& thePoints)
     }
     if (aNearest > 0 && aNearest != i + 1) {
       // Keep given order of points to use it in case of equidistant candidates
-      //               .-<---<-.
-      //              /         \
+      //              .--<---<--.
+      //             |           |
       // o  o  o  c  o->o->o->o->n  o  o
       //          |  |           |
       //          i i+1       nearest

@@ -168,7 +168,6 @@ bool Selector_Intersect::restore()
     return false;
   myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
   // restore sub-selectors
-  bool aSubResult = true;
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
     Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {

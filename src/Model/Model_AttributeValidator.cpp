@@ -32,7 +32,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
-                                       const std::list<std::string>& theArguments,
+                                       const std::list<std::string>& /*theArguments*/,
                                        Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {

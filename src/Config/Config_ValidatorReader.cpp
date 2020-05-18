@@ -68,7 +68,7 @@ void Config_ValidatorReader::cleanup(xmlNodePtr theNode)
   }
 }
 
-bool Config_ValidatorReader::processChildren(xmlNodePtr aNode)
+bool Config_ValidatorReader::processChildren(xmlNodePtr /*aNode*/)
 {
   return true;
 }

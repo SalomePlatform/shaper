@@ -390,7 +390,9 @@ void XGUI_ActionsMgr::updateByDocumentKind()
 {
   std::string aStdDocKind = ModelAPI_Session::get()->activeDocument()->kind();
   QString aDocKind = QString::fromStdString(aStdDocKind);
+#ifdef HAVE_SALOME
   XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
+#endif
   foreach(QAction* eachAction, myActions.values()) {
     QString aCmdDocKind;
 #ifdef HAVE_SALOME

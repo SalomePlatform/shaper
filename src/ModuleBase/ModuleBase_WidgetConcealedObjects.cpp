@@ -73,14 +73,12 @@ bool ModuleBase_WidgetConcealedObjects::storeValueCustom()
   DataPtr aData = myFeature->data();
   AttributeRefListPtr anAttributeList = aData->reflist(attributeID());
   anAttributeList->clear();
-  int aSize1 = anAttributeList->size(false);
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
     QCheckBox* aButton =
         dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
     if (aButton->isChecked())
       anAttributeList->append(myConcealedResults[i]);
   }
-  int aSize = anAttributeList->size(false);
   return true;
 }
 
@@ -127,7 +125,6 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
 
   DataPtr aData = myFeature->data();
   AttributeRefListPtr anAttributeList = aData->reflist(attributeID());
-  int aSize = anAttributeList->size();
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
     ResultPtr aResult = myConcealedResults[i];
     QCheckBox* aButton =
@@ -171,7 +168,7 @@ void ModuleBase_WidgetConcealedObjects::addViewRow(
   }
 }
 
-void ModuleBase_WidgetConcealedObjects::onItemToggled(bool theState)
+void ModuleBase_WidgetConcealedObjects::onItemToggled(bool /*theState*/)
 {
   emit valuesChanged();
   updateObject(myFeature);

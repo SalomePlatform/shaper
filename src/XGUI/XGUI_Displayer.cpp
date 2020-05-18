@@ -90,6 +90,10 @@
 
 #include <set>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4702)
+#endif
+
 /// defines the local context mouse selection sensitivity
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
@@ -126,8 +130,10 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 
 //**************************************************************
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-: myWorkshop(theWorkshop), myNeedUpdate(false),
-  myViewerBlockedRecursiveCount(0), myContextId(0)
+: myWorkshop(theWorkshop),
+  myViewerBlockedRecursiveCount(0),
+  myContextId(0),
+  myNeedUpdate(false)
 {
   BRepMesh_IncrementalMesh::SetParallelDefault(Standard_True);
 }
@@ -1036,9 +1042,9 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
     ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
     for (; anIt != aLast; ++anIt) {
-      AISObjectPtr aAISObj = getAISObject(*anIt);
-      if (aAISObj.get() != NULL) {
-        Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      AISObjectPtr aCurAISObj = getAISObject(*anIt);
+      if (aCurAISObj.get() != NULL) {
+        Handle(AIS_InteractiveObject) anAIS = aCurAISObj->impl<Handle(AIS_InteractiveObject)>();
         if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
           thePresentations.Add(anAIS);
       }
@@ -1144,7 +1150,7 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
           Handle(AIS_Shape) anOwnerPresentation =
                             Handle(AIS_Shape)::DownCast(anOwner->Selectable());
           const TopoDS_Shape& aPresentationShape = anOwnerPresentation->Shape();
-          if (aParameterShape.IsSame(anOwnerPresentation->Shape()) &&
+          if (aParameterShape.IsSame(aPresentationShape) &&
               !aCompsolidPresentations.Contains(anOwnerPresentation))
             aCompsolidPresentations.Add(anOwnerPresentation);
         }

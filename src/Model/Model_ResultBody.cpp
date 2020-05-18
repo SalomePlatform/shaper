@@ -128,12 +128,12 @@ void Model_ResultBody::loadFirstLevel(GeomShapePtr theShape, const std::string& 
   }
 }
 
-int Model_ResultBody::numberOfSubs(bool forTree) const
+int Model_ResultBody::numberOfSubs(bool /*forTree*/) const
 {
   return int(mySubs.size());
 }
 
-ResultBodyPtr Model_ResultBody::subResult(const int theIndex, bool forTree) const
+ResultBodyPtr Model_ResultBody::subResult(const int theIndex, bool /*forTree*/) const
 {
   if (theIndex >= int(mySubs.size()))
     return ResultBodyPtr();

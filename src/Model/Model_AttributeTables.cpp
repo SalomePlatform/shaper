@@ -110,7 +110,8 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
       for(int aTable = 0; aTable < theTables; aTable++) {
         for(int aColumn = 0; aColumn < theColumns; aColumn++) {
           for(int aRow = 0; aRow < theRows; aRow++) {
-            int anOldIndex, anIndex = aTable * theRows * theColumns + aRow * theColumns + aColumn;
+            int anOldIndex = 0;
+            int anIndex = aTable * theRows * theColumns + aRow * theColumns + aColumn;
             bool aRestore = aTable < myTables && aColumn < myCols && aRow < myRows;
             if (aRestore)
               anOldIndex = aTable * myRows * myCols + aRow * myCols + aColumn;

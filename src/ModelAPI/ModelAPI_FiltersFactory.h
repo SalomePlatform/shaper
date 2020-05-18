@@ -34,6 +34,8 @@
 class ModelAPI_FiltersFactory
 {
 public:
+  virtual ~ModelAPI_FiltersFactory() {}
+
   /// Register an instance of a filter
   /// \param theID unique identifier of the filter, not necessary equal to the name of filter
   /// \param theFilter the filter's instance

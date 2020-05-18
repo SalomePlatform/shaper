@@ -209,7 +209,7 @@ double Config_PropManager::stringToDouble(const std::string& theDouble)
   // change locale and convert "," to "." if exists
   std::string aCurLocale = setlocale(LC_NUMERIC, 0);
   setlocale(LC_NUMERIC, "C");
-  int dotpos = (int)aStr.find(',');
+  size_t dotpos = aStr.find(',');
   if (dotpos != std::string::npos)
     aStr.replace(dotpos, 1, ".");
 

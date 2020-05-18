@@ -363,13 +363,13 @@ void ExchangePlugin_ImportFeature::removeFeature(
 }
 // LCOV_EXCL_STOP
 
-int ExchangePlugin_ImportFeature::numberOfSubs(bool forTree) const
+int ExchangePlugin_ImportFeature::numberOfSubs(bool /*forTree*/) const
 {
   return data()->reflist(FEATURES_ID())->size(true);
 }
 
 std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
-    const int theIndex, bool forTree)
+    const int theIndex, bool /*forTree*/)
 {
   ObjectPtr anObj = data()->reflist(FEATURES_ID())->object(theIndex, false);
   FeaturePtr aRes = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
@@ -413,7 +413,6 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
   //load result
   theResultBody->store(theGeomShape);
 
-  int aTag(1);
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS);
 }

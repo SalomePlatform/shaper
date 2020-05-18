@@ -125,7 +125,7 @@ private:
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false), myActiveMessageBox(0)
+: QObject(theParent), myWorkshop(theWorkshop), myActiveMessageBox(0), mySHIFTPressed(false)
 {
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
@@ -388,7 +388,6 @@ bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
 
   QListIterator<ModuleBase_Operation*> anIt(myOperations);
   anIt.toBack();
-  ModuleBase_Operation* aPreviousOperation = 0;
   while (anIt.hasPrevious() && !isGranted) {
     ModuleBase_Operation* anOp = anIt.previous();
     if (anOp)
@@ -467,9 +466,9 @@ void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
     // all operation from the current to triggered should also be aborted
     // operations over the parameter one are not aborted(e.g. extrusion cut, sketch abort)
     while(hasOperation()) {
-      ModuleBase_Operation* aCurrentOperation = currentOperation();
-      aCurrentOperation->abort();
-      if(theOperation == aCurrentOperation)
+      ModuleBase_Operation* aCurOperation = currentOperation();
+      aCurOperation->abort();
+      if(theOperation == aCurOperation)
         break;
     }
   }
@@ -723,7 +722,6 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
 bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
 {
   // Let the manager decide what to do with the given key combination.
-  ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = false;
   switch (theEvent->key()) {
     case Qt::Key_Escape: {

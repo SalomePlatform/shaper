@@ -59,7 +59,7 @@ public:
 
   /// Initializes arguments of a filter. If a filter has no arguments, this method may be
   /// not redefined.
-  virtual void initAttributes(ModelAPI_FiltersArgs& theArguments) {}
+  virtual void initAttributes(ModelAPI_FiltersArgs& /*theArguments*/) {}
 
   /// Returns XML string which represents GUI of the filter
   /// by reading corresponding XML file.

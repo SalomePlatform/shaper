@@ -25,7 +25,7 @@
 #include <ModelAPI_ResultConstruction.h>
 
 bool GeomValidators_Finite::isValid(const AttributePtr& theAttribute,
-                                   const std::list<std::string>& theArguments,
+                                   const std::list<std::string>& /*theArguments*/,
                                    Events_InfoMessage& theError) const
 {
   bool aValid = true;

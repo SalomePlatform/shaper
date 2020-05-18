@@ -618,8 +618,8 @@ void XGUI_ObjectsBrowser::clearContent()
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
-                                       const QItemSelection& theDeselected)
+void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& /*theSelected*/,
+                                             const QItemSelection& /*theDeselected*/)
 {
   onSelectionChanged();
 }

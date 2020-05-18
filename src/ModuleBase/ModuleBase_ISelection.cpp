@@ -115,11 +115,11 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
     std::shared_ptr<GeomAPI_Vertex> aGeomPrsVertex = getPresentationVertex(aPrs);
     if (aGeomPrsVertex.get()) {
       const TopoDS_Vertex& aPrsVertex = aGeomPrsVertex->impl<TopoDS_Vertex>();
-      std::set<std::shared_ptr<GeomAPI_Vertex> >::const_iterator anIt = aVerticesMap.begin(),
-                                                                 aLast = aVerticesMap.end();
+      std::set<std::shared_ptr<GeomAPI_Vertex> >::const_iterator aVIt = aVerticesMap.begin(),
+                                                                 aVLast = aVerticesMap.end();
       bool aFound = false;
-      for (; anIt != aLast && !aFound; anIt++) {
-        std::shared_ptr<GeomAPI_Vertex> aGeomVertex = *anIt;
+      for (; aVIt != aVLast && !aFound; aVIt++) {
+        std::shared_ptr<GeomAPI_Vertex> aGeomVertex = *aVIt;
         const TopoDS_Vertex& aVertex = aGeomVertex->impl<TopoDS_Vertex>();
         gp_Pnt aPoint1 = BRep_Tool::Pnt(aVertex);
         gp_Pnt aPoint2 = BRep_Tool::Pnt(aPrsVertex);

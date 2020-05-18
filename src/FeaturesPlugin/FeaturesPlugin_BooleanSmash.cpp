@@ -97,8 +97,8 @@ void FeaturesPlugin_BooleanSmash::execute()
       // add unused shapes of compounds/compsolids to the history,
       // to avoid treating them as unused later when constructing a compound containing
       // the result of Smash and all unused sub-shapes of multi-level compounds
-      for (ListOfShape::iterator anIt = aNotUsed.begin(); anIt != aNotUsed.end(); ++anIt)
-        anObjectsHistory.addObject(*anIt);
+      for (ListOfShape::iterator aNUIt = aNotUsed.begin(); aNUIt != aNotUsed.end(); ++aNUIt)
+        anObjectsHistory.addObject(*aNUIt);
     }
   }
 

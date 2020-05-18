@@ -79,6 +79,7 @@ static int getGenerationTag(const TopoDS_Shape& theShape) {
     case TopAbs_VERTEX: return GENERATED_VERTICES_TAG;
     case TopAbs_EDGE:   return GENERATED_EDGES_TAG;
     case TopAbs_FACE:   return GENERATED_FACES_TAG;
+    default: break; // [to avoid compilation warning]
   }
 
   return INVALID_TAG;
@@ -90,6 +91,7 @@ static int getModificationTag(const TopoDS_Shape& theShape) {
     case TopAbs_VERTEX: return MODIFIED_VERTICES_TAG;
     case TopAbs_EDGE:   return MODIFIED_EDGES_TAG;
     case TopAbs_FACE:   return MODIFIED_FACES_TAG;
+    default: break; // [to avoid compilation warning]
   }
 
   return INVALID_TAG;
@@ -218,7 +220,6 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
-    TDF_Label aShapeLab = aData->shapeLab();
     // clean builders
     if (theIsCleanStored)
       clean();

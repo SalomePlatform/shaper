@@ -137,7 +137,8 @@ void ParametersPlugin_Parameter::execute()
     setError("Expression error.", false);
 }
 
-double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
+double ParametersPlugin_Parameter::evaluate(const std::string& /*theExpression*/,
+                                            std::string& theError)
 {
   FeaturePtr aMyPtr = std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner());
   std::shared_ptr<ModelAPI_ParameterEvalMessage> aProcessMessage =
@@ -150,7 +151,7 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
     theError = aProcessMessage->error();
     // compare the list of parameters to store if changed
     AttributeRefListPtr aParams = reflist(ARGUMENTS_ID());
-    bool aDifferent = aParams->size() != aParamsList.size();
+    bool aDifferent = aParams->size() != (int)aParamsList.size();
     if (!aDifferent) {
       std::list<ResultParameterPtr>::const_iterator aNewIter = aParamsList.begin();
       std::list<ObjectPtr> anOldList = aParams->list();

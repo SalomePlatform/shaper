@@ -203,7 +203,7 @@ void Config_XMLReader::cleanup(xmlNodePtr)
 }
 
 // LCOV_EXCL_START
-bool Config_XMLReader::processChildren(xmlNodePtr aNode)
+bool Config_XMLReader::processChildren(xmlNodePtr /*aNode*/)
 {
   return true;
 }

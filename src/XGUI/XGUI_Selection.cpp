@@ -358,7 +358,6 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
     return aPresentations;
 
   QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
     if (!anOwner.IsNull()) {
@@ -447,13 +446,12 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
 
     Handle(SelectMgr_Selection) aSelection = theObject->Selection(aMode);
     NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> anEntities = aSelection->Entities();
-    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator anIt(anEntities);
-	 anIt.More();
-	 anIt.Next()) {
-      Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
+    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator anEntIt(anEntities);
+         anEntIt.More(); anEntIt.Next()) {
+      Handle(SelectMgr_SensitiveEntity) anEntity = anEntIt.Value();
       if (anEntity.IsNull())
         continue;
-       Handle(SelectMgr_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
+      Handle(SelectMgr_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
       if (!anOwner.IsNull())
         theOwners.Add(anOwner);
     }

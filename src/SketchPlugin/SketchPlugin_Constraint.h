@@ -25,7 +25,7 @@
 #include <string>
 
 /// Size of the list of constraint attributes
-const unsigned int CONSTRAINT_ATTR_SIZE = 4;
+const int CONSTRAINT_ATTR_SIZE = 4;
 
 /** \class SketchPlugin_Constraint
  *  \brief Abstract interface to the SketchPlugin_ConstraintBase

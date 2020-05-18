@@ -144,9 +144,9 @@ const std::string& Config_FeatureMessage::pluginLibrary() const
   return myPluginLibrary;
 }
 
-void Config_FeatureMessage::setPluginLibrary(const std::string& myPluginLibrary)
+void Config_FeatureMessage::setPluginLibrary(const std::string& thePluginLibrary)
 {
-  this->myPluginLibrary = myPluginLibrary;
+  this->myPluginLibrary = thePluginLibrary;
 }
 
 // LCOV_EXCL_START

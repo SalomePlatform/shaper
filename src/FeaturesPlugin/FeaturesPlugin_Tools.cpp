@@ -92,6 +92,8 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
                                         GeomAPI_Shape::VERTEX,
                                         theName);
     }
+    default: // [to avoid compilation warning]
+      break;
   }
 }
 

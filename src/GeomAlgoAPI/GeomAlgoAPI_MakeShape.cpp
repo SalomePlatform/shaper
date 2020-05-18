@@ -233,6 +233,8 @@ void GeomAlgoAPI_MakeShape::initialize()
       myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
       break;
     }
+    default:
+      break;
   }
 
   if(myMap.get()) {
@@ -255,7 +257,6 @@ void GeomAlgoAPI_MakeShape::initialize()
 void GeomAlgoAPI_MakeShape::prepareNamingFaces()
 {
   long long index = 1;
-  GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
     GeomShapePtr aFace = anExp.current();
     myCreatedFaces["Face_" + std::to_string(index++)] = aFace;

@@ -59,6 +59,8 @@ public:
   /// Initializes the algorithm
   SELECTOR_EXPORT Selector_Algo();
 
+  virtual ~Selector_Algo() {}
+
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
   /// \param theContext whole shape that contains the selected sub-shape

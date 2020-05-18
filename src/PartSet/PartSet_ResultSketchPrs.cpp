@@ -48,7 +48,7 @@
 #include <Prs3d_LineAspect.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 
-#define DEBUG_WIRE
+//#define DEBUG_WIRE
 
 #ifdef DEBUG_WIRE
 #include <TopTools_IndexedMapOfShape.hxx>

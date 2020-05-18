@@ -46,6 +46,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <cfloat>
+
 
 static GeomShapePtr faceByThreeVertices(const std::shared_ptr<GeomAPI_Vertex> theV1,
                                         const std::shared_ptr<GeomAPI_Vertex> theV2,
@@ -494,7 +496,8 @@ std::shared_ptr<GeomAPI_Face> makeRectangularFace(const std::shared_ptr<GeomAPI_
 
   // use all 8 points of the bounding box to find the 2D bounds
   bool isFirst = true;
-  double aMinX2d, aMaxX2d, aMinY2d, aMaxY2d;
+  double aMinX2d = DBL_MAX, aMaxX2d = -DBL_MAX;
+  double aMinY2d = DBL_MAX, aMaxY2d = -DBL_MAX;
   for(int aXIsMin = 0; aXIsMin < 2; aXIsMin++) {
     for(int aYIsMin = 0; aYIsMin < 2; aYIsMin++) {
       for(int aZIsMin = 0; aZIsMin < 2; aZIsMin++) {

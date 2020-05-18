@@ -71,7 +71,6 @@ public:
 
 private:
   void result(const GeomShapePtr theShape,
-              OperationType theOperationType,
               ListOfShape& theHistory);
 
 protected:

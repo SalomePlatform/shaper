@@ -41,6 +41,10 @@
 #include <vector>
 #include <map>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 class QAction;
 class QMouseEvent;
 class QKeyEvent;

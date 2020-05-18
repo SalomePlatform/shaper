@@ -268,12 +268,12 @@ AttributePtr Model_Data::addFloatingAttribute(
     for(; anIter.More(); anIter.Next()) {
       TCollection_AsciiString aThisName(Handle(TDataStd_Name)::DownCast(anIter.Value())->Get());
       if (theID == aThisName.ToCString()) {
-        TDF_Label aLab = anIter.Value()->Label();
+        TDF_Label aChildLab = anIter.Value()->Label();
         Handle(TDataStd_Name) aGName;
-        if (aLab.FindAttribute(kGroupAttributeGroupID, aGName)) {
+        if (aChildLab.FindAttribute(kGroupAttributeGroupID, aGName)) {
           TCollection_AsciiString aGroupName(aGName->Get());
           if (theGroup == aGroupName.ToCString()) {
-            return addAttribute(theGroup + "__" + theID, theAttrType, aLab.Tag());
+            return addAttribute(theGroup + "__" + theID, theAttrType, aChildLab.Tag());
           }
         }
       }
@@ -739,9 +739,9 @@ void Model_Data::referencesToObjects(
       if (aRef->isObject()) {
         aReferenced.push_back(aRef->object());
       } else {
-        AttributePtr anAttr = aRef->attr();
-        if (anAttr.get())
-          aReferenced.push_back(anAttr->owner());
+        AttributePtr aReferredAttr = aRef->attr();
+        if (aReferredAttr.get())
+          aReferenced.push_back(aReferredAttr->owner());
       }
     } else if (aType == ModelAPI_AttributeRefList::typeId()) { // list of references
       aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr)->list();

@@ -149,8 +149,8 @@ void findCoincidences(const FeaturePtr theStartCoin,
     std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
     for (; aCIt != aCoincidences.end(); ++aCIt) {
       FeaturePtr aConstrFeature = *aCIt;
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
-      if(aPnt.get() && aOrig->isEqual(aPnt)) {
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = getCoincidencePoint(aConstrFeature);
+      if(aPnt2d.get() && aOrig->isEqual(aPnt2d)) {
         findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(),
                          theList, theIsAttrOnly);
         findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(),
@@ -246,7 +246,7 @@ private:
         continue; // already processed
       theCoincidences.insert(*aCIt);
       // iterate on coincident attributes
-      for (int i = 0, aPtInd = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+      for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
         AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
         if (aRefAttr && !aRefAttr->isObject())
         {
@@ -761,9 +761,9 @@ void SketchPlugin_SegmentationTools::fillObjectShapes(
       // collect all intersection points with other edges for Trim operation only
       std::list<FeaturePtr> aFeatures;
       for (int i = 0; i < aSketch->numberOfSubs(); i++) {
-        FeaturePtr aFeature = aSketch->subFeature(i);
-        if (aFeature.get() && aFeature->getKind() != SketchPlugin_Projection::ID())
-          aFeatures.push_back(aFeature);
+        FeaturePtr aSubFeature = aSketch->subFeature(i);
+        if (aSubFeature.get() && aSubFeature->getKind() != SketchPlugin_Projection::ID())
+          aFeatures.push_back(aSubFeature);
       }
       ModelGeomAlgo_Point2D::getPointsIntersectedShape(aFeature, aFeatures, aPoints);
     }

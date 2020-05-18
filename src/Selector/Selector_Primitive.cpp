@@ -48,7 +48,7 @@ bool Selector_Primitive::restore()
 }
 
 TDF_Label Selector_Primitive::restoreByName(std::string theName,
-  const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
+  const TopAbs_ShapeEnum /*theShapeType*/, Selector_NameGenerator* theNameGenerator)
 {
   TDF_Label aContext;
   if (theNameGenerator->restoreContext(theName, aContext, myFinal)) {

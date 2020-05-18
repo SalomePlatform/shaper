@@ -53,7 +53,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidator
   /// Fills given container with selection modes if the widget has it
   /// \param [out] theModuleSelectionModes module additional modes, -1 means all default modes
   /// \param theModes [out] a container of modes
-  virtual void selectionModes(int& theModuleSelectionModes, QIntList& theModes) {}
+  virtual void selectionModes(int& /*theModuleSelectionModes*/, QIntList& /*theModes*/) {}
 
   /// Appends into container of workshop selection filters
   /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes

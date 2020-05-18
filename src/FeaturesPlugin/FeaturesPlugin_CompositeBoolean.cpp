@@ -288,13 +288,13 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
              aCompSolidIt.next())
         {
           GeomShapePtr aSolidInCompSolid = aCompSolidIt.current();
-          ListOfShape::iterator anIt = aUsedShapes.begin();
-          for(; anIt != aUsedShapes.end(); anIt++) {
-            if(aSolidInCompSolid->isEqual(*anIt)) {
+          ListOfShape::iterator aUseIt = aUsedShapes.begin();
+          for(; aUseIt != aUsedShapes.end(); aUseIt++) {
+            if(aSolidInCompSolid->isEqual(*aUseIt)) {
               break;
             }
           }
-          if(anIt == aUsedShapes.end()) {
+          if(aUseIt == aUsedShapes.end()) {
             aShapesToAdd.push_back(aSolidInCompSolid);
           }
         }
@@ -374,6 +374,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       theMakeShapes.push_back(aMakeShapeList);
       break;
     }
+    default: // [to avoid compilation warnings]
+      break;
   }
 
   return true;

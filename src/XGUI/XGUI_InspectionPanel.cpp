@@ -367,6 +367,8 @@ void XGUI_InspectionPanel::setShapeParams(const TopoDS_Shape& theShape)
   case GeomAPI_Shape::COMPOUND:
     fillContainer(aShape);
     break;
+  default: // [to avoid compilation warning]
+    break;
   }
 }
 

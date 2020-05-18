@@ -290,7 +290,7 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
   if (!aDoc.get()) // the part document is not presented for the moment
     return "";
-  TDF_Label anAccessLabel = aDoc->generalLabel();
+  MAYBE_UNUSED TDF_Label anAccessLabel = aDoc->generalLabel();
   // make the selection attribute anyway:
   // otherwise just by name it is not stable to search the result
   std::string aName;

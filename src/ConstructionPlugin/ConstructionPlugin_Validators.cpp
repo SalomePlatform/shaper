@@ -136,14 +136,11 @@ bool ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel::isValid(
     aShape2 = aContext2->shape();
   }
 
-  bool isPlaneFirst = false;
   anEdge = getEdge(aShape1);
-
   aFace = getFace(aShape2);
   if(!anEdge.get() || !aFace.get()) {
     anEdge = getEdge(aShape2);
     aFace = getFace(aShape1);
-    isPlaneFirst = true;
   }
 
   if(!anEdge.get() || !aFace.get()) {

@@ -113,9 +113,9 @@ GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
           anEdge.Orientation(TopAbs_FORWARD);
           // if the edge was already processed, remove it to keep original order of the current wire
           if (!aProcessedEdges.add(anEdge)) {
-            for (TopTools_ListIteratorOfListOfShape anIt(aListOfEdges); anIt.More(); anIt.Next())
-              if (SetOfEdges::isEqual(anEdge, anIt.Value())) {
-                aListOfEdges.Remove(anIt);
+            for (TopTools_ListIteratorOfListOfShape aEIt(aListOfEdges); aEIt.More(); aEIt.Next())
+              if (SetOfEdges::isEqual(anEdge, aEIt.Value())) {
+                aListOfEdges.Remove(aEIt);
                 break;
               }
           }
@@ -153,7 +153,6 @@ bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const GeomShapePtr& theWire)
   }
 
   // Check intersections between edges pair-wise
-  int aNbEdges = (int)anEdges.size();
   std::list<GeomShapePtr>::const_iterator anEdgesIt = anEdges.begin();
   for (int i = 0; anEdgesIt != anEdges.end(); ++anEdgesIt, i++) {
     GeomEdgePtr anEdge1(new GeomAPI_Edge(*anEdgesIt));

@@ -142,9 +142,9 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
           }
         }
       }
-      if (aFatherGroup.size() < aList->size() && aFatherGroup.size() != 1)  // already good
+      if (aFatherGroup.size() < (size_t)aList->size() && aFatherGroup.size() != 1)  // already good
         break;
-      if (aFatherGroup.size() == aList->size()) // no sence to iterate further
+      if (aFatherGroup.size() == (size_t)aList->size()) // no sence to iterate further
         break;
       if (aFatherGroup.size() == 1 && aList->size() > 1 && aCurrentDepth == aMinDepth)
         aSplitAnyway = true;  // split anyway, better that just move
@@ -152,7 +152,6 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
 
     std::set<int> aRemoved;
     bool aStay = false; // to indicate that the good attribute found stays in the list
-    int anIndex = 1; // index of the name assigned to group-feature and result
     // added in the order: 3 2 1 orig=0, so, keep the results to give names later
     std::list<FeaturePtr> aResults;
     for(int aNext = aList->size() - 1; aNext >= 0; aNext--) {
@@ -171,7 +170,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
 
       aRemoved.insert(aNext);
       FeaturePtr aNew;
-      if (aSplitAnyway || aFGroup > aResults.size()) {
+      if (aSplitAnyway || aFGroup > (int)aResults.size()) {
         aNew = aDoc->addFeature(ID(), false);
         aResults.push_front(aNew); // to keep the order
       } else { // appending in already created new result

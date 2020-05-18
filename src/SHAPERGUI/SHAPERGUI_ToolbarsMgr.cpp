@@ -42,7 +42,7 @@ class SHAPERGUI_CommandIdItem : public QListWidgetItem
 {
 public:
   SHAPERGUI_CommandIdItem(QListWidget* theParent, int theId, SHAPERGUI* theModule)
-    : QListWidgetItem(theParent), myId(theId), myModule(theModule) {}
+    : QListWidgetItem(theParent), myModule(theModule), myId(theId) {}
 
 
   virtual QVariant data(int theRole) const {

@@ -65,6 +65,8 @@ typedef std::shared_ptr<ModelAPI_Validator> ValidatorPtr;
 class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
 {
  public:
+   virtual ~ModelAPI_ValidatorsFactory() {}
+
   /// Registers the instance of the validator by the ID
   virtual void registerValidator(const std::string& theID, ModelAPI_Validator* theValidator) = 0;
 

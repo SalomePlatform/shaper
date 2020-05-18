@@ -76,9 +76,6 @@
 
 static const double PI = 3.141592653589793238463;
 
-static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
-static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
-
 SketchPlugin_Trim::SketchPlugin_Trim()
 {
 }
@@ -357,27 +354,27 @@ void SketchPlugin_Trim::execute()
                 << "]" << std::endl;
 #endif
 
-    std::shared_ptr<GeomAPI_Pnt> aPoint;
+    std::shared_ptr<GeomAPI_Pnt> aExtrPoint;
     if (aStartShapePoint2d.get() && aPoint2d->isEqual(aStartShapePoint2d))
-      aPoint = aStartShapePoint;
+      aExtrPoint = aStartShapePoint;
     else if (aLastShapePoint2d.get() && aPoint2d->isEqual(aLastShapePoint2d))
-      aPoint = aLastShapePoint;
+      aExtrPoint = aLastShapePoint;
 
-    if (!aPoint.get())
+    if (!aExtrPoint.get())
       continue;
 
     std::pair<std::list<AttributePoint2DPtr >, std::list<ObjectPtr > > anInfo;
     for (GeomAlgoAPI_ShapeTools::PointToRefsMap::const_iterator aRefIt = aRefsMap.begin();
          aRefIt != aRefsMap.end(); aRefIt++)
     {
-      if (aRefIt->first->isEqual(aPoint)) {
+      if (aRefIt->first->isEqual(aExtrPoint)) {
         anInfo = aRefIt->second;
         // prefer a segment instead of a point, because further coincidence with a segment
         // decreases only 1 DoF (instead of 2 for point) and prevents an overconstraint situation.
         bool isEdge = false;
-        for (std::list<ObjectPtr>::const_iterator anIt = anInfo.second.begin();
-             anIt != anInfo.second.end() && !isEdge; ++anIt) {
-          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anIt);
+        for (std::list<ObjectPtr>::const_iterator anInfoIt = anInfo.second.begin();
+             anInfoIt != anInfo.second.end() && !isEdge; ++anInfoIt) {
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anInfoIt);
           if (aResult) {
             GeomShapePtr aShape = aResult->shape();
             isEdge = aShape && aShape->isEdge();
@@ -1089,7 +1086,7 @@ FeaturePtr SketchPlugin_Trim::trimClosed(const std::shared_ptr<GeomAPI_Pnt2d>& t
 }
 
 void SketchPlugin_Trim::arrangePointsOnLine(const AttributePoint2DPtr& theStartPointAttr,
-                                            const AttributePoint2DPtr& theEndPointAttr,
+                                            const AttributePoint2DPtr& /*theEndPointAttr*/,
                                             std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
                                             std::shared_ptr<GeomAPI_Pnt2d>& theLastPoint) const
 {
@@ -1107,7 +1104,7 @@ void SketchPlugin_Trim::arrangePointsOnLine(const AttributePoint2DPtr& theStartP
 
 void SketchPlugin_Trim::arrangePointsOnArc(const FeaturePtr& theArc,
                                   const AttributePoint2DPtr& theStartPointAttr,
-                                  const AttributePoint2DPtr& theEndPointAttr,
+                                  const AttributePoint2DPtr& /*theEndPointAttr*/,
                                   std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
                                   std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint) const
 {

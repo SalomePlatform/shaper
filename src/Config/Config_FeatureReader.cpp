@@ -99,7 +99,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
           std::string aCaseNodeID = getProperty(aCaseNode, _ID);
           std::string aSwitchNodeID = "";
           const xmlChar* aName = aCaseNode->name;
-          xmlNodePtr aSwitchNode;
+          xmlNodePtr aSwitchNode = 0;
           if (!xmlStrcmp(aName, (const xmlChar *) WDG_SWITCH_CASE)) {
             aSwitchNode = hasParentRecursive(aCaseNode, WDG_SWITCH, NULL);
           }

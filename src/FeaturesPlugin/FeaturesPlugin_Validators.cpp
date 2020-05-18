@@ -62,6 +62,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4100)
+#endif
+
 //==================================================================================================
 bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
@@ -433,7 +437,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
         return false;
       }
 
-      GeomShapePtr aContextShape = aContext->shape();
+      aContextShape = aContext->shape();
       if(aShape->isEqual(aContextShape)) {
         // Whole construction selected. Check that it have faces.
         if(aConstruction->facesNum() > 0) {
@@ -546,8 +550,7 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
 // LCOV_EXCL_STOP
   }
 
-  std::list<std::string>::const_iterator
-    anArgsIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anArgsIt = theArguments.begin();
 
   AttributePtr aCheckAttribute = theFeature->attribute(*anArgsIt);
   ++anArgsIt;
@@ -1135,7 +1138,6 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
   }
 
   for(int anIndex = 0; anIndex < aBaseObjectsAttrList->size(); ++anIndex) {
-    bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aBaseObjectsAttrList->value(anIndex);
     ResultPtr aContext = anAttrSelectionInList->context();
     if (!aContext.get()) {
@@ -1561,16 +1563,16 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if(!aContext.get()) {
-      FeaturePtr aContFeat = anAttrSelection->contextFeature();
-      if (!aContFeat.get() || !aContFeat->results().size() ||
-          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+    if (aContext.get()) {
+      aFeature = ModelAPI_Feature::feature(aContext);
+    } else {
+      aFeature = anAttrSelection->contextFeature();
+      if (!aFeature.get() || !aFeature->results().size() ||
+          aFeature->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
         theError = "Error: Empty selection context.";
         return false;
       }
     }
-    FeaturePtr aFeature = anAttrSelection->contextFeature().get() ?
-      anAttrSelection->contextFeature() : ModelAPI_Feature::feature(aContext);
     if (!aFeature.get()) {
       theError = "Error: empty feature.";
       return false;
@@ -1686,7 +1688,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
 
   int anObjectsNb = 0, aToolsNb = 0;
 
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
 
   bool isAllInSameCompSolid = true;
   ResultBodyPtr aCompSolid;
@@ -1736,8 +1738,6 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
       }
     }
   }
-
-  anIt++;
 
   if (anObjectsNb + aToolsNb < 2) {
     theError = "Not enough arguments for Fuse operation.";
@@ -1840,9 +1840,8 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
 
   int anObjectsNb = 0, aToolsNb = 0;
 
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
 
-  bool isAllInSameCompSolid = true;
   ResultBodyPtr aCompSolid;
 
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);

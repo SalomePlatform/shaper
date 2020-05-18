@@ -105,12 +105,11 @@ std::shared_ptr<GeomAPI_Shape> GeomAPI_AISObject::getShape() const
   if (!anAIS.IsNull()) {
     Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
     if (aShapeAIS) {
-      std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+      aResult.reset(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aShapeAIS->Shape()));
-      return aResult;
     }
   }
-  return std::shared_ptr<GeomAPI_Shape>();
+  return aResult;
 }
 
 void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoint,

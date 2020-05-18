@@ -61,7 +61,6 @@ ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
 
   ModuleBase_ModelWidget* aWgt;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  bool isOffToolBox = false;
   for (aWIt = theWidgets.begin(); aWIt != theWidgets.end() && !aFirstWidget; ++aWIt) {
     aWgt = (*aWIt);
     if (!aValidators->isCase(aWgt->feature(), aWgt->attributeID()))

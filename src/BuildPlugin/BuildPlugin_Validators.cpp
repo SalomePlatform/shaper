@@ -243,7 +243,7 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
     GeomShapePtr aSectedEdges = aPaveFiller.shape();
 
-    int anEdgesNum = 0;
+    size_t anEdgesNum = 0;
     for(GeomAPI_ShapeExplorer
         anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       anEdgesNum++;
@@ -460,8 +460,8 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
 
 //=================================================================================================
 bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttribute,
-                                                      const std::list<std::string>& theArguments,
-                                                      Events_InfoMessage& theError) const
+                                                    const std::list<std::string>& /*theArguments*/,
+                                                    Events_InfoMessage& theError) const
 {
   // Get base objects list.
   if (theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {

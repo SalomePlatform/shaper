@@ -156,7 +156,7 @@ bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
   //thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
-  return true;
+  return isCustomized;
 }
 
 //==================================================================================================
@@ -304,8 +304,7 @@ std::list<std::shared_ptr<GeomAPI_Vertex> >
     }
   }
 
-  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace,
-    aPlaneSelection->context()->groupName() == ModelAPI_ResultConstruction::group());
+  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace);
 }
 
 //==================================================================================================

@@ -70,7 +70,6 @@ bool Selector_Container::restore()
     return false;
   myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
   // restore sub-selectors
-  bool aSubResult = true;
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
     Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {
@@ -161,6 +160,8 @@ bool Selector_Container::solve(const TopoDS_Shape& theContext)
     aResult = aWire;
     break;
   }
+  default:
+    break;
   }
   TopoDS_ListOfShape aSubSelectorShapes;
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();

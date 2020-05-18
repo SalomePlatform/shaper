@@ -55,7 +55,7 @@ void XGUI_ActiveControlMgr::addSelector(XGUI_ActiveControlSelector* theSelector)
 //********************************************************************
 XGUI_ActiveControlSelector* XGUI_ActiveControlMgr::getSelector(const QString& theType)
 {
-  XGUI_ActiveControlSelector* aSelector;
+  XGUI_ActiveControlSelector* aSelector = 0;
   for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)
   {
     if (mySelectors[i]->getType() != theType)

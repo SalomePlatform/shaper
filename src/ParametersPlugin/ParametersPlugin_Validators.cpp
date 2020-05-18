@@ -38,7 +38,7 @@ ParametersPlugin_VariableValidator::~ParametersPlugin_VariableValidator()
 }
 
 bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribute,
-                                                 const std::list<std::string>& theArguments,
+                                                 const std::list<std::string>& /*theArguments*/,
                                                  Events_InfoMessage& theError) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
@@ -95,7 +95,7 @@ ParametersPlugin_ExpressionValidator::~ParametersPlugin_ExpressionValidator()
 }
 
 bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttribute,
-                                                   const std::list<std::string>& theArguments,
+                                                   const std::list<std::string>& /*theArguments*/,
                                                    Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());

@@ -484,7 +484,6 @@ AISObjectPtr FeaturesPlugin_Measurement::radiusDimension(AISObjectPtr thePreviou
   }
   if (aShape.get()) {
     TopoDS_Shape aShp = aShape->impl<TopoDS_Shape>();
-    Handle(AIS_RadiusDimension) aDim;
     if (thePrevious.get()) {
       aAISObj = thePrevious;
       Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();

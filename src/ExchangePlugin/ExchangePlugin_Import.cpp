@@ -138,7 +138,7 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
           anAcceptedValues.push_back((*aFIt)->name());
       }
 
-      if (aPartsAttr->size() != anAcceptedValues.size())
+      if ((size_t)aPartsAttr->size() != anAcceptedValues.size())
         aTargetAttr->setValue(0);
 
       aPartsAttr->setSize((int)anAcceptedValues.size());

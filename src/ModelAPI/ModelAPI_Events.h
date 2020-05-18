@@ -37,78 +37,87 @@ class ModelAPI_Document;
 class ModelAPI_ResultParameter;
 class GeomAPI_Pnt2d;
 
+#if defined __GNUC__ || defined __clang__
+#define MAYBE_UNUSED __attribute__((unused))
+#else
+#define MAYBE_UNUSED
+#endif
+
 /// Event ID that feature is created (comes with ModelAPI_ObjectUpdatedMessage)
-static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
+MAYBE_UNUSED static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
 /// Event ID that data of feature is updated (comes with Model_ObjectUpdatedMessage)
-static const char * EVENT_OBJECT_UPDATED = "ObjectUpdated";
+MAYBE_UNUSED static const char * EVENT_OBJECT_UPDATED = "ObjectUpdated";
 /// Event ID that data of feature is deleted (comes with Model_ObjectDeletedMessage)
-static const char * EVENT_OBJECT_DELETED = "ObjectDeleted";
+MAYBE_UNUSED static const char * EVENT_OBJECT_DELETED = "ObjectDeleted";
 /// Event ID that name of feature is changed (comes with Model_ObjectRenamedMessage)
-static const char * EVENT_OBJECT_RENAMED = "ObjectRenamed";
+MAYBE_UNUSED static const char * EVENT_OBJECT_RENAMED = "ObjectRenamed";
 /// Event ID that data of feature is updated (comes with ModelAPI_ObjectUpdatedMessage)
-static const char * EVENT_OBJECT_MOVED = "ObjectsMoved";
+MAYBE_UNUSED static const char * EVENT_OBJECT_MOVED = "ObjectsMoved";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
-static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
+MAYBE_UNUSED static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
 /// Event ID that plugin is loaded (comes with ModelAPI_ObjectUpdatedMessage)
-static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
+MAYBE_UNUSED static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 /// The active document becomes another one
-static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
+MAYBE_UNUSED static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 
 /// Event ID that order of objects in group is changed,
 /// so, tree must be fully recreated (movement of feature)
-static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
+MAYBE_UNUSED static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
-static const char * EVENT_UPDATE_SELECTION = "UpdateSelection";
+MAYBE_UNUSED static const char * EVENT_UPDATE_SELECTION = "UpdateSelection";
 
 /// Request for the enabled/disabled actions behavior for some specific features
-static const char * EVENT_FEATURE_STATE_REQUEST = "FeatureStateRequest";
+MAYBE_UNUSED static const char * EVENT_FEATURE_STATE_REQUEST = "FeatureStateRequest";
 /// Reply for the enabled/disabled actions behavior for some specific features
-static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
+MAYBE_UNUSED static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 
 /// To block the viewer updates
-static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
+MAYBE_UNUSED static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
 /// To unblock the viewer updates
-static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
+MAYBE_UNUSED static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 
 /// To inform that there is an empty presentation in the viewer
-static const char * EVENT_EMPTY_AIS_PRESENTATION = "EmptyAISPresentation";
+MAYBE_UNUSED static const char * EVENT_EMPTY_AIS_PRESENTATION = "EmptyAISPresentation";
 /// To inform that there is an empty operation for presentation in the viewer
-static const char * EVENT_EMPTY_OPERATION_PRESENTATION = "EmptyOperationPresentation";
+MAYBE_UNUSED static const char * EVENT_EMPTY_OPERATION_PRESENTATION = "EmptyOperationPresentation";
 /// To block preview
-static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
+MAYBE_UNUSED static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
 /// To preview the current feature in the viewer (to compute the result)
-static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
+MAYBE_UNUSED static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
 /// To block automatic recomputation of any feature (by the GUI button press)
-static const char * EVENT_AUTOMATIC_RECOMPUTATION_DISABLE = "DisableAutomaticRecomputation";
+MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_DISABLE
+                                                         = "DisableAutomaticRecomputation";
 /// To unblock block automatic recomputation (default state: the GUI button unpressed)
-static const char * EVENT_AUTOMATIC_RECOMPUTATION_ENABLE = "EnableAutomaticRecomputation";
+MAYBE_UNUSED static const char * EVENT_AUTOMATIC_RECOMPUTATION_ENABLE
+                                                         = "EnableAutomaticRecomputation";
 
 /// Event ID that solver has conflicting constraints (comes with ModelAPI_SolverFailedMessage)
-static const char * EVENT_SOLVER_FAILED = "SolverFailed";
+MAYBE_UNUSED static const char * EVENT_SOLVER_FAILED = "SolverFailed";
 /// Event ID that the problem in solver disappeared
-static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
+MAYBE_UNUSED static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
 
 /// Event Id that sketch has DoF = 0
-static const char * EVENT_SKETCH_FULLY_CONSTRAINED = "SketchFullyConstrainted";
+MAYBE_UNUSED static const char * EVENT_SKETCH_FULLY_CONSTRAINED = "SketchFullyConstrainted";
 /// Event Id that sketch has DoF > 0
-static const char * EVENT_SKETCH_UNDER_CONSTRAINED = "SketchUnderConstrainted";
+MAYBE_UNUSED static const char * EVENT_SKETCH_UNDER_CONSTRAINED = "SketchUnderConstrainted";
 /// Event Id that sketch has DoF < 0
-static const char * EVENT_SKETCH_OVER_CONSTRAINED  = "SketchOverConstrainted";
+MAYBE_UNUSED static const char * EVENT_SKETCH_OVER_CONSTRAINED  = "SketchOverConstrainted";
 
 /// Event ID that informs that some object has changed the stability
-static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
+MAYBE_UNUSED static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
 
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
-static const char * EVENT_SKETCH_PREPARED = "SketchPrepared";
+MAYBE_UNUSED static const char * EVENT_SKETCH_PREPARED = "SketchPrepared";
 
 /// Event ID that provides a request for list of non-fixed objects necessary for DoF = 0
-static const char * EVENT_GET_DOF_OBJECTS = "GetDoFObjects";
+MAYBE_UNUSED static const char * EVENT_GET_DOF_OBJECTS = "GetDoFObjects";
 
 /// Event ID that provides a request for list of non-fixed objects necessary for DoF = 0
-static const char * EVENT_DOF_OBJECTS = "DoFObjects";
+MAYBE_UNUSED static const char * EVENT_DOF_OBJECTS = "DoFObjects";
 
 /// Event ID that requests updates visual attributes for presentations
-static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttributes";
+MAYBE_UNUSED static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttributes";
+
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
@@ -175,6 +184,8 @@ public:
 class MODELAPI_EXPORT ModelAPI_EventCreator
 {
 public:
+  virtual ~ModelAPI_EventCreator() {}
+
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const = 0;

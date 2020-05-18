@@ -155,17 +155,14 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 //******************************************************
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
+  myIsOperationIsLaunched(false),
   myVisualLayerId(0),
-  myRoot(0),
-  myIsOperationIsLaunched(false)
+  myRoot(0)
 {
   new PartSet_IconFactory(this);
 
   mySketchMgr = new PartSet_SketcherMgr(this);
   mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);
-
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
 
   ModuleBase_IViewer* aViewer = theWshop->viewer();
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
@@ -874,7 +871,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
                                                            Config_WidgetAPI* theWidgetApi)
 {
   ModuleBase_IWorkshop* aWorkshop = workshop();
-  XGUI_Workshop* aXUIWorkshop = getWorkshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
@@ -1156,8 +1152,6 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
      (aCurrentOperation->id() == "Measurement")))
   {
     double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
-
-    double aPrevLen = SketcherPrs_Tools::getArrowSize();
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);

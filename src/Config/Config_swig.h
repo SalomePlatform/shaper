@@ -26,4 +26,12 @@
   #include "Config_ValidatorReader.h"
   #include "Config_XMLReader.h"
 
+  #ifdef _MSC_VER
+  # pragma warning(disable: 4127) // conditional expression is constant
+  # pragma warning(disable: 4456) // declaration of variable hides previous local declaration
+  # pragma warning(disable: 4459) // declaration of variable hides global declaration
+  # pragma warning(disable: 4701) // potentially uninitialized local variable
+  # pragma warning(disable: 4703) // potentially uninitialized local pointer variable
+  #endif
+
 #endif /* SRC_CONFIG_SWIG_H_ */

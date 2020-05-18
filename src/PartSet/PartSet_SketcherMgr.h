@@ -83,6 +83,8 @@ public:
   PartSet_Fitter(PartSet_SketcherMgr* theSketchMgr):
     mySketchMgr(theSketchMgr) {}
 
+  virtual ~PartSet_Fitter() {}
+
   /// A method which has top be reimplemented to provide alterantive implementation FitAll command
   /// \param theView - a view which has to be fit
   virtual void fitAll(Handle(V3d_View) theView);

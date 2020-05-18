@@ -496,7 +496,7 @@ bool SketchPlugin_Projection::fillEllipticArc(FeaturePtr& theProjection,
 
 bool SketchPlugin_Projection::fillBSpline(FeaturePtr& theProjection,
                                           const GeomCurvePtr& theCurve,
-                                          const GeomPlanePtr& thePlane)
+                                          const GeomPlanePtr& /*thePlane*/)
 {
   GeomAPI_BSpline aBSpline(theCurve);
 
@@ -526,9 +526,9 @@ bool SketchPlugin_Projection::fillBSpline(FeaturePtr& theProjection,
   }
   else { // non-rational B-spline
     aWeightsAttr->setSize((int)aWeights.size());
-    std::list<double>::iterator anIt = aWeights.begin();
-    for (int anIndex = 0; anIt != aWeights.end(); ++anIt, ++anIndex)
-      aWeightsAttr->setValue(anIndex, *anIt);
+    std::list<double>::iterator aWIt = aWeights.begin();
+    for (int anIndex = 0; aWIt != aWeights.end(); ++aWIt, ++anIndex)
+      aWeightsAttr->setValue(anIndex, *aWIt);
   }
 
   AttributeDoubleArrayPtr aKnotsAttr =

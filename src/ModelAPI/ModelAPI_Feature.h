@@ -73,7 +73,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// Computes the attribute value on the base of other attributes if the value can be computed
   /// \param theAttributeId an attribute index to be computed
   /// \return a boolean value about it is computed
-  virtual bool compute(const std::string& theAttributeId) { return false; };
+  virtual bool compute(const std::string& /*theAttributeId*/) { return false; };
 
   /// Registers error during the execution, causes the ExecutionFailed state
   MODELAPI_EXPORT virtual void setError(const std::string& theError,
@@ -254,6 +254,8 @@ typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
 //! over this feature.
 class ModelAPI_FeatureCopyInterface {
 public:
+  virtual ~ModelAPI_FeatureCopyInterface() {}
+
   /// An algorithm to update the moved feature by the separate Copy feature
   /// \param theContext the original context object
   /// \param theValue the original shape

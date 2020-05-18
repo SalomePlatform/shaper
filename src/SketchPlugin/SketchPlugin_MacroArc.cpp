@@ -407,7 +407,6 @@ std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Mes
     if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
       aFilledAttributeName = TANGENT_POINT_ID();
       AttributeRefAttrPtr aRefAttr = refattr(aFilledAttributeName);
-      FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
       aRefAttr->setAttr(aCreatedFeature->attribute(SketchPlugin_Arc::END_ID()));
     }
     else if (anArcType == ARC_TYPE_BY_TRANSVERSAL_LINE()) {
@@ -445,7 +444,6 @@ std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Mes
           if (aRefAttr.get()) {
             if (anAttribute.get()) {
               if (!anAttribute->owner().get() || !anAttribute->owner()->data()->isValid()) {
-                FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
                 if (aCreatedFeature.get()) {
                   std::string anID = anAttribute->id();
                   std::string anArcID;

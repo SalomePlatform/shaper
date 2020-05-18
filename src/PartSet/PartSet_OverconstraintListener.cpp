@@ -97,7 +97,6 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
     theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
   if (myIsFullyConstrained) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     // only entity features has custom color when sketch is fully constrained
     if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind()) &&
         !PartSet_SketcherMgr::isExternalFeature(aFeature)) {
@@ -110,8 +109,7 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
   }
 }
 
-void PartSet_OverconstraintListener::processEvent(
-                                                 const std::shared_ptr<Events_Message>& theMessage)
+void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   // #2271 open document: if sketch has confilcting elements, solver sends message with the
   // elements by opening the document. Sketch is not active, but an internal container should
@@ -146,13 +144,12 @@ void PartSet_OverconstraintListener::processEvent(
       anEventID == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
     std::shared_ptr<ModelAPI_SolverFailedMessage> anErrorMsg =
                    std::dynamic_pointer_cast<ModelAPI_SolverFailedMessage>(theMessage);
-    bool anUpdated = false;
     if (anErrorMsg.get()) {
       const std::set<ObjectPtr>& aConflictingObjects = anErrorMsg->objects();
       if (anEventID == Events_Loop::eventByName(EVENT_SOLVER_FAILED))
-        anUpdated = appendConflictingObjects(aConflictingObjects);
+        appendConflictingObjects(aConflictingObjects);
       else
-        anUpdated = repairConflictingObjects(aConflictingObjects);
+        repairConflictingObjects(aConflictingObjects);
     }
   }
   else if (anEventID == Events_Loop::eventByName(EVENT_SKETCH_UNDER_CONSTRAINED) ||

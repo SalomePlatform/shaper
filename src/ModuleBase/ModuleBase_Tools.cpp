@@ -412,7 +412,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
       hasCompositeOwner |= (ModelAPI_Tools::bodyOwner(aResult) != NULL);
 
     if (!hasResultInHistory && aResult.get()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      aFeature = ModelAPI_Feature::feature(aResult);
       hasResultInHistory = aFeature.get() && aFeature->isInHistory();
     }
 
@@ -1011,8 +1011,6 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   aPartFeatureNames.sort();
   anOtherFeatureNames.sort();
 
-  bool aCanReplaceParameters = !aFeaturesRefsToParameterOnly.empty();
-
   QMessageBox aMessageBox(theParent);
   aMessageBox.setWindowTitle(QObject::tr("Delete features"));
   aMessageBox.setIcon(QMessageBox::Warning);
@@ -1041,7 +1039,9 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
                        "be deleted.\nOr parameters could be replaced by their values.\n";
     aText += QString(QObject::tr(aMsg))
                      .arg(aParamFeatureNames.join(aSep));
+#ifdef _DEBUG
     QPushButton *aReplaceButton =
+#endif
       aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
   }
 
@@ -1287,8 +1287,6 @@ std::string generateName(const AttributePtr& theAttribute,
 {
   std::string aName;
   if (theAttribute.get() != NULL) {
-    ModuleBase_Operation* anOperation = theWorkshop->currentOperation();
-
     FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
     if (aFeature.get()) {
       std::string aXmlCfg, aDescription;

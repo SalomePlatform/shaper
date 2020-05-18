@@ -84,7 +84,6 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
 void GeomAlgoAPI_Sewing::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                   ListOfShape& theHistory)
 {
-  static int anIndex = 0;
   if(!theShape.get()) {
     return;
   }

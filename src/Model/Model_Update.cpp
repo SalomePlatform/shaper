@@ -202,11 +202,11 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   ModelAPI_Tools::allResults(theFeature, allResults);
   std::list<ResultPtr>::iterator aRes = allResults.begin();
   for(; aRes != allResults.end(); aRes++) {
-    const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = (*aRes)->data()->refsToMe();
-    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
-    for(; aRefIter != aRefs.cend(); aRefIter++) {
-      if ((*aRefIter)->isArgument()) {
-        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
+    const std::set<std::shared_ptr<ModelAPI_Attribute> >& aResRefs = (*aRes)->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRIter = aResRefs.cbegin();
+    for(; aRIter != aResRefs.cend(); aRIter++) {
+      if ((*aRIter)->isArgument()) {
+        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRIter)->owner());
         if (aReferenced.get()) {
           addModified(aReferenced, theFeature);
         }
@@ -227,7 +227,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   static Events_Loop* aLoop = Events_Loop::loop();
-  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+  //static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
@@ -265,7 +265,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         }
       }
       processFeatures();
-      myIsPreviewBlocked = myIsPreviewBlocked;
+      myIsPreviewBlocked = aPreviewBlockedState;
     }
   }
 
@@ -360,7 +360,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         for(; aRefIter != aRefs.cend(); aRefIter++) {
           if (!(*aRefIter)->owner()->data()->isValid())
             continue;
-          FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
+          anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
           if (anUpdated.get()) {
             if (addModified(anUpdated, aReason))
               aSomeModified = true;

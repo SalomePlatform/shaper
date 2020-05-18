@@ -28,7 +28,7 @@
 
 ModuleBase_WidgetValidator::ModuleBase_WidgetValidator(ModuleBase_ModelWidget* theModelWidget,
                                                        ModuleBase_IWorkshop* theWorkshop)
-: myModelWidget(theModelWidget), myWorkshop(theWorkshop), myIsInValidate(false)
+  : myIsInValidate(false), myModelWidget(theModelWidget), myWorkshop(theWorkshop)
 {
   myAttributeStore = new ModuleBase_WidgetSelectorStore();
 }
@@ -78,8 +78,6 @@ bool ModuleBase_WidgetValidator::isValidAttribute(const AttributePtr& theAttribu
 
 bool ModuleBase_WidgetValidator::isFilterActivated() const
 {
-  bool isActivated = false;
-
   Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 

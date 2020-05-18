@@ -174,7 +174,7 @@ void XGUI_MenuMgr::createFeatureActions()
       std::list<std::shared_ptr<Config_FeatureMessage> >::const_iterator aFIt =
         aFeaturesInfo.begin(), aFLast = aFeaturesInfo.end();
       size_t aFSize = aFeaturesInfo.size();
-      for(int i = 0; aFIt != aFLast; aFIt++, i++) {
+      for(size_t i = 0; aFIt != aFLast; aFIt++, i++) {
         std::shared_ptr<Config_FeatureMessage> aMessage = *aFIt;
         bool aUseSeparator = i == aFSize-1;
         QAction* aAction = buildAction(aMessage, aWchName, aUseSeparator);

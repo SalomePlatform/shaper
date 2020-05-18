@@ -84,7 +84,10 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
         std::wstring aWStr((wchar_t*)aStr);
         static const int aBufSize = 1000;
         static char aMBStr[aBufSize];
-        size_t aLen = wcstombs(aMBStr, aWStr.c_str(), aBufSize);
+#ifdef _DEBUG
+        size_t aLen =
+#endif
+          wcstombs(aMBStr, aWStr.c_str(), aBufSize);
         std::string aCodec = Config_Translator::codec("");
         aText = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aMBStr);
       } else {

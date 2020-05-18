@@ -152,9 +152,9 @@ private:
   Quantity_Color getShapeColor(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
 private:
-  bool myPresentationIsEmpty; /// Boolean state about empty presentation
-  FeaturePtr myFeature; /// Reference to a feature object
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
+  FeaturePtr myFeature; /// Reference to a feature object
+  bool myPresentationIsEmpty; /// Boolean state about empty presentation
   /// map of presentation type to AIS object
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, AISObjectPtr> myPresentations;
   /// State whether the presentation is activated/deactivated

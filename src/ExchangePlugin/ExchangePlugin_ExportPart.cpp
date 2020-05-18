@@ -196,9 +196,9 @@ void collectFeatures(DocumentPtr theDocument,
   std::set<FeaturePtr> aFeaturesToExport;
   for (int anIndex = 0, aSize = theSelected->size(); anIndex < aSize; ++anIndex) {
     AttributeSelectionPtr aCurrent = theSelected->value(anIndex);
-    FeaturePtr aCurrentFeature = ModelAPI_Feature::feature(aCurrent->context());
-    if (aCurrentFeature)
-      aFeaturesToExport.insert(aCurrentFeature);
+    FeaturePtr aCurFeature = ModelAPI_Feature::feature(aCurrent->context());
+    if (aCurFeature)
+      aFeaturesToExport.insert(aCurFeature);
   }
   // recursively collect all features used for the selected results
   allReferencedFeatures(aFeaturesToExport, aFeaturesToExport);

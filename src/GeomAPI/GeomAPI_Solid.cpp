@@ -68,8 +68,8 @@ std::shared_ptr<GeomAPI_Cylinder> GeomAPI_Solid::getCylinder() const
 
   GeomPointPtr aLocation;
   GeomDirPtr anAxis;
-  double aRadius;
-  double aHeight;
+  double aRadius = 0.0;
+  double aHeight = 0.0;
 
   GeomPlanePtr aCaps[2];
 
@@ -173,8 +173,7 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Solid::getCone() const
 
   GeomPointPtr anApex;
   GeomDirPtr anAxis;
-  double aSemiAngle;
-  double aHeight;
+  double aSemiAngle = 0.0;
 
   GeomPlanePtr aCaps[2];
 
@@ -205,7 +204,6 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Solid::getCone() const
         else
           anAxis = aCurCone->axis();
         aSemiAngle = aCurCone->semiAngle();
-        aHeight = aCurCone->height();
         isCone = true;
       }
     }

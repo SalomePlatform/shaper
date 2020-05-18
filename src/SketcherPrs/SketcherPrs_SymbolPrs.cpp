@@ -119,9 +119,10 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketcher)
- : AIS_InteractiveObject(), myConstraint(theConstraint),
-   myIsCustomColor(false),
-   mySketcher(theSketcher)
+ : AIS_InteractiveObject(),
+   myConstraint(theConstraint),
+   mySketcher(theSketcher),
+   myIsCustomColor(false)
 {
   SetAutoHilight(Standard_False);
 }
@@ -229,8 +230,6 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
-  gp_Pnt aP1 = aPnt1->impl<gp_Pnt>();
-  gp_Pnt aP2 = aPnt2->impl<gp_Pnt>();
 
   // Draw line by two points
   Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments(2, 1);
@@ -241,7 +240,7 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                            const SelectMgr_SequenceOfOwner& theOwners)
+                                            const SelectMgr_SequenceOfOwner& /*theOwners*/)
 {
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
   aSelectionPrs->Clear();
@@ -256,7 +255,7 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
                                   const Handle(PrsMgr_PresentationManager3d)& thePM,
                                   const Handle(Prs3d_Drawer)& theStyle,
-                                  const Handle(SelectMgr_EntityOwner)& theOwner)
+                                  const Handle(SelectMgr_EntityOwner)& /*theOwner*/)
 {
   thePM->Color(this, theStyle);
 
@@ -271,9 +270,9 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::Compute(
-                const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                const Handle(PrsMgr_PresentationManager3d)& /*thePresentationManager*/,
                 const Handle(Prs3d_Presentation)& thePresentation,
-                const Standard_Integer theMode)
+                const Standard_Integer /*theMode*/)
 {
   if (!plane().get())
     return;

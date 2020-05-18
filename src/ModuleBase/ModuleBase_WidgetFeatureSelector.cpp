@@ -98,7 +98,6 @@ ModuleBase_WidgetFeatureSelector::~ModuleBase_WidgetFeatureSelector()
 //********************************************************************
 bool ModuleBase_WidgetFeatureSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
   ObjectPtr anObject = ModelAPI_Feature::feature(thePrs->object());
   GeomShapePtr aShape;
 

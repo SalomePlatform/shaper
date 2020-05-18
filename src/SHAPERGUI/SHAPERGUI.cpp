@@ -184,17 +184,26 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
 
   QString aToolName = tr("Inspection");
   int aTool = createTool(aToolName);
-  int aToolId = createTool(myWhatIsAction, aTool);
+#ifdef _DEBUG
+  int aToolId =
+#endif
+    createTool(myWhatIsAction, aTool);
   registerCommandToolbar(aToolName, aId);
 
   // Define Edit toolbars command
   aId = getNextCommandId();
   //myActionsList.append(aId); Do not use it for editing of toolbars
   aTip = tr("Edit toolbars of the module");
-  QAction* aAction = createAction(aId, aTip, QIcon(":pictures/configure_toolbars.png"),
+#ifdef _DEBUG
+  QAction* aAction =
+#endif
+    createAction(aId, aTip, QIcon(":pictures/configure_toolbars.png"),
     tr("Edit toolbars..."), aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
   int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, 30);
-  int aEditItem = createMenu(aId, aEditMenu);
+#ifdef _DEBUG
+  int aEditItem =
+#endif
+    createMenu(aId, aEditMenu);
 
   // Initialize viewer proxy if OCC viewer is already exist
   ViewManagerList aOCCViewManagers;
@@ -655,12 +664,18 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
   aAction->setData(theId);
 
   int aWBMenu = createMenu(theWBName, -1, -1, 30/*10-Window, 1000 - Help*/);
-  int aItemId = createMenu(aId, aWBMenu);
+#ifdef _DEBUG
+  int aItemId =
+#endif
+    createMenu(aId, aWBMenu);
   if (isAddSeparator)
     createMenu(separator(), aWBMenu);
 
   int aWBTool = createTool(theTBName, theTBName);
-  int aToolId = createTool(aId, aWBTool);
+#ifdef _DEBUG
+  int aToolId =
+#endif
+    createTool(aId, aWBTool);
   registerCommandToolbar(theTBName, aId);
   if (isAddSeparator) {
     createTool(separator(), aWBTool);
@@ -697,7 +712,10 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
   createMenu(separator(), aWBMenu); /// nested action is always separated of others
 
   int aWBTool = createTool(theWBName, theWBName);
-  int aToolId = createTool(anAction, aWBTool);
+#ifdef _DEBUG
+  int aToolId =
+#endif
+    createTool(anAction, aWBTool);
   registerCommandToolbar(theWBName, aItemId);
   createTool(separator(), aWBTool); /// nested action is always separated of others
   registerCommandToolbar(theWBName, -1);
@@ -1055,7 +1073,10 @@ void SHAPERGUI::saveToolbarsConfig()
     return;
   // Save toolbars configuration into map
   QMap<QString, QStringList> aToolbarsConfig;
-  QtxActionToolMgr* aMgr = toolMgr();
+#ifdef _DEBUG
+  QtxActionToolMgr* aMgr =
+#endif
+    toolMgr();
   QStringList aToolbars = myToolbars.keys();
   QIntList aActionsIds;
   foreach(QString aName, aToolbars) {

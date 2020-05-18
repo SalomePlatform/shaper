@@ -46,7 +46,7 @@ IMPLEMENT_STANDARD_RTTIEXT(PartSet_FieldStepPrs, ViewerData_AISShape);
 #define POINT_SIZE 8
 
 
-void emptyDeleter(ModelAPI_ResultField* theF)
+void emptyDeleter(ModelAPI_ResultField* /*theF*/)
 {
   // Do nothing
 }
@@ -118,6 +118,8 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
         break;
       case ModelAPI_AttributeTables::INTEGER:
         aFieldStepData << aVal.myInt;
+        break;
+      default: // [to avoid compilation warning]
         break;
       }
     }
@@ -256,7 +258,6 @@ QList<double> PartSet_FieldStepPrs::booleanValues() const
     }
   }
   QList<double> aShapeData;
-  double aRangeMin = aFieldStepData.first(), aRangeMax = aFieldStepData.last();
   for (int aRow = 0; aRow < aRows - 1; aRow++) {
     double aNorm = 0;
     int aBaseIndex = aRow * aCols;

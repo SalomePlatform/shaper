@@ -347,9 +347,9 @@ std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments
   std::list<std::shared_ptr<ModelAPI_Document> > aResult;
   aResult.push_back(moduleDocument());
   // add subs recursively
-  std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
-  for(; aDoc != aResult.end(); aDoc++) {
-    DocumentPtr anAPIDoc = *aDoc;
+  std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDocIt = aResult.begin();
+  for(; aDocIt != aResult.end(); aDocIt++) {
+    DocumentPtr anAPIDoc = *aDocIt;
     std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(anAPIDoc);
     if (aDoc) {
       const std::set<int> aSubs = aDoc->subDocuments();
@@ -647,7 +647,7 @@ void Model_Session::blockAutoUpdate(const bool theBlock)
       aLoop->send(aMsg);
     } else {
       // if there is no operation, start it to avoid modifications outside of transaction
-      bool isOperation = this->isOperation();
+      isOperation = this->isOperation();
       if (!isOperation)
         startOperation("Auto update enabling");
       static const Events_ID kAutoOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);

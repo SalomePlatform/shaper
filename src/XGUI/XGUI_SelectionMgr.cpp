@@ -249,9 +249,9 @@ void XGUI_SelectionMgr::convertToObjectBrowserSelection(
               aFeature = anActiveDocument->producedByFeature(aResult, aShape);
               if (aFeature.get()) {
                 QList<TopoDS_Shape> aResList = findAllShapes(aResult);
-                foreach(TopoDS_Shape aShape, aResList) {
-                  if (!aShapeMap.Contains(aShape))
-                    aShapeMap.Add(aShape);
+                foreach(TopoDS_Shape aResShape, aResList) {
+                  if (!aShapeMap.Contains(aResShape))
+                    aShapeMap.Add(aResShape);
                 }
               }
             }

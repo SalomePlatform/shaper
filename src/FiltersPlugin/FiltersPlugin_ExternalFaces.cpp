@@ -31,7 +31,7 @@ bool FiltersPlugin_ExternalFaces::isSupported(GeomAPI_Shape::ShapeType theType) 
 
 bool FiltersPlugin_ExternalFaces::isOk(const GeomShapePtr& theShape,
                                        const ResultPtr& theResult,
-                                       const ModelAPI_FiltersArgs& theArgs) const
+                                       const ModelAPI_FiltersArgs& /*theArgs*/) const
 {
   if (!theShape->isFace())
     return false;

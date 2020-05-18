@@ -39,7 +39,7 @@ public:
   ModuleBase_ISelectionActivate(ModuleBase_IWorkshop* theWorkshop) : myWorkshop(theWorkshop) {}
 
   /// Destructor
-  ~ModuleBase_ISelectionActivate() {}
+  virtual ~ModuleBase_ISelectionActivate() {}
 
   /// Updates active selection modes in the viewer depending on the application state
   MODULEBASE_EXPORT virtual void updateSelectionModes() = 0;

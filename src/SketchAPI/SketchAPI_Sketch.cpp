@@ -918,7 +918,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngle(
 
   if (aVersion == SketchPlugin_ConstraintAngle::THE_VERSION_1) {
     std::string aTypeLC = theType;
-    std::transform(aTypeLC.begin(), aTypeLC.end(), aTypeLC.begin(), ::tolower);
+    std::transform(aTypeLC.begin(), aTypeLC.end(), aTypeLC.begin(),
+                   [](char c) { return static_cast<char>(::tolower(c)); });
     if (aTypeLC == "supplementary")
       aType = (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY;
     else if (aTypeLC == "backward")

@@ -1095,10 +1095,10 @@ FeaturePtr SketchPlugin_Split::splitEllipticArc(FeaturePtr& theSplitFeature,
 }
 
 FeaturePtr SketchPlugin_Split::splitClosed(FeaturePtr& theSplitFeature,
-                                               FeaturePtr& theBaseFeatureModified,
-                                               FeaturePtr& theAfterFeature,
-                                               std::set<AttributePoint2DPtr>& thePoints,
-                                               std::set<FeaturePtr>& theCreatedFeatures,
+                                           FeaturePtr& theBaseFeatureModified,
+                                           FeaturePtr& /*theAfterFeature*/,
+                                           std::set<AttributePoint2DPtr>& thePoints,
+                                           std::set<FeaturePtr>& theCreatedFeatures,
                  std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
 {
   FeaturePtr anNewFeature;
@@ -1212,7 +1212,7 @@ FeaturePtr SketchPlugin_Split::splitClosed(FeaturePtr& theSplitFeature,
 
 void SketchPlugin_Split::arrangePointsOnLine(
     const AttributePoint2DPtr& theStartPointAttr,
-    const AttributePoint2DPtr& theEndPointAttr,
+    const AttributePoint2DPtr& /*theEndPointAttr*/,
     AttributePoint2DPtr& theFirstPointAttr,
     AttributePoint2DPtr& theLastPointAttr) const
 {
@@ -1228,7 +1228,7 @@ void SketchPlugin_Split::arrangePointsOnLine(
 void SketchPlugin_Split::arrangePointsOnArc(
     const FeaturePtr& theArc,
     const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-    const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr,
+    const std::shared_ptr<GeomDataAPI_Point2D>& /*theEndPointAttr*/,
     std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
     std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr) const
 {

@@ -288,8 +288,6 @@ bool PartSet_WidgetSketchCreator::isSelectionMode() const
 bool PartSet_WidgetSketchCreator::hasSubObjects() const
 {
   bool aHasSubObjects = false;
-
-  bool aCanSetFocus = true;
   CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if (aComposite.get())
     aHasSubObjects = aComposite->numberOfSubs() > 0;
@@ -379,7 +377,6 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   }
   // manually deactivation because the widget was not activated as has no focus acceptin controls
   deactivate();
-  bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
   // start edit operation for the sketch
@@ -441,7 +438,6 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
   AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
   if (aCompFeature->numberOfSubs() > 0) {
     // set the sub feature to attribute selection list and check whether sketch is valid
-    SessionPtr aMgr = ModelAPI_Session::get();
     const static std::string aNestedOpID("Set Sketch result into Selection list");
     aMgr->startOperation(aNestedOpID, false); // false to not attach to Extrusion operation
     setSketchObjectToList(aCompFeature, anAttrList);
@@ -515,7 +511,6 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
                                     (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
       ResultPtr aRes = aSelAttr.get() ? aSelAttr->context() : ResultPtr();
       if (aRes.get()) {
-        SessionPtr aMgr = ModelAPI_Session::get();
         ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
         AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
         std::string aValidatorID;

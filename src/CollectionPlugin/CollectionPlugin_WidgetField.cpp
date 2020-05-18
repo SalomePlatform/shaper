@@ -598,9 +598,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
       }
     }
     // Restore columns width
-    for (int i = 0; i < aTable->columnCount(); i++) {
-      if (i < aColWidth.size())
-        aTable->setColumnWidth(i, aColWidth.at(i));
+    for (int col = 0; col < aTable->columnCount(); col++) {
+      if (col < aColWidth.size())
+        aTable->setColumnWidth(col, aColWidth.at(col));
     }
 
     aTable->blockSignals(isBlocked);

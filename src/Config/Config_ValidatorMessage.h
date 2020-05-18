@@ -27,7 +27,7 @@
 #include <string>
 
 /// Event ID that Validator is loaded (comes with Config_ValidatorMessage)
-static const char * EVENT_VALIDATOR_LOADED = "ValidatorLoaded";
+MAYBE_UNUSED static const char * EVENT_VALIDATOR_LOADED = "ValidatorLoaded";
 
 /*!
  * \class Config_ValidatorMessage

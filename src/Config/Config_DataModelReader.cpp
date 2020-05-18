@@ -23,6 +23,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <algorithm>
+
 // used only for GUI xml data reading
 // LCOV_EXCL_START
 Config_DataModelReader::Config_DataModelReader()
@@ -46,10 +48,9 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     std::string aIcon = getProperty(theNode, NODE_ICON);
     std::string aEmpty = getProperty(theNode, SHOW_EMPTY);
     std::string aFeatures = getProperty(theNode, FOLDER_FEATURES);
-    std::string::iterator aIt;
-    for (aIt = aEmpty.begin(); aIt != aEmpty.end(); aIt++) {
-      (*aIt) = toupper(*aIt);
-    }
+
+    std::transform(aEmpty.begin(), aEmpty.end(), aEmpty.begin(),
+                   [](char c) { return static_cast<char>(::toupper(c)); });
     bool aIsEmpty = (aEmpty == "FALSE")? false : true;
 
    if (isRootReading) {
@@ -72,10 +73,8 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     isRootReading = false;
     mySubTypes = getProperty(theNode, GROUP_TYPE);
     std::string isResult = getProperty(theNode, LINK_ITEM);
-    std::string::iterator aIt;
-    for (aIt = isResult.begin(); aIt != isResult.end(); aIt++) {
-      (*aIt) = toupper(*aIt);
-    }
+    std::transform(isResult.begin(), isResult.end(), isResult.begin(),
+                   [](char c) { return static_cast<char>(::toupper(c)); });
     myIsResultLink = (isResult == "TRUE")? true : false;
   }
 }

@@ -155,28 +155,28 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
           AttributeSelectionPtr aSelectAttr =
             std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
           aSelectAttr->setValue(myPresentedObject, GeomShapePtr(), true);
-          GeomShapePtr aShape = aSelectAttr->value();
-          if (!aShape.get() && aSelectAttr->contextFeature().get() &&
+          GeomShapePtr aShapePtr = aSelectAttr->value();
+          if (!aShapePtr.get() && aSelectAttr->contextFeature().get() &&
             aSelectAttr->contextFeature()->firstResult().get()) {
-            aShape = aSelectAttr->contextFeature()->firstResult()->shape();
+            aShapePtr = aSelectAttr->contextFeature()->firstResult()->shape();
           }
-          if (aShape.get()) {
-            const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
+          if (aShapePtr.get()) {
+            const TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
             Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
             aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
           }
         }
         else {
-          ResultPtr aResult = aFeature->firstResult();
-          if (aResult.get()) {
-            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
+          ResultPtr aFirstRes = aFeature->firstResult();
+          if (aFirstRes.get()) {
+            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aFirstRes);
             if (aBody.get() && (aBody->numberOfSubs() > 0))
               collectSubBodies(aBody, aOwnersList);
             else {
-              GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aResult);
+              GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aFirstRes);
               if (aShapePtr.get()) {
                 TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
-                AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
+                AISObjectPtr aIOPtr = myWorkshop->findPresentation(aFirstRes);
                 if (aIOPtr.get()) {
                   Handle(AIS_InteractiveObject) anIO =
                     aIOPtr->impl<Handle(AIS_InteractiveObject)>();
@@ -328,8 +328,6 @@ bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribu
 //********************************************************************
 bool ModuleBase_WidgetValidated::isFilterActivated() const
 {
-  bool isActivated = false;
-
   Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 

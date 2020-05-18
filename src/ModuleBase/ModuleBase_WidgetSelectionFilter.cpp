@@ -324,7 +324,7 @@ ModuleBase_WidgetSelectionFilter::~ModuleBase_WidgetSelectionFilter()
     aCtx->Remove(myPreview, false);
     myPreview.Nullify();
     if (myListIO.Size() > 0) {
-      Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
+      aCtx = myWorkshop->viewer()->AISContext();
       AIS_ListOfInteractive::const_iterator aIt;
       Handle(AIS_Shape) aShapeIO;
       for (aIt = myListIO.cbegin(); aIt != myListIO.cend(); aIt++) {
@@ -455,7 +455,6 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
   int aNb = aDoc->size(ModelAPI_ResultBody::group());
   ObjectPtr aObj;
   ResultBodyPtr aBody;
-  GeomShapePtr aShape;
   for (int i = 0; i < aNb; i++) {
     aObj = aDoc->object(ModelAPI_ResultBody::group(), i);
     aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
@@ -465,15 +464,15 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
     TopTools_MapOfShape alreadyThere;
     std::list<GeomShapePtr>::const_iterator aShapesIt;
     for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
-      GeomShapePtr aShape = (*aShapesIt);
-      TopoDS_Shape aTShape = aShape->impl<TopoDS_Shape>();
+      GeomShapePtr aSubShape = (*aShapesIt);
+      TopoDS_Shape aTShape = aSubShape->impl<TopoDS_Shape>();
       if (!alreadyThere.Add(aTShape))
         continue;
       static SessionPtr aSession = ModelAPI_Session::get();
-      bool isValid = aSession->filters()->isValid(myFeature, aBody, aShape);
+      bool isValid = aSession->filters()->isValid(myFeature, aBody, aSubShape);
       if (isValid) {
         aBuilder.Add(aComp, aTShape);
-        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aShape));
+        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aSubShape));
         myValues.append(aValue);
       }
     }

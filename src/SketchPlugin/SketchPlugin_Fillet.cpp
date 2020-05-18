@@ -81,7 +81,7 @@ static std::set<FeaturePtr> findFeaturesToRemove(const FeaturePtr theFeature,
                                                  const AttributePtr theAttribute);
 
 SketchPlugin_Fillet::SketchPlugin_Fillet()
-: myFilletCreated(false), myIsReversed(false)
+: myIsReversed(false), myFilletCreated(false)
 {
   myIsNotInversed[0] = myIsNotInversed[1] = true;
 }

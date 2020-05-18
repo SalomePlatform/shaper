@@ -26,7 +26,7 @@
 
 
 bool CollectionPlugin_FieldValidator::isValid(const FeaturePtr& theFeature,
-  const std::list<std::string>& theArguments,
+  const std::list<std::string>& /*theArguments*/,
   Events_InfoMessage& theError) const
 {
   AttributeSelectionListPtr aSelList =

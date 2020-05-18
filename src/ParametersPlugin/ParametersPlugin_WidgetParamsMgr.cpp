@@ -455,8 +455,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
     } else
       aValues << aExpr.c_str();
 
-    std::string aErr =
-      aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
+    aErr = aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
     if (aErr.empty()) {
       AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
       aValues << QString::number(aValueAttribute->value());

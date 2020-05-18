@@ -64,7 +64,6 @@ bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   if (anAttrC.get() == NULL)
     return aReadyToDisplay;
 
-  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
   // If size of source objects and mirrored ones is not equal then the constraint is not computed
   if (aNb != anAttrC->size())

@@ -83,14 +83,6 @@ void SketchPlugin_ConstraintLength::execute()
         GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
 
     if (aPoint1.get() && aPoint2.get()) {
-      double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
-
-      //std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      //    ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-      //if(!aValueAttr->isInitialized()) {
-      //  aValueAttr->setValue(aLenght);
-      //}
-
       // the value should to be computed here, not in the getAISObject
       // in order to change the model value
       // inside the object transaction. This is important for creating a constraint by preselection.

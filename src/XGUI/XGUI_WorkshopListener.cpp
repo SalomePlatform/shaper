@@ -86,7 +86,6 @@ XGUI_WorkshopListener::XGUI_WorkshopListener(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop),
     myUpdatePrefs(false)
 {
-  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 }
 
 //******************************************************
@@ -430,7 +429,6 @@ void XGUI_WorkshopListener::
                  !anObject->isDisplayed();
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-      bool isConcealed = aRes && aRes->isConcealed();
       aHide = aRes && aRes->isConcealed();
       // Hide the presentation with an empty shape. But isDisplayed state of the object should not
       // be changed to the object becomes visible when the shape becomes not empty
@@ -448,7 +446,7 @@ void XGUI_WorkshopListener::
     }
   }
 
-  bool isCustomized = customizeFeature(anObjects, aDisplayed);
+  MAYBE_UNUSED bool isCustomized = customizeFeature(anObjects, aDisplayed);
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
@@ -522,7 +520,6 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
     return aDisplayed;
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  int aNb = aDisplayer->objectsCount();
   return aDisplayer->display(theObj, false);
 }
 

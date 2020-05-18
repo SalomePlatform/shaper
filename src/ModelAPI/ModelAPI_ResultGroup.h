@@ -55,7 +55,7 @@ public:
   /// \brief Stores the result of operation made on groups.
   ///        Cleans the storage if empty shape is given.
   /// param[in] theShape shape to store.
-  MODELAPI_EXPORT virtual void store(const GeomShapePtr& theShape)
+  MODELAPI_EXPORT virtual void store(const GeomShapePtr& /*theShape*/)
   {}
 };
 

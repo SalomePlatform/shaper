@@ -159,7 +159,6 @@ void PrimitivesPlugin_Box::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxA
   theBoxAlgo->prepareNamingFaces();
 
   // Insert to faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theBoxAlgo->getCreatedFaces();
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();
