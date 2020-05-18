@@ -191,7 +191,6 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
   if (!feature().get())
     return anError;
 
-  std::string aFeatureID = feature()->getKind();
   std::string anAttributeID = attributeID();
   AttributePtr anAttribute = feature()->attribute(anAttributeID);
   if (!anAttribute.get())
@@ -206,7 +205,7 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
       anErrorMsg = "Unknown error.";
 
     if (anErrorMsg.context().empty()) {
-      anErrorMsg.setContext(aFeatureID + ":" + anAttributeID + ":" + aValidatorID);
+      anErrorMsg.setContext(context() + ":" + aValidatorID);
     }
   }
 

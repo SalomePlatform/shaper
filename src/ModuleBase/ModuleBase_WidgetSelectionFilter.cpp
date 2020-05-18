@@ -93,7 +93,8 @@ ModuleBase_FilterStarter::ModuleBase_FilterStarter(const std::string& theFeature
   ModuleBase_Tools::adjustMargins(aMainLayout);
 
   aMainLayout->addStretch(1);
-  QPushButton* aLaunchBtn = new QPushButton(tr("Selection by filters"), this);
+  QPushButton* aLaunchBtn = new QPushButton(
+      ModuleBase_Tools::translate("FiltersSelection", "Selection by filters"), this);
   connect(aLaunchBtn, SIGNAL(clicked()), SLOT(onFiltersLaunch()));
   aMainLayout->addWidget(aLaunchBtn);
 }
@@ -184,6 +185,7 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
 
 void ModuleBase_FilterItem::addItemRow(QWidget* theParent)
 {
+  std::string aContext = mySelection->getKind();
   QHBoxLayout* aLayout = new QHBoxLayout(theParent);
   ModuleBase_Tools::zeroMargins(aLayout);
 
@@ -197,17 +199,17 @@ void ModuleBase_FilterItem::addItemRow(QWidget* theParent)
     myRevBtn->setIcon(QIcon(":pictures/reverce.png"));
   else
     myRevBtn->setIcon(QIcon(":pictures/add.png"));
-  myRevBtn->setToolTip(tr("Reverse the filter"));
+  myRevBtn->setToolTip(ModuleBase_Tools::translate(aContext, "Reverse the filter"));
   connect(myRevBtn, SIGNAL(toggled(bool)), SLOT(onReverse(bool)));
   aLayout->addWidget(myRevBtn);
 
   const std::string& aFilterName = ModelAPI_Session::get()->filters()->filter(myFilterID)->name();
-  aLayout->addWidget(new QLabel(aFilterName.c_str(), theParent), 1);
+  aLayout->addWidget(new QLabel(ModuleBase_Tools::translate(aContext, aFilterName), theParent), 1);
 
   QToolButton* aDelBtn = new QToolButton(theParent);
   aDelBtn->setIcon(QIcon(":pictures/delete.png"));
   aDelBtn->setAutoRaise(true);
-  aDelBtn->setToolTip(tr("Delete the filter"));
+  aDelBtn->setToolTip(ModuleBase_Tools::translate(aContext, "Delete the filter"));
   connect(aDelBtn, SIGNAL(clicked(bool)), SLOT(onDelete()));
   aLayout->addWidget(aDelBtn);
 }
@@ -249,7 +251,7 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLayout);
 
-  QGroupBox* aFiltersGroup = new QGroupBox(tr("Filters"), this);
+  QGroupBox* aFiltersGroup = new QGroupBox(translate("Filters"), this);
   QVBoxLayout* aGroupLayout = new QVBoxLayout(aFiltersGroup);
   aGroupLayout->setContentsMargins(0, 0, 0, 0);
   aGroupLayout->setSpacing(0);
@@ -260,14 +262,15 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   aGroupLayout->addWidget(myFiltersWgt);
 
   myFiltersCombo = new QComboBox(aFiltersGroup);
-  myFiltersCombo->addItem(tr("Add new filter..."));
+  myFiltersCombo->addItem(translate("Add new filter..."));
   SessionPtr aSession = ModelAPI_Session::get();
   std::list<FilterPtr> allFilters =
     aSession->filters()->filters((GeomAPI_Shape::ShapeType) mySelectionType);
+  storeFilters(allFilters);
   QStringList aItems;
   std::list<FilterPtr>::const_iterator aIt;
   for (aIt = allFilters.cbegin(); aIt != allFilters.cend(); aIt++) {
-    aItems.push_back((*aIt)->name().c_str());
+    aItems.push_back(translate((*aIt)->name().c_str()));
   }
   myFiltersCombo->addItems(aItems);
   connect(myFiltersCombo, SIGNAL(currentIndexChanged(int)), SLOT(onAddFilter(int)));
@@ -282,7 +285,7 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
 
   aBtnLayout->addStretch(1);
 
-  mySelectBtn = new QPushButton(tr("Select"), aBtnWgt);
+  mySelectBtn = new QPushButton(translate("Select"), aBtnWgt);
   connect(mySelectBtn, SIGNAL(clicked()), SLOT(onSelect()));
   aBtnLayout->addWidget(mySelectBtn);
 
@@ -293,13 +296,13 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   QHBoxLayout* aLblLayout = new QHBoxLayout(aLblWgt);
   ModuleBase_Tools::zeroMargins(aLblLayout);
 
-  aLblLayout->addWidget(new QLabel(tr("Number of selected objects:"), aLblWgt));
+  aLblLayout->addWidget(new QLabel(translate("Number of selected objects:"), aLblWgt));
 
   myNbLbl = new QLabel("0", aLblWgt);
   aLblLayout->addWidget(myNbLbl);
 
   // Show only button
-  myShowBtn = new QCheckBox(tr("Show only"), this);
+  myShowBtn = new QCheckBox(translate("Show only"), this);
   connect(myShowBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
   aLblLayout->addWidget(myShowBtn);
 
@@ -351,7 +354,6 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
     return;
 
   ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
-  std::list<FilterPtr> aFilters = aFactory->filters((GeomAPI_Shape::ShapeType) mySelectionType);
   FiltersFeaturePtr aFiltersFeature =
     std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
 
@@ -360,12 +362,15 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   std::list<FilterPtr>::iterator aIt;
   int i;
   std::string aFilter;
-  for (aIt = aFilters.begin(), i = 0; aIt != aFilters.cend(); i++, aIt++) {
-    if (aText == (*aIt)->name()) {
-      aFilter = aFactory->id(*aIt);
-      break;
-    }
+  std::map<std::string, FilterPtr>::const_iterator aFound = myFilters.find(aText);
+  if (aFound == myFilters.end()) {
+    std::list<FilterPtr> aFilters = aFactory->filters((GeomAPI_Shape::ShapeType) mySelectionType);
+    storeFilters(aFilters);
+    aFound = myFilters.find(aText);
   }
+  if (aFound != myFilters.end())
+    aFilter = aFactory->id(aFound->second);
+
   aFiltersFeature->addFilter(aFilter);
   updateObject(myFeature);
 
@@ -555,9 +560,8 @@ void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
 {
   int aNb = myValues.size();
   myNbLbl->setText(QString::number(aNb));
-  //QString aErr = () ? tr("Selection is empty") : "";
   if (aNb == 0)
-    myFeature->setError(tr("Selection is empty").toStdString(), false, false);
+    myFeature->setError(translate("Selection is empty").toStdString(), false, false);
   else {
     myFeature->setError("", false, false);
     myFeature->data()->execState(ModelAPI_StateDone);
@@ -701,7 +705,7 @@ QString ModuleBase_WidgetSelectionFilter::getError(const bool theValueStateCheck
   QString aErrorMsg = ModuleBase_ModelWidget::getError(theValueStateChecked);
   if (aErrorMsg.isEmpty()) {
     if (myValues.size() == 0)
-      aErrorMsg = tr("Selection is empty");
+      aErrorMsg = translate("Selection is empty");
   }
   return aErrorMsg;
 }
@@ -727,4 +731,18 @@ void ModuleBase_WidgetSelectionFilter::onObjectUpdated()
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   ModelAPI_EventCreator::get()->sendUpdated(myFeature, EVENT_DISP);
   Events_Loop::loop()->flush(EVENT_DISP);
+}
+
+void ModuleBase_WidgetSelectionFilter::storeFilters(const std::list<FilterPtr>& theFilters)
+{
+  for (std::list<FilterPtr>::const_iterator anIt = theFilters.begin();
+       anIt != theFilters.end(); ++anIt) {
+    std::string aName = translate((*anIt)->name()).toStdString();
+    myFilters[aName] = *anIt;
+  }
+}
+
+QString ModuleBase_WidgetSelectionFilter::translate(const std::string& theString) const
+{
+  return ModuleBase_Tools::translate(myFeatureId, theString);
 }

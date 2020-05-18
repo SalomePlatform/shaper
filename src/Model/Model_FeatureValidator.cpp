@@ -25,6 +25,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_FiltersFeature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
 
@@ -59,7 +60,11 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
         theError = "Attribute \"%1\" is not initialized.";
         theError.addParameter(anAttr->id());
-        theError.setContext(theFeature->getKind() + ":" + anAttr->id());
+        // workaround for the filters selection feature: do not append the attribute id
+        if (std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theFeature))
+          theError.setContext(theFeature->getKind());
+        else
+          theError.setContext(theFeature->getKind() + ":" + anAttr->id());
         return false;
       }
     }

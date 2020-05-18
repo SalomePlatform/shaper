@@ -41,6 +41,8 @@ class QVBoxLayout;
 class QPushButton;
 class QCheckBox;
 
+class ModelAPI_Filter;
+
 class ModuleBase_IWorkshop;
 
 /**
@@ -220,6 +222,12 @@ private:
   /// Return currently created filter items
   QList<ModuleBase_FilterItem*> itemsList() const;
 
+  /// Translate a string
+  QString translate(const std::string& theString) const;
+
+  /// Store translated names of filters and their instances
+  void storeFilters(const std::list<std::shared_ptr<ModelAPI_Filter> >& theFilters);
+
 private:
   ModuleBase_IWorkshop* myWorkshop;
 
@@ -248,6 +256,9 @@ private:
 
   /// Attribute name which will get result of filtering
   std::string mySelectorAttribute;
+
+  /// Translated name and the corresponding filter
+  std::map<std::string, std::shared_ptr<ModelAPI_Filter> > myFilters;
 };
 
 

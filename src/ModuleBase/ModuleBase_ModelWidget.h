@@ -245,12 +245,19 @@ Q_OBJECT
 
   /// \return Context for translation
   virtual std::string context() const {
-
+    bool isAppendAttr = true;
     std::string aContext = myFeatureId;
     if(!aContext.empty() && !myAttributeID.empty()) {
-      aContext += ":";
+      // workaround for ModelAPI_Filter's attributes:
+      // do not keep attribute name, because it may be changed
+      // if the same filter is selected twice or more.
+      if (myAttributeID.find(aContext + "__") != std::string::npos)
+        isAppendAttr = false;
+      else
+        aContext += ":";
     }
-    aContext += myAttributeID;
+    if (isAppendAttr)
+      aContext += myAttributeID;
 
     return aContext;
   }
