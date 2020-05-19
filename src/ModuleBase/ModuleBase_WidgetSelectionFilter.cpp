@@ -360,7 +360,6 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   std::string aText = myFiltersCombo->itemText(theIndex).toStdString();
 
   std::list<FilterPtr>::iterator aIt;
-  int i;
   std::string aFilter;
   std::map<std::string, FilterPtr>::const_iterator aFound = myFilters.find(aText);
   if (aFound == myFilters.end()) {
