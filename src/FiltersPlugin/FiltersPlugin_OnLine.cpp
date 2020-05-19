@@ -31,7 +31,10 @@ static void convertToLines(const AttributeSelectionListPtr& theSelected,
                            std::list<GeomLinePtr>& theLines)
 {
   for (int i = 0; i < theSelected->size(); i++) {
-    GeomShapePtr aCurShape = theSelected->value(i)->value();
+    AttributeSelectionPtr aSel = theSelected->value(i);
+    GeomShapePtr aCurShape = aSel->value();
+    if (!aCurShape)
+      aCurShape = aSel->context()->shape();
     if (aCurShape && aCurShape->isEdge()) {
       GeomLinePtr aLine = aCurShape->edge()->line();
       if (aLine)
