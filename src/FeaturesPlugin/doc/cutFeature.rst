@@ -1,6 +1,7 @@
-.. _featureCut:
 .. |bool_cut.icon|    image:: images/bool_cut.png
    :height: 16px
+
+.. _featureCut:
 
 Cut
 ===
@@ -26,6 +27,8 @@ The following property panel will be opened:
   Any kind of shape can be selected, including subshapes of compsolids/compounds.
   Non-selected subshapes from compsolids/compounds will be ignored.
 - **See preview** button shows a result of the operation.
+
+The minimal dimension of Tool Objects should be not less than the maximal dimension of Main Objects.
 
 **TUI Command**:
 

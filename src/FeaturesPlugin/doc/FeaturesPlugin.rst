@@ -8,25 +8,21 @@ Features plug-in provides a set of common topological operations. It implements 
 
 .. toctree::
    :titlesonly:
-   :maxdepth: 1
+   :maxdepth: 2
 
+   booleanOperations.rst
    angularCopyFeature.rst
    chamferFeature.rst
-   commonFeature.rst
    copyFeature.rst
-   cutFeature.rst
    defeaturingFeature.rst
    extrusionCutFeature.rst
    extrusionFeature.rst
    extrusionFuseFeature.rst
    filletFeature.rst
-   fuseFeature.rst
    fuseFeatureFaces.rst
    importResultFeature.rst
-   intersectionFeature.rst
    linearCopyFeature.rst
    measurementFeature.rst
-   partitionFeature.rst
    pipeFeature.rst
    placementFeature.rst
    recoverFeature.rst
@@ -35,9 +31,6 @@ Features plug-in provides a set of common topological operations. It implements 
    revolutionFeature.rst
    revolutionFuseFeature.rst
    rotationFeature.rst
-   smashFeature.rst
-   splitFeature.rst
    symmetryFeature.rst
    transformationFeature.rst
    translationFeature.rst
-   unionFeature.rst

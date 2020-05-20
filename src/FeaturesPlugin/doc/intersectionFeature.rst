@@ -1,5 +1,7 @@
 .. |intersection_btn.icon|    image:: images/intersection_btn.png
 
+.. _featureIntersect:
+
 Intersection
 ============
 
@@ -18,6 +20,8 @@ The following property panel will be opened:
    **Intersection operation**
 
 **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected.
+
+All intersected objects should be 1- or 2-dimensional (edges, faces, shells). However, it is allowed to select 3-dimensional objects, but only their shells will be taken into operation.
 
 **TUI Command**:
 
