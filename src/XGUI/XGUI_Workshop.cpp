@@ -1956,7 +1956,7 @@ void XGUI_Workshop::deleteObjects()
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
-      notDelete = (!aFeature->isInHistory()) && aConstr->isInfinite();
+      notDelete = (!aFeature->isInHistory()) && (aConstr && aConstr->isInfinite());
       if (notDelete) {
         anObjects.removeAll(aObj);
         aIt--;
