@@ -144,6 +144,8 @@ bool GeomAPI_Face::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape)
 
   Handle(Geom_Surface) anOwnSurf = baseSurface(anOwnFace);
   Handle(Geom_Surface) anOtherSurf = baseSurface(anOtherFace);
+  if (anOwnSurf == anOtherSurf)
+    return true;
 
   // case of two elementary surfaces
   if (anOwnSurf->IsKind(STANDARD_TYPE(Geom_ElementarySurface)) &&
