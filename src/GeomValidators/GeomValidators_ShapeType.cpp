@@ -179,6 +179,8 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
         }
       }
     }
+    else
+      aValid = false;
   }
   else if (anAttributeType == ModelAPI_AttributeReference::typeId()) {
     AttributeReferencePtr anAttr =
