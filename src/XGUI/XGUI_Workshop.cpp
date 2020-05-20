@@ -2787,7 +2787,7 @@ void XGUI_Workshop::setNormalView(bool toInvert)
   GeomShapePtr aPlanarFace;
   foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
     GeomShapePtr aShape = aPrs->shape();
-    if (aShape.get() && aShape->isPlanar()) {
+    if (aShape.get() && aShape->isFace() && aShape->isPlanar()) {
       aPlanarFace = aShape;
       break;
     }
