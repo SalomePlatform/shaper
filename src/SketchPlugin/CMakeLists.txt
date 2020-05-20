@@ -224,6 +224,7 @@ ADD_UNIT_TESTS(
   Test3132.py
   Test3154.py
   Test3170.py
+  Test3240.py
   Test19089.py
   Test19101.py
   TestArcBehavior.py
