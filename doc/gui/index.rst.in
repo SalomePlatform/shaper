@@ -13,4 +13,8 @@ Welcome to SHAPER documentation!
    General/Introduction.rst
    General/Tutorial.rst
 <insert here>
+
+.. toctree::
+   :hidden:
+
    General/TUI_scripts.rst

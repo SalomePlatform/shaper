@@ -1,7 +1,7 @@
 .. _create_import_Parameters:
 .. |importParameters.icon|    image:: images/importParameters.png
 
-import Parameters
+Import Parameters
 =================
 
 Import Parameters is a macro-feature and can not be edited after execution.
