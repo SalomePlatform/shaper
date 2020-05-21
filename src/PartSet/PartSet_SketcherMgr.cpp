@@ -2269,11 +2269,11 @@ std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
   if (aOCListener->isConflictingObject(theObject)) {
     return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
-  if (aOCListener->isFullyConstrained()) {
-    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
-  }
   if (isDistanceKind(aKind)) {
     return Config_PropManager::color("Visualization", "sketch_dimension_color");
+  }
+  if (aOCListener->isFullyConstrained()) {
+    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
   }
   if (aKind == SketchPlugin_ConstraintCoincidence::ID())
     return std::vector<int>(3, 0);
