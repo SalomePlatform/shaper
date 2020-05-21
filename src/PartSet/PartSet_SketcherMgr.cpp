@@ -468,19 +468,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       }
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
-      if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSPFeature =
-                  std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSPFeature.get() &&
-          (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
-           aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
-          DataPtr aData = aSPFeature->data();
-          AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr =
-            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
-          aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
-        }
-      }
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
       bool aPrevLaunchingState = myIsEditLaunching;
