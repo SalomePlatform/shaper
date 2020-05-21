@@ -537,9 +537,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
         canBeShaded = aDisplayer->canBeShaded(aObject);
       }
       if (aShape.get()) {
-        if (aShape->isPlanar()) {
-          hasPlanar = true;
-        }
+        hasPlanar = (aShape->isFace() && aShape->isPlanar());
       }
     }
     if (isVisible) {
