@@ -22,12 +22,6 @@
 
 #include <PlaneGCSSolver_Defs.h>
 
-#include <list>
-#include <memory>
-
-class GeomAPI_BSpline2d;
-class GeomAPI_Pnt2d;
-
 namespace GCS {
   /// \brife SHAPER's implementation of B-spline curves in PlaneGCS solver
   class BSplineImpl : public BSpline
@@ -39,17 +33,32 @@ namespace GCS {
     virtual BSplineImpl* Copy();
 
   private:
-    /// Verify the cached curve satisfies to the parameters
-    bool isCacheValid() const;
-    /// Poles or weights are changed, cache curve has to be rebuilt
-    void rebuildCache();
+    /// Return the index of start knot for the given parameter.
+    /// Parameter is updated accordingly, if the B-spline curve is periodic
+    /// and the parameter is out of period.
+    int spanIndex(double& u);
+
+    /// Collect the list of poles and their weights affecting the given span
+    void spanPolesAndWeights(int theSpanIndex,
+                             double* theDerivParam,
+                             std::vector<GCS::DeriVector2>& thePoles,
+                             std::vector<double>& theWeights) const;
+
+    /// Execute De Boor algorithm to calculate B-spline curve's value
+    void performDeBoor(double theU, int theSpanIndex,
+                       std::vector<GCS::DeriVector2>& thePoles, std::vector<double>& theWeights,
+                       GCS::DeriVector2& theValue, GCS::DeriVector2& theDerivative) const;
+
+    /// Calculate the value and the first derivative for the given parameter on B-spline
+    void d1(double theU, double* theDerivParam,
+            GCS::DeriVector2& theValue, GCS::DeriVector2& theDerivative);
+
+    /// Find the parameter on B-spline corresponding to the given point
+    /// \return \c false if it is unable to calculate the parameter
+    bool parameter(const Point& thePoint, double& theParam) const;
 
   private:
-    std::shared_ptr<GeomAPI_BSpline2d> myCurve; /// cached B-spline curve
-    std::list<std::shared_ptr<GeomAPI_Pnt2d> > myCachedPoles; /// cached B-spline poles
-    std::list<double> myCachedWeights; /// cached B-spline weights
-    std::list<double> myCachedKnots; /// cached B-spline knots
-    std::list<int> myCachedMultiplicities; /// cached B-spline multiplicities
+    VEC_D myFlatKnots; /// indices of knots duplicated by multiplicity
   };
 }
 

@@ -84,7 +84,7 @@ void SketchPlugin_MacroBSpline::execute()
 
   if (boolean(CONTROL_POLYGON_ID())->value()) {
     std::list<FeaturePtr> aControlPoles;
-    createControlPolygon(aBSpline, aControlPoles);
+    createControlPolygon(aBSpline, myIsPeriodic, aControlPoles);
     constraintsForPoles(aControlPoles);
   }
 }
@@ -147,6 +147,7 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
 }
 
 void SketchPlugin_MacroBSpline::createControlPolygon(FeaturePtr theBSpline,
+                                                     bool thePeriodic,
                                                      std::list<FeaturePtr>& thePoles)
 {
   AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
@@ -158,7 +159,7 @@ void SketchPlugin_MacroBSpline::createControlPolygon(FeaturePtr theBSpline,
   // segments
   for (int index = 1; index < aSize; ++index)
     createAuxiliarySegment(aPoles, index - 1, index);
-  if (myIsPeriodic) {
+  if (thePeriodic) {
     // additional segment to close the control polygon
     createAuxiliarySegment(aPoles, aSize - 1, 0);
   }

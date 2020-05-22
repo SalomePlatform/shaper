@@ -31,6 +31,7 @@
 #include "SketchPlugin_Ellipse.h"
 #include "SketchPlugin_EllipticArc.h"
 #include "SketchPlugin_Fillet.h"
+#include "SketchPlugin_CurveFitting.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_MacroArc.h"
 #include "SketchPlugin_MacroCircle.h"
@@ -49,6 +50,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -1891,5 +1893,24 @@ bool SketchPlugin_BSplineValidator::isValid(const AttributePtr& theAttribute,
     return false;
   }
 
+  return true;
+}
+
+bool SketchPlugin_CurveFittingValidator::isValid(const FeaturePtr& theFeature,
+                                                 const std::list<std::string>& theArguments,
+                                                 Events_InfoMessage& theError) const
+{
+  AttributeRefAttrListPtr aRefAttrList =
+      theFeature->refattrlist(SketchPlugin_CurveFitting::POINTS_ID());
+  AttributeBooleanPtr aPeriodicAttr =
+      theFeature->boolean(SketchPlugin_CurveFitting::PERIODIC_ID());
+
+  // check number of selected entities
+  int aMinNbPoints = aPeriodicAttr->value() ? 3 : 2;
+  if (aRefAttrList->size() < aMinNbPoints) {
+    theError = "Not enough points selected. Need at least %1 points.";
+    theError.arg(aMinNbPoints);
+    return false;
+  }
   return true;
 }

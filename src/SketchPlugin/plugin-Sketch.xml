@@ -9,6 +9,7 @@
                 SketchBSpline SketchMacroBSpline SketchMacroBSplinePeriodic SketchBSplinePeriodic
                 SketchRectangle
                 SketchProjection
+                SketchCurveFitting
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
@@ -700,6 +701,61 @@
                    tooltip="Construction element"
                    obligatory="0"
                    change_visual_attributes="true"/>
+      </feature>
+
+      <!-- Curve fitting -->
+      <feature id="SketchCurveFitting"
+               title="Curve fitting"
+               tooltip="Create curve passing through the points"
+               icon="icons/Sketch/curvefitting.png"
+               helpfile="curveFittingFeature.html">
+        <sketch_multi_selector id="points"
+                               label="Points"
+                               tooltip="Select points for curve fitting"
+                               shape_types="Vertices"
+                               use_external="true"
+                               greed="true">
+        </sketch_multi_selector>
+        <switch id="type">
+          <case id="interpolation_type" title="Interpolation"/>
+          <case id="approximation_type" title="Approximation">
+            <doublevalue id="precision"
+                         label="Precision"
+                         tooltip="Maximal distance from selected points to the curve"
+                         default="0.001"
+                         min="1.e-7"
+                         use_reset="false">
+              <validator id="GeomValidators_Positive" parameters="0"/>
+            </doublevalue>
+          </case>
+        </switch>
+        <boolvalue id="need_control_poly"
+                   label="Create control polygon"
+                   default="true"
+                   tooltip="Specify if the control polygon should be created"/>
+        <optionalbox id="periodic"
+                     title="Periodic"
+                     tooltip="Make curve periodic"
+                     default="false"
+                     has_frame="false"
+                     enable_on_check="false"
+                     show_title="true">
+          <boolvalue id="closed"
+                     label="Closed"
+                     default="false"
+                     tooltip="Make curve closed, but not periodic"
+                     obligatory="1"/>
+        </optionalbox>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   default="false"
+                   tooltip="Construction element"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
+        <validator id="SketchPlugin_CurveFittingValidator"/>
+        <action id="reorder_points"
+                label="Reorder points"
+                tooltip="Sort selected points to minimize the distance heighbors"/>
       </feature>
     </group>
 

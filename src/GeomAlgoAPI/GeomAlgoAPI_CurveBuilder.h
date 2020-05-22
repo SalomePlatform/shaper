@@ -27,23 +27,35 @@
 
 /// \class GeomAlgoAPI_CurveBuilder
 /// \ingroup DataAlgo
-/// \brief Allows to create interpolation curve.
+/// \brief Allows to create a curve by the list of point.
 class GeomAlgoAPI_CurveBuilder
 {
  public:
    /// \brief Creates an interpolation curve from points.
    /// \param[in] thePoints list of points.
-   /// \param[in] theIsClosed defines whether the curve to be closed.
+   /// \param[in] thePeriodic defines whether the curve to be periodic.
    /// \param[in] theIsToReorder defines whether to change the order of points to construct
    ///            the shortest curve.
    /// \param[in] theStartTangent vector tangent to the start of curve.
    /// \param[in] theEndTangent vector tangent to the end of curve.
    /// \return Interpolation curve (edge). Empty in case of error or bad input.
    GEOMALGOAPI_EXPORT static GeomEdgePtr edge(const std::list<GeomPointPtr>& thePoints,
-                                              const bool theIsClosed,
+                                              const bool thePeriodic,
                                               const bool theIsToReorder,
                                               const GeomDirPtr& theStartTangent,
                                               const GeomDirPtr& theEndTangent);
+
+   /// \brief Approximate the given points by a curve.
+   /// \param[in] thePoints list of points.
+   /// \param[in] thePeriodic defines whether the curve to be periodic.
+   /// \param[in] thePrecision how close the curve should be to the points.
+   /// \return Apporimation curve (edge). Empty in case of error or bad input.
+   GEOMALGOAPI_EXPORT static GeomEdgePtr approximate(const std::list<GeomPointPtr>& thePoints,
+                                                     const bool thePeriodic,
+                                                     const double thePrecision);
+
+   /// \brief Reoder the list of points to get a polyline of minimal length
+   GEOMALGOAPI_EXPORT static void reorderPoints(std::list<GeomPointPtr>& thePoints);
 };
 
 #endif

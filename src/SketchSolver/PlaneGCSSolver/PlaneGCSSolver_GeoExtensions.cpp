@@ -22,65 +22,38 @@
 
 #include <GeomAPI_BSpline2d.h>
 #include <GeomAPI_Pnt2d.h>
-#include <GeomAPI_XY.h>
 
 #include <cmath>
 
 namespace GCS
 {
 
+  static void periodicNormalization(double& theParam, double thePeriodStart, double thePeriodEnd)
+  {
+    double aPeriod = thePeriodEnd - thePeriodStart;
+    if (aPeriod > tolerance) {
+      theParam = std::max(thePeriodStart,
+                          theParam + aPeriod * std::ceil((thePeriodStart - theParam) / aPeriod));
+    }
+  }
+
+
 DeriVector2 BSplineImpl::Value(double u, double du, double* derivparam)
 {
-  if (!isCacheValid())
-    rebuildCache();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aValue;
-  std::shared_ptr<GeomAPI_XY> aDeriv;
-  myCurve->D1(u, aValue, aDeriv);
-
-  // calculate the derivative on solver's parameter
-  std::shared_ptr<GeomAPI_Pnt2d> aValueDeriv(new GeomAPI_Pnt2d(0.0, 0.0));
-  bool hasParam = false;
-  std::list<GeomPnt2dPtr> aPolesDeriv;
-  for (GCS::VEC_P::iterator anIt = poles.begin(); anIt != poles.end(); ++anIt) {
-    double x = 0.0, y = 0.0;
-    if (anIt->x == derivparam) {
-      x = 1.0;
-      hasParam = true;
-    }
-    else if (anIt->y == derivparam) {
-      y = 1.0;
-      hasParam = true;
-    }
-	  aPolesDeriv.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(x, y)));
-  }
-  if (hasParam) {
-    // use non-periodic curve, because the most of B-spline coefficients are 0,
-    // thus, it is not necessary to keep original knots and multiplicities to get correct value
-    std::shared_ptr<GeomAPI_BSpline2d> aCurveDeriv(
-        new GeomAPI_BSpline2d(degree, aPolesDeriv, myCachedWeights));
-    aCurveDeriv->D0(u, aValueDeriv);
-  }
-
-  return DeriVector2(aValue->x(), aValue->y(),
-                     aValueDeriv->x() + aDeriv->x() * du, aValueDeriv->y() + aDeriv->y() * du);
+  DeriVector2 value, deriv;
+  d1(u, derivparam, value, deriv);
+  return value.sum(GCS::DeriVector2(0., 0., deriv.x, deriv.y).mult(du));
 }
 
 DeriVector2 BSplineImpl::CalculateNormal(Point &p, double* derivparam)
 {
-  if (!isCacheValid())
-    rebuildCache();
-
   double u = 0.0;
-  if (!myCurve->parameter(GeomPnt2dPtr(new GeomAPI_Pnt2d(*p.x, *p.y)), 1e100, u))
+  if (!parameter(p, u))
     return DeriVector2();
 
-  std::shared_ptr<GeomAPI_Pnt2d> aValue;
-  std::shared_ptr<GeomAPI_XY> aDeriv;
-  myCurve->D1(u, aValue, aDeriv);
-
-  DeriVector2 norm(aDeriv->x(), aDeriv->y(), 0.0, 0.0);
-  return norm.rotate90ccw();
+  DeriVector2 value, deriv;
+  d1(u, derivparam, value, deriv);
+  return deriv.rotate90ccw();
 }
 
 BSplineImpl* BSplineImpl::Copy()
@@ -88,49 +61,120 @@ BSplineImpl* BSplineImpl::Copy()
   return new BSplineImpl(*this);
 }
 
-
-bool BSplineImpl::isCacheValid() const
+void BSplineImpl::d1(double theU,
+                     double* theDerivParam,
+                     GCS::DeriVector2& theValue,
+                     GCS::DeriVector2& theDerivative)
 {
-  // curve has to be initialized
-  bool isValid = myCurve.get() && !myCurve->isNull();
-
-  static const double THE_TOLERANCE = 1.e-7;
-  // compare poles
-  isValid = isValid && poles.size() == myCachedPoles.size();
-  std::list<GeomPnt2dPtr>::const_iterator aCachePIt = myCachedPoles.begin();
-  GCS::VEC_P::const_iterator aPolesIt = poles.begin();
-  for (; isValid && aPolesIt != poles.end(); ++aPolesIt, ++aCachePIt) {
-    isValid = isValid && fabs((*aCachePIt)->x() - *aPolesIt->x) < THE_TOLERANCE
-                      && fabs((*aCachePIt)->y() - *aPolesIt->y) < THE_TOLERANCE;
-  }
-
-  // compare weights
-  isValid = isValid && weights.size() == myCachedWeights.size();
-  std::list<double>::const_iterator aCacheWIt = myCachedWeights.begin();
-  GCS::VEC_pD::const_iterator aWeightsIt = weights.begin();
-  for (; isValid && aWeightsIt != weights.end(); ++aWeightsIt, ++aCacheWIt)
-    isValid = isValid && fabs(*aCacheWIt - **aWeightsIt) < THE_TOLERANCE;
-
-  return isValid;
+  int aSpan = spanIndex(theU);
+  std::vector<GCS::DeriVector2> aPoles;
+  std::vector<double> aWeights;
+  spanPolesAndWeights(aSpan, theDerivParam, aPoles, aWeights);
+  performDeBoor(theU, aSpan, aPoles, aWeights, theValue, theDerivative);
 }
 
-void BSplineImpl::rebuildCache()
+int BSplineImpl::spanIndex(double& u)
 {
-  myCachedPoles.clear();
-  myCachedWeights.clear();
-  myCachedKnots.clear();
-  myCachedMultiplicities.clear();
+  if (myFlatKnots.empty()) {
+    // fill flat knots indices
+    for (int i = 0; i < (int)mult.size(); ++i)
+      myFlatKnots.resize(myFlatKnots.size() + mult[i], *knots[i]);
+    if (periodic) {
+      // additional knots at the beginning and the end to complete periodity
+      int anExtraBegin = degree + 1 - mult.front();
+      int anExtraEnd = degree + 1 - mult.back();
+      double aPeriod = *knots.back() - *knots.front();
+      VEC_D aNewFlatKnots;
+      aNewFlatKnots.reserve(myFlatKnots.size() + (size_t)(anExtraBegin + anExtraEnd));
+      auto it = myFlatKnots.end() - mult.back() - anExtraBegin;
+      while (anExtraBegin > 0) {
+        aNewFlatKnots.push_back(*(it++) - aPeriod);
+        --anExtraBegin;
+      }
+      aNewFlatKnots.insert(aNewFlatKnots.end(), myFlatKnots.begin(), myFlatKnots.end());
+      it = myFlatKnots.begin() + mult.front();
+      while (anExtraEnd > 0) {
+        aNewFlatKnots.push_back(*(it++) + aPeriod);
+        --anExtraEnd;
+      }
+      myFlatKnots = aNewFlatKnots;
+    }
+  }
 
-  for (GCS::VEC_P::iterator anIt = poles.begin(); anIt != poles.end(); ++anIt)
-    myCachedPoles.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(*anIt->x, *anIt->y)));
-  for (GCS::VEC_pD::iterator anIt = weights.begin(); anIt != weights.end(); ++anIt)
-    myCachedWeights.push_back(**anIt);
-  for (GCS::VEC_pD::iterator anIt = knots.begin(); anIt != knots.end(); ++anIt)
-    myCachedKnots.push_back(**anIt);
-  myCachedMultiplicities.assign(mult.begin(), mult.end());
+  if (periodic)
+    periodicNormalization(u, *knots.front(), *knots.back());
 
-  myCurve.reset(new GeomAPI_BSpline2d(degree, myCachedPoles, myCachedWeights,
-                                      myCachedKnots, myCachedMultiplicities, periodic));
+  int anIndex = 0;
+  for (int i = 1; i < (int)knots.size() - 1; ++i) {
+    if (u <= *knots[i])
+      break;
+    anIndex += mult[i];
+  }
+  return anIndex;
+}
+
+void BSplineImpl::spanPolesAndWeights(int theSpanIndex,
+                                      double* theDerivParam,
+                                      std::vector<GCS::DeriVector2>& thePoles,
+                                      std::vector<double>& theWeights) const
+{
+  thePoles.reserve(degree + 1);
+  theWeights.reserve(degree + 1);
+  for (int i = theSpanIndex; i <= theSpanIndex + degree; ++i) {
+    // optimization: weighted pole
+    int idx = i % (int)poles.size();
+    thePoles.push_back(GCS::DeriVector2(poles[idx], theDerivParam).mult(*weights[idx]));
+    theWeights.push_back(*weights[idx]);
+  }
+}
+
+void BSplineImpl::performDeBoor(double theU,
+                                int theSpanIndex,
+                                std::vector<GCS::DeriVector2>& thePoles,
+                                std::vector<double>& theWeights,
+                                GCS::DeriVector2& theValue,
+                                GCS::DeriVector2& theDerivative) const
+{
+  std::vector<GCS::DeriVector2> aPDeriv(thePoles.size(), DeriVector2());
+  std::vector<double> aWDeriv(theWeights.size(), 0.0);
+  for (int i = 0; i < degree; ++i) {
+    for (int j = degree; j > i; --j) {
+      double denom = (myFlatKnots[theSpanIndex + j + degree - i] -
+                      myFlatKnots[theSpanIndex + j]);
+      double a = (theU - myFlatKnots[theSpanIndex + j]) / denom;
+      aPDeriv[j] = aPDeriv[j].linCombi(a, aPDeriv[j - 1], 1.0 - a).sum(
+                   thePoles[j].subtr(thePoles[j - 1]).mult(1.0 / denom));
+      aWDeriv[j] = aWDeriv[j] * a + aWDeriv[j - 1] * (1.0 - a)
+                 + (theWeights[j] - theWeights[j - 1]) / denom;
+      thePoles[j] = thePoles[j].linCombi(a, thePoles[j - 1], 1.0 - a);
+      theWeights[j] = theWeights[j] * a + theWeights[j - 1] * (1.0 - a);
+    }
+  }
+  double w = 1 / theWeights[degree];
+  theValue = thePoles[degree].mult(w);
+  theDerivative = aPDeriv[degree].subtr(theValue.mult(aWDeriv[degree])).mult(w);
+}
+
+bool BSplineImpl::parameter(const Point& thePoint, double& theParam) const
+{
+  std::list<GeomPnt2dPtr> aPoles;
+  std::list<double> aWeights;
+  std::list<double> aKnots;
+  std::list<int> aMults;
+
+  for (GCS::VEC_P::const_iterator anIt = poles.begin(); anIt != poles.end(); ++anIt)
+    aPoles.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(*anIt->x, *anIt->y)));
+  for (GCS::VEC_pD::const_iterator anIt = weights.begin(); anIt != weights.end(); ++anIt)
+    aWeights.push_back(**anIt);
+  for (GCS::VEC_pD::const_iterator anIt = knots.begin(); anIt != knots.end(); ++anIt)
+    aKnots.push_back(**anIt);
+  aMults.assign(mult.begin(), mult.end());
+
+  std::shared_ptr<GeomAPI_BSpline2d> aCurve(
+      new GeomAPI_BSpline2d(degree, aPoles, aWeights, aKnots, aMults, periodic));
+
+  GeomPnt2dPtr aPoint(new GeomAPI_Pnt2d(*thePoint.x, *thePoint.y));
+  return aCurve->parameter(aPoint, 1e100, theParam);
 }
 
 } // namespace GCS

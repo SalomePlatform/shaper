@@ -73,6 +73,10 @@
       <translation>Distance horizontale</translation>
     </message>
     <message>
+      <source>Curve fitting</source>
+      <translation>Courbe d&apos;ajustement</translation>
+    </message>
+    <message>
       <source>Length</source>
       <translation>Longueur</translation>
     </message>
@@ -4280,6 +4284,122 @@
   </context>
   <context>
     <name>SketchMacroBSplinePeriodic:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliaire</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Élément de construction</translation>
+    </message>
+  </context>
+
+  <!-- SketchCurveFitting-->
+  <context>
+    <name>SketchCurveFitting</name>
+    <message>
+      <source>Curve fitting</source>
+      <translation>Courbe d&apos;ajustement</translation>
+    </message>
+    <message>
+      <source>Create curve passing through the points</source>
+      <translation>Créer une courbe passant par les points</translation>
+    </message>
+    <message>
+      <source>Error: Feature "%1" does not support action "%2".</source>
+      <translation>Erreur: la fonctionnalité "% 1" ne prend pas en charge l'action "% 2".</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:SketchPlugin_CurveFittingValidator</name>
+    <message>
+      <source>Not enough points selected. Need at least %1 points.</source>
+      <translation>Pas assez de points sélectionnés. Besoin d&apos;au moins %1 points.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:points</name>
+    <message>
+      <source>Points</source>
+      <translation>Points</translation>
+    </message>
+    <message>
+      <source>Select points for curve fitting</source>
+      <translation>Sélectionner des points pour l&apos;ajustement de courbe</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des points pour l'ajustement de courbe</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:periodic</name>
+    <message>
+      <source>Periodic</source>
+      <translation>Périodique</translation>
+    </message>
+    <message>
+      <source>Make curve periodic</source>
+      <translation>Rendre la courbe périodique</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:closed</name>
+    <message>
+      <source>Closed</source>
+      <translation>Fermé</translation>
+    </message>
+    <message>
+      <source>Make curve closed, but not periodic</source>
+      <translation>Rendre la courbe fermée, mais pas périodique</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:type</name>
+    <message>
+      <source>Interpolation</source>
+      <translation>Interpolation</translation>
+    </message>
+    <message>
+      <source>Approximation</source>
+      <translation>Approximation</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:precision</name>
+    <message>
+      <source>Precision</source>
+      <translation>Précision</translation>
+    </message>
+    <message>
+      <source>Maximal distance from selected points to the curve</source>
+      <translation>Distance maximale entre les points sélectionnés et la courbe</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:need_control_poly</name>
+    <message>
+      <source>Create control polygon</source>
+      <translation>Créer un polygone de contrôle</translation>
+    </message>
+    <message>
+      <source>Specify if the control polygon should be created</source>
+      <translation>Précisez si le polygone de contrôle doit être créé</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:reorder_points</name>
+    <message>
+      <source>Reorder points</source>
+      <translation>Réorganiser les points</translation>
+    </message>
+    <message>
+      <source>Sort selected points to minimize the distance heighbors</source>
+      <translation>Trier les points sélectionnés pour minimiser la distance des voisins</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:Auxiliary</name>
     <message>
       <source>Auxiliary</source>
       <translation>Auxiliaire</translation>
