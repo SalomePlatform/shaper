@@ -108,7 +108,12 @@ protected:
 private:
   FeaturePtr createBSplineFeature();
 
-  void createControlPolygon(FeaturePtr theBSpline, std::list<FeaturePtr>& thePoles);
+  /// Create control polygon for the B-spline and returns the list of its poles
+  static void createControlPolygon(FeaturePtr theBSpline,
+                                   bool thePeriodic,
+                                   std::list<FeaturePtr>& thePoles);
+
+  /// Create additional coincidences if other features were selected while creating the B-spline
   void constraintsForPoles(const std::list<FeaturePtr>& thePoles);
 
   /// Create Point feature coincident with the B-spline pole
@@ -124,6 +129,7 @@ private:
                                       const int thePoleIndex1,
                                       const int thePoleIndex2 = -1);
   friend class SketchPlugin_BSplineBase;
+  friend class SketchPlugin_CurveFitting;
 
 private:
   std::list<double> myKnots;
@@ -133,9 +139,9 @@ private:
 };
 
 
-/**\class SketchPlugin_MacroBSpline
+/**\class SketchPlugin_MacroBSplinePeriodic
 * \ingroup Plugins
-* \brief Feature for creation of the new B-spline in Sketch.
+* \brief Feature for creation of the new periodic B-spline in Sketch.
 */
 class SketchPlugin_MacroBSplinePeriodic : public SketchPlugin_MacroBSpline
 {

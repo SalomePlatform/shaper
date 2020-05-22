@@ -36,6 +36,7 @@
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_CurveFitting.h>
 #include <SketchPlugin_Trim.h>
 #include <SketchPlugin_Split.h>
 #include <SketchPlugin_ConstraintTangent.h>
@@ -791,6 +792,68 @@ std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
       aBSpline->setByParameters(degree, aPoints, weights, knots, multiplicities);
   }
   return aBSpline;
+}
+
+//--------------------------------------------------------------------------------------
+static std::shared_ptr<SketchAPI_BSpline> buildInterpolation(
+    const CompositeFeaturePtr& theSketch,
+    const FeaturePtr& theCurveFittingFeature,
+    const std::list<ModelHighAPI_RefAttr>& points,
+    const bool periodic,
+    const bool closed)
+{
+  AttributeBooleanPtr aPeriodicAttr =
+      theCurveFittingFeature->boolean(SketchPlugin_CurveFitting::PERIODIC_ID());
+  fillAttribute(periodic, aPeriodicAttr);
+  AttributeBooleanPtr aClosedAttr =
+      theCurveFittingFeature->boolean(SketchPlugin_CurveFitting::CLOSED_ID());
+  fillAttribute(closed, aClosedAttr);
+  AttributeRefAttrListPtr aPointsAttr =
+      theCurveFittingFeature->refattrlist(SketchPlugin_CurveFitting::POINTS_ID());
+  fillAttribute(points, aPointsAttr);
+  apply(); // to execute and kill the macro-feature
+
+  // find created B-spline feature
+  BSplinePtr aBSpline;
+  const std::string& aKindToFind =
+      periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID();
+  int aNbSubs = theSketch->numberOfSubs();
+  for (int anIndex = aNbSubs - 1; anIndex >= 0; --anIndex) {
+    FeaturePtr aFeature = theSketch->subFeature(anIndex);
+    if (aFeature->getKind() == aKindToFind) {
+      aBSpline.reset(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
+        : new SketchAPI_BSpline(aFeature));
+      aBSpline->execute();
+      break;
+    }
+  }
+  return aBSpline;
+}
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addInterpolation(
+    const std::list<ModelHighAPI_RefAttr>& points,
+    const bool periodic,
+    const bool closed)
+{
+  CompositeFeaturePtr aSketch = compositeFeature();
+  FeaturePtr anInterpFeature = aSketch->addFeature(SketchPlugin_CurveFitting::ID());
+  anInterpFeature->string(SketchPlugin_CurveFitting::TYPE_ID())
+      ->setValue(SketchPlugin_CurveFitting::TYPE_INTERPOLATION_ID());
+  return buildInterpolation(aSketch, anInterpFeature, points, periodic, closed);
+}
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addApproximation(
+    const std::list<ModelHighAPI_RefAttr>& points,
+    const ModelHighAPI_Double& precision,
+    const bool periodic,
+    const bool closed)
+{
+  CompositeFeaturePtr aSketch = compositeFeature();
+  FeaturePtr anInterpFeature = aSketch->addFeature(SketchPlugin_CurveFitting::ID());
+  anInterpFeature->string(SketchPlugin_CurveFitting::TYPE_ID())
+      ->setValue(SketchPlugin_CurveFitting::TYPE_APPROXIMATION_ID());
+  fillAttribute(precision, anInterpFeature->real(SketchPlugin_CurveFitting::PRECISION_ID()));
+  return buildInterpolation(aSketch, anInterpFeature, points, periodic, closed);
 }
 
 //--------------------------------------------------------------------------------------

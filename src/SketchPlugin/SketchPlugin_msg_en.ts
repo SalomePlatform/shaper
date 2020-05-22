@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
+
+  <context>
+    <name>workshop</name>
+    <message>
+      <source>Curve fitting</source>
+      <translation>Curve fitting</translation>
+    </message>
+  </context>
+
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
@@ -2262,4 +2271,121 @@
       <translation></translation>
     </message>
   </context>
+
+  <!-- SketchCurveFitting -->
+  <context>
+    <name>SketchCurveFitting</name>
+    <message>
+      <source>Curve fitting</source>
+      <translation>Curve fitting</translation>
+    </message>
+    <message>
+      <source>Create curve passing through the points</source>
+      <translation>Create curve passing through the points</translation>
+    </message>
+    <message>
+      <source>Error: Feature "%1" does not support action "%2".</source>
+      <translation>Error: Feature "%1" does not support action "%2".</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:SketchPlugin_CurveFittingValidator</name>
+    <message>
+      <source>Not enough points selected. Need at least %1 points.</source>
+      <translation>Not enough points selected. Need at least %1 points.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:points</name>
+    <message>
+      <source>Points</source>
+      <translation>Points</translation>
+    </message>
+    <message>
+      <source>Select points for curve fitting</source>
+      <translation>Select points for curve fitting</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select points for interpolation</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:periodic</name>
+    <message>
+      <source>Periodic</source>
+      <translation>Periodic</translation>
+    </message>
+    <message>
+      <source>Make curve periodic</source>
+      <translation>Make curve periodic</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:closed</name>
+    <message>
+      <source>Closed</source>
+      <translation>Closed</translation>
+    </message>
+    <message>
+      <source>Make curve closed, but not periodic</source>
+      <translation>Make curve closed, but not periodic</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:type</name>
+    <message>
+      <source>Interpolation</source>
+      <translation>Interpolation</translation>
+    </message>
+    <message>
+      <source>Approximation</source>
+      <translation>Approximation</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:precision</name>
+    <message>
+      <source>Precision</source>
+      <translation>Precision</translation>
+    </message>
+    <message>
+      <source>Maximal distance from selected points to the curve</source>
+      <translation>Maximal distance from selected points to the curve</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:need_control_poly</name>
+    <message>
+      <source>Create control polygon</source>
+      <translation>Create control polygon</translation>
+    </message>
+    <message>
+      <source>Specify if the control polygon should be created</source>
+      <translation>Specify if the control polygon should be created</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:reorder_points</name>
+    <message>
+      <source>Reorder points</source>
+      <translation>Reorder points</translation>
+    </message>
+    <message>
+      <source>Sort selected points to minimize the distance heighbors</source>
+      <translation>Sort selected points to minimize the distance heighbors</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCurveFitting:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>Auxiliary</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Construction element</translation>
+    </message>
+  </context>
+
 </TS>

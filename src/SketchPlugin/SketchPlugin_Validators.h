@@ -546,4 +546,20 @@ class SketchPlugin_BSplineValidator : public ModelAPI_AttributeValidator
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_CurveFittingValidator
+ * \ingroup Validators
+ * \brief Validator for the selected vertices for the curve fitting feature.
+ */
+class SketchPlugin_CurveFittingValidator : public ModelAPI_FeatureValidator
+{
+public:
+  //! returns true if number of selected points is greater than the minimal value
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

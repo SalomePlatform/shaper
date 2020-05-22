@@ -54,6 +54,7 @@ ModuleBase_WidgetOptionalBox::ModuleBase_WidgetOptionalBox(QWidget* theParent,
 
   myHaveFrame = theData->getBooleanAttribute("has_frame", true);
   myEnableOnCheck = theData->getBooleanAttribute("enable_on_check", true);
+  myAlwaysShowTitle = theData->getBooleanAttribute("show_title", false);
 
   bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
   setDefaultValue(isChecked ? "true" : "false");
@@ -201,7 +202,10 @@ void ModuleBase_WidgetOptionalBox::createControl(const OptionType& theType)
 
     myCheckBoxLayout = new QHBoxLayout(myCheckBoxFrame);
     ModuleBase_Tools::adjustMargins(myCheckBoxLayout);
-    myCheckBox = new QCheckBox(myCheckBoxFrame);
+    if (myAlwaysShowTitle)
+      myCheckBox = new QCheckBox(translate(myGroupTitle), myCheckBoxFrame);
+    else
+      myCheckBox = new QCheckBox(myCheckBoxFrame);
     myCheckBox->setChecked(getDefaultValue() == "true");
     myCheckBoxLayout->addWidget(myCheckBox);
 

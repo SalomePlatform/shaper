@@ -62,6 +62,7 @@
 #include <SketchPlugin_MacroEllipticArc.h>
 #include <SketchPlugin_SketchDrawer.h>
 #include <SketchPlugin_SketchCopy.h>
+#include <SketchPlugin_CurveFitting.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -154,6 +155,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_MultiRotationAngleValidator);
   aFactory->registerValidator("SketchPlugin_BSplineValidator",
                               new SketchPlugin_BSplineValidator);
+  aFactory->registerValidator("SketchPlugin_CurveFittingValidator",
+                              new SketchPlugin_CurveFittingValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -276,6 +279,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_EllipticArc);
   } else if (theFeatureID == SketchPlugin_MacroEllipticArc::ID()) {
     return FeaturePtr(new SketchPlugin_MacroEllipticArc);
+  } else if (theFeatureID == SketchPlugin_CurveFitting::ID()) {
+    return FeaturePtr(new SketchPlugin_CurveFitting);
   } else if (theFeatureID == SketchPlugin_SketchDrawer::ID()) {
     return FeaturePtr(new SketchPlugin_SketchDrawer);
   } else if (theFeatureID == SketchPlugin_SketchCopy::ID()) {
@@ -359,6 +364,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_MacroEllipticArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_CurveFitting::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Offset::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);

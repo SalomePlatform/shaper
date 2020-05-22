@@ -28,13 +28,13 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_SketchEntity.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 #include <ModelHighAPI_Selection.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_CompositeFeature;
 class ModelAPI_Object;
-class ModelHighAPI_Double;
 class ModelHighAPI_Integer;
 class ModelHighAPI_RefAttr;
 class ModelHighAPI_Reference;
@@ -337,6 +337,21 @@ public:
       const std::list<ModelHighAPI_Double>& knots = std::list<ModelHighAPI_Double>(),
       const std::list<ModelHighAPI_Integer>& multiplicities = std::list<ModelHighAPI_Integer>(),
       const bool periodic = false);
+
+  /// Add interpolation feature
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addInterpolation(
+      const std::list<ModelHighAPI_RefAttr>& points,
+      const bool periodic = false,
+      const bool closed = false);
+
+  /// Add approximation feature
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addApproximation(
+      const std::list<ModelHighAPI_RefAttr>& points,
+      const ModelHighAPI_Double& precision = ModelHighAPI_Double(1.e-3),
+      const bool periodic = false,
+      const bool closed = false);
 
   /// Add projection
   SKETCHAPI_EXPORT

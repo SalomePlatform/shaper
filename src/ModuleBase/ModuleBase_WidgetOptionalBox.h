@@ -136,6 +136,7 @@ private:
 
   bool myHaveFrame;
   bool myEnableOnCheck;
+  bool myAlwaysShowTitle;
 };
 
 #endif /* ModuleBase_WidgetOptionalBox_H_ */

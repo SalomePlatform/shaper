@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintRigid.h
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
+    SketchPlugin_CurveFitting.h
     SketchPlugin_Ellipse.h
     SketchPlugin_EllipticArc.h
     SketchPlugin_ExternalValidator.h
@@ -104,6 +105,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintRigid.cpp
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
+    SketchPlugin_CurveFitting.cpp
     SketchPlugin_Ellipse.cpp
     SketchPlugin_EllipticArc.cpp
     SketchPlugin_ExternalValidator.cpp

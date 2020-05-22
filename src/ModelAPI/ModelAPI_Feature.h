@@ -198,6 +198,11 @@ class ModelAPI_Feature : public ModelAPI_Object
   {
     return data()->refattr(theID);
   }
+  /// Returns the refattrlist attribute by the identifier
+  inline std::shared_ptr<ModelAPI_AttributeRefAttrList> refattrlist(const std::string& theID)
+  {
+    return data()->refattrlist(theID);
+  }
   /// Returns the reference attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID)
   {
