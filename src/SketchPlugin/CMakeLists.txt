@@ -63,6 +63,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MacroEllipticArc.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
+    SketchPlugin_Offset.h
     SketchPlugin_Plugin.h
     SketchPlugin_Point.h
     SketchPlugin_Projection.h
@@ -116,6 +117,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_MacroEllipticArc.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
+    SketchPlugin_Offset.cpp
     SketchPlugin_Plugin.cpp
     SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp

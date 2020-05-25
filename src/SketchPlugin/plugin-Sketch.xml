@@ -17,6 +17,7 @@
                 SketchConstraintCoincidence SketchConstraintCoincidenceInternal
                 SketchConstraintMirror SketchConstraintAngle
                 SketchMultiRotation SketchMultiTranslation
+                SketchOffset
                 SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
@@ -937,6 +938,36 @@
           <validator id="GeomValidators_Positive" parameters="1"/>
         </integervalue>
         <validator id="PartSet_MultyTranslationSelection" />
+      </feature>
+
+      <!-- Offset curve -->
+      <feature id="SketchOffset"
+               title="Offset"
+               tooltip="Offset a curve to a distance"
+               icon="icons/Sketch/offset.png"
+               helpfile="offsetFeature.html">
+        <sketch_multi_selector id="segments"
+                               label="Edges"
+                               tooltip="Select edges to offset"
+                               shape_types="Edges"
+                               use_external="true"
+                               greed="true">
+        </sketch_multi_selector>
+        <doublevalue id="offset_value"
+                     label="Offset value"
+                     tooltip="Offset value"
+                     default="1" min="0.000001"
+                     use_reset="false">
+          <validator id="GeomValidators_Positive" parameters="1"/>
+        </doublevalue>
+        <boolvalue id="reversed"
+                   label="Reversed"
+                   tooltip="Reverse the offset"
+                   default="false"
+                   obligatory="0"/>
+        <action id="add_wire"
+                label="Select wire"
+                tooltip="Add the list of segments conposing a wire with the selected items through the coincidence by boundary points"/>
       </feature>
     </group>
 
