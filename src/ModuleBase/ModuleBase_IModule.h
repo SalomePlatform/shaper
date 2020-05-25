@@ -421,6 +421,10 @@ public slots:
   /// \param theAIS a presentation object
   virtual void onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS) {}
 
+  /// Called on transformation in current viewer
+  /// \param theTrsfType type of tranformation
+  virtual void onViewTransformed(int theTrsfType = 2) {}
+
 protected slots:
   /// Called on selection changed event
   virtual void onSelectionChanged() {}

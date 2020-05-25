@@ -235,6 +235,9 @@ Q_OBJECT
   /// It is necessary to activate the viewer trihedron in the current selection mode
   void onViewPortMapped();
 
+  /// Signal called in order to apdate viewer transformed objects
+  void onAfterViewCreated();
+
  private:
   SHAPERGUI_OCCSelector* mySelector;
   SHAPERGUI_SalomeView* myView;

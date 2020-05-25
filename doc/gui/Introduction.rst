@@ -540,6 +540,8 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 - **Sketch auxiliary entity color** selects default color for sketch auxiliary objects;
 - **Sketch overconstraint color** selects default color for a sketch with redundant constraints;
 - **Sketch fully constraint color** selects default color for a sketch with zero degrees of freedom.
+- **Zoom trihedron arrows** if this control is checked then arrows of a view trihedron will be scaled according to current view scale
+- **Axis arrow size** relative size of trihedron arrows. It has effect only in case if **Zoom trihedron arrows** is On.
   
 To redefine any color click on the corresponding line to access **Select color** dialog box
 

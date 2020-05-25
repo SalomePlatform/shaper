@@ -284,6 +284,8 @@ private slots:
 
   std::vector<int> myOldSelectionColor;
   Handle(Graphic3d_AspectMarker3d) myHighlightPointAspect;
+
+  double myAxisArrowRate;
 };
 
 #endif
