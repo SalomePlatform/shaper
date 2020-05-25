@@ -135,6 +135,12 @@ public:
   /// \param thePlane the current sketch plane
   /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(radiusConstraint)
+
+  /// Creates radius dimension presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
+  GET_CONSTRAINT_PRS(offsetObject)
 };
 
 #endif

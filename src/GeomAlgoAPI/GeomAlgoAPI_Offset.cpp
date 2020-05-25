@@ -19,8 +19,16 @@
 
 #include "GeomAlgoAPI_Offset.h"
 
-#include <BRepOffsetAPI_MakeOffsetShape.hxx>
+#include <GeomAPI_Pln.h>
 
+#include <BRepOffsetAPI_MakeOffsetShape.hxx>
+#include <BRepOffsetAPI_MakeOffset.hxx>
+
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+
+#include <TopoDS.hxx>
+#include <TopoDS_Wire.hxx>
 
 GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomShapePtr& theShape,
                                        const double theOffsetValue)
@@ -51,5 +59,47 @@ void GeomAlgoAPI_Offset::generated(const GeomShapePtr theOldShape,
     GeomAlgoAPI_MakeShape::generated(theOldShape, theNewShapes);
   } catch(...) {
     // nothing is generated
+  }
+}
+
+GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomPlanePtr& thePlane,
+                                       const GeomShapePtr& theEdgeOrWire,
+                                       const double theOffsetValue)
+{
+  // 1. Make wire from edge, if need
+  TopoDS_Wire aWire;
+  TopoDS_Shape anEdgeOrWire = theEdgeOrWire->impl<TopoDS_Shape>();
+  if (anEdgeOrWire.ShapeType() == TopAbs_WIRE) {
+    aWire = TopoDS::Wire(anEdgeOrWire);
+  } else {
+    if (anEdgeOrWire.ShapeType() == TopAbs_EDGE) {
+      BRepBuilderAPI_MakeWire aWireBuilder;
+      aWireBuilder.Add(TopoDS::Edge(anEdgeOrWire));
+      if (aWireBuilder.IsDone()) {
+        aWire = aWireBuilder.Wire();
+      }
+    }
+  }
+  if (aWire.IsNull())
+    return;
+
+  // 2. Make invalid face to pass it in Offset algorithm
+  BRepBuilderAPI_MakeFace aFaceBuilder (thePlane->impl<gp_Pln>(), aWire);
+  const TopoDS_Face& aFace = aFaceBuilder.Face();
+
+  // 3. Make Offset
+  BRepOffsetAPI_MakeOffset* aParal = new BRepOffsetAPI_MakeOffset;
+  setImpl(aParal);
+  setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
+
+  Standard_Boolean isOpenResult = !aWire.Closed();
+  aParal->Init(aFace, GeomAbs_Arc, isOpenResult);
+  aParal->Perform(theOffsetValue, 0.);
+  if (aParal->IsDone()) {
+    TopoDS_Shape anOffset = aParal->Shape();
+    GeomShapePtr aResult(new GeomAPI_Shape());
+    aResult->setImpl(new TopoDS_Shape(anOffset));
+    setShape(aResult);
+    setDone(true);
   }
 }

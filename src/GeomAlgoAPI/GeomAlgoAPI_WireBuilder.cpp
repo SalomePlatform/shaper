@@ -24,12 +24,15 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepTools_ReShape.hxx>
 #include <Geom_Curve.hxx>
 #include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Wire.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 
 #include <cmath>
@@ -91,14 +94,21 @@ public:
   }
 };
 
-//=================================================================================================
-GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
+static GeomShapePtr fromTopoDS(const TopoDS_Shape& theShape)
+{
+  GeomShapePtr aResultShape(new GeomAPI_Shape());
+  aResultShape->setImpl(new TopoDS_Shape(theShape));
+  return aResultShape;
+}
+
+GeomAlgoAPI_WireBuilder::GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes,
+                                                 const bool theForceOpenWire)
 {
   TopTools_ListOfShape aListOfEdges;
   SetOfEdges aProcessedEdges;
 
   ListOfShape::const_iterator anIt = theShapes.cbegin();
-  for(; anIt != theShapes.cend(); ++anIt) {
+  for (; anIt != theShapes.cend(); ++anIt) {
     TopoDS_Shape aShape = (*anIt)->impl<TopoDS_Shape>();
     switch(aShape.ShapeType()) {
       case TopAbs_EDGE: {
@@ -108,7 +118,7 @@ GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
         break;
       }
       case TopAbs_WIRE: {
-        for(TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        for (TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
           TopoDS_Shape anEdge = anExp.Current();
           anEdge.Orientation(TopAbs_FORWARD);
           // if the edge was already processed, remove it to keep original order of the current wire
@@ -123,21 +133,99 @@ GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
         }
         break;
       }
-      default: {
-        return GeomShapePtr();
-      }
+    default:
+      break;
     }
   }
 
-  BRepBuilderAPI_MakeWire aWireBuilder;
-  aWireBuilder.Add(aListOfEdges);
-  if(aWireBuilder.Error() != BRepBuilderAPI_WireDone) {
-    return GeomShapePtr();
+  bool isSplitWire = false;
+  gp_Pnt aSplitPoint;
+  if (theForceOpenWire && aListOfEdges.Size() > 1) {
+    // find a vertex to split the wire
+    TopoDS_Vertex V1[2];
+    TopExp::Vertices(TopoDS::Edge(aListOfEdges.First()), V1[0], V1[1]);
+    TopoDS_Vertex V2[2];
+    TopExp::Vertices(TopoDS::Edge(aListOfEdges.Last()), V2[0], V2[1]);
+    gp_Pnt P1[2] = { BRep_Tool::Pnt(V1[0]), BRep_Tool::Pnt(V1[1]) };
+    gp_Pnt P2[2] = { BRep_Tool::Pnt(V2[0]), BRep_Tool::Pnt(V2[1]) };
+    double Tol1[2] = { BRep_Tool::Tolerance(V1[0]), BRep_Tool::Tolerance(V1[1]) };
+    double Tol2[2] = { BRep_Tool::Tolerance(V2[0]), BRep_Tool::Tolerance(V2[1]) };
+    for (int i = 0; i < 2 && !isSplitWire; ++i)
+      for (int j = 0; j < 2 && !isSplitWire; ++j)
+        if (P1[i].Distance(P2[j]) < Max(Tol1[i], Tol2[j])) {
+          aSplitPoint = P1[i];
+          isSplitWire = true;
+        }
   }
 
-  GeomShapePtr aResultShape(new GeomAPI_Shape());
-  aResultShape->setImpl(new TopoDS_Shape(aWireBuilder.Wire()));
-  return aResultShape;
+  BRepBuilderAPI_MakeWire* aWireBuilder = new BRepBuilderAPI_MakeWire;
+  aWireBuilder->Add(aListOfEdges);
+  if (aWireBuilder->Error() == BRepBuilderAPI_WireDone) {
+    setImpl(aWireBuilder);
+    setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
+
+    // split the result wire
+    TopoDS_Wire aWire = aWireBuilder->Wire();
+    if (isSplitWire && BRep_Tool::IsClosed(aWire)) {
+      TopoDS_Wire aNewWire;
+      BRep_Builder aBuilder;
+      aBuilder.MakeWire(aNewWire);
+      for (TopExp_Explorer anExp(aWire, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        TopoDS_Edge aNewCurrent = TopoDS::Edge(anExp.Current());
+        if (isSplitWire) {
+          bool isToReshape = false;
+          BRepTools_ReShape aReshape;
+          TopoDS_Vertex aVF, aVL;
+          TopExp::Vertices(aNewCurrent, aVF, aVL);
+          gp_Pnt aPF = BRep_Tool::Pnt(aVF);
+          double aTolF = BRep_Tool::Tolerance(aVF);
+          gp_Pnt aPL = BRep_Tool::Pnt(aVL);
+          double aTolL = BRep_Tool::Tolerance(aVL);
+          if (aSplitPoint.SquareDistance(aPF) < aTolF * aTolF) {
+            aReshape.Replace(aVF, aReshape.CopyVertex(aVF));
+            isToReshape = true;
+          }
+          else if (aSplitPoint.SquareDistance(aPL) < aTolL * aTolL) {
+            aReshape.Replace(aVL, aReshape.CopyVertex(aVL));
+            isToReshape = true;
+          }
+          if (isToReshape) {
+            aNewCurrent = TopoDS::Edge(aReshape.Apply(aNewCurrent));
+            isSplitWire = false; // no need to continue splitting
+          }
+        }
+        aBuilder.Add(aNewWire, aNewCurrent);
+      }
+      aWire = aNewWire;
+    }
+
+    // store generated/modified shapes
+    for (TopTools_ListOfShape::Iterator aBaseIt(aListOfEdges); aBaseIt.More(); aBaseIt.Next()) {
+      TopoDS_Edge aBaseCurrent = TopoDS::Edge(aBaseIt.Value());
+      Standard_Real aFirst, aLast;
+      Handle(Geom_Curve) aBaseCurve = BRep_Tool::Curve(aBaseCurrent, aFirst, aLast);
+
+      for (TopExp_Explorer anExp(aWire, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        TopoDS_Edge aNewCurrent = TopoDS::Edge(anExp.Current());
+        Handle(Geom_Curve) aNewCurve = BRep_Tool::Curve(aNewCurrent, aFirst, aLast);
+        if (aBaseCurve == aNewCurve) {
+          GeomShapePtr aBaseShape = fromTopoDS(aBaseCurrent);
+          GeomShapePtr aNewShape = fromTopoDS(aNewCurrent);
+          addGenerated(aBaseShape, aNewShape);
+          addModified(aBaseShape, aNewShape);
+        }
+      }
+    }
+
+    setShape(fromTopoDS(aWire));
+    setDone(true);
+  }
+}
+
+//=================================================================================================
+GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
+{
+  return GeomAlgoAPI_WireBuilder(theShapes).shape();
 }
 
 //=================================================================================================

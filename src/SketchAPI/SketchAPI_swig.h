@@ -37,6 +37,7 @@
   #include "SketchAPI_IntersectionPoint.h"
   #include "SketchAPI_Line.h"
   #include "SketchAPI_Mirror.h"
+  #include "SketchAPI_Offset.h"
   #include "SketchAPI_Sketch.h"
   #include "SketchAPI_SketchEntity.h"
   #include "SketchAPI_Point.h"

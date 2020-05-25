@@ -71,6 +71,7 @@
 %shared_ptr(SketchAPI_IntersectionPoint)
 %shared_ptr(SketchAPI_Line)
 %shared_ptr(SketchAPI_Mirror)
+%shared_ptr(SketchAPI_Offset)
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
 %shared_ptr(SketchAPI_Point)
@@ -579,6 +580,7 @@
 %include "SketchAPI_BSpline.h"
 %include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
+%include "SketchAPI_Offset.h"
 %include "SketchAPI_Translation.h"
 %include "SketchAPI_Rectangle.h"
 %include "SketchAPI_Rotation.h"

@@ -50,6 +50,7 @@ class SketchAPI_BSpline;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
+class SketchAPI_Offset;
 class SketchAPI_Point;
 class SketchAPI_Projection;
 class SketchAPI_Rectangle;
@@ -369,6 +370,13 @@ public:
   std::shared_ptr<SketchAPI_Mirror> addMirror(
       const ModelHighAPI_RefAttr & theMirrorLine,
       const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects);
+
+  /// Add offset
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Offset> addOffset(
+      const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+      const ModelHighAPI_Double & theValue,
+      const bool theReversed);
 
   /// Add translation
   SKETCHAPI_EXPORT

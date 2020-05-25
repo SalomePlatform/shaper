@@ -1,0 +1,59 @@
+.. |offset.icon|    image:: images/offset.png
+
+Offset
+======
+
+Offset operation offsets sketch entities on a given distance.
+Gaps are filled by arcs.
+Offset is performed outside a closed contour or to the right
+of an open one, unless the **Reversed** flag is not set.
+
+To create an Offset in the active Sketch:
+
+#. select in the Main Menu *Sketch - > Offset* item  or
+#. click |offset.icon| **Offset** button in Sketch toolbar:
+
+Property panel:
+
+.. image:: images/Offset_panel.png
+  :align: center
+
+.. centered::
+   Offset
+
+Input fields:
+
+- **Edges** is the list of segments (lines, circles, arcs) selected in the view.
+- **Offset value** is the offset distance.
+- **Reversed** sets the reversed offset side (inside a closed contour or to the left of an open one).
+
+Button:
+
+- **Select wire** button adds edges connected by coincident boundary constraint
+                  and composing a wire with the already selected segments.
+                  Not more than 2 edges can be connected with one coincident point.
+
+**TUI Command**:
+
+.. py:function:: Sketch_1.addOffset(Objects, Distance, isReversed)
+
+    :param list: A list of objects.
+    :param real: An offset distance.
+    :param boolean: Reversed flag.
+    :return: Result object.
+
+Result
+""""""
+
+Created Offset appears in the view.
+
+| The original and the offset objects are marked with a special sign.
+| Offset object is drawn with a thinner line.
+
+.. image:: images/Offset_res.png
+	   :align: center
+
+.. centered::
+   Offset created
+
+**See Also** a sample TUI Script of :ref:`tui_create_offset` operation.

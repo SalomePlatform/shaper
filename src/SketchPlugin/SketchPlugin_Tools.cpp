@@ -20,6 +20,7 @@
 #include "SketchPlugin_Tools.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_BSpline.h"
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintCoincidenceInternal.h"
@@ -37,6 +38,7 @@
 #include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelGeomAlgo_Shape.h>
@@ -113,10 +115,10 @@ std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin
   return aPnt;
 }
 
-std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature)
+std::set<FeaturePtr> findCoincidentConstraints(const ObjectPtr& theObject)
 {
   std::set<FeaturePtr> aCoincident;
-  const std::set<AttributePtr>& aRefsList = theFeature->data()->refsToMe();
+  const std::set<AttributePtr>& aRefsList = theObject->data()->refsToMe();
   std::set<AttributePtr>::const_iterator aIt;
   for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
@@ -199,26 +201,29 @@ std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& th
 // Useful to find points coincident to a given point.
 class CoincidentPoints
 {
+  static const int THE_DEFAULT_INDEX = -1;
+
 public:
-  void addCoincidence(const AttributePoint2DPtr& thePoint1,
-                      const AttributePoint2DPtr& thePoint2 = AttributePoint2DPtr())
+  void addCoincidence(const AttributePtr& thePoint1, const int theIndex1,
+                      const AttributePtr& thePoint2, const int theIndex2)
   {
-    std::list< std::set<AttributePoint2DPtr> >::iterator aFound1 = find(thePoint1);
-    std::list< std::set<AttributePoint2DPtr> >::iterator aFound2 = find(thePoint2);
+    auto aFound1 = find(thePoint1, theIndex1);
+    auto aFound2 = find(thePoint2, theIndex2);
     if (aFound1 == myCoincidentPoints.end()) {
       if (aFound2 == myCoincidentPoints.end()) {
-        std::set<AttributePoint2DPtr> aNewSet;
-        aNewSet.insert(thePoint1);
+        std::map<AttributePtr, std::set<int> > aNewSet;
+        aNewSet[thePoint1].insert(theIndex1);
         if (thePoint2)
-          aNewSet.insert(thePoint2);
+          aNewSet[thePoint2].insert(theIndex2);
         myCoincidentPoints.push_back(aNewSet);
       } else
-        aFound2->insert(thePoint1);
+        (*aFound2)[thePoint1].insert(theIndex1);
     } else if (aFound2 == myCoincidentPoints.end()) {
       if (thePoint2)
-        aFound1->insert(thePoint2);
+        (*aFound1)[thePoint2].insert(theIndex2);
     } else {
-      aFound1->insert(aFound2->begin(), aFound2->end());
+      for (auto it = aFound2->begin(); it != aFound2->end(); ++it)
+        (*aFound1)[it->first].insert(it->second.begin(), it->second.end());
       myCoincidentPoints.erase(aFound2);
     }
   }
@@ -227,10 +232,35 @@ public:
   {
     collectCoincidentPoints(thePoint);
 
-    std::list< std::set<AttributePoint2DPtr> >::iterator aFound = find(thePoint);
-    if (aFound == myCoincidentPoints.end())
-      return std::set<AttributePoint2DPtr>();
-    return *aFound;
+    std::set<AttributePoint2DPtr> aCoincPoints;
+    auto aFound = find(thePoint, THE_DEFAULT_INDEX);
+    if (aFound != myCoincidentPoints.end()) {
+      for (auto it = aFound->begin(); it != aFound->end(); ++it) {
+        AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(it->first);
+        if (aPoint)
+          aCoincPoints.insert(aPoint);
+        else {
+          AttributePoint2DArrayPtr aPointArray =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(it->first);
+          if (aPointArray) {
+            // this is a B-spline feature, the connection is possible
+            // to the first or the last point
+            FeaturePtr anOwner = ModelAPI_Feature::feature(aPointArray->owner());
+            if (it->second.find(0) != it->second.end()) {
+              AttributePoint2DPtr aFirstPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                  anOwner->attribute(SketchPlugin_BSpline::START_ID()));
+              aCoincPoints.insert(aFirstPoint);
+            }
+            if (it->second.find(aPointArray->size() - 1) != it->second.end()) {
+              AttributePoint2DPtr aFirstPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                  anOwner->attribute(SketchPlugin_BSpline::END_ID()));
+              aCoincPoints.insert(aFirstPoint);
+            }
+          }
+        }
+      }
+    }
+    return aCoincPoints;
   }
 
 private:
@@ -239,7 +269,11 @@ private:
   {
     // iterate through coincideces for the given feature
     std::set<FeaturePtr> aCoincidences = SketchPlugin_Tools::findCoincidentConstraints(theFeature);
-    std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
+    if (theFeature->getKind() == SketchPlugin_Point::ID()) {
+      std::set<FeaturePtr> aCoincToRes =
+          SketchPlugin_Tools::findCoincidentConstraints(theFeature->lastResult());
+      aCoincidences.insert(aCoincToRes.begin(), aCoincToRes.end());
+    }    std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
     for (; aCIt != aCoincidences.end(); ++aCIt)
     {
       if (theCoincidences.find(*aCIt) != theCoincidences.end())
@@ -248,12 +282,18 @@ private:
       // iterate on coincident attributes
       for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
         AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
-        if (aRefAttr && !aRefAttr->isObject())
-        {
-          FeaturePtr anOwner = ModelAPI_Feature::feature(aRefAttr->attr()->owner());
-          if (anOwner != theFeature)
-            coincidences(anOwner, theCoincidences);
+        if (!aRefAttr)
+          continue;
+        FeaturePtr anOwner;
+        if (aRefAttr->isObject()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+          if (aFeature->getKind() == SketchPlugin_Point::ID())
+            anOwner = aFeature;
         }
+        else
+          anOwner = ModelAPI_Feature::feature(aRefAttr->attr()->owner());
+        if (anOwner && anOwner != theFeature)
+          coincidences(anOwner, theCoincidences);
       }
     }
   }
@@ -262,7 +302,8 @@ private:
   // (two points may be coincident through the third point)
   void collectCoincidentPoints(const AttributePoint2DPtr& thePoint)
   {
-    AttributePoint2DPtr aPoints[2];
+    AttributePtr aPoints[2];
+    int anIndicesInArray[2];
 
     FeaturePtr anOwner = ModelAPI_Feature::feature(thePoint->owner());
     std::set<FeaturePtr> aCoincidences;
@@ -270,30 +311,69 @@ private:
 
     std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
     for (; aCIt != aCoincidences.end(); ++aCIt) {
-      aPoints[0] = AttributePoint2DPtr();
-      aPoints[1] = AttributePoint2DPtr();
+      aPoints[0] = aPoints[1] = AttributePtr();
+      anIndicesInArray[0] = anIndicesInArray[1] = THE_DEFAULT_INDEX;
       for (int i = 0, aPtInd = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
         AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
-        if (aRefAttr && !aRefAttr->isObject())
-          aPoints[aPtInd++] = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+        if (!aRefAttr)
+          continue;
+        if (aRefAttr->isObject()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+          if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
+            aPoints[aPtInd++] = aFeature->attribute(SketchPlugin_Point::COORD_ID());
+        }
+        else {
+          AttributePoint2DPtr aPointAttr =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+          AttributePoint2DArrayPtr aPointArray =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(aRefAttr->attr());
+          if (aPointAttr)
+            aPoints[aPtInd++] = aPointAttr;
+          else if (aPointArray) {
+            AttributeIntegerPtr anIndexAttr = (*aCIt)->integer(i == 0 ?
+                SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A() :
+                SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+            aPoints[aPtInd] = aPointArray;
+            anIndicesInArray[aPtInd++] = anIndexAttr->value();
+          }
+        }
       }
 
       if (aPoints[0] && aPoints[1])
-        addCoincidence(aPoints[0], aPoints[1]);
+        addCoincidence(aPoints[0], anIndicesInArray[0], aPoints[1], anIndicesInArray[1]);
     }
   }
 
-  std::list< std::set<AttributePoint2DPtr> >::iterator find(const AttributePoint2DPtr& thePoint)
+  std::list< std::map<AttributePtr, std::set<int> > >::iterator find(const AttributePtr& thePoint,
+                                                                     const int theIndex)
   {
-    std::list< std::set<AttributePoint2DPtr> >::iterator aSeek = myCoincidentPoints.begin();
-    for (; aSeek != myCoincidentPoints.end(); ++aSeek)
-      if (aSeek->find(thePoint) != aSeek->end())
+    auto aSeek = myCoincidentPoints.begin();
+    for (; aSeek != myCoincidentPoints.end(); ++aSeek) {
+      auto aFound = aSeek->find(thePoint);
+      if (aFound != aSeek->end() && aFound->second.find(theIndex) != aFound->second.end())
         return aSeek;
+    }
+    // nothing is found, but if the point is a B-spline boundary point, lets check it as poles array
+    FeaturePtr anOwner = ModelAPI_Feature::feature(thePoint->owner());
+    if (anOwner->getKind() == SketchPlugin_BSpline::ID()) {
+      AttributePtr aPointsArray;
+      int anIndex = -1;
+      if (thePoint->id() == SketchPlugin_BSpline::START_ID()) {
+        aPointsArray = anOwner->attribute(SketchPlugin_BSpline::POLES_ID());
+        anIndex = 0;
+      }
+      else if (thePoint->id() == SketchPlugin_BSpline::END_ID()) {
+        aPointsArray = anOwner->attribute(SketchPlugin_BSpline::POLES_ID());
+        anIndex = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(aPointsArray)->size() - 1;
+      }
+      if (aPointsArray)
+        return find(aPointsArray, anIndex);
+    }
     return myCoincidentPoints.end();
   }
 
 private:
-  std::list< std::set<AttributePoint2DPtr> > myCoincidentPoints;
+  std::list< std::map<AttributePtr, std::set<int> > > myCoincidentPoints;
 };
 
 std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint)
@@ -301,6 +381,7 @@ std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2D
   CoincidentPoints aCoincidentPoints;
   return aCoincidentPoints.coincidentPoints(thePoint);
 }
+
 
 void resetAttribute(SketchPlugin_Feature* theFeature,
                     const std::string& theId)
@@ -599,6 +680,10 @@ void SketchPlugin_SegmentationTools::getFeaturePoints(const FeaturePtr& theFeatu
   else if (aFeatureKind == SketchPlugin_EllipticArc::ID()) {
     aStartAttributeName = SketchPlugin_EllipticArc::START_POINT_ID();
     anEndAttributeName = SketchPlugin_EllipticArc::END_POINT_ID();
+  }
+  else if (aFeatureKind == SketchPlugin_BSpline::ID()) {
+    aStartAttributeName = SketchPlugin_BSpline::START_ID();
+    anEndAttributeName = SketchPlugin_BSpline::END_ID();
   }
   if (!aStartAttributeName.empty() && !anEndAttributeName.empty()) {
     theStartPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

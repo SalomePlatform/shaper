@@ -36,6 +36,7 @@
 #include "SketchPlugin_MacroArc.h"
 #include "SketchPlugin_MacroCircle.h"
 #include "SketchPlugin_MultiRotation.h"
+#include "SketchPlugin_Offset.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Trim.h"
@@ -513,6 +514,7 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefListPtr aSelAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
+  std::set<ObjectPtr> aSelected;
 
   AttributeRefListPtr aRefListOfInitial = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
@@ -524,6 +526,12 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
   std::list<ObjectPtr>::iterator anObjIter;
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
     ObjectPtr aSelObject = aSelAttr->object(anInd);
+    if (aSelected.find(aSelObject) != aSelected.end()) {
+      theError = "Error: An object selected twice";
+      return false;
+    }
+    aSelected.insert(aSelObject);
+
     anObjIter = anInitialObjects.begin();
     for (; anObjIter != anInitialObjects.end(); anObjIter++)
       if (aSelObject == *anObjIter)
@@ -533,20 +541,34 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
 
     // B-splines are not supported in Copying features
     FeaturePtr aSelFeature = ModelAPI_Feature::feature(aSelObject);
-    if (aSelFeature && (aSelFeature->getKind() == SketchPlugin_BSpline::ID() ||
+    if (aFeature->getKind() != SketchPlugin_Offset::ID() &&
+        aSelFeature && (aSelFeature->getKind() == SketchPlugin_BSpline::ID() ||
         aSelFeature->getKind() == SketchPlugin_BSplinePeriodic::ID())) {
       theError = "Not supported";
       return false;
     }
 
     anObjIter = aCopiedObjects.begin();
-    for (; anObjIter != aCopiedObjects.end(); anObjIter++)
-      if (aSelObject == *anObjIter) {
+    for (; anObjIter != aCopiedObjects.end(); anObjIter++) {
+      bool isFound = aSelObject == *anObjIter;
+      if (!isFound) {
+        // check in the results of the feature
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+        if (aFeature) {
+          const std::list<ResultPtr>& aResults = aFeature->results();
+          for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+            aResIt != aResults.end() && !isFound; ++aResIt) {
+            isFound = aSelObject == *aResIt;
+          }
+        }
+      }
+      if (isFound) {
         std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
         theError = "The object %1 is a result of copy";
         theError.arg(aName);
         return false;
       }
+    }
   }
   return true;
 }
