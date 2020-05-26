@@ -113,6 +113,8 @@ void FeaturesPlugin_BooleanFuse::execute()
   // in boolean operation and will be added to result.
   bool isProcessCompsolid = !isSimpleCreation || !aFuseVersion.empty();
   ListOfShape aShapesToAdd;
+  int aNbCompsolids = 0; // number of compsolids, which subs is taken into operation
+  bool hasSeparateSolids = false; // are solids or full results exist
   for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjectsHierarchy.begin();
        isProcessCompsolid && anObjectsIt != anObjectsHierarchy.end();
        ++anObjectsIt) {
@@ -120,6 +122,7 @@ void FeaturesPlugin_BooleanFuse::execute()
     GeomShapePtr aParent = anObjectsHierarchy.parent(anObject, false);
 
     if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+      ++aNbCompsolids;
       // mark all subs of this parent as precessed to avoid handling twice
       aParent = anObjectsHierarchy.parent(anObject);
 
@@ -127,7 +130,10 @@ void FeaturesPlugin_BooleanFuse::execute()
       anObjectsHierarchy.splitCompound(aParent, aUsed, aNotUsed);
       aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
     }
+    else
+      hasSeparateSolids = true;
   }
+  bool isSingleCompsolid = aNbCompsolids == 1 && !hasSeparateSolids;
 
   ListOfShape anOriginalShapes = aSolidsToFuse;
   anOriginalShapes.insert(anOriginalShapes.end(), aShapesToAdd.begin(), aShapesToAdd.end());
@@ -150,7 +156,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // If we have compsolids then cut with not used solids all others.
-  if (!aShapesToAdd.empty()) {
+  if (!aShapesToAdd.empty() && !isSingleCompsolid) {
     aSolidsToFuse.clear();
     for (ListOfShape::iterator
          anIt = anOriginalShapes.begin(); anIt != anOriginalShapes.end(); anIt++) {

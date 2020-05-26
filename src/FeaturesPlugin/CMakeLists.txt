@@ -662,4 +662,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2817.py
                Test19065.py
                Test19066.py
+               Test19115.py
 )
