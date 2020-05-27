@@ -340,15 +340,7 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
 
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
-
-    ModuleBase_OperationFeature* aFOperation =
-      dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (aFOperation && !aFOperation->isEditOperation()) {
-      // the selection is cleared after commit the create operation
-      // in order to do not use the same selected objects in the restarted operation
-      // for common behaviour, the selection is cleared even if the operation is not restarted
-      getWorkshop()->selector()->clearSelection();
-    }
+    getWorkshop()->selector()->clearSelection();
   }
 }
 
@@ -360,6 +352,8 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
   /// deactivate of overconstraint listener should be performed after Sketch abort (#2176)
   if (PartSet_SketcherMgr::isSketchOperation(theOperation))
     overconstraintListener()->setActive(false);
+
+  getWorkshop()->selector()->clearSelection();
 }
 
 //******************************************************
