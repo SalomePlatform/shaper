@@ -135,7 +135,8 @@ void PartSet_OperationPrs::Compute(
     // change deviation coefficient to provide more precise circle
     // as there is no result, the shape is processed to correct deviation. To be unified
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
-    ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, DynamicHilightAttributes());
+    //This presentation is not used for selection, so it don't need highlighting
+    //ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, DynamicHilightAttributes());
 
     if (myUseAISWidth) {
       Handle(AIS_InteractiveObject) anIO = anIter.Value();
@@ -368,8 +369,10 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
                                        aRLast = aResults.end();
   for (; aRIt != aRLast; aRIt++) {
     ResultPtr aResult = *aRIt;
-    GeomShapePtr aGeomShape = aResult->shape();
-    appendShapeIfVisible(theWorkshop, aResult, aGeomShape, theObjectShapes);
+    if (!aResult->isDisabled()) {
+      GeomShapePtr aGeomShape = aResult->shape();
+      appendShapeIfVisible(theWorkshop, aResult, aGeomShape, theObjectShapes);
+    }
   }
 }
 
