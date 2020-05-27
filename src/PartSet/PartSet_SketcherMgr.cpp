@@ -2272,14 +2272,15 @@ std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
   if (isDistanceKind(aKind)) {
     return Config_PropManager::color("Visualization", "sketch_dimension_color");
   }
+  if (isExternal(theFeature))
+    return Config_PropManager::color("Visualization", "sketch_external_color");
+
   if (aOCListener->isFullyConstrained()) {
     return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
   }
   if (aKind == SketchPlugin_ConstraintCoincidence::ID())
     return std::vector<int>(3, 0);
 
-  if (isExternal(theFeature))
-    return Config_PropManager::color("Visualization", "sketch_external_color");
   if (isConstruction)
     return Config_PropManager::color("Visualization", "sketch_auxiliary_color");
 
