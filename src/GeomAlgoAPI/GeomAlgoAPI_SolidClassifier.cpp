@@ -26,6 +26,8 @@
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepClass_FaceClassifier.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <TopoDS.hxx>
@@ -58,7 +60,20 @@ classifyMiddlePoint(BRepClass3d_SolidClassifier& theClassifier,
                     const double theTolerance)
 {
   GeomPointPtr aMiddlePoint = theShape->middlePoint();
-  theClassifier.Perform(aMiddlePoint->impl<gp_Pnt>(), theTolerance);
+  gp_Pnt aPointOnFace = aMiddlePoint->impl<gp_Pnt>();
+  if (theShape->shapeType() == GeomAPI_Shape::FACE) {
+    // middle point may be out of face (within a hole),
+    // in this case, find the nearest point on the face
+    const TopoDS_Face& aFace = theShape->impl<TopoDS_Face>();
+    BRepClass_FaceClassifier aFaceClassifier(aFace, aPointOnFace, theTolerance);
+    if (aFaceClassifier.State() == TopAbs_OUT) {
+      BRepBuilderAPI_MakeVertex aVertex(aPointOnFace);
+      BRepExtrema_DistShapeShape aDistance(aVertex.Vertex(), aFace);
+      if (aDistance.NbSolution())
+        aPointOnFace = aDistance.PointOnShape2(1);
+    }
+  }
+  theClassifier.Perform(aPointOnFace, theTolerance);
   return stateToState(theClassifier.State());
 }
 
