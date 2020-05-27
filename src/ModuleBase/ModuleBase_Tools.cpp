@@ -1208,7 +1208,7 @@ FeaturePtr createParameter(const QString& theText)
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
 
-  aParameter = aDoc->addFeature("Parameter");
+  aParameter = aDoc->addFeature("Parameter", false);
   if (aParameter.get()) {
     AttributeStringPtr aNameAttr = aParameter->string("variable");
     aNameAttr->setValue(aParamName.toStdString());
