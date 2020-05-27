@@ -470,8 +470,12 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
   double aDeflection;
   if (isConstruction)
     aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
-  else
+  else {
     aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+    // workaround (issue #3256): to avoid hang up on one of restricted models
+    // set the maximal deflection to be the same as a default body deflection
+    theDrawer->SetMaximalChordialDeviation(aDeflection);
+  }
 
   theDrawer->SetDeviationCoefficient(aDeflection);
 }
