@@ -1115,6 +1115,13 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
       const TopoDS_Shape& aShape = BROwnr->Shape();
+
+      Handle(ModuleBase_ResultPrs) aResPrs = Handle(ModuleBase_ResultPrs)::DownCast(BROwnr->Selectable());
+      TopoDS_Shape aRealShape;
+      if (!aResPrs.IsNull()) {
+        aRealShape = aResPrs->originalShape();
+      }
+
       if (aShape.IsNull())
         continue;
 
@@ -1131,7 +1138,15 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
           // isSame should be used here as it does not check orientation of shapes
           // despite on isEqual of shapes or IsBound for shape in QMap. Orientation is
           // different for Edges shapes in model shape and owner even if this is the same shape
-        if (ModuleBase_Tools::isSameShape(aParameterShape, aShape)) {
+        bool isSame = ModuleBase_Tools::isSameShape(aParameterShape, aShape);
+        if (!isSame) {
+          // In case of using HideFaces panel we can have instead of an original shape
+          // a compaund of faces which represent original shape with hidden faces.
+          // So, we have to compare the parameter with original shape
+          if (!aRealShape.IsNull())
+            isSame = ModuleBase_Tools::isSameShape(aParameterShape, aRealShape);
+        }
+        if (isSame) {
           Handle(AIS_InteractiveObject) anOwnerPresentation =
             Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
           NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
