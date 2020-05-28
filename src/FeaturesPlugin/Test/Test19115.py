@@ -84,4 +84,4 @@ model.testResultsVolumes(Fuse_1, [0.78640233633346512398532])
 print("Elapsed time of Union: {}".format(tUnion))
 print("Elapsed time of Fuse: {}".format(tFuse))
 
-assert(tFuse <= tUnion * 1.35)
+assert(tFuse <= tUnion * 1.5)
