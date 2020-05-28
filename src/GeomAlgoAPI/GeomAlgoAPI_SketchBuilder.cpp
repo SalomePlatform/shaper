@@ -202,7 +202,7 @@ static void sortAreas(TopTools_ListOfShape& theAreas,
 
 void GeomAlgoAPI_SketchBuilder::build(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-    const std::shared_ptr<GeomAPI_Dir>& /*theDirX*/,
+    const std::shared_ptr<GeomAPI_Dir>& theDirX,
     const std::shared_ptr<GeomAPI_Dir>& theNorm,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges)
 {
@@ -213,7 +213,8 @@ void GeomAlgoAPI_SketchBuilder::build(
 
   BRep_Builder aBuilder;
   // Planar face, where the sketch was built
-  Handle(Geom_Surface) aPlane(new Geom_Plane(theOrigin->impl<gp_Pnt>(), theNorm->impl<gp_Dir>()));
+  gp_Ax3 aPlnAxes(theOrigin->impl<gp_Pnt>(), theNorm->impl<gp_Dir>(), theDirX->impl<gp_Dir>());
+  Handle(Geom_Surface) aPlane(new Geom_Plane(aPlnAxes));
   TopoDS_Face aPlnFace;
   aBuilder.MakeFace(aPlnFace, aPlane, Precision::Confusion());
 
