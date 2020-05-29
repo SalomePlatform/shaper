@@ -33,6 +33,8 @@
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pnt.h>
 
+#include <GeomAlgoAPI_ShapeTools.h>
+
 
 #ifdef WIN32
 #pragma warning(disable : 4996) // for sprintf
@@ -78,7 +80,25 @@ namespace ModelGeomAlgo_Shape
     for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
          aSubIt != aSubs.end(); ++aSubIt) {
       GeomPointPtr aMiddlePoint = (*aSubIt)->middlePoint();
-      if (aMiddlePoint && aMiddlePoint->distance(thePoint) < theTolerance)
+      if (!aMiddlePoint)
+        continue;
+
+      double aDistance = aMiddlePoint->distance(thePoint);
+      bool isFound = aDistance < theTolerance;
+      // issue #19019: special workaround for faces, because if the face contains B-spline contour,
+      // the middle point is calculated with respect to its poles, but not a curve itself.
+      // Thus is some operations (like BOP) the curve may have different number of poles
+      // from time to time, as a result, the face parametric boundaries are floating
+      // as well as the middle point.
+      // The workaround is to find a distance from the picking point to the face, if the distance
+      // between the picking point and the middle point on the face is small to some extend.
+      static const double THE_THRESHOLD = 100.;
+      if (!isFound && aDistance < THE_THRESHOLD * theTolerance && (*aSubIt)->isFace()) {
+        GeomVertexPtr aVertex(new GeomAPI_Vertex(thePoint));
+        aDistance = GeomAlgoAPI_ShapeTools::minimalDistance(aVertex, *aSubIt);
+        isFound = aDistance < theTolerance;
+      }
+      if (isFound)
         aFoundSubs.push_back(*aSubIt);
     }
     return aFoundSubs;

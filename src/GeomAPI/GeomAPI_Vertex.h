@@ -38,6 +38,10 @@ public:
   GEOMAPI_EXPORT
   GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
+  /// Creation of vertex by the given point.
+  GEOMAPI_EXPORT
+  GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
+
    /// Creation of vertex by 3d coordinates.
   GEOMAPI_EXPORT
   GeomAPI_Vertex(double theX, double theY, double theZ);
