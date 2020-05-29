@@ -125,7 +125,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [10769.186376787])
+model.testResultsVolumes(Extrusion_1, [5169.186376787])
 
 ParamFrom.setValue(-20)
 model.do()
@@ -135,7 +135,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [5169.186376787])
+model.testResultsVolumes(Extrusion_1, [10769.186376787])
 
 model.testHaveNamingSubshapes(Extrusion_1, model, Part_1_doc)
 

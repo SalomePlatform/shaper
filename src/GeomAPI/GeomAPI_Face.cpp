@@ -28,6 +28,8 @@
 #include "GeomAPI_Cone.h"
 #include "GeomAPI_Torus.h"
 
+#include <Bnd_Box2d.hxx>
+#include <BndLib_Add2dCurve.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
@@ -58,6 +60,9 @@
 #include <gp_Cylinder.hxx>
 #include <gp_Cone.hxx>
 #include <gp_Torus.hxx>
+
+static void optimalBounds(const TopoDS_Face& theFace, double& theUMin, double& theUMax,
+                                                      double& theVMin, double& theVMax);
 
 
 GeomAPI_Face::GeomAPI_Face()
@@ -360,9 +365,8 @@ GeomPointPtr GeomAPI_Face::middlePoint() const
   if (aFace.IsNull())
     return anInnerPoint;
 
-  BRepGProp_Face aProp(aFace);
   double aUMin, aUMax, aVMin, aVMax;
-  aProp.Bounds(aUMin, aUMax, aVMin, aVMax);
+  optimalBounds(aFace, aUMin, aUMax, aVMin, aVMax);
 
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
   if (aSurf.IsNull())
@@ -371,4 +375,213 @@ GeomPointPtr GeomAPI_Face::middlePoint() const
   gp_Pnt aPnt = aSurf->Value((aUMin + aUMax) * 0.5, (aVMin + aVMax) * 0.5);
   anInnerPoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
   return anInnerPoint;
+}
+
+
+// ==================     Auxiliary functions     ========================
+
+void optimalBounds(const TopoDS_Face& theFace, const TopoDS_Edge& theEdge, Bnd_Box2d& theBndBox)
+{
+  Standard_Real aFirst, aLast;
+  const Handle(Geom2d_Curve) aC2D = BRep_Tool::CurveOnSurface(theEdge, theFace, aFirst, aLast);
+  if (aC2D.IsNull())
+    return;
+
+  Standard_Real aXmin = 0.0, aYmin = 0.0, aXmax = 0.0, aYmax = 0.0;
+  Standard_Real aUmin, aUmax, aVmin, aVmax;
+  Bnd_Box2d aBoxC, aBoxS;
+  BndLib_Add2dCurve::AddOptimal(aC2D, aFirst, aLast, 0., aBoxC);
+  if (aBoxC.IsVoid())
+    return;
+
+  aBoxC.Get(aXmin, aYmin, aXmax, aYmax);
+
+  TopLoc_Location aLoc;
+  Handle(Geom_Surface) aS = BRep_Tool::Surface(theFace, aLoc);
+  aS->Bounds(aUmin, aUmax, aVmin, aVmax);
+
+  if (aS->DynamicType() == STANDARD_TYPE(Geom_RectangularTrimmedSurface))
+  {
+    const Handle(Geom_RectangularTrimmedSurface) aSt =
+        Handle(Geom_RectangularTrimmedSurface)::DownCast(aS);
+    aS = aSt->BasisSurface();
+  }
+
+  //
+  if (!aS->IsUPeriodic())
+  {
+    Standard_Boolean isUPeriodic = Standard_False;
+
+    // Additional verification for U-periodicity for B-spline surfaces.
+    // 1. Verify that the surface is U-closed (if such flag is false). Verification uses 2 points.
+    // 2. Verify periodicity of surface inside UV-bounds of the edge. It uses 3 or 6 points.
+    if (aS->DynamicType() == STANDARD_TYPE(Geom_BSplineSurface) &&
+      (aXmin < aUmin || aXmax > aUmax))
+    {
+      Standard_Real aTol2 = 100 * Precision::SquareConfusion();
+      isUPeriodic = Standard_True;
+      gp_Pnt P1, P2;
+      // 1. Verify that the surface is U-closed
+      if (!aS->IsUClosed())
+      {
+        Standard_Real aVStep = aVmax - aVmin;
+        for (Standard_Real aV = aVmin; aV <= aVmax; aV += aVStep)
+        {
+          P1 = aS->Value(aUmin, aV);
+          P2 = aS->Value(aUmax, aV);
+          if (P1.SquareDistance(P2) > aTol2)
+          {
+            isUPeriodic = Standard_False;
+            break;
+          }
+        }
+      }
+      // 2. Verify periodicity of surface inside UV-bounds of the edge
+      if (isUPeriodic) // the flag still not changed
+      {
+        Standard_Real aV = (aVmin + aVmax) * 0.5;
+        Standard_Real aU[6]; // values of U lying out of surface boundaries
+        Standard_Real aUpp[6]; // corresponding U-values plus/minus period
+        Standard_Integer aNbPnt = 0;
+        if (aXmin < aUmin)
+        {
+          aU[0] = aXmin;
+          aU[1] = (aXmin + aUmin) * 0.5;
+          aU[2] = aUmin;
+          aUpp[0] = aU[0] + aUmax - aUmin;
+          aUpp[1] = aU[1] + aUmax - aUmin;
+          aUpp[2] = aU[2] + aUmax - aUmin;
+          aNbPnt += 3;
+        }
+        if (aXmax > aUmax)
+        {
+          aU[aNbPnt] = aUmax;
+          aU[aNbPnt + 1] = (aXmax + aUmax) * 0.5;
+          aU[aNbPnt + 2] = aXmax;
+          aUpp[aNbPnt] = aU[aNbPnt] - aUmax + aUmin;
+          aUpp[aNbPnt + 1] = aU[aNbPnt + 1] - aUmax + aUmin;
+          aUpp[aNbPnt + 2] = aU[aNbPnt + 2] - aUmax + aUmin;
+          aNbPnt += 3;
+        }
+        for (Standard_Integer anInd = 0; anInd < aNbPnt; anInd++)
+        {
+          P1 = aS->Value(aU[anInd], aV);
+          P2 = aS->Value(aUpp[anInd], aV);
+          if (P1.SquareDistance(P2) > aTol2)
+          {
+            isUPeriodic = Standard_False;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!isUPeriodic)
+    {
+      if ((aXmin < aUmin) && (aUmin < aXmax))
+      {
+        aXmin = aUmin;
+      }
+      if ((aXmin < aUmax) && (aUmax < aXmax))
+      {
+        aXmax = aUmax;
+      }
+    }
+  }
+
+  if (!aS->IsVPeriodic())
+  {
+    Standard_Boolean isVPeriodic = Standard_False;
+
+    // Additional verification for V-periodicity for B-spline surfaces.
+    // 1. Verify that the surface is V-closed (if such flag is false). Verification uses 2 points.
+    // 2. Verify periodicity of surface inside UV-bounds of the edge. It uses 3 or 6 points.
+    if (aS->DynamicType() == STANDARD_TYPE(Geom_BSplineSurface) &&
+      (aYmin < aVmin || aYmax > aVmax))
+    {
+      Standard_Real aTol2 = 100 * Precision::SquareConfusion();
+      isVPeriodic = Standard_True;
+      gp_Pnt P1, P2;
+      // 1. Verify that the surface is V-closed
+      if (!aS->IsVClosed())
+      {
+        Standard_Real aUStep = aUmax - aUmin;
+        for (Standard_Real aU = aUmin; aU <= aUmax; aU += aUStep)
+        {
+          P1 = aS->Value(aU, aVmin);
+          P2 = aS->Value(aU, aVmax);
+          if (P1.SquareDistance(P2) > aTol2)
+          {
+            isVPeriodic = Standard_False;
+            break;
+          }
+        }
+      }
+      // 2. Verify periodicity of surface inside UV-bounds of the edge
+      if (isVPeriodic) // the flag still not changed
+      {
+        Standard_Real aU = (aUmin + aUmax) * 0.5;
+        Standard_Real aV[6]; // values of V lying out of surface boundaries
+        Standard_Real aVpp[6]; // corresponding V-values plus/minus period
+        Standard_Integer aNbPnt = 0;
+        if (aYmin < aVmin)
+        {
+          aV[0] = aYmin;
+          aV[1] = (aYmin + aVmin) * 0.5;
+          aV[2] = aVmin;
+          aVpp[0] = aV[0] + aVmax - aVmin;
+          aVpp[1] = aV[1] + aVmax - aVmin;
+          aVpp[2] = aV[2] + aVmax - aVmin;
+          aNbPnt += 3;
+        }
+        if (aYmax > aVmax)
+        {
+          aV[aNbPnt] = aVmax;
+          aV[aNbPnt + 1] = (aYmax + aVmax) * 0.5;
+          aV[aNbPnt + 2] = aYmax;
+          aVpp[aNbPnt] = aV[aNbPnt] - aVmax + aVmin;
+          aVpp[aNbPnt + 1] = aV[aNbPnt + 1] - aVmax + aVmin;
+          aVpp[aNbPnt + 2] = aV[aNbPnt + 2] - aVmax + aVmin;
+          aNbPnt += 3;
+        }
+        for (Standard_Integer anInd = 0; anInd < aNbPnt; anInd++)
+        {
+          P1 = aS->Value(aU, aV[anInd]);
+          P2 = aS->Value(aU, aVpp[anInd]);
+          if (P1.SquareDistance(P2) > aTol2)
+          {
+            isVPeriodic = Standard_False;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!isVPeriodic)
+    {
+      if ((aYmin < aVmin) && (aVmin < aYmax))
+      {
+        aYmin = aVmin;
+      }
+      if ((aYmin < aVmax) && (aVmax < aYmax))
+      {
+        aYmax = aVmax;
+      }
+    }
+  }
+
+  aBoxS.Update(aXmin, aYmin, aXmax, aYmax);
+
+  theBndBox.Add(aBoxS);
+}
+
+void optimalBounds(const TopoDS_Face& theFace, double& theUMin, double& theUMax,
+                                               double& theVMin, double& theVMax)
+{
+  Bnd_Box2d aBB;
+
+  for (TopExp_Explorer anExp(theFace, TopAbs_EDGE); anExp.More(); anExp.Next())
+    optimalBounds(theFace, TopoDS::Edge(anExp.Current()), aBB);
+
+  aBB.Get(theUMin, theVMin, theUMax, theVMax);
 }
