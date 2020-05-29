@@ -1116,7 +1116,8 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
       const TopoDS_Shape& aShape = BROwnr->Shape();
 
-      Handle(ModuleBase_ResultPrs) aResPrs = Handle(ModuleBase_ResultPrs)::DownCast(BROwnr->Selectable());
+      Handle(ModuleBase_ResultPrs) aResPrs =
+          Handle(ModuleBase_ResultPrs)::DownCast(BROwnr->Selectable());
       TopoDS_Shape aRealShape;
       if (!aResPrs.IsNull()) {
         aRealShape = aResPrs->originalShape();
