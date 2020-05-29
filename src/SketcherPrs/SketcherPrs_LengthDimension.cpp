@@ -133,21 +133,21 @@ SketcherPrs_LengthDimension::~SketcherPrs_LengthDimension()
 bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
-  gp_Pnt aPnt1, aPnt2;
+  gp_Pnt2d aPnt1, aPnt2;
   return readyToDisplay(theConstraint, thePlane, aPnt1, aPnt2);
 }
 
 static bool isEqualPoints(ModelAPI_Feature* theConstraint,
-                          const gp_Pnt& thePoint1,
-                          const gp_Pnt& thePoint2)
+  const gp_Pnt2d& theP1, const gp_Pnt2d& theP2)
 {
   bool isEqual = false;
   if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
-    isEqual = Abs(thePoint1.X() - thePoint2.X()) < Precision::Confusion();
+    isEqual = Abs(theP1.X() - theP2.X()) < Precision::Confusion();
   else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
-    isEqual = Abs(thePoint1.Y() - thePoint2.Y()) < Precision::Confusion();
-  else
-    isEqual = thePoint1.SquareDistance(thePoint2) < Precision::SquareConfusion();
+    isEqual = Abs(theP1.Y() - theP2.Y()) < Precision::Confusion();
+  else {
+    isEqual = theP1.SquareDistance(theP2) < Precision::SquareConfusion();
+  }
   return isEqual;
 }
 
@@ -158,10 +158,10 @@ void SketcherPrs_LengthDimension::Compute(
 {
   if (!plane().get())
     return;
-  gp_Pnt aPnt1, aPnt2;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aPnt1, aPnt2);
+  gp_Pnt2d aP1, aP2;
+  bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aP1, aP2);
   if (aReadyToDisplay) {
-    if (isEqualPoints(myConstraint, aPnt1, aPnt2)) {
+    if (isEqualPoints(myConstraint, aP1, aP2)) {
       // adjust points to draw the dimension presentation
       std::shared_ptr<GeomDataAPI_Dir> aDirAttr = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
           myConstraint->attribute(SketchPlugin_ConstraintDistance::DIRECTION_ID()));
@@ -176,15 +176,14 @@ void SketcherPrs_LengthDimension::Compute(
         y = 1.0;
       else
         x = 1.0;
-      GeomPointPtr aCoord = plane()->to3D(x, y);
 
-      gp_XYZ aDir(aCoord->x(), aCoord->y(), aCoord->z());
-      aPnt1.ChangeCoord().Add(aDir * (-Precision::Confusion()));
-      aPnt2.ChangeCoord().Add(aDir * Precision::Confusion());
+      gp_XY aDir(x, y);
+      aP1.ChangeCoord().Add(aDir * (-Precision::Confusion()));
+      aP2.ChangeCoord().Add(aDir * Precision::Confusion());
     }
 
-    myFirstPoint = aPnt1;
-    mySecondPoint = aPnt2;
+    myFirstPoint = plane()->to3D(aP1.X(), aP1.Y())->impl<gp_Pnt>();
+    mySecondPoint = plane()->to3D(aP2.X(), aP2.Y())->impl<gp_Pnt>();
 
     myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
     myPlane = gp_Pln(plane()->impl<gp_Ax3>());
@@ -238,7 +237,7 @@ void SketcherPrs_LengthDimension::Compute(
 
 bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint,
                                                  const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                                 gp_Pnt& thePnt1, gp_Pnt& thePnt2)
+                                                 gp_Pnt2d& thePnt1, gp_Pnt2d& thePnt2)
 {
   if (!thePlane)
     return false;
@@ -264,8 +263,8 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
     std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
       (aLineData->attribute(SketchPlugin_Line::END_ID()));
-    thePnt1 = thePlane->to3D(aStartPoint->x(), aStartPoint->y())->impl<gp_Pnt>();
-    thePnt2 = thePlane->to3D(aEndPoint->x(), aEndPoint->y())->impl<gp_Pnt>();
+    thePnt1 = gp_Pnt2d(aStartPoint->x(), aStartPoint->y());
+    thePnt2 = gp_Pnt2d(aEndPoint->x(), aEndPoint->y());
     return true;
 
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID() ||
@@ -303,20 +302,9 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
     if (!aPnt_A || !aPnt_B) // Objects not found
       return false;
 
-    /*if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
-      if (fabs(aPnt_A->x() - aPnt_B->x()) < Precision::Confusion())
-        return false;
-    }
-    else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID()) {
-      if (fabs(aPnt_A->y() - aPnt_B->y()) < Precision::Confusion())
-        return false;
-    }*/
-
     // Get points from these object
-    std::shared_ptr<GeomAPI_Pnt> aPoint1 = thePlane->to3D(aPnt_A->x(), aPnt_A->y());
-    std::shared_ptr<GeomAPI_Pnt> aPoint2 = thePlane->to3D(aPnt_B->x(), aPnt_B->y());
-    thePnt1 = aPoint1->impl<gp_Pnt>();
-    thePnt2 = aPoint2->impl<gp_Pnt>();
+    thePnt1 = gp_Pnt2d(aPnt_A->x(), aPnt_A->y());
+    thePnt2 = gp_Pnt2d(aPnt_B->x(), aPnt_B->y());
     return true;
   }
   return false;
