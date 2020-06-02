@@ -222,8 +222,8 @@ void GeomAlgoAPI_SketchBuilder::build(
   BOPAlgo_Builder* aBB = new BOPAlgo_Builder;
   aBB->AddArgument(aPlnFace);
   // Set fuzzy value for BOP, because PlaneGCS can solve the set of constraints with
-  // the precision up to 1e-5 if the sketch contains arcs.
-  static const double THE_FUZZY_TOL = 1.e-5;
+  // the precision up to 5.e-5 if the sketch contains arcs.
+  static const double THE_FUZZY_TOL = 5.e-5;
   aBB->SetFuzzyValue(THE_FUZZY_TOL);
 
   setImpl(aBB);
