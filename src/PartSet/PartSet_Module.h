@@ -414,6 +414,8 @@ public slots:
   /// \param theTrsfType type of tranformation
   virtual void onViewTransformed(int theTrsfType = 2);
 
+  void onConflictingConstraints();
+
 protected slots:
   /// Called when previous operation is finished
   virtual void onSelectionChanged();

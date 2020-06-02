@@ -1854,3 +1854,28 @@ void PartSet_Module::disableCustomMode(ModuleBase_CustomizeFlag theMode) {
 void PartSet_Module::enableCustomModes() {
   myCustomPrs->enableCustomModes();
 }
+
+//******************************************************
+void PartSet_Module::onConflictingConstraints()
+{
+  const std::set<ObjectPtr>& aConstraints = myOverconstraintListener->conflictingObjects();
+  if (aConstraints.size() == 1) {
+    QObjectPtrList aObjectsList;
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); aIt++) {
+      if (mySketchReentrantMgr->isLastAutoConstraint(*aIt))
+        aObjectsList.append(*aIt);
+    }
+    if (aObjectsList.size() > 0) {
+      XGUI_Workshop* aWorkshop = getWorkshop();
+      QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
+      ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
+      XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+
+      anOpMgr->startOperation(anOpAction);
+      aWorkshop->deleteFeatures(aObjectsList);
+      anOpMgr->commitOperation();
+      ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
+    }
+  }
+}

@@ -134,6 +134,8 @@ public:
   bool isAutoConstraints() const { return myIsAutoConstraints; }
 
 
+  bool isLastAutoConstraint(const ObjectPtr& theObj) const;
+
 public slots:
   /// The slot is called when user checks "Automatic constraints" button
   /// \param isOn a state of the check box
@@ -240,6 +242,7 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d> myClickedSketchPoint; /// cashed clicked point
 
   bool myIsAutoConstraints;
+  void* myLastAutoConstraint; //< Stores address of last automatic constraint. Connot be used as a pointer!!!
 };
 
 #endif

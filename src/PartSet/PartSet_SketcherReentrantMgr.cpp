@@ -75,7 +75,8 @@ PartSet_SketcherReentrantMgr::PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop*
   myIsFlagsBlocked(false),
   myIsInternalEditOperation(false),
   myNoMoreWidgetsAttribute(""),
-  myIsAutoConstraints(true)
+  myIsAutoConstraints(true),
+  myLastAutoConstraint(0)
 {
 }
 
@@ -872,16 +873,24 @@ void PartSet_SketcherReentrantMgr::addConstraints(const FeaturePtr& theFeature)
     double aTolerance = Config_PropManager::real(SKETCH_TAB_NAME, "angular_tolerance");
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
     FeaturePtr aFeature;
-    if (aHorAngle < aTolerance)
+    if (aHorAngle < aTolerance) {
       // Add horizontal constraint
       aFeature = aSketch->addFeature(SketchPlugin_ConstraintHorizontal::ID());
-    else if (aVertAngle < aTolerance)
+    }
+    else if (aVertAngle < aTolerance) {
       // Add vertical constraint
       aFeature = aSketch->addFeature(SketchPlugin_ConstraintVertical::ID());
-
+    }
     if (aFeature.get()) {
       aFeature->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(
           theFeature->firstResult());
+      myLastAutoConstraint = aFeature.get();
     }
   }
+}
+
+
+bool PartSet_SketcherReentrantMgr::isLastAutoConstraint(const ObjectPtr& theObj) const
+{
+  return theObj.get() == myLastAutoConstraint;
 }

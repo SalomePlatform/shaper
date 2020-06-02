@@ -35,6 +35,8 @@
 #include "SketchPlugin_SketchEntity.h"
 #include "SketchPlugin_MacroArcReentrantMessage.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_ConstraintHorizontal.h"
+#include "SketchPlugin_ConstraintVertical.h"
 
 #include "Events_Loop.h"
 
@@ -44,6 +46,7 @@
 #include <ModuleBase_Tools.h>
 
 #include <QString>
+#include <QTimer>
 
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
@@ -253,6 +256,21 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
   if (isUpdated)
     redisplayObjects(aModifiedObjects);
 
+  if (myConflictingObjects.size() == 1) {
+    // If the conflicting object is an automatic constraint caused the conflict
+    // then it has to be deleted
+    ObjectPtr aObj = *theConflictingObjects.cbegin();
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature) {
+      std::string aType = aFeature->getKind();
+      if ((aType == SketchPlugin_ConstraintHorizontal::ID()) ||
+        (aType == SketchPlugin_ConstraintVertical::ID())) {
+        PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+        QTimer::singleShot(5, aModule, SLOT(onConflictingConstraints()));
+      }
+    }
+  }
+
   return isUpdated;
 }
 
@@ -267,7 +285,6 @@ bool PartSet_OverconstraintListener::repairConflictingObjects(
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) != theConflictingObjects.end()) { // it is found
       myConflictingObjects.erase(anObject);
-
       aModifiedObjects.insert(anObject);
     }
   }
