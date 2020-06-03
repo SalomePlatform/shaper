@@ -1872,10 +1872,16 @@ void PartSet_Module::onConflictingConstraints()
       ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
       XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
 
+      ModuleBase_Operation* anOp = anOpMgr->currentOperation();
+      if (sketchMgr()->isNestedSketchOperation(anOp))
+        anOp->abort();
+
       anOpMgr->startOperation(anOpAction);
       aWorkshop->deleteFeatures(aObjectsList);
       anOpMgr->commitOperation();
       ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
+
+      myWorkshop->viewer()->update();
     }
   }
 }
