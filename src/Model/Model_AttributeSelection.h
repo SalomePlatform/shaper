@@ -209,7 +209,8 @@ protected:
   /// theResultOfFeature if not null defines exact referenced result of a feature
   void concealedFeature(
     const FeaturePtr theFeature, const FeaturePtr theStop, const bool theCheckCopy,
-    std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature);
+    std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature,
+    const bool theCheckWholeFeature = false);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

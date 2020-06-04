@@ -88,8 +88,11 @@ void ModelHighAPI_Interface::execute(bool isForce)
 
 void ModelHighAPI_Interface::setName(const std::string& theName)
 {
-  if (feature().get())
+  if (feature().get() && feature()->data()->isValid())
     feature()->data()->setName(theName);
+  else {
+    std::cout<<"Error: set name "<<theName.c_str()<<" for an invalid feature"<<std::endl;
+  }
 }
 
 std::string ModelHighAPI_Interface::name() const

@@ -1316,7 +1316,8 @@ void Model_AttributeSelection::computeValues(
 
 void Model_AttributeSelection::concealedFeature(
   const FeaturePtr theFeature, const FeaturePtr theStop, const bool theCheckCopy,
-  std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature)
+  std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature,
+  const bool theCheckWholeFeature)
 {
   std::set<FeaturePtr> alreadyProcessed;
   alreadyProcessed.insert(theFeature);
@@ -1332,16 +1333,21 @@ void Model_AttributeSelection::concealedFeature(
   }
   std::list<ResultPtr>::const_iterator aRootIter = aRootRes.cbegin();
   for(; aRootIter != aRootRes.cend(); aRootIter++) {
-    std::list<ResultPtr> allRes;
-    allRes.push_back(*aRootIter);
+    std::list<DataPtr> allRes;
+    allRes.push_back((*aRootIter)->data());
     ResultBodyPtr aRootBody = ModelAPI_Tools::bodyOwner(*aRootIter, true);
     if (!aRootBody.get())
       aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRootIter);
     if (aRootBody.get()) {
-      ModelAPI_Tools::allSubs(aRootBody, allRes);
+      std::list<ResultPtr> allSub;
+      ModelAPI_Tools::allSubs(aRootBody, allSub);
+      for(std::list<ResultPtr>::iterator anIt = allSub.begin(); anIt != allSub.end(); anIt++)
+        allRes.push_back((*anIt)->data());
     }
-    for(std::list<ResultPtr>::iterator aRIter = allRes.begin(); aRIter != allRes.end(); aRIter++) {
-      const std::set<AttributePtr>& aRefs = (*aRIter)->data()->refsToMe();
+    if (theCheckWholeFeature)
+      allRes.push_back(theFeature->data());
+    for(std::list<DataPtr>::iterator aRIter = allRes.begin(); aRIter != allRes.end(); aRIter++) {
+      const std::set<AttributePtr>& aRefs = (*aRIter)->refsToMe();
       std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
       for (; aRef != aRefs.cend(); aRef++) {
         if (!aRef->get() || !(*aRef)->owner().get())
@@ -2094,8 +2100,15 @@ ResultPtr Model_AttributeSelection::newestContext(
   }
   // in case sketch line was selected for wire, but wire was concealed and not such line anymore,
   // so, actually, the sketch element was selected (which is never concealed)
-  if (aResult != theCurrent && aResult->isConcealed())
-    aResult = theCurrent;
+  if (aResult != theCurrent && theCurrent->groupName() == ModelAPI_ResultConstruction::group()) {
+    //&& aResult->isConcealed())
+    std::list<FeaturePtr> aConcealers;
+    FeaturePtr aResFeature = aDoc->feature(aResult);
+    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    concealedFeature(aResFeature, aThisFeature, false, aConcealers, aResult, true);
+    if (aConcealers.size())
+      aResult = theCurrent;
+  }
   return aResult;
 }
 
