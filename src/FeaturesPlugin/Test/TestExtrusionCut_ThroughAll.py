@@ -64,7 +64,7 @@ SketchCircle_3 = Sketch_3.addCircle(7, 2, 1.5)
 ExtrusionCut_3.setNestedSketch(Sketch_3)
 model.do()
 Shape = ExtrusionCut_3.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 5.00008072, 5.079732577, 5.08050677)
+checkMiddlePoint(Shape, 5.00008072, 5.079732786, 5.08050663)
 
 model.end()
 
