@@ -2098,10 +2098,9 @@ ResultPtr Model_AttributeSelection::newestContext(
       }
     }
   }
-  // in case sketch line was selected for wire, but wire was concealed and not such line anymore,
-  // so, actually, the sketch element was selected (which is never concealed)
+  // in case sketch line was selected for wire, but wire was concealed and there is no such line
+  // anymore, so, actually, the sketch element was selected (which is never concealed)
   if (aResult != theCurrent && theCurrent->groupName() == ModelAPI_ResultConstruction::group()) {
-    //&& aResult->isConcealed())
     std::list<FeaturePtr> aConcealers;
     FeaturePtr aResFeature = aDoc->feature(aResult);
     FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
