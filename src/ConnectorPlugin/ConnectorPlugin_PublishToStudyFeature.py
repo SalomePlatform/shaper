@@ -173,25 +173,15 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
         else:
           aSelList = aRef.selectionList("group_list")
         aSelType = GeomAPI_Shape.shapeTypeByStr(aSelList.selectionType())
-        for aSelIndex in range(aSelList.size()):
-          aSelection = aSelList.value(aSelIndex)
-          if aSelection.contextObject():
-            aShape = aSelection.value()
-            if aShape:
-              allShapesList = [] # collect all sub-shapes selected in the group
-              if aShape.shapeType() == 0 or aShape.shapeType() != aSelType: # compound or whole res
-                anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
-                while anExplorer.more():
-                  allShapesList.append(anExplorer.current())
-                  anExplorer.next()
-              else:
-                allShapesList.append(aShape)
-              # get index of each selected shape: if 0, this sub-shape is not in our result
-              for aSelected in allShapesList:
-                anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, aSelected)
-                if anId > 0 and not anId in aGroupHasIndex:
-                  aGroupIndices.append(anId)
-                  aGroupHasIndex[anId] = 0
+        for aGroupRes in aRef.results():
+          aShape = aGroupRes.shape()
+          anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
+          while anExplorer.more():
+            anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, anExplorer.current())
+            if anId > 0 and not anId in aGroupHasIndex:
+              aGroupIndices.append(anId)
+              aGroupHasIndex[anId] = 0
+            anExplorer.next()
         if len(aGroupIndices): # create group
           aGroupFeatureId = aRef.data().featureId()
           if theFields:
