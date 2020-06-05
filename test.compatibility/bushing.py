@@ -588,7 +588,7 @@ ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Ske
 # Test reexecution after parameter change
 Parameter_H.setValue(14)
 model.do()
-model.testResultsVolumes(ExtrusionCut_2, [10205.255531030932615976780653000])
+model.testResultsVolumes(ExtrusionCut_2, [10205.25717])
 Parameter_H.setValue(12)
 model.end()
 
