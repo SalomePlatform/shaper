@@ -201,10 +201,12 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
-    DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
-    ModuleBase_ITreeNode* aRoot = myRoot->findRoot(aDoc);
-    if (aRoot) {
-      updateSubTree(aRoot);
+    if (ModelAPI_Session::get()->hasModuleDocument()) {
+      DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
+      ModuleBase_ITreeNode* aRoot = myRoot->findRoot(aDoc);
+      if (aRoot) {
+        updateSubTree(aRoot);
+      }
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {

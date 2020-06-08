@@ -50,6 +50,9 @@ class INITIALIZATIONPLUGIN_EXPORT InitializationPlugin_PyInterp : public PyInter
   /// Evaluates theExpression and returns its value.
   double evaluate(const std::string& theExpression, std::string& theError);
 
+  /// Runs the string command in the python interpreter. Returns true if no error is in result.
+  bool runString(std::string theString);
+
  protected:
   /// Returns error message.
   std::string errorMessage();

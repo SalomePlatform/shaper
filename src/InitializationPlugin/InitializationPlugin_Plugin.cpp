@@ -63,6 +63,8 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     if (aDoc != ModelAPI_Session::get()->moduleDocument())
       return;
 
+    myEvalListener->initDataModel();
+
     std::list<FeaturePtr> aFeatures;
 
     // the viewer update should be blocked in order to avoid the features blinking before they are

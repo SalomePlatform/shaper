@@ -1530,6 +1530,9 @@ if (aObjIndex.isValid()) { \
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (!aMgr->hasModuleDocument()) // if document is closed, do not call the document creation
+      return;
     // Do not change activation of parts if an operation active
     static QStringList aAllowActivationList;
     if (aAllowActivationList.isEmpty())
@@ -1541,32 +1544,34 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       (!aAllowActivationList.contains(myWorkshop->currentOperation()->id())))
       return;
     XGUI_Workshop* aWorkshop = getWorkshop();
-    XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
-    QLabel* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
-    QPalette aPalet = aLabel->palette();
-
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aActiveDoc = aMgr->activeDocument();
-
-    // Clear active part index if there is no Part documents
-    // It could be not null if document was closed and opened a new
-    // without closeDocument call
-    if (aMgr->allOpenedDocuments().size() <= 1)
-      myActivePartIndex = QModelIndex();
-
-    XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
-    QModelIndex aOldActive = myActivePartIndex;
-    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
     bool needUpdate = false;
-    if (myActivePartIndex.isValid()) {
-      needUpdate = aTreeView->isExpanded(myActivePartIndex);
-      if (!needUpdate)
-        aTreeView->setExpanded(myActivePartIndex, true);
-    }
-    if ((aOldActive != myActivePartIndex) && (aOldActive.isValid()))
-      aTreeView->setExpanded(aOldActive, false);
+    XGUI_DataTree* aTreeView;
+    if (aWorkshop->objectBrowser()) {
+      aTreeView = aWorkshop->objectBrowser()->treeView();
+      QLabel* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
+      QPalette aPalet = aLabel->palette();
 
-    aLabel->setPalette(aPalet);
+      DocumentPtr aActiveDoc = aMgr->activeDocument();
+
+      // Clear active part index if there is no Part documents
+      // It could be not null if document was closed and opened a new
+      // without closeDocument call
+      if (aMgr->allOpenedDocuments().size() <= 1)
+        myActivePartIndex = QModelIndex();
+
+      XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
+      QModelIndex aOldActive = myActivePartIndex;
+      myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
+      if (myActivePartIndex.isValid()) {
+        needUpdate = aTreeView->isExpanded(myActivePartIndex);
+        if (!needUpdate)
+          aTreeView->setExpanded(myActivePartIndex, true);
+      }
+      if ((aOldActive != myActivePartIndex) && (aOldActive.isValid()))
+        aTreeView->setExpanded(aOldActive, false);
+
+      aLabel->setPalette(aPalet);
+    }
     aWorkshop->updateCommandStatus();
 
     // Update displayed objects in order to update active color

@@ -255,3 +255,9 @@ void InitializationPlugin_PyInterp::closeContext()
   Py_XDECREF(_local_context);
   PyInterp_Interp::closeContext();
 }
+
+bool InitializationPlugin_PyInterp::runString(std::string theString)
+{
+  PyLockWrapper lck; // Acquire GIL until the end of the method
+  return PyRun_SimpleString(theString.c_str());
+}

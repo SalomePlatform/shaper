@@ -23,8 +23,8 @@
       <translation>Toutes les pièces de l'assemblage ne sont pas à jour, rien n'est publié. Veuillez mettre la dernière fonctionnalité à jour.</translation>
     </message>
     <message>
-      <source>For publish to SHAPER-STUDY some Part is not activated</source>
-      <translation>Pour la publication sur SHAPER-STUDY, une pièce n'est pas activée</translation>
+      <source>To publish to SHAPER-STUDY, activate Parts in SHAPER</source>
+      <translation>Pour publier dans SHAPER-STUDY, activez les pièces dans SHAPER</translation>
     </message>
   </context>
 </TS>

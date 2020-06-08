@@ -83,7 +83,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
           aPartRes = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject))
           aPartDoc = aPartRes.partDoc()
           if aPartDoc is None and aPartObject is not None:
-            EventsAPI.Events_InfoMessage("PublishToStudy", "For publish to SHAPER-STUDY some Part is not activated", self).send()
+            EventsAPI.Events_InfoMessage("PublishToStudy", "To publish to SHAPER-STUDY, activate Parts in SHAPER", self).send()
             break
           aPartFeatureId = aPartSet.feature(aPartRes).data().featureId()
           # Collects all features of exported results to find results of the same features and extend id.

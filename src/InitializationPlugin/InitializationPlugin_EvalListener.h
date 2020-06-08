@@ -45,6 +45,9 @@ class InitializationPlugin_EvalListener : public Events_Listener
   INITIALIZATIONPLUGIN_EXPORT
     virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  // performs the python call to initialize high level data model on internal data model creation
+  void initDataModel();
+
  protected:
   /// Evaluates theExpression and returns its value.
    double evaluate(std::shared_ptr<ModelAPI_Feature> theParameter,

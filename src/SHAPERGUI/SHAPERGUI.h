@@ -241,6 +241,9 @@ private slots:
   void saveToolbarsConfig();
   void loadToolbarsConfig();
 
+
+  void hideInternalWindows();
+
   /// List of registered nested actions
   QStringList myNestedActionsList;
 
