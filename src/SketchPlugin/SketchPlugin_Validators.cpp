@@ -231,9 +231,6 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     std::set<FeaturePtr> aCoincidences = SketchPlugin_Tools::findCoincidentConstraints(aRefFea);
     for (std::set<FeaturePtr>::iterator anIt = aCoincidences.begin();
          anIt != aCoincidences.end() && !isValid; ++anIt) {
-      if ((*anIt)->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID())
-        continue; // skip internal constraints
-
       std::set<FeaturePtr> aCoinc;
       if (isApplicableCoincidence(*anIt, SketchPlugin_Constraint::ENTITY_A()))
         SketchPlugin_Tools::findCoincidences(*anIt, SketchPlugin_Constraint::ENTITY_B(),
@@ -242,7 +239,13 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
         SketchPlugin_Tools::findCoincidences(*anIt, SketchPlugin_Constraint::ENTITY_A(),
                                              aCoinc, true);
 
-      isValid = aCoinc.find(aOtherFea) != aCoinc.end();
+      std::set<FeaturePtr>::iterator aFoundCoinc = aCoinc.find(aOtherFea);
+      if (aFoundCoinc != aCoinc.end()) {
+        // do not take into account internal constraints
+        AttributeReferencePtr aParent =
+            (*aFoundCoinc)->reference(SketchPlugin_SketchEntity::PARENT_ID());
+        isValid = !aParent || !aParent->isInitialized() || aParent->value() != aRefFea;
+      }
     }
   }
 
