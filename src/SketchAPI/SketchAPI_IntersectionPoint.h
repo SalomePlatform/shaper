@@ -46,7 +46,7 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_IntersectionPoint(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                 const std::string & theExternalName);
+                 const std::wstring & theExternalName);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_IntersectionPoint();
@@ -66,7 +66,7 @@ public:
 
   /// Set by external name
   SKETCHAPI_EXPORT
-  void setByExternalEdgeName(const std::string & theExternalEdgeName);
+  void setByExternalEdgeName(const std::wstring & theExternalEdgeName);
 
   /// Set flag to include projection to result or not
   SKETCHAPI_EXPORT

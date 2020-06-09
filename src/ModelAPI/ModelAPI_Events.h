@@ -393,8 +393,8 @@ public:
 class ModelAPI_ObjectRenamedMessage : public Events_Message
 {
   ObjectPtr myObject;
-  std::string myOldName;
-  std::string myNewName;
+  std::wstring myOldName;
+  std::wstring myNewName;
 
  public:
   /// Static. Returns EventID of the message.
@@ -407,8 +407,8 @@ class ModelAPI_ObjectRenamedMessage : public Events_Message
 
   /// Useful method that creates and sends the AttributeEvalMessage event
   MODELAPI_EXPORT static void send(ObjectPtr theObject,
-                                   const std::string& theOldName,
-                                   const std::string& theNewName,
+                                   const std::wstring& theOldName,
+                                   const std::wstring& theNewName,
                                    const void* theSender);
 
   /// Creates an empty message
@@ -421,13 +421,13 @@ class ModelAPI_ObjectRenamedMessage : public Events_Message
   /// Sets an object
   MODELAPI_EXPORT void setObject(ObjectPtr theObject);
   /// Returns an old name
-  MODELAPI_EXPORT std::string oldName() const;
+  MODELAPI_EXPORT std::wstring oldName() const;
   /// Sets an old name
-  MODELAPI_EXPORT void setOldName(const std::string& theOldName);
+  MODELAPI_EXPORT void setOldName(const std::wstring& theOldName);
   /// Returns a new name
-  MODELAPI_EXPORT std::string newName() const;
+  MODELAPI_EXPORT std::wstring newName() const;
   /// Sets a new name
-  MODELAPI_EXPORT void setNewName(const std::string& theNewName);
+  MODELAPI_EXPORT void setNewName(const std::wstring& theNewName);
 };
 
 /// Message that the parameter should be replaced with its value

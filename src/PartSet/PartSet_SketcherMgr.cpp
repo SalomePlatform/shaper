@@ -1141,7 +1141,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = *anIt;
       if (aFeature.get())
-        anInvalidFeatureNames.append(aFeature->name().c_str());
+        anInvalidFeatureNames.append(QString::fromStdWString(aFeature->name()));
     }
     std::string aPrefixInfo = QString("Invalid features of the sketch will be deleted: %1.\n\n").
                                   arg(anInvalidFeatureNames.join(", ")).toStdString().c_str();

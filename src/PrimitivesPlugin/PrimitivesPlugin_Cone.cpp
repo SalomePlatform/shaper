@@ -63,7 +63,7 @@ void PrimitivesPlugin_Cone::initAttributes()
     data()->selection(PrimitivesPlugin_Cone::BASE_POINT_ID());
   if (!aCenterPoint->isInitialized()) {
     ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()
-      ->objectByName(ModelAPI_ResultConstruction::group(), "Origin");
+      ->objectByName(ModelAPI_ResultConstruction::group(), L"Origin");
     if (aPointObj.get()) {
       ResultPtr aPointRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
       aCenterPoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());
@@ -74,7 +74,7 @@ void PrimitivesPlugin_Cone::initAttributes()
   AttributeSelectionPtr anAxis = data()->selection(PrimitivesPlugin_Cone::AXIS_ID());
   if (!anAxis->isInitialized()) {
     ObjectPtr anAxisObj = ModelAPI_Session::get()->moduleDocument()
-      ->objectByName(ModelAPI_ResultConstruction::group(), "OZ");
+      ->objectByName(ModelAPI_ResultConstruction::group(), L"OZ");
     if (anAxisObj.get()) {
       ResultPtr anAxisRes = std::dynamic_pointer_cast<ModelAPI_Result>(anAxisObj);
       anAxis->setValue(anAxisRes, std::shared_ptr<GeomAPI_Shape>());

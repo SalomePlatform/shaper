@@ -320,7 +320,7 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     if (aRefAttr->isObject()) {
       if (aRefAttr->object() == aRAttr->object()) {
         ObjectPtr anObject = aRefAttr->object();
-        std::string aName = anObject.get() ? anObject->data()->name() : "";
+        std::wstring aName = anObject.get() ? anObject->data()->name() : L"";
         theError = "The object %1 has been already fixed.";
         theError.arg(aName);
         return false;
@@ -328,7 +328,7 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     }
     else if (aRefAttr->attr() == aRAttr->attr()) {
       AttributePtr anAttribute = aRefAttr->attr();
-      std::string aName = anAttribute.get() ? anAttribute->id() : "";
+      std::wstring aName = anAttribute.get() ? ModelAPI_Tools::toWString(anAttribute->id()) : L"";
       theError = "The attribute %1 has been already fixed.";
       theError.arg(aName);
       return false;
@@ -425,7 +425,7 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
       return false;
     }
 
-    std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
+    std::wstring aName = aSelObject.get() ? aSelObject->data()->name() : L"";
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
       if (aSelObject == *aMirIter) {
@@ -544,7 +544,7 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
     anObjIter = aCopiedObjects.begin();
     for (; anObjIter != aCopiedObjects.end(); anObjIter++)
       if (aSelObject == *anObjIter) {
-        std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
+        std::wstring aName = aSelObject.get() ? aSelObject->data()->name() : L"";
         theError = "The object %1 is a result of copy";
         theError.arg(aName);
         return false;

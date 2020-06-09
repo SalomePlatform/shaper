@@ -84,10 +84,10 @@ class Model_Objects
   //! \param theName name of the object to search
   //! \returns null if such object is not found
   std::shared_ptr<ModelAPI_Object> objectByName(
-    const std::string& theGroupID, const std::string& theName);
+    const std::string& theGroupID, const std::wstring& theName);
 
   //! Returns the result by the result name
-  ResultPtr findByName(const std::string theName);
+  ResultPtr findByName(const std::wstring theName);
 
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
@@ -291,7 +291,7 @@ class Model_Objects
   bool hasCustomName(DataPtr theFeatureData,
                      ResultPtr theResult,
                      int theResultIndex,
-                     std::string& theParentName) const;
+                     std::wstring& theParentName) const;
 
   /// Return object representing a folder or empty pointer
   const ObjectPtr& folder(TDF_Label theLabel) const;

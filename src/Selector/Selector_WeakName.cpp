@@ -85,16 +85,16 @@ bool Selector_WeakName::restore()
   return restoreBaseArray(anEmptyRefList, myContext);
 }
 
-TDF_Label Selector_WeakName::restoreByName(std::string theName,
+TDF_Label Selector_WeakName::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
-  std::string aWeakIndex = theName.substr(pureWeakNameID().size());
-  std::size_t aContextPosition = aWeakIndex.find("_");
-  myWeakIndex = atoi(aWeakIndex.c_str());
+  std::wstring aWeakIndex = theName.substr(pureWeakNameID().size());
+  std::size_t aContextPosition = aWeakIndex.find(L"_");
+  myWeakIndex = std::stoi(aWeakIndex.c_str());
   myShapeType = theShapeType;
   TDF_Label aContext;
-  if (aContextPosition != std::string::npos) { // context is also defined
-    std::string aContextName = aWeakIndex.substr(aContextPosition + 1);
+  if (aContextPosition != std::wstring::npos) { // context is also defined
+    std::wstring aContextName = aWeakIndex.substr(aContextPosition + 1);
     if (theNameGenerator->restoreContext(aContextName, aContext, myContext)) {
       if (myContext.IsNull())
         aContext.Nullify();
@@ -126,13 +126,13 @@ bool Selector_WeakName::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_WeakName::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_WeakName::name(Selector_NameGenerator* theNameGenerator)
 {
   // _weak_naming_1_Context
-  std::ostringstream aWeakStr;
+  std::wostringstream aWeakStr;
   aWeakStr<<pureWeakNameID()<<myWeakIndex;
-  std::string aResult = aWeakStr.str();
+  std::wstring aResult = aWeakStr.str();
   if (!myContext.IsNull())
-    aResult += "_" + theNameGenerator->contextName(myContext);
+    aResult += L"_" + theNameGenerator->contextName(myContext);
   return aResult;
 }

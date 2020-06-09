@@ -164,7 +164,7 @@ class ModelAPI_Feature : public ModelAPI_Object
  // Helper methods, aliases for data()->method()
  // -----------------------------------------------------------------------------------------------
   /// Returns the name stored in the attribute
-  inline std::string name()
+  inline std::wstring name()
   {
     return data()->name();
   }

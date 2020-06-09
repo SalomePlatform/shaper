@@ -32,6 +32,7 @@
 #include <Model_Application.h>
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Trsf.h>
 
@@ -90,7 +91,7 @@ void Model_ResultPart::activate()
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!aMgr->isOperation()) {
     // open transaction even document is not created to set current docs in setActiveDocument
-    std::string aMsg = "Activation " + data()->name();
+    std::string aMsg = "Activation " + ModelAPI_Tools::toString(data()->name());
     aMgr->startOperation(aMsg);
     isNewTransaction = true;
   }
@@ -253,7 +254,7 @@ static bool IsEqualTrsf(gp_Trsf& theT1, gp_Trsf theT2) {
   return true;
 }
 
-std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
+std::wstring Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
   int& theIndex)
 {
   theIndex = 0; // not initialized
@@ -279,21 +280,21 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
       }
     }
     // something is not right
-    return "";
+    return L"";
   }
 
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   if (aShape.IsNull())
-    return "";
+    return L"";
 
   // getting an access to the document of part
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
   if (!aDoc.get()) // the part document is not presented for the moment
-    return "";
+    return L"";
   TDF_Label anAccessLabel = aDoc->generalLabel();
   // make the selection attribute anyway:
   // otherwise just by name it is not stable to search the result
-  std::string aName;
+  std::wstring aName;
   // for this the context result is needed
   ResultPtr aContext;
   const std::string& aBodyGroup = ModelAPI_ResultBody::group();
@@ -342,7 +343,7 @@ gp_Trsf Model_ResultPart::sumTrsf() {
   return aResult;
 }
 
-bool Model_ResultPart::combineGeometrical(const int theIndex, std::string& theNewName)
+bool Model_ResultPart::combineGeometrical(const int theIndex, std::wstring& theNewName)
 {
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
   if (aDoc.get()) {
@@ -361,7 +362,7 @@ bool Model_ResultPart::combineGeometrical(const int theIndex, std::string& theNe
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
-  const std::string& theName, const std::string& theType, int& theIndex)
+  const std::wstring& theName, const std::string& theType, int& theIndex)
 {
   theIndex = 0; // not found yet
   std::shared_ptr<GeomAPI_Shape> aResult;

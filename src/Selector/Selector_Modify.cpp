@@ -240,7 +240,7 @@ bool Selector_Modify::restore()
   return false;
 }
 
-TDF_Label Selector_Modify::restoreByName(std::string theName,
+TDF_Label Selector_Modify::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
   TDF_Label aContext;
@@ -248,11 +248,11 @@ TDF_Label Selector_Modify::restoreByName(std::string theName,
     if (aStart != 0)
       aStart++;
     anEnd = theName.find('&', aStart);
-    std::string aSubStr =
+    std::wstring aSubStr =
       theName.substr(aStart, anEnd == std::string::npos ? anEnd : anEnd - aStart);
     if (aSubStr.find(weakNameID()) == 0) { // weak name identifier
-      std::string aWeakIndex = aSubStr.substr(weakNameID().size());
-      myWeakIndex = atoi(aWeakIndex.c_str());
+      std::wstring aWeakIndex = aSubStr.substr(weakNameID().size());
+      myWeakIndex = std::stoi(aWeakIndex.c_str());
       continue;
     }
     TDF_Label aSubContext, aValue;
@@ -323,24 +323,24 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_Modify::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_Modify::name(Selector_NameGenerator* theNameGenerator)
 {
   // final&base1&base2 +optionally: [weak_name_1]
-  std::string aResult;
+  std::wstring aResult;
   Handle(TDataStd_Name) aName;
   if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
-    return "";
-  aResult += theNameGenerator->contextName(myFinal) + "/" +
-    std::string(TCollection_AsciiString(aName->Get()).ToCString());
+    return L"";
+  aResult += theNameGenerator->contextName(myFinal) + L"/";
+  aResult += (wchar_t*)aName->Get().ToExtString();
   for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
     if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
-      return "";
-    aResult += "&";
-    aResult += theNameGenerator->contextName(*aBase) + "/" +
-      std::string(TCollection_AsciiString(aName->Get()).ToCString());
+      return L"";
+    aResult += L"&";
+    aResult += theNameGenerator->contextName(*aBase) + L"/";
+    aResult += (wchar_t*)aName->Get().ToExtString();
   }
   if (myWeakIndex != -1) {
-    std::ostringstream aWeakStr;
+    std::wostringstream aWeakStr;
     aWeakStr<<"&"<<weakNameID()<<myWeakIndex;
     aResult += aWeakStr.str();
   }

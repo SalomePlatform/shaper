@@ -30,9 +30,9 @@
 #include <ModelAPI_Tools.h>
 
 
-static const std::string THE_NEW_PART_STR("New Part");
+static const std::wstring THE_NEW_PART_STR(L"New Part");
 
-DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartName)
+DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::wstring& thePartName)
 {
   DocumentPtr aDoc;
   FeaturePtr aPartFeature;
@@ -100,7 +100,8 @@ void ExchangePlugin_Import::execute()
   AttributeIntegerPtr aTargetAttr = integer(TARGET_PART_ID());
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aDoc =
-    findDocument(aSession->moduleDocument(), aPartsAttr->value(aTargetAttr->value()));
+    findDocument(aSession->moduleDocument(),
+      ModelAPI_Tools::toWString(aPartsAttr->value(aTargetAttr->value())));
 
   if (aDoc.get()) {
     FeaturePtr aImportFeature = aDoc->addFeature(ExchangePlugin_ImportFeature::ID());
@@ -127,7 +128,7 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
     DocumentPtr aDoc = document();
     bool isPartSet = aDoc == aSession->moduleDocument();
     if (isPartSet) {
-      std::list<std::string> anAcceptedValues;
+      std::list<std::wstring> anAcceptedValues;
       anAcceptedValues.push_back(THE_NEW_PART_STR);
 
       // append names of all parts
@@ -142,9 +143,9 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
         aTargetAttr->setValue(0);
 
       aPartsAttr->setSize((int)anAcceptedValues.size());
-      std::list<std::string>::iterator anIt = anAcceptedValues.begin();
+      std::list<std::wstring>::iterator anIt = anAcceptedValues.begin();
       for (int anInd = 0; anIt != anAcceptedValues.end(); ++anIt, ++anInd)
-        aPartsAttr->setValue(anInd, *anIt);
+        aPartsAttr->setValue(anInd, ModelAPI_Tools::toString(*anIt));
     }
     else {
       // keep only the name of the current part
@@ -152,7 +153,7 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
         FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
 
         aPartsAttr->setSize(1);
-        aPartsAttr->setValue(0, aPartFeature->name());
+        aPartsAttr->setValue(0, ModelAPI_Tools::toString(aPartFeature->name()));
         aTargetAttr->setValue(0);
       }
     }

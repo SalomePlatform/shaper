@@ -193,7 +193,7 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
             QAction* aAction;
             int i = 0;
             foreach (FeaturePtr aCoins, myCoinsideLines) {
-              QString anItemText = aCoins->data()->name().c_str();
+              QString anItemText = QString::fromStdWString(aCoins->data()->name());
 #ifdef _DEBUG
               if (anIsAttributes[i])
                 anItemText += " [attribute]";
@@ -320,7 +320,7 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
 
     ModuleBase_Operation* anOpAction =
-      new ModuleBase_Operation(tr("Detach %1").arg(aLine->data()->name().c_str()), myModule);
+      new ModuleBase_Operation(tr("Detach %1").arg(QString::fromStdWString(aLine->data()->name())), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
     XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
     // the active nested sketch operation should be aborted unconditionally

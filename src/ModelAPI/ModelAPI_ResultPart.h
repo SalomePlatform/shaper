@@ -73,7 +73,7 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual bool isActivated() = 0;
 
   /// Returns the name of the shape inside of the part
-  virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
+  virtual std::wstring nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
     int& theIndex) = 0;
   /// Updates the selection inside of the part by the selection index
   virtual bool updateInPart(const int theIndex) = 0;
@@ -87,10 +87,10 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 
   /// Returns the shape by the name in the part
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(
-    const std::string& theName, const std::string& theType, int& theIndex) = 0;
+    const std::wstring& theName, const std::string& theType, int& theIndex) = 0;
 
   /// Updates the selection inside of the part as a geometrical selection
-  virtual bool combineGeometrical(const int theIndex, std::string& theNewName) = 0;
+  virtual bool combineGeometrical(const int theIndex, std::wstring& theNewName) = 0;
 
   /// Returns the shape selected in the selection index
   virtual std::shared_ptr<GeomAPI_Shape> selectionValue(const int theIndex) = 0;

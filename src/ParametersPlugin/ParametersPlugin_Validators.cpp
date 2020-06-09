@@ -71,7 +71,7 @@ bool ParametersPlugin_VariableValidator::isUnique(const AttributePtr& theAttribu
   for (int anIndex = 0, aSize = aDocument->size(ModelAPI_ResultParameter::group());
        anIndex < aSize; ++anIndex) {
     ObjectPtr aParamObj = aDocument->object(ModelAPI_ResultParameter::group(), anIndex);
-    if (aParamObj->data()->name() != theString)
+    if (ModelAPI_Tools::toString(aParamObj->data()->name()) != theString)
       continue;
     ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
     if (!aParam.get())

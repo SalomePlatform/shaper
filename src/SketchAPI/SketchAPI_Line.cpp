@@ -65,7 +65,7 @@ SketchAPI_Line::SketchAPI_Line(
 
 SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theExternalName )
+    const std::wstring & theExternalName )
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -105,7 +105,7 @@ void SketchAPI_Line::setByExternal(const ModelHighAPI_Selection & theExternal)
   execute();
 }
 
-void SketchAPI_Line::setByExternalName(const std::string & theExternalName)
+void SketchAPI_Line::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
 

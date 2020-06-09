@@ -73,12 +73,12 @@ TopoDS_Shape Selector_Selector::value()
   return TopoDS_Shape(); // empty, error shape
 }
 
-std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
+std::wstring Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   return myAlgo->name(theNameGenerator);
 }
 
 TDF_Label Selector_Selector::restoreByName(
-  std::string theName, const TopAbs_ShapeEnum theShapeType,
+  std::wstring theName, const TopAbs_ShapeEnum theShapeType,
   Selector_NameGenerator* theNameGenerator, const bool theGeometricalNaming)
 {
   TDF_Label aResult;

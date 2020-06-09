@@ -297,12 +297,12 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
     Handle(AIS_TrihedronOwner) aTrihedronOwner = Handle(AIS_TrihedronOwner)::DownCast(theOwner);
     if (!aTrihedronOwner.IsNull()) {
       const Prs3d_DatumParts& aPart = aTrihedronOwner->DatumPart();
-      std::string aName;
+      std::wstring aName;
       switch (aPart) {
-        case Prs3d_DP_Origin: aName = "Origin"; break;
-        case Prs3d_DP_XAxis: aName = "OX"; break;
-        case Prs3d_DP_YAxis: aName = "OY"; break;
-        case Prs3d_DP_ZAxis: aName = "OZ"; break;
+        case Prs3d_DP_Origin: aName = L"Origin"; break;
+        case Prs3d_DP_XAxis: aName = L"OX"; break;
+        case Prs3d_DP_YAxis: aName = L"OY"; break;
+        case Prs3d_DP_ZAxis: aName = L"OZ"; break;
         default: break;
       }
       if (aName.length() > 0) {
@@ -453,8 +453,7 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
       Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
       if (anEntity.IsNull())
         continue;
-       Handle(SelectMgr_EntityOwner) anOwner =
-        Handle(SelectMgr_EntityOwner)::DownCast(anEntity->BaseSensitive()->OwnerId());
+       Handle(SelectMgr_EntityOwner) anOwner = anEntity->BaseSensitive()->OwnerId();
       if (!anOwner.IsNull())
         theOwners.Add(anOwner);
     }

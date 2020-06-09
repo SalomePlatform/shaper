@@ -104,10 +104,10 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
         AttributeDoublePtr aValueAttribute =
           aParam->data()->real(ModelAPI_ResultParameter::VALUE());
         QString aVal = QString::number(aValueAttribute->value());
-        QString aTitle = QString(myObject->data()->name().c_str());
+        QString aTitle = QString::fromStdWString(myObject->data()->name());
         return aTitle + " = " + aVal;
       }
-      return myObject->data()->name().c_str();
+      return QString::fromStdWString(myObject->data()->name());
     }
     break;
   case Qt::DecorationRole:
@@ -974,9 +974,9 @@ QVariant PartSet_PartRootNode::data(int theColumn, int theRole) const
       ResultPartPtr aPartRes = getPartResult(myObject);
       if (aPartRes.get()) {
         if (aPartRes->partDoc().get() == NULL)
-          return QString(myObject->data()->name().c_str()) + " (Not loaded)";
+          return QString::fromStdWString(myObject->data()->name()) + " (Not loaded)";
       }
-      return QString(myObject->data()->name().c_str());
+      return QString::fromStdWString(myObject->data()->name());
     }
     case Qt::DecorationRole:
       return ModuleBase_IconFactory::get()->getIcon(myObject);

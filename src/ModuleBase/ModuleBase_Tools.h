@@ -401,7 +401,7 @@ bool MODULEBASE_EXPORT isSameShape(const TopoDS_Shape& theShape1, const TopoDS_S
 /// \param theAttribute a model attribute
 /// \param theWorkshop a workshop class instance
 /// \return string value
-std::string MODULEBASE_EXPORT generateName(const AttributePtr& theAttribute,
+std::wstring MODULEBASE_EXPORT generateName(const AttributePtr& theAttribute,
   ModuleBase_IWorkshop* theWorkshop);
 
 /// Returns pixel ratio of a screen where main window is displayed

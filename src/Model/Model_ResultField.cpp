@@ -24,6 +24,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
@@ -152,10 +153,10 @@ std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> Model_ResultField::ste
   return NULL;
 }
 
-std::string Model_ResultField::Model_FieldStep::name() {
-  std::ostringstream aStream;
+std::wstring Model_ResultField::Model_FieldStep::name() {
+  std::wostringstream aStream;
   aStream<<myParent->data()->name()<<std::endl;
-  aStream<<"Step "<<(myId + 1)<<" "<<myParent->textLine(myId);
+  aStream<<"Step "<<(myId + 1)<<" "<< ModelAPI_Tools::toWString(myParent->textLine(myId));
   return aStream.str();
 }
 // LCOV_EXCL_STOP

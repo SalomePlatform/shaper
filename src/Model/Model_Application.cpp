@@ -21,6 +21,7 @@
 #include <Model_Document.h>
 
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Tools.h>
 
 #include <BinDrivers_DocumentRetrievalDriver.hxx>
 #include <BinDrivers_DocumentStorageDriver.hxx>
@@ -61,7 +62,7 @@ void Model_Application::createDocument(const int theDocID)
 }
 
 //=======================================================================
-bool Model_Application::loadDocument(const std::string theDocName, const int theDocID)
+bool Model_Application::loadDocument(const std::wstring theDocName, const int theDocID)
 {
   static const std::string thePartKind("Part"); // root document is never loaded here
   std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID, thePartKind));
@@ -70,7 +71,7 @@ bool Model_Application::loadDocument(const std::string theDocName, const int the
   bool aRes = true;
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocName) != myLoadedByDemand.end() && !myPath.empty()) {
-    aRes = aNew->load(myPath.c_str(), theDocName.c_str(), aNew);
+    aRes = aNew->load(myPath.c_str(), ModelAPI_Tools::toString(theDocName).c_str(), aNew);
     myLoadedByDemand.erase(theDocName);  // done, don't do it anymore
   } else { // error
     aRes = false;
@@ -132,13 +133,13 @@ const std::string& Model_Application::loadPath() const
 }
 
 //=======================================================================
-void Model_Application::setLoadByDemand(std::string theID, const int theDocID)
+void Model_Application::setLoadByDemand(std::wstring theID, const int theDocID)
 {
   myLoadedByDemand[theID] = theDocID;
 }
 
 //=======================================================================
-bool Model_Application::isLoadByDemand(std::string theID, const int theDocIndex)
+bool Model_Application::isLoadByDemand(std::wstring theID, const int theDocIndex)
 {
   return myLoadedByDemand.find(theID) != myLoadedByDemand.end() &&
     myLoadedByDemand[theID] == theDocIndex;
@@ -152,7 +153,7 @@ int Model_Application::generateDocumentId()
   for(aResult = int(myDocs.size()); true; aResult++) {
     if (myDocs.find(aResult) == myDocs.end()) {
       bool aFound = false;
-      std::map<std::string, int>::iterator aLBDIter = myLoadedByDemand.begin();
+      std::map<std::wstring, int>::iterator aLBDIter = myLoadedByDemand.begin();
       for(; aLBDIter != myLoadedByDemand.end(); aLBDIter++) {
         if (aLBDIter->second == aResult) {
           aFound = true;

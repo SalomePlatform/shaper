@@ -102,9 +102,9 @@ class Model_Data : public ModelAPI_Data
   /// The simplest constructor. "setLabel" must be called just after to initialize correctly.
   Model_Data();
   /// Returns the name of the feature visible by the user in the object browser
-  MODEL_EXPORT virtual std::string name();
+  MODEL_EXPORT virtual std::wstring name();
   /// Defines the name of the feature visible by the user in the object browser
-  MODEL_EXPORT virtual void setName(const std::string& theName);
+  MODEL_EXPORT virtual void setName(const std::wstring& theName);
   /// Return \c true if the object has been renamed by the user
   MODEL_EXPORT virtual bool hasUserDefinedName() const;
   /// Returns version of the feature (empty string if not applicable)

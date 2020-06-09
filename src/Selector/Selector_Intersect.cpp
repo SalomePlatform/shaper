@@ -181,7 +181,7 @@ bool Selector_Intersect::restore()
   return true;
 }
 
-TDF_Label Selector_Intersect::restoreByName(std::string theName,
+TDF_Label Selector_Intersect::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
   myShapeType = theShapeType;
@@ -189,15 +189,15 @@ TDF_Label Selector_Intersect::restoreByName(std::string theName,
   for(size_t aStart = 0; aStart != std::string::npos; aStart = theName.find('[', aStart + 1)) {
     size_t anEndPos = theName.find(']', aStart + 1);
     if (anEndPos != std::string::npos) {
-      std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+      std::wstring aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
       if (aSubStr.find(weakNameID()) == 0) { // weak name identifier
-        std::string aWeakIndex = aSubStr.substr(weakNameID().size());
-        myWeakIndex = atoi(aWeakIndex.c_str());
+        std::wstring aWeakIndex = aSubStr.substr(weakNameID().size());
+        myWeakIndex = stoi(aWeakIndex);
         continue;
       }
       TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
       if (anEndPos != std::string::npos && anEndPos + 1 < theName.size()) {
-        char aShapeChar = theName[anEndPos + 1];
+        wchar_t aShapeChar = theName[anEndPos + 1];
         if (theName[anEndPos + 1] != '[') {
           switch(aShapeChar) {
           case 'e': aSubShapeType = TopAbs_EDGE; break;
@@ -277,9 +277,9 @@ bool Selector_Intersect::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_Intersect::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_Intersect::name(Selector_NameGenerator* theNameGenerator)
 {
-  std::string aResult;
+  std::wstring aResult;
   // add names of sub-components one by one in "[]" +optionally [weak_name_1]
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
   for(; aSubSel != list().cend(); aSubSel++) {
@@ -291,15 +291,15 @@ std::string Selector_Intersect::name(Selector_NameGenerator* theNameGenerator)
       TopAbs_ShapeEnum aSubType = aSubVal.ShapeType();
       if (aSubType != TopAbs_FACE) { // in case the sub shape type must be stored
         switch(aSubType) {
-        case TopAbs_EDGE: aResult += "e"; break;
-        case TopAbs_VERTEX: aResult += "v"; break;
+        case TopAbs_EDGE: aResult += L"e"; break;
+        case TopAbs_VERTEX: aResult += L"v"; break;
         default:;
         }
       }
     }
   }
   if (myWeakIndex != -1) {
-    std::ostringstream aWeakStr;
+    std::wostringstream aWeakStr;
     aWeakStr<<"["<<weakNameID()<<myWeakIndex<<"]";
     aResult += aWeakStr.str();
   }

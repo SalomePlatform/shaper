@@ -95,6 +95,10 @@ public:
   /// Returns list of parameters
   std::list<std::string> parameters() const { return myParameters; }
 
+  /// Add parameter for message string of wstring type
+  /// \param theParam the parameter
+  EVENTS_EXPORT Events_InfoMessage& arg(const std::wstring& theParam);
+
   /// Add parameter for message string of string type
   /// \param theParam the parameter
   Events_InfoMessage& arg(const std::string& theParam) { addParameter(theParam); return *this; }

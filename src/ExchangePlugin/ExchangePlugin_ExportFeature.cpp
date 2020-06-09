@@ -394,7 +394,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   if (aGeometryName.empty() && aResults.size() == 1) {
     // get the name from the first result
     ResultPtr aResultBody = *aResults.begin();
-    aGeometryName = aResultBody->data()->name();
+    aGeometryName = ModelAPI_Tools::toString(aResultBody->data()->name());
   }
 
   aXao.getGeometry()->setName(aGeometryName);
@@ -429,7 +429,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       XAO::Dimension aGroupDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
 
       XAO::Group* aXaoGroup = aXao.addGroup(aGroupDimension,
-                                            aResultGroup->data()->name());
+        ModelAPI_Tools::toString(aResultGroup->data()->name()));
 
       try {
         GeomAPI_ShapeExplorer aGroupResExplorer(aResultGroup->shape(), aSelType);
@@ -448,7 +448,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       } catch (XAO::XAO_Exception& e) {
         // LCOV_EXCL_START
         std::string msg = "An error occurred while exporting group " +
-          aResultGroup->data()->name();
+          ModelAPI_Tools::toString(aResultGroup->data()->name());
         msg += ".\n";
         msg += e.what();
         msg += "\n";
@@ -485,7 +485,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       XAO::Type aFieldType = XAO::XaoUtils::stringToFieldType(aTypeString);
 
       XAO::Field* aXaoField = aXao.addField(aFieldType, aFieldDimension, aTables->columns(),
-                                            aResultField->data()->name());
+        ModelAPI_Tools::toString(aResultField->data()->name()));
 
 
       try {
@@ -546,7 +546,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       } catch (XAO::XAO_Exception& e) {
         // LCOV_EXCL_START
         std::string msg = "An error occurred while exporting field " +
-          aResultField->data()->name();
+          ModelAPI_Tools::toString(aResultField->data()->name());
         msg += ".\n";
         msg += e.what();
         msg += "\n";

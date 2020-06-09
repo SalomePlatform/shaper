@@ -410,7 +410,7 @@ Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab, TDF_Label theBaseDo
 }
 
 Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseDocLab,
-  std::string theName, const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
+  std::wstring theName, const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
   Selector_NameGenerator* theNameGenerator, TDF_Label& theContextLab)
 {
   Selector_Algo* aResult = NULL;

@@ -94,7 +94,6 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
     return;
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  std::string aFeatureName = aFeature->data()->name();
 
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
     theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
@@ -202,7 +201,7 @@ void PartSet_OverconstraintListener::processEvent(
     // This Line's message should not be processed, as the reentrant operation is not for Line
     // It is not enoght of kind, the name should be used, e.g. restarted Lines on auxiliary
     // cirlce sometimes causes previous line change, kind the same, but feature line is different
-    std::string aCurrentFeatureName;
+    std::wstring aCurrentFeatureName;
     ModuleBase_Operation* anOperation =
                 XGUI_Tools::workshop(myWorkshop)->operationMgr()->currentOperation();
     if (anOperation) {

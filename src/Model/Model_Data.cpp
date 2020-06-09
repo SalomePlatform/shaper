@@ -106,22 +106,23 @@ void Model_Data::setLabel(TDF_Label theLab)
   }
 }
 
-std::string Model_Data::name()
+std::wstring Model_Data::name()
 {
   Handle(TDataStd_Name) aName;
   if (shapeLab().FindAttribute(TDataStd_Name::GetID(), aName)) {
 #ifdef DEBUG_NAMES
     myObject->myName = TCollection_AsciiString(aName->Get()).ToCString();
 #endif
-    return std::string(TCollection_AsciiString(aName->Get()).ToCString());
+    return std::wstring((wchar_t*)aName->Get().ToExtString());
+    //return std::wstring(TCollection_AsciiString(aName->Get()).ToCString());
   }
-  return "";  // not defined
+  return L"";  // not defined
 }
 
-void Model_Data::setName(const std::string& theName)
+void Model_Data::setName(const std::wstring& theName)
 {
   bool isModified = false;
-  std::string anOldName = name();
+  std::wstring anOldName = name();
   Handle(TDataStd_Name) aName;
   if (!shapeLab().FindAttribute(TDataStd_Name::GetID(), aName)) {
     TDataStd_Name::Set(shapeLab(), theName.c_str());
@@ -136,7 +137,7 @@ void Model_Data::setName(const std::string& theName)
       bool isUserDefined = true;
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
       if (aResult) {
-        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult, false).first;
+        std::wstring aDefaultName = ModelAPI_Tools::getDefaultName(aResult, false).first;
         isUserDefined = aDefaultName != theName;
       }
       if (isUserDefined) {

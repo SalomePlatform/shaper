@@ -100,7 +100,7 @@ public:
   //! \param theName name of the object to search
   //! \returns null if such object is not found
   virtual std::shared_ptr<ModelAPI_Object> objectByName(const std::string& theGroupID,
-                                                    const std::string& theName) = 0;
+                                                    const std::wstring& theName) = 0;
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
   //! \param theObject object of this document

@@ -58,7 +58,7 @@ SketchAPI_Projection::SketchAPI_Projection(
 
 SketchAPI_Projection::SketchAPI_Projection(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theExternalName)
+    const std::wstring & theExternalName)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -79,7 +79,7 @@ void SketchAPI_Projection::setExternalFeature(const ModelHighAPI_Selection & the
   execute(true);
 }
 
-void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
+void SketchAPI_Projection::setByExternalName(const std::wstring& theExternalName)
 {
   setExternalFeature(ModelHighAPI_Selection("EDGE", theExternalName));
 }

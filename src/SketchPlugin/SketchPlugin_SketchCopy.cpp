@@ -228,8 +228,8 @@ static void renameByParent(FeaturePtr theOld, FeaturePtr theNew)
 
   AttributeReferencePtr aNewParentRef = theNew->reference(SketchPlugin_SketchEntity::PARENT_ID());
 
-  std::string anOldName = anOldParentRef->value()->data()->name();
-  std::string aNewName = aNewParentRef->value()->data()->name();
+  std::wstring anOldName = anOldParentRef->value()->data()->name();
+  std::wstring aNewName = aNewParentRef->value()->data()->name();
 
   // substitute name of old parent by the new one
   theNew->data()->setName(theOld->name());
@@ -282,14 +282,14 @@ static void copyFeature(const FeaturePtr theFeature,
   renameByParent(theFeature, aNewFeature);
 }
 
-static int index(const std::string& theName, const std::string& thePrefix)
+static int index(const std::wstring& theName, const std::wstring& thePrefix)
 {
   int anIndex = -1;
   if (theName.find(thePrefix) == 0) {
     anIndex = 0;
     if (theName[thePrefix.size()] == '_') {
-      std::string anIndexStr = theName.substr(thePrefix.size() + 1);
-      anIndex = std::atoi(anIndexStr.c_str());
+      std::wstring anIndexStr = theName.substr(thePrefix.size() + 1);
+      anIndex = std::stoi(anIndexStr);
     }
   }
   return anIndex;
@@ -326,8 +326,8 @@ void SketchPlugin_SketchCopy::execute()
   aNewSketch->execute();
 
   // check number of copies of the selected sketch before name the new sketch
-  static const std::string SKETCH_NAME_SUFFIX("_Copy");
-  std::string aSketchName = aBaseSketch->name() + SKETCH_NAME_SUFFIX;
+  static const std::wstring SKETCH_NAME_SUFFIX(L"_Copy");
+  std::wstring aSketchName = aBaseSketch->name() + SKETCH_NAME_SUFFIX;
   int aNewSketchIndex = 0;
   std::list<FeaturePtr> aFeatures = document()->allFeatures();
   for (std::list<FeaturePtr>::iterator aFIt = aFeatures.begin(); aFIt != aFeatures.end(); ++aFIt) {
@@ -340,7 +340,7 @@ void SketchPlugin_SketchCopy::execute()
     if (anIndex >= aNewSketchIndex)
       aNewSketchIndex = anIndex + 1;
   }
-  std::ostringstream aNameStream;
+  std::wostringstream aNameStream;
   aNameStream << aSketchName;
   if (aNewSketchIndex > 0)
     aNameStream << '_' << aNewSketchIndex;

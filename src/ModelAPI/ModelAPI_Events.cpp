@@ -234,8 +234,8 @@ ModelAPI_ObjectRenamedMessage::~ModelAPI_ObjectRenamedMessage()
 {}
 
 void ModelAPI_ObjectRenamedMessage::send(ObjectPtr theObject,
-                                         const std::string& theOldName,
-                                         const std::string& theNewName,
+                                         const std::wstring& theOldName,
+                                         const std::wstring& theNewName,
                                          const void* theSender)
 {
   std::shared_ptr<ModelAPI_ObjectRenamedMessage> aMessage(
@@ -256,22 +256,22 @@ void ModelAPI_ObjectRenamedMessage::setObject(ObjectPtr theObject)
   myObject = theObject;
 }
 
-std::string ModelAPI_ObjectRenamedMessage::oldName() const
+std::wstring ModelAPI_ObjectRenamedMessage::oldName() const
 {
   return myOldName;
 }
 
-void ModelAPI_ObjectRenamedMessage::setOldName(const std::string& theOldName)
+void ModelAPI_ObjectRenamedMessage::setOldName(const std::wstring& theOldName)
 {
   myOldName = theOldName;
 }
 
-std::string ModelAPI_ObjectRenamedMessage::newName() const
+std::wstring ModelAPI_ObjectRenamedMessage::newName() const
 {
   return myNewName;
 }
 
-void ModelAPI_ObjectRenamedMessage::setNewName(const std::string& theNewName)
+void ModelAPI_ObjectRenamedMessage::setNewName(const std::wstring& theNewName)
 {
   myNewName = theNewName;
 }

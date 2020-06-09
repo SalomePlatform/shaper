@@ -47,7 +47,7 @@ SketchAPI_IntersectionPoint::SketchAPI_IntersectionPoint(
 
 SketchAPI_IntersectionPoint::SketchAPI_IntersectionPoint(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theExternalName )
+    const std::wstring & theExternalName )
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -68,7 +68,7 @@ void SketchAPI_IntersectionPoint::setByExternalEdge(const ModelHighAPI_Selection
   execute();
 }
 
-void SketchAPI_IntersectionPoint::setByExternalEdgeName(const std::string & theExternalLineName)
+void SketchAPI_IntersectionPoint::setByExternalEdgeName(const std::wstring & theExternalLineName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalLineName), externalFeature());
 

@@ -37,6 +37,7 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <codecvt>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -172,9 +173,10 @@ std::string getFeatureError(const FeaturePtr& theFeature)
 ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup,
                        const std::string& theName)
 {
+  std::wstring aName = toWString(theName);
   for (int anIndex = 0; anIndex < theDocument->size(theGroup); ++anIndex) {
     ObjectPtr anObject = theDocument->object(theGroup, anIndex);
-    if (anObject->data()->name() == theName)
+    if (anObject->data()->name() == aName)
       return anObject;
   }
   // not found
@@ -338,9 +340,9 @@ void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
 }
 
 //******************************************************************
-bool allDocumentsActivated(std::string& theNotActivatedNames)
+bool allDocumentsActivated(std::wstring& theNotActivatedNames)
 {
-  theNotActivatedNames = "";
+  theNotActivatedNames = L"";
   bool anAllPartActivated = true;
 
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
@@ -351,7 +353,7 @@ bool allDocumentsActivated(std::string& theNotActivatedNames)
     if (!aPart->isActivated()) {
       anAllPartActivated = false;
       if (!theNotActivatedNames.empty())
-        theNotActivatedNames += ", ";
+        theNotActivatedNames += L", ";
       theNotActivatedNames += aObject->data()->name().c_str();
     }
   }
@@ -615,7 +617,7 @@ void getConcealedResults(const FeaturePtr& theFeature,
   }
 }
 
-std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
+std::pair<std::wstring, bool> getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
                                             const bool theInherited)
 {
   typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
@@ -627,10 +629,10 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
     // names of sub-solids in CompSolid should be default (for example,
     // result of boolean operation 'Boolean_1_1' is a CompSolid which is renamed to 'MyBOOL',
     // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1_1', 'Boolean_1_1_2' etc.)
-    std::ostringstream aDefaultName;
+    std::wostringstream aDefaultName;
     aDefaultName << getDefaultName(anOwnerRes).first;
     aDefaultName << "_" << (bodyIndex(theResult) + 1);
-    return std::pair<std::string, bool>(aDefaultName.str(), false);
+    return std::pair<std::wstring, bool>(aDefaultName.str(), false);
   }
 
   FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
@@ -706,7 +708,7 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
       // return name of reference result only if it has been renamed by the user,
       // in other case compose a default name
       if (anObjRes->data()->hasUserDefinedName()) {
-        std::stringstream aName;
+        std::wstringstream aName;
         aName << anObjRes->data()->name();
         std::map<ResultPtr, int>::iterator aFound = aNbRefToObject.find(anObjRes);
         if (aFound != aNbRefToObject.end()) {
@@ -714,19 +716,19 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
           // referring to the same shape
           aName << "_" << aFound->second + 1;
         }
-        return std::pair<std::string, bool>(aName.str(), true);
+        return std::pair<std::wstring, bool>(aName.str(), true);
       }
     }
   }
 
   // compose default name by the name of the feature and the index of result
-  std::stringstream aDefaultName;
+  std::wstringstream aDefaultName;
   aDefaultName << anOwner->name();
   // if there are several results (issue #899: any number of result),
   // add unique prefix starting from second
   if (anIndexInOwner > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
     aDefaultName << "_" << anIndexInOwner + 1;
-  return std::pair<std::string, bool>(aDefaultName.str(), false);
+  return std::pair<std::wstring, bool>(aDefaultName.str(), false);
 }
 
 std::set<FeaturePtr> getParents(const FeaturePtr& theFeature)
@@ -1103,5 +1105,21 @@ std::list<FeaturePtr> referencedFeatures(
 }
 
 // LCOV_EXCL_STOP
+std::string toString(const std::wstring& theWStr)
+{
+  static std::wstring_convert<std::codecvt_utf8<wchar_t> > aConvertor;
+  return aConvertor.to_bytes(theWStr);
+}
+
+/*! Converts a byte string to an extended string
+*  \param theStr a byte string
+*/
+std::wstring toWString(const std::string& theStr)
+{
+  static std::wstring_convert<std::codecvt_utf8<wchar_t> > aConvertor;
+  return aConvertor.from_bytes(theStr);
+}
+
+
 
 } // namespace ModelAPI_Tools

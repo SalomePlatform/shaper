@@ -379,7 +379,7 @@ void XGUI_FacesPanel::processSelection()
     }
 
     QString aItemName = aResGroup.get()?
-      aResGroup->data()->name().c_str() : XGUI_Tools::generateName(aPrs);
+      QString::fromStdWString(aResGroup->data()->name()) : XGUI_Tools::generateName(aPrs);
     if (myListView->hasItem(aItemName))
       continue;
 

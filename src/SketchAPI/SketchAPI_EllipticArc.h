@@ -63,7 +63,7 @@ public:
   /// Constructor with external.
   SKETCHAPI_EXPORT
   SketchAPI_EllipticArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                        const std::string& theExternalName);
+                        const std::wstring& theExternalName);
 
   /// Destructor.
   SKETCHAPI_EXPORT
@@ -119,7 +119,7 @@ public:
 
   /// Set by external name.
   SKETCHAPI_EXPORT
-  void setByExternalName(const std::string& theExternalName);
+  void setByExternalName(const std::wstring& theExternalName);
 
   /// Set center.
   SKETCHAPI_EXPORT
@@ -143,15 +143,15 @@ public:
   /// And the name of the feature shows that it is a regular feature.
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > construction(
-      const std::string& center = std::string(),
-      const std::string& firstFocus = std::string(),
-      const std::string& secondFocus = std::string(),
-      const std::string& majorAxisStart = std::string(),
-      const std::string& majorAxisEnd = std::string(),
-      const std::string& minorAxisStart = std::string(),
-      const std::string& minorAxisEnd = std::string(),
-      const std::string& majorAxis = std::string(),
-      const std::string& minorAxis = std::string()) const;
+      const std::wstring& center = std::wstring(),
+      const std::wstring& firstFocus = std::wstring(),
+      const std::wstring& secondFocus = std::wstring(),
+      const std::wstring& majorAxisStart = std::wstring(),
+      const std::wstring& majorAxisEnd = std::wstring(),
+      const std::wstring& minorAxisStart = std::wstring(),
+      const std::wstring& minorAxisEnd = std::wstring(),
+      const std::wstring& majorAxis = std::wstring(),
+      const std::wstring& minorAxis = std::wstring()) const;
 
   /// Dump wrapped feature
   SKETCHAPI_EXPORT

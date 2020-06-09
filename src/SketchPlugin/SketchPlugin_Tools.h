@@ -155,7 +155,7 @@ void customizeFeaturePrs(const AISObjectPtr& thePrs, bool isAxiliary);
 void setDimensionColor(const AISObjectPtr& theDimPrs);
 
 /// Replace string in the name of object
-void replaceInName(ObjectPtr theObject, const std::string& theSource, const std::string& theDest);
+void replaceInName(ObjectPtr theObject, const std::wstring& theSource, const std::wstring& theDest);
 
 }; // namespace SketchPlugin_Tools
 

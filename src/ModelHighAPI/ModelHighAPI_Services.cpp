@@ -42,17 +42,17 @@ std::shared_ptr<ModelAPI_Document> activeDocument()
 }
 
 //--------------------------------------------------------------------------------------
-std::shared_ptr<GeomAPI_Ax3> defaultPlane( const std::string& theName )
+std::shared_ptr<GeomAPI_Ax3> defaultPlane( const std::wstring& theName )
 {
   std::shared_ptr<GeomAPI_Pnt> o(new GeomAPI_Pnt(0, 0, 0));
   std::shared_ptr<GeomAPI_Dir> n, x;
-  if (theName == "XOY") {
+  if (theName == L"XOY") {
       n.reset(new GeomAPI_Dir(0, 0, 1));
       x.reset(new GeomAPI_Dir(1, 0, 0));
-  } else if (theName == "XOZ") {
+  } else if (theName == L"XOZ") {
       n.reset(new GeomAPI_Dir(0, -1, 0));
       x.reset(new GeomAPI_Dir(1, 0, 0));
-  } else if (theName == "YOZ") {
+  } else if (theName == L"YOZ") {
       n.reset(new GeomAPI_Dir(1, 0, 0));
       x.reset(new GeomAPI_Dir(0, 1, 0));
   }
@@ -60,35 +60,35 @@ std::shared_ptr<GeomAPI_Ax3> defaultPlane( const std::string& theName )
   return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(o, x, n));
 }
 
-std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+std::wstring defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                          const std::shared_ptr<GeomAPI_Dir>& theNormal,
                          const std::shared_ptr<GeomAPI_Dir>& theDirX)
 {
   static const double aTol = 1.e-10;
 
   if (fabs(theOrigin->x()) > aTol || fabs(theOrigin->y()) > aTol || fabs(theOrigin->z()) > aTol)
-    return std::string();
+    return std::wstring();
 
   // XOY or XOZ
   if (fabs(theNormal->x()) < aTol &&
       fabs(theDirX->x() - 1.0) < aTol && fabs(theDirX->y()) < aTol && fabs(theDirX->z()) < aTol) {
     // XOY
     if (fabs(theNormal->y()) < aTol && fabs(theNormal->z() - 1.0) < aTol)
-      return std::string("XOY");
+      return std::wstring(L"XOY");
     else if (fabs(theNormal->y() + 1.0) < aTol && fabs(theNormal->z()) < aTol)
-      return std::string("XOZ");
+      return std::wstring(L"XOZ");
   }
   // YOZ
   else if (fabs(theNormal->x() - 1.0) < aTol &&
            fabs(theNormal->y()) < aTol && fabs(theNormal->z()) < aTol &&
            fabs(theDirX->x()) < aTol && fabs(theDirX->y() - 1.0) < aTol &&
            fabs(theDirX->z()) < aTol)
-    return std::string("YOZ");
+    return std::wstring(L"YOZ");
 
-  return std::string();
+  return std::wstring();
 }
 
-std::shared_ptr<ModelAPI_Result> standardPlane(const std::string & theName){
+std::shared_ptr<ModelAPI_Result> standardPlane(const std::wstring & theName){
   DocumentPtr aPartSet = ModelAPI_Session::get()->moduleDocument();
   // searching for the construction element
   return std::dynamic_pointer_cast<ModelAPI_Result>(

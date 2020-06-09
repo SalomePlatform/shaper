@@ -206,7 +206,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
     int aDispMode = isShading? Shading : Wireframe;
     anAISIO->SetDisplayMode(aDispMode);
-    aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, aDispMode, 0, false, AIS_DS_Displayed);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
@@ -703,7 +703,7 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!aContext.IsNull() && !anAISIO.IsNull()) {
-    aContext->Display(anAISIO, theDisplayMode, 0, false/*update viewer*/, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, theDisplayMode, 0, false/*update viewer*/, AIS_DS_Displayed);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
@@ -1058,7 +1058,6 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
                         0 /*wireframe*/,
                         -1 /* selection mode */,
                         Standard_True /* update viewer*/,
-                        Standard_False /* allow decomposition */,
                         AIS_DS_Displayed /* xdisplay status */);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(aTrihedron);
@@ -1098,7 +1097,7 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   /// OCCT: to write about the problem that active owners method returns one owner several times
   QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
+    anOwner = anOwnersIt.Value();
     if (aSelectedIds.contains((size_t)anOwner.get()))
       continue;
     aSelectedIds.append((size_t)anOwner.get());

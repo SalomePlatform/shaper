@@ -51,14 +51,14 @@ public:
 
   /// Restores the selected shape by the topological name string.
   /// Returns not empty label of the context.
-  SELECTOR_EXPORT virtual TDF_Label restoreByName(std::string theName,
+  SELECTOR_EXPORT virtual TDF_Label restoreByName(std::wstring theName,
     const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator) override;
 
   /// Updates the current shape by the stored topological name
   SELECTOR_EXPORT virtual bool solve(const TopoDS_Shape& theContext) override;
 
   /// Returns the naming name of the selection
-  SELECTOR_EXPORT virtual std::string name(Selector_NameGenerator* theNameGenerator) override;
+  SELECTOR_EXPORT virtual std::wstring name(Selector_NameGenerator* theNameGenerator) override;
 
 private:
   /// Initializes selector

@@ -94,7 +94,7 @@ Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 
 // prefix for the whole feature context identification
-const static std::string kWHOLE_FEATURE = "all-in-";
+const static std::wstring kWHOLE_FEATURE = L"all-in-";
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -368,7 +368,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
               std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
               int anIndex;
               std::string aType; // to reuse already existing selection the type is not needed
-              return aPart->shapeInPart(aNameInPart, aType, anIndex);
+              return aPart->shapeInPart(ModelAPI_Tools::toWString(aNameInPart), aType, anIndex);
             }
           }
         }
@@ -715,13 +715,13 @@ bool Model_AttributeSelection::selectPart(
   }
   // store the shape (in case part is not loaded it should be useful
   TopoDS_Shape aShape;
-  std::string aName = theContext->data()->name();
+  std::wstring aName = theContext->data()->name();
   if (!theSubShape.get() || theSubShape->isNull()) {// the whole part shape is selected
     aShape = theContext->shape()->impl<TopoDS_Shape>();
   } else {
     aShape = theSubShape->impl<TopoDS_Shape>();
     int anIndex;
-    aName += "/" + aPart->nameInPart(theSubShape, anIndex);
+    aName += L"/" + aPart->nameInPart(theSubShape, anIndex);
     TDataStd_Integer::Set(selectionLabel(), anIndex);
   }
   TNaming_Builder aBuilder(selectionLabel());
@@ -737,22 +737,22 @@ TDF_Label Model_AttributeSelection::selectionLabel()
 }
 
 /// prefixes of the shape names with centers defined
-static std::map<ModelAPI_AttributeSelection::CenterType, std::string> kCENTERS_PREFIX;
+static std::map<ModelAPI_AttributeSelection::CenterType, std::wstring> kCENTERS_PREFIX;
 
 /// returns the map that contains all possible prefixes of the center-names
-static std::map<ModelAPI_AttributeSelection::CenterType, std::string>& centersMap()
+static std::map<ModelAPI_AttributeSelection::CenterType, std::wstring>& centersMap()
 {
   if (kCENTERS_PREFIX.empty()) { // fill map by initial values
-    kCENTERS_PREFIX[ModelAPI_AttributeSelection::CIRCLE_CENTER] = "__cc";
-    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS] = "__eff";
-    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS] = "__esf";
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::CIRCLE_CENTER] = L"__cc";
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS] = L"__eff";
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS] = L"__esf";
   }
   return kCENTERS_PREFIX;
 }
 
-std::string Model_AttributeSelection::namingName(const std::string& theDefaultName)
+std::wstring Model_AttributeSelection::namingName(const std::wstring& theDefaultName)
 {
-  std::string aName("");
+  std::wstring aName(L"");
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
 
@@ -761,12 +761,13 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     GeomShapePtr aShape = value();
     if (!aShape.get() && context().get())
       aShape = context()->shape();
-    std::string aName;
+    std::wstring aName;
     if (aShape.get()) {
-      aName = aShape->shapeTypeStr();
+      aName = ModelAPI_Tools::toWString(aShape->shapeTypeStr());
       if (myParent) {
-        aName += std::string("_") +
-          TCollection_AsciiString(selectionLabel().Father().Tag()).ToCString();
+        std::wostringstream aStream;
+        aStream << "_" << selectionLabel().Father().Tag();
+        aName += aStream.str();
       }
     }
     return aName;
@@ -777,21 +778,21 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
 
   FeaturePtr aContFeature = contextFeature();
   if (aContFeature.get()) {
-    std::string aResName;
+    std::wstring aResName;
     // checking part-owner
     if (aContFeature->document() != owner()->document())
-        aResName += aContFeature->document()->kind() + "/";
+        aResName += ModelAPI_Tools::toWString(aContFeature->document()->kind()) + L"/";
     // selection of a full feature
     if (aContFeature.get()) {
       return aResName + kWHOLE_FEATURE + aContFeature->name();
     }
     // in case of selection of removed result
-    return "";
+    return L"";
   }
 
   ResultPtr aCont = context();
   if (!aCont.get()) {
-    return ""; // invalid case
+    return L""; // invalid case
   }
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // whole context, no value
@@ -802,8 +803,9 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   if (aCont->groupName() == ModelAPI_ResultPart::group()) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCont);
     int anIndex;
-    std::string aResult = aSubSh.get() ?
-      aPart->data()->name() + "/" + aPart->nameInPart(aSubSh, anIndex) : aPart->data()->name();
+    std::wstring aResult = aSubSh.get() ?
+      aPart->data()->name() + L"/" + aPart->nameInPart(aSubSh, anIndex)
+      : aPart->data()->name();
     if (aCenterType != NOT_CENTER)
       aResult += centersMap()[aCenterType];
     return aResult;
@@ -818,7 +820,7 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   }
 
   Selector_Selector aSelector(aSelLab, baseDocumentLab());
-  std::string aResult;
+  std::wstring aResult;
   if (aCont->shape().get() && aSelector.restore(aCont->shape()->impl<TopoDS_Shape>()))
     aResult = aSelector.name(this);
   if (aCenterType != NOT_CENTER) {
@@ -828,9 +830,9 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
 }
 
 // returns the center type and modifies the shape name if this name is center-name
-static ModelAPI_AttributeSelection::CenterType centerTypeByName(std::string& theShapeName)
+static ModelAPI_AttributeSelection::CenterType centerTypeByName(std::wstring& theShapeName)
 {
-  std::map<ModelAPI_AttributeSelection::CenterType, std::string>::iterator aPrefixIter =
+  std::map<ModelAPI_AttributeSelection::CenterType, std::wstring>::iterator aPrefixIter =
     centersMap().begin();
   for(; aPrefixIter != centersMap().end(); aPrefixIter++) {
     std::size_t aFound = theShapeName.find(aPrefixIter->second);
@@ -845,11 +847,11 @@ static ModelAPI_AttributeSelection::CenterType centerTypeByName(std::string& the
 
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
 void Model_AttributeSelection::selectSubShape(
-  const std::string& theType, const std::string& theSubShapeName)
+  const std::string& theType, const std::wstring& theSubShapeName)
 {
   if(theSubShapeName.empty() || theType.empty()) return;
 
-  std::string aSubShapeName = theSubShapeName;
+  std::wstring aSubShapeName = theSubShapeName;
   CenterType aCenterType = theType[0] == 'v' || theType[0] == 'V' ? // only for vertex-type
     centerTypeByName(aSubShapeName) : NOT_CENTER;
   std::string aType = aCenterType == NOT_CENTER ? theType : "EDGE"; // search for edge now
@@ -870,9 +872,9 @@ void Model_AttributeSelection::selectSubShape(
     // check this is Part-name: 2 delimiters in the name
     std::size_t aPartEnd = aSubShapeName.find('/');
     if (aPartEnd != std::string::npos) {
-      std::string aPartName = aSubShapeName.substr(0, aPartEnd);
+      std::wstring aPartName = aSubShapeName.substr(0, aPartEnd);
       DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-      if (aPartName == aRootDoc->kind()) {
+      if (aPartName == ModelAPI_Tools::toWString(aRootDoc->kind())) {
         aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
         aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
       }
@@ -881,7 +883,7 @@ void Model_AttributeSelection::selectSubShape(
           owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
         if (aFound.get()) { // found such part, so asking it for the name
           ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
-          std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
+          std::wstring aNameInPart = aSubShapeName.substr(aPartEnd + 1);
           if (aNameInPart.empty()) { // whole part
             setValue(aPart, anEmptyShape);
             return;
@@ -924,7 +926,7 @@ void Model_AttributeSelection::selectSubShape(
     // check this is a whole feature context
     if (aSubShapeName.size() > kWHOLE_FEATURE.size() &&
       aSubShapeName.substr(0, kWHOLE_FEATURE.size()) == kWHOLE_FEATURE) {
-      std::string aFeatureName = aSubShapeName.substr(kWHOLE_FEATURE.size());
+      std::wstring aFeatureName = aSubShapeName.substr(kWHOLE_FEATURE.size());
       ObjectPtr anObj = aDoc->objectByName(ModelAPI_Feature::group(), aFeatureName);
       if (anObj.get()) {
         setValue(anObj, anEmptyShape);
@@ -1075,7 +1077,7 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
 }
 
 void Model_AttributeSelection::selectSubShape(const std::string& theType,
-  const std::string& theContextName, const int theIndex)
+  const std::wstring& theContextName, const int theIndex)
 {
   // selection of context by name
   selectSubShape(theType, theContextName);
@@ -1128,17 +1130,17 @@ void Model_AttributeSelection::setId(int theID)
   setValue(aContextRes, aSelection);
 }
 
-std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) const
+std::wstring Model_AttributeSelection::contextName(const ResultPtr& theContext) const
 {
-  std::string aResult;
+  std::wstring aResult;
   if (owner()->document() != theContext->document()) {
     if (theContext->document() == ModelAPI_Session::get()->moduleDocument()) {
-      aResult = theContext->document()->kind() + "/";
+      aResult = ModelAPI_Tools::toWString(theContext->document()->kind()) + L"/";
     } else {
       ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
         ModelAPI_Session::get()->moduleDocument(), theContext->document());
       if (aDocRes.get()) {
-        aResult = aDocRes->data()->name() + "/";
+        aResult = aDocRes->data()->name() + L"/";
       }
     }
   }
@@ -1843,7 +1845,7 @@ void Model_AttributeSelection::setParent(Model_AttributeSelectionList* theParent
   myParent = theParent;
 }
 
-std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLab)
+std::wstring Model_AttributeSelection::contextName(const TDF_Label theSelectionLab)
 {
   std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
@@ -1868,7 +1870,7 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
     }
     if (aResult.get()) {
       // this is to avoid duplicated names of results problem
-      std::string aContextName = aResult->data()->name();
+      std::wstring aContextName = aResult->data()->name();
       // myLab corresponds to the current time
       TDF_Label aCurrentLab = selectionLabel();
       while(aCurrentLab.Depth() > 3)
@@ -1877,29 +1879,29 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
       int aNumInHistoryNames =
         aDoc->numberOfNameInHistory(aResult, aCurrentLab);
       while(aNumInHistoryNames > 1) { // add "_" before name the needed number of times
-        aContextName = "_" + aContextName;
+        aContextName = L"_" + aContextName;
         aNumInHistoryNames--;
       }
       if (aBaseDocumnetUsed)
-        aContextName = aDoc->kind() + "/" + aContextName;
+        aContextName = ModelAPI_Tools::toWString(aDoc->kind()) + L"/" + aContextName;
       return aContextName;
     }
   }
-  return ""; // invalid case
+  return L""; // invalid case
 }
 
 /// This method restores by the context and value name the context label and
 /// sub-label where the value is. Returns true if it is valid.
-bool Model_AttributeSelection::restoreContext(std::string theName,
+bool Model_AttributeSelection::restoreContext(std::wstring theName,
   TDF_Label& theContext, TDF_Label& theValue)
 {
   static const GeomShapePtr anEmptyShape; // to store context only
-  std::string aName = theName;
+  std::wstring aName = theName;
   std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
 
   // remove the sub-value part if exists
-  std::string aSubShapeName = aName;
+  std::wstring aSubShapeName = aName;
   std::string::size_type n = aName.find('/');
   if (n != std::string::npos) {
     aName = aName.substr(0, n);
@@ -1912,7 +1914,7 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
     // name in PartSet?
     aDoc = std::dynamic_pointer_cast<Model_Document>(
       ModelAPI_Session::get()->moduleDocument());
-    if (theName.find(aDoc->kind()) == 0) { // remove the document identifier from name if exists
+    if (theName.find(ModelAPI_Tools::toWString(aDoc->kind())) == 0) { // remove the document identifier from name if exists
       aSubShapeName = theName.substr(aDoc->kind().size() + 1);
       aName = aSubShapeName;
       std::string::size_type n = aName.find('/');
@@ -1933,7 +1935,7 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
   if (theValue.IsNull() && aCont->groupName() == ModelAPI_ResultConstruction::group()) {
     std::string::size_type aSlash = aSubShapeName.rfind('/');
     if (aSlash != std::string::npos) {
-      std::string aCompName = aSubShapeName.substr(aSlash + 1);
+      std::wstring aCompName = aSubShapeName.substr(aSlash + 1);
       CompositeFeaturePtr aComposite =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDoc->feature(aCont));
       if (aComposite.get() && aComposite->numberOfSubs()) {
@@ -2116,7 +2118,7 @@ void Model_AttributeSelection::combineGeometrical()
     Handle(TDataStd_Integer) anIndex;
     if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
       if (anIndex->Get()) { // special selection attribute was created, use it
-        std::string aNewName;
+        std::wstring aNewName;
         aPart->combineGeometrical(anIndex->Get(), aNewName);
         TDataStd_Name::Set(aSelLab, aNewName.c_str());
       }

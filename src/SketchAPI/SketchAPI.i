@@ -27,6 +27,8 @@
 
   // fix for SWIG v2.0.4
   #define SWIGPY_SLICE_ARG(obj) ((PyObject*)(obj))
+
+  #define SWIGPY_UNICODE_ARG(obj) ((PyObject*) (obj))
 %}
 
 %include "doxyhelp.i"
@@ -40,10 +42,7 @@
 #define SKETCHAPI_EXPORT
 
 // standard definitions
-%include "typemaps.i"
-%include "std_list.i"
 %include "std_pair.i"
-%include "std_shared_ptr.i"
 
 // function with named parameters
 %feature("kwargs") SketchAPI_BSpline::controlPoles;

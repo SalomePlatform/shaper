@@ -74,11 +74,11 @@ void ParametersPlugin_Parameter::attributeChanged(const std::string& theID)
 void ParametersPlugin_Parameter::updateName()
 {
   std::string aName = string(VARIABLE_ID())->value();
-  data()->setName(aName);
+  data()->setName(ModelAPI_Tools::toWString(aName));
 
   ResultParameterPtr aParam = document()->createParameter(data());
-  std::string anOldName = aParam->data()->name();
-  aParam->data()->setName(aName);
+  std::string anOldName = ModelAPI_Tools::toString(aParam->data()->name());
+  aParam->data()->setName(ModelAPI_Tools::toWString(aName));
   setResult(aParam);
 
 

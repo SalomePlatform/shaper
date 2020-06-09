@@ -801,7 +801,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
-      myListView->addItem(aAttr->namingName().c_str(), i);
+      myListView->addItem(QString::fromStdWString(aAttr->namingName()), i);
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -809,7 +809,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        myListView->addItem(anObject->data()->name().c_str(), i);
+        myListView->addItem(QString::fromStdWString(anObject->data()->name()), i);
       }
     }
   }
@@ -819,13 +819,13 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
       AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
       QString aName;
       if (anAttribute.get()) {
-        std::string anAttrName = ModuleBase_Tools::generateName(anAttribute, myWorkshop);
-        aName = QString::fromStdString(anAttrName);
+        std::wstring anAttrName = ModuleBase_Tools::generateName(anAttribute, myWorkshop);
+        aName = QString::fromStdWString(anAttrName);
       }
       else {
         ObjectPtr anObject = aRefAttrListAttr->object(i);
         if (anObject.get()) {
-          aName = anObject->data()->name().c_str();
+          aName = QString::fromStdWString(anObject->data()->name());
         }
       }
       myListView->addItem(aName, i);

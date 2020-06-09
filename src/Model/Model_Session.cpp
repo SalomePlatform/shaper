@@ -362,7 +362,7 @@ std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments
   return aResult;
 }
 
-bool Model_Session::isLoadByDemand(const std::string theDocID, const int theDocIndex)
+bool Model_Session::isLoadByDemand(const std::wstring theDocID, const int theDocIndex)
 {
   return Model_Application::getApplication()->isLoadByDemand(theDocID, theDocIndex);
 }

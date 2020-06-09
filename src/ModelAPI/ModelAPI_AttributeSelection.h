@@ -92,13 +92,13 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Returns a textual string of the selection
   /// \param theDefaultValue a value, which is used if the naming name can not be obtained
-  virtual std::string namingName(const std::string& theDefaultValue = "") = 0;
+  virtual std::wstring namingName(const std::wstring& theDefaultValue = L"") = 0;
 
   /// Defines an id of the selection
   virtual void setId(int theID) = 0;
 
   /// Selects sub-shape by the textual Name
-  virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
+  virtual void selectSubShape(const std::string& theType, const std::wstring& theSubShapeName) = 0;
 
   /// Selects sub-shape by its inner point
   virtual void selectSubShape(const std::string& theType,
@@ -106,7 +106,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Selects sub-shape by weak naming index
   virtual void selectSubShape(const std::string& theType,
-    const std::string& theContextName, const int theIndex) = 0;
+    const std::wstring& theContextName, const int theIndex) = 0;
 
   /// Returns true if recompute of selection become impossible
   virtual bool isInvalid() = 0;
@@ -118,7 +118,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelection();
 
   /// Returns the name by context. Adds the part name if the context is located in other document
-  MODELAPI_EXPORT virtual std::string contextName(const ResultPtr& theContext) const = 0;
+  MODELAPI_EXPORT virtual std::wstring contextName(const ResultPtr& theContext) const = 0;
 
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   MODELAPI_EXPORT virtual void combineGeometrical() = 0;

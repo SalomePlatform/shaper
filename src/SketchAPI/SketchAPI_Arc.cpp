@@ -75,7 +75,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
 
 //================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const std::string& theExternalName)
+                             const std::wstring& theExternalName)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -126,7 +126,7 @@ void SketchAPI_Arc::setByExternal(const ModelHighAPI_Selection & theExternal)
 }
 
 //===============================================================================================
-void SketchAPI_Arc::setByExternalName(const std::string & theExternalName)
+void SketchAPI_Arc::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
 

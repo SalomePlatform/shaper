@@ -114,8 +114,8 @@ ConePtr addCone(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const ModelHighAPI_Double& theTopRadius,
                 const ModelHighAPI_Double& theHeight)
 {
-  ModelHighAPI_Selection aBasePoint("VERTEX", "PartSet/Origin");
-  ModelHighAPI_Selection anAxis("EDGE", "PartSet/OZ");
+  ModelHighAPI_Selection aBasePoint("VERTEX", L"PartSet/Origin");
+  ModelHighAPI_Selection anAxis("EDGE", L"PartSet/OZ");
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Cone::ID());
   return ConePtr(new PrimitivesAPI_Cone(aFeature, aBasePoint, anAxis, theBaseRadius,
                                         theTopRadius, theHeight));

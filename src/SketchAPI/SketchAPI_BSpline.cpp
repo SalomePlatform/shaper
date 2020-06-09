@@ -30,6 +30,8 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <ModelAPI_Tools.h>
+
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
@@ -152,8 +154,8 @@ static void createPole(const CompositeFeaturePtr& theSketch,
   aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theBSpline);
   aPointFeature->execute();
 
-  std::ostringstream aName;
-  aName << theBSpline->name() << "_" << thePoles->id() << "_" << thePoleIndex;
+  std::wostringstream aName;
+  aName << theBSpline->name() << "_" << ModelAPI_Tools::toWString(thePoles->id()) << "_" << thePoleIndex;
   aPointFeature->data()->setName(aName.str());
   aPointFeature->lastResult()->data()->setName(aName.str());
 
@@ -185,7 +187,7 @@ static void createSegment(const CompositeFeaturePtr& theSketch,
   aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theBSpline);
   aLineFeature->execute();
 
-  std::ostringstream aName;
+  std::wostringstream aName;
   aName << theBSpline->name() << "_segment_" << theStartPoleIndex << "_" << aEndPoleIndex;
   aLineFeature->data()->setName(aName.str());
   aLineFeature->lastResult()->data()->setName(aName.str());

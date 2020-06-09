@@ -1389,7 +1389,7 @@ std::string SketchPlugin_Split::getFeatureInfo(const std::shared_ptr<ModelAPI_Fe
   }
 
   if (theFeature->data()->isValid())
-    anInfo.append(theFeature->data()->name().c_str());
+    anInfo.append(ModelAPI_Tools::toString(theFeature->data()->name()));
 
   if (isUseAttributesInfo) {
     std::string aPointsInfo = ModelGeomAlgo_Point2D::getPontAttributesInfo(theFeature,

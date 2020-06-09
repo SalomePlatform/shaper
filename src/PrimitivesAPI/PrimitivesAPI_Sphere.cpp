@@ -94,7 +94,7 @@ SpherePtr addSphere(const std::shared_ptr<ModelAPI_Document>& thePart,
 SpherePtr addSphere(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const ModelHighAPI_Double& theRadius)
 {
-  ModelHighAPI_Selection aCenterPoint("VERTEX", "PartSet/Origin");
+  ModelHighAPI_Selection aCenterPoint("VERTEX", L"PartSet/Origin");
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Sphere::ID());
   return SpherePtr(new PrimitivesAPI_Sphere(aFeature, aCenterPoint, theRadius));
 }

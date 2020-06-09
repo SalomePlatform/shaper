@@ -58,7 +58,7 @@ class InitializationPlugin_Plugin : public Events_Listener
   /// \param theX - X coordinate
   /// \param theY - Y coordinate
   /// \param theZ - Z coordinate
-  FeaturePtr createPoint(DocumentPtr theDoc, const std::string& theName,
+  FeaturePtr createPoint(DocumentPtr theDoc, const std::wstring& theName,
                          double theX, double theY, double theZ);
 
   /// Creates an axis which is started from origin point

@@ -74,7 +74,7 @@ SketchAPI_EllipticArc::SketchAPI_EllipticArc(const std::shared_ptr<ModelAPI_Feat
 }
 
 SketchAPI_EllipticArc::SketchAPI_EllipticArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::string& theExternalName)
+                                     const std::wstring& theExternalName)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -125,7 +125,7 @@ void SketchAPI_EllipticArc::setByExternal(const ModelHighAPI_Selection & theExte
   execute();
 }
 
-void SketchAPI_EllipticArc::setByExternalName(const std::string & theExternalName)
+void SketchAPI_EllipticArc::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
   execute();
@@ -178,15 +178,15 @@ static const std::list<PairOfStrings>& ellipticArcAttrAndDumpNames()
 }
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_EllipticArc::construction(
-    const std::string& center,
-    const std::string& firstFocus,
-    const std::string& secondFocus,
-    const std::string& majorAxisStart,
-    const std::string& majorAxisEnd,
-    const std::string& minorAxisStart,
-    const std::string& minorAxisEnd,
-    const std::string& majorAxis,
-    const std::string& minorAxis) const
+    const std::wstring& center,
+    const std::wstring& firstFocus,
+    const std::wstring& secondFocus,
+    const std::wstring& majorAxisStart,
+    const std::wstring& majorAxisEnd,
+    const std::wstring& minorAxisStart,
+    const std::wstring& minorAxisEnd,
+    const std::wstring& majorAxis,
+    const std::wstring& minorAxis) const
 {
   FeaturePtr anEllipse = feature();
 

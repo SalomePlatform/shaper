@@ -305,7 +305,7 @@ QString objectName(const ObjectPtr& theObj)
   if (!theObj.get())
     return "";
 
-  return theObj->data()->name().c_str();
+  return QString::fromStdWString(theObj->data()->name());
 }
 
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
@@ -336,8 +336,8 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
     if (aFeature->data()->isValid()) {
-      aFeatureStr.append(QString(", name=%1").arg(theObj->data()->name().c_str()).toStdString()
-                                                                                       .c_str());
+      aFeatureStr.append(QString(", name=%1")
+        .arg(QString::fromStdWString(theObj->data()->name())).toStdString().c_str());
     }
     if (isUseAttributesInfo) {
       std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes;
@@ -564,8 +564,8 @@ void getParameters(QStringList& theParameters)
     int aSize = aDocument->size(aGroupId);
     for (int i = 0; i < aSize; i++) {
       ObjectPtr anObject = aDocument->object(aGroupId, i);
-      std::string aParameterName = anObject->data()->name();
-      theParameters.append(aParameterName.c_str());
+      std::wstring aParameterName = anObject->data()->name();
+      theParameters.append(QString::fromStdWString(aParameterName));
     }
   }
 }
@@ -941,12 +941,12 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
                  const std::string& thePrefixInfo)
 {
   QString aNotActivatedDocWrn;
-  std::string aNotActivatedNames;
+  std::wstring aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     if (ModuleBase_Tools::hasModuleDocumentFeature(theFeatures))
       aNotActivatedDocWrn =
         QObject::tr("Selected objects can be used in Part documents which are not loaded: %1.\n")
-                            .arg(aNotActivatedNames.c_str());
+                            .arg(QString::fromStdWString(aNotActivatedNames));
   }
 
   std::set<FeaturePtr> aFeaturesRefsTo;
@@ -962,7 +962,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
       continue;
 
     if (isFeatureOfResult(aFeature, ModelAPI_ResultPart::group()))
-      aPartFeatureNames.append(aFeature->name().c_str());
+      aPartFeatureNames.append(QString::fromStdWString(aFeature->name()));
 
     std::set<FeaturePtr> aRefFeatures;
     std::set<FeaturePtr> aRefList = theReferences.at(aFeature);
@@ -992,7 +992,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
     FeaturePtr aFeature = *anIt;
     if (theReferencesToDelete.find(aFeature) == theReferencesToDelete.end()) {
       aFeaturesRefsToParameterOnly.insert(aFeature);
-      aParamFeatureNames.append(aFeature->name().c_str());
+      aParamFeatureNames.append(QString::fromStdWString(aFeature->name()));
     }
   }
   aParamFeatureNames.sort();
@@ -1004,9 +1004,9 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
     if (aFeature->getKind() == "RemoveResults")
       continue; // skip the remove results feature mentioning: result will be removed anyway
     if (isFeatureOfResult(aFeature, ModelAPI_ResultPart::group()))
-      aPartFeatureNames.append(aFeature->name().c_str());
+      aPartFeatureNames.append(QString::fromStdWString(aFeature->name()));
     else
-      anOtherFeatureNames.append(aFeature->name().c_str());
+      anOtherFeatureNames.append(QString::fromStdWString(aFeature->name()));
   }
   aPartFeatureNames.sort();
   anOtherFeatureNames.sort();
@@ -1252,7 +1252,7 @@ bool isNameExist(const QString& theName, FeaturePtr theIgnoreParameter)
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
   FeaturePtr aParamFeature;
   int aNbFeatures = aDoc->numInternalFeatures();
-  std::string aName = theName.toStdString();
+  std::wstring aName = theName.toStdWString();
   for (int i = 0; i < aNbFeatures; i++) {
     aParamFeature = aDoc->internalFeature(i);
     if (aParamFeature && aParamFeature->getKind() == "Parameter") {
@@ -1269,7 +1269,7 @@ FeaturePtr findParameter(const QString& theName)
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
   FeaturePtr aParamFeature;
   int aNbFeatures = aDoc->numInternalFeatures();
-  std::string aName = theName.toStdString();
+  std::wstring aName = theName.toStdWString();
   for (int i = 0; i < aNbFeatures; i++) {
     aParamFeature = aDoc->internalFeature(i);
     if (aParamFeature && aParamFeature->getKind() == "Parameter") {
@@ -1282,10 +1282,10 @@ FeaturePtr findParameter(const QString& theName)
 
 
 //********************************************************************
-std::string generateName(const AttributePtr& theAttribute,
+std::wstring generateName(const AttributePtr& theAttribute,
   ModuleBase_IWorkshop* theWorkshop)
 {
-  std::string aName;
+  std::wstring aName;
   if (theAttribute.get() != NULL) {
     ModuleBase_Operation* anOperation = theWorkshop->currentOperation();
 
@@ -1298,7 +1298,7 @@ std::string generateName(const AttributePtr& theAttribute,
       std::string anAttributeTitle;
       aFactory.getAttributeTitle(theAttribute->id(), anAttributeTitle);
 
-      std::stringstream aStreamName;
+      std::wstringstream aStreamName;
       aStreamName << theAttribute->owner()->data()->name() << "/" << anAttributeTitle.c_str();
       aName = aStreamName.str();
     }

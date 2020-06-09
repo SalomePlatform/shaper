@@ -294,17 +294,17 @@ bool Selector_FilterByNeighbors::restore()
   return myNBLevel.size() == list().size() && !myNBLevel.empty();
 }
 
-TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
+TDF_Label Selector_FilterByNeighbors::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
   myShapeType = theShapeType;
   TDF_Label aContext;
-  std::string aLastLevel; // last level string (after '(' )  to check the context name in the end
+  std::wstring aLastLevel; // last level string (after '(' )  to check the context name in the end
   for (size_t aStart = 0; aStart != std::string::npos;
     aStart = theName.find('(', aStart + 1)) {
     size_t anEndPos = theName.find(')', aStart + 1);
     if (anEndPos != std::string::npos) {
-      std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+      std::wstring aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
         Selector_Algo::restoreByName(newSubLabel(), baseDocument(), aSubStr, myShapeType,
@@ -327,7 +327,7 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       //  aContext = theNameGenerator->newestContext(aContext);
 
       // searching for the level index
-      std::string aLevel;
+      std::wstring aLevel;
       for (anEndPos++; anEndPos != std::string::npos &&
         theName[anEndPos] != '(' && theName[anEndPos] != 0;
         anEndPos++) {
@@ -337,7 +337,7 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       if (aLevel.empty() || aLevel[0] == '_')
         myNBLevel.push_back(1); // by default it is 1
       else {
-        int aNum = atoi(aLevel.c_str());
+        int aNum = std::stoi(aLevel.c_str());
         if (aNum > 0)
           myNBLevel.push_back(aNum);
         else
@@ -347,9 +347,9 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       return TDF_Label(); // invalid parentheses
   }
   if (!aLastLevel.empty()) { // get the context
-    size_t aLinePos = aLastLevel.find("_");
+    size_t aLinePos = aLastLevel.find(L"_");
     if (aLinePos != std::string::npos) {
-      std::string aContextName = aLastLevel.substr(aLinePos + 1);
+      std::wstring aContextName = aLastLevel.substr(aLinePos + 1);
       if (!aContextName.empty()) {
         TDF_Label aThisContext, aValue;
         if (theNameGenerator->restoreContext(aContextName, aThisContext, aValue)) {
@@ -387,23 +387,23 @@ bool Selector_FilterByNeighbors::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGenerator)
 {
   // (nb1)level_if_more_than_1(nb2)level_if_more_than_1(nb3)level_if_more_than_1
   bool aThisContextNameNeeded = !myContext.IsNull();
-  std::string aContextName;
+  std::wstring aContextName;
   if (aThisContextNameNeeded)
     aContextName = theNameGenerator->contextName(myContext);
-  std::string aResult;
+  std::wstring aResult;
   std::list<int>::iterator aLevel = myNBLevel.begin();
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
   for(; aSubSel != list().cend(); aSubSel++, aLevel++) {
     if (!*aSubSel)
       continue;
-    std::string aSubName = (*aSubSel)->name(theNameGenerator);
-    aResult += "(" + aSubName + ")";
+    std::wstring aSubName = (*aSubSel)->name(theNameGenerator);
+    aResult += L"(" + aSubName + L")";
     if (*aLevel > 1) {
-      std::ostringstream aLevelStr;
+      std::wostringstream aLevelStr;
       aLevelStr<<*aLevel;
       aResult += aLevelStr.str();
     }
@@ -413,7 +413,7 @@ std::string Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGene
       aThisContextNameNeeded = false;
   }
   if (aThisContextNameNeeded) {
-    aResult = aResult + "_" + aContextName;
+    aResult = aResult + L"_" + aContextName;
   }
   return aResult;
 }

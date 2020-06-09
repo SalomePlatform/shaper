@@ -49,12 +49,12 @@ void CollectionPlugin_Group::execute()
 }
 
 // returns name with suffix, not existing in the existing set
-static std::string findName(
-  const std::string theOrigin, int& theSuffix, std::set<std::string>& theExisting)
+static std::wstring findName(
+  const std::wstring theOrigin, int& theSuffix, std::set<std::wstring>& theExisting)
 {
-  std::string aRes;
+  std::wstring aRes;
   do {
-    std::ostringstream aName;
+    std::wostringstream aName;
     aName<<theOrigin<<"_"<<theSuffix;
     aRes = aName.str();
     theSuffix++;
@@ -82,7 +82,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
   if (theActionId == "split") {
     DocumentPtr aDoc = document();
     // collect all existing names of features to give unique names
-    std::set<std::string> aFeatNames, aResNames;
+    std::set<std::wstring> aFeatNames, aResNames;
     std::list<FeaturePtr> allFeat = aDoc->allFeatures();
     std::list<FeaturePtr>::iterator allFeatIter = allFeat.begin();
     for(; allFeatIter != allFeat.end(); allFeatIter++) {
@@ -197,7 +197,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
         aFeat->data()->setName(findName(name(), aSuffix, aFeatNames));
         if (!aFeat->results().empty() && !results().empty()) {
           int aResSuf = aSuffix - 1;
-          std::string aResName = findName(firstResult()->data()->name(), aResSuf, aResNames);
+          std::wstring aResName = findName(firstResult()->data()->name(), aResSuf, aResNames);
           aFeat->firstResult()->data()->setName(aResName);
           ModelAPI_Tools::copyVisualizationAttrs(firstResult(), aFeat->firstResult());
         }

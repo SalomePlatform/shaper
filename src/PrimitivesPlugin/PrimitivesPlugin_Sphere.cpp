@@ -54,7 +54,7 @@ void PrimitivesPlugin_Sphere::initAttributes()
     data()->selection(PrimitivesPlugin_Sphere::CENTER_POINT_ID());
   if (!aCenterPoint->isInitialized()) {
     ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()
-      ->objectByName(ModelAPI_ResultConstruction::group(), "Origin");
+      ->objectByName(ModelAPI_ResultConstruction::group(), L"Origin");
     if (aPointObj.get()) {
       ResultPtr aPointRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
       aCenterPoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());

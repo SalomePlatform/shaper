@@ -59,7 +59,7 @@ static void indexingSketchEdges(
     const CompositeFeaturePtr& theComposite,
     NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
     NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
-    std::map<int, std::string>& theEdgesNames);
+    std::map<int, std::wstring>& theEdgesNames);
 
 /// Convert each face to the list of indices of its edges
 /// \param[in]  theFaces          list of faces to proceed
@@ -82,13 +82,13 @@ static void faceToEdgeIndices(
 /// \param theEdgesNames      named of edges
 static void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
                               TDF_Label& theShapeLabel,
-                              const std::string& theName,
+                              const std::wstring& theName,
                               const TopoDS_Shape& theShape,
                               NCollection_DataMap<int, TopoDS_Face>& theFacesOrder,
                               NCollection_List<TopoDS_Face>& theUnorderedFaces,
                               const MapFaceToEdgeIndices& theFaceEdges,
                               const NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
-                              const std::map<int, std::string>& theEdgesNames);
+                              const std::map<int, std::wstring>& theEdgesNames);
 
 
 // identifier of the infinite result
@@ -121,18 +121,18 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
   return myShape;
 }
 
-static std::string shortName(
+static std::wstring shortName(
   std::shared_ptr<ModelAPI_ResultConstruction>& theConstr)
 {
-  std::string aName = theConstr->data()->name();
+  std::wstring aName = theConstr->data()->name();
   // remove "-", "/" and "&" command-symbols
   aName.erase(std::remove(aName.begin(), aName.end(), '-'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
   // remove the last 's', 'e', 'f' and 'r' symbols:
   // they are used as markers of start/end/forward/reversed indicators
-  static const std::string aSyms("sefr");
-  std::string::iterator aSuffix = aName.end() - 1;
+  static const std::wstring aSyms(L"sefr");
+  std::wstring::iterator aSuffix = aName.end() - 1;
   while(aSyms.find(*aSuffix) != std::string::npos) {
     --aSuffix;
   }
@@ -270,7 +270,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData && aData->isValid()) {
-    std::string aMyName = data()->name();
+    std::wstring aMyName = data()->name();
     TDF_Label aShapeLab = aData->shapeLab();
     if (!theShape.get() || theShape->isNull()) {
       aShapeLab.ForgetAllAttributes();
@@ -296,7 +296,8 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         TDF_Label aSubLab = aShapeLab.FindChild(anIndex);
         TNaming_Builder aBuilder(aSubLab);
         aBuilder.Generated(anExp.Current());
-        std::string aVertexName = aMyName + "_" + (anIndex == 1 ? "StartVertex" : "EndVertex");
+        std::wstring aVertexName = aMyName + L"_" +
+          (anIndex == 1 ? L"StartVertex" : L"EndVertex");
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);
       }
@@ -316,7 +317,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       // collect indices of curves of current composite
       NCollection_DataMap<Handle(Geom_Curve), int> aCurvesIndices;
       NCollection_DataMap<int, TopoDS_Edge> anEdgeIndices;
-      std::map<int, std::string> aComponentsNames; // names of components that lay on index
+      std::map<int, std::wstring> aComponentsNames; // names of components that lay on index
       indexingSketchEdges(aComposite, aCurvesIndices, anEdgeIndices, aComponentsNames);
 
       GeomAlgoAPI_SketchBuilder aSketchBuilder(aWirePtr->origin(), aWirePtr->dirX(),
@@ -379,7 +380,7 @@ void Model_ResultConstruction::setFacesOrder(const std::list<GeomFacePtr>& theFa
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData && aData->isValid()) {
-    std::string aMyName = data()->name();
+    std::wstring aMyName = data()->name();
     TDF_Label aShapeLab = aData->shapeLab();
     GeomShapePtr aResShape = shape();
     if (!aResShape.get() || aResShape->isNull()) {
@@ -400,7 +401,7 @@ void Model_ResultConstruction::setFacesOrder(const std::list<GeomFacePtr>& theFa
       // collect indices of curves of current composite
       NCollection_DataMap<Handle(Geom_Curve), int> aCurvesIndices;
       NCollection_DataMap<int, TopoDS_Edge> anEdgeIndices;
-      std::map<int, std::string> aComponentsNames; // names of components that lay on index
+      std::map<int, std::wstring> aComponentsNames; // names of components that lay on index
       indexingSketchEdges(aComposite, aCurvesIndices, anEdgeIndices, aComponentsNames);
 
       ListOfShape aFaces;
@@ -426,13 +427,13 @@ void Model_ResultConstruction::setFacesOrder(const std::list<GeomFacePtr>& theFa
 
 void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
                        TDF_Label& theShapeLabel,
-                       const std::string& theName,
+                       const std::wstring& theName,
                        const TopoDS_Shape& theShape,
                        NCollection_DataMap<int, TopoDS_Face>& theFacesOrder,
                        NCollection_List<TopoDS_Face>& theUnorderedFaces,
                        const MapFaceToEdgeIndices& theFaceEdges,
                        const NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
-                       const std::map<int, std::string>& theEdgesNames)
+                       const std::map<int, std::wstring>& theEdgesNames)
 {
   theShapeLabel.ForgetAllAttributes(); // clear all previously stored
   TDataStd_Name::Set(theShapeLabel, theName.c_str()); // restore name forgotten
@@ -466,7 +467,7 @@ void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
     // store also indices of the new face edges
     Handle(TDataStd_IntPackedMap) aNewMap = TDataStd_IntPackedMap::Set(aLab);
     const TColStd_ListOfInteger& aNewInd = theFaceEdges.FindFromKey(aFaceToPut);
-    std::stringstream aName;
+    std::wstringstream aName;
     aName<<"Face";
     TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);
     TNaming_Builder *anEdgesBuilder = 0, *aVerticesBuilder = 0;
@@ -525,8 +526,8 @@ void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
       TDF_Label aWireLab = aLab.FindChild(aWireTag);
       TNaming_Builder aWireBuilder(aWireLab);
       aWireBuilder.Generated(aWires.Current());
-      std::ostringstream aWireName;
-      aWireName<<aName.str()<<"_wire";
+      std::wostringstream aWireName;
+      aWireName<<aName.str()<<L"_wire";
       if (aWireTag > 3)
         aWireName<<"_"<<aWireTag - 2;
       TDataStd_Name::Set(aWireLab, aWireName.str().c_str());
@@ -539,7 +540,7 @@ void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
 void indexingSketchEdges(const CompositeFeaturePtr& theComposite,
                          NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
                          NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
-                         std::map<int, std::string>& theEdgesNames)
+                         std::map<int, std::wstring>& theEdgesNames)
 {
   const int aSubNum = theComposite->numberOfSubs();
   for (int a = 0; a < aSubNum; a++) {

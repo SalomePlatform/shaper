@@ -86,13 +86,13 @@ void ModelHighAPI_Interface::execute(bool isForce)
   //aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
 
-void ModelHighAPI_Interface::setName(const std::string& theName)
+void ModelHighAPI_Interface::setName(const std::wstring& theName)
 {
   if (feature().get())
     feature()->data()->setName(theName);
 }
 
-std::string ModelHighAPI_Interface::name() const
+std::wstring ModelHighAPI_Interface::name() const
 {
   return feature()->data()->name();
 }

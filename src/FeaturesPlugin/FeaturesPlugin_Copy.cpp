@@ -59,7 +59,7 @@ void FeaturesPlugin_Copy::execute()
   int aCopiesNum = integer(NUMBER())->value();
   AttributeSelectionListPtr aList = selectionList(OBJECTS());
   int aResultIndex = 0;
-  std::set<std::string> anExistingNames; // to avoid names duplication
+  std::set<std::wstring> anExistingNames; // to avoid names duplication
   for(int aCopy = 0; aCopy < aCopiesNum; aCopy++) {
     for (int aSelIndex = 0; aSelIndex < aList->size(); aSelIndex++) {
       AttributeSelectionPtr aSel = aList->value(aSelIndex);
@@ -74,13 +74,13 @@ void FeaturesPlugin_Copy::execute()
       }
       GeomShapePtr aResult = aCopyBuilder->shape();
 
-      std::string aBaseName = aSel->context() ? aSel->context()->data()->name() :
+      std::wstring aBaseName = aSel->context() ? aSel->context()->data()->name() :
         aSel->contextFeature()->firstResult()->data()->name();
-      std::string aName;
+      std::wstring aName;
       int anInd = 0;
       do {
         anInd++;
-        std::ostringstream aNameStr;
+        std::wostringstream aNameStr;
         aNameStr << aBaseName << "_" << (aCopy + anInd);
         aName = aNameStr.str();
       } while (anExistingNames.count(aName));
@@ -90,7 +90,7 @@ void FeaturesPlugin_Copy::execute()
         document()->createBody(data(), aResultIndex);
       aResultBody->data()->setName(aName);
       // to make sub-results also names with a similar name temporarily rename the feature
-      std::string anOrigName = name();
+      std::wstring anOrigName = name();
       data()->setName(aBaseName);
       aResultBody->store(aResult);
       data()->setName(anOrigName);

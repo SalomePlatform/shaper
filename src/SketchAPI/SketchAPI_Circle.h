@@ -58,7 +58,7 @@ public:
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                   const std::string& theExternalName);
+                   const std::wstring& theExternalName);
 
   /// Destructor.
   SKETCHAPI_EXPORT
@@ -86,7 +86,7 @@ public:
 
   /// Set by external name.
   SKETCHAPI_EXPORT
-  void setByExternalName(const std::string& theExternalName);
+  void setByExternalName(const std::wstring& theExternalName);
 
   /// Set center.
   SKETCHAPI_EXPORT

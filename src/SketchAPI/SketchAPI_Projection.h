@@ -46,7 +46,7 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Projection(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                       const std::string & theExternalName);
+                       const std::wstring & theExternalName);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Projection();
@@ -68,7 +68,7 @@ public:
 
   /// Set by external name
   SKETCHAPI_EXPORT
-  void setByExternalName(const std::string & theExternalName);
+  void setByExternalName(const std::wstring & theExternalName);
 
   /// Set flag to include projection to result or not
   SKETCHAPI_EXPORT

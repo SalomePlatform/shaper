@@ -18,27 +18,32 @@
 //
 
 #include "Events_InfoMessage.h"
-
-#ifdef WIN32
-#pragma warning(disable : 4996) // for sprintf
-#endif
+#include <sstream>
+#include <codecvt>
 
 void Events_InfoMessage::addParameter(double theParam)
 {
-  static char aBuf[50];
-  sprintf(aBuf, "%g", theParam);
-  myParameters.push_back(std::string(aBuf));
+  std::stringstream aStream;
+  aStream << theParam;
+  myParameters.push_back(aStream.str());
 }
 
 void Events_InfoMessage::addParameter(int theParam)
 {
-  static char aBuf[50];
-  sprintf(aBuf, "%d", theParam);
-  myParameters.push_back(std::string(aBuf));
+  std::stringstream aStream;
+  aStream << theParam;
+  myParameters.push_back(aStream.str());
 }
 
 void Events_InfoMessage::send()
 {
   std::shared_ptr<Events_Message> aMsg(new Events_InfoMessage(*this));
   Events_Loop::loop()->send(aMsg);
+}
+
+Events_InfoMessage& Events_InfoMessage::arg(const std::wstring& theParam)
+{
+  static std::wstring_convert<std::codecvt_utf8<wchar_t> > aConvertor;
+  addParameter(aConvertor.to_bytes(theParam));
+  return *this;
 }
