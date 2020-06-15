@@ -470,6 +470,29 @@ bool ConstructionPlugin_ValidatorPointThreeNonParallelPlanes::isValid(
   return true;
 }
 
+//==================================================================================================
+bool ConstructionPlugin_ValidatorNotFeature::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& /*theArguments*/,
+    Events_InfoMessage& theError) const
+{
+  AttributeSelectionPtr aSelAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  if (!aSelAttr) {
+    theError = "Wrong attribute";
+    return false;
+  }
+
+  FeaturePtr aContextFeature = aSelAttr->contextFeature();
+  if (aContextFeature) {
+    theError = "Feature should not be selected";
+    return false;
+  }
+  return true;
+}
+
+//==================================================================================================
+
 std::shared_ptr<GeomAPI_Edge> getEdge(const GeomShapePtr theShape)
 {
   GeomEdgePtr anEdge;

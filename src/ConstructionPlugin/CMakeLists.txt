@@ -98,4 +98,5 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPlane_ErrorMsg.py
                TestPlane_FaceValidator.py
                Test19207.py
+               Test19471.py
 )

@@ -798,6 +798,17 @@
     </message>
   </context>
   <context>
+    <name>Point:edge:ConstructionPlugin_ValidatorNotFeature</name>
+    <message>
+      <source>Wrong attribute</source>
+      <translation>Attribut incorrect.</translation>
+    </message>
+    <message>
+      <source>Feature should not be selected</source>
+      <translation>La fonction ne doit pas être sélectionnée.</translation>
+    </message>
+  </context>
+  <context>
     <name>Point:edge_for_point_projection</name>
     <message>
       <source>Edge for projection.</source>
