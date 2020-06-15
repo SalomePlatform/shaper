@@ -157,8 +157,15 @@ def testExportXAO(theFile, theEmptyFormat = False):
 
     # Check exported file
     aRefPath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Xao", "box2.xao")
-    import filecmp
-    assert filecmp.cmp(theFile, aRefPath)
+    # endlines may be different on different platforms, thus compare files line-by-line
+    areFilesEqual = True
+    with open(theFile, 'r') as file, open(aRefPath, 'r') as ref:
+        l1 = l2 = True
+        while l1 and l2 and areFilesEqual:
+            l1 = file.readline()
+            l2 = ref.readline()
+            areFilesEqual = l1 == l2
+    assert areFilesEqual
 
 if __name__ == '__main__':
     with TemporaryDirectory() as tmp_dir:
