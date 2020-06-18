@@ -683,7 +683,7 @@ void XGUI_ViewerProxy::setColorScaleTitle(const QString& theText)
   myWorkshop->salomeConnector()->viewer()->setColorScaleTitle(theText);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
-  aColorScale->SetTitle(theText.toStdString().c_str());
+  aColorScale->SetTitle(theText.toStdWString().c_str());
 #endif
 }
 
