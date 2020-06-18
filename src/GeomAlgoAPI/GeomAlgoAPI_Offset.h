@@ -23,6 +23,8 @@
 #include <GeomAlgoAPI.h>
 #include <GeomAlgoAPI_MakeShape.h>
 
+#include <GeomAPI_Pln.h>
+
 /// \class GeomAlgoAPI_Offset
 /// \ingroup DataAlgo
 /// \brief Perform 3D offset for the shape
@@ -38,6 +40,17 @@ public:
   /// \param[out] theNewShapes shapes generated from \a theShape. Does not cleared!
   GEOMALGOAPI_EXPORT virtual void generated(const GeomShapePtr theOldShape,
                                             ListOfShape& theNewShapes);
+
+  /// \return a compound of offset wires
+  /// \param[in] thePlane base plane for all offsets
+  /// \param[in] theEdgesAndWires base shapes
+  /// \param[in] theOffsetValue offset distance, it can be negative
+  //GEOMALGOAPI_EXPORT static GeomShapePtr OffsetInPlane (const std::shared_ptr<GeomAPI_Pln>& thePlane,
+  //                                                      const ListOfShape& theEdgesAndWires,
+  //                                                      const double theOffsetValue);
+  GEOMALGOAPI_EXPORT static GeomShapePtr OffsetInPlane (const std::shared_ptr<GeomAPI_Pln>& thePlane,
+                                                        const GeomShapePtr& theEdgeOrWire,
+                                                        const double theOffsetValue);
 
 private:
   /// \brief Perform offset operation
