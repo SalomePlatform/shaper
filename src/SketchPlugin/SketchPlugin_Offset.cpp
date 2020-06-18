@@ -19,12 +19,31 @@
 
 #include <SketchPlugin_Offset.h>
 
+#include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Tools.h>
+
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Tools.h>
 
+#include <GeomAlgoAPI_Offset.h>
+#include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_WireBuilder.h>
+
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Circ.h>
+
+#include <GeomDataAPI_Point2D.h>
+
+#include <iostream>
 
 SketchPlugin_Offset::SketchPlugin_Offset()
   : SketchPlugin_SketchEntity()
@@ -33,6 +52,7 @@ SketchPlugin_Offset::SketchPlugin_Offset()
 
 void SketchPlugin_Offset::initDerivedClassAttributes()
 {
+  std::cout << "   !!!   ***   SketchPlugin_Offset::initDerivedClassAttributes()" << std::endl;
   data()->addAttribute(EDGES_ID(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
@@ -40,14 +60,219 @@ void SketchPlugin_Offset::initDerivedClassAttributes()
 
 void SketchPlugin_Offset::execute()
 {
+  std::cout << "   !!!   ***   SketchPlugin_Offset::execute()" << std::endl;
+
+  ModelAPI_Tools::removeFeaturesAndReferences(myCreatedFeatures);
+
+  SketchPlugin_Sketch* aSketch = sketch();
+  if (!aSketch) return;
+
+  // 1. Sketch plane
+  std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
+
+  // 2. Offset value
+  AttributeDoublePtr aValueAttr = real(VALUE_ID());
+  if (!aValueAttr->isInitialized()) return;
+  double aValue = aValueAttr->value();
+  const double tolerance = 1.e-7;
+  if (aValue < tolerance) return;
+
+  // 2.a. Reversed?
+  AttributeBooleanPtr aReversedAttr = boolean(REVERSED_ID());
+  if (!aReversedAttr->isInitialized()) return;
+  if (aReversedAttr->value()) aValue = -aValue; // reverse offset direction
+
+  // 3. List of all selected edges
+  AttributeRefListPtr aSelectedEdges = reflist(EDGES_ID());
+  std::list<ObjectPtr> anEdgesList = aSelectedEdges->list();
+
+  // 4. Put all selected edges in a set to pass them into findWireOneWay() below
+  std::set<FeaturePtr> anEdgesSet;
+  std::list<ObjectPtr>::const_iterator anEdgesIt = anEdgesList.begin();
+  for (; anEdgesIt != anEdgesList.end(); anEdgesIt++) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
+    if (aFeature) {
+      anEdgesSet.insert(aFeature);
+    }
+  }
+
+  // 5. Gather chains of edges
+  for (anEdgesIt = anEdgesList.begin(); anEdgesIt != anEdgesList.end(); anEdgesIt++) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
+    if (aFeature.get()) {
+      if (anEdgesSet.find(aFeature) == anEdgesSet.end())
+        continue;
+
+      // End points (if any)
+      std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
+      SketchPlugin_SegmentationTools::getFeaturePoints(aFeature, aStartPoint, anEndPoint);
+
+      std::list<FeaturePtr> aChain;
+      aChain.push_back(aFeature);
+      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain);
+      if (!isClosed)
+        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain);
+      std::set<FeaturePtr>::iterator aPos = anEdgesSet.find(aFeature);
+      if (aPos != anEdgesSet.end())
+        anEdgesSet.erase(aPos);
+
+      ListOfShape aTopoChain;
+      std::list<FeaturePtr>::iterator aChainIt = aChain.begin();
+      for (; aChainIt != aChain.end(); ++aChainIt) {
+        FeaturePtr aChainFeature = (*aChainIt);
+        GeomShapePtr aTopoEdge = aChainFeature->lastResult()->shape();
+        if (aTopoEdge->shapeType() == GeomAPI_Shape::EDGE) {
+          aTopoChain.push_back(aTopoEdge);
+        }
+      }
+      GeomShapePtr anEdgeOrWire = GeomAlgoAPI_WireBuilder::wire(aTopoChain);
+
+      // 6. Make offset for each wire or edge
+      std::shared_ptr<GeomAPI_Shape> anOffsetShape =
+        GeomAlgoAPI_Offset::OffsetInPlane(aPlane, anEdgeOrWire, aValue);
+
+      // 7. Store offset results
+      //    Create sketch feature for each edge of anOffsetShape,
+      //    and also store created features in list to remove them on next execute()
+      addToSketch(anOffsetShape);
+    }
+  }
+}
+
+bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
+                                          const FeaturePtr& theEdge,
+                                          const std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint,
+                                          std::set<FeaturePtr>& theEdgesSet,
+                                          std::list<FeaturePtr>& theChain)
+{
+  // Find coincident edges at Start Point
+  if (!theEndPoint) return false;
+
+  FeaturePtr aNextEdgeFeature;
+  std::set<FeaturePtr> aCoincFeatures =
+    SketchPlugin_Tools::findFeaturesCoincidentToPoint(theEndPoint);
+
+  int nbFound = 0;
+  std::set<FeaturePtr>::iterator aCoincIt;
+  for (aCoincIt = aCoincFeatures.begin(); aCoincIt != aCoincFeatures.end(); ++aCoincIt) {
+    FeaturePtr aCoincFeature = (*aCoincIt);
+    if (aCoincFeature->getKind() != SketchPlugin_Point::ID()) {
+      if (aCoincFeature != theEdge) {
+        bool isInSet = true; // empty set means all sketch edges
+        if (theEdgesSet.size()) {
+          isInSet = (theEdgesSet.find(aCoincFeature) != theEdgesSet.end());
+        }
+        if (isInSet) {
+          aNextEdgeFeature = aCoincFeature;
+          nbFound++;
+        }
+      }
+    }
+  }
+
+  if (nbFound == 1) {
+    if (aNextEdgeFeature == theFirstEdge)
+      // Closed chain found
+      return true;
+
+    // continue the chain
+    theChain.push_back(aNextEdgeFeature);
+    // remove from the set, if the set is used
+    if (theEdgesSet.size()) {
+      std::set<FeaturePtr>::iterator aPos = theEdgesSet.find(aNextEdgeFeature);
+      if (aPos != theEdgesSet.end())
+        theEdgesSet.erase(aPos);
+    }
+
+    std::shared_ptr<GeomDataAPI_Point2D> aNextStartPoint, aNextEndPoint;
+    SketchPlugin_SegmentationTools::getFeaturePoints(aNextEdgeFeature, aNextStartPoint, aNextEndPoint);
+    if (aNextStartPoint && aNextEndPoint) {
+      if (aNextEndPoint == theEndPoint)
+        aNextEndPoint = aNextStartPoint;
+
+      return findWireOneWay (theFirstEdge, aNextEdgeFeature, aNextEndPoint, theEdgesSet, theChain);
+    }
+  }
+
+  return false;
+}
+
+void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOffsetShape)
+{
+  //GeomAPI_ShapeExplorer::GeomAPI_ShapeExplorer
+  ListOfShape aResEdges = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(anOffsetShape);
+  std::list<GeomShapePtr>::const_iterator aResEdgesIt = aResEdges.begin();
+  for (; aResEdgesIt != aResEdges.end(); aResEdgesIt++) {
+    GeomShapePtr aResShape = (*aResEdgesIt);
+    if (aResShape->shapeType() == GeomAPI_Shape::EDGE) {
+      // Add new feature
+      FeaturePtr aResFeature;
+      std::shared_ptr<GeomAPI_Edge> aResEdge (new GeomAPI_Edge(aResShape));
+
+      std::shared_ptr<GeomAPI_Pnt2d> aFP, aLP;
+      std::shared_ptr<GeomAPI_Pnt> aFP3d = aResEdge->firstPoint();
+      std::shared_ptr<GeomAPI_Pnt> aLP3d = aResEdge->lastPoint();
+      if (aFP3d.get() && aLP3d.get()) {
+        aFP = sketch()->to2D(aFP3d);
+        aLP = sketch()->to2D(aLP3d);
+      }
+
+      if (aResEdge->isLine()) {
+        aResFeature = sketch()->addFeature(SketchPlugin_Line::ID());
+
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Line::START_ID()))->setValue(aFP);
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Line::END_ID()))->setValue(aLP);
+      }
+      else if (aResEdge->isArc()) {
+        std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
+        std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
+        std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+
+        aResFeature = sketch()->addFeature(SketchPlugin_Arc::ID());
+
+        bool aWasBlocked = aResFeature->data()->blockSendAttributeUpdated(true);
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
+       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(aFP);
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
+        aResFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+      }
+      else if (aResEdge->isCircle()) {
+        std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
+        std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
+        std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+
+        aResFeature = sketch()->addFeature(SketchPlugin_Circle::ID());
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+          (aResFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(aCP);
+        aResFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircEdge->radius());
+      }
+      else {
+      }
+
+      if (aResFeature.get()) {
+        myCreatedFeatures.insert(aResFeature);
+
+        aResFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue
+          (boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
+        aResFeature->execute();
+      }
+    }
+  }
 }
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
+  std::cout << "   !!!   ***   SketchPlugin_Offset::attributeChanged()" << std::endl;
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
 {
+  std::cout << "   !!!   ***   SketchPlugin_Offset::customAction()" << std::endl;
   bool isOk = false;
   if (theActionId == ADD_WIRE_ACTION_ID()) {
     isOk = findWires();
@@ -61,5 +286,55 @@ bool SketchPlugin_Offset::customAction(const std::string& theActionId)
 
 bool SketchPlugin_Offset::findWires()
 {
-  return false;
+  AttributeRefListPtr aSelectedEdges = reflist(EDGES_ID());
+  std::list<ObjectPtr> anEdgesList = aSelectedEdges->list();
+
+  // Empty set
+  std::set<FeaturePtr> anEdgesSet;
+
+  // Processed set
+  std::set<FeaturePtr> anEdgesSet1;
+
+  // Put all selected edges in a set to pass them into findWireOneWay() below
+  std::set<FeaturePtr> aSelectedSet;
+  std::list<ObjectPtr>::const_iterator anEdgesIt = anEdgesList.begin();
+  for (; anEdgesIt != anEdgesList.end(); anEdgesIt++) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
+    if (aFeature) {
+      aSelectedSet.insert(aFeature);
+    }
+  }
+
+  // Gather chains of edges
+  for (anEdgesIt = anEdgesList.begin(); anEdgesIt != anEdgesList.end(); anEdgesIt++) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
+    if (aFeature.get()) {
+      if (anEdgesSet1.find(aFeature) != anEdgesSet1.end())
+        continue;
+      anEdgesSet1.insert(aFeature);
+
+      // End points (if any)
+      std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
+      SketchPlugin_SegmentationTools::getFeaturePoints(aFeature, aStartPoint, anEndPoint);
+
+      std::list<FeaturePtr> aChain;
+      aChain.push_back(aFeature);
+      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain);
+      if (!isClosed)
+        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain);
+
+      std::list<FeaturePtr>::iterator aChainIt = aChain.begin();
+      for (; aChainIt != aChain.end(); ++aChainIt) {
+        FeaturePtr aChainFeature = (*aChainIt);
+        anEdgesSet1.insert(aChainFeature);
+        if (aSelectedSet.find(aChainFeature) == aSelectedSet.end()) {
+          // TODO: add in reflist(EDGES_ID()), update viewer
+          // ?? ModelHighAPI_Tools::fillAttribute()
+          std::cout << "   !!!   ***   SketchPlugin_Offset::findWires() - Add an edge" << std::endl;
+        }
+      }
+    }
+  }
+
+  return true;
 }

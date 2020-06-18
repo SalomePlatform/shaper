@@ -22,6 +22,7 @@
 
 #include <SketchPlugin.h>
 #include <SketchPlugin_SketchEntity.h>
+#include <GeomDataAPI_Point2D.h>
 
 /**\class SketchPlugin_Offset
  * \ingroup Plugins
@@ -82,7 +83,8 @@ public:
   /// \returns true
   SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
-  SKETCHPLUGIN_EXPORT virtual bool isPreviesNeeded() const { return false; }
+  //SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
+  SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return true; }
 
   /// Find edges connected by coincident boundary constraint and composing a wire with
   /// the already selected segments. It means that not more than 2 edges can be connected
@@ -91,7 +93,7 @@ public:
   /// \return \c false in case the action not performed.
   SKETCHPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
 
-  /// Use plugin manager for features creatio
+  /// Use plugin manager for features creation.
   SketchPlugin_Offset();
 
 protected:
@@ -101,6 +103,26 @@ protected:
 private:
   /// Find all wires connected with the selected edges
   bool findWires();
+
+  // Create sketch feature for each edge of theOffsetResult,
+  // and store it in myCreatedFeatures to remove on next execute()
+  void addToSketch (const std::shared_ptr<GeomAPI_Shape>& theOffsetResult);
+
+  // Find edges that prolongate theEdgeFeature (in a chain) at theEndPoint
+  // Recursive method.
+  // \param[in] theEdgeFeature
+  // \param[in] theEndPoint
+  // \param[in/out] theAllEdges
+  // \param[in/out] theChain
+  /// \return \c true if the chain is closed
+  bool findWireOneWay (const FeaturePtr& theFirstEdge,
+                       const FeaturePtr& theEdge,
+                       const std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint,
+                       std::set<FeaturePtr>& theEdgesSet,
+                       std::list<FeaturePtr>& theChain);
+
+  // tmp
+  std::set<FeaturePtr> myCreatedFeatures;
 };
 
 #endif

@@ -958,16 +958,22 @@
                      tooltip="Offset value"
                      default="1" min="0.000001"
                      use_reset="false">
-          <validator id="GeomValidators_Positive" parameters="1"/>
+          <validator id="GeomValidators_Positive" parameters="1e-07"/>
         </doublevalue>
         <boolvalue id="reversed"
                    label="Reversed"
                    tooltip="Reverse the offset"
                    default="false"
                    obligatory="0"/>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   tooltip="Construction element"
+                   default="false"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
         <action id="add_wire"
                 label="Select wire"
-                tooltip="Add the list of segments conposing a wire with the selected items through the coincidence by boundary points"/>
+                tooltip="Add the list of segments composing a wire with the selected items through the coincidence by boundary points"/>
       </feature>
     </group>
 
