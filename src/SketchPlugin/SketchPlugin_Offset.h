@@ -110,10 +110,11 @@ private:
 
   // Find edges that prolongate theEdgeFeature (in a chain) at theEndPoint
   // Recursive method.
-  // \param[in] theEdgeFeature
-  // \param[in] theEndPoint
-  // \param[in/out] theAllEdges
-  // \param[in/out] theChain
+  // \param[in] theFirstEdge Start edge of wire searching
+  // \param[in] theEdge Current edge
+  // \param[in] theEndPoint Point of the Current edge, not belonging to a previous edge
+  // \param[in/out] theEdgesSet All edges to find among. If empty, all sketch edges assumed.
+  // \param[in/out] theChain Resulting edges
   /// \return \c true if the chain is closed
   bool findWireOneWay (const FeaturePtr& theFirstEdge,
                        const FeaturePtr& theEdge,

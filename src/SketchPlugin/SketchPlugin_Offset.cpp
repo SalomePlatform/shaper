@@ -106,6 +106,8 @@ void SketchPlugin_Offset::execute()
       // End points (if any)
       std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
       SketchPlugin_SegmentationTools::getFeaturePoints(aFeature, aStartPoint, anEndPoint);
+      std::cout << "aStartPoint = (" << aStartPoint->x() << ", " << aStartPoint->y() << ")" << std::endl;
+      std::cout << "anEndPoint  = (" << anEndPoint->x()  << ", " << anEndPoint->y()  << ")" << std::endl;
 
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
@@ -149,13 +151,16 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   if (!theEndPoint) return false;
 
   FeaturePtr aNextEdgeFeature;
-  std::set<FeaturePtr> aCoincFeatures =
-    SketchPlugin_Tools::findFeaturesCoincidentToPoint(theEndPoint);
-
   int nbFound = 0;
-  std::set<FeaturePtr>::iterator aCoincIt;
-  for (aCoincIt = aCoincFeatures.begin(); aCoincIt != aCoincFeatures.end(); ++aCoincIt) {
-    FeaturePtr aCoincFeature = (*aCoincIt);
+
+  std::set<AttributePoint2DPtr> aCoincPoints =
+    SketchPlugin_Tools::findPointsCoincidentToPoint(theEndPoint);
+
+  std::set<AttributePoint2DPtr>::iterator aPointsIt = aCoincPoints.begin();
+  for (; aPointsIt != aCoincPoints.end(); aPointsIt++) {
+    AttributePoint2DPtr aP = (*aPointsIt);
+    FeaturePtr aCoincFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aP->owner());
+
     if (aCoincFeature->getKind() != SketchPlugin_Point::ID()) {
       if (aCoincFeature != theEdge) {
         bool isInSet = true; // empty set means all sketch edges
@@ -187,8 +192,16 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
     std::shared_ptr<GeomDataAPI_Point2D> aNextStartPoint, aNextEndPoint;
     SketchPlugin_SegmentationTools::getFeaturePoints(aNextEdgeFeature, aNextStartPoint, aNextEndPoint);
     if (aNextStartPoint && aNextEndPoint) {
-      if (aNextEndPoint == theEndPoint)
+      std::cout << "theEndPoint     = (" << theEndPoint->x()     << ", " << theEndPoint->y()     << ")" << std::endl;
+      std::cout << "aNextStartPoint = (" << aNextStartPoint->x() << ", " << aNextStartPoint->y() << ")" << std::endl;
+      std::cout << "aNextEndPoint   = (" << aNextEndPoint->x()   << ", " << aNextEndPoint->y()   << ")" << std::endl;
+      // Check which end of aNextEdgeFeature should be used to find a next edge
+      std::shared_ptr<GeomAPI_Pnt2d> anEndPnt = theEndPoint->pnt();
+      std::shared_ptr<GeomAPI_Pnt2d> aNextEndPnt = aNextEndPoint->pnt();
+      if (aNextEndPnt->isEqual(anEndPnt)) {
+        std::cout << "aNextEndPoint == theEndPoint" << std::endl;
         aNextEndPoint = aNextStartPoint;
+      }
 
       return findWireOneWay (theFirstEdge, aNextEdgeFeature, aNextEndPoint, theEdgesSet, theChain);
     }
@@ -267,7 +280,11 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
-  std::cout << "   !!!   ***   SketchPlugin_Offset::attributeChanged()" << std::endl;
+  std::cout << "   !!!   ***   SketchPlugin_Offset::attributeChanged() myCreatedFeatures.size() 1 = "
+            << myCreatedFeatures.size() << std::endl;
+  ModelAPI_Tools::removeFeaturesAndReferences(myCreatedFeatures);
+  std::cout << "   !!!   ***   SketchPlugin_Offset::attributeChanged() myCreatedFeatures.size() 2 = "
+            << myCreatedFeatures.size() << std::endl;
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
@@ -316,6 +333,8 @@ bool SketchPlugin_Offset::findWires()
       // End points (if any)
       std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
       SketchPlugin_SegmentationTools::getFeaturePoints(aFeature, aStartPoint, anEndPoint);
+      std::cout << "aStartPoint = (" << aStartPoint->x() << ", " << aStartPoint->y() << ")" << std::endl;
+      std::cout << "anEndPoint  = (" << anEndPoint->x()  << ", " << anEndPoint->y()  << ")" << std::endl;
 
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
@@ -328,13 +347,13 @@ bool SketchPlugin_Offset::findWires()
         FeaturePtr aChainFeature = (*aChainIt);
         anEdgesSet1.insert(aChainFeature);
         if (aSelectedSet.find(aChainFeature) == aSelectedSet.end()) {
-          // TODO: add in reflist(EDGES_ID()), update viewer
-          // ?? ModelHighAPI_Tools::fillAttribute()
           std::cout << "   !!!   ***   SketchPlugin_Offset::findWires() - Add an edge" << std::endl;
+          aSelectedEdges->append(aChainFeature->lastResult());
         }
       }
     }
   }
+  // TODO: hilight selection in the viewer
 
   return true;
 }
