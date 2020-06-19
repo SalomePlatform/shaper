@@ -314,8 +314,8 @@ void ModelHighAPI_Dumper::DumpStorage::write(const AttributeSelectionPtr& theAtt
   getShapeAndContext(theAttrSelect, aShape, aContext);
 
   if (aShape.get()) {
-    //TODO: vsv myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \""
-    //             << theAttrSelect->namingName() << "\"";
+    myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \""
+                 << ModelAPI_Tools::toString(theAttrSelect->namingName()) << "\"";
   }
 
   myDumpBuffer << ")";
@@ -495,8 +495,10 @@ void ModelHighAPI_Dumper::DumpStorageWeak::write(const AttributeSelectionPtr& th
     GeomAlgoAPI_NExplode aNExplode(aContext->shape(), aShape->shapeType());
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it
-      //TODO: vsv myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
-      //             << theAttrSelect->contextName(aContext) << "\", " << anIndex << ")";
+      std::wstring aaa = theAttrSelect->contextName(aContext);
+      myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
+                   << ModelAPI_Tools::toString(theAttrSelect->contextName(aContext))
+                   << "\", " << anIndex << ")";
       aStandardDump = false;
     }
   }
