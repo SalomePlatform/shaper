@@ -495,7 +495,6 @@ void ModelHighAPI_Dumper::DumpStorageWeak::write(const AttributeSelectionPtr& th
     GeomAlgoAPI_NExplode aNExplode(aContext->shape(), aShape->shapeType());
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it
-      std::wstring aaa = theAttrSelect->contextName(aContext);
       myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
                    << ModelAPI_Tools::toString(theAttrSelect->contextName(aContext))
                    << "\", " << anIndex << ")";
