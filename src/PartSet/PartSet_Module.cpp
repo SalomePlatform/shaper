@@ -260,10 +260,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
     Config_Prop::Color, FEATURE_ITEM_COLOR);
 
   Config_PropManager::registerProp("Visualization", "zoom_trihedron_arrows",
-    "Zoom trihedron arrows", Config_Prop::Boolean, "false");
+    "Keep trihedron arrows view size constant", Config_Prop::Boolean, "false");
 
   Config_PropManager::registerProp("Visualization", "axis_arrow_size",
-    "Axis arrow size", Config_Prop::IntSpin, "10");
+    "Trihedron arrows constant size", Config_Prop::IntSpin, "10");
 
   Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
     "Add parameter in parameters manager dialog",
