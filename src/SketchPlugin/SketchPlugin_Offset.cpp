@@ -24,12 +24,18 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
+#include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Tools.h>
 
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
@@ -40,8 +46,11 @@
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Ellipse.h>
+#include <GeomAPI_BSpline.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 
 #include <iostream>
 
@@ -243,7 +252,8 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
       std::shared_ptr<GeomAPI_Pnt2d> aFP, aLP;
       std::shared_ptr<GeomAPI_Pnt> aFP3d = aResEdge->firstPoint();
       std::shared_ptr<GeomAPI_Pnt> aLP3d = aResEdge->lastPoint();
-      if (aFP3d.get() && aLP3d.get()) {
+      //if (aFP3d.get() && aLP3d.get()) {
+      if (aFP3d && aLP3d) {
         aFP = sketch()->to2D(aFP3d);
         aLP = sketch()->to2D(aLP3d);
       }
@@ -266,7 +276,7 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
         bool aWasBlocked = aResFeature->data()->blockSendAttributeUpdated(true);
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>
           (aResFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
-       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
           (aResFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(aFP);
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>
           (aResFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
@@ -282,6 +292,44 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
           (aResFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(aCP);
         aResFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircEdge->radius());
       }
+      else if (aResEdge->isEllipse()) {
+        std::shared_ptr<GeomAPI_Ellipse> anEllipseEdge = aResEdge->ellipse();
+
+        GeomPointPtr aCP3d = anEllipseEdge->center();
+        GeomPnt2dPtr aCP = sketch()->to2D(aCP3d);
+
+        GeomPointPtr aFocus3d = anEllipseEdge->firstFocus();
+        GeomPnt2dPtr aFocus = sketch()->to2D(aFocus3d);
+
+        if (aFP3d && aLP3d) {
+          // Elliptic arc
+          aResFeature = sketch()->addFeature(SketchPlugin_EllipticArc::ID());
+
+          bool aWasBlocked = aResFeature->data()->blockSendAttributeUpdated(true);
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID()))->setValue(aCP);
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_EllipticArc::FIRST_FOCUS_ID()))->setValue(aFocus);
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_EllipticArc::START_POINT_ID()))->setValue(aFP);
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_EllipticArc::END_POINT_ID()))->setValue(aLP);
+          aResFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+        }
+        else {
+          // Ellipse
+          aResFeature = sketch()->addFeature(SketchPlugin_Ellipse::ID());
+
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()))->setValue(aCP);
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+            (aResFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()))->setValue(aFocus);
+          aResFeature->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(anEllipseEdge->minorRadius());
+        }
+      }
+      else if (aResEdge->isBSpline()) {
+        mkBSpline(aResFeature, aResEdge);
+      }
       else {
       }
 
@@ -294,6 +342,67 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
       }
     }
   }
+}
+
+void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
+                                     const GeomEdgePtr& theEdge)
+{
+  if (!theEdge->isBSpline())
+    return;
+
+  GeomCurvePtr aCurve (new GeomAPI_Curve (theEdge));
+  GeomAPI_BSpline aBSpline (aCurve);
+
+  if (aBSpline.isPeriodic())
+    theResult = sketch()->addFeature(SketchPlugin_BSplinePeriodic::ID());
+  else
+    theResult = sketch()->addFeature(SketchPlugin_BSpline::ID());
+
+  theResult->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(aBSpline.degree());
+
+  AttributePoint2DArrayPtr aPolesAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>
+    (theResult->attribute(SketchPlugin_BSpline::POLES_ID()));
+  std::list<GeomPointPtr> aPoles = aBSpline.poles();
+  aPolesAttr->setSize((int)aPoles.size());
+  std::list<GeomPointPtr>::iterator anIt = aPoles.begin();
+  for (int anIndex = 0; anIt != aPoles.end(); ++anIt, ++anIndex) {
+    GeomPnt2dPtr aPoleInSketch = sketch()->to2D(*anIt);
+    aPolesAttr->setPnt(anIndex, aPoleInSketch);
+  }
+
+  AttributeDoubleArrayPtr aWeightsAttr =
+      theResult->data()->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
+  std::list<double> aWeights = aBSpline.weights();
+  if (aWeights.empty()) { // rational B-spline
+    int aSize = (int)aPoles.size();
+    aWeightsAttr->setSize(aSize);
+    for (int anIndex = 0; anIndex < aSize; ++anIndex)
+      aWeightsAttr->setValue(anIndex, 1.0);
+  }
+  else { // non-rational B-spline
+    aWeightsAttr->setSize((int)aWeights.size());
+    std::list<double>::iterator anIt = aWeights.begin();
+    for (int anIndex = 0; anIt != aWeights.end(); ++anIt, ++anIndex)
+      aWeightsAttr->setValue(anIndex, *anIt);
+  }
+
+  AttributeDoubleArrayPtr aKnotsAttr =
+      theResult->data()->realArray(SketchPlugin_BSpline::KNOTS_ID());
+  std::list<double> aKnots = aBSpline.knots();
+  int aSize = (int)aKnots.size();
+  aKnotsAttr->setSize(aSize);
+  std::list<double>::iterator aKIt = aKnots.begin();
+  for (int index = 0; index < aSize; ++index, ++aKIt)
+    aKnotsAttr->setValue(index, *aKIt);
+
+  AttributeIntArrayPtr aMultsAttr =
+      theResult->data()->intArray(SketchPlugin_BSpline::MULTS_ID());
+  std::list<int> aMultiplicities = aBSpline.mults();
+  aSize = (int)aMultiplicities.size();
+  aMultsAttr->setSize(aSize);
+  std::list<int>::iterator aMIt = aMultiplicities.begin();
+  for (int index = 0; index < aSize; ++index, ++aMIt)
+    aMultsAttr->setValue(index, *aMIt);
 }
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)

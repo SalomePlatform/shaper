@@ -175,9 +175,9 @@ bool GeomAPI_Edge::isEllipse() const
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
   if (aCurve.IsNull()) // degenerative edge
     return false;
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Ellipse)))
-    return true;
-  return false;
+  while (aCurve->IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+  return aCurve->IsKind(STANDARD_TYPE(Geom_Ellipse));
 }
 
 bool GeomAPI_Edge::isBSpline() const
@@ -234,6 +234,8 @@ std::shared_ptr<GeomAPI_Ellipse> GeomAPI_Edge::ellipse() const
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
   if (!aCurve.IsNull()) {
+    while (aCurve->IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+      aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
     Handle(Geom_Ellipse) aElips = Handle(Geom_Ellipse)::DownCast(aCurve);
     if (!aElips.IsNull()) {
       gp_Elips aGpElips = aElips->Elips();

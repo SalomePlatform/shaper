@@ -22,7 +22,9 @@
 
 #include <SketchPlugin.h>
 #include <SketchPlugin_SketchEntity.h>
+
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Edge.h>
 
 /**\class SketchPlugin_Offset
  * \ingroup Plugins
@@ -107,6 +109,9 @@ private:
   // Create sketch feature for each edge of theOffsetResult,
   // and store it in myCreatedFeatures to remove on next execute()
   void addToSketch (const std::shared_ptr<GeomAPI_Shape>& theOffsetResult);
+
+  // Create BSpline or BSplinePeriodic sketch feature from theEdge
+  void mkBSpline (FeaturePtr& theResult, const GeomEdgePtr& theEdge);
 
   // Find edges that prolongate theEdgeFeature (in a chain) at theEndPoint
   // Recursive method.
