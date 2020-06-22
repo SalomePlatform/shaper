@@ -67,8 +67,9 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
             if theForce or theFeature.isInHistory() or aFeatureKind=="Export" or aFeatureKind=="RemoveResults":
                 aDumper = self.myFeatures[aFeatureKind](theFeature)
                 # Dump comment for the operation before the dumping of the feature to improve the readability of a script.
-                self.__print__("\n### Create " + theFeature.getKind())
-                self.newline()
+                if self.dumpCommentBeforeFeature(theFeature):
+                    self.__print__("\n### Create " + theFeature.getKind())
+                    self.newline()
             else:
                 self.name(theFeature)
                 self.clearNotDumped()

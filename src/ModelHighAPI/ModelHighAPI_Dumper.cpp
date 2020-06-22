@@ -1060,6 +1060,16 @@ bool ModelHighAPI_Dumper::isDefaultTransparency(const ResultPtr& theResult) cons
   return fabs(anAttribute->value()) < 1.e-12;
 }
 
+bool ModelHighAPI_Dumper::dumpCommentBeforeFeature(const FeaturePtr& theFeature) const
+{
+  // currently, the comment should not be dumped only before the filters
+  FiltersFeaturePtr aFilters = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theFeature);
+  if (aFilters)
+    return false;
+  // all other features should be commented before the dump
+  return true;
+}
+
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
 {
   *myDumpStorage << theChar;

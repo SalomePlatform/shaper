@@ -356,6 +356,10 @@ public:
   MODELHIGHAPI_EXPORT virtual void exportVariable(
     const std::string& theEntry, const std::string& theVarName) const {}
 
+  /// Returns \c true if the special comment line to improve the readability
+  /// should be printed before the feature of the given kind.
+  MODELHIGHAPI_EXPORT bool dumpCommentBeforeFeature(const FeaturePtr& theFeature) const;
+
 protected:
   /// Dump "setName" command if last entity had user-defined name
   MODELHIGHAPI_EXPORT void dumpEntitySetName();
