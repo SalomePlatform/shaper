@@ -91,6 +91,10 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  FEATURESPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
   /// Performs the fillet algorithm and stores it in the data structure.
   FEATURESPLUGIN_EXPORT virtual void execute();
 

@@ -37,6 +37,7 @@
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_InteractiveObject.hxx>
@@ -50,6 +51,7 @@ PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED));
 
   initPresentation(ModuleBase_IModule::CustomizeArguments);
   initPresentation(ModuleBase_IModule::CustomizeResults);
@@ -99,6 +101,8 @@ bool PartSet_CustomPrs::deactivate(const ModuleBase_IModule::ModuleBase_Customiz
 {
   myIsActive[theFlag] = false;
   erasePresentation(theFlag, theUpdateViewer);
+  if (theFlag == ModuleBase_IModule::CustomizeResults)
+    clearErrorShape();
   return true;
 }
 
@@ -244,12 +248,50 @@ void PartSet_CustomPrs::clearPrs()
   clearPresentation(ModuleBase_IModule::CustomizeArguments);
   clearPresentation(ModuleBase_IModule::CustomizeResults);
   clearPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
+  clearErrorShape();
+}
+
+void PartSet_CustomPrs::clearErrorShape()
+{
+  if (!myErrorShapes.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+    if (aContext->IsDisplayed(myErrorShapes))
+      aContext->Remove(myErrorShapes, true);
+  }
 }
 
 void PartSet_CustomPrs::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION))
     myPresentationIsEmpty = true; /// store state to analize it after display/erase is finished
+  else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED)) {
+    std::shared_ptr<ModelAPI_ShapesFailedMessage> aErrMsg =
+      std::dynamic_pointer_cast<ModelAPI_ShapesFailedMessage>(theMessage);
+    Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+    ListOfShape aShapes = aErrMsg->shapes();
+    if (aShapes.size() > 0) {
+      GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+      TopoDS_Shape aErrShape = aCompound->impl<TopoDS_Shape>();
+      if (myErrorShapes.IsNull()) {
+        myErrorShapes = new AIS_Shape(aErrShape);
+        myErrorShapes->SetColor(Quantity_NOC_RED);
+        Handle(Prs3d_Drawer) aDrawer = myErrorShapes->Attributes();
+        aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_RING1, Quantity_NOC_RED, 2.));
+        aDrawer->SetLineAspect(new Prs3d_LineAspect(Quantity_NOC_RED, Aspect_TOL_SOLID, 2.));
+        aContext->Display(myErrorShapes, true);
+        aContext->Deactivate(myErrorShapes);
+      }
+      else {
+        myErrorShapes->Set(aErrShape);
+        aContext->Redisplay(myErrorShapes, true);
+      }
+    }
+    else {
+      if (!myErrorShapes.IsNull()) {
+        aContext->Remove(myErrorShapes, true);
+      }
+    }
+  }
 }
 
 void PartSet_CustomPrs::initPresentation(
