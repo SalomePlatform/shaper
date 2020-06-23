@@ -22,13 +22,20 @@
 
 #include <Geom_BSplineCurve.hxx>
 
+#include <GeomConvert.hxx>
+
 #define MY_BSPLINE (*(implPtr<Handle_Geom_BSplineCurve>()))
 
-GeomAPI_BSpline::GeomAPI_BSpline(const GeomCurvePtr& theCurve)
+GeomAPI_BSpline::GeomAPI_BSpline (const GeomCurvePtr& theCurve,
+                                  const bool isForced)
 {
   GeomCurvePtr anUntrimmedCurve = theCurve->basisCurve();
   Handle(Geom_Curve) aCurve = anUntrimmedCurve->impl<Handle(Geom_Curve)>();
   Handle(Geom_BSplineCurve) aBSpl = Handle(Geom_BSplineCurve)::DownCast(aCurve);
+  if (aBSpl.IsNull() && isForced) {
+    // convert to b-spline
+    aBSpl = GeomConvert::CurveToBSplineCurve(aCurve);
+  }
   if (aBSpl.IsNull())
     throw Standard_ConstructionError("GeomAPI_BSpline: Curve is not a B-spline");
   setImpl(new Handle_Geom_BSplineCurve(aBSpl));

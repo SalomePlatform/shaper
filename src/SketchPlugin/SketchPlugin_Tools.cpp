@@ -20,6 +20,7 @@
 #include "SketchPlugin_Tools.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_BSpline.h"
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintCoincidenceInternal.h"
@@ -660,6 +661,10 @@ void SketchPlugin_SegmentationTools::getFeaturePoints(const FeaturePtr& theFeatu
   else if (aFeatureKind == SketchPlugin_EllipticArc::ID()) {
     aStartAttributeName = SketchPlugin_EllipticArc::START_POINT_ID();
     anEndAttributeName = SketchPlugin_EllipticArc::END_POINT_ID();
+  }
+  else if (aFeatureKind == SketchPlugin_BSpline::ID()) {
+    aStartAttributeName = SketchPlugin_BSpline::START_ID();
+    anEndAttributeName = SketchPlugin_BSpline::END_ID();
   }
   if (!aStartAttributeName.empty() && !anEndAttributeName.empty()) {
     theStartPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

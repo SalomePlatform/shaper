@@ -120,9 +120,9 @@ void SketchPlugin_Offset::execute()
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
       if (aStartPoint && anEndPoint) { // not closed edge
-        bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain);
+        bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain, true);
         if (!isClosed)
-          findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain);
+          findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain, false);
       }
       std::set<FeaturePtr>::iterator aPos = anEdgesSet.find(aFeature);
       if (aPos != anEdgesSet.end())
@@ -156,7 +156,8 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
                                           const FeaturePtr& theEdge,
                                           const std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint,
                                           std::set<FeaturePtr>& theEdgesSet,
-                                          std::list<FeaturePtr>& theChain)
+                                          std::list<FeaturePtr>& theChain,
+                                          const bool isPrepend)
 {
   // 1. Find a single edge, coincident to theEndPoint by one of its ends
   if (!theEndPoint) return false;
@@ -180,6 +181,9 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   for (; aPointsIt != anAllCoincPoints.end(); aPointsIt++) {
     AttributePtr aP = (*aPointsIt);
     FeaturePtr aCoincFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aP->owner());
+
+    // Condition 0: not auxiliary
+    if (aCoincFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) continue;
 
     // Condition 1: not a point feature
     if (aCoincFeature->getKind() != SketchPlugin_Point::ID()) {
@@ -226,7 +230,10 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
     return true;
 
   // 3. Add the found edge to the chain
-  theChain.push_back(aNextEdgeFeature);
+  if (isPrepend)
+    theChain.push_front(aNextEdgeFeature);
+  else
+    theChain.push_back(aNextEdgeFeature);
   // remove from the set, if the set is used
   if (theEdgesSet.size()) {
     std::set<FeaturePtr>::iterator aPos = theEdgesSet.find(aNextEdgeFeature);
@@ -243,7 +250,7 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   }
 
   // 5. Continue gathering the chain (recursive)
-  return findWireOneWay (theFirstEdge, aNextEdgeFeature, aP2, theEdgesSet, theChain);
+  return findWireOneWay (theFirstEdge, aNextEdgeFeature, aP2, theEdgesSet, theChain, isPrepend);
 }
 
 void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOffsetShape)
@@ -340,6 +347,8 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
         mkBSpline(aResFeature, aResEdge);
       }
       else {
+        // convert to b-spline
+        mkBSpline(aResFeature, aResEdge);
       }
 
       if (aResFeature.get()) {
@@ -356,11 +365,9 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
 void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
                                      const GeomEdgePtr& theEdge)
 {
-  if (!theEdge->isBSpline())
-    return;
-
   GeomCurvePtr aCurve (new GeomAPI_Curve (theEdge));
-  GeomAPI_BSpline aBSpline (aCurve);
+  // Forced conversion to b-spline, if aCurve is not b-spline
+  GeomAPI_BSpline aBSpline (aCurve, /*isForced*/true);
 
   if (aBSpline.isPeriodic())
     theResult = sketch()->addFeature(SketchPlugin_BSplinePeriodic::ID());
@@ -468,9 +475,9 @@ bool SketchPlugin_Offset::findWires()
 
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
-      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain);
+      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aChain, true);
       if (!isClosed)
-        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain);
+        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aChain, false);
 
       std::list<FeaturePtr>::iterator aChainIt = aChain.begin();
       for (; aChainIt != aChain.end(); ++aChainIt) {

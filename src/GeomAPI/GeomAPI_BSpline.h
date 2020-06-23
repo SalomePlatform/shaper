@@ -36,7 +36,10 @@ class GeomAPI_BSpline : public GeomAPI_Interface
 {
 public:
   /// Creation of B-spline defined by a curve
-  GEOMAPI_EXPORT GeomAPI_BSpline(const GeomCurvePtr& theCurve);
+  /// \param isForced if true and theCurve is not a b-spline
+  ///                 curve, theCurve is converted to b-spline
+  GEOMAPI_EXPORT GeomAPI_BSpline (const GeomCurvePtr& theCurve,
+                                  const bool isForced = false);
 
   /// Degree of B-spline curve
   GEOMAPI_EXPORT int degree() const;
