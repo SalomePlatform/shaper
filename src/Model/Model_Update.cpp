@@ -904,6 +904,13 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSel));
       if (isObligatory)
         aState = ModelAPI_StateInvalidArgument;
+    } else if (theFeature->getKind() == "Sketch" && aSel->id() == "External" &&
+               aSel->isInitialized()) {
+      // #19703 : if sketch plane was selected, but after context disappears, it must become invalid
+      aSel->update();
+      if (aSel->isInvalid()) {
+          aState = ModelAPI_StateInvalidArgument;
+      }
     }
   }
   // update the selection list attributes if any
