@@ -53,6 +53,9 @@ public:
   GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
                                            ListOfShape& theNewShapes);
 
+  /// \return List of failed vertices
+  const ListOfShape& failedVertices() const { return myFailedVertices; }
+
 private:
   /// Perform 1d-fillet on wire
   /// \param theBaseWire        a changing wire
@@ -65,6 +68,8 @@ private:
 private:
   MapModified myGenerated;
   MapModified myModified;
+
+  ListOfShape myFailedVertices;
 };
 
 #endif

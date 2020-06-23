@@ -32,6 +32,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Events.h>
 
 FeaturesPlugin_Fillet1D::FeaturesPlugin_Fillet1D()
 {
@@ -146,10 +147,27 @@ bool FeaturesPlugin_Fillet1D::performFillet(const GeomShapePtr& theWire,
   std::shared_ptr<GeomAlgoAPI_Fillet1D> aFilletBuilder(
       new GeomAlgoAPI_Fillet1D(theWire, theVertices, aRadius));
 
+  bool isOk = true;
+  bool isSendMessage = !myFailedVertices.empty();
+  myFailedVertices = aFilletBuilder->failedVertices();
+
   std::string anError;
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFilletBuilder, getKind(), anError)) {
-    setError(anError);
-    return false;
+    isOk = false;
+    // in case of vertices, the fillet completed, send message to highlight them in the viewer
+    isSendMessage = true;
+    bool isAllFailed = myFailedVertices.size() == theVertices.size();
+    setError(anError, isAllFailed);
+    if (isAllFailed)
+      return isOk;
+  }
+
+  if (isSendMessage) {
+    // send message to highlight the failed vertices
+    std::shared_ptr<ModelAPI_Fillet1DFailedMessage> aMessage(
+        new ModelAPI_Fillet1DFailedMessage(Events_Loop::eventByName(EVENT_1DFILLET_FAILED)));
+    aMessage->setVertices(myFailedVertices);
+    Events_Loop::loop()->send(aMessage);
   }
 
   static const std::string THE_PREFIX = "Fillet1D";
@@ -165,5 +183,5 @@ bool FeaturesPlugin_Fillet1D::performFillet(const GeomShapePtr& theWire,
   for (ListOfShape::const_iterator anIt = theVertices.begin(); anIt != theVertices.end(); ++anIt)
     aResult->loadGeneratedShapes(aFilletBuilder, *anIt, GeomAPI_Shape::VERTEX, THE_PREFIX, true);
 
-  return true;
+  return isOk;
 }

@@ -107,6 +107,9 @@ private:
   bool performFillet(const GeomShapePtr& theWire,
                      const ListOfShape& theVertices,
                      const int theResultIndex);
+
+private:
+  ListOfShape myFailedVertices;
 };
 
 #endif

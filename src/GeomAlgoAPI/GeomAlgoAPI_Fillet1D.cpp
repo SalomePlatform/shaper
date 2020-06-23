@@ -73,6 +73,7 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
   if (!theBaseWire || theFilletVertices.empty() || theRadius < 0.)
     return;
 
+  myFailedVertices.clear();
   // store all edges of a base wire as modified, because they will be rebuild by ShapeFix
   for (GeomAPI_WireExplorer aWExp(theBaseWire->wire()); aWExp.more(); aWExp.next()) {
     GeomShapePtr aCurrent = aWExp.current();
@@ -109,8 +110,11 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
 
     // create fillet builder
     GEOMImpl_Fillet1d aFilletBuilder(anEdge1, anEdge2, aPlane->impl<gp_Pln>());
-    if (!aFilletBuilder.Perform(theRadius))
-      return; // fillet is failed, no way to continue
+    if (!aFilletBuilder.Perform(theRadius)) {
+      // store the failed vertex and continue
+      myFailedVertices.push_back(*aVIt);
+      continue;
+    }
 
     GeomPointPtr aPoint = aVE->first->vertex()->point();
     TopoDS_Edge aFilletEdge = aFilletBuilder.Result(aPoint->impl<gp_Pnt>(), anEdge1, anEdge2);
@@ -149,8 +153,10 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
   aFixWire.ClosedWireMode() = aBaseWire->isClosed();
   aFixWire.FixReorder();
   aNewWire = aFixWire.WireAPIMake();
-  if (aNewWire.IsNull())
+  if (aNewWire.IsNull()) {
+    myFailedVertices = theFilletVertices;
     return;
+  }
 
   // update the map of modified shapes, because the edges are changed by ShapeFix
   for (BRepTools_WireExplorer anExp(aNewWire); anExp.More(); anExp.Next()) {
@@ -190,7 +196,7 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
   myModified[theBaseWire].push_back(aShape);
 
   setShape(aShape);
-  setDone(true);
+  setDone(myFailedVertices.empty());
 }
 
 void GeomAlgoAPI_Fillet1D::generated(const GeomShapePtr theOldShape,
