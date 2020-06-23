@@ -28,6 +28,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <list>
@@ -49,7 +50,7 @@ void clearExpressions(FeaturePtr theFeature);
 std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin);
 
 /// Find all Coincident constraints referred to the feature or its attribute
-std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature);
+std::set<FeaturePtr> findCoincidentConstraints(const ObjectPtr& theObject);
 
 /// Finds lines coincident at point
 /// \param[in] theStartCoin coincidence feature
@@ -66,6 +67,13 @@ std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& th
 
 /// Find all points the given point is coincident to.
 std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint);
+
+/// Find all points the given point is coincident to.
+/// Returns GeomDataAPI_Point2D attribute and
+/// GeomDataAPI_Point2DArray with the index of coincident point.
+void findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint,
+                                 std::set<AttributePoint2DPtr>& thePoints,
+                                 std::map<AttributePoint2DArrayPtr, int>& thePointsInArray);
 
 void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
 

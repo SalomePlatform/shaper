@@ -164,12 +164,19 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   FeaturePtr aNextEdgeFeature;
   int nbFound = 0;
 
-  std::set<AttributePoint2DPtr> aCoincPoints =
-    SketchPlugin_Tools::findPointsCoincidentToPoint(theEndPoint);
+  std::set<AttributePoint2DPtr> aCoincPoints;
+  std::map<AttributePoint2DArrayPtr, int> aCoincPointsInArray;
+  SketchPlugin_Tools::findPointsCoincidentToPoint(theEndPoint, aCoincPoints, aCoincPointsInArray);
 
-  std::set<AttributePoint2DPtr>::iterator aPointsIt = aCoincPoints.begin();
-  for (; aPointsIt != aCoincPoints.end(); aPointsIt++) {
-    AttributePoint2DPtr aP = (*aPointsIt);
+  // store all found attributes to a single array
+  std::set<AttributePtr> anAllCoincPoints;
+  anAllCoincPoints.insert(aCoincPoints.begin(), aCoincPoints.end());
+  for (auto it = aCoincPointsInArray.begin(); it != aCoincPointsInArray.end(); ++it)
+    anAllCoincPoints.insert(it->first);
+
+  std::set<AttributePtr>::iterator aPointsIt = anAllCoincPoints.begin();
+  for (; aPointsIt != anAllCoincPoints.end(); aPointsIt++) {
+    AttributePtr aP = (*aPointsIt);
     FeaturePtr aCoincFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aP->owner());
 
     // Condition 1: not a point feature
