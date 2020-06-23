@@ -30,6 +30,8 @@
 #include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Tools.h>
 
+#include <SketcherPrs_Factory.h>
+
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeBoolean.h>
@@ -483,4 +485,15 @@ bool SketchPlugin_Offset::findWires()
   // TODO: hilight selection in the viewer
 
   return true;
+}
+
+
+AISObjectPtr SketchPlugin_Offset::getAISObject(AISObjectPtr thePrevious)
+{
+  if (!sketch())
+    return thePrevious;
+
+  AISObjectPtr anAIS = SketcherPrs_Factory::offsetObject(this, sketch(),
+    thePrevious);
+  return anAIS;
 }

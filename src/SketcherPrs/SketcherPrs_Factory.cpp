@@ -33,6 +33,7 @@
 #include "SketcherPrs_Mirror.h"
 #include "SketcherPrs_Transformation.h"
 #include "SketcherPrs_Angle.h"
+#include "SketcherPrs_Offset.h"
 
 // Macros for constraint presentation definition
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
@@ -66,6 +67,7 @@ CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
 CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 CONSTRAINT_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
 CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
+CONSTRAINT_PRS_IMPL(offsetObject, SketcherPrs_Offset);
 
 // Non-standard constraints definition
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,

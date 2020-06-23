@@ -44,6 +44,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_Mirror.h
     SketcherPrs_Transformation.h
     SketcherPrs_Angle.h
+	SketcherPrs_Offset.h
 )
 
 SET(PROJECT_SOURCES
@@ -67,6 +68,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_Mirror.cpp
     SketcherPrs_Transformation.cpp
     SketcherPrs_Angle.cpp
+	SketcherPrs_Offset.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -102,6 +104,7 @@ SET(PROJECT_PICTURES
     icons/mirror.png
     icons/rotate.png
     icons/translate.png
+    icons/offset.png
 )
 
 ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${OpenCASCADE_DEFINITIONS} -D_CRT_SECURE_NO_WARNINGS)

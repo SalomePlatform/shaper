@@ -24,13 +24,15 @@
 #include <SketchPlugin_SketchEntity.h>
 
 #include <GeomDataAPI_Point2D.h>
+
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_IPresentable.h>
 
 /**\class SketchPlugin_Offset
  * \ingroup Plugins
  * \brief Builds offset curves in the sketch.
  */
-class SketchPlugin_Offset : public SketchPlugin_SketchEntity
+class SketchPlugin_Offset : public SketchPlugin_SketchEntity, public GeomAPI_IPresentable
 {
 public:
   /// Offset macro feature kind
@@ -83,7 +85,7 @@ public:
 
   /// Reimplemented from ModelAPI_Feature::isMacro().
   /// \returns true
-  SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return true; }
+  //SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return false; }
 
   //SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return true; }
@@ -94,6 +96,9 @@ public:
   /// \param[in] theActionId action key id (in following form: Action#Index)
   /// \return \c false in case the action not performed.
   SKETCHPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
+
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Use plugin manager for features creation.
   SketchPlugin_Offset();
