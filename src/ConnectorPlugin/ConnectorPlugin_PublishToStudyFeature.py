@@ -85,7 +85,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
           if aPartDoc is None and aPartObject is not None:
             EventsAPI.Events_InfoMessage("PublishToStudy", "To publish to SHAPER-STUDY, activate Parts in SHAPER", self).send()
             break
-          aPartFeatureId = aPartSet.feature(aPartRes).data().featureId()
+          aPartFeatureId = aPartSet.feature(aPartRes.original()).data().featureId()
           # Collects all features of exported results to find results of the same features and extend id.
           # Map from feature index to index of result. If index is zero (initial), no surrfix to entry is added.
           aFeaturesIndices = {}
