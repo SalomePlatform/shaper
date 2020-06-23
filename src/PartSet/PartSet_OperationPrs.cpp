@@ -123,7 +123,6 @@ void PartSet_OperationPrs::Compute(
   thePresentation->Clear();
   bool aReadyToDisplay = !myShapeToPrsMap.IsEmpty();
 
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
   // create presentations on the base of the shapes
   BRep_Builder aBuilder;
@@ -244,24 +243,20 @@ void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorksho
                               GeomShapePtr theGeomShape,
                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
-  // VSV: Do not use isVisible checking because it can be used when state "Show Only" is ON
-  //if (XGUI_Displayer::isVisible(aDisplayer, theObject)) {
-    if (theGeomShape.get()) {
-      if (theObjectShapes.contains(theObject))
-        theObjectShapes[theObject].append(theGeomShape);
-      else {
-        QList<GeomShapePtr> aShapes;
-        aShapes.append(theGeomShape);
-        theObjectShapes[theObject] = aShapes;
-      }
-    } else {
-  #ifdef DEBUG_EMPTY_SHAPE
-      qDebug(QString("Empty shape in result, result: %1")
-              .arg(ModuleBase_Tools::objectInfo(theObject)).toStdString().c_str());
-  #endif
+  if (theGeomShape.get()) {
+    if (theObjectShapes.contains(theObject))
+      theObjectShapes[theObject].append(theGeomShape);
+    else {
+      QList<GeomShapePtr> aShapes;
+      aShapes.append(theGeomShape);
+      theObjectShapes[theObject] = aShapes;
     }
-  //}
+  } else {
+#ifdef DEBUG_EMPTY_SHAPE
+    qDebug(QString("Empty shape in result, result: %1")
+            .arg(ModuleBase_Tools::objectInfo(theObject)).toStdString().c_str());
+#endif
+  }
 }
 
 void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
@@ -363,8 +358,6 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
 
   if (!theFeature.get())
     return;
-
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
 
   std::list<ResultPtr> aResults;
   ModelAPI_Tools::allResults(theFeature, aResults);

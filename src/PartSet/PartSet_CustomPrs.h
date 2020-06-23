@@ -151,6 +151,9 @@ private:
   /// \return theShapeColor a color
   Quantity_Color getShapeColor(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
+  /// Removes error shapes presentation
+  void clearErrorShape();
+
 private:
   bool myPresentationIsEmpty; /// Boolean state about empty presentation
   FeaturePtr myFeature; /// Reference to a feature object
@@ -161,6 +164,8 @@ private:
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, bool> myIsActive;
 
   int myDisabledMode;
+
+  Handle(AIS_Shape) myErrorShapes;
 };
 
 #endif

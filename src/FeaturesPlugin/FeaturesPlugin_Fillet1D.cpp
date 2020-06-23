@@ -164,9 +164,9 @@ bool FeaturesPlugin_Fillet1D::performFillet(const GeomShapePtr& theWire,
 
   if (isSendMessage) {
     // send message to highlight the failed vertices
-    std::shared_ptr<ModelAPI_Fillet1DFailedMessage> aMessage(
-        new ModelAPI_Fillet1DFailedMessage(Events_Loop::eventByName(EVENT_1DFILLET_FAILED)));
-    aMessage->setVertices(myFailedVertices);
+    std::shared_ptr<ModelAPI_ShapesFailedMessage> aMessage(
+        new ModelAPI_ShapesFailedMessage(Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED)));
+    aMessage->setShapes(myFailedVertices);
     Events_Loop::loop()->send(aMessage);
   }
 

@@ -111,8 +111,8 @@ static const char * EVENT_DOF_OBJECTS = "DoFObjects";
 /// Event ID that requests updates visual attributes for presentations
 static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttributes";
 
-/// Event ID that 1D-fillet failed (comes with ModelAPI_Fillet1DFailedMessage)
-static const char * EVENT_1DFILLET_FAILED = "1DFilletFailed";
+/// Event ID that 1D-fillet failed (comes with ModelAPI_ShapesFailedMessage)
+static const char * EVENT_OPERATION_SHAPES_FAILED = "OperationShapesFailed";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
@@ -534,26 +534,26 @@ public:
 };
 
 /// Message that sends the failed vertices of 1D-fillet to highlight them in 3D viewer
-class ModelAPI_Fillet1DFailedMessage : public Events_Message
+class ModelAPI_ShapesFailedMessage : public Events_Message
 {
 public:
   /// Creates an message
-  MODELAPI_EXPORT ModelAPI_Fillet1DFailedMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT ModelAPI_ShapesFailedMessage(const Events_ID theID, const void* theSender = 0);
   /// Default destructor
-  MODELAPI_EXPORT virtual ~ModelAPI_Fillet1DFailedMessage();
+  MODELAPI_EXPORT virtual ~ModelAPI_ShapesFailedMessage();
   /// Static. Returns EventID of the message.
   MODELAPI_EXPORT static Events_ID eventId()
   {
-    return Events_Loop::eventByName(EVENT_1DFILLET_FAILED);
+    return Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED);
   }
 
   /// Sets list of failed vertices
-  MODELAPI_EXPORT void setVertices(const std::list< std::shared_ptr<GeomAPI_Shape> >& theVertices);
+  MODELAPI_EXPORT void setShapes(const std::list< std::shared_ptr<GeomAPI_Shape> >& theVertices);
   /// Returns list of failed vertices
-  MODELAPI_EXPORT const std::list< std::shared_ptr<GeomAPI_Shape> >& vertices() const;
+  MODELAPI_EXPORT const std::list< std::shared_ptr<GeomAPI_Shape> >& shapes() const;
 
 private:
-  std::list< std::shared_ptr<GeomAPI_Shape> > myVertices;
+  std::list< std::shared_ptr<GeomAPI_Shape> > myShapes;
 };
 
 #endif

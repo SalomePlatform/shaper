@@ -387,21 +387,21 @@ void ModelAPI_ObjectMovedMessage::setCurrentPosition(
 }
 
 
-// =====   ModelAPI_Fillet1DFailedMessage   =====
-ModelAPI_Fillet1DFailedMessage::ModelAPI_Fillet1DFailedMessage(const Events_ID theID,
+// =====   ModelAPI_ShapesFailedMessage   =====
+ModelAPI_ShapesFailedMessage::ModelAPI_ShapesFailedMessage(const Events_ID theID,
                                                                const void* theSender)
   : Events_Message(theID, theSender)
 {}
 
-ModelAPI_Fillet1DFailedMessage::~ModelAPI_Fillet1DFailedMessage()
+ModelAPI_ShapesFailedMessage::~ModelAPI_ShapesFailedMessage()
 {}
 
-void ModelAPI_Fillet1DFailedMessage::setVertices(const ListOfShape& theVertices)
+void ModelAPI_ShapesFailedMessage::setShapes(const ListOfShape& theShapes)
 {
-  myVertices = theVertices;
+  myShapes = theShapes;
 }
 
-const ListOfShape& ModelAPI_Fillet1DFailedMessage::vertices() const
+const ListOfShape& ModelAPI_ShapesFailedMessage::shapes() const
 {
-  return myVertices;
+  return myShapes;
 }
