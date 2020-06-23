@@ -224,7 +224,10 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
     def fillField(self, theField, theFeature, theEngine, theSelectionIndices):
       aTables = theFeature.tables("values")
       aValType = aTables.type() # type of the values
-      theField.SetValuesType(aValType)
+      aValTypeToSet = aValType
+      if aValType == 3: # strings do not supported by SMESH, so, make them empty boolean table
+        aValTypeToSet = 0
+      theField.SetValuesType(aValTypeToSet)
       aNumSteps = aTables.tables() # number of steps is number of tables
       aSteps = []
       for aVal in range(aNumSteps):
