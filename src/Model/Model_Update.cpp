@@ -308,6 +308,10 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
           aFeatures.push_back(*anObjIter);
         } else {
           aResults.push_back(*anObjIter);
+          ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*anObjIter);
+          if (aPart.get() && aPart->data().get() && aPart->data()->isValid()) {
+            aPart->shape(); // to update the shape on creation of the result
+          }
         }
       }
     }
