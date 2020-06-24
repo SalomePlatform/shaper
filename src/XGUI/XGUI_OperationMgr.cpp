@@ -107,6 +107,7 @@ bool XGUI_ShortCutListener::eventFilter(QObject *theObject, QEvent *theEvent)
             break;
           case Qt::Key_F2:
             myOperationMgr->xworkshop()->objectBrowser()->onEditItem();
+            isAccepted = true;
             break;
           default:
             isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
