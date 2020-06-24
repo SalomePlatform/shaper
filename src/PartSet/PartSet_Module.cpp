@@ -1859,29 +1859,25 @@ void PartSet_Module::enableCustomModes() {
 void PartSet_Module::onConflictingConstraints()
 {
   const std::set<ObjectPtr>& aConstraints = myOverconstraintListener->conflictingObjects();
-  if (aConstraints.size() == 1) {
-    QObjectPtrList aObjectsList;
-    std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); aIt++) {
-      if (mySketchReentrantMgr->isLastAutoConstraint(*aIt))
-        aObjectsList.append(*aIt);
-    }
-    if (aObjectsList.size() > 0) {
-      XGUI_Workshop* aWorkshop = getWorkshop();
-      QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-      ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
-      XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+  QObjectPtrList aObjectsList;
+  std::set<ObjectPtr>::const_iterator aIt;
+  for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); aIt++) {
+    if (mySketchReentrantMgr->isLastAutoConstraint(*aIt))
+      aObjectsList.append(*aIt);
+  }
+  if (aObjectsList.size() > 0) {
+    XGUI_Workshop* aWorkshop = getWorkshop();
+    QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
+    XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
 
-      ModuleBase_Operation* anOp = anOpMgr->currentOperation();
-      if (sketchMgr()->isNestedSketchOperation(anOp))
-        anOp->abort();
+    ModuleBase_Operation* anOp = anOpMgr->currentOperation();
+    if (sketchMgr()->isNestedSketchOperation(anOp))
+      anOp->abort();
 
-      anOpMgr->startOperation(anOpAction);
-      aWorkshop->deleteFeatures(aObjectsList);
-      anOpMgr->commitOperation();
-      ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
-
-      myWorkshop->viewer()->update();
-    }
+    anOpMgr->startOperation(anOpAction);
+    aWorkshop->deleteFeatures(aObjectsList);
+    anOpMgr->commitOperation();
+    ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
   }
 }

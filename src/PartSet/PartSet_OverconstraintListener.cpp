@@ -245,30 +245,32 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
   // set error state for new objects and append them in the internal map of objects
   std::set<ObjectPtr>::const_iterator
     anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
+  FeaturePtr aFeature;
+  bool isHVConstraint = false;
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
       aModifiedObjects.insert(anObject);
       myConflictingObjects.insert(anObject);
     }
+    if (!isHVConstraint) {
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      if (aFeature) {
+        std::string aType = aFeature->getKind();
+        isHVConstraint = (aType == SketchPlugin_ConstraintHorizontal::ID()) ||
+          (aType == SketchPlugin_ConstraintVertical::ID());
+      }
+    }
   }
   bool isUpdated = !aModifiedObjects.empty();
   if (isUpdated)
     redisplayObjects(aModifiedObjects);
 
-  if (myConflictingObjects.size() == 1) {
-    // If the conflicting object is an automatic constraint caused the conflict
-    // then it has to be deleted
-    ObjectPtr aObj = *theConflictingObjects.cbegin();
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-    if (aFeature) {
-      std::string aType = aFeature->getKind();
-      if ((aType == SketchPlugin_ConstraintHorizontal::ID()) ||
-        (aType == SketchPlugin_ConstraintVertical::ID())) {
-        PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-        QTimer::singleShot(5, aModule, SLOT(onConflictingConstraints()));
-      }
-    }
+  // If the conflicting object is an automatic constraint caused the conflict
+  // then it has to be deleted
+  if (isHVConstraint) {
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    QTimer::singleShot(5, aModule, SLOT(onConflictingConstraints()));
   }
 
   return isUpdated;
