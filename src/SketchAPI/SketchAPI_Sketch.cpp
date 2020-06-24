@@ -43,6 +43,7 @@
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_MacroBSpline.h>
 #include <SketchPlugin_SketchCopy.h>
+#include <SketchPlugin_Offset.h>
 #include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_Events.h>
@@ -67,6 +68,7 @@
 #include "SketchAPI_MacroEllipse.h"
 #include "SketchAPI_MacroEllipticArc.h"
 #include "SketchAPI_Mirror.h"
+#include "SketchAPI_Offset.h"
 #include "SketchAPI_Point.h"
 #include "SketchAPI_Projection.h"
 #include "SketchAPI_Rectangle.h"
@@ -887,6 +889,18 @@ std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_ConstraintMirror::ID());
   return MirrorPtr(new SketchAPI_Mirror(aFeature, theMirrorLine, theObjects));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Offset> SketchAPI_Sketch::addOffset(
+    const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+    const ModelHighAPI_Double & theValue,
+    const bool theReversed,
+    const bool theAuxiliary)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchPlugin_Offset::ID());
+  return OffsetPtr(new SketchAPI_Offset(aFeature, theObjects, theValue, theReversed, theAuxiliary));
 }
 
 //--------------------------------------------------------------------------------------

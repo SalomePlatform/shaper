@@ -70,6 +70,13 @@ public:
     return ID;
   }
 
+  /// attribute to store the created objects
+  inline static const std::string& CREATED_ID()
+  {
+    static const std::string ID("created");
+    return ID;
+  }
+
   /// name for add wire action
   inline static const std::string& ADD_WIRE_ACTION_ID()
   {
@@ -112,8 +119,11 @@ private:
   bool findWires();
 
   // Create sketch feature for each edge of theOffsetResult,
-  // and store it in myCreatedFeatures to remove on next execute()
+  // and store it in CREATED_ID()
   void addToSketch (const std::shared_ptr<GeomAPI_Shape>& theOffsetResult);
+
+  // Remove created features
+  void removeCreated ();
 
   // Create BSpline or BSplinePeriodic sketch feature from theEdge
   void mkBSpline (FeaturePtr& theResult, const GeomEdgePtr& theEdge);
@@ -133,9 +143,6 @@ private:
                        std::set<FeaturePtr>& theEdgesSet,
                        std::list<FeaturePtr>& theChain,
                        const bool isPrepend = false);
-
-  // tmp
-  std::set<FeaturePtr> myCreatedFeatures;
 };
 
 #endif

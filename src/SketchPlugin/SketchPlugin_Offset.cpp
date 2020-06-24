@@ -39,8 +39,10 @@
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Offset.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -66,12 +68,14 @@ void SketchPlugin_Offset::initDerivedClassAttributes()
   data()->addAttribute(EDGES_ID(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(CREATED_ID(), ModelAPI_AttributeRefList::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CREATED_ID());
 }
 
 void SketchPlugin_Offset::execute()
 {
-  ModelAPI_Tools::removeFeaturesAndReferences(myCreatedFeatures);
-  myCreatedFeatures.clear();
+  removeCreated(); // remove created objects
 
   SketchPlugin_Sketch* aSketch = sketch();
   if (!aSketch) return;
@@ -104,6 +108,12 @@ void SketchPlugin_Offset::execute()
       anEdgesSet.insert(aFeature);
     }
   }
+
+  // Wait all objects being created, then send update events
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
   // 5. Gather wires and make offset for each wire
   for (anEdgesIt = anEdgesList.begin(); anEdgesIt != anEdgesList.end(); anEdgesIt++) {
@@ -146,10 +156,14 @@ void SketchPlugin_Offset::execute()
 
       // 5.e. Store offset results.
       //      Create sketch feature for each edge of anOffsetShape, and also store
-      //      created features in myCreatedFeatures to remove them on next execute()
+      //      created features in CREATED_ID() to remove them on next execute()
       addToSketch(anOffsetShape);
     }
   }
+
+  // send events to update the sub-features by the solver
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
 }
 
 bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
@@ -255,7 +269,10 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
 
 void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOffsetShape)
 {
-  //GeomAPI_ShapeExplorer::GeomAPI_ShapeExplorer
+  AttributeRefListPtr aRefListOfCreated =
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
+    (data()->attribute(SketchPlugin_Offset::CREATED_ID()));
+
   ListOfShape aResEdges = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(anOffsetShape);
   std::list<GeomShapePtr>::const_iterator aResEdgesIt = aResEdges.begin();
   for (; aResEdgesIt != aResEdges.end(); aResEdgesIt++) {
@@ -352,7 +369,7 @@ void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOf
       }
 
       if (aResFeature.get()) {
-        myCreatedFeatures.insert(aResFeature);
+        aRefListOfCreated->append(aResFeature);
 
         aResFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue
           (boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
@@ -423,8 +440,26 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
-  ModelAPI_Tools::removeFeaturesAndReferences(myCreatedFeatures);
-  myCreatedFeatures.clear();
+  removeCreated();
+}
+
+void SketchPlugin_Offset::removeCreated()
+{
+  if (!sketch()) return;
+
+  // Remove all created objects
+  AttributeRefListPtr aRefListOfCreated =
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
+    (data()->attribute(SketchPlugin_Offset::CREATED_ID()));
+  std::list<ObjectPtr> aList = aRefListOfCreated->list();
+  std::set<FeaturePtr> aSet;
+  std::list<ObjectPtr>::iterator anIter = aList.begin();
+  for (; anIter != aList.end(); anIter++) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIter);
+    aSet.insert(aFeature);
+  }
+  ModelAPI_Tools::removeFeaturesAndReferences(aSet);
+  aRefListOfCreated->clear();
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
