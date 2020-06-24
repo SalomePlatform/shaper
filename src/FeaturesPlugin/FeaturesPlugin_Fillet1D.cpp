@@ -34,6 +34,14 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
 
+void sendMessageWithFailedShapes(const ListOfShape& theVertices)
+{
+  std::shared_ptr<ModelAPI_ShapesFailedMessage> aMessage(
+      new ModelAPI_ShapesFailedMessage(Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED)));
+  aMessage->setShapes(theVertices);
+  Events_Loop::loop()->send(aMessage);
+}
+
 FeaturesPlugin_Fillet1D::FeaturesPlugin_Fillet1D()
 {
 }
@@ -58,6 +66,15 @@ void FeaturesPlugin_Fillet1D::execute()
     if (!performFillet(*anIt, aVertices[*anIt], aResultIndex++))
       break;
   removeResults(aResultIndex);
+}
+
+void FeaturesPlugin_Fillet1D::attributeChanged(const std::string& theID)
+{
+  if (theID == CREATION_METHOD()) {
+    // creation method is changed, drop failed vertices and send the message
+    removeResults(0);
+    sendMessageWithFailedShapes(ListOfShape());
+  }
 }
 
 bool FeaturesPlugin_Fillet1D::baseShapes(ListOfShape& theWires, MapShapeSubs& theWireVertices)
@@ -164,10 +181,7 @@ bool FeaturesPlugin_Fillet1D::performFillet(const GeomShapePtr& theWire,
 
   if (isSendMessage) {
     // send message to highlight the failed vertices
-    std::shared_ptr<ModelAPI_ShapesFailedMessage> aMessage(
-        new ModelAPI_ShapesFailedMessage(Events_Loop::eventByName(EVENT_OPERATION_SHAPES_FAILED)));
-    aMessage->setShapes(myFailedVertices);
-    Events_Loop::loop()->send(aMessage);
+    sendMessageWithFailedShapes(myFailedVertices);
   }
 
   static const std::string THE_PREFIX = "Fillet1D";
