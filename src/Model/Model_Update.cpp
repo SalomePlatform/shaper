@@ -21,7 +21,6 @@
 #include <Model_Document.h>
 #include <Model_Data.h>
 #include <Model_Objects.h>
-#include <Model_AttributeSelection.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -1087,8 +1086,8 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
       (*anObj)->data()->attributes(ModelAPI_AttributeSelection::typeId());
     std::list<AttributePtr>::iterator aRefsIter = aRefs.begin();
     for (; aRefsIter != aRefs.end(); aRefsIter++) {
-      std::shared_ptr<Model_AttributeSelection> aSel =
-        std::dynamic_pointer_cast<Model_AttributeSelection>(*aRefsIter);
+      AttributeSelectionPtr aSel =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
       bool aRemove = false;
       aSel->updateInHistory(aRemove);
     }
@@ -1099,12 +1098,12 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
       std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
       for(int a = aSel->size() - 1; a >= 0; a--) {
-        std::shared_ptr<Model_AttributeSelection> aSelAttr =
-          std::dynamic_pointer_cast<Model_AttributeSelection>(aSel->value(a));
+        AttributeSelectionPtr aSelAttr =
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
         if (aSelAttr.get()) {
-          bool theRemove = false;
-          aSelAttr->updateInHistory(theRemove);
-          if (theRemove) {
+          bool aRemove = false;
+          aSelAttr->updateInHistory(aRemove);
+          if (aRemove) {
             aRemoveSet.insert(a);
           }
         }

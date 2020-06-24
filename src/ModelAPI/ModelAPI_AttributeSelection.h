@@ -123,6 +123,11 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   MODELAPI_EXPORT virtual void combineGeometrical() = 0;
 
+  /// Updates the arguments of selection if something was affected by creation
+  /// or reorder of features upper in the history line.
+  /// Returns theRemove true if this attribute must be removed (become deleted)
+  MODELAPI_EXPORT virtual void updateInHistory(bool& theRemove) = 0;
+
  protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeSelection();

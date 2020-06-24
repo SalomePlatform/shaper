@@ -327,7 +327,11 @@ bool Model_ResultPart::updateInPart(const int theIndex)
     AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
     AttributeSelectionPtr aThisAttr = aSelAttr->value(theIndex - 1);
     if (aThisAttr.get()) {
-      return aThisAttr->update();
+      if (aThisAttr->update()) {
+        bool aRemove = false;
+        aThisAttr->updateInHistory(aRemove);
+        return true; // it was updated
+      }
     }
   }
   return false; // something is wrong
