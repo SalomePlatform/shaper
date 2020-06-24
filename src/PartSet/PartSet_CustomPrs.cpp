@@ -255,8 +255,10 @@ void PartSet_CustomPrs::clearErrorShape()
 {
   if (!myErrorShapes.IsNull()) {
     Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-    if (aContext->IsDisplayed(myErrorShapes))
+    if (aContext->IsDisplayed(myErrorShapes)) {
       aContext->Remove(myErrorShapes, true);
+      myErrorShapes.Nullify();
+    }
   }
 }
 
@@ -289,6 +291,7 @@ void PartSet_CustomPrs::processEvent(const std::shared_ptr<Events_Message>& theM
     else {
       if (!myErrorShapes.IsNull()) {
         aContext->Remove(myErrorShapes, true);
+        myErrorShapes.Nullify();
       }
     }
   }
