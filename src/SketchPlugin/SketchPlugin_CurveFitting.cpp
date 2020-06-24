@@ -52,11 +52,11 @@ static void convertTo3D(SketchPlugin_Sketch* theSketch,
                         std::list<GeomPointPtr>& thePoints);
 
 static GeomEdgePtr buildInterpolationCurve(SketchPlugin_Sketch* theSketch,
-                                           AttributeRefAttrListPtr& thePoints,
+                                           AttributeRefAttrListPtr thePoints,
                                            bool thePeriodic,
                                            bool theClosed);
 static GeomEdgePtr buildApproximationCurve(SketchPlugin_Sketch* theSketch,
-                                           AttributeRefAttrListPtr& thePoints,
+                                           AttributeRefAttrListPtr thePoints,
                                            double thePrecision,
                                            bool thePeriodic,
                                            bool theClosed);
@@ -353,7 +353,7 @@ void convertTo3D(SketchPlugin_Sketch* theSketch,
 }
 
 GeomEdgePtr buildInterpolationCurve(SketchPlugin_Sketch* theSketch,
-                                    AttributeRefAttrListPtr& thePoints,
+                                    AttributeRefAttrListPtr thePoints,
                                     bool thePeriodic,
                                     bool theClosed)
 {
@@ -371,7 +371,7 @@ GeomEdgePtr buildInterpolationCurve(SketchPlugin_Sketch* theSketch,
 }
 
 GeomEdgePtr buildApproximationCurve(SketchPlugin_Sketch* theSketch,
-                                    AttributeRefAttrListPtr& thePoints,
+                                    AttributeRefAttrListPtr thePoints,
                                     double thePrecision,
                                     bool thePeriodic,
                                     bool theClosed)
