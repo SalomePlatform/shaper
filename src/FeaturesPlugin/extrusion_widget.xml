@@ -8,6 +8,15 @@
                    shape_types="vertices edges wires faces shells solids compsolids compounds">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
   </sketch_launcher>
+  <choice id="use_sapes"
+    widget_type="radiobuttons"
+    buttons_dir="horizontal"
+    label="Type"
+    tooltip="Using shapes type"
+    string_list="Vertices Edges Faces"
+    icons_list=":pictures/vertex32.png :pictures/edge32.png :pictures/face32.png"
+    default="2">
+  </choice>
   <multi_selector id="base"
                   label="Base objects:"
                   tooltip="Select a base objects"

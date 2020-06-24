@@ -212,6 +212,9 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
   XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
   const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
   foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+    QString aType(aWidget->metaObject()->className());
+    if (aType == "ModuleBase_WidgetChoice")
+      continue;
     if (theSelectionControl) { // hide other controls
       if (aWidget != this)
         aWidget->setVisible(false);

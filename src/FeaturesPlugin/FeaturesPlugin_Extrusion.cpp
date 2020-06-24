@@ -23,6 +23,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -56,6 +57,8 @@ void FeaturesPlugin_Extrusion::initAttributes()
   data()->addAttribute(FROM_OFFSET_ID(), ModelAPI_AttributeDouble::typeId());
 
   data()->addAttribute(DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(USE_SHAPES_ID(), ModelAPI_AttributeInteger::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
