@@ -53,6 +53,9 @@
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_ChoiceCtrl.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ISelectionActivate.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -67,6 +70,25 @@
 #include <QMainWindow>
 
 #define DEBUG_UNDO_INVALID_SKETCH
+
+
+
+QStringList getIconsList(const QStringList& theNames)
+{
+  QStringList aIcons;
+  foreach(QString aName, theNames) {
+    QString aUName = aName.toUpper();
+    if ((aUName == "VERTICES") || (aUName == "VERTEX"))
+      aIcons << ":pictures/vertex32.png";
+    else if ((aUName == "EDGES") || (aUName == "EDGE"))
+      aIcons << ":pictures/edge32.png";
+    else if ((aUName == "FACES") || (aUName == "FACE"))
+      aIcons << ":pictures/face32.png";
+  }
+  return aIcons;
+}
+
+
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
                                                          PartSet_Module* theModule,
@@ -102,11 +124,37 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
 
   aLayout->addWidget(mySizeOfViewWidget);
   aLayout->addWidget(myLabel);
-  aLayout->addStretch(1);
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
+  myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
+  QStringList aIconsList = getIconsList(myShapeTypes);
+  myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
+  myTypeCtrl->setLabel(tr("Type"));
+  if (!myShapeTypes.empty()) {
+    std::string aDefType = theData->getProperty("default_type");
+    if (aDefType.size() > 0) {
+      bool aOk = false;
+      int aId = QString(aDefType.c_str()).toInt(&aOk);
+      if (aOk) {
+        myTypeCtrl->setValue(aId);
+        myDefMode = myShapeTypes.at(aId).toStdString();
+      }
+    }
+    if (myDefMode.size() == 0) {
+      myTypeCtrl->setValue(0);
+      myDefMode = myShapeTypes.first().toStdString();
+    }
+  }
+  aLayout->addWidget(myTypeCtrl);
+  // There is no sense to parameterize list of types while we can not parameterize selection mode
+  // if the xml definition contains one type, the controls to select a type should not be shown
+  if (myShapeTypes.size() <= 1 || !myIsUseChoice) {
+    myTypeCtrl->setVisible(false);
+  }
+  connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
+  aLayout->addStretch(1);
   myPreviewPlanes = new PartSet_PreviewPlanes();
 }
 
@@ -212,9 +260,6 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
   XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
   const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
   foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
-    QString aType(aWidget->metaObject()->className());
-    if (aType == "ModuleBase_WidgetChoice")
-      continue;
     if (theSelectionControl) { // hide other controls
       if (aWidget != this)
         aWidget->setVisible(false);
@@ -253,8 +298,13 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
 QIntList PartSet_WidgetSketchCreator::shapeTypes() const
 {
   QIntList aShapeTypes;
-  foreach(QString aType, myShapeTypes) {
-    aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+  if (myShapeTypes.length() > 1 && myIsUseChoice) {
+    aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCtrl->textValue()));
+  }
+  else {
+    foreach(QString aType, myShapeTypes) {
+      aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+    }
   }
   return aShapeTypes;
 }
@@ -591,4 +641,39 @@ void PartSet_WidgetSketchCreator::setEnabledModelWidget(ModuleBase_ModelWidget* 
   foreach(QWidget*  eachControl, aMyControls) {
     eachControl->setEnabled(theEnabled);
   }
+}
+
+void PartSet_WidgetSketchCreator::onSelectionTypeChanged()
+{
+  // Clear current selection in order to avoid updating of object browser with obsolete indexes
+  // which can appear because of results deletetion after changing a type of selection
+  QString aSelectionType = myTypeCtrl->textValue();
+  QList<ModuleBase_ViewerPrsPtr> aEmptyList;
+  myWorkshop->setSelected(aEmptyList);
+
+  updateSelectionModesAndFilters(true);
+  myWorkshop->selectionActivate()->updateSelectionModes();
+
+  if (!myFeature)
+    return;
+
+  if (aSelectionType != "Faces") {
+    setVisibleSelectionControl(false);
+    myWorkshop->propertyPanel()->activateNextWidget();
+  }
+
+  /// store the selected type
+  AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
+  anAttrList->setSelectionType(aSelectionType.toStdString());
+  anAttrList->clear();
+
+  // update object is necessary to flush update signal. It leads to objects references map update
+  // and the operation presentation will not contain deleted items visualized as parameters of
+  // the feature.
+  updateObject(myFeature);
+  myWorkshop->propertyPanel()->activeWidget()->restoreValue();
+  myWorkshop->setSelected(getAttributeSelection());
+  // may be the feature's result is not displayed, but attributes should be
+  // hope that something is redisplayed by object updated
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments, true);
 }

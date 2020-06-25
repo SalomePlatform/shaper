@@ -132,8 +132,19 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   if (!myShapeTypes.empty()) {
-    myTypeCtrl->setValue(0);
-    myDefMode = myShapeTypes.first().toStdString();
+    std::string aDefType = theData->getProperty("default_type");
+    if (aDefType.size() > 0) {
+      bool aOk = false;
+      int aId = QString(aDefType.c_str()).toInt(&aOk);
+      if (aOk) {
+        myTypeCtrl->setValue(aId);
+        myDefMode = myShapeTypes.at(aId).toStdString();
+      }
+    }
+    if (myDefMode.size() == 0) {
+      myTypeCtrl->setValue(0);
+      myDefMode = myShapeTypes.first().toStdString();
+    }
   }
   myMainLayout->addWidget(myTypeCtrl);
 
@@ -570,6 +581,8 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
+  if (myTypeCtrl->isVisible())
+    result << myTypeCtrl;
   result << myListView->getControl();
   return result;
 }
@@ -618,8 +631,9 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   restoreValue();
   myWorkshop->setSelected(getAttributeSelection());
   // may be the feature's result is not displayed, but attributes should be
-  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments,
-                            true); /// hope that something is redisplayed by object updated
+  // hope that something is redisplayed by object updated
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments, false);
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeResults, true);
   // clear history should follow after set selected to do not increase history by setSelected
   clearSelectedHistory();
 

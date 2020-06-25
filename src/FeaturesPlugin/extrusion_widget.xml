@@ -5,24 +5,19 @@
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
-                   shape_types="vertices edges wires faces shells solids compsolids compounds">
+                  shape_types="Vertices Edges Faces"
+                  default_type = "2"
+                  use_choice="true">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
   </sketch_launcher>
-  <choice id="use_sapes"
-    widget_type="radiobuttons"
-    buttons_dir="horizontal"
-    label="Type"
-    tooltip="Using shapes type"
-    string_list="Vertices Edges Faces"
-    icons_list=":pictures/vertex32.png :pictures/edge32.png :pictures/face32.png"
-    default="2">
-  </choice>
   <multi_selector id="base"
                   label="Base objects:"
                   tooltip="Select a base objects"
-                  shape_types="vertices edges wires faces shells compounds"
+                  shape_types="Vertices Edges Faces"
+                  default_type = "2"
+                  use_choice="true"
                   concealment="true">
-    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
+    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face"/>
   </multi_selector>
   <shape_selector id="direction_object"
                   icon="icons/Features/axis.png"

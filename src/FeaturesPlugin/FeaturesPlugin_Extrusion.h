@@ -123,13 +123,6 @@ public:
     return MY_FROM_OFFSET_ID;
   }
 
-  /// Attribute name of using shape types.
-  inline static const std::string& USE_SHAPES_ID()
-  {
-    static const std::string MY_USE_SHAPEST_ID("use_sapes");
-    return MY_USE_SHAPEST_ID;
-  }
-
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
