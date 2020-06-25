@@ -720,13 +720,14 @@
         <switch id="type">
           <case id="interpolation_type" title="Interpolation"/>
           <case id="approximation_type" title="Approximation">
-            <doublevalue_editor id="precision"
-                                label="Precision"
-                                tooltip="Maximal distance from selected points to the curve"
-                                default="1.e-3"
-                                min="1.e-7">
+            <doublevalue id="precision"
+                         label="Precision"
+                         tooltip="Maximal distance from selected points to the curve"
+                         default="0.001"
+                         min="1.e-7"
+                         use_reset="false">
               <validator id="GeomValidators_Positive" parameters="0"/>
-            </doublevalue_editor>
+            </doublevalue>
           </case>
         </switch>
         <boolvalue id="need_control_poly"
