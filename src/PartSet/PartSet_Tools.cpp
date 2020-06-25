@@ -384,10 +384,13 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(
   anIntoResult->setValue(SKETCH_PROJECTION_INCLUDE_INTO_RESULT);
   aProjectionFeature->execute();
 
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  bool isValid = aValidators->validate(aProjectionFeature);
+
   // if projection feature has not been created, exit
   AttributeRefAttrPtr aRefAttr = aProjectionFeature->data()->refattr(
     SketchPlugin_Projection::PROJECTED_FEATURE_ID());
-  if (!aRefAttr || !aRefAttr->isInitialized())
+  if (!isValid || !aRefAttr || !aRefAttr->isInitialized())
   {
     // remove external feature if the attribute is not filled
     std::set<FeaturePtr> aFeatures;

@@ -2157,6 +2157,10 @@
       <translation>Erreur: L&apos;arc d&apos;ellipse est orthogonal au plan d&apos;esquisse.</translation>
     </message>
     <message>
+      <source>Error: Periodic B-spline is orthogonal to the sketch plane.</source>
+      <translation>Erreur: La B-spline périodique est orthogonale au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
       <source>Error: Selected object is not supported for projection.</source>
       <translation>Erreur: L&apos;objet sélectionné n&apos;est pas pris en charge pour la projection.</translation>
     </message>
