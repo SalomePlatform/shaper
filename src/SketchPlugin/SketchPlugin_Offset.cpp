@@ -440,7 +440,7 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
-  removeCreated();
+//  removeCreated();
 }
 
 void SketchPlugin_Offset::removeCreated()
@@ -458,8 +458,8 @@ void SketchPlugin_Offset::removeCreated()
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIter);
     aSet.insert(aFeature);
   }
-  ModelAPI_Tools::removeFeaturesAndReferences(aSet);
   aRefListOfCreated->clear();
+  ModelAPI_Tools::removeFeaturesAndReferences(aSet);
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
