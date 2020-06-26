@@ -92,7 +92,8 @@ GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomPlanePtr& thePlane,
   setImpl(aParal);
   setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-  aParal->Init(aFace, GeomAbs_Arc, Standard_True);
+  Standard_Boolean isOpenResult = !aWire.Closed();
+  aParal->Init(aFace, GeomAbs_Arc, isOpenResult);
   aParal->Perform(theOffsetValue, 0.);
   if (aParal->IsDone()) {
     TopoDS_Shape anOffset = aParal->Shape();

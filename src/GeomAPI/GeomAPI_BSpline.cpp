@@ -26,16 +26,11 @@
 
 #define MY_BSPLINE (*(implPtr<Handle_Geom_BSplineCurve>()))
 
-GeomAPI_BSpline::GeomAPI_BSpline (const GeomCurvePtr& theCurve,
-                                  const bool isForced)
+GeomAPI_BSpline::GeomAPI_BSpline (const GeomCurvePtr& theCurve)
 {
   GeomCurvePtr anUntrimmedCurve = theCurve->basisCurve();
   Handle(Geom_Curve) aCurve = anUntrimmedCurve->impl<Handle(Geom_Curve)>();
   Handle(Geom_BSplineCurve) aBSpl = Handle(Geom_BSplineCurve)::DownCast(aCurve);
-  if (aBSpl.IsNull() && isForced) {
-    // convert to b-spline
-    aBSpl = GeomConvert::CurveToBSplineCurve(aCurve);
-  }
   if (aBSpl.IsNull())
     throw Standard_ConstructionError("GeomAPI_BSpline: Curve is not a B-spline");
   setImpl(new Handle_Geom_BSplineCurve(aBSpl));
@@ -82,4 +77,21 @@ std::list<int> GeomAPI_BSpline::mults() const
 bool GeomAPI_BSpline::isPeriodic() const
 {
   return MY_BSPLINE->IsPeriodic();
+}
+
+GeomBSplinePtr GeomAPI_BSpline::convertToBSpline (const GeomCurvePtr& theCurve)
+{
+  GeomCurvePtr anUntrimmedCurve = theCurve->basisCurve();
+  Handle(Geom_Curve) aCurve = anUntrimmedCurve->impl<Handle(Geom_Curve)>();
+  Handle(Geom_BSplineCurve) aBSpl = Handle(Geom_BSplineCurve)::DownCast(aCurve);
+  if (aBSpl.IsNull()) {
+    // convert to b-spline
+    aBSpl = GeomConvert::CurveToBSplineCurve(aCurve);
+  }
+  if (aBSpl.IsNull())
+    throw Standard_ConstructionError("GeomAPI_BSpline: Conversion to B-spline failed");
+  GeomCurvePtr aResCurve (new GeomAPI_Curve());
+  aResCurve->setImpl(new Handle_Geom_BSplineCurve(aBSpl));
+  GeomBSplinePtr aResult (new GeomAPI_BSpline(aResCurve));
+  return aResult;
 }

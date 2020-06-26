@@ -27,6 +27,10 @@
 #include <memory>
 
 class GeomAPI_Pnt;
+class GeomAPI_BSpline;
+
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_BSpline> GeomBSplinePtr;
 
 /**\class GeomAPI_BSpline
  * \ingroup DataModel
@@ -36,10 +40,7 @@ class GeomAPI_BSpline : public GeomAPI_Interface
 {
 public:
   /// Creation of B-spline defined by a curve
-  /// \param isForced if true and theCurve is not a b-spline
-  ///                 curve, theCurve is converted to b-spline
-  GEOMAPI_EXPORT GeomAPI_BSpline (const GeomCurvePtr& theCurve,
-                                  const bool isForced = false);
+  GEOMAPI_EXPORT GeomAPI_BSpline (const GeomCurvePtr& theCurve);
 
   /// Degree of B-spline curve
   GEOMAPI_EXPORT int degree() const;
@@ -58,9 +59,9 @@ public:
 
   /// Return \c true if the curve is periodic
   GEOMAPI_EXPORT bool isPeriodic() const;
-};
 
-//! Pointer on the object
-typedef std::shared_ptr<GeomAPI_BSpline> GeomBSplinePtr;
+  /// Convert any curve into a B-spline curve
+  GEOMAPI_EXPORT static GeomBSplinePtr convertToBSpline (const GeomCurvePtr& theCurve);
+};
 
 #endif

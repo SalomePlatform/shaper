@@ -579,17 +579,17 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 {
   GeomCurvePtr aCurve (new GeomAPI_Curve (theEdge));
   // Forced conversion to b-spline, if aCurve is not b-spline
-  GeomAPI_BSpline aBSpline (aCurve, /*isForced*/true);
+  GeomBSplinePtr aBSpline = GeomAPI_BSpline::convertToBSpline(aCurve);
 
-  const std::string& aBSplineKind = aBSpline.isPeriodic() ? SketchPlugin_BSplinePeriodic::ID()
-                                                          : SketchPlugin_BSpline::ID();
+  const std::string& aBSplineKind = aBSpline->isPeriodic() ? SketchPlugin_BSplinePeriodic::ID()
+                                                           : SketchPlugin_BSpline::ID();
   findOrCreateFeatureByKind(sketch(), aBSplineKind, theResult, thePoolOfFeatures);
 
-  theResult->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(aBSpline.degree());
+  theResult->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(aBSpline->degree());
 
   AttributePoint2DArrayPtr aPolesAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>
     (theResult->attribute(SketchPlugin_BSpline::POLES_ID()));
-  std::list<GeomPointPtr> aPoles = aBSpline.poles();
+  std::list<GeomPointPtr> aPoles = aBSpline->poles();
   aPolesAttr->setSize((int)aPoles.size());
   std::list<GeomPointPtr>::iterator anIt = aPoles.begin();
   for (int anIndex = 0; anIt != aPoles.end(); ++anIt, ++anIndex) {
@@ -599,7 +599,7 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
   AttributeDoubleArrayPtr aWeightsAttr =
       theResult->data()->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
-  std::list<double> aWeights = aBSpline.weights();
+  std::list<double> aWeights = aBSpline->weights();
   if (aWeights.empty()) { // rational B-spline
     int aSize = (int)aPoles.size();
     aWeightsAttr->setSize(aSize);
@@ -615,7 +615,7 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
   AttributeDoubleArrayPtr aKnotsAttr =
       theResult->data()->realArray(SketchPlugin_BSpline::KNOTS_ID());
-  std::list<double> aKnots = aBSpline.knots();
+  std::list<double> aKnots = aBSpline->knots();
   int aSize = (int)aKnots.size();
   aKnotsAttr->setSize(aSize);
   std::list<double>::iterator aKIt = aKnots.begin();
@@ -624,7 +624,7 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
   AttributeIntArrayPtr aMultsAttr =
       theResult->data()->intArray(SketchPlugin_BSpline::MULTS_ID());
-  std::list<int> aMultiplicities = aBSpline.mults();
+  std::list<int> aMultiplicities = aBSpline->mults();
   aSize = (int)aMultiplicities.size();
   aMultsAttr->setSize(aSize);
   std::list<int>::iterator aMIt = aMultiplicities.begin();
