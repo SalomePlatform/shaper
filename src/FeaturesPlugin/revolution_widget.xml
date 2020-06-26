@@ -6,6 +6,7 @@
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
                   shape_types="Vertices Edges Faces"
+                  type_icons=":/icons/extrusion_vertex32.png :/icons/extrusion_edge32.png :/icons/extrusion_face32.png"
                   default_type = "2"
                   use_choice="true">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
@@ -14,6 +15,7 @@
                   label="Base objects:"
                   tooltip="Select a base objects"
                   shape_types="Vertices Edges Faces"
+                  type_icons=":/icons/extrusion_vertex32.png :/icons/extrusion_edge32.png :/icons/extrusion_face32.png"
                   default_type = "2"
                   use_choice="true"
                   concealment="true">

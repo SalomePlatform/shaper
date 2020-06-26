@@ -128,7 +128,15 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
   myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
-  QStringList aIconsList = getIconsList(myShapeTypes);
+
+  QStringList aIconsList;
+  std::string aIcons = theData->getProperty("type_icons");
+  if (aIcons.size() > 0)
+    aIconsList = QString(aIcons.c_str()).split(' ', QString::SkipEmptyParts);
+
+  if (aIconsList.size() != myShapeTypes.size())
+    aIconsList = getIconsList(myShapeTypes);
+
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   if (!myShapeTypes.empty()) {

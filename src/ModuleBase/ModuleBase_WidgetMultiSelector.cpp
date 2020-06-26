@@ -128,7 +128,15 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(myMainLayout);
 
-  QStringList aIconsList = getIconsList(myShapeTypes);
+
+  QStringList aIconsList;
+  std::string aIcons = theData->getProperty("type_icons");
+  if (aIcons.size() > 0)
+    aIconsList = QString(aIcons.c_str()).split(' ', QString::SkipEmptyParts);
+
+  if (aIconsList.size() != myShapeTypes.size())
+    aIconsList = getIconsList(myShapeTypes);
+
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   if (!myShapeTypes.empty()) {
