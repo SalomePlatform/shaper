@@ -55,6 +55,8 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Ellipse.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Wire.h>
+#include <GeomAPI_WireExplorer.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
@@ -297,6 +299,25 @@ static void setRefListValue(AttributeRefListPtr theList, int theListSize,
     theList->append(theValue);
 }
 
+// Reorder shapes according to the wire's order
+static void reorderShapes(ListOfShape& theShapes, GeomShapePtr theWire)
+{
+  std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aShapes;
+  aShapes.insert(theShapes.begin(), theShapes.end());
+  theShapes.clear();
+
+  GeomWirePtr aWire(new GeomAPI_Wire(theWire));
+  GeomAPI_WireExplorer anExp(aWire);
+  for (; anExp.more(); anExp.next()) {
+    GeomShapePtr aCurEdge = anExp.current();
+    auto aFound = aShapes.find(aCurEdge);
+    if (aFound != aShapes.end()) {
+      theShapes.push_back(aCurEdge);
+      aShapes.erase(aFound);
+    }
+  }
+}
+
 static void removeLastFromIndex(AttributeRefListPtr theList, int theListSize, int& theLastIndex)
 {
   if (theLastIndex < theListSize) {
@@ -351,8 +372,12 @@ void SketchPlugin_Offset::addToSketch(const ListOfMakeShape& theOffsetAlgos)
     GeomShapePtr aBaseShape = aBaseFeature->lastResult()->shape();
     ListOfShape aNewShapes;
     for (ListOfMakeShape::const_iterator anAlgoIt = theOffsetAlgos.begin();
-         anAlgoIt != theOffsetAlgos.end() && aNewShapes.empty(); ++anAlgoIt) {
+         anAlgoIt != theOffsetAlgos.end(); ++anAlgoIt) {
       (*anAlgoIt)->generated(aBaseShape, aNewShapes);
+      if (!aNewShapes.empty()) {
+        reorderShapes(aNewShapes, (*anAlgoIt)->shape());
+        break;
+      }
     }
 
     // store base feature
@@ -647,6 +672,8 @@ bool SketchPlugin_Offset::findWires()
     }
   }
 
+  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+
   // Gather chains of edges
   for (anEdgesIt = anEdgesList.begin(); anEdgesIt != anEdgesList.end(); anEdgesIt++) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
@@ -677,6 +704,7 @@ bool SketchPlugin_Offset::findWires()
   }
   // TODO: hilight selection in the viewer
 
+  data()->blockSendAttributeUpdated(aWasBlocked);
   return true;
 }
 
