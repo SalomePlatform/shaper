@@ -635,7 +635,7 @@ void replaceInName(ObjectPtr theObject, const std::wstring& theSource, const std
   size_t aPos = aName.find(theSource);
   if (aPos != std::string::npos) {
     std::wstring aNewName = aName.substr(0, aPos) + theDest
-                          + aName.substr(aPos + theSource.size());
+                            + aName.substr(aPos + theSource.size());
     theObject->data()->setName(aNewName);
   }
 }
