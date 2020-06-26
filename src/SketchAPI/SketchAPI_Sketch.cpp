@@ -895,12 +895,11 @@ std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
 std::shared_ptr<SketchAPI_Offset> SketchAPI_Sketch::addOffset(
     const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
     const ModelHighAPI_Double & theValue,
-    const bool theReversed,
-    const bool theAuxiliary)
+    const bool theReversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Offset::ID());
-  return OffsetPtr(new SketchAPI_Offset(aFeature, theObjects, theValue, theReversed, theAuxiliary));
+  return OffsetPtr(new SketchAPI_Offset(aFeature, theObjects, theValue, theReversed));
 }
 
 //--------------------------------------------------------------------------------------

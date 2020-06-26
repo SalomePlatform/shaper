@@ -21,15 +21,22 @@
 #define GeomAlgoAPI_WireBuilder_H_
 
 #include "GeomAlgoAPI.h"
+#include "GeomAlgoAPI_MakeShapeCustom.h"
 
 #include <GeomAPI_Shape.h>
 
 /// \class GeomAlgoAPI_WireBuilder
 /// \ingroup DataAlgo
 /// \brief Allows to create wire-shapes by different parameters.
-class GeomAlgoAPI_WireBuilder
+class GeomAlgoAPI_WireBuilder : public GeomAlgoAPI_MakeShapeCustom
 {
  public:
+   /// \brief Creates a wire from edges and wires.
+   /// \param[in] theShapes list of shapes. Only edges and wires allowed.
+   /// The edges are not to be consecutive.
+   /// But they are to be all connected geometrically or topologically.
+   GEOMALGOAPI_EXPORT GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes);
+
    /// \brief Creates a wire from edges and wires.
    /// \param[in] theShapes list of shapes. Only edges and wires allowed.
    /// The edges are not to be consecutive.

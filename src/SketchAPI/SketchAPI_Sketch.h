@@ -376,8 +376,7 @@ public:
   std::shared_ptr<SketchAPI_Offset> addOffset(
       const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
       const ModelHighAPI_Double & theValue,
-      const bool theReversed,
-      const bool theAuxiliary);
+      const bool theReversed);
 
   /// Add translation
   SKETCHAPI_EXPORT

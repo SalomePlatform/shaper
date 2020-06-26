@@ -21,18 +21,19 @@
 #define SketchPlugin_Offset_H_
 
 #include <SketchPlugin.h>
-#include <SketchPlugin_SketchEntity.h>
+#include <SketchPlugin_ConstraintBase.h>
 
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Edge.h>
-#include <GeomAPI_IPresentable.h>
+
+class GeomAlgoAPI_MakeShape;
 
 /**\class SketchPlugin_Offset
  * \ingroup Plugins
  * \brief Builds offset curves in the sketch.
  */
-class SketchPlugin_Offset : public SketchPlugin_SketchEntity, public GeomAPI_IPresentable
+class SketchPlugin_Offset : public SketchPlugin_ConstraintBase
 {
 public:
   /// Offset macro feature kind
@@ -70,13 +71,6 @@ public:
     return ID;
   }
 
-  /// attribute to store the created objects
-  inline static const std::string& CREATED_ID()
-  {
-    static const std::string ID("created");
-    return ID;
-  }
-
   /// name for add wire action
   inline static const std::string& ADD_WIRE_ACTION_ID()
   {
@@ -90,11 +84,6 @@ public:
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Reimplemented from ModelAPI_Feature::isMacro().
-  /// \returns true
-  //SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return false; }
-
-  //SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return true; }
 
   /// Find edges connected by coincident boundary constraint and composing a wire with
@@ -112,30 +101,36 @@ public:
 
 protected:
   /// \brief Initializes attributes of derived class.
-  virtual void initDerivedClassAttributes();
+  virtual void initAttributes();
 
 private:
   /// Find all wires connected with the selected edges
   bool findWires();
 
-  // Create sketch feature for each edge of theOffsetResult,
-  // and store it in CREATED_ID()
-  void addToSketch (const std::shared_ptr<GeomAPI_Shape>& theOffsetResult);
+  /// Create sketch feature for each edge of the offset result,
+  /// and store it in ENTITY_B(). Original edges are copied to ENTITY_A() to update
+  /// correctly if original selection is modified.
+  void addToSketch (const std::list< std::shared_ptr<GeomAlgoAPI_MakeShape> >& theOffsetAlgos);
 
-  // Remove created features
-  void removeCreated ();
+  /// Create BSpline or BSplinePeriodic sketch feature from theEdge
+  void mkBSpline (FeaturePtr& theResult, const GeomEdgePtr& theEdge,
+                  std::list<ObjectPtr>& thePoolOfFeatures);
 
-  // Create BSpline or BSplinePeriodic sketch feature from theEdge
-  void mkBSpline (FeaturePtr& theResult, const GeomEdgePtr& theEdge);
+  /// Update existent feature by the parameters of the given edge or create a new feature.
+  /// \param[in]     theShape          a shape to be converted to sketch feature
+  /// \param[in,out] theFeature        sketch feature to be updated or created from scratch
+  /// \param[in,out] thePoolOfFeatures list of features to be removed (may be used as a new feature)
+  void updateExistentOrCreateNew (const GeomShapePtr& theShape, FeaturePtr& theFeature,
+                                  std::list<ObjectPtr>& thePoolOfFeatures);
 
-  // Find edges that prolongate theEdgeFeature (in a chain) at theEndPoint
-  // Recursive method.
-  // \param[in] theFirstEdge Start edge of wire searching
-  // \param[in] theEdge Current edge
-  // \param[in] theEndPoint Point of the Current edge, not belonging to a previous edge
-  // \param[in/out] theEdgesSet All edges to find among. If empty, all sketch edges assumed.
-  // \param[in/out] theChain Resulting edges
-  // \param[in] isPrepend if true, push new found edges to theChain front, else to the back
+  /// Find edges that prolongate theEdgeFeature (in a chain) at theEndPoint
+  /// Recursive method.
+  /// \param[in] theFirstEdge Start edge of wire searching
+  /// \param[in] theEdge Current edge
+  /// \param[in] theEndPoint Point of the Current edge, not belonging to a previous edge
+  /// \param[in/out] theEdgesSet All edges to find among. If empty, all sketch edges assumed.
+  /// \param[in/out] theChain Resulting edges
+  /// \param[in] isPrepend if true, push new found edges to theChain front, else to the back
   /// \return \c true if the chain is closed
   bool findWireOneWay (const FeaturePtr& theFirstEdge,
                        const FeaturePtr& theEdge,

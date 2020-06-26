@@ -1021,12 +1021,6 @@
                    tooltip="Reverse the offset"
                    default="false"
                    obligatory="0"/>
-        <boolvalue id="Auxiliary"
-                   label="Auxiliary"
-                   tooltip="Construction element"
-                   default="false"
-                   obligatory="0"
-                   change_visual_attributes="true"/>
         <action id="add_wire"
                 label="Select wire"
                 tooltip="Add the list of segments composing a wire with the selected items through the coincidence by boundary points"/>

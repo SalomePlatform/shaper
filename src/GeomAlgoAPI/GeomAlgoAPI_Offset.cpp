@@ -19,6 +19,8 @@
 
 #include "GeomAlgoAPI_Offset.h"
 
+#include <GeomAPI_Pln.h>
+
 #include <BRepOffsetAPI_MakeOffsetShape.hxx>
 #include <BRepOffsetAPI_MakeOffset.hxx>
 
@@ -60,18 +62,10 @@ void GeomAlgoAPI_Offset::generated(const GeomShapePtr theOldShape,
   }
 }
 
-//GeomShapePtr GeomAlgoAPI_Offset::OffsetInPlane (const std::shared_ptr<GeomAPI_Pln>& thePlane,
-//                                                const ListOfShape& theEdgesAndWires,
-//                                                const double theOffsetValue)
-//{
-//}
-
-GeomShapePtr GeomAlgoAPI_Offset::OffsetInPlane (const std::shared_ptr<GeomAPI_Pln>& thePlane,
-                                                const GeomShapePtr& theEdgeOrWire,
-                                                const double theOffsetValue)
+GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomPlanePtr& thePlane,
+                                       const GeomShapePtr& theEdgeOrWire,
+                                       const double theOffsetValue)
 {
-  GeomShapePtr aResult;
-
   // 1. Make wire from edge, if need
   TopoDS_Wire aWire;
   TopoDS_Shape anEdgeOrWire = theEdgeOrWire->impl<TopoDS_Shape>();
@@ -87,21 +81,24 @@ GeomShapePtr GeomAlgoAPI_Offset::OffsetInPlane (const std::shared_ptr<GeomAPI_Pl
     }
   }
   if (aWire.IsNull())
-    return aResult;
+    return;
 
   // 2. Make invalid face to pass it in Offset algorithm
   BRepBuilderAPI_MakeFace aFaceBuilder (thePlane->impl<gp_Pln>(), aWire);
   const TopoDS_Face& aFace = aFaceBuilder.Face();
 
   // 3. Make Offset
-  BRepOffsetAPI_MakeOffset aParal;
-  aParal.Init(aFace, GeomAbs_Arc, Standard_True);
-  aParal.Perform(theOffsetValue, 0.);
-  if (aParal.IsDone()) {
-    TopoDS_Shape anOffset = aParal.Shape();
-    aResult.reset(new GeomAPI_Shape());
-    aResult->setImpl(new TopoDS_Shape(anOffset));
-  }
+  BRepOffsetAPI_MakeOffset* aParal = new BRepOffsetAPI_MakeOffset;
+  setImpl(aParal);
+  setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-  return aResult;
+  aParal->Init(aFace, GeomAbs_Arc, Standard_True);
+  aParal->Perform(theOffsetValue, 0.);
+  if (aParal->IsDone()) {
+    TopoDS_Shape anOffset = aParal->Shape();
+    GeomShapePtr aResult(new GeomAPI_Shape());
+    aResult->setImpl(new TopoDS_Shape(anOffset));
+    setShape(aResult);
+    setDone(true);
+  }
 }

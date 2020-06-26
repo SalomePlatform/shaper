@@ -40,6 +40,7 @@
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
+#include <SketchSolver_ConstraintOffset.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
@@ -63,6 +64,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_Offset.h>
 #include <SketchPlugin_Point.h>
 
 #include <GeomAPI_BSpline2d.h>
@@ -186,6 +188,8 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintAngle(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintPerpendicular::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintPerpendicular(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_Offset::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintOffset(theConstraint));
   }
   // All other types of constraints
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));

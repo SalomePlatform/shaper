@@ -24,45 +24,77 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <Geom_Curve.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Wire.hxx>
 #include <TopExp_Explorer.hxx>
 
-//=================================================================================================
-GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
+static GeomShapePtr fromTopoDS(const TopoDS_Shape& theShape)
+{
+  GeomShapePtr aResultShape(new GeomAPI_Shape());
+  aResultShape->setImpl(new TopoDS_Shape(theShape));
+  return aResultShape;
+}
+
+GeomAlgoAPI_WireBuilder::GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes)
 {
   TopTools_ListOfShape aListOfEdges;
 
   ListOfShape::const_iterator anIt = theShapes.cbegin();
-  for(; anIt != theShapes.cend(); ++anIt) {
+  for (; anIt != theShapes.cend(); ++anIt) {
     const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
-    switch(aShape.ShapeType()) {
-      case TopAbs_EDGE: {
-        aListOfEdges.Append(aShape);
-        break;
+    switch (aShape.ShapeType()) {
+    case TopAbs_EDGE: {
+      aListOfEdges.Append(aShape);
+      break;
+    }
+    case TopAbs_WIRE: {
+      for (TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        aListOfEdges.Append(anExp.Current());
       }
-      case TopAbs_WIRE: {
-        for(TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
-          aListOfEdges.Append(anExp.Current());
-        }
-        break;
-      }
-      default: {
-        return GeomShapePtr();
-      }
+      break;
+    }
+    default:
+      break;
     }
   }
 
-  BRepBuilderAPI_MakeWire aWireBuilder;
-  aWireBuilder.Add(aListOfEdges);
-  if(aWireBuilder.Error() != BRepBuilderAPI_WireDone) {
-    return GeomShapePtr();
-  }
+  BRepBuilderAPI_MakeWire* aWireBuilder = new BRepBuilderAPI_MakeWire;
+  aWireBuilder->Add(aListOfEdges);
+  if (aWireBuilder->Error() == BRepBuilderAPI_WireDone) {
+    setImpl(aWireBuilder);
+    setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-  GeomShapePtr aResultShape(new GeomAPI_Shape());
-  aResultShape->setImpl(new TopoDS_Shape(aWireBuilder.Wire()));
-  return aResultShape;
+    // store generated/modified shapes
+    TopoDS_Wire aWire = aWireBuilder->Wire();
+    for (TopTools_ListOfShape::Iterator aBaseIt(aListOfEdges); aBaseIt.More(); aBaseIt.Next()) {
+      TopoDS_Edge aBaseCurrent = TopoDS::Edge(aBaseIt.Value());
+      Standard_Real aFirst, aLast;
+      Handle(Geom_Curve) aBaseCurve = BRep_Tool::Curve(aBaseCurrent, aFirst, aLast);
+
+      for (TopExp_Explorer anExp(aWire, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        TopoDS_Edge aNewCurrent = TopoDS::Edge(anExp.Current());
+        Handle(Geom_Curve) aNewCurve = BRep_Tool::Curve(aNewCurrent, aFirst, aLast);
+        if (aBaseCurve == aNewCurve) {
+          GeomShapePtr aBaseShape = fromTopoDS(aBaseCurrent);
+          GeomShapePtr aNewShape = fromTopoDS(aNewCurrent);
+          addGenerated(aBaseShape, aNewShape);
+          addModified(aBaseShape, aNewShape);
+        }
+      }
+    }
+
+    setShape(fromTopoDS(aWire));
+    setDone(true);
+  }
+}
+
+//=================================================================================================
+GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
+{
+  return GeomAlgoAPI_WireBuilder(theShapes).shape();
 }
 
 //=================================================================================================

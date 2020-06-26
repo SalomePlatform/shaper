@@ -58,6 +58,7 @@
 %shared_ptr(GeomAlgoAPI_Copy)
 %shared_ptr(GeomAlgoAPI_Symmetry)
 %shared_ptr(GeomAlgoAPI_MapShapesAndAncestors)
+%shared_ptr(GeomAlgoAPI_WireBuilder)
 
 // all supported interfaces
 %include "GeomAlgoAPI_MakeShape.h"

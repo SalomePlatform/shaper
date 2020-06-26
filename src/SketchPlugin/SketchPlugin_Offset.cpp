@@ -38,20 +38,23 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Validator.h>
 
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Offset.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
-#include <GeomAPI_Edge.h>
-#include <GeomAPI_Circ.h>
-#include <GeomAPI_Ellipse.h>
 #include <GeomAPI_BSpline.h>
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Ellipse.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
@@ -59,24 +62,32 @@
 #include <iostream>
 
 SketchPlugin_Offset::SketchPlugin_Offset()
-  : SketchPlugin_SketchEntity()
 {
 }
 
-void SketchPlugin_Offset::initDerivedClassAttributes()
+void SketchPlugin_Offset::initAttributes()
 {
   data()->addAttribute(EDGES_ID(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(CREATED_ID(), ModelAPI_AttributeRefList::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CREATED_ID());
+  // store original entities
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
+  // store offset entities
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
+  // store mapping between original entity and index of the corresponding offset entity
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeIntArray::typeId());
+
+  ModelAPI_Session::get()->validators()->
+      registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
+  ModelAPI_Session::get()->validators()->
+      registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
+  ModelAPI_Session::get()->validators()->
+      registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
 }
 
 void SketchPlugin_Offset::execute()
 {
-  removeCreated(); // remove created objects
-
   SketchPlugin_Sketch* aSketch = sketch();
   if (!aSketch) return;
 
@@ -116,6 +127,7 @@ void SketchPlugin_Offset::execute()
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
   // 5. Gather wires and make offset for each wire
+  ListOfMakeShape anOffsetAlgos;
   for (anEdgesIt = anEdgesList.begin(); anEdgesIt != anEdgesList.end(); anEdgesIt++) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anEdgesIt);
     if (aFeature.get()) {
@@ -148,18 +160,24 @@ void SketchPlugin_Offset::execute()
           aTopoChain.push_back(aTopoEdge);
         }
       }
-      GeomShapePtr anEdgeOrWire = GeomAlgoAPI_WireBuilder::wire(aTopoChain);
+      std::shared_ptr<GeomAlgoAPI_WireBuilder> aWireBuilder(
+          new GeomAlgoAPI_WireBuilder(aTopoChain));
 
       // 5.d. Make offset for each wire
-      std::shared_ptr<GeomAPI_Shape> anOffsetShape =
-        GeomAlgoAPI_Offset::OffsetInPlane(aPlane, anEdgeOrWire, aValue);
+      std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape(
+          new GeomAlgoAPI_Offset(aPlane, aWireBuilder->shape(), aValue));
 
-      // 5.e. Store offset results.
-      //      Create sketch feature for each edge of anOffsetShape, and also store
-      //      created features in CREATED_ID() to remove them on next execute()
-      addToSketch(anOffsetShape);
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
+      aMakeList->appendAlgo(aWireBuilder);
+      aMakeList->appendAlgo(anOffsetShape);
+      anOffsetAlgos.push_back(aMakeList);
     }
   }
+
+  // 6. Store offset results.
+  //    Create sketch feature for each edge of anOffsetShape, and also store
+  //    created features in CREATED_ID() to remove them on next execute()
+  addToSketch(anOffsetAlgos);
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
@@ -267,129 +285,280 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   return findWireOneWay (theFirstEdge, aNextEdgeFeature, aP2, theEdgesSet, theChain, isPrepend);
 }
 
-void SketchPlugin_Offset::addToSketch(const std::shared_ptr<GeomAPI_Shape>& anOffsetShape)
+static void setRefListValue(AttributeRefListPtr theList, int theListSize,
+                            ObjectPtr theValue, int theIndex)
 {
-  AttributeRefListPtr aRefListOfCreated =
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
-    (data()->attribute(SketchPlugin_Offset::CREATED_ID()));
+  if (theIndex < theListSize) {
+    ObjectPtr aCur = theList->object(theIndex);
+    if (aCur != theValue)
+      theList->substitute(aCur, theValue);
+  }
+  else
+    theList->append(theValue);
+}
 
-  ListOfShape aResEdges = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(anOffsetShape);
-  std::list<GeomShapePtr>::const_iterator aResEdgesIt = aResEdges.begin();
-  for (; aResEdgesIt != aResEdges.end(); aResEdgesIt++) {
-    GeomShapePtr aResShape = (*aResEdgesIt);
-    if (aResShape->shapeType() == GeomAPI_Shape::EDGE) {
-      // Add new feature
-      FeaturePtr aResFeature;
-      std::shared_ptr<GeomAPI_Edge> aResEdge (new GeomAPI_Edge(aResShape));
+static void removeLastFromIndex(AttributeRefListPtr theList, int theListSize, int& theLastIndex)
+{
+  if (theLastIndex < theListSize) {
+    std::set<int> anIndicesToRemove;
+    for (; theLastIndex < theListSize; ++theLastIndex)
+      anIndicesToRemove.insert(theLastIndex);
+    theList->remove(anIndicesToRemove);
+  }
+}
 
-      std::shared_ptr<GeomAPI_Pnt2d> aFP, aLP;
-      std::shared_ptr<GeomAPI_Pnt> aFP3d = aResEdge->firstPoint();
-      std::shared_ptr<GeomAPI_Pnt> aLP3d = aResEdge->lastPoint();
-      //if (aFP3d.get() && aLP3d.get()) {
-      if (aFP3d && aLP3d) {
-        aFP = sketch()->to2D(aFP3d);
-        aLP = sketch()->to2D(aLP3d);
-      }
+void SketchPlugin_Offset::addToSketch(const ListOfMakeShape& theOffsetAlgos)
+{
+  AttributeRefListPtr aSelectedRefList = reflist(EDGES_ID());
+  AttributeRefListPtr aBaseRefList = reflist(ENTITY_A());
+  AttributeRefListPtr anOffsetRefList = reflist(ENTITY_B());
+  AttributeIntArrayPtr anOffsetToBaseMap = intArray(ENTITY_C());
 
-      if (aResEdge->isLine()) {
-        aResFeature = sketch()->addFeature(SketchPlugin_Line::ID());
+  // compare the list of selected edges and the previously stored,
+  // and store maping between them
+  std::map<ObjectPtr, std::list<ObjectPtr> > aMapExistent;
+  std::list<ObjectPtr> anObjectsToRemove;
+  std::list<ObjectPtr> aSelectedList = aSelectedRefList->list();
+  for (std::list<ObjectPtr>::iterator aSIt = aSelectedList.begin();
+       aSIt != aSelectedList.end(); ++aSIt) {
+    aMapExistent[*aSIt] = std::list<ObjectPtr>();
+  }
+  for (int anIndex = 0, aSize = anOffsetRefList->size(); anIndex < aSize; ++anIndex) {
+    ObjectPtr aCurrent = anOffsetRefList->object(anIndex);
+    int aBaseIndex = anOffsetToBaseMap->value(anIndex);
+    if (aBaseIndex >= 0) {
+      ObjectPtr aBaseObj = aBaseRefList->object(aBaseIndex);
+      std::map<ObjectPtr, std::list<ObjectPtr> >::iterator aFound = aMapExistent.find(aBaseObj);
+      if (aFound != aMapExistent.end())
+        aFound->second.push_back(aCurrent);
+      else
+        anObjectsToRemove.push_back(aCurrent);
+    }
+    else
+      anObjectsToRemove.push_back(aCurrent);
+  }
 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Line::START_ID()))->setValue(aFP);
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Line::END_ID()))->setValue(aLP);
-      }
-      else if (aResEdge->isArc()) {
-        std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
-        std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
-        std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+  // update lists of base shapes and of offset shapes
+  int aBaseListSize = aBaseRefList->size();
+  int anOffsetListSize = anOffsetRefList->size();
+  int aBaseListIndex = 0, anOffsetListIndex = 0;
+  std::list<int> anOffsetBaseBackRefs;
+  std::set<GeomShapePtr, GeomAPI_Shape::ComparatorWithOri> aProcessedOffsets;
+  for (std::list<ObjectPtr>::iterator aSIt = aSelectedList.begin();
+       aSIt != aSelectedList.end(); ++aSIt) {
+    // find an offseted edge
+    FeaturePtr aBaseFeature = ModelAPI_Feature::feature(*aSIt);
+    GeomShapePtr aBaseShape = aBaseFeature->lastResult()->shape();
+    ListOfShape aNewShapes;
+    for (ListOfMakeShape::const_iterator anAlgoIt = theOffsetAlgos.begin();
+         anAlgoIt != theOffsetAlgos.end() && aNewShapes.empty(); ++anAlgoIt) {
+      (*anAlgoIt)->generated(aBaseShape, aNewShapes);
+    }
 
-        aResFeature = sketch()->addFeature(SketchPlugin_Arc::ID());
+    // store base feature
+    setRefListValue(aBaseRefList, aBaseListSize, *aSIt, aBaseListIndex);
 
-        bool aWasBlocked = aResFeature->data()->blockSendAttributeUpdated(true);
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(aFP);
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
-        aResFeature->data()->blockSendAttributeUpdated(aWasBlocked);
-      }
-      else if (aResEdge->isCircle()) {
-        std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
-        std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
-        std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+    // create or update an offseted feature
+    const std::list<ObjectPtr>& anImages = aMapExistent[*aSIt];
+    std::list<ObjectPtr>::const_iterator anImgIt = anImages.begin();
+    for (ListOfShape::iterator aNewIt = aNewShapes.begin(); aNewIt != aNewShapes.end(); ++aNewIt) {
+      FeaturePtr aNewFeature;
+      if (anImgIt != anImages.end())
+        aNewFeature = ModelAPI_Feature::feature(*anImgIt++);
+      updateExistentOrCreateNew(*aNewIt, aNewFeature, anObjectsToRemove);
+      aProcessedOffsets.insert(*aNewIt);
 
-        aResFeature = sketch()->addFeature(SketchPlugin_Circle::ID());
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-          (aResFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(aCP);
-        aResFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircEdge->radius());
-      }
-      else if (aResEdge->isEllipse()) {
-        std::shared_ptr<GeomAPI_Ellipse> anEllipseEdge = aResEdge->ellipse();
+      // store an offseted feature
+      setRefListValue(anOffsetRefList, anOffsetListSize, aNewFeature, anOffsetListIndex);
 
-        GeomPointPtr aCP3d = anEllipseEdge->center();
-        GeomPnt2dPtr aCP = sketch()->to2D(aCP3d);
+      anOffsetBaseBackRefs.push_back(aBaseListIndex);
+      ++anOffsetListIndex;
+    }
+    ++aBaseListIndex;
+    anObjectsToRemove.insert(anObjectsToRemove.end(), anImgIt, anImages.end());
+  }
+  // create arcs generated from vertices
+  for (ListOfMakeShape::const_iterator anAlgoIt = theOffsetAlgos.begin();
+       anAlgoIt != theOffsetAlgos.end(); ++anAlgoIt) {
+    GeomShapePtr aCurWire = (*anAlgoIt)->shape();
+    GeomAPI_ShapeExplorer anExp(aCurWire, GeomAPI_Shape::EDGE);
+    for (; anExp.more(); anExp.next()) {
+      GeomShapePtr aCurEdge = anExp.current();
+      if (aProcessedOffsets.find(aCurEdge) == aProcessedOffsets.end()) {
+        FeaturePtr aNewFeature;
+        updateExistentOrCreateNew(aCurEdge, aNewFeature, anObjectsToRemove);
+        aProcessedOffsets.insert(aCurEdge);
 
-        GeomPointPtr aFocus3d = anEllipseEdge->firstFocus();
-        GeomPnt2dPtr aFocus = sketch()->to2D(aFocus3d);
+        // store an offseted feature
+        setRefListValue(anOffsetRefList, anOffsetListSize, aNewFeature, anOffsetListIndex);
 
-        if (aFP3d && aLP3d) {
-          // Elliptic arc
-          aResFeature = sketch()->addFeature(SketchPlugin_EllipticArc::ID());
-
-          bool aWasBlocked = aResFeature->data()->blockSendAttributeUpdated(true);
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID()))->setValue(aCP);
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_EllipticArc::FIRST_FOCUS_ID()))->setValue(aFocus);
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_EllipticArc::START_POINT_ID()))->setValue(aFP);
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_EllipticArc::END_POINT_ID()))->setValue(aLP);
-          aResFeature->data()->blockSendAttributeUpdated(aWasBlocked);
-        }
-        else {
-          // Ellipse
-          aResFeature = sketch()->addFeature(SketchPlugin_Ellipse::ID());
-
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()))->setValue(aCP);
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-            (aResFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()))->setValue(aFocus);
-          aResFeature->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(anEllipseEdge->minorRadius());
-        }
-      }
-      else if (aResEdge->isBSpline()) {
-        mkBSpline(aResFeature, aResEdge);
-      }
-      else {
-        // convert to b-spline
-        mkBSpline(aResFeature, aResEdge);
-      }
-
-      if (aResFeature.get()) {
-        aRefListOfCreated->append(aResFeature);
-
-        aResFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue
-          (boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
-        aResFeature->execute();
+        anOffsetBaseBackRefs.push_back(-1);
+        ++anOffsetListIndex;
       }
     }
+  }
+
+  removeLastFromIndex(aBaseRefList, aBaseListSize, aBaseListIndex);
+  removeLastFromIndex(anOffsetRefList, anOffsetListSize, anOffsetListIndex);
+
+  anOffsetToBaseMap->setSize((int)anOffsetBaseBackRefs.size(), false);
+  int anIndex = 0;
+  for (std::list<int>::iterator anIt = anOffsetBaseBackRefs.begin();
+       anIt != anOffsetBaseBackRefs.end(); ++anIt) {
+    anOffsetToBaseMap->setValue(anIndex++, *anIt, false);
+  }
+
+  // remove unused objects
+  std::set<FeaturePtr> aSet;
+  for (std::list<ObjectPtr>::iterator anIt = anObjectsToRemove.begin();
+       anIt != anObjectsToRemove.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (aFeature)
+      aSet.insert(aFeature);
+  }
+  ModelAPI_Tools::removeFeaturesAndReferences(aSet);
+}
+
+static void findOrCreateFeatureByKind(SketchPlugin_Sketch* theSketch,
+                                      const std::string& theFeatureKind,
+                                      FeaturePtr& theFeature,
+                                      std::list<ObjectPtr>& thePoolOfFeatures)
+{
+  if (!theFeature) {
+    // try to find appropriate feature in the pool
+    for (std::list<ObjectPtr>::iterator it = thePoolOfFeatures.begin();
+         it != thePoolOfFeatures.end(); ++it) {
+      FeaturePtr aCurFeature = ModelAPI_Feature::feature(*it);
+      if (aCurFeature->getKind() == theFeatureKind) {
+        theFeature = aCurFeature;
+        thePoolOfFeatures.erase(it);
+        break;
+      }
+    }
+    // feature not found, create new
+    if (!theFeature)
+      theFeature = theSketch->addFeature(theFeatureKind);
+  }
+}
+
+void SketchPlugin_Offset::updateExistentOrCreateNew(const GeomShapePtr& theShape,
+                                                    FeaturePtr& theFeature,
+                                                    std::list<ObjectPtr>& thePoolOfFeatures)
+{
+  if (theShape->shapeType() != GeomAPI_Shape::EDGE)
+    return;
+
+  std::shared_ptr<GeomAPI_Edge> aResEdge(new GeomAPI_Edge(theShape));
+
+  std::shared_ptr<GeomAPI_Pnt2d> aFP, aLP;
+  std::shared_ptr<GeomAPI_Pnt> aFP3d = aResEdge->firstPoint();
+  std::shared_ptr<GeomAPI_Pnt> aLP3d = aResEdge->lastPoint();
+  if (aFP3d && aLP3d) {
+    aFP = sketch()->to2D(aFP3d);
+    aLP = sketch()->to2D(aLP3d);
+  }
+
+  if (aResEdge->isLine()) {
+    findOrCreateFeatureByKind(sketch(), SketchPlugin_Line::ID(), theFeature, thePoolOfFeatures);
+
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Line::START_ID()))->setValue(aFP);
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Line::END_ID()))->setValue(aLP);
+  }
+  else if (aResEdge->isArc()) {
+    std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
+    std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
+    std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+
+    findOrCreateFeatureByKind(sketch(), SketchPlugin_Arc::ID(), theFeature, thePoolOfFeatures);
+
+    bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(aFP);
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
+    theFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+  }
+  else if (aResEdge->isCircle()) {
+    std::shared_ptr<GeomAPI_Circ> aCircEdge = aResEdge->circle();
+    std::shared_ptr<GeomAPI_Pnt> aCP3d = aCircEdge->center();
+    std::shared_ptr<GeomAPI_Pnt2d> aCP = sketch()->to2D(aCP3d);
+
+    findOrCreateFeatureByKind(sketch(), SketchPlugin_Circle::ID(), theFeature, thePoolOfFeatures);
+
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (theFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(aCP);
+    theFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircEdge->radius());
+  }
+  else if (aResEdge->isEllipse()) {
+    std::shared_ptr<GeomAPI_Ellipse> anEllipseEdge = aResEdge->ellipse();
+
+    GeomPointPtr aCP3d = anEllipseEdge->center();
+    GeomPnt2dPtr aCP = sketch()->to2D(aCP3d);
+
+    GeomPointPtr aFocus3d = anEllipseEdge->firstFocus();
+    GeomPnt2dPtr aFocus = sketch()->to2D(aFocus3d);
+
+    if (aFP3d && aLP3d) {
+      // Elliptic arc
+      findOrCreateFeatureByKind(sketch(), SketchPlugin_EllipticArc::ID(),
+                                theFeature, thePoolOfFeatures);
+
+      bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID()))->setValue(aCP);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_EllipticArc::FIRST_FOCUS_ID()))->setValue(aFocus);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_EllipticArc::START_POINT_ID()))->setValue(aFP);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_EllipticArc::END_POINT_ID()))->setValue(aLP);
+      theFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+    }
+    else {
+      // Ellipse
+      findOrCreateFeatureByKind(sketch(), SketchPlugin_Ellipse::ID(),
+                                theFeature, thePoolOfFeatures);
+
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()))->setValue(aCP);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (theFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()))->setValue(aFocus);
+      theFeature->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(anEllipseEdge->minorRadius());
+    }
+  }
+  else {
+    // convert to b-spline
+    mkBSpline(theFeature, aResEdge, thePoolOfFeatures);
+  }
+
+  if (theFeature.get()) {
+    theFeature->boolean(SketchPlugin_SketchEntity::COPY_ID())->setValue(true);
+    theFeature->execute();
+
+    static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, aRedisplayEvent);
+    const std::list<ResultPtr>& aResults = theFeature->results();
+    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+         anIt != aResults.end(); ++anIt)
+      ModelAPI_EventCreator::get()->sendUpdated(*anIt, aRedisplayEvent);
   }
 }
 
 void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
-                                     const GeomEdgePtr& theEdge)
+                                     const GeomEdgePtr& theEdge,
+                                     std::list<ObjectPtr>& thePoolOfFeatures)
 {
   GeomCurvePtr aCurve (new GeomAPI_Curve (theEdge));
   // Forced conversion to b-spline, if aCurve is not b-spline
   GeomAPI_BSpline aBSpline (aCurve, /*isForced*/true);
 
-  if (aBSpline.isPeriodic())
-    theResult = sketch()->addFeature(SketchPlugin_BSplinePeriodic::ID());
-  else
-    theResult = sketch()->addFeature(SketchPlugin_BSpline::ID());
+  const std::string& aBSplineKind = aBSpline.isPeriodic() ? SketchPlugin_BSplinePeriodic::ID()
+                                                          : SketchPlugin_BSpline::ID();
+  findOrCreateFeatureByKind(sketch(), aBSplineKind, theResult, thePoolOfFeatures);
 
   theResult->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(aBSpline.degree());
 
@@ -440,26 +609,8 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
-//  removeCreated();
-}
-
-void SketchPlugin_Offset::removeCreated()
-{
-  if (!sketch()) return;
-
-  // Remove all created objects
-  AttributeRefListPtr aRefListOfCreated =
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
-    (data()->attribute(SketchPlugin_Offset::CREATED_ID()));
-  std::list<ObjectPtr> aList = aRefListOfCreated->list();
-  std::set<FeaturePtr> aSet;
-  std::list<ObjectPtr>::iterator anIter = aList.begin();
-  for (; anIter != aList.end(); anIter++) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIter);
-    aSet.insert(aFeature);
-  }
-  aRefListOfCreated->clear();
-  ModelAPI_Tools::removeFeaturesAndReferences(aSet);
+////  if (theID == EDGES_ID())
+////    removeCreated();
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
