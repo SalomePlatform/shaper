@@ -1008,6 +1008,7 @@
                                shape_types="Edges"
                                use_external="true"
                                greed="true">
+          <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
         <doublevalue id="offset_value"
                      label="Offset value"

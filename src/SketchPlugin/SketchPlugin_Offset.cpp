@@ -216,9 +216,11 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   for (; aPointsIt != anAllCoincPoints.end(); aPointsIt++) {
     AttributePtr aP = (*aPointsIt);
     FeaturePtr aCoincFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aP->owner());
+    bool isInSet = (theEdgesSet.find(aCoincFeature) != theEdgesSet.end());
 
     // Condition 0: not auxiliary
-    if (aCoincFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) continue;
+    if (!isInSet && aCoincFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value())
+      continue;
 
     // Condition 1: not a point feature
     if (aCoincFeature->getKind() != SketchPlugin_Point::ID()) {
@@ -226,11 +228,7 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
       if (aCoincFeature != theEdge) {
         // Condition 3: it is in the set of interest.
         //              Empty set means all sketch edges.
-        bool isInSet = true;
-        if (theEdgesSet.size()) {
-          isInSet = (theEdgesSet.find(aCoincFeature) != theEdgesSet.end());
-        }
-        if (isInSet) {
+        if (isInSet || theEdgesSet.empty()) {
           // Condition 4: consider only features with two end points
           std::shared_ptr<GeomDataAPI_Point2D> aP1, aP2;
           SketchPlugin_SegmentationTools::getFeaturePoints(aCoincFeature, aP1, aP2);
@@ -450,6 +448,14 @@ static void findOrCreateFeatureByKind(SketchPlugin_Sketch* theSketch,
                                       FeaturePtr& theFeature,
                                       std::list<ObjectPtr>& thePoolOfFeatures)
 {
+  if (theFeature) {
+    // check the feature type is the same as required
+    if (theFeature->getKind() != theFeatureKind) {
+      // return feature to the pool and try to find the most appropriate
+      thePoolOfFeatures.push_back(theFeature);
+      theFeature = FeaturePtr();
+    }
+  }
   if (!theFeature) {
     // try to find appropriate feature in the pool
     for (std::list<ObjectPtr>::iterator it = thePoolOfFeatures.begin();

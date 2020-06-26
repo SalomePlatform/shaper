@@ -98,7 +98,7 @@ std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject)
   if (!aRes.get()) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
     if (aFeature.get())
-      aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFeature->firstResult());
+      aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFeature->lastResult());
   }
   if (aRes.get() != NULL && aRes->data()->isValid()) {
     /// essential check as it is called in openGl thread
