@@ -47,8 +47,12 @@ bool SketcherPrs_Offset::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
   AttributeDoublePtr aValueAttr = theConstraint->real(SketchPlugin_Offset::VALUE_ID());
   if (aValueAttr->isInitialized()) {
-    AttributeRefListPtr aSelectedEdges = theConstraint->reflist(SketchPlugin_Offset::EDGES_ID());
+    AttributeRefListPtr aSelectedEdges = theConstraint->reflist(SketchPlugin_Offset::ENTITY_A());
     aReadyToDisplay = (aSelectedEdges->list().size() > 0);
+    if (aReadyToDisplay) {
+      AttributeRefListPtr aOffcetEdges = theConstraint->reflist(SketchPlugin_Offset::ENTITY_B());
+      aReadyToDisplay = (aOffcetEdges->list().size() > 0);
+    }
   }
   return aReadyToDisplay;
 }
@@ -63,13 +67,13 @@ bool SketcherPrs_Offset::updateIfReadyToDisplay(double theStep, bool withColor) 
   // Set points of the presentation
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
 
-  AttributeRefListPtr aSelectedEdges = myConstraint->reflist(SketchPlugin_Offset::EDGES_ID());
+  AttributeRefListPtr aSelectedEdges = myConstraint->reflist(SketchPlugin_Offset::ENTITY_A());
   int aNb = aSelectedEdges->size();
 
-  //std::list<std::shared_ptr<ModelAPI_Result> > aResList = myConstraint->results();
-  //int aRNb = aResList.size();
+  AttributeRefListPtr aOffcetEdges = myConstraint->reflist(SketchPlugin_Offset::ENTITY_B());
+  int aOffNb = aOffcetEdges->size();
 
-  myPntArray = new Graphic3d_ArrayOfPoints(aNb, withColor);
+  myPntArray = new Graphic3d_ArrayOfPoints(aNb + aOffNb, withColor);
   int i;
   ObjectPtr aObj;
   gp_Pnt aP1;
@@ -81,20 +85,34 @@ bool SketcherPrs_Offset::updateIfReadyToDisplay(double theStep, bool withColor) 
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(i + 1, aP1);
   }
+  for (i = aNb; i < aNb + aOffNb; i++) {
+    aObj = aOffcetEdges->object(i - aNb);
+    if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
+      continue;
+    aP1 = aMgr->getPosition(aObj, this, theStep);
+    myPntArray->SetVertice(i + 1, aP1);
+  }
   return true;
 }
 
 void SketcherPrs_Offset::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   Quantity_Color theColor) const
 {
-  AttributeRefListPtr aSelectedEdges = myConstraint->reflist(SketchPlugin_Offset::EDGES_ID());
+  AttributeRefListPtr aSelectedEdges = myConstraint->reflist(SketchPlugin_Offset::ENTITY_A());
   if (aSelectedEdges.get() == NULL)
     return;
+  AttributeRefListPtr aOffcetEdges = myConstraint->reflist(SketchPlugin_Offset::ENTITY_B());
+  if (aOffcetEdges.get() == NULL)
+    return;
 
-  int aNb = aSelectedEdges->size();
-  if (aNb == 0)
+  if (aSelectedEdges->size() == 0)
+    return;
+
+  if (aOffcetEdges->size() == 0)
     return;
 
   // Draw source objects
   drawListOfShapes(aSelectedEdges, thePrs, theColor);
+  // Draw offcet objects
+  drawListOfShapes(aOffcetEdges, thePrs, theColor);
 }
