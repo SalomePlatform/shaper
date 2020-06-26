@@ -63,6 +63,8 @@
 
 #include <iostream>
 
+static const double tolerance = 1.e-7;
+
 SketchPlugin_Offset::SketchPlugin_Offset()
 {
 }
@@ -100,7 +102,6 @@ void SketchPlugin_Offset::execute()
   AttributeDoublePtr aValueAttr = real(VALUE_ID());
   if (!aValueAttr->isInitialized()) return;
   double aValue = aValueAttr->value();
-  const double tolerance = 1.e-7;
   if (aValue < tolerance) return;
 
   // 2.a. Reversed?
@@ -498,13 +499,18 @@ void SketchPlugin_Offset::updateExistentOrCreateNew(const GeomShapePtr& theShape
 
     findOrCreateFeatureByKind(sketch(), SketchPlugin_Arc::ID(), theFeature, thePoolOfFeatures);
 
+    GeomDirPtr aCircNormal = aCircEdge->normal();
+    GeomDirPtr aSketchNormal = sketch()->coordinatePlane()->normal();
+    if (aSketchNormal->dot(aCircNormal) < -tolerance)
+      std::swap(aFP, aLP);
+
     bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-      (theFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
+      (theFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
       (theFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(aFP);
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-      (theFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(aLP);
+      (theFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCP);
     theFeature->data()->blockSendAttributeUpdated(aWasBlocked);
   }
   else if (aResEdge->isCircle()) {
