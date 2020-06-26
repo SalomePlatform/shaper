@@ -222,7 +222,7 @@ Note, that the result used in feature as argument is removed.
 
 This child result can be restored using **Recover** feature.
 
-Each feature, result, construction, group, field, parameter can be renamed using *Rename* pop-up menu command.
+Each feature, result, construction, group, field, parameter can be renamed using *Rename* pop-up menu command (hotkey "F2").
 
 .. image:: images/popup_menu_object_browser_feature.png
    :align: center
