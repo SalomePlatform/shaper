@@ -2364,7 +2364,7 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
     thePrs->setWidth(17);
     //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
   }
-  if (isCopy(aFeature) && !isIncludeToResult(aFeature)) {
+  if (isCopy(aFeature) || !isIncludeToResult(aFeature)) {
     double aWidth = thePrs->width();
     thePrs->setWidth(aWidth / 2.5);
   }
