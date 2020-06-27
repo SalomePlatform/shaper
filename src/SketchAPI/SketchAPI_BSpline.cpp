@@ -155,7 +155,8 @@ static void createPole(const CompositeFeaturePtr& theSketch,
   aPointFeature->execute();
 
   std::wostringstream aName;
-  aName << theBSpline->name() << "_" << ModelAPI_Tools::toWString(thePoles->id()) << "_" << thePoleIndex;
+  aName << theBSpline->name() << "_" << ModelAPI_Tools::toWString(thePoles->id())
+                              << "_" << thePoleIndex;
   aPointFeature->data()->setName(aName.str());
   aPointFeature->lastResult()->data()->setName(aName.str());
 

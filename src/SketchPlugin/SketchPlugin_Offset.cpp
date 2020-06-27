@@ -564,7 +564,8 @@ void SketchPlugin_Offset::updateExistentOrCreateNew(const GeomShapePtr& theShape
         (theFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()))->setValue(aCP);
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
         (theFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()))->setValue(aFocus);
-      theFeature->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(anEllipseEdge->minorRadius());
+      theFeature->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(
+        anEllipseEdge->minorRadius());
     }
   }
   else {

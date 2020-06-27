@@ -48,7 +48,8 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection,
   /// Reference to the parent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
 
-  std::shared_ptr<Model_Document> myRestoreDocument; // current document to restore by name
+  /// current document to restore by name
+  std::shared_ptr<Model_Document> myRestoreDocument;
   /// If true attribute selects geometry instead of shape.
   bool myIsGeometricalSelection;
 

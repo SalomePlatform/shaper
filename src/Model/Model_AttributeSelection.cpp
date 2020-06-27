@@ -1914,7 +1914,8 @@ bool Model_AttributeSelection::restoreContext(std::wstring theName,
     // name in PartSet?
     aDoc = std::dynamic_pointer_cast<Model_Document>(
       ModelAPI_Session::get()->moduleDocument());
-    if (theName.find(ModelAPI_Tools::toWString(aDoc->kind())) == 0) { // remove the document identifier from name if exists
+    if (theName.find(ModelAPI_Tools::toWString(aDoc->kind())) == 0) {
+      // remove the document identifier from name if exists
       aSubShapeName = theName.substr(aDoc->kind().size() + 1);
       aName = aSubShapeName;
       std::string::size_type n = aName.find('/');

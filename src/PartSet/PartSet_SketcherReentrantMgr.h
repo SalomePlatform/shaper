@@ -242,7 +242,8 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d> myClickedSketchPoint; /// cashed clicked point
 
   bool myIsAutoConstraints;
-  void* myLastAutoConstraint; //< Stores address of last automatic constraint. Connot be used as a pointer!!!
+  void* myLastAutoConstraint; //< Stores address of last automatic constraint.
+                              //< Cannot be used as a pointer!!!
 };
 
 #endif

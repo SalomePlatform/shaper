@@ -319,8 +319,8 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
 
-    ModuleBase_Operation* anOpAction =
-      new ModuleBase_Operation(tr("Detach %1").arg(QString::fromStdWString(aLine->data()->name())), myModule);
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(tr("Detach %1").arg(
+        QString::fromStdWString(aLine->data()->name())), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
     XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
     // the active nested sketch operation should be aborted unconditionally

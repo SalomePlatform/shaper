@@ -40,7 +40,8 @@ public:
     SketchPlugin_Sketch* theSketcher);
   DEFINE_STANDARD_RTTIEXT(SketcherPrs_Offset, SketcherPrs_SymbolPrs)
 
-    /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
+    /// Returns true if the constraint feature arguments are correcly
+    /// filled to build AIS presentation
     /// \param theConstraint a constraint feature
     /// \param thePlane a coordinate plane of current sketch
     /// \return boolean result value

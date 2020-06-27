@@ -284,7 +284,9 @@ class Model_Document : public ModelAPI_Document
   int numberOfNameInHistory(const ObjectPtr& theNameObject, const TDF_Label& theStartFrom);
   //! Returns the result by name of the result (names of results must be unique, used for naming
   //! selection by name.
-  ResultPtr findByName(std::wstring& theName, std::wstring& theSubShapeName, bool& theUniqueContext);
+  ResultPtr findByName(std::wstring& theName,
+                       std::wstring& theSubShapeName,
+                       bool& theUniqueContext);
 
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
