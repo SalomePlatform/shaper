@@ -19,7 +19,19 @@
 
 #include "Events_InfoMessage.h"
 #include <sstream>
+
+// To support old types of GCC (less than 5.0), check the wide-string conversion is working
+#if (__cplusplus >= 201103L || _MSVC_LANG >= 201103L)  && \
+    (__cplusplus >= 201402L || !defined(__GLIBCXX__)   || \
+    (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE > 4))
+#define HAVE_WORKING_WIDESTRING 1
+#else
+#define HAVE_WORKING_WIDESTRING 0
+#endif
+
+#if HAVE_WORKING_WIDESTRING
 #include <codecvt>
+#endif
 
 void Events_InfoMessage::addParameter(double theParam)
 {
@@ -43,7 +55,16 @@ void Events_InfoMessage::send()
 
 Events_InfoMessage& Events_InfoMessage::arg(const std::wstring& theParam)
 {
+#if HAVE_WORKING_WIDESTRING
   static std::wstring_convert<std::codecvt_utf8<wchar_t> > aConvertor;
   addParameter(aConvertor.to_bytes(theParam));
+#else
+  char* aBuf = new char[2 * (theParam.size() + 1)];
+  size_t aNbChars = std::wcstombs(aBuf, theParam.c_str(), theParam.size());
+  if (aNbChars != (size_t)-1)
+    aBuf[aNbChars] = '\0';
+  addParameter(aBuf);
+  delete[] aBuf;
+#endif
   return *this;
 }
