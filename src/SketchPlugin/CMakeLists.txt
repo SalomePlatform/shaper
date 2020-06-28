@@ -295,6 +295,10 @@ ADD_UNIT_TESTS(
   TestCreateEllipticArc.py
   TestCreateEllipticArcByExternal.py
   TestCreateMacroBSpline.py
+  TestCurveFitting1.py
+  TestCurveFitting2.py
+  TestCurveFitting3.py
+  TestCurveFitting4.py
   TestDegeneratedGeometry.py
   TestDistanceDump.py
   TestDistanceSignedVsUnsigned01.py
