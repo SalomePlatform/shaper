@@ -1142,10 +1142,10 @@ std::wstring toWString(const std::string& theStr)
   static std::wstring_convert<std::codecvt_utf8<wchar_t> > aConvertor;
   return aConvertor.from_bytes(theStr);
 #else
-  wchar_t* aBuf = new wchar_t[theStr.size()];
+  wchar_t* aBuf = new wchar_t[theStr.size() + 1];
   size_t aNbWChars = std::mbstowcs(aBuf, theStr.c_str(), theStr.size());
   if (aNbWChars != (size_t)-1)
-    aBuf[aNbWChars] = '\0';
+    aBuf[aNbWChars] = L'\0';
   std::wstring aWStr(aBuf);
   delete[] aBuf;
   return aWStr;
