@@ -49,9 +49,11 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
+    Locale
     ${OpenCASCADE_ApplicationFramework_LIBRARIES}
 )
 SET(PROJECT_INCLUDES
+  ../Locale
   ${OpenCASCADE_INCLUDE_DIR}
 )
 

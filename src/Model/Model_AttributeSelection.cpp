@@ -46,6 +46,8 @@
 #include <GeomAlgoAPI_NExplode.h>
 #include <Selector_Selector.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_Builder.hxx>
@@ -368,7 +370,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
               std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
               int anIndex;
               std::string aType; // to reuse already existing selection the type is not needed
-              return aPart->shapeInPart(ModelAPI_Tools::toWString(aNameInPart), aType, anIndex);
+              return aPart->shapeInPart(Locale::Convert::toWString(aNameInPart), aType, anIndex);
             }
           }
         }
@@ -763,7 +765,7 @@ std::wstring Model_AttributeSelection::namingName(const std::wstring& theDefault
       aShape = context()->shape();
     std::wstring aName;
     if (aShape.get()) {
-      aName = ModelAPI_Tools::toWString(aShape->shapeTypeStr());
+      aName = Locale::Convert::toWString(aShape->shapeTypeStr());
       if (myParent) {
         std::wostringstream aStream;
         aStream << "_" << selectionLabel().Father().Tag();
@@ -781,7 +783,7 @@ std::wstring Model_AttributeSelection::namingName(const std::wstring& theDefault
     std::wstring aResName;
     // checking part-owner
     if (aContFeature->document() != owner()->document())
-        aResName += ModelAPI_Tools::toWString(aContFeature->document()->kind()) + L"/";
+        aResName += Locale::Convert::toWString(aContFeature->document()->kind()) + L"/";
     // selection of a full feature
     if (aContFeature.get()) {
       return aResName + kWHOLE_FEATURE + aContFeature->name();
@@ -874,7 +876,7 @@ void Model_AttributeSelection::selectSubShape(
     if (aPartEnd != std::string::npos) {
       std::wstring aPartName = aSubShapeName.substr(0, aPartEnd);
       DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-      if (aPartName == ModelAPI_Tools::toWString(aRootDoc->kind())) {
+      if (aPartName == Locale::Convert::toWString(aRootDoc->kind())) {
         aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
         aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
       }
@@ -1135,7 +1137,7 @@ std::wstring Model_AttributeSelection::contextName(const ResultPtr& theContext) 
   std::wstring aResult;
   if (owner()->document() != theContext->document()) {
     if (theContext->document() == ModelAPI_Session::get()->moduleDocument()) {
-      aResult = ModelAPI_Tools::toWString(theContext->document()->kind()) + L"/";
+      aResult = Locale::Convert::toWString(theContext->document()->kind()) + L"/";
     } else {
       ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
         ModelAPI_Session::get()->moduleDocument(), theContext->document());
@@ -1883,7 +1885,7 @@ std::wstring Model_AttributeSelection::contextName(const TDF_Label theSelectionL
         aNumInHistoryNames--;
       }
       if (aBaseDocumnetUsed)
-        aContextName = ModelAPI_Tools::toWString(aDoc->kind()) + L"/" + aContextName;
+        aContextName = Locale::Convert::toWString(aDoc->kind()) + L"/" + aContextName;
       return aContextName;
     }
   }
@@ -1914,7 +1916,7 @@ bool Model_AttributeSelection::restoreContext(std::wstring theName,
     // name in PartSet?
     aDoc = std::dynamic_pointer_cast<Model_Document>(
       ModelAPI_Session::get()->moduleDocument());
-    if (theName.find(ModelAPI_Tools::toWString(aDoc->kind())) == 0) {
+    if (theName.find(Locale::Convert::toWString(aDoc->kind())) == 0) {
       // remove the document identifier from name if exists
       aSubShapeName = theName.substr(aDoc->kind().size() + 1);
       aName = aSubShapeName;

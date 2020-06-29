@@ -46,6 +46,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -329,7 +331,8 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     }
     else if (aRefAttr->attr() == aRAttr->attr()) {
       AttributePtr anAttribute = aRefAttr->attr();
-      std::wstring aName = anAttribute.get() ? ModelAPI_Tools::toWString(anAttribute->id()) : L"";
+      std::wstring aName =
+          anAttribute.get() ? Locale::Convert::toWString(anAttribute->id()) : L"";
       theError = "The attribute %1 has been already fixed.";
       theError.arg(aName);
       return false;

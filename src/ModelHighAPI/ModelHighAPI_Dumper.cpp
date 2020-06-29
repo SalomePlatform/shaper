@@ -37,6 +37,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeDoubleArray.h>
@@ -315,7 +317,7 @@ void ModelHighAPI_Dumper::DumpStorage::write(const AttributeSelectionPtr& theAtt
 
   if (aShape.get()) {
     myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \""
-                 << ModelAPI_Tools::toString(theAttrSelect->namingName()) << "\"";
+                 << Locale::Convert::toString(theAttrSelect->namingName()) << "\"";
   }
 
   myDumpBuffer << ")";
@@ -496,7 +498,7 @@ void ModelHighAPI_Dumper::DumpStorageWeak::write(const AttributeSelectionPtr& th
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it
       myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
-                   << ModelAPI_Tools::toString(theAttrSelect->contextName(aContext))
+                   << Locale::Convert::toString(theAttrSelect->contextName(aContext))
                    << "\", " << anIndex << ")";
       aStandardDump = false;
     }
@@ -588,12 +590,12 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   std::ostringstream aDefaultName;
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   if (aFeature) {
-    aName = ModelAPI_Tools::toString(aFeature->name());
+    aName = Locale::Convert::toString(aFeature->name());
     aKind = aFeature->getKind();
   } else {
     FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(theEntity);
     if (aFolder) {
-      aName = ModelAPI_Tools::toString(aFolder->data()->name());
+      aName = Locale::Convert::toString(aFolder->data()->name());
       aKind = ModelAPI_Folder::ID();
       isSaveNotDumped = false;
     }
@@ -687,8 +689,8 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
   ModelAPI_Tools::allResults(theFeature, allRes);
   for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
     std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(*aRes);
-    std::string aDefaultName = ModelAPI_Tools::toString(aName.first);
-    std::string aResName = ModelAPI_Tools::toString((*aRes)->data()->name());
+    std::string aDefaultName = Locale::Convert::toString(aName.first);
+    std::string aResName = Locale::Convert::toString((*aRes)->data()->name());
     bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
     myNames[*aRes] =
       EntityName(aResName, (isUserDefined ? aResName : std::string()), !isUserDefined);
@@ -873,14 +875,14 @@ void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFea
 {
   name(theSubFeature, false);
   myNames[theSubFeature] =
-    EntityName(theSubFeatureGet, ModelAPI_Tools::toString(theSubFeature->name()), false);
+    EntityName(theSubFeatureGet, Locale::Convert::toString(theSubFeature->name()), false);
 
   // store results if they have user-defined names or colors
   std::list<ResultPtr> aResultsWithNameOrColor;
   const std::list<ResultPtr>& aResults = theSubFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (; aResIt != aResults.end(); ++aResIt) {
-    std::string aResName = ModelAPI_Tools::toString((*aResIt)->data()->name());
+    std::string aResName = Locale::Convert::toString((*aResIt)->data()->name());
     myNames[*aResIt] = EntityName(aResName, aResName, false);
     aResultsWithNameOrColor.push_back(*aResIt);
   }
@@ -1093,7 +1095,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::string& theStrin
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::wstring& theString)
 {
-  *myDumpStorage << ModelAPI_Tools::toString(theString);
+  *myDumpStorage << Locale::Convert::toString(theString);
   return *this;
 }
 

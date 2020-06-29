@@ -58,6 +58,8 @@
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <TDataStd_Name.hxx>
 #include <TDataStd_AsciiString.hxx>
 #include <TDataStd_UAttribute.hxx>
@@ -113,8 +115,7 @@ std::wstring Model_Data::name()
 #ifdef DEBUG_NAMES
     myObject->myName = TCollection_AsciiString(aName->Get()).ToCString();
 #endif
-    return std::wstring((wchar_t*)aName->Get().ToExtString());
-    //return std::wstring(TCollection_AsciiString(aName->Get()).ToCString());
+    return Locale::Convert::toWString(aName->Get().ToExtString());
   }
   return L"";  // not defined
 }

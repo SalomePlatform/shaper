@@ -36,6 +36,8 @@
 
 #include <GeomAPI_Trsf.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_Tool.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
@@ -91,7 +93,7 @@ void Model_ResultPart::activate()
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!aMgr->isOperation()) {
     // open transaction even document is not created to set current docs in setActiveDocument
-    std::string aMsg = "Activation " + ModelAPI_Tools::toString(data()->name());
+    std::string aMsg = "Activation " + Locale::Convert::toString(data()->name());
     aMgr->startOperation(aMsg);
     isNewTransaction = true;
   }

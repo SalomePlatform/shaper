@@ -19,6 +19,8 @@
 
 #include <ExchangePlugin_ImportPart.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeStringArray.h>
@@ -103,7 +105,7 @@ void ExchangePlugin_ImportPart::attributeChanged(const std::string& theID)
       for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
            aFIt != aSubFeatures.end(); ++aFIt) {
         if ((*aFIt)->getKind() == PartSetPlugin_Part::ID())
-          anAcceptedValues.push_back(ModelAPI_Tools::toString((*aFIt)->name()));
+          anAcceptedValues.push_back(Locale::Convert::toString((*aFIt)->name()));
       }
 
       if (aPartsAttr->size() != anAcceptedValues.size())
@@ -120,7 +122,7 @@ void ExchangePlugin_ImportPart::attributeChanged(const std::string& theID)
         FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
 
         aPartsAttr->setSize(1);
-        aPartsAttr->setValue(0, ModelAPI_Tools::toString(aPartFeature->name()));
+        aPartsAttr->setValue(0, Locale::Convert::toString(aPartFeature->name()));
         aTargetAttr->setValue(0);
       }
     }
@@ -149,7 +151,7 @@ DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartNa
       for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
            aFIt != aSubFeatures.end(); ++aFIt) {
         if ((*aFIt)->getKind() == PartSetPlugin_Part::ID() &&
-          ModelAPI_Tools::toString((*aFIt)->name()) == thePartName) {
+          Locale::Convert::toString((*aFIt)->name()) == thePartName) {
           aPartFeature = *aFIt;
           break;
         }

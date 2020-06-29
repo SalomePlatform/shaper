@@ -34,6 +34,8 @@
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -522,7 +524,7 @@ bool Model_Document::save(
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
       if (!aPart->isActivated()) {
         // copy not-activated document that is not in the memory
-        std::string aDocName = ModelAPI_Tools::toString(aPart->data()->name());
+        std::string aDocName = Locale::Convert::toString(aPart->data()->name());
         if (!aDocName.empty()) {
           // just copy file
           TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
@@ -539,7 +541,7 @@ bool Model_Document::save(
           }
         }
       } else { // simply save opened document
-        std::string aDocName = ModelAPI_Tools::toString(aPart->data()->name());
+        std::string aDocName = Locale::Convert::toString(aPart->data()->name());
         isDone = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc())->
           save(theDirName, aDocName.c_str(), theResults);
       }
@@ -1706,7 +1708,7 @@ void Model_Document::changeNamingName(const std::wstring theOldName,
         TDF_ChildIDIterator aChild(theLabel, TDataStd_Name::GetID());
         for(; aChild.More(); aChild.Next()) {
           Handle(TDataStd_Name) aSubName = Handle(TDataStd_Name)::DownCast(aChild.Value());
-          std::wstring aName = (wchar_t*)aSubName->Get().ToExtString();
+          std::wstring aName = Locale::Convert::toWString(aSubName->Get().ToExtString());
           if (aName.find(theOldName) == 0) { // started from parent name
             std::wstring aNewSubName = theNewName + aName.substr(theOldName.size());
             changeNamingName(aName, aNewSubName, aSubName->Label());

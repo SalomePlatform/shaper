@@ -23,6 +23,8 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <BinDrivers_DocumentRetrievalDriver.hxx>
 #include <BinDrivers_DocumentStorageDriver.hxx>
 
@@ -71,7 +73,7 @@ bool Model_Application::loadDocument(const std::wstring theDocName, const int th
   bool aRes = true;
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocName) != myLoadedByDemand.end() && !myPath.empty()) {
-    aRes = aNew->load(myPath.c_str(), ModelAPI_Tools::toString(theDocName).c_str(), aNew);
+    aRes = aNew->load(myPath.c_str(), Locale::Convert::toString(theDocName).c_str(), aNew);
     myLoadedByDemand.erase(theDocName);  // done, don't do it anymore
   } else { // error
     aRes = false;

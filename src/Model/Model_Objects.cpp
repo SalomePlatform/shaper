@@ -38,6 +38,8 @@
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -734,7 +736,7 @@ static std::wstring composeName(const std::string& theFeatureKind, const int the
 {
   std::stringstream aNameStream;
   aNameStream << theFeatureKind << "_" << theIndex;
-  return ModelAPI_Tools::toWString(aNameStream.str());
+  return Locale::Convert::toWString(aNameStream.str());
 }
 
 void Model_Objects::setUniqueName(FeaturePtr theFeature)

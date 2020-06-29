@@ -37,6 +37,8 @@
 
 #include <SketcherPrs_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Tools.h>
@@ -528,7 +530,7 @@ void createAuxiliaryPointOnEllipse(const FeaturePtr& theEllipseFeature,
 
   aPointFeature->execute();
   std::wstring aName = theEllipseFeature->name() + L"_" +
-    ModelAPI_Tools::toWString(theEllipsePoint);
+    Locale::Convert::toWString(theEllipsePoint);
   aPointFeature->data()->setName(aName);
   aPointFeature->lastResult()->data()->setName(aName);
 

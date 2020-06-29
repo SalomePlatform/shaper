@@ -29,6 +29,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
 //--------------------------------------------------------------------------------------
+#include <Locale_Convert.h>
+//--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -415,7 +417,7 @@ std::string storeFeatures(const std::wstring& theDocName, DocumentPtr theDoc,
   if (theCompare) {
      aDocFind = theStore.find(theDocName);
      if (aDocFind == theStore.end()) {
-       return "Document '" + ModelAPI_Tools::toString(theDocName) + "' not found";
+       return "Document '" + Locale::Convert::toString(theDocName) + "' not found";
      }
   }
   // store the model features information: iterate all features
@@ -439,12 +441,12 @@ std::string storeFeatures(const std::wstring& theDocName, DocumentPtr theDoc,
       std::map<std::wstring, ModelHighAPI_FeatureStore>::iterator
         anObjFind = aDocFind->second.find(anObject->data()->name());
       if (anObjFind == aDocFind->second.end()) {
-        return "Document '" + ModelAPI_Tools::toString(theDocName)
-          + "' feature '" + ModelAPI_Tools::toString(anObject->data()->name()) + "' not found";
+        return "Document '" + Locale::Convert::toString(theDocName)
+          + "' feature '" + Locale::Convert::toString(anObject->data()->name()) + "' not found";
       }
       std::string anError = anObjFind->second.compare(anObject);
       if (!anError.empty()) {
-        anError = "Document " + ModelAPI_Tools::toString(theDocName) + " " + anError;
+        anError = "Document " + Locale::Convert::toString(theDocName) + " " + anError;
         return anError;
       }
       anObjectsCount++;
@@ -483,9 +485,9 @@ std::string storeFeatures(const std::wstring& theDocName, DocumentPtr theDoc,
           aLostName = aLostIter->first;
         }
       }
-      return "For document '" + ModelAPI_Tools::toString(theDocName) +
+      return "For document '" + Locale::Convert::toString(theDocName) +
         "' the number of features is decreased, there is no feature '" +
-        ModelAPI_Tools::toString(aLostName) + "'";
+        Locale::Convert::toString(aLostName) + "'";
     }
   }
   return ""; // ok
@@ -539,7 +541,7 @@ static bool checkDump(SessionPtr theSession,
 
   // compare with the stored data
   std::string anError =
-    storeFeatures(ModelAPI_Tools::toWString(theSession->moduleDocument()->kind()),
+    storeFeatures(Locale::Convert::toWString(theSession->moduleDocument()->kind()),
     theSession->moduleDocument(), theStorage, true);
   if (!anError.empty()) {
     std::cout << anError << std::endl;
@@ -580,7 +582,7 @@ bool checkPyDump(const std::string& theFilenameNaming,
    // map from document name to feature name to feature data
   std::map<std::wstring, std::map<std::wstring, ModelHighAPI_FeatureStore> > aStore;
   std::string anError =
-    storeFeatures(ModelAPI_Tools::toWString(aSession->moduleDocument()->kind()),
+    storeFeatures(Locale::Convert::toWString(aSession->moduleDocument()->kind()),
     aSession->moduleDocument(), aStore, false);
   if (!anError.empty()) {
     Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), anError);

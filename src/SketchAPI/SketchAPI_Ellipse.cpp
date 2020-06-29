@@ -21,6 +21,8 @@
 
 #include <GeomAPI_Pnt2d.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -209,7 +211,7 @@ static void createPoint(const CompositeFeaturePtr& theSketch,
   aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipse);
   aPointFeature->execute();
 
-  std::wstring aName = theEllipse->name() + L"_" + ModelAPI_Tools::toWString(theCoincident);
+  std::wstring aName = theEllipse->name() + L"_" + Locale::Convert::toWString(theCoincident);
   aPointFeature->data()->setName(aName);
   aPointFeature->lastResult()->data()->setName(aName);
 

@@ -104,6 +104,7 @@ SET(PROJECT_LIBRARIES
     GeomData
     GeomAPI
     GeomAlgoAPI
+    Locale
     ModelGeomAlgo
     ${OpenCASCADE_ApplicationFramework_LIBRARIES}
 )
@@ -116,6 +117,7 @@ SET(PROJECT_INCLUDES
   ../GeomDataAPI
   ../GeomAlgoAPI
   ../GeomAPI
+  ../Locale
   ../ModelGeomAlgo
   ../ConstructionPlugin
   ${OpenCASCADE_INCLUDE_DIR}

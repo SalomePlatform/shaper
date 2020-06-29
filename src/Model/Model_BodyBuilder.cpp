@@ -19,6 +19,8 @@
 
 #include <Model_BodyBuilder.h>
 
+#include <Locale_Convert.h>
+
 #include <Model_Data.h>
 #include <Model_Document.h>
 #include <ModelAPI_Session.h>
@@ -202,7 +204,7 @@ void Model_BodyBuilder::store(const GeomShapePtr& theShape,
     if(!aBuilder.NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
-        std::wstring aName ((wchar_t*)anAttr->Get().ToExtString());
+        std::wstring aName = Locale::Convert::toWString(anAttr->Get().ToExtString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
             std::dynamic_pointer_cast<Model_Document>(document());
@@ -255,7 +257,7 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
     if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
-        std::wstring aName((wchar_t*)anAttr->Get().ToExtString());
+        std::wstring aName = Locale::Convert::toWString(anAttr->Get().ToExtString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
             std::dynamic_pointer_cast<Model_Document>(document());
@@ -347,7 +349,7 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
     if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
-        std::wstring aName ((wchar_t*)anAttr->Get().ToExtString());
+        std::wstring aName = Locale::Convert::toWString(anAttr->Get().ToExtString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
             std::dynamic_pointer_cast<Model_Document>(document());

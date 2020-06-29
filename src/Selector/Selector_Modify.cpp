@@ -22,6 +22,8 @@
 #include <Selector_NameGenerator.h>
 #include <Selector_NExplode.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_SameShapeIterator.hxx>
@@ -331,17 +333,17 @@ std::wstring Selector_Modify::name(Selector_NameGenerator* theNameGenerator)
   if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
     return L"";
   aResult += theNameGenerator->contextName(myFinal) + L"/";
-  aResult += (wchar_t*)aName->Get().ToExtString();
+  aResult += Locale::Convert::toWString(aName->Get().ToExtString());
   for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
     if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
       return L"";
     aResult += L"&";
     aResult += theNameGenerator->contextName(*aBase) + L"/";
-    aResult += (wchar_t*)aName->Get().ToExtString();
+    aResult += Locale::Convert::toWString(aName->Get().ToExtString());
   }
   if (myWeakIndex != -1) {
     std::wostringstream aWeakStr;
-    aWeakStr<<"&"<<weakNameID()<<myWeakIndex;
+    aWeakStr<<L"&"<<weakNameID()<<myWeakIndex;
     aResult += aWeakStr.str();
   }
   return aResult;

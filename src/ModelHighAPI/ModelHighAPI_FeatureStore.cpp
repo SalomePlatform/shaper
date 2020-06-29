@@ -46,6 +46,8 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_Pnt.h>
 
+#include <Locale_Convert.h>
+
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
 
@@ -75,7 +77,7 @@ ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(ObjectPtr theObject) {
 std::string ModelHighAPI_FeatureStore::compare(ObjectPtr theObject) {
   std::string anError = compareData(theObject->data(), myAttrs);
   if (!anError.empty()) {
-    return "Features '" + ModelAPI_Tools::toString(theObject->data()->name()) +
+    return "Features '" + Locale::Convert::toString(theObject->data()->name()) +
       "' differ:" + anError;
   }
 
@@ -88,13 +90,13 @@ std::string ModelHighAPI_FeatureStore::compare(ObjectPtr theObject) {
     for(; aRes != allResults.end() && aResIter != myRes.end(); aRes++, aResIter++) {
       anError = compareData((*aRes)->data(), *aResIter);
       if (!anError.empty())
-        return "Results of feature '" + ModelAPI_Tools::toString(aFeature->name()) +
-        "' '" + ModelAPI_Tools::toString((*aRes)->data()->name()) +
+        return "Results of feature '" + Locale::Convert::toString(aFeature->name()) +
+        "' '" + Locale::Convert::toString((*aRes)->data()->name()) +
         "' differ:" + anError;
     }
     if (aRes != allResults.end()) {
       return "Current model has more results '" +
-        ModelAPI_Tools::toString((*aRes)->data()->name()) + "'";
+        Locale::Convert::toString((*aRes)->data()->name()) + "'";
     }
     if (aResIter != myRes.end()) {
       return "Original model had more results '" + (*aResIter)["__name__"] + "'";
@@ -107,7 +109,7 @@ void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData
   std::map<std::string, std::string>& theAttrs)
 {
   // store name to keep also this information and output if needed
-  theAttrs["__name__"] = ModelAPI_Tools::toString(theData->name());
+  theAttrs["__name__"] = Locale::Convert::toString(theData->name());
   std::list<std::shared_ptr<ModelAPI_Attribute> > allAttrs = theData->attributes("");
   std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = allAttrs.begin();
   for(; anAttr != allAttrs.end(); anAttr++) {
@@ -193,7 +195,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       ResultPtr aRes = ModelAPI_Tools::findPartResult(aDoc, anAttr->value());
       if (aRes.get()) {
         // Part result name (the same as saved file name)
-        aResult<< ModelAPI_Tools::toString(aRes->data()->name());
+        aResult<< Locale::Convert::toString(aRes->data()->name());
       }
     } else {
       aResult<<aDoc->kind(); // PartSet
@@ -247,7 +249,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     AttributeReferencePtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttr);
     if (anAttr->value().get()) {
-      aResult<< ModelAPI_Tools::toString(anAttr->value()->data()->name());
+      aResult<< Locale::Convert::toString(anAttr->value()->data()->name());
     } else {
       aResult<<"__empty__";
     }
@@ -255,7 +257,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttr);
     if (anAttr->context().get())
-      aResult<< ModelAPI_Tools::toString(anAttr->namingName());
+      aResult<< Locale::Convert::toString(anAttr->namingName());
     else
       aResult<<"__notinitialized__";
   } else if (aType == ModelAPI_AttributeSelectionList::typeId()) {
@@ -264,14 +266,14 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     for(int a = 0; a < anAttr->size(); a++) {
       if (a != 0)
         aResult<<" ";
-      aResult<< ModelAPI_Tools::toString(anAttr->value(a)->namingName());
+      aResult<< Locale::Convert::toString(anAttr->value(a)->namingName());
     }
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttr);
     ObjectPtr anObj = anAttr->isObject() ? anAttr->object() : anAttr->attr()->owner();
     if (anObj.get()) {
-      aResult<< ModelAPI_Tools::toString(anObj->data()->name());
+      aResult<< Locale::Convert::toString(anObj->data()->name());
       if (!anAttr->isObject()) {
         aResult<<" "<<anAttr->attr()->id();
       }
@@ -297,7 +299,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
           if (aStr == "SketchConstraint")
             continue; // no need to dump and check constraints
         }
-        aResList.push_back(ModelAPI_Tools::toString((*aL)->data()->name()));
+        aResList.push_back(Locale::Convert::toString((*aL)->data()->name()));
       } else if (!isSketchFeatures) {
         aResList.push_back("__empty__");
       }
@@ -317,7 +319,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
         aResult<<" ";
       ObjectPtr anObj = aL->second.get() ? aL->second->owner() : aL->first;
       if (anObj.get()) {
-        aResult<< ModelAPI_Tools::toString(anObj->data()->name());
+        aResult<< Locale::Convert::toString(anObj->data()->name());
         if (aL->second.get()) {
           aResult<<" "<<aL->second->id();
         }

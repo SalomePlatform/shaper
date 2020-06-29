@@ -299,17 +299,6 @@ MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result> the
 MODELAPI_EXPORT std::list<std::shared_ptr<ModelAPI_Feature> > referencedFeatures(
   std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
   const bool theSortResults);
-
-/*! Converts an extended string to a simple (byte) string
-*  \param theWStr an extended string
-*/
-MODELAPI_EXPORT std::string toString(const std::wstring& theWStr);
-
-/*! Converts a byte string to an extended string
-*  \param theStr a byte string
-*/
-MODELAPI_EXPORT std::wstring toWString(const std::string& theStr);
-
 }
 
 #endif

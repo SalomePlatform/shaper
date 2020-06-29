@@ -27,6 +27,8 @@
 #include <SketchPlugin_Tools.h>
 #include <SketchPlugin_Sketch.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttrList.h>
@@ -270,7 +272,7 @@ void SketchPlugin_MacroBSpline::assignDefaultNameForAux(FeaturePtr theAuxFeature
   std::wostringstream aName;
   aName << aBSpline->name();
   if (theAuxFeature->getKind() == SketchPlugin_Point::ID())
-    aName << "_" << ModelAPI_Tools::toWString(theBSplinePoles->id()) << "_" << thePoleIndex1;
+    aName << "_" << Locale::Convert::toWString(theBSplinePoles->id()) << "_" << thePoleIndex1;
   else
     aName << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
 

@@ -21,6 +21,8 @@
 
 #include <Selector_NameGenerator.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
 
@@ -80,7 +82,7 @@ std::wstring Selector_Primitive::name(Selector_NameGenerator* theNameGenerator)
   std::wstring aResult = theNameGenerator->contextName(myFinal);
   if (!aResult.empty()) {
     aResult += L"/";
-    aResult += ((wchar_t*)aName->Get().ToExtString());
+    aResult += Locale::Convert::toWString(aName->Get().ToExtString());
   }
   return aResult;
 }

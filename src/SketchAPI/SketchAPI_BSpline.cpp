@@ -24,6 +24,8 @@
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Integer.h>
@@ -155,7 +157,7 @@ static void createPole(const CompositeFeaturePtr& theSketch,
   aPointFeature->execute();
 
   std::wostringstream aName;
-  aName << theBSpline->name() << "_" << ModelAPI_Tools::toWString(thePoles->id())
+  aName << theBSpline->name() << "_" << Locale::Convert::toWString(thePoles->id())
                               << "_" << thePoleIndex;
   aPointFeature->data()->setName(aName.str());
   aPointFeature->lastResult()->data()->setName(aName.str());

@@ -131,6 +131,7 @@ SET(PROJECT_LIBRARIES
     ModuleBase
     ModelGeomAlgo
     Config
+    Locale
     GeomAPI
     GeomDataAPI
     SketcherPrs
@@ -165,6 +166,7 @@ SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES} ${PROJECT_RESOURCES})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/Config
                     ${PROJECT_SOURCE_DIR}/src/Events
+                    ${PROJECT_SOURCE_DIR}/src/Locale
                     ${PROJECT_SOURCE_DIR}/src/ModuleBase
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/ModelGeomAlgo

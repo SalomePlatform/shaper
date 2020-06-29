@@ -21,6 +21,8 @@
 
 #include "ParametersPlugin_Parameter.h"
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -74,11 +76,11 @@ void ParametersPlugin_Parameter::attributeChanged(const std::string& theID)
 void ParametersPlugin_Parameter::updateName()
 {
   std::string aName = string(VARIABLE_ID())->value();
-  data()->setName(ModelAPI_Tools::toWString(aName));
+  data()->setName(Locale::Convert::toWString(aName));
 
   ResultParameterPtr aParam = document()->createParameter(data());
-  std::string anOldName = ModelAPI_Tools::toString(aParam->data()->name());
-  aParam->data()->setName(ModelAPI_Tools::toWString(aName));
+  std::string anOldName = Locale::Convert::toString(aParam->data()->name());
+  aParam->data()->setName(Locale::Convert::toWString(aName));
   setResult(aParam);
 
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2019  CEA/DEN, EDF R&D
+// Copyright (C) 2020  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,32 +17,17 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "Events_InfoMessage.h"
-#include <Locale_Convert.h>
-#include <sstream>
+#ifndef LOCALE_DEF_H
+#define LOCALE_DEF_H
 
-void Events_InfoMessage::addParameter(double theParam)
-{
-  std::stringstream aStream;
-  aStream << theParam;
-  myParameters.push_back(aStream.str());
-}
+#if defined WIN32
+# if defined LOCALE_EXPORTS
+#  define LOCALE_EXPORT __declspec( dllexport )
+# else
+#  define LOCALE_EXPORT __declspec( dllimport )
+# endif
+#else
+# define LOCALE_EXPORT
+#endif
 
-void Events_InfoMessage::addParameter(int theParam)
-{
-  std::stringstream aStream;
-  aStream << theParam;
-  myParameters.push_back(aStream.str());
-}
-
-void Events_InfoMessage::send()
-{
-  std::shared_ptr<Events_Message> aMsg(new Events_InfoMessage(*this));
-  Events_Loop::loop()->send(aMsg);
-}
-
-Events_InfoMessage& Events_InfoMessage::arg(const std::wstring& theParam)
-{
-  addParameter(Locale::Convert::toString(theParam));
-  return *this;
-}
+#endif

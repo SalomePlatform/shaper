@@ -20,6 +20,8 @@
 #include "ExchangePlugin_Import.h"
 #include "ExchangePlugin_ImportFeature.h"
 
+#include <Locale_Convert.h>
+
 #include <PartSetPlugin_Part.h>
 
 #include <ModelAPI_AttributeString.h>
@@ -101,7 +103,7 @@ void ExchangePlugin_Import::execute()
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aDoc =
     findDocument(aSession->moduleDocument(),
-      ModelAPI_Tools::toWString(aPartsAttr->value(aTargetAttr->value())));
+      Locale::Convert::toWString(aPartsAttr->value(aTargetAttr->value())));
 
   if (aDoc.get()) {
     FeaturePtr aImportFeature = aDoc->addFeature(ExchangePlugin_ImportFeature::ID());
@@ -145,7 +147,7 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
       aPartsAttr->setSize((int)anAcceptedValues.size());
       std::list<std::wstring>::iterator anIt = anAcceptedValues.begin();
       for (int anInd = 0; anIt != anAcceptedValues.end(); ++anIt, ++anInd)
-        aPartsAttr->setValue(anInd, ModelAPI_Tools::toString(*anIt));
+        aPartsAttr->setValue(anInd, Locale::Convert::toString(*anIt));
     }
     else {
       // keep only the name of the current part
@@ -153,7 +155,7 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
         FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
 
         aPartsAttr->setSize(1);
-        aPartsAttr->setValue(0, ModelAPI_Tools::toString(aPartFeature->name()));
+        aPartsAttr->setValue(0, Locale::Convert::toString(aPartFeature->name()));
         aTargetAttr->setValue(0);
       }
     }

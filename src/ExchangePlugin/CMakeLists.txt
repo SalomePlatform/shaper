@@ -22,6 +22,7 @@ INCLUDE(UnitTest)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/Config
+                    ${PROJECT_SOURCE_DIR}/src/Locale
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
@@ -70,6 +71,7 @@ SET(TEXT_RESOURCES
 SET(PROJECT_LIBRARIES
     Events
     Config
+    Locale
     ModelAPI
     ModelHighAPI
     GeomAPI

@@ -137,11 +137,12 @@ SET(PROJECT_LIBRARIES
     Config
     GeomAPI
     GeomAlgoAPI
+    GeomDataAPI
+    Locale
     ModelAPI
     ModelGeomAlgo
     ModuleBase
     SketcherPrs
-    GeomDataAPI
 )
 
 SET(XML_RESOURCES
@@ -168,6 +169,7 @@ TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES})
 INCLUDE_DIRECTORIES(
   ../Config
   ../Events
+  ../Locale
   ../ModelAPI
   ../ModelGeomAlgo
   ../ModuleBase
