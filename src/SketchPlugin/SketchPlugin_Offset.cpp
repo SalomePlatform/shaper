@@ -166,9 +166,24 @@ void SketchPlugin_Offset::execute()
       std::shared_ptr<GeomAlgoAPI_WireBuilder> aWireBuilder(
           new GeomAlgoAPI_WireBuilder(aTopoChain));
 
-      // 5.d. Make offset for each wire
+      GeomShapePtr aWireShape = aWireBuilder->shape();
+      GeomWirePtr aWire (new GeomAPI_Wire (aWireShape));
+
+      // Fix for a problem of offset side change with selection change.
+      // Wire direction is defined by the first selected edge of this wire.
+      if (!aWire->isClosed()) {
+        ListOfShape aModified;
+        // First selected edge of current chain
+        GeomShapePtr aFirstSel = aFeature->lastResult()->shape();
+        aWireBuilder->modified(aFirstSel, aModified);
+        GeomShapePtr aModFS = aModified.front();
+        if (aModFS->orientation() != aFirstSel->orientation())
+          aValue = -aValue;
+      }
+
+      // 5.d. Make offset for the wire
       std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape(
-          new GeomAlgoAPI_Offset(aPlane, aWireBuilder->shape(), aValue));
+          new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue));
 
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
       aMakeList->appendAlgo(aWireBuilder);
