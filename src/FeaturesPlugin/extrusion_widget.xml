@@ -19,7 +19,7 @@
                   default_type = "2"
                   use_choice="true"
                   concealment="true">
-    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face"/>
+    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
   </multi_selector>
   <shape_selector id="direction_object"
                   icon="icons/Features/axis.png"

@@ -440,14 +440,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
         if(aConstruction->facesNum() > 0) {
           return true;
         }
-      } else {
-        // Shape on construction selected. Check that it is a face or wire.
-        if(aShape->shapeType() == GeomAPI_Shape::WIRE ||
-           aShape->shapeType() == GeomAPI_Shape::FACE) {
-          return true;
-        }
       }
-      return false;
     }
 
     if(aContextShape.get() && !aShape->isEqual(aContextShape)) {

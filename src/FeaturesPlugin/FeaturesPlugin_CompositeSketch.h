@@ -66,6 +66,10 @@ public:
   /// structures of the owner (the remove from the document will be done outside just after).
   FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
+  /// On change of attribute of the result update presentation of this result:
+  /// for the current moment there are only presentation attributes assigned to results
+  FEATURESPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
 protected:
   enum InitFlags {
     InitSketchLauncher   = 1 << 0,
@@ -99,6 +103,8 @@ protected:
                    const ListOfShape& theShapes,
                    const std::string theName);
 
+private:
+  std::string myCurrentSelectionType; //< type of selection (vertex, edge or face)
 };
 
 #endif

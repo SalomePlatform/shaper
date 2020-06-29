@@ -50,6 +50,7 @@ void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int the
   // Initialize selection list.
   if(theInitFlags & InitBaseObjectsList) {
     data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
+    myCurrentSelectionType = selectionList(BASE_OBJECTS_ID())->selectionType();
   }
 }
 
@@ -285,6 +286,18 @@ void storeSubShape(
       // store from/to shapes as primitives and then store modification of them by the boolean
       theResultBody->generated(aSubShape, theName, false);
       theResultBody->loadModifiedShapes(theMakeShape, aSubShape, theType);
+    }
+  }
+}
+
+//=================================================================================================
+void FeaturesPlugin_CompositeSketch::attributeChanged(const std::string& theID)
+{
+  if (theID == BASE_OBJECTS_ID()) {
+    AttributeSelectionListPtr anObjects = selectionList(BASE_OBJECTS_ID());
+    if (anObjects->size() == 0 || anObjects->selectionType() != myCurrentSelectionType) {
+      myCurrentSelectionType = anObjects->selectionType();
+      removeResults(0); // clear the results
     }
   }
 }
