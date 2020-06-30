@@ -212,8 +212,6 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   // 1. Find a single edge, coincident to theEndPoint by one of its ends
   if (!theEndPoint) return false;
 
-  std::shared_ptr<GeomAPI_Pnt2d> aP2d = theEndPoint->pnt();
-
   FeaturePtr aNextEdgeFeature;
   int nbFound = 0;
 

@@ -328,6 +328,7 @@ ADD_UNIT_TESTS(
   TestMultiRotation05.py
   TestMultiRotationWithParameter.py
   TestMultiTranslation.py
+  TestOffset.py
   TestPresentation.py
   TestProjection.py
   TestProjectionBSpline.py
