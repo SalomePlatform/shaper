@@ -180,5 +180,6 @@ The plug-in includes the following operations:
    mirrorFeature.rst
    translationFeature.rst
    rotationFeature.rst
+   offsetFeature.rst
    sketchDrawer.rst
    sketchCopy.rst
