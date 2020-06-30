@@ -68,13 +68,6 @@ std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& th
 /// Find all points the given point is coincident to.
 std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint);
 
-/// Find all points the given point is coincident to.
-/// Returns GeomDataAPI_Point2D attribute and
-/// GeomDataAPI_Point2DArray with the index of coincident point.
-void findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint,
-                                 std::set<AttributePoint2DPtr>& thePoints,
-                                 std::map<AttributePoint2DArrayPtr, int>& thePointsInArray);
-
 void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
 
 /// Create new constraint between given attributes

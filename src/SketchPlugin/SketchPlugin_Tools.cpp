@@ -231,26 +231,39 @@ public:
     }
   }
 
-  void coincidentPoints(const AttributePoint2DPtr& thePoint,
-                        std::set<AttributePoint2DPtr>& thePoints,
-                        std::map<AttributePoint2DArrayPtr, int>& thePointsInArray)
+  std::set<AttributePoint2DPtr> coincidentPoints(const AttributePoint2DPtr& thePoint)
   {
     collectCoincidentPoints(thePoint);
 
+    std::set<AttributePoint2DPtr> aCoincPoints;
     auto aFound = find(thePoint, THE_DEFAULT_INDEX);
     if (aFound != myCoincidentPoints.end()) {
       for (auto it = aFound->begin(); it != aFound->end(); ++it) {
         AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(it->first);
         if (aPoint)
-          thePoints.insert(aPoint);
+          aCoincPoints.insert(aPoint);
         else {
           AttributePoint2DArrayPtr aPointArray =
               std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(it->first);
-          if (aPointArray)
-            thePointsInArray[aPointArray] = *it->second.begin();
+          if (aPointArray) {
+            // this is a B-spline feature, the connection is possible
+            // to the first or the last point
+            FeaturePtr anOwner = ModelAPI_Feature::feature(aPointArray->owner());
+            if (it->second.find(0) != it->second.end()) {
+              AttributePoint2DPtr aFirstPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                  anOwner->attribute(SketchPlugin_BSpline::START_ID()));
+              aCoincPoints.insert(aFirstPoint);
+            }
+            if (it->second.find(aPointArray->size() - 1) != it->second.end()) {
+              AttributePoint2DPtr aFirstPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                  anOwner->attribute(SketchPlugin_BSpline::END_ID()));
+              aCoincPoints.insert(aFirstPoint);
+            }
+          }
         }
       }
     }
+    return aCoincPoints;
   }
 
 private:
@@ -344,6 +357,22 @@ private:
       if (aFound != aSeek->end() && aFound->second.find(theIndex) != aFound->second.end())
         return aSeek;
     }
+    // nothing is found, but if the point is a B-spline boundary point, lets check it as poles array
+    FeaturePtr anOwner = ModelAPI_Feature::feature(thePoint->owner());
+    if (anOwner->getKind() == SketchPlugin_BSpline::ID()) {
+      AttributePtr aPointsArray;
+      int anIndex = -1;
+      if (thePoint->id() == SketchPlugin_BSpline::START_ID()) {
+        aPointsArray = anOwner->attribute(SketchPlugin_BSpline::POLES_ID());
+        anIndex = 0;
+      }
+      else if (thePoint->id() == SketchPlugin_BSpline::END_ID()) {
+        aPointsArray = anOwner->attribute(SketchPlugin_BSpline::POLES_ID());
+        anIndex = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(aPointsArray)->size() - 1;
+      }
+      if (aPointsArray)
+        return find(aPointsArray, anIndex);
+    }
     return myCoincidentPoints.end();
   }
 
@@ -353,18 +382,8 @@ private:
 
 std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint)
 {
-  std::set<AttributePoint2DPtr> aPoints;
-  std::map<AttributePoint2DArrayPtr, int> aPointsInArray;
-  findPointsCoincidentToPoint(thePoint, aPoints, aPointsInArray);
-  return aPoints;
-}
-
-void findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint,
-                                 std::set<AttributePoint2DPtr>& thePoints,
-                                 std::map<AttributePoint2DArrayPtr, int>& thePointsInArray)
-{
   CoincidentPoints aCoincidentPoints;
-  aCoincidentPoints.coincidentPoints(thePoint, thePoints, thePointsInArray);
+  return aCoincidentPoints.coincidentPoints(thePoint);
 }
 
 
