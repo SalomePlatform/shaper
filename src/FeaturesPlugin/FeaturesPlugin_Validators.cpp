@@ -23,6 +23,7 @@
 #include "FeaturesPlugin_BooleanFuse.h"
 #include "FeaturesPlugin_BooleanCommon.h"
 #include "FeaturesPlugin_BooleanSmash.h"
+#include "FeaturesPlugin_CompositeBoolean.h"
 #include "FeaturesPlugin_Extrusion.h"
 #include "FeaturesPlugin_Pipe.h"
 #include "FeaturesPlugin_Union.h"
@@ -439,6 +440,16 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
         // Whole construction selected. Check that it have faces.
         if(aConstruction->facesNum() > 0) {
           return true;
+        }
+      } else {
+        // CUT operation supports only FACE or WIRE as a tool base
+        std::shared_ptr<FeaturesPlugin_CompositeBoolean> aComposite =
+            std::dynamic_pointer_cast<FeaturesPlugin_CompositeBoolean>(
+            ModelAPI_Feature::feature(theAttribute->owner()));
+        if (aComposite &&
+            aComposite->operationType() == FeaturesPlugin_CompositeBoolean::BOOL_CUT) {
+          return aShape->shapeType() == GeomAPI_Shape::WIRE ||
+                 aShape->shapeType() == GeomAPI_Shape::FACE;
         }
       }
     }
