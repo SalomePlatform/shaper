@@ -51,39 +51,43 @@ def normalize(theDir):
         aLen = 1.0
     return [theDir[0] / aLen, theDir[1] / aLen]
 
-def checkOffset(theListInit, theListOff, theValue, theIsReversed):
+def checkOffset(theListIn, theListOut, theOutToIn, theDist, isReversed, nbIn, nbOut):
     TOL = 6.e-5
-    aListSize = theListInit.size()
+    aNbIn  = theListIn.size()
+    aNbOut = theListOut.size()
 
-    #aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
-    #aLineEndPoint = geomDataAPI_Point2D(theMirrorLine.attribute("EndPoint"))
-    #aLineDir = [aLineEndPoint.x() - aLineStartPoint.x(), aLineEndPoint.y() - aLineStartPoint.y()]
-    #aLineDir = normalize(aLineDir)
+    #print("**checkOffset**")
+    assert (theListIn.size() == nbIn)
+    assert (theListOut.size() == nbOut)
+    assert (theOutToIn.size() == nbOut)
 
-    for ind in range(0, aListSize):
-        aFeatureB = ModelAPI_Feature.feature(theListInit.object(ind))
-        aFeatureC = ModelAPI_Feature.feature(theListOff.object(ind))
-        assert(aFeatureB is not None)
-        assert(aFeatureC is not None)
-        assert(aFeatureB.getKind() == aFeatureC.getKind())
+    for ind in range(0, aNbOut):
+        aFeatureOut = ModelAPI_Feature.feature(theListOut.object(ind))
+        assert(aFeatureOut is not None)
+        anInInd = theOutToIn.value(ind)
+        if (not anInInd == -1):
+            aFeatureIn = ModelAPI_Feature.feature(theListIn.object(anInInd))
+            assert(aFeatureIn is not None)
 
-        anAttributes = []
-        if (aFeatureB.getKind() == "SketchLine"):
-            anAttributes = ['StartPoint', 'EndPoint']
-        elif (aFeatureB.getKind() == "SketchArc"):
-            anAttributes = ['center_point', 'start_point', 'end_point']
-
-        for key in anAttributes:
-            aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
-            aPointC = geomDataAPI_Point2D(aFeatureC.attribute(key))
-            aDir = [aPointC.x() - aPointB.x(), aPointC.y() - aPointB.y()]
-            aDir = normalize(aDir)
-            #aDot = aLineDir[0] * aDir[0] + aLineDir[1] * aDir[1]
-            #assert math.fabs(aDot) < TOL, "aDot = {0}".format(aDot)
-            #aDir[0] = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
-            #aDir[1] = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
-            #aCross = aLineDir[0] * aDir[1] - aLineDir[1] * aDir[0]
-            #assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
+            #print(aFeatureIn.getKind())
+            if (aFeatureIn.getKind() == "SketchLine"):
+                assert(aFeatureOut.getKind() == aFeatureIn.getKind())
+                # Line and its offset are parallel
+                aP1Out = geomDataAPI_Point2D(aFeatureOut.attribute('StartPoint'))
+                aP2Out = geomDataAPI_Point2D(aFeatureOut.attribute('EndPoint'))
+                aP1In  = geomDataAPI_Point2D(aFeatureIn.attribute('StartPoint'))
+                aP2In  = geomDataAPI_Point2D(aFeatureIn.attribute('EndPoint'))
+                aDirOut = [aP2Out.x() - aP1Out.x(), aP2Out.y() - aP1Out.y()]
+                aDirIn  = [ aP2In.x() -  aP1In.x(),  aP2In.y() -  aP1In.y()]
+                aCross = aDirOut[0] * aDirIn[1] - aDirOut[1] * aDirIn[0]
+                assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
+            elif (aFeatureIn.getKind() == "SketchArc"):
+                assert(aFeatureOut.getKind() == aFeatureIn.getKind())
+                # Arc and its offset have the same center
+                aCPOut = geomDataAPI_Point2D(aFeatureOut.attribute('center_point'))
+                aCPIn  = geomDataAPI_Point2D(aFeatureIn.attribute('center_point'))
+                assert (math.fabs(aCPOut.x() - aCPIn.x()) < TOL)
+                assert (math.fabs(aCPOut.y() - aCPIn.y()) < TOL)
 
 
 #=========================================================================
@@ -175,9 +179,8 @@ assert (model.dof(aSketchFeature) == 9)
 #=========================================================================
 aRefListA = anOffset.reflist("ConstraintEntityA")
 aRefListB = anOffset.reflist("ConstraintEntityB")
-assert (aRefListA.size() == 3)
-assert (aRefListB.size() == 6)
-#checkOffset(aRefListA, aRefListB, VALUE, IS_REVERSED)
+anOffsetToBaseMap = anOffset.intArray("ConstraintEntityC")
+checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 3, 6)
 assert (model.dof(aSketchFeature) == 9)
 
 #=========================================================================
@@ -186,24 +189,20 @@ assert (model.dof(aSketchFeature) == 9)
 aSession.startOperation()
 aRefListInitial.remove(aSketchLine2.lastResult())
 aSession.finishOperation()
-assert (aRefListA.size() == 2)
-assert (aRefListB.size() == 4)
-#checkOffset(aRefListA, aRefListB, VALUE, IS_REVERSED)
+checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 2, 4)
 assert (model.dof(aSketchFeature) == 9)
 
 #=========================================================================
-# Clear list of mirrored features
+# Clear list of objects
 #=========================================================================
 aSession.startOperation()
 aRefListInitial.clear()
-assert (aRefListA.size() == 0)
-assert (aRefListB.size() == 0)
+#TODO: uncomment next line
+#checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 0, 0)
 # add arc once again
 aRefListInitial.append(aSketchArc1.lastResult())
 aSession.finishOperation()
-assert (aRefListA.size() == 1)
-assert (aRefListB.size() == 1)
-#checkOffset(aRefListA, aRefListB, VALUE, IS_REVERSED)
+checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 1, 1)
 assert (model.dof(aSketchFeature) == 9)
 
 #=========================================================================
