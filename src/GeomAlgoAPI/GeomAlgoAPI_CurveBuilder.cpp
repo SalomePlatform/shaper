@@ -186,6 +186,8 @@ void GeomAlgoAPI_CurveBuilder::reorderPoints(std::list<GeomPointPtr>& thePoints)
         // remove duplicates
         std::list<GeomPointPtr>::iterator aRemoveIt = aNextIt++;
         thePoints.erase(aRemoveIt);
+        // update iterator showing the nearest point, because it may become invalid
+        aNearestIt = aPIt; ++aNearestIt;
         continue;
       }
       if (aDist < aMinDist && (aMinDist - aDist) > Precision::Confusion()) {
