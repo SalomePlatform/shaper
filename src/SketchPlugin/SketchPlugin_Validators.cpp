@@ -552,10 +552,12 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
       if (!isFound) {
         // check in the results of the feature
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
-        const std::list<ResultPtr>& aResults = aFeature->results();
-        for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-             aResIt != aResults.end() && !isFound; ++aResIt) {
-          isFound = aSelObject == *aResIt;
+        if (aFeature) {
+          const std::list<ResultPtr>& aResults = aFeature->results();
+          for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+            aResIt != aResults.end() && !isFound; ++aResIt) {
+            isFound = aSelObject == *aResIt;
+          }
         }
       }
       if (isFound) {
