@@ -266,6 +266,7 @@
 // std::pair -> []
 %template(ResultSubShapePair) std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >;
 %template(StringsPair) std::pair<std::string, std::string>;
+%template(StringWStringPair) std::pair<std::string, std::wstring>;
 
 
 // fix compilarion error: 'res*' was not declared in this scope
