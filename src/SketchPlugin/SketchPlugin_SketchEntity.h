@@ -227,6 +227,9 @@ protected:
   /// \brief Initializes attributes of derived class.
   virtual void initDerivedClassAttributes(){};
 
+  /// \brief Initializes attributes of derived class which were added recently.
+  virtual void initDerivedClassAttributes2(){};
+
 };
 
 #endif

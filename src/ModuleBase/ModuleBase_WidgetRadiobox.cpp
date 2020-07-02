@@ -20,11 +20,12 @@
 #include <ModuleBase_WidgetRadiobox.h>
 #include <ModuleBase_PageBase.h>
 
+#include <Config_WidgetAPI.h>
+
 #include <QFormLayout>
 #include <QRadioButton>
 #include <QFrame>
 #include <QButtonGroup>
-
 
 ModuleBase_WidgetRadiobox::ModuleBase_WidgetRadiobox(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
@@ -34,6 +35,8 @@ ModuleBase_WidgetRadiobox::ModuleBase_WidgetRadiobox(QWidget* theParent,
   ModuleBase_Tools::adjustMargins(myLayout);
   myGroup = new QButtonGroup(this);
   myGroup->setExclusive(true);
+
+  myVerticalAlignment = theData->getProperty("align_subs").find("vert") == 0;
 
   connect(myGroup, SIGNAL(buttonToggled(int, bool)), SLOT(onPageChanged()));
 }
@@ -68,7 +71,11 @@ int ModuleBase_WidgetRadiobox::addPage(ModuleBase_PageBase* thePage,
 
   //QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
   QWidget* aPage = thePage->pageWidget();
-  myLayout->addRow(aWgt, aPage);
+  if (myVerticalAlignment) {
+    myLayout->addRow(aWgt);
+    myLayout->addRow(aPage);
+  } else
+    myLayout->addRow(aWgt, aPage);
   myGroup->addButton(aButton, myGroup->buttons().count());
 
   bool isDefault = theCaseId.toStdString() == getDefaultValue();

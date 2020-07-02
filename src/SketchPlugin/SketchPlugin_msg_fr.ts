@@ -2119,76 +2119,6 @@
   </context>
 
   <context>
-    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>Un argument de type %1 de la fonctionnalité de projection n&apos;est pas pris en charge</translation>
-    </message>
-    <message>
-      <source>The attribute %1 should be an edge</source>
-      <translation>L&apos;attribut %1 doit être une arête</translation>
-    </message>
-    <message>
-      <source>There is no sketch referring to the current feature</source>
-      <translation>La fonction de projection n&apos;a pas d&apos;esquisse</translation>
-    </message>
-    <message>
-      <source>The attribute %1 should be an edge or vertex</source>
-      <translation>L&apos;élément projeté doit être une arête ou un sommet</translation>
-    </message>
-    <message>
-      <source>Unable to project feature from the same sketch</source>
-      <translation>Les fonctions de l&apos;esquisse en cours ne peuvent pas être projetées</translation>
-    </message>
-    <message>
-      <source>Error: Line is orthogonal to the sketch plane.</source>
-      <translation>Erreur: La ligne est orthogonale au plan d&apos;esquisse.</translation>
-    </message>
-    <message>
-      <source>Error: Circle is orthogonal to the sketch plane.</source>
-      <translation>Erreur: Le cercle est orthogonal au plan d&apos;esquisse.</translation>
-    </message>
-    <message>
-      <source>Error: Arc is orthogonal to the sketch plane.</source>
-      <translation>Erreur: L&apos;arc est orthogonal au plan d&apos;esquisse.</translation>
-    </message>
-    <message>
-      <source>Error: Ellipse is orthogonal to the sketch plane.</source>
-      <translation>Erreur: L&apos;ellipse est orthogonale au plan d&apos;esquisse.</translation>
-    </message>
-    <message>
-      <source>Error: Elliptic Arc is orthogonal to the sketch plane.</source>
-      <translation>Erreur: L&apos;arc d&apos;ellipse est orthogonal au plan d&apos;esquisse.</translation>
-    </message>
-    <message>
-      <source>Error: Selected object is not supported for projection.</source>
-      <translation>Erreur: L&apos;objet sélectionné n&apos;est pas pris en charge pour la projection.</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchProjection:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchProjection:ExternalFeature</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
-    </message>
-    <message>
-      <source>Object</source>
-      <translation>Objet</translation>
-    </message>
-    <message>
-      <source>Select external edge or vertex.</source>
-      <translation>Sélectionnez une arête externe ou un sommet.</translation>
-    </message>
-  </context>
-
-  <context>
     <name>Sketch</name>
     <message>
       <source>Create sketch</source>
@@ -3987,6 +3917,97 @@
     <message>
       <source>Include projected feature into the sketch result</source>
       <translation>Inclure la fonctionnalité projetée dans le résultat de l&apos;esquisse</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:keep_reference</name>
+    <message>
+      <source>A sketch entity will be created without connection to the selected shape.</source>
+      <translation>Une entité d&apos;esquisse sera créée sans connexion à la forme sélectionnée.</translation>
+    </message>
+    <message>
+      <source>The reference to the original curve is stored. So it can be changed later.</source>
+      <translation>La référence à la courbe d&apos;origine est stockée. Elle peut donc être modifiée ultérieurement.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:make_fixed</name>
+    <message>
+      <source>Assign the Fixed constraint to the result of projection</source>
+      <translation>Affectez la contrainte Fixe au résultat de la projection</translation>
+    </message>
+    <message>
+      <source>Make projected curve fixed</source>
+      <translation>Fixer la courbe projetée</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>Un argument de type %1 de la fonctionnalité de projection n&apos;est pas pris en charge</translation>
+    </message>
+    <message>
+      <source>The attribute %1 should be an edge</source>
+      <translation>L&apos;attribut %1 doit être une arête</translation>
+    </message>
+    <message>
+      <source>There is no sketch referring to the current feature</source>
+      <translation>La fonction de projection n&apos;a pas d&apos;esquisse</translation>
+    </message>
+    <message>
+      <source>The attribute %1 should be an edge or vertex</source>
+      <translation>L&apos;élément projeté doit être une arête ou un sommet</translation>
+    </message>
+    <message>
+      <source>Unable to project feature from the same sketch</source>
+      <translation>Les fonctions de l&apos;esquisse en cours ne peuvent pas être projetées</translation>
+    </message>
+    <message>
+      <source>Error: Line is orthogonal to the sketch plane.</source>
+      <translation>Erreur: La ligne est orthogonale au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
+      <source>Error: Circle is orthogonal to the sketch plane.</source>
+      <translation>Erreur: Le cercle est orthogonal au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
+      <source>Error: Arc is orthogonal to the sketch plane.</source>
+      <translation>Erreur: L&apos;arc est orthogonal au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
+      <source>Error: Ellipse is orthogonal to the sketch plane.</source>
+      <translation>Erreur: L&apos;ellipse est orthogonale au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
+      <source>Error: Elliptic Arc is orthogonal to the sketch plane.</source>
+      <translation>Erreur: L&apos;arc d&apos;ellipse est orthogonal au plan d&apos;esquisse.</translation>
+    </message>
+    <message>
+      <source>Error: Selected object is not supported for projection.</source>
+      <translation>Erreur: L&apos;objet sélectionné n&apos;est pas pris en charge pour la projection.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:ExternalFeature</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une arête externe ou un sommet.</translation>
+    </message>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Select external edge or vertex.</source>
+      <translation>Sélectionnez une arête externe ou un sommet.</translation>
     </message>
   </context>
 

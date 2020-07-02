@@ -2266,7 +2266,7 @@ bool isIncludeToResult(const ObjectPtr& theObject)
   for (aIt = aRefsToMe.cbegin(); aIt != aRefsToMe.cend(); ++aIt) {
     if ((*aIt)->id() == SketchPlugin_Projection::PROJECTED_FEATURE_ID()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
-      if (aFeature.get()) {
+      if (aFeature.get() && !aFeature->isMacro()) {
         anAttr = aFeature->data()->boolean(SketchPlugin_Projection::INCLUDE_INTO_RESULT());
         if (anAttr.get())
           return anAttr->value();

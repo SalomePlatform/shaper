@@ -56,16 +56,6 @@ SketchAPI_Projection::SketchAPI_Projection(
   }
 }
 
-SketchAPI_Projection::SketchAPI_Projection(
-    const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theExternalName)
-: SketchAPI_SketchEntity(theFeature)
-{
-  if (initialize()) {
-    setByExternalName(theExternalName);
-  }
-}
-
 SketchAPI_Projection::~SketchAPI_Projection()
 {
 
@@ -79,14 +69,18 @@ void SketchAPI_Projection::setExternalFeature(const ModelHighAPI_Selection & the
   execute(true);
 }
 
-void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
-{
-  setExternalFeature(ModelHighAPI_Selection("EDGE", theExternalName));
-}
-
 void SketchAPI_Projection::setIncludeToResult(bool theKeepResult)
 {
   fillAttribute(theKeepResult, includeToResult());
+  execute(true);
+}
+
+void SketchAPI_Projection::setKeepReferenceToOriginal(bool theKeepRefToOriginal)
+{
+  // the Fixed constraint should be assigned explicitly
+  fillAttribute(false, feature()->boolean(SketchPlugin_Projection::MAKE_FIXED()));
+  fillAttribute(theKeepRefToOriginal ? "true" : "false",
+                feature()->string(SketchPlugin_Projection::KEEP_REFERENCE_ID()));
   execute(true);
 }
 

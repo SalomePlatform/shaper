@@ -336,6 +336,7 @@ ADD_UNIT_TESTS(
   TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
+  TestProjectionWithoutReference.py
   TestRectangle.py
   TestRemainingDoF.py
   TestRemoveBSpline.py

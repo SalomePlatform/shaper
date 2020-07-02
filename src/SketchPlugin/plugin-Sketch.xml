@@ -813,8 +813,26 @@
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
-        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"
-                   change_visual_attributes="true"/>
+        <radiobox id="keep_reference"
+                  align_subs="vertical">
+          <radio id="true"
+                 title="Keep reference to the original shape"
+                 tooltip="The reference to the original curve is stored. So it can be changed later.">
+            <boolvalue id="IncludeToResult"
+                       label="Include into the sketch result"
+                       default="true"
+                       tooltip="Include projected feature into the sketch result"
+                       change_visual_attributes="true"/>
+          </radio>
+          <radio id="false"
+                 title="Break connection with the original shape"
+                 tooltip="A sketch entity will be created without connection to the selected shape.">
+            <boolvalue id="make_fixed"
+                       label="Make projected curve fixed"
+                       default="true"
+                       tooltip="Assign the Fixed constraint to the result of projection"/>
+          </radio>
+        </radiobox>
         <validator id="PartSet_ProjectionSelection"/>
       </feature>
 

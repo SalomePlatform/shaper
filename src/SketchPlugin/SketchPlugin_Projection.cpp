@@ -35,6 +35,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -59,6 +60,12 @@
 #include <cmath>
 
 static const double tolerance = 1.e-7;
+static const std::string THE_KEEP_REF("true");
+
+static bool isKeepReference(AttributeStringPtr theAttr)
+{
+  return !theAttr || !theAttr->isInitialized() || theAttr->value() == THE_KEEP_REF;
+}
 
 
 SketchPlugin_Projection::SketchPlugin_Projection()
@@ -71,6 +78,7 @@ void SketchPlugin_Projection::initDerivedClassAttributes()
 {
   data()->addAttribute(EXTERNAL_FEATURE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PROJECTED_FEATURE_ID(), ModelAPI_AttributeRefAttr::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PROJECTED_FEATURE_ID());
   data()->attribute(PROJECTED_FEATURE_ID())->setIsArgument(false);
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
@@ -81,6 +89,22 @@ void SketchPlugin_Projection::initDerivedClassAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
 
+void SketchPlugin_Projection::initDerivedClassAttributes2()
+{
+  AttributePtr aKeepRefAttr =
+      data()->addAttribute(KEEP_REFERENCE_ID(), ModelAPI_AttributeString::typeId());
+  if (!aKeepRefAttr->isInitialized()) {
+    std::dynamic_pointer_cast<ModelAPI_AttributeString>(aKeepRefAttr)->setValue(THE_KEEP_REF);
+  }
+
+  data()->addAttribute(MAKE_FIXED(), ModelAPI_AttributeBoolean::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAKE_FIXED());
+
+  data()->addAttribute(FIXED_CONSTRAINT_ID(), ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIXED_CONSTRAINT_ID());
+  data()->attribute(FIXED_CONSTRAINT_ID())->setIsArgument(false);
+}
+
 void SketchPlugin_Projection::execute()
 {
   AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
@@ -88,7 +112,7 @@ void SketchPlugin_Projection::execute()
     return;
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
-  if (!lastResult().get()) {
+  if (isKeepReference(string(KEEP_REFERENCE_ID())) && !lastResult().get()) {
     bool hasProjResult = aProjection->lastResult().get() != NULL;
     ResultConstructionPtr aConstr = document()->createConstruction(data());
     if (hasProjResult)
@@ -104,6 +128,16 @@ void SketchPlugin_Projection::execute()
   // is sketch plane is changed (issue 1791), attribute of projection is not changed, but
   // projection must be fully recomputed
   computeProjection(EXTERNAL_FEATURE_ID());
+}
+
+bool SketchPlugin_Projection::isMacro() const
+{
+  if (!data() || !data()->isValid())
+    return false;
+
+  AttributeStringPtr aKeepRefAttr =
+      const_cast<SketchPlugin_Projection*>(this)->string(KEEP_REFERENCE_ID());
+  return !isKeepReference(aKeepRefAttr);
 }
 
 void SketchPlugin_Projection::attributeChanged(const std::string& theID)
@@ -233,25 +267,52 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   if (!isProjected)
     return; // projection is not computed, stop processing
 
-  aProjection->boolean(COPY_ID())->setValue(true);
+  bool keepBackRef = isKeepReference(string(KEEP_REFERENCE_ID()));
+
+  aProjection->boolean(COPY_ID())->setValue(keepBackRef);
   aProjection->execute();
   aRefAttr->setObject(aProjection);
 
   restoreCurrentFeature();
 
-  if (theID == EXTERNAL_FEATURE_ID()) {
-    selection(EXTERNAL_ID())->selectValue(aExtFeature);
+  AttributeBooleanPtr aMakeFixedAttr = boolean(MAKE_FIXED());
+  bool isMakeFixed = aMakeFixedAttr && aMakeFixedAttr->isInitialized() && aMakeFixedAttr->value();
 
-    if (aResult) {
-      aResult->setShape(aProjection->lastResult()->shape());
-      setResult(aResult);
-      GeomShapePtr anEmptyVal;
-      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), anEmptyVal);
+  AttributeReferencePtr aFixedConstrAttr = reference(FIXED_CONSTRAINT_ID());
+  FeaturePtr aFixedConstraint;
+  if (aFixedConstrAttr && aFixedConstrAttr->isInitialized())
+    aFixedConstraint = ModelAPI_Feature::feature(aFixedConstrAttr->value());
 
-      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
-      ModelAPI_EventCreator::get()->sendUpdated(aProjection, anEvent, false);
+  if (keepBackRef) {
+    if (theID == EXTERNAL_FEATURE_ID()) {
+      selection(EXTERNAL_ID())->selectValue(aExtFeature);
+
+      if (aResult) {
+        aResult->setShape(aProjection->lastResult()->shape());
+        setResult(aResult);
+        GeomShapePtr anEmptyVal;
+        aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), anEmptyVal);
+      }
     }
   }
+  else if (isMakeFixed) {
+    // fix the projected entity with the Fixed constraint
+    if (!aFixedConstraint)
+      aFixedConstraint = sketch()->addFeature(SketchPlugin_ConstraintRigid::ID());
+    aFixedConstraint->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(
+                              aProjection->lastResult());
+  }
+
+
+  // remove Fixed constraint in case of redundance
+  if (aFixedConstraint && (keepBackRef || !isMakeFixed)) {
+    document()->removeFeature(aFixedConstraint);
+    aFixedConstraint = FeaturePtr();
+  }
+  aFixedConstrAttr->setValue(aFixedConstraint);
+
+  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
+  ModelAPI_EventCreator::get()->sendUpdated(aProjection, anEvent, false);
 }
 
 bool SketchPlugin_Projection::rebuildProjectedFeature(

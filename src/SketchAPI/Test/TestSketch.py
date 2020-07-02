@@ -173,7 +173,7 @@ class SketchTestCase(unittest.TestCase):
     def test_arc_by_projection(self):
         """ Test 10. Create arc by projection of external feature
         """
-        self.sketch.addProjection("[Cylinder_2_1/Face_1][Cylinder_2_1/Face_3]")
+        self.sketch.addProjection(model.selection("EDGE", "[Cylinder_2_1/Face_1][Cylinder_2_1/Face_3]"))
         model.do()
         anArc = SketchAPI.SketchAPI_Arc(model.lastSubFeature(self.sketch, "SketchArc"))
 
