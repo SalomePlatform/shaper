@@ -65,7 +65,9 @@ def checkOffset(theListIn, theListOut, theOutToIn, theDist, isReversed, nbIn, nb
         aFeatureOut = ModelAPI_Feature.feature(theListOut.object(ind))
         assert(aFeatureOut is not None)
         anInInd = theOutToIn.value(ind)
-        if (not anInInd == -1):
+        if (anInInd == -1):
+            assert(aFeatureOut.getKind() == "SketchArc")
+        else:
             aFeatureIn = ModelAPI_Feature.feature(theListIn.object(anInInd))
             assert(aFeatureIn is not None)
 
