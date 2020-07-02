@@ -43,4 +43,7 @@ void SketchPlugin_SketchEntity::initAttributes()
   anAttr = data()->addAttribute(PARENT_ID(), ModelAPI_AttributeReference::typeId());
   anAttr->setIsArgument(false);
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PARENT_ID());
+
+  // initialize the rest of attributes
+  initDerivedClassAttributes2();
 }

@@ -43,10 +43,6 @@ public:
   SKETCHAPI_EXPORT
   SketchAPI_Projection(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                        const ModelHighAPI_Selection & theExternalFeature);
-  /// Constructor with values
-  SKETCHAPI_EXPORT
-  SketchAPI_Projection(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                       const std::wstring & theExternalName);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Projection();
@@ -66,13 +62,13 @@ public:
   SKETCHAPI_EXPORT
   void setExternalFeature(const ModelHighAPI_Selection & theExternalLine);
 
-  /// Set by external name
-  SKETCHAPI_EXPORT
-  void setByExternalName(const std::wstring & theExternalName);
-
   /// Set flag to include projection to result or not
   SKETCHAPI_EXPORT
   void setIncludeToResult(bool theKeepResult);
+
+  /// Set flag to keep the reference to the original shape
+  SKETCHAPI_EXPORT
+  void setKeepReferenceToOriginal(bool theKeepRefToOriginal);
 
   /// Returns created feature
   SKETCHAPI_EXPORT

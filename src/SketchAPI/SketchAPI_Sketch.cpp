@@ -861,23 +861,15 @@ std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addApproximation(
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
     const ModelHighAPI_Selection & theExternalFeature,
-    bool theKeepResult)
+    bool keepResult,
+    bool keepRefToOriginal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalFeature));
-  aProjection->setIncludeToResult(theKeepResult);
-  return aProjection;
-}
-
-std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
-    const std::wstring & theExternalName,
-    bool theKeepResult)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalName));
-  aProjection->setIncludeToResult(theKeepResult);
+  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature));
+  aProjection->setIncludeToResult(keepResult);
+  aProjection->setKeepReferenceToOriginal(keepRefToOriginal);
+  aProjection->setExternalFeature(theExternalFeature);
   return aProjection;
 }
 

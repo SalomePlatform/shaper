@@ -59,6 +59,7 @@ protected:
 private:
   QFormLayout* myLayout;
   QButtonGroup* myGroup;
+  bool myVerticalAlignment;
 };
 
 #endif

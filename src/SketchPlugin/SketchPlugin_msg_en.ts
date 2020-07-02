@@ -2220,7 +2220,66 @@
       <translation>Edges in selected point has tangent constraint</translation>
     </message>
   </context>
-  
+
+  <context>
+    <name>SketchProjection</name>
+    <message>
+      <source>Project feature onto sketch plane</source>
+      <translation>Project feature onto sketch plane</translation>
+    </message>
+    <message>
+      <source>Projection</source>
+      <translation>Projection</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:ExternalFeature</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select external edge or vertex.</translation>
+    </message>
+    <message>
+      <source>Object</source>
+      <translation>Object</translation>
+    </message>
+    <message>
+      <source>Select external edge or vertex.</source>
+      <translation>Select external edge or vertex.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:IncludeToResult</name>
+    <message>
+      <source>Include into the sketch result</source>
+      <translation>Include into the sketch result</translation>
+    </message>
+    <message>
+      <source>Include projected feature into the sketch result</source>
+      <translation>Include projected feature into the sketch result</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:keep_reference</name>
+    <message>
+      <source>A sketch entity will be created without connection to the selected shape.</source>
+      <translation>A sketch entity will be created without connection to the selected shape.</translation>
+    </message>
+    <message>
+      <source>The reference to the original curve is stored. So it can be changed later.</source>
+      <translation>The reference to the original curve is stored. So it can be changed later.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:make_fixed</name>
+    <message>
+      <source>Assign the Fixed constraint to the result of projection</source>
+      <translation>Assign the Fixed constraint to the result of projection</translation>
+    </message>
+    <message>
+      <source>Make projected curve fixed</source>
+      <translation>Make projected curve fixed</translation>
+    </message>
+  </context>
   <context>
     <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
@@ -2262,13 +2321,6 @@
     <message>
       <source>Error: Selected object is not supported for projection.</source>
       <translation>Error: Selected object is not supported for projection.</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchProjection:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation></translation>
     </message>
   </context>
 

@@ -49,9 +49,10 @@
 %feature("kwargs") SketchAPI_BSpline::controlPolygon;
 %feature("kwargs") SketchAPI_Ellipse::construction;
 %feature("kwargs") SketchAPI_EllipticArc::construction;
-%feature("kwargs") SketchAPI_Sketch::addSpline;
-%feature("kwargs") SketchAPI_Sketch::addInterpolation;
 %feature("kwargs") SketchAPI_Sketch::addApproximation;
+%feature("kwargs") SketchAPI_Sketch::addInterpolation;
+%feature("kwargs") SketchAPI_Sketch::addProjection;
+%feature("kwargs") SketchAPI_Sketch::addSpline;
 %feature("kwargs") SketchAPI_Sketch::setAngle;
 
 // shared pointers

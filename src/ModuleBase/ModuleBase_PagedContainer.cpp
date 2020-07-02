@@ -106,7 +106,8 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
       aCaseId = QString::fromStdString(aStringAttr->value());
     else
       aCaseId = QString::fromStdString(aDefVal.empty() ? aStringAttr->value() : aDefVal);
-    myIsFirst = false;
+    if (myIsFirst)
+      storeValueCustom();
     int idx = myCaseIds.indexOf(aCaseId);
     if (idx == -1)
       idx = currentPageIndex();

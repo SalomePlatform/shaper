@@ -42,7 +42,8 @@ GeomCurvePtr GeomAlgoAPI_Projection::project(const GeomCurvePtr& theCurve)
   Handle(Geom_Curve) aCurve = theCurve->impl<Handle_Geom_Curve>();
   Handle(Geom_Plane) aPlane = new Geom_Plane(myPlane->impl<gp_Ax3>());
 
-  Handle(Geom_Curve) aProj = GeomProjLib::Project(aCurve, aPlane);
+  Handle(Geom_Curve) aProj =
+      GeomProjLib::ProjectOnPlane(aCurve, aPlane, aPlane->Axis().Direction(), false);
 
   GeomCurvePtr aProjCurve(new GeomAPI_Curve);
   aProjCurve->setImpl(new Handle_Geom_Curve(aProj));

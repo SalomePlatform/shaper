@@ -134,7 +134,7 @@ bool SketchPlugin_Ellipse::fillCharacteristicPoints()
     return false;
   }
 
-  data()->blockSendAttributeUpdated(true);
+  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   GeomPnt2dPtr aCenter2d = aCenterAttr->pnt();
   GeomPnt2dPtr aFocus2d = aFocusAttr->pnt();
   GeomDir2dPtr aMajorDir2d(new GeomAPI_Dir2d(aFocus2d->x() - aCenter2d->x(),
@@ -144,7 +144,9 @@ bool SketchPlugin_Ellipse::fillCharacteristicPoints()
   AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
   double aFocalDist = aCenter2d->distance(aFocus2d);
   double aMajorRadius = sqrt(aFocalDist * aFocalDist + aMinorRadius * aMinorRadius);
-  aMajorRadiusAttr->setValue(aMajorRadius);
+  if (!aMajorRadiusAttr->isInitialized() ||
+      fabs(aMajorRadiusAttr->value() - aMajorRadius) > tolerance)
+    aMajorRadiusAttr->setValue(aMajorRadius);
 
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_FOCUS_ID()))
     ->setValue(2.0 * aCenter2d->x() - aFocus2d->x(), 2.0 * aCenter2d->y() - aFocus2d->y());
@@ -160,7 +162,7 @@ bool SketchPlugin_Ellipse::fillCharacteristicPoints()
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MINOR_AXIS_END_ID()))
       ->setValue(aCenter2d->x() + aMinorDir2d->x() * aMinorRadius,
                  aCenter2d->y() + aMinorDir2d->y() * aMinorRadius);
-  data()->blockSendAttributeUpdated(false);
+  data()->blockSendAttributeUpdated(aWasBlocked);
 
   return true;
 }

@@ -62,6 +62,24 @@ public:
     return MY_INCLUDE;
   }
 
+  static const std::string& KEEP_REFERENCE_ID()
+  {
+    static std::string ID("keep_reference");
+    return ID;
+  }
+
+  static const std::string& MAKE_FIXED()
+  {
+    static std::string ID("make_fixed");
+    return ID;
+  }
+
+  static const std::string& FIXED_CONSTRAINT_ID()
+  {
+    static std::string ID("fixed_constraint");
+    return ID;
+  }
+
   /// Returns true because projected feature is always external
   virtual bool isFixed()
   { return true; }
@@ -79,12 +97,20 @@ public:
   /// Called on change of any argument-attribute of this object: for external point
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
+  /// Returns true if this feature is used as macro: creates other features and then removed.
+  /// This feature may change its macro-state according to selected item.
+  /// \returns false by default
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const;
+
   /// Use plugin manager for features creation
   SketchPlugin_Projection();
 
 protected:
   /// \brief Initializes attributes of derived class.
   virtual void initDerivedClassAttributes();
+
+  /// \brief Initializes attributes of keeping the reference to the original shape.
+  virtual void initDerivedClassAttributes2();
 
 private:
   /// \brief Find projection of a feature onto sketch plane
