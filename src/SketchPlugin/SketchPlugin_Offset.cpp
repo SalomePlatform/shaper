@@ -171,6 +171,7 @@ void SketchPlugin_Offset::execute()
 
       // Fix for a problem of offset side change with selection change.
       // Wire direction is defined by the first selected edge of this wire.
+      double aSign = 1.;
       if (!aWire->isClosed()) {
         ListOfShape aModified;
         // First selected edge of current chain
@@ -178,12 +179,12 @@ void SketchPlugin_Offset::execute()
         aWireBuilder->modified(aFirstSel, aModified);
         GeomShapePtr aModFS = aModified.front();
         if (aModFS->orientation() != aFirstSel->orientation())
-          aValue = -aValue;
+          aSign = -1.;
       }
 
       // 5.d. Make offset for the wire
       std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape(
-          new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue));
+          new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign));
 
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
       aMakeList->appendAlgo(aWireBuilder);
