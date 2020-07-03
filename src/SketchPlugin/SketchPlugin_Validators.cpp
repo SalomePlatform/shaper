@@ -519,6 +519,7 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefListPtr aSelAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
+  std::set<ObjectPtr> aSelected;
 
   AttributeRefListPtr aRefListOfInitial = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
@@ -530,6 +531,12 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
   std::list<ObjectPtr>::iterator anObjIter;
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
     ObjectPtr aSelObject = aSelAttr->object(anInd);
+    if (aSelected.find(aSelObject) != aSelected.end()) {
+      theError = "Error: An object selected twice";
+      return false;
+    }
+    aSelected.insert(aSelObject);
+
     anObjIter = anInitialObjects.begin();
     for (; anObjIter != anInitialObjects.end(); anObjIter++)
       if (aSelObject == *anObjIter)

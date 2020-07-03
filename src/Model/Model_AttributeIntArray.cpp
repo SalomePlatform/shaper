@@ -74,7 +74,7 @@ void Model_AttributeIntArray::setValue(const int theIndex,
                                        const int theValue,
                                        bool sendUpdated)
 {
-  if (myArray->Value(theIndex) != theValue) {
+  if (!isInitialized() || myArray->Value(theIndex) != theValue) {
     setInitialized();
     myArray->SetValue(theIndex, theValue);
     if (sendUpdated)
