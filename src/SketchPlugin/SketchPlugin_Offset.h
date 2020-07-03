@@ -129,6 +129,7 @@ private:
   /// \param[in] theEdge Current edge
   /// \param[in] theEndPoint Point of the Current edge, not belonging to a previous edge
   /// \param[in/out] theEdgesSet All edges to find among. If empty, all sketch edges assumed.
+  /// \param[in/out] theProcessedEdgesSet Already processed (put in chains) edges.
   /// \param[in/out] theChain Resulting edges
   /// \param[in] isPrepend if true, push new found edges to theChain front, else to the back
   /// \return \c true if the chain is closed
@@ -136,6 +137,7 @@ private:
                        const FeaturePtr& theEdge,
                        const std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint,
                        std::set<FeaturePtr>& theEdgesSet,
+                       std::set<FeaturePtr>& theProcessedEdgesSet,
                        std::list<FeaturePtr>& theChain,
                        const bool isPrepend = false);
 };
