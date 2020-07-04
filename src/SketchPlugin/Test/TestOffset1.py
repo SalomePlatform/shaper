@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2019  CEA/DEN, EDF R&D
+# Copyright (C) 2020  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -141,7 +141,7 @@ aLine2EndPoint.setValue(-20., 0.)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 13)
 #=========================================================================
-# Link arc points and lines points by the coincidence constraint
+# Link arc points and lines points by the coincidence constraints
 #=========================================================================
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
@@ -159,7 +159,15 @@ reflistA.setAttr(anArcStartPoint)
 reflistB.setAttr(aLine2StartPoint)
 aConstraint.execute()
 aSession.finishOperation()
-assert (model.dof(aSketchFeature) == 9)
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setAttr(aLine1EndPoint)
+reflistB.setAttr(aLine2EndPoint)
+aConstraint.execute()
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Make offset for objects created above
 #=========================================================================
@@ -175,7 +183,7 @@ anOffset.real("offset_value").setValue(VALUE)
 anOffset.boolean("reversed").setValue(IS_REVERSED)
 anOffset.execute()
 aSession.finishOperation()
-assert (model.dof(aSketchFeature) == 9)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Verify all offset objects
 #=========================================================================
@@ -183,7 +191,7 @@ aRefListA = anOffset.reflist("ConstraintEntityA")
 aRefListB = anOffset.reflist("ConstraintEntityB")
 anOffsetToBaseMap = anOffset.intArray("ConstraintEntityC")
 checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 3, 6)
-assert (model.dof(aSketchFeature) == 9)
+assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # Remove object from offset
@@ -192,7 +200,7 @@ aSession.startOperation()
 aRefListInitial.remove(aSketchLine2.lastResult())
 aSession.finishOperation()
 checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 2, 4)
-assert (model.dof(aSketchFeature) == 9)
+assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # Clear list of objects
@@ -205,7 +213,7 @@ aRefListInitial.clear()
 aRefListInitial.append(aSketchArc1.lastResult())
 aSession.finishOperation()
 checkOffset(aRefListA, aRefListB, anOffsetToBaseMap, VALUE, IS_REVERSED, 1, 1)
-assert (model.dof(aSketchFeature) == 9)
+assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # End of test

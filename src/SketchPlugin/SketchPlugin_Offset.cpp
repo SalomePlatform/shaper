@@ -143,10 +143,14 @@ void SketchPlugin_Offset::execute()
       // 5.b. Find a chain of edges
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
-      if (aStartPoint && anEndPoint) { // not closed edge
-        bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aProcessedEdgesSet, aChain, true);
-        if (!isClosed)
-          findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aProcessedEdgesSet, aChain, false);
+      bool isClosed = !(aStartPoint && anEndPoint);  // not closed edge
+      if (!isClosed) {
+        isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet,
+                                  aProcessedEdgesSet, aChain, true);
+        if (!isClosed) {
+          isClosed = findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet,
+                                    aProcessedEdgesSet, aChain, false);
+        }
       }
       aProcessedEdgesSet.insert(aFeature);
 
@@ -161,7 +165,7 @@ void SketchPlugin_Offset::execute()
         }
       }
       std::shared_ptr<GeomAlgoAPI_WireBuilder> aWireBuilder(
-          new GeomAlgoAPI_WireBuilder(aTopoChain));
+          new GeomAlgoAPI_WireBuilder(aTopoChain, !isClosed));
 
       GeomShapePtr aWireShape = aWireBuilder->shape();
       GeomWirePtr aWire (new GeomAPI_Wire (aWireShape));
@@ -283,7 +287,8 @@ bool SketchPlugin_Offset::findWireOneWay (const FeaturePtr& theFirstEdge,
   }
 
   // 5. Continue gathering the chain (recursive)
-  return findWireOneWay (theFirstEdge, aNextEdgeFeature, aP2, theEdgesSet, theProcessedEdgesSet, theChain, isPrepend);
+  return findWireOneWay (theFirstEdge, aNextEdgeFeature, aP2, theEdgesSet,
+                         theProcessedEdgesSet, theChain, isPrepend);
 }
 
 static void setRefListValue(AttributeRefListPtr theList, int theListSize,
@@ -647,8 +652,27 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
 
 void SketchPlugin_Offset::attributeChanged(const std::string& theID)
 {
-////  if (theID == EDGES_ID())
-////    removeCreated();
+  if (theID == EDGES_ID()) {
+    AttributeRefListPtr aSelected = reflist(EDGES_ID());
+    if (aSelected->size() == 0) {
+      // Clear list of objects
+      AttributeRefListPtr anOffsetAttr = reflist(SketchPlugin_Constraint::ENTITY_B());
+      std::list<ObjectPtr> anOffsetList = anOffsetAttr->list();
+      std::set<FeaturePtr> aFeaturesToBeRemoved;
+      for (std::list<ObjectPtr>::iterator anIt = anOffsetList.begin();
+           anIt != anOffsetList.end(); ++anIt) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+        if (aFeature)
+          aFeaturesToBeRemoved.insert(aFeature);
+      }
+
+      reflist(SketchPlugin_Constraint::ENTITY_A())->clear();
+      anOffsetAttr->clear();
+      intArray(SketchPlugin_Constraint::ENTITY_C())->setSize(0);
+
+      ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
+    }
+  }
 }
 
 bool SketchPlugin_Offset::customAction(const std::string& theActionId)
@@ -701,9 +725,12 @@ bool SketchPlugin_Offset::findWires()
 
       std::list<FeaturePtr> aChain;
       aChain.push_back(aFeature);
-      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet, aProcessedEdgesSet, aChain, true);
-      if (!isClosed)
-        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet, aProcessedEdgesSet, aChain, false);
+      bool isClosed = findWireOneWay(aFeature, aFeature, aStartPoint, anEdgesSet,
+                                     aProcessedEdgesSet, aChain, true);
+      if (!isClosed) {
+        findWireOneWay(aFeature, aFeature, anEndPoint, anEdgesSet,
+                       aProcessedEdgesSet, aChain, false);
+      }
 
       std::list<FeaturePtr>::iterator aChainIt = aChain.begin();
       for (; aChainIt != aChain.end(); ++aChainIt) {

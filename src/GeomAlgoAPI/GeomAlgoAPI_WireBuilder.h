@@ -33,9 +33,12 @@ class GeomAlgoAPI_WireBuilder : public GeomAlgoAPI_MakeShapeCustom
  public:
    /// \brief Creates a wire from edges and wires.
    /// \param[in] theShapes list of shapes. Only edges and wires allowed.
+   /// \param[in] theForceOpenWire indicates the necessity to split wire
+   ///                             in the first vertex if it becomes closed.
    /// The edges are not to be consecutive.
    /// But they are to be all connected geometrically or topologically.
-   GEOMALGOAPI_EXPORT GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes);
+   GEOMALGOAPI_EXPORT GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes,
+                                              const bool theForceOpenWire = false);
 
    /// \brief Creates a wire from edges and wires.
    /// \param[in] theShapes list of shapes. Only edges and wires allowed.
