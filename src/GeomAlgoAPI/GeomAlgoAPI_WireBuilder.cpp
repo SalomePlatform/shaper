@@ -67,7 +67,7 @@ GeomAlgoAPI_WireBuilder::GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes,
 
   bool isSplitWire = false;
   gp_Pnt aSplitPoint;
-  if (theForceOpenWire) {
+  if (theForceOpenWire && aListOfEdges.Size() > 1) {
     // find a vertex to split the wire
     TopoDS_Vertex V1[2];
     TopExp::Vertices(TopoDS::Edge(aListOfEdges.First()), V1[0], V1[1]);
@@ -79,7 +79,7 @@ GeomAlgoAPI_WireBuilder::GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes,
     double Tol2[2] = { BRep_Tool::Tolerance(V2[0]), BRep_Tool::Tolerance(V2[1]) };
     for (int i = 0; i < 2 && !isSplitWire; ++i)
       for (int j = 0; j < 2 && !isSplitWire; ++j)
-        if (P1[i].Distance(P2[i]) < Max(Tol1[i], Tol2[j])) {
+        if (P1[i].Distance(P2[j]) < Max(Tol1[i], Tol2[j])) {
           aSplitPoint = P1[i];
           isSplitWire = true;
         }
