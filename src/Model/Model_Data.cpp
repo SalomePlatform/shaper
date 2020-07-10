@@ -113,7 +113,7 @@ std::wstring Model_Data::name()
   Handle(TDataStd_Name) aName;
   if (shapeLab().FindAttribute(TDataStd_Name::GetID(), aName)) {
 #ifdef DEBUG_NAMES
-    myObject->myName = TCollection_AsciiString(aName->Get()).ToCString();
+    myObject->myName = Locale::Convert::toWString(aName->Get().ToExtString());
 #endif
     return Locale::Convert::toWString(aName->Get().ToExtString());
   }

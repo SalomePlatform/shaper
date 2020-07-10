@@ -47,7 +47,7 @@ class ModelAPI_Object: public ModelAPI_Entity
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
  public:
 #ifdef DEBUG_NAMES
-  std::string myName; // name of this object
+  std::wstring myName; // name of this object
 #endif
   /// By default object is displayed in the object browser.
   MODELAPI_EXPORT virtual bool isInHistory();
