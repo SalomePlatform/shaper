@@ -1,7 +1,7 @@
 .. _create_compound_Vertices:
 .. |compoundVertices.icon|    image:: images/compound.png
 
-compound Vertices
+Compound Vertices
 =================
 
 Compound Vertices is a feature and can be edited after execution.

@@ -29,6 +29,14 @@
 #include <gp_Pnt.hxx>
 #include <Precision.hxx>
 
+static TopoDS_Shape* buildVertex(const gp_Pnt& thePoint)
+{
+  TopoDS_Vertex aVertex;
+  BRep_Builder aBuilder;
+  aBuilder.MakeVertex(aVertex, thePoint, Precision::Confusion());
+  return new TopoDS_Shape(aVertex);
+}
+
 GeomAPI_Vertex::GeomAPI_Vertex()
   : GeomAPI_Shape()
 {
@@ -41,12 +49,14 @@ GeomAPI_Vertex::GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Shape>& theShape)
   }
 }
 
+GeomAPI_Vertex::GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
+{
+  setImpl(buildVertex(thePoint->impl<gp_Pnt>()));
+}
+
 GeomAPI_Vertex::GeomAPI_Vertex(double theX, double theY, double theZ)
 {
-  TopoDS_Vertex aVertex;
-  BRep_Builder aBuilder;
-  aBuilder.MakeVertex(aVertex, gp_Pnt(theX, theY, theZ), Precision::Confusion());
-  setImpl(new TopoDS_Shape(aVertex));
+  setImpl(buildVertex(gp_Pnt(theX, theY, theZ)));
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Vertex::point()

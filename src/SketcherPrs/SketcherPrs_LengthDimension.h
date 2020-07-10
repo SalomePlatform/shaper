@@ -81,7 +81,7 @@ protected:
 private:
   static bool readyToDisplay(ModelAPI_Feature* theConstraint,
                              const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                             gp_Pnt& thePnt1, gp_Pnt& thePnt2);
+                             gp_Pnt2d& thePnt1, gp_Pnt2d& thePnt2);
 
   /// Set the direction for horizontal/vertical constraint
   void setDirection(ModelAPI_Feature* theConstraint,

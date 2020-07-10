@@ -219,3 +219,8 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
                                     aCalculatedValue[1]);
   }
 }
+
+void InitializationPlugin_EvalListener::initDataModel()
+{
+  myInterp->runString("salome_iapp.register_module_in_study(\"Shaper\")");
+}

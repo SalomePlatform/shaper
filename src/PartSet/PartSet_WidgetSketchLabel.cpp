@@ -39,7 +39,6 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_ResultConstruction.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -352,21 +351,22 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // 1. hide main planes if they have been displayed and display sketch preview plane
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
+  QString aSizeOfViewStr = mySizeOfView->text();
+  bool isSetSizeOfView = false;
+  double aSizeOfView = 0;
+  if (!aSizeOfViewStr.isEmpty()) {
+    aSizeOfView = aSizeOfViewStr.toDouble(&isSetSizeOfView);
+    if (isSetSizeOfView && aSizeOfView <= 0) {
+      isSetSizeOfView = false;
+    }
+  }
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-    bool isSetSizeOfView = false;
-    double aSizeOfView = 0;
-    QString aSizeOfViewStr = mySizeOfView->text();
-    if (!aSizeOfViewStr.isEmpty()) {
-      aSizeOfView = aSizeOfViewStr.toDouble(&isSetSizeOfView);
-      if (isSetSizeOfView && aSizeOfView <= 0) {
-        isSetSizeOfView = false;
-      }
-    }
     aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, isSetSizeOfView);
-    if (myViewVisible->isChecked())
-      aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    // Call of createSketchPlane is managed by events Loop
+    //if (myViewVisible->isChecked())
+    //  aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
   }
   // 2. if the planes were displayed, change the view projection
 
@@ -380,18 +380,13 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aRotate) {
     myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
   }
-  QString aSizeOfViewStr = mySizeOfView->text();
-  if (!aSizeOfViewStr.isEmpty()) {
-    bool isOk;
-    double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
-    if (isOk && aSizeOfView > 0) {
-      Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-      if (!aView3d.IsNull()) {
-        Bnd_Box aBndBox;
-        double aHalfSize = aSizeOfView/2.0;
-        aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
-        aView3d->FitAll(aBndBox, 0.01, false);
-      }
+  if (isSetSizeOfView && aSizeOfView > 0) {
+    Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+    if (!aView3d.IsNull()) {
+      Bnd_Box aBndBox;
+      double aHalfSize = aSizeOfView/2.0;
+      aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
+      aView3d->FitAll(aBndBox, 0.01, false);
     }
   }
   if (myOpenTransaction) {
@@ -512,19 +507,8 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 {
   bool isOwnerSet = false;
 
-  GeomShapePtr aShape = thePrs->shape();
+  const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
-
-  if (!aShape.get() || aShape->isNull()) {
-    if (thePrs->object() && (feature() != thePrs->object())) {
-      if (thePrs->object()->groupName() == ModelAPI_ResultConstruction::group()) {
-        ResultConstructionPtr aConstruction =
-          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(thePrs->object());
-        if (aConstruction.get())
-          aShape = aConstruction->shape();
-      }
-    }
-  }
 
   if (aShape.get() && !aShape->isNull()) {
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -532,41 +516,39 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
     isOwnerSet = aDir.get();
   }
   if (thePrs->object() && (feature() != thePrs->object())) {
-    if (thePrs->object()->groupName() != ModelAPI_ResultConstruction::group()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
-      DataPtr aData = feature()->data();
-      AttributeSelectionPtr aSelAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-      if (aSelAttr.get()) {
-        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
-        if (aRes.get()) {
-          GeomShapePtr aShapePtr;
-          if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
-            aShapePtr = ModelAPI_Tools::shape(aRes);
-          }
-          else { // selection happens in OB browser
-            aShapePtr = aShape;
-          }
-          if (aShapePtr.get() && aShapePtr->isFace()) {
-            const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
-            setSketchPlane(aTDShape);
-            aSelAttr->setValue(aRes, aShapePtr);
-            isOwnerSet = true;
-          }
+    FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+    DataPtr aData = feature()->data();
+    AttributeSelectionPtr aSelAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+    if (aSelAttr.get()) {
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
+      if (aRes.get()) {
+        GeomShapePtr aShapePtr;
+        if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
+          aShapePtr = ModelAPI_Tools::shape(aRes);
         }
-        else {
-          aSelAttr->setValue(aFeature, GeomShapePtr());
-          GeomShapePtr aSelShape = aSelAttr->value();
-          if (!aSelShape.get() && aSelAttr->contextFeature().get() &&
-            aSelAttr->contextFeature()->firstResult().get()) {
-            aSelShape = aSelAttr->contextFeature()->firstResult()->shape();
-          }
-          if (aSelShape.get() && aSelShape->isPlanar()) {
-            const TopoDS_Shape& aTDShape = aSelShape->impl<TopoDS_Shape>();
-            setSketchPlane(aTDShape);
-            isOwnerSet = true;
-          }
+        else { // selection happens in OB browser
+          aShapePtr = aShape;
+        }
+        if (aShapePtr.get() && aShapePtr->isFace()) {
+          const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
+          setSketchPlane(aTDShape);
+          aSelAttr->setValue(aRes, aShapePtr);
+          isOwnerSet = true;
+        }
+      }
+      else {
+        aSelAttr->setValue(aFeature, GeomShapePtr());
+        GeomShapePtr aSelShape = aSelAttr->value();
+        if (!aSelShape.get() && aSelAttr->contextFeature().get() &&
+          aSelAttr->contextFeature()->firstResult().get()) {
+          aSelShape = aSelAttr->contextFeature()->firstResult()->shape();
+        }
+        if (aSelShape.get() && aSelShape->isPlanar()) {
+          const TopoDS_Shape& aTDShape = aSelShape->impl<TopoDS_Shape>();
+          setSketchPlane(aTDShape);
+          isOwnerSet = true;
         }
       }
     }

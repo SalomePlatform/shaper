@@ -74,6 +74,8 @@
 #include <QMenu>
 #include <QToolBar>
 
+#include <ModelAPI_Session.h>
+
 #if OCC_VERSION_HEX < 0x070400
   #define SALOME_PATCH_FOR_CTRL_WHEEL
 #endif
@@ -205,6 +207,13 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
 #endif
     createMenu(aId, aEditMenu);
 
+  if (!myInspectionPanel) {
+    myInspectionPanel = myWorkshop->inspectionPanel();
+    connect(myInspectionPanel->toggleViewAction(), SIGNAL(toggled(bool)),
+      this, SLOT(onWhatIs(bool)));
+  }
+  hideInternalWindows();
+
   // Initialize viewer proxy if OCC viewer is already exist
   ViewManagerList aOCCViewManagers;
   application()->viewManagers(OCCViewer_Viewer::Type(), aOCCViewManagers);
@@ -224,6 +233,8 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
       }
     }
   }
+  SHAPERGUI_DataModel* aDataModel = dynamic_cast<SHAPERGUI_DataModel*>(dataModel());
+  aDataModel->initRootObject();
 }
 
 //******************************************************
@@ -265,11 +276,16 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 //******************************************************
 bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 {
-  bool isDone = LightApp_Module::activateModule(theStudy);
-  loadToolbarsConfig();
+  ModelAPI_Session::get()->moduleDocument(); // initialize a root document if not done yet
 
+  // this must be done in the initialization and in activation (on the second activation
+  // initialization in not called, so SComponent must be added anyway
   SHAPERGUI_DataModel* aDataModel = dynamic_cast<SHAPERGUI_DataModel*>(dataModel());
   aDataModel->initRootObject();
+
+
+  bool isDone = LightApp_Module::activateModule(theStudy);
+  loadToolbarsConfig();
 
   if (isDone) {
     setMenuShown(true);
@@ -284,11 +300,6 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       aObjDoc->toggleViewAction()->setVisible(true);
     }
 
-    if (!myInspectionPanel) {
-      myInspectionPanel = myWorkshop->inspectionPanel();
-      connect(myInspectionPanel->toggleViewAction(), SIGNAL(toggled(bool)),
-              this, SLOT(onWhatIs(bool)));
-    }
     myInspectionPanel->toggleViewAction()->setVisible(true);
 
     myWorkshop->facesPanel()->toggleViewAction()->setVisible(true);
@@ -387,15 +398,11 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 }
 
 //******************************************************
-bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
+void SHAPERGUI::hideInternalWindows()
 {
-  saveToolbarsConfig();
-
   myProxyViewer->activateViewer(false);
   setMenuShown(false);
   setToolShown(false);
-
-  myWorkshop->deactivateModule();
 
   QObject* aObj = myWorkshop->objectBrowser()->parent();
   QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
@@ -405,16 +412,29 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     aObjDoc->toggleViewAction()->setVisible(false);
   }
 
-  myIsInspectionVisible = myInspectionPanel->isVisible();
   myInspectionPanel->hide();
   myInspectionPanel->toggleViewAction()->setVisible(false);
 
-  myIsFacesPanelVisible = myWorkshop->facesPanel()->isVisible();
   myWorkshop->facesPanel()->hide();
   myWorkshop->facesPanel()->toggleViewAction()->setVisible(false);
 
   myWorkshop->propertyPanel()->hide();
   myWorkshop->propertyPanel()->toggleViewAction()->setVisible(false);
+
+  myWorkshop->hidePanel(myWorkshop->facesPanel());
+}
+
+
+//******************************************************
+bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
+{
+  saveToolbarsConfig();
+  myWorkshop->deactivateModule();
+
+  myIsInspectionVisible = myInspectionPanel->isVisible();
+  myIsFacesPanelVisible = myWorkshop->facesPanel()->isVisible();
+  hideInternalWindows();
+
 
   // the active operation should be stopped for the next activation.
   // There should not be active operation and visualized preview.
@@ -447,7 +467,6 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     mySelector = 0;
   }
 
-  myWorkshop->hidePanel(myWorkshop->facesPanel());
   //myWorkshop->contextMenuMgr()->disconnectViewer();
 
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
@@ -1226,6 +1245,6 @@ void SHAPERGUI::resetToolbars()
 
 void SHAPERGUI::publishToStudy()
 {
-  if (isActiveModule())
+  if (isActiveModule() && ModelAPI_Session::get()->hasModuleDocument())
     myWorkshop->module()->launchOperation("PublishToStudy", false);
 }

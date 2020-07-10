@@ -309,6 +309,17 @@
     </message>
   </context>
   <context>
+    <name>Point:edge:ConstructionPlugin_ValidatorNotFeature</name>
+    <message>
+      <source>Wrong attribute</source>
+      <translation>Wrong attribute.</translation>
+    </message>
+    <message>
+      <source>Feature should not be selected</source>
+      <translation>Feature should not be selected.</translation>
+    </message>
+  </context>
+  <context>
     <name>Point:edge_for_point_projection</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>

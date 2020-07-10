@@ -8,9 +8,13 @@ Welcome to SHAPER documentation!
 
 .. toctree::
    :titlesonly:
-   :maxdepth: 2
+   :maxdepth: 3
 
    General/Introduction.rst
    General/Tutorial.rst
 <insert here>
+
+.. toctree::
+   :hidden:
+
    General/TUI_scripts.rst

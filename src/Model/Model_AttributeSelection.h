@@ -123,7 +123,7 @@ public:
   /// Updates the arguments of selection if something was affected by creation
   /// or reorder of features upper in the history line (issue #1757)
   /// Returns theRemove true if this attribute must be removed (become deleted)
-  MODEL_EXPORT virtual void updateInHistory(bool& theRemove);
+  MODEL_EXPORT virtual void updateInHistory(bool& theRemove) override;
 
   // Implementation of the name generator method from the Selector package
   // This method returns the context name by the label of the sub-selected shape
@@ -210,7 +210,8 @@ protected:
   /// theResultOfFeature if not null defines exact referenced result of a feature
   void concealedFeature(
     const FeaturePtr theFeature, const FeaturePtr theStop, const bool theCheckCopy,
-    std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature);
+    std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature,
+    const bool theCheckWholeFeature = false);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

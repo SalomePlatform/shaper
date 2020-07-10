@@ -1150,6 +1150,8 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
 {
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
+  if (!aSession->hasModuleDocument() || !myObjs)
+    return FeaturePtr(); // this may be on close of the document
   FeaturePtr aFeature = aSession->createFeature(theID, this);
   if (!aFeature)
     return aFeature;

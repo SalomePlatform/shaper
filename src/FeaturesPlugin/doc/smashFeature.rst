@@ -1,6 +1,8 @@
 .. |bool_smash.icon|    image:: images/bool_smash.png
    :height: 16px
 
+.. _featureSmash:
+
 Smash
 =====
 
@@ -24,6 +26,8 @@ The following property panel will be opened:
 - **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be smashed into main objects.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
 - **See preview** button shows a result of the operation.
+
+Main objects and Tools objects should have the same dimension. There are supported 2-dimensional (face) or 3-dimensional (solid, compsolid) arguments.
 
 **TUI Command**:
 

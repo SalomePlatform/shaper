@@ -42,9 +42,22 @@
 #include <cmath>
 #include <regex>
 #include <sstream>
+#include <vector>
 
 const double tolerance = 1.e-7;
 #define PI 3.1415926535897932
+
+// To support old types of GCC (less than 4.9), check the regular expressions are working
+#if (__cplusplus >= 201103L || _MSVC_LANG >= 201103L)  && \
+    (__cplusplus >= 201402L || !defined(__GLIBCXX__)   || \
+        (defined(_GLIBCXX_REGEX_DFS_QUANTIFIERS_LIMIT) || \
+         defined(_GLIBCXX_REGEX_STATE_LIMIT)           || \
+         (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE > 4)))
+#define HAVE_WORKING_REGEX 1
+#else
+#define HAVE_WORKING_REGEX 0
+#endif
+
 
 /// \brief Calculate intersection point of two lines
 static std::shared_ptr<GeomAPI_Pnt2d> intersect(FeaturePtr theLine1, FeaturePtr theLine2);
@@ -308,6 +321,46 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle,
   return anAngle;
 }
 
+#if !HAVE_WORKING_REGEX
+static bool parseString(const std::string& theString, std::ostringstream* theResult)
+{
+  // skip leading spaces
+  size_t aLength = theString.size();
+  size_t aPos = theString.find_first_not_of(' ');
+  if (aPos == std::string::npos)
+    return false;
+  // first should be a value
+  if (theString[aPos] == '-' || theString[aPos] == '+')
+    theResult[1] << theString[aPos++];
+  while (aPos < aLength && theString[aPos] >= '0' && theString[aPos] <= '9')
+    theResult[1] << theString[aPos++];
+  if (theString[aPos] != ' ') {
+    if (theString[aPos] != '.')
+      return false;
+    theResult[1] << theString[aPos++];
+    while (aPos < aLength && theString[aPos] >= '0' && theString[aPos] <= '9')
+      theResult[1] << theString[aPos++];
+  }
+
+  // next, find the sign
+  aPos = theString.find_first_not_of(' ', aPos);
+  if (aPos == std::string::npos)
+    return false;
+  if (theString[aPos] == '-' || theString[aPos] == '+')
+    theResult[2] << theString[aPos++];
+
+  // a variable should be at the end
+  aPos = theString.find_first_not_of(' ', aPos);
+  if (aPos == std::string::npos)
+    return false;
+  if (theString[aPos] != '(' || theString.back() != ')')
+    return false;
+  theResult[3] << theString.substr(aPos + 1, aLength - aPos - 2);
+
+  return true;
+}
+#endif
+
 // Convert angle value or a text expression from one angle type to another
 static void convertAngle(AttributeDoublePtr theAngle,
                          const int thePrevType, const int theNewType)
@@ -324,15 +377,23 @@ static void convertAngle(AttributeDoublePtr theAngle,
     else {
       // process the parametric value
       std::string anAngleText = theAngle->text();
+#if HAVE_WORKING_REGEX
       std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)$",
                               std::regex_constants::ECMAScript);
+#endif
 
       double anAnglePrefix = 0.0;
       static const char aSignPrefix[2] = { '-', '+' };
       int aSignInd = 1;
 
+#if HAVE_WORKING_REGEX
       std::smatch aResult;
       if (std::regex_search(anAngleText, aResult, anAngleRegex)) {
+#else
+      // workaround to support old versions of GCC (less than 4.9)
+      std::ostringstream aResult[4];
+      if (parseString(anAngleText, aResult)) {
+#endif
         anAnglePrefix = std::atof(aResult[1].str().c_str());
         aSignInd = aResult[2].str()[0] == aSignPrefix[0] ? 0 : 1;
         anAngleText = aResult[3].str();

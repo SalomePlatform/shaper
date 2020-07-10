@@ -102,6 +102,32 @@ static GeomShapePtr toShape(const TopoDS_Shape& theShape)
   return aShape;
 }
 
+static void changeOrientationIfNeeded(const TopoDS_Shape& theShape, gp_Vec& theNormal)
+{
+  TopExp_Explorer anExp(theShape, TopAbs_VERTEX);
+  gp_Pnt aPnt0 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
+  gp_Dir aDir01;
+  for (anExp.Next(); anExp.More(); anExp.Next()) {
+    gp_Pnt aPnt1 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
+    if (aPnt1.SquareDistance(aPnt0) > Precision::SquareConfusion()) {
+      aDir01 = gp_Dir(gp_Vec(aPnt0, aPnt1));
+      break;
+    }
+  }
+  gp_Vec aNormal;
+  for (; anExp.More(); anExp.Next()) {
+    gp_Pnt aPnt2 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
+    if (aPnt2.SquareDistance(aPnt0) > Precision::SquareConfusion()) {
+      aNormal = gp_Vec(aDir01) ^ gp_Vec(aPnt0, aPnt2);
+      if (aNormal.SquareMagnitude() > Precision::SquareConfusion())
+        break;
+    }
+  }
+  if (anExp.More() && aNormal.XYZ().Dot(theNormal.XYZ()) < -Precision::Confusion()) {
+    // directions differ, reverse the normal
+    theNormal.Reverse();
+  }
+}
 
 //==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
@@ -147,6 +173,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
   if(aFindPlane.Found() == Standard_True)
   {
+    bool checkOrientation = false;
     Handle(Geom_Plane) aPlane;
     if(aBaseShape.ShapeType() == TopAbs_FACE || aBaseShape.ShapeType() == TopAbs_SHELL) {
       TopExp_Explorer anExp(aBaseShape, TopAbs_FACE);
@@ -163,9 +190,17 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
       aPlane = Handle(Geom_Plane)::DownCast(aSurface);
     } else {
       aPlane = aFindPlane.Plane();
+      checkOrientation = true;
     }
     gp_Pnt aLoc = aPlane->Axis().Location();
     aBaseVec = aPlane->Axis().Direction();
+
+    if (checkOrientation) {
+      // to stabilize the result of algorithm, if base shape is a wire, compare the orientation
+      // of calculated plane with the normal vector got iterating on vertices
+      changeOrientationIfNeeded(aBaseShape, aBaseVec);
+    }
+
     aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
     aBaseDir.reset(new GeomAPI_Dir(aBaseVec.X(), aBaseVec.Y(), aBaseVec.Z()));
   }

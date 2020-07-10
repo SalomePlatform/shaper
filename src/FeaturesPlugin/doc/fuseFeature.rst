@@ -1,6 +1,8 @@
 .. |bool_fuse.icon|    image:: images/bool_fuse.png
    :height: 16px
 
+.. _featureFuse:
+
 Fuse
 ====
 
@@ -35,8 +37,8 @@ Simple
 
    **Simple**
 
-- **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused to a single result.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will cut the fuse shape then will be joined to the result.
 - **Remove intersection edges** -  if enabled, edges that lie on the same surface will be removed.
 - **See preview** - button shows a result of the operation.
 

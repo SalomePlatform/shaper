@@ -46,6 +46,7 @@
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
 #include <Geom_TrimmedCurve.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -287,15 +288,13 @@ bool GeomAPI_Shape::isPlanar() const
   if(aShapeType == TopAbs_VERTEX) {
     return true;
   } else if(aShapeType == TopAbs_FACE) {
-    const Handle(Geom_Surface)& aSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
-    Handle(Standard_Type) aType = aSurface->DynamicType();
-
-    if(aType == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
+    Handle(Geom_Surface) aSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
+    if(aSurface->DynamicType() == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
       Handle(Geom_RectangularTrimmedSurface) aTrimSurface =
-        Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
-      aType = aTrimSurface->BasisSurface()->DynamicType();
+          Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
+      aSurface = aTrimSurface->BasisSurface();
     }
-    return (aType == STANDARD_TYPE(Geom_Plane)) == Standard_True;
+    return GeomLib_IsPlanarSurface(aSurface).IsPlanar();
   } else {
     BRepBuilderAPI_FindPlane aFindPlane(aShape);
     bool isFound = aFindPlane.Found() == Standard_True;

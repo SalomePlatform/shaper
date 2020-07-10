@@ -110,6 +110,10 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   Standard_Boolean bRunParallel = Standard_True;
   aBuilder->SetRunParallel(bRunParallel);
 
+  // Set fuzzy value to eliminate thin results
+  static const Standard_Real aFuzzy = 1.e-5;
+  aBuilder->SetFuzzyValue(aFuzzy);
+
   // Building and getting result.
   aBuilder->Perform();
   if (aBuilder->HasErrors())

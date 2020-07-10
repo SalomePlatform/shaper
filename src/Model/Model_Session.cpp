@@ -73,6 +73,7 @@ void Model_Session::closeAll()
 {
   Model_Application::getApplication()->deleteAllDocuments();
   static const Events_ID aDocChangeEvent = Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED);
+  myCurrentDoc = NULL;
   static std::shared_ptr<Events_Message> aMsg(new Events_Message(aDocChangeEvent));
   Events_Loop::loop()->send(aMsg);
   Events_Loop::loop()->flush(aDocChangeEvent);
@@ -251,6 +252,12 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
     anApp->createDocument(0); // 0 is a root ID
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(true);
+    if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id())) {
+      myCurrentDoc = moduleDocument();
+      static std::shared_ptr<Events_Message> aMsg(
+        new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
+      Events_Loop::loop()->send(aMsg);
+    }
   }
   return anApp->rootDocument();
 }
@@ -268,8 +275,9 @@ bool Model_Session::hasModuleDocument()
 
 std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 {
-  if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id()))
-    myCurrentDoc = moduleDocument();
+  if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id())) {
+    return moduleDocument();
+  }
   return myCurrentDoc;
 }
 

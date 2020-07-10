@@ -520,33 +520,40 @@ void ModuleBase_WidgetSelectionFilter::updatePreview(const TopoDS_Shape& theShap
 
 void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
 {
-  if (myPreview.IsNull())
-    return;
   Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
-
   if (theShow) {
     AIS_ListOfInteractive aList;
     aCtx->DisplayedObjects(AIS_KOI_Shape, -1, aList);
-    aList.Remove(myPreview);
+    if (!myPreview.IsNull())
+      aList.Remove(myPreview);
     if (aList.Size() > 0)
       myListIO = aList;
   }
   AIS_ListOfInteractive::const_iterator aIt;
   Handle(AIS_Shape) aShapeIO;
+  bool isModified = false;
   for (aIt = myListIO.cbegin(); aIt != myListIO.cend(); aIt++) {
     aShapeIO = Handle(AIS_Shape)::DownCast(*aIt);
     if (!aShapeIO.IsNull()) {
-      if (theShow)
-        aCtx->Erase(aShapeIO, false);
+      if (theShow) {
+        if (aCtx->IsDisplayed(aShapeIO)) {
+          aCtx->Erase(aShapeIO, false);
+          isModified = true;
+        }
+      }
       else {
-        aCtx->Display(aShapeIO, false);
-        std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
-        anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aShapeIO));
-        myWorkshop->applyCurrentSelectionModes(anAISObj);
+        if (!aCtx->IsDisplayed(aShapeIO)) {
+          aCtx->Display(aShapeIO, false);
+          std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
+          anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aShapeIO));
+          myWorkshop->applyCurrentSelectionModes(anAISObj);
+          isModified = true;
+        }
       }
     }
   }
-  myWorkshop->viewer()->update();
+  if (isModified)
+    myWorkshop->viewer()->update();
 }
 
 void ModuleBase_WidgetSelectionFilter::updateSelectBtn()
@@ -559,11 +566,16 @@ void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
 {
   int aNb = myValues.size();
   myNbLbl->setText(QString::number(aNb));
-  if (aNb == 0)
+  if (aNb == 0) {
     myFeature->setError(translate("Selection is empty").toStdString(), false, false);
+    myShowBtn->setChecked(false);
+    onShowOnly(false);
+    myShowBtn->setEnabled(false);
+  }
   else {
     myFeature->setError("", false, false);
     myFeature->data()->execState(ModelAPI_StateDone);
+    myShowBtn->setEnabled(true);
   }
 }
 

@@ -5,8 +5,8 @@
 
 .. _filtersPlugin:
 
-Filters Plugin
-==============
+Filters plug-in
+===============
 
 Filters plug-in provides a collection of filters used Filters property panel (for example see :ref:`groupPage` feature).
 

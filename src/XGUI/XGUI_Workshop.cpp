@@ -1954,7 +1954,7 @@ void XGUI_Workshop::deleteObjects()
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
-      notDelete = (!aFeature->isInHistory()) && aConstr->isInfinite();
+      notDelete = (!aFeature->isInHistory()) && (aConstr && aConstr->isInfinite());
       if (notDelete) {
         anObjects.removeAll(aObj);
         aIt--;
@@ -2785,7 +2785,7 @@ void XGUI_Workshop::setNormalView(bool toInvert)
   GeomShapePtr aPlanarFace;
   foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
     GeomShapePtr aShape = aPrs->shape();
-    if (aShape.get() && aShape->isPlanar()) {
+    if (aShape.get() && aShape->isFace() && aShape->isPlanar()) {
       aPlanarFace = aShape;
       break;
     }

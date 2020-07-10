@@ -2319,6 +2319,10 @@
       <translation>Error: Elliptic Arc is orthogonal to the sketch plane.</translation>
     </message>
     <message>
+      <source>Error: Periodic B-spline is orthogonal to the sketch plane.</source>
+      <translation>Error: Periodic B-spline is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
       <source>Error: Selected object is not supported for projection.</source>
       <translation>Error: Selected object is not supported for projection.</translation>
     </message>

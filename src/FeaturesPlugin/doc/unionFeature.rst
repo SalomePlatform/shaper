@@ -1,7 +1,11 @@
 .. |union_btn.icon|    image:: images/union_btn.png
 
+.. _featureUnion:
+
 Union
 =====
+
+**Caution**. This operation is obsolete. Fuse operation should be used instead.
 
 Union feature implements a Boolean operation for creation of a union of selected objects.
 

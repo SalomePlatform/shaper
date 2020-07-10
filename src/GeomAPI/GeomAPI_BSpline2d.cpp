@@ -48,8 +48,15 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
     return newBSpline2d(thePoles, theWeights, theDegree, thePeriodic);
 
   int anAuxPole = 0;
-  if (thePeriodic && thePoles.front()->distance(thePoles.back()) < Precision::Confusion())
-    anAuxPole = -1;
+  if (thePeriodic && thePoles.front()->distance(thePoles.back()) < Precision::Confusion()) {
+    // additionally check the number of poles is greater than needed for th periodic B-spline
+    int aNbPoles = 0;
+    std::list<int>::const_iterator it = theMults.begin();
+    for (++it; it != theMults.end(); ++it)
+      aNbPoles += *it;
+    if ((int)thePoles.size() > aNbPoles)
+      anAuxPole = -1;
+  }
 
   // collect arrays of poles, weights, knots and multiplicities
   TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size() + anAuxPole);

@@ -1,5 +1,7 @@
 .. |partition_btn.icon|    image:: images/partition_btn.png
 
+.. _featurePartition:
+
 Partition
 =========
 
@@ -17,7 +19,7 @@ The following property panel will be opened:
 
    **Partition operation**
 
-**Base Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be partitioned.
+**Base Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be partitioned. Constuction planes are allowed too if at least one non-construction entity is selected.
 
 **TUI Command**:
 

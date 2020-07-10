@@ -21,8 +21,8 @@ if __name__ == "__main__":
   aPartFeature = locals()["Part_1"]
   model.testNbResults(aPartFeature, 1)
   model.testNbSubResults(aPartFeature, [0])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [552])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [4086])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [17086])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [34172])
-  model.testResultsVolumes(aPartFeature, [55.645173358299])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [553])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [4089])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [17094])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [34188])
+  model.testResultsVolumes(aPartFeature, [55.64517345856])

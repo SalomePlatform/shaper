@@ -122,8 +122,10 @@ ADD_UNIT_TESTS(
   TestFilter_BelongsTo_Exclude.py
   TestFilter_OnPlane.py
   TestFilter_OnPlane_Exclude.py
+  TestFilter_OnPlane_Multi.py
   TestFilter_OnLine.py
   TestFilter_OnLine_Exclude.py
+  TestFilter_OnLine_Multi.py
   TestFilter_OnGeometry_Edge1.py
   TestFilter_OnGeometry_Edge2.py
   TestFilter_OnGeometry_Face1.py
@@ -140,6 +142,7 @@ ADD_UNIT_TESTS(
   TestFilter_OnPlaneSide_Plane.py
   TestFilter_OnPlaneSide_Exclude_Face.py
   TestFilter_OnPlaneSide_Exclude_Plane.py
+  TestFilter_OnPlaneSide_Multi.py
   TestFilter_OppositeToEdge.py
   TestFilter_OppositeToEdge_Exclude.py
   TestFilter_RelativeToSolid_In.py
@@ -154,6 +157,7 @@ ADD_UNIT_TESTS(
   TestFilter_RelativeToSolid_Exclude_NotOn.py
   TestFilter_RelativeToSolid_Exclude_InAndOn.py
   TestFilter_RelativeToSolid_Exclude_OutAndOn.py
+  TestFilter_RelativeToSolid_Multi.py
   TestFilter_ExternalFaces1.py
   TestFilter_ExternalFaces2.py
   TestFilter_ExternalFaces_Exclude1.py
@@ -198,13 +202,11 @@ ADD_UNIT_TESTS(
   TestFilter_TopoConnectedFaces_Prop_Exclude_Face1.py
   TestFilter_TopoConnectedFaces_Prop_Exclude_Face2.py
   TestFilter_TopoConnectedFaces_Prop_Exclude_Face3.py
+  TestFilter_TopoConnectedFaces_Multi.py
   Test2946.py
   Test2951.py
+  Test3241.py
   Test17924.py
   Test17962.py
-  TestFilter_OnLine_Multi.py
-  TestFilter_OnPlane_Multi.py
-  TestFilter_OnPlaneSide_Multi.py
-  TestFilter_RelativeToSolid_Multi.py
-  TestFilter_TopoConnectedFaces_Multi.py
+  Test19190.py
 )

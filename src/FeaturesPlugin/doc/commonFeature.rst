@@ -72,9 +72,11 @@ Advanced
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be cut from
   other objects (to avoid self-intersection) and added to the result.
-- **Tools** contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound  will be ignored.
+- **Tools** contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected with tool objects.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
 - **See preview** button shows a result of the operation.
+
+Any kind of shape is supported as an object or a tool of Common. Moreover, constructions planes can be selected as tools.
 
 **TUI Command**:
 

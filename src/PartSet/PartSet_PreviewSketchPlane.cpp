@@ -104,6 +104,21 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
     myShape = GeomAlgoAPI_FaceBuilder::squareFace(
       myViewCentralPoint.get() ? myViewCentralPoint : anOrigin->pnt(), aNormal->dir(), aFaceSize);
   }
+  else if (myIsUseSizeOfView && (mySizeOfView > 0)) {
+    std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(myShape));
+    std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
+    if (aPlane.get()) {
+      double anA, aB, aC, aD;
+      aPlane->coefficients(anA, aB, aC, aD);
+      std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+      std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+      std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+      aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+      std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+      myShape = GeomAlgoAPI_FaceBuilder::squareFace(
+        myViewCentralPoint.get() ? myViewCentralPoint : anOrigPnt, aNormDir, mySizeOfView);
+    }
+  }
   myPlane = createPreviewPlane();
 
   aDisp->displayAIS(myPlane, false/*load object in selection*/, 1/*shaded*/, false);

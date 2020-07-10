@@ -1,6 +1,8 @@
 .. |bool_split.icon|    image:: images/bool_split.png
    :height: 16px
 
+.. _featureSplit:
+
 Split
 =====
 
@@ -19,7 +21,7 @@ The following property panel will be opened:
    **Split operation**
 
 - **Main Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be cut and splitted by tool objects.
-- **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut and split the main objects.
+- **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut and split the main objects. Construction planes may be selected too.
 - **See preview** button shows a result of the operation.
 
 **TUI Command**:

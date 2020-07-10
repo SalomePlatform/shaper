@@ -178,7 +178,9 @@ GeomTrsfPtr FeaturesPlugin_Translation::translationByTwoPoints()
   }
 
   GeomTrsfPtr aTrsf(new GeomAPI_Trsf);
-  aTrsf->setTranslation(aFirstPoint, aSecondPoint);
+  if (aFirstPoint && aSecondPoint) {
+    aTrsf->setTranslation(aFirstPoint, aSecondPoint);
+  }
   return aTrsf;
 }
 

@@ -65,6 +65,7 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <GeomAPI_BSpline.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Ellipse.h>
@@ -242,7 +243,13 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
         SketchPlugin_Tools::findCoincidences(*anIt, SketchPlugin_Constraint::ENTITY_A(),
                                              aCoinc, true);
 
-      isValid = aCoinc.find(aOtherFea) != aCoinc.end();
+      std::set<FeaturePtr>::iterator aFoundCoinc = aCoinc.find(aOtherFea);
+      if (aFoundCoinc != aCoinc.end()) {
+        // do not take into account internal constraints
+        AttributeReferencePtr aParent =
+            (*aFoundCoinc)->reference(SketchPlugin_SketchEntity::PARENT_ID());
+        isValid = !aParent || !aParent->isInitialized() || aParent->value() != aRefFea;
+      }
     }
   }
 
@@ -1264,6 +1271,31 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
       theError.arg(anEdge->isClosed() ? "Error: Ellipse is orthogonal to the sketch plane."
                                       : "Error: Elliptic Arc is orthogonal to the sketch plane.");
   }
+  else if (anEdge->isBSpline()) {
+    // check B-spline is periodic and planar
+    std::shared_ptr<GeomAPI_Curve> aCurve(new GeomAPI_Curve(anEdge));
+    std::shared_ptr<GeomAPI_BSpline> aBSpline(new GeomAPI_BSpline(aCurve));
+    if (aBSpline->isPeriodic()) {
+      GeomPlanePtr aBSplinePlane = GeomAlgoAPI_ShapeTools::findPlane(ListOfShape(1, anEdge));
+      if (aBSplinePlane) {
+        std::shared_ptr<GeomAPI_Dir> aBSplineNormal = aBSplinePlane->direction();
+        double aDot = fabs(aNormal->dot(aBSplineNormal));
+        aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
+        if (!aValid) {
+          // B-spline's plane is orthogonal to the sketch plane,
+          // thus, need to check whether B-spline is planar.
+          std::list<GeomPointPtr> aPoles = aBSpline->poles();
+          for (std::list<GeomPointPtr>::iterator it = aPoles.begin();
+            it != aPoles.end() && !aValid; ++it) {
+            if (aBSplinePlane->distance(*it) > tolerance)
+              aValid = true; // non-planar B-spline curve
+          }
+          if (!aValid)
+            theError = "Error: Periodic B-spline is orthogonal to the sketch plane.";
+        }
+      }
+    }
+  }
 
   return aValid;
 }
@@ -1803,8 +1835,20 @@ bool SketchPlugin_ReplicationReferenceValidator::isValid(
   if (!aCopyAttr || !aCopyAttr->value())
     return true; // feature is not a copy, thus valid
 
-  // check the copy feature is already referred by the "Multi" feature
   FeaturePtr aMultiFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  // Collect original entities
+  std::set<FeaturePtr> anOriginalFeatures;
+  if (theArguments.size() > 1) {
+    AttributeRefListPtr anOrigList = aMultiFeature->reflist(theArguments.back());
+    for (int i = 0; i < anOrigList->size(); ++i)
+    {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anOrigList->object(i));
+      if (aFeature == anAttrOwnerFeature)
+        return true;
+    }
+  }
+
+  // check the copy feature is already referred by the "Multi" feature
   AttributeRefListPtr aRefList = aMultiFeature->reflist(theArguments.front());
   for (int i = 0; i < aRefList->size(); ++i)
   {

@@ -2028,6 +2028,8 @@ FeaturePtr Model_Objects::lastFeature()
 
 bool Model_Objects::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
 {
+  if (theLater->getKind() == "InternalSelectionInPartFeature")
+    return true;
   std::shared_ptr<Model_Data> aLaterD = std::static_pointer_cast<Model_Data>(theLater->data());
   std::shared_ptr<Model_Data> aCurrentD = std::static_pointer_cast<Model_Data>(theCurrent->data());
   if (aLaterD.get() && aLaterD->isValid() && aCurrentD.get() && aCurrentD->isValid()) {

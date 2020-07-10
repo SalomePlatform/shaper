@@ -468,19 +468,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       }
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
-      if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSPFeature =
-                  std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSPFeature.get() &&
-          (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
-           aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
-          DataPtr aData = aSPFeature->data();
-          AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr =
-            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
-          aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
-        }
-      }
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
       bool aPrevLaunchingState = myIsEditLaunching;
@@ -2286,17 +2273,18 @@ std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
   if (aOCListener->isConflictingObject(theObject)) {
     return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
-  if (aOCListener->isFullyConstrained()) {
-    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
-  }
   if (isDistanceKind(aKind)) {
     return Config_PropManager::color("Visualization", "sketch_dimension_color");
+  }
+  if (isExternal(theFeature))
+    return Config_PropManager::color("Visualization", "sketch_external_color");
+
+  if (aOCListener->isFullyConstrained()) {
+    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
   }
   if (aKind == SketchPlugin_ConstraintCoincidence::ID())
     return std::vector<int>(3, 0);
 
-  if (isExternal(theFeature))
-    return Config_PropManager::color("Visualization", "sketch_external_color");
   if (isConstruction)
     return Config_PropManager::color("Visualization", "sketch_auxiliary_color");
 

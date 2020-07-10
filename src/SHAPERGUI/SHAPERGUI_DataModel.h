@@ -70,7 +70,7 @@ class SHAPERGUI_EXPORT SHAPERGUI_DataModel : public LightApp_DataModel
   /// Creates a module root object if it has not been created yet
   /// and append it to the active study. It is necessary for correct persistent
   /// of the model.
-  void initRootObject();
+  virtual void initRootObject() override;
 
   /// Update data object
   /// \param theObj an data object

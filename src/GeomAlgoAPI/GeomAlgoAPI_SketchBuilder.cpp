@@ -202,7 +202,7 @@ static void sortAreas(TopTools_ListOfShape& theAreas,
 
 void GeomAlgoAPI_SketchBuilder::build(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-    const std::shared_ptr<GeomAPI_Dir>& /*theDirX*/,
+    const std::shared_ptr<GeomAPI_Dir>& theDirX,
     const std::shared_ptr<GeomAPI_Dir>& theNorm,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges)
 {
@@ -213,7 +213,8 @@ void GeomAlgoAPI_SketchBuilder::build(
 
   BRep_Builder aBuilder;
   // Planar face, where the sketch was built
-  Handle(Geom_Surface) aPlane(new Geom_Plane(theOrigin->impl<gp_Pnt>(), theNorm->impl<gp_Dir>()));
+  gp_Ax3 aPlnAxes(theOrigin->impl<gp_Pnt>(), theNorm->impl<gp_Dir>(), theDirX->impl<gp_Dir>());
+  Handle(Geom_Surface) aPlane(new Geom_Plane(aPlnAxes));
   TopoDS_Face aPlnFace;
   aBuilder.MakeFace(aPlnFace, aPlane, Precision::Confusion());
 
@@ -221,8 +222,8 @@ void GeomAlgoAPI_SketchBuilder::build(
   BOPAlgo_Builder* aBB = new BOPAlgo_Builder;
   aBB->AddArgument(aPlnFace);
   // Set fuzzy value for BOP, because PlaneGCS can solve the set of constraints with
-  // the precision up to 1e-5 if the sketch contains arcs.
-  static const double THE_FUZZY_TOL = 1.e-5;
+  // the precision up to 5.e-5 if the sketch contains arcs.
+  static const double THE_FUZZY_TOL = 5.e-5;
   aBB->SetFuzzyValue(THE_FUZZY_TOL);
 
   setImpl(aBB);

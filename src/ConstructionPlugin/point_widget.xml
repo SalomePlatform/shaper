@@ -16,6 +16,7 @@
                       icon="icons/Construction/edge.png"
                       shape_types="edge">
         <validator id="GeomValidators_Finite"/>
+        <validator id="ConstructionPlugin_ValidatorNotFeature"/>
       </shape_selector>
       <radiobox id="offset_type">
         <radio id="offset_type_by_distance"
