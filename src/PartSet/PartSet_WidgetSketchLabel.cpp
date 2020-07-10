@@ -364,9 +364,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aModule) {
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, isSetSizeOfView);
-    // Call of createSketchPlane is managed by events Loop
-    //if (myViewVisible->isChecked())
-    //  aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    if (myViewVisible->isChecked())
+      aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
   }
   // 2. if the planes were displayed, change the view projection
 
