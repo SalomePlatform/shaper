@@ -23,6 +23,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
@@ -71,7 +73,7 @@ bool ParametersPlugin_VariableValidator::isUnique(const AttributePtr& theAttribu
   for (int anIndex = 0, aSize = aDocument->size(ModelAPI_ResultParameter::group());
        anIndex < aSize; ++anIndex) {
     ObjectPtr aParamObj = aDocument->object(ModelAPI_ResultParameter::group(), anIndex);
-    if (aParamObj->data()->name() != theString)
+    if (Locale::Convert::toString(aParamObj->data()->name()) != theString)
       continue;
     ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
     if (!aParam.get())

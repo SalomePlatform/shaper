@@ -55,6 +55,7 @@ SET(PROJECT_LIBRARIES
   GeomAPI
   GeomDataAPI
   GeomAlgoAPI
+  Locale
   ModelAPI
   ModelGeomAlgo
 )
@@ -83,6 +84,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
   ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+  ${PROJECT_SOURCE_DIR}/src/Locale
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelGeomAlgo
   ${PROJECT_SOURCE_DIR}/src/PartSetPlugin

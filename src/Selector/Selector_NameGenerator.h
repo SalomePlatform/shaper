@@ -37,11 +37,11 @@ public:
   Selector_NameGenerator() {};
 
   /// This method returns the context name by the label of the sub-selected shape
-  virtual std::string contextName(const TDF_Label theSelectionLab) = 0;
+  virtual std::wstring contextName(const TDF_Label theSelectionLab) = 0;
 
   /// This method restores by the context and value name the context label and
   /// sub-label where the value is. Returns true if it is valid.
-  virtual bool restoreContext(std::string theName,
+  virtual bool restoreContext(std::wstring theName,
     TDF_Label& theContext, TDF_Label& theValue) = 0;
 
   /// Returns true if the first result is older than the second one in the tree of features

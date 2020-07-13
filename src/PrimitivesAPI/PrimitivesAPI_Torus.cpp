@@ -101,8 +101,8 @@ TorusPtr addTorus(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Double& theRadius,
                   const ModelHighAPI_Double& theRingRadius)
 {
-  ModelHighAPI_Selection aBasePoint("VERTEX", "PartSet/Origin");
-  ModelHighAPI_Selection anAxis("EDGE", "PartSet/OZ");
+  ModelHighAPI_Selection aBasePoint("VERTEX", L"PartSet/Origin");
+  ModelHighAPI_Selection anAxis("EDGE", L"PartSet/OZ");
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Torus::ID());
   return TorusPtr(new PrimitivesAPI_Torus(aFeature, aBasePoint, anAxis, theRadius, theRingRadius));
 }

@@ -50,7 +50,7 @@ static bool verifyExport(const std::list<FeaturePtr>& theFeatures,
                          std::list<FeaturePtr>& theExportedParts,
                          std::list<FeaturePtr>& theReferredParts);
 // Collect names of features as a single string
-static std::string namesOfFeatures(const std::list<FeaturePtr>& theFeatures);
+static std::wstring namesOfFeatures(const std::list<FeaturePtr>& theFeatures);
 
 
 ExchangePlugin_ExportPart::ExchangePlugin_ExportPart()
@@ -101,7 +101,7 @@ void ExchangePlugin_ExportPart::execute()
   std::list<FeaturePtr> anExternalLinks, anExportedParts, aReferredParts;
   if (!verifyExport(aFeaturesToExport, anExternalLinks, anExportedParts, aReferredParts)) {
     if (!anExternalLinks.empty()) {
-      std::string aListOfFeatures = namesOfFeatures(anExternalLinks);
+      std::wstring aListOfFeatures = namesOfFeatures(anExternalLinks);
 
       std::string aMessage = "The selected results were created using external references "
                              "outside of this Part from features %1. "
@@ -110,7 +110,7 @@ void ExchangePlugin_ExportPart::execute()
       Events_InfoMessage(getKind(), aMessage).arg(aListOfFeatures).send();
     }
     if (!aReferredParts.empty()) {
-      std::string aListOfParts = namesOfFeatures(aReferredParts);
+      std::wstring aListOfParts = namesOfFeatures(aReferredParts);
 
       std::string aMessage = "The selected results were created using references "
                              "to the results of Parts: %1. Please, remove these references "
@@ -118,7 +118,7 @@ void ExchangePlugin_ExportPart::execute()
       Events_InfoMessage(getKind(), aMessage).arg(aListOfParts).send();
     }
     if (!anExportedParts.empty()) {
-      std::string aListOfParts = namesOfFeatures(anExportedParts);
+      std::wstring aListOfParts = namesOfFeatures(anExportedParts);
 
       std::string aMessage = "The export of Part's result is forbidden (%1).";
       Events_InfoMessage(getKind(), aMessage).arg(aListOfParts).send();
@@ -273,9 +273,9 @@ bool verifyExport(const std::list<FeaturePtr>& theFeatures,
   return theExternalReferences.empty() && theExportedParts.empty() && theReferredParts.empty();
 }
 
-std::string namesOfFeatures(const std::list<FeaturePtr>& theFeatures)
+std::wstring namesOfFeatures(const std::list<FeaturePtr>& theFeatures)
 {
-  std::ostringstream aListOfFeatures;
+  std::wostringstream aListOfFeatures;
   for (std::list<FeaturePtr>::const_iterator anIt = theFeatures.begin();
        anIt != theFeatures.end(); ++anIt) {
     if (anIt != theFeatures.begin())

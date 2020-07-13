@@ -22,7 +22,10 @@ INCLUDE(UnitTest)
 INCLUDE(UseQtExt)
 
 # additional include directories
-INCLUDE_DIRECTORIES(${QT_INCLUDES})
+INCLUDE_DIRECTORIES(
+    ../Locale
+    ${QT_INCLUDES}
+)
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
@@ -68,6 +71,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
 SET(PROJECT_LIBRARIES
     Events
     Config
+    Locale
     ModelAPI
     ModuleBase
     ${QT_LIBRARIES}

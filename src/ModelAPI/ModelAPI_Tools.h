@@ -140,7 +140,7 @@ MODELAPI_EXPORT void allResults(const std::shared_ptr<ModelAPI_Feature>& theFeat
  \param theNotActivatedNames out string which contains not activated names
  \return a boolean value
  */
-MODELAPI_EXPORT bool allDocumentsActivated(std::string& theNotActivatedNames);
+MODELAPI_EXPORT bool allDocumentsActivated(std::wstring& theNotActivatedNames);
 
 /*! Removes features from the document
 * \param theFeatures a list of features to be removed
@@ -199,7 +199,7 @@ MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>
  *  Return also whether the name is get from the concealing result of parent object
  *  (means that concealing result has user-defined name).
  */
-MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
+MODELAPI_EXPORT std::pair<std::wstring, bool> getDefaultName(
   const std::shared_ptr<ModelAPI_Result>& theResult, const bool theInherited = true);
 
 /*! Collect all parents for the given feature, including the Part
@@ -299,7 +299,6 @@ MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result> the
 MODELAPI_EXPORT std::list<std::shared_ptr<ModelAPI_Feature> > referencedFeatures(
   std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
   const bool theSortResults);
-
 }
 
 #endif

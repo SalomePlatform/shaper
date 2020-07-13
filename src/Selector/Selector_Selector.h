@@ -66,14 +66,14 @@ public:
   /// Restores the selected shape by the topological name string.
   /// Returns not empty label of the context.
   SELECTOR_EXPORT TDF_Label restoreByName(
-    std::string theName, const TopAbs_ShapeEnum theShapeType,
+    std::wstring theName, const TopAbs_ShapeEnum theShapeType,
     Selector_NameGenerator* theNameGenerator, const bool theGeometricalNaming = false);
 
   /// Returns the current sub-shape value (null if can not resolve)
   SELECTOR_EXPORT TopoDS_Shape value();
 
   /// Returns the naming name of the selection
-  SELECTOR_EXPORT std::string name(Selector_NameGenerator* theNameGenerator);
+  SELECTOR_EXPORT std::wstring name(Selector_NameGenerator* theNameGenerator);
 
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   SELECTOR_EXPORT void combineGeometrical(const TopoDS_Shape theContext);

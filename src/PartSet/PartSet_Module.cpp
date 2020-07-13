@@ -233,6 +233,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
                                    "Hidden faces transparency",
                                    Config_Prop::DblSpin,
                                    "0.8");
+
   std::ostringstream aStream;
   aStream << SketcherPrs_Tools::getDefaultArrowSize();
   Config_PropManager::registerProp("Visualization", "dimension_arrow_size",
@@ -254,6 +255,12 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "feature_objectbrowser_color",
     "Feature items in Object Browser",
     Config_Prop::Color, FEATURE_ITEM_COLOR);
+
+  Config_PropManager::registerProp("Visualization", "zoom_trihedron_arrows",
+    "Keep trihedron arrows view size constant", Config_Prop::Boolean, "false");
+
+  Config_PropManager::registerProp("Visualization", "axis_arrow_size",
+    "Trihedron arrows constant size", Config_Prop::IntSpin, "10");
 
   Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
     "Add parameter in parameters manager dialog",
@@ -1146,13 +1153,13 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     return;
 
   bool isModified = false;
+  double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
   if (aCurrentOperation &&
     (PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
      sketchMgr()->isNestedSketchOperation(aCurrentOperation) ||
      (aCurrentOperation->id() == "Measurement")))
   {
-    double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
@@ -1171,10 +1178,24 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
         isModified = true;
       }
     }
-    if (isModified)
-      aDisplayer->updateViewer();
   }
 
+  // Manage trihedron arrows
+  if (Config_PropManager::boolean("Visualization", "zoom_trihedron_arrows")) {
+    Handle(AIS_Trihedron) aTrihedron = aViewer->trihedron();
+    if (!aTrihedron.IsNull()) {
+      double aAxLen =
+        aView->Convert(Config_PropManager::integer("Visualization", "axis_arrow_size"));
+      Handle(Prs3d_DatumAspect) aDatumAspect = aTrihedron->Attributes()->DatumAspect();
+      double aAxisLen = aDatumAspect->AxisLength(Prs3d_DP_XAxis);
+      aDatumAspect->SetAttribute(Prs3d_DP_ShadingConeLengthPercent, aAxLen / aAxisLen);
+      aTrihedron->Attributes()->SetDatumAspect(aDatumAspect);
+      aContext->Redisplay(aTrihedron, false);
+      isModified = true;
+    }
+  }
+  if (isModified)
+    aDisplayer->updateViewer();
 }
 
 //******************************************************
@@ -1825,4 +1846,31 @@ void PartSet_Module::disableCustomMode(ModuleBase_CustomizeFlag theMode) {
 //******************************************************
 void PartSet_Module::enableCustomModes() {
   myCustomPrs->enableCustomModes();
+}
+
+//******************************************************
+void PartSet_Module::onConflictingConstraints()
+{
+  const std::set<ObjectPtr>& aConstraints = myOverconstraintListener->conflictingObjects();
+  QObjectPtrList aObjectsList;
+  std::set<ObjectPtr>::const_iterator aIt;
+  for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); aIt++) {
+    if (mySketchReentrantMgr->isLastAutoConstraint(*aIt))
+      aObjectsList.append(*aIt);
+  }
+  if (aObjectsList.size() > 0) {
+    XGUI_Workshop* aWorkshop = getWorkshop();
+    QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
+    XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+
+    ModuleBase_Operation* anOp = anOpMgr->currentOperation();
+    if (sketchMgr()->isNestedSketchOperation(anOp))
+      anOp->abort();
+
+    anOpMgr->startOperation(anOpAction);
+    aWorkshop->deleteFeatures(aObjectsList);
+    anOpMgr->commitOperation();
+    ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
+  }
 }

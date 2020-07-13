@@ -79,26 +79,26 @@ bool Selector_Container::restore()
   return true;
 }
 
-TDF_Label Selector_Container::restoreByName(std::string theName,
+TDF_Label Selector_Container::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
   myShapeType = theShapeType;
   TDF_Label aContext;
-  for(size_t aStart = 0; aStart != std::string::npos; aStart = theName.find('[', aStart + 1)) {
-    size_t anEndPos = theName.find(']', aStart + 1);
-    if (anEndPos != std::string::npos) {
+  for(size_t aStart = 0; aStart != std::wstring::npos; aStart = theName.find('[', aStart + 1)) {
+    size_t anEndPos = theName.find(L']', aStart + 1);
+    if (anEndPos != std::wstring::npos) {
       // there could be sub-intersections, so, [[...]] case; searching for other open-bracket
-      size_t aNextStart = theName.find('[', aStart + 1);
-      while(aNextStart != std::string::npos && aNextStart < anEndPos) {
-        anEndPos = theName.find(']', anEndPos + 1);
-        if (anEndPos == std::string::npos) {
+      size_t aNextStart = theName.find(L'[', aStart + 1);
+      while(aNextStart != std::wstring::npos && aNextStart < anEndPos) {
+        anEndPos = theName.find(L']', anEndPos + 1);
+        if (anEndPos == std::wstring::npos) {
           return TDF_Label(); // invalid parentheses
         }
-        aNextStart = theName.find('[', aNextStart + 1);
+        aNextStart = theName.find(L'[', aNextStart + 1);
       }
-      if (anEndPos == std::string::npos)
+      if (anEndPos == std::wstring::npos)
         return TDF_Label(); // invalid parentheses
-      std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+      std::wstring aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
       TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
       switch (myShapeType) {
       case TopAbs_COMPSOLID: aSubShapeType = TopAbs_SOLID; break;
@@ -178,9 +178,9 @@ bool Selector_Container::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_Container::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_Container::name(Selector_NameGenerator* theNameGenerator)
 {
-  std::string aResult;
+  std::wstring aResult;
   // add names of sub-components one by one in "[]"
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
   for(; aSubSel != list().cend(); aSubSel++) {

@@ -68,7 +68,7 @@ SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theF
 
 //==================================================================================================
 SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                   const std::string& theExternalName)
+                                   const std::wstring& theExternalName)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -110,7 +110,7 @@ void SketchAPI_Circle::setByExternal(const ModelHighAPI_Selection & theExternal)
 }
 
 //==================================================================================================
-void SketchAPI_Circle::setByExternalName(const std::string & theExternalName)
+void SketchAPI_Circle::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
 

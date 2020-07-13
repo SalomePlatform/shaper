@@ -578,9 +578,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
           // Add selection names
           AttributeSelectionPtr aAttr = aSelList->value(k - 1);
           if (aItem) {
-            aItem->setText(aAttr->namingName().c_str());
+            aItem->setText(QString::fromStdWString(aAttr->namingName()));
           } else {
-            aItem = new QTableWidgetItem(aAttr->namingName().c_str());
+            aItem = new QTableWidgetItem(QString::fromStdWString(aAttr->namingName()));
             aTable->setItem(k, j, aItem);
           }
         } else if (j > 0) {
@@ -769,8 +769,8 @@ void CollectionPlugin_WidgetField::onAddStep()
           aTable->setItem(j, i, aItem);
         }
         AttributeSelectionPtr aAttr = aSelList->value(j - 1);
-        aItem->setText(aAttr->namingName().c_str());
-        aItem->setToolTip(aAttr->namingName().c_str());
+        aItem->setText(QString::fromStdWString(aAttr->namingName()));
+        aItem->setToolTip(QString::fromStdWString(aAttr->namingName()));
       }
     } else {
       QString aDefVal = aTable->item(0, i)->text();
@@ -885,8 +885,8 @@ bool CollectionPlugin_WidgetField::
               aTable->setItem(j, i, aItem);
             }
             AttributeSelectionPtr aAttr = aSelList->value(j - 1);
-            aItem->setText(aAttr->namingName().c_str());
-            aItem->setToolTip(aAttr->namingName().c_str());
+            aItem->setText(QString::fromStdWString(aAttr->namingName()));
+            aItem->setToolTip(QString::fromStdWString(aAttr->namingName()));
           }
         } else {
           QString aDefVal = aTable->item(0, i)->text();
@@ -904,8 +904,8 @@ bool CollectionPlugin_WidgetField::
       // Update only selection name
       for(int j = 1; j < aNewRows - 1; j++) {
         AttributeSelectionPtr aAttr = aSelList->value(j);
-        aTable->item(j, 0)->setText(aAttr->namingName().c_str());
-        aTable->item(j, 0)->setToolTip(aAttr->namingName().c_str());
+        aTable->item(j, 0)->setText(QString::fromStdWString(aAttr->namingName()));
+        aTable->item(j, 0)->setToolTip(QString::fromStdWString(aAttr->namingName()));
       }
     }
   }

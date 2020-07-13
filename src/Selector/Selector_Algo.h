@@ -84,14 +84,14 @@ public:
 
   /// Restores the selected shape by the topological name string.
   /// Returns not empty label of the context.
-  SELECTOR_EXPORT virtual TDF_Label restoreByName(std::string theName,
+  SELECTOR_EXPORT virtual TDF_Label restoreByName(std::wstring theName,
     const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator) = 0;
 
   /// Updates the current shape by the stored topological name
   SELECTOR_EXPORT virtual bool solve(const TopoDS_Shape& theContext) = 0;
 
   /// Returns the naming name of the selection
-  SELECTOR_EXPORT virtual std::string name(Selector_NameGenerator* theNameGenerator) = 0;
+  SELECTOR_EXPORT virtual std::wstring name(Selector_NameGenerator* theNameGenerator) = 0;
   /// Returns the current sub-shape value (null if can not resolve)
   SELECTOR_EXPORT TopoDS_Shape value();
   /// Restores sub-algorithm of a given type by the storage-label
@@ -99,7 +99,7 @@ public:
   /// Restores the selected sub-algorithm by the naming name.
   /// Returns not empty label of the context.
   SELECTOR_EXPORT static Selector_Algo* restoreByName(
-    TDF_Label theLab, TDF_Label theBaseDocLab, std::string theName,
+    TDF_Label theLab, TDF_Label theBaseDocLab, std::wstring theName,
     const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
     Selector_NameGenerator* theNameGenerator, TDF_Label& theContextLab);
 
@@ -151,27 +151,28 @@ protected:
     return kSHAPE_TYPE;
   }
   /// old string identifier of the weak name in modification or intersection types of algorithm
-  static const std::string& oldWeakNameID()
+  static const std::wstring& oldWeakNameID()
   {
-    static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+    static const std::wstring kWEAK_NAME_IDENTIFIER = L"weak_name_";
     return kWEAK_NAME_IDENTIFIER;
   }
   /// old string identifier of the pure weak name
-  static const std::string& oldPureWeakNameID()
+  static const std::wstring& oldPureWeakNameID()
   {
-    static const std::string kPURE_WEAK_NAME_IDENTIFIER = "_weak_name_";
+    static const std::wstring kPURE_WEAK_NAME_IDENTIFIER = L"_weak_name_";
     return kPURE_WEAK_NAME_IDENTIFIER;
   }
   /// string identifier of the weak name in modification or intersection types of algorithm
-  static const std::string& weakNameID()
+  static const std::wstring& weakNameID()
   {
-    static const std::string kWEAK_NAME_IDENTIFIER = std::string("new_") + oldWeakNameID();
+    static const std::wstring kWEAK_NAME_IDENTIFIER = std::wstring(L"new_") + oldWeakNameID();
     return kWEAK_NAME_IDENTIFIER;
   }
   /// string identifier of the pure weak name
-  static const std::string& pureWeakNameID()
+  static const std::wstring& pureWeakNameID()
   {
-    static const std::string kPURE_WEAK_NAME_IDENTIFIER = std::string("_new") + oldPureWeakNameID();
+    static const std::wstring kPURE_WEAK_NAME_IDENTIFIER =
+        std::wstring(L"_new") + oldPureWeakNameID();
     return kPURE_WEAK_NAME_IDENTIFIER;
   }
   /// Stores the type of an algorithm in the data tree (in myLab)

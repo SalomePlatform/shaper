@@ -37,8 +37,11 @@
 
 #include <SketcherPrs_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelGeomAlgo_Shape.h>
@@ -273,7 +276,8 @@ private:
       std::set<FeaturePtr> aCoincToRes =
           SketchPlugin_Tools::findCoincidentConstraints(theFeature->lastResult());
       aCoincidences.insert(aCoincToRes.begin(), aCoincToRes.end());
-    }    std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
+    }
+    std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
     for (; aCIt != aCoincidences.end(); ++aCIt)
     {
       if (theCoincidences.find(*aCIt) != theCoincidences.end())
@@ -544,7 +548,8 @@ void createAuxiliaryPointOnEllipse(const FeaturePtr& theEllipseFeature,
   aCoord->setValue(anElPoint->x(), anElPoint->y());
 
   aPointFeature->execute();
-  std::string aName = theEllipseFeature->name() + "_" + theEllipsePoint;
+  std::wstring aName = theEllipseFeature->name() + L"_" +
+    Locale::Convert::toWString(theEllipsePoint);
   aPointFeature->data()->setName(aName);
   aPointFeature->lastResult()->data()->setName(aName);
 
@@ -577,8 +582,8 @@ void createAuxiliaryAxisOfEllipse(const FeaturePtr& theEllipseFeature,
   aLineEnd->setValue(aEndPoint->x(), aEndPoint->y());
 
   aLineFeature->execute();
-  std::string aName = theEllipseFeature->name() + "_" +
-    (theStartPoint == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ? "major_axis" : "minor_axis");
+  std::wstring aName = theEllipseFeature->name() + L"_" +
+    (theStartPoint == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ? L"major_axis" : L"minor_axis");
   aLineFeature->data()->setName(aName);
   aLineFeature->lastResult()->data()->setName(aName);
 
@@ -645,13 +650,13 @@ void setDimensionColor(const AISObjectPtr& theDimPrs)
     theDimPrs->setColor(aColor[0], aColor[1], aColor[2]);
 }
 
-void replaceInName(ObjectPtr theObject, const std::string& theSource, const std::string& theDest)
+void replaceInName(ObjectPtr theObject, const std::wstring& theSource, const std::wstring& theDest)
 {
-  std::string aName = theObject->data()->name();
+  std::wstring aName = theObject->data()->name();
   size_t aPos = aName.find(theSource);
-  if (aPos != std::string::npos) {
-    std::string aNewName = aName.substr(0, aPos) + theDest
-                         + aName.substr(aPos + theSource.size());
+  if (aPos != std::wstring::npos) {
+    std::wstring aNewName = aName.substr(0, aPos) + theDest
+                          + aName.substr(aPos + theSource.size());
     theObject->data()->setName(aNewName);
   }
 }

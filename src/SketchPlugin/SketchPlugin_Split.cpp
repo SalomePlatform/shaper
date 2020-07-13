@@ -28,6 +28,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -1389,7 +1391,7 @@ std::string SketchPlugin_Split::getFeatureInfo(const std::shared_ptr<ModelAPI_Fe
   }
 
   if (theFeature->data()->isValid())
-    anInfo.append(theFeature->data()->name().c_str());
+    anInfo.append(Locale::Convert::toString(theFeature->data()->name()));
 
   if (isUseAttributesInfo) {
     std::string aPointsInfo = ModelGeomAlgo_Point2D::getPontAttributesInfo(theFeature,

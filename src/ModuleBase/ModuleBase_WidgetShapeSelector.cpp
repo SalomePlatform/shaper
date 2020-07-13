@@ -216,21 +216,21 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
   bool isNameUpdated = false;
   AttributeSelectionPtr aSelect = aData->selection(attributeID());
   if (aSelect) {
-    std::string aDefault = translate(getDefaultValue()).toStdString();
-    myTextLine->setText(QString::fromStdString(aSelect->namingName(aDefault)));
+    std::wstring aDefault = translate(getDefaultValue()).toStdWString();
+    myTextLine->setText(QString::fromStdWString(aSelect->namingName(aDefault)));
     isNameUpdated = true;
   }
   if (!isNameUpdated) {
     ObjectPtr anObject = ModuleBase_Tools::getObject(myFeature->attribute(attributeID()));
     if (anObject.get() != NULL) {
-      std::string aName = anObject->data()->name();
-      myTextLine->setText(QString::fromStdString(aName));
+      std::wstring aName = anObject->data()->name();
+      myTextLine->setText(QString::fromStdWString(aName));
     } else {
       AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
       if (aRefAttr && aRefAttr->attr().get() != NULL) {
         //myIsObject = aRefAttr->isObject();
-        std::string anAttrName = ModuleBase_Tools::generateName(aRefAttr->attr(), myWorkshop);
-        myTextLine->setText(QString::fromStdString(anAttrName));
+        std::wstring anAttrName = ModuleBase_Tools::generateName(aRefAttr->attr(), myWorkshop);
+        myTextLine->setText(QString::fromStdWString(anAttrName));
       }
       else {
         myTextLine->setText(translate(getDefaultValue()));

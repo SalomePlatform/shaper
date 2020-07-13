@@ -64,6 +64,11 @@ public:
     return (myConflictingObjects.find(theObject) != myConflictingObjects.end());
   }
 
+  const std::set<ObjectPtr>& conflictingObjects() const
+  {
+    return myConflictingObjects;
+  }
+
   bool isFullyConstrained() const { return myIsFullyConstrained; }
 
 protected:

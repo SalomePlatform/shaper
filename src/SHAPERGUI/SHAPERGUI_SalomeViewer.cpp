@@ -32,6 +32,7 @@
 
 #include <QMouseEvent>
 #include <QContextMenuEvent>
+#include <QTimer>
 
 #if OCC_VERSION_HEX < 0x070400
   #define SALOME_PATCH_FOR_CTRL_WHEEL
@@ -279,10 +280,18 @@ void SHAPERGUI_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
   myWindowScale.insert(aView->getViewPort()->getView(),
                        aView->getViewPort()->getView()->Camera()->Scale());
 
+  QTimer::singleShot(10, this, SLOT(onAfterViewCreated()));
+
   emit viewCreated(myView);
-
-
 }
+
+//**********************************************
+void SHAPERGUI_SalomeViewer::onAfterViewCreated()
+{
+  // Update trihedron and dimension arrows
+  emit onViewTransformed(OCCViewer_ViewWindow::ZOOMVIEW);
+}
+
 
 //**********************************************
 void SHAPERGUI_SalomeViewer::onActivated(SUIT_ViewManager* theMgr)

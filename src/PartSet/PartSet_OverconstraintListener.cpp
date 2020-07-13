@@ -35,6 +35,8 @@
 #include "SketchPlugin_SketchEntity.h"
 #include "SketchPlugin_MacroArcReentrantMessage.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_ConstraintHorizontal.h"
+#include "SketchPlugin_ConstraintVertical.h"
 
 #include "Events_Loop.h"
 
@@ -44,6 +46,7 @@
 #include <ModuleBase_Tools.h>
 
 #include <QString>
+#include <QTimer>
 
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
@@ -91,7 +94,6 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
     return;
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  std::string aFeatureName = aFeature->data()->name();
 
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
     theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
@@ -196,7 +198,7 @@ void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_M
     // This Line's message should not be processed, as the reentrant operation is not for Line
     // It is not enoght of kind, the name should be used, e.g. restarted Lines on auxiliary
     // cirlce sometimes causes previous line change, kind the same, but feature line is different
-    std::string aCurrentFeatureName;
+    std::wstring aCurrentFeatureName;
     ModuleBase_Operation* anOperation =
                 XGUI_Tools::workshop(myWorkshop)->operationMgr()->currentOperation();
     if (anOperation) {
@@ -239,16 +241,33 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
   // set error state for new objects and append them in the internal map of objects
   std::set<ObjectPtr>::const_iterator
     anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
+  FeaturePtr aFeature;
+  bool isHVConstraint = false;
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
       aModifiedObjects.insert(anObject);
       myConflictingObjects.insert(anObject);
     }
+    if (!isHVConstraint) {
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      if (aFeature) {
+        std::string aType = aFeature->getKind();
+        isHVConstraint = (aType == SketchPlugin_ConstraintHorizontal::ID()) ||
+          (aType == SketchPlugin_ConstraintVertical::ID());
+      }
+    }
   }
   bool isUpdated = !aModifiedObjects.empty();
   if (isUpdated)
     redisplayObjects(aModifiedObjects);
+
+  // If the conflicting object is an automatic constraint caused the conflict
+  // then it has to be deleted
+  if (isHVConstraint) {
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    QTimer::singleShot(5, aModule, SLOT(onConflictingConstraints()));
+  }
 
   return isUpdated;
 }
@@ -264,7 +283,6 @@ bool PartSet_OverconstraintListener::repairConflictingObjects(
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) != theConflictingObjects.end()) { // it is found
       myConflictingObjects.erase(anObject);
-
       aModifiedObjects.insert(anObject);
     }
   }

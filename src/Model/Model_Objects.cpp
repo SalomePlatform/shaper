@@ -38,6 +38,8 @@
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -627,7 +629,7 @@ ObjectPtr Model_Objects::object(const std::string& theGroupID,
 }
 
 std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
-    const std::string& theGroupID, const std::string& theName)
+    const std::string& theGroupID, const std::wstring& theName)
 {
   createHistory(theGroupID);
   if (theGroupID == ModelAPI_Feature::group()) { // searching among features (in history or not)
@@ -731,22 +733,22 @@ TDF_Label Model_Objects::featuresLabel() const
   return myMain.FindChild(TAG_OBJECTS);
 }
 
-static std::string composeName(const std::string& theFeatureKind, const int theIndex)
+static std::wstring composeName(const std::string& theFeatureKind, const int theIndex)
 {
   std::stringstream aNameStream;
   aNameStream << theFeatureKind << "_" << theIndex;
-  return aNameStream.str();
+  return Locale::Convert::toWString(aNameStream.str());
 }
 
 void Model_Objects::setUniqueName(FeaturePtr theFeature)
 {
   if (!theFeature->data()->name().empty())
     return;  // not needed, name is already defined
-  std::string aName;  // result
+  std::wstring aName;  // result
   // first count all features of such kind to start with index = count + 1
   int aNumObjects = -1; // this feature is already in this map
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
-  std::set<std::string> allNames;
+  std::set<std::wstring> allNames;
   for (; aFIter.More(); aFIter.Next()) {
     if (aFIter.Value()->getKind() == theFeature->getKind())
       aNumObjects++;
@@ -767,7 +769,7 @@ void Model_Objects::setUniqueName(FolderPtr theFolder)
     return; // name is already defined
 
   int aNbFolders = myFolders.Size();
-  std::string aName = composeName(ModelAPI_Folder::ID(), aNbFolders);
+  std::wstring aName = composeName(ModelAPI_Folder::ID(), aNbFolders);
 
   // check the uniqueness of the name
   NCollection_DataMap<TDF_Label, ObjectPtr>::Iterator anIt(myFolders);
@@ -1188,7 +1190,7 @@ TDF_Label Model_Objects::resultLabel(
 bool Model_Objects::hasCustomName(DataPtr theFeatureData,
                                   ResultPtr theResult,
                                   int /*theResultIndex*/,
-                                  std::string& theParentName) const
+                                  std::wstring& theParentName) const
 {
   ResultBodyPtr aBodyRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theFeatureData->owner());
   if (aBodyRes) {
@@ -1199,7 +1201,7 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
     // result of boolean operation 'Boolean_1' is a CompSolid which is renamed to 'MyBOOL',
     // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1', 'Boolean_1_2' etc.)
     if (std::dynamic_pointer_cast<Model_Data>(aBodyRes->data())->label().Depth() == 6) {
-      std::ostringstream aDefaultName;
+      std::wostringstream aDefaultName;
       // compute default name of CompSolid (name of feature + index of CompSolid's result)
       int aBodyResultIndex = 0;
       const std::list<ResultPtr>& aResults = anOwner->results();
@@ -1216,7 +1218,7 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
     return false;
   }
 
-  std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(theResult);
+  std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(theResult);
   if (aName.second)
     theParentName = aName.first;
   return aName.second;
@@ -1231,13 +1233,13 @@ void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {
     // if was not initialized, generate event and set a name
-    std::string aNewName = theFeatureData->name();
+    std::wstring aNewName = theFeatureData->name();
     if (hasCustomName(theFeatureData, theResult, theResultIndex, aNewName)) {
       // if the name of result is user-defined, then, at first time, assign name of the result
       // by empty string to be sure that corresponding flag in the data model is set
-      theResult->data()->setName("");
+      theResult->data()->setName(L"");
     } else {
-      std::stringstream aName;
+      std::wstringstream aName;
       aName << aNewName;
       // if there are several results (issue #899: any number of result),
       // add unique prefix starting from second
@@ -1936,7 +1938,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
   }
 }
 
-ResultPtr Model_Objects::findByName(const std::string theName)
+ResultPtr Model_Objects::findByName(const std::wstring theName)
 {
   ResultPtr aResult;
   FeaturePtr aResFeature; // keep feature to return the latest one

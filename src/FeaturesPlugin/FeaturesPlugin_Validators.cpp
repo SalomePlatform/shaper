@@ -23,6 +23,7 @@
 #include "FeaturesPlugin_BooleanFuse.h"
 #include "FeaturesPlugin_BooleanCommon.h"
 #include "FeaturesPlugin_BooleanSmash.h"
+#include "FeaturesPlugin_CompositeBoolean.h"
 #include "FeaturesPlugin_Extrusion.h"
 #include "FeaturesPlugin_Pipe.h"
 #include "FeaturesPlugin_Union.h"
@@ -445,13 +446,16 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
           return true;
         }
       } else {
-        // Shape on construction selected. Check that it is a face or wire.
-        if(aShape->shapeType() == GeomAPI_Shape::WIRE ||
-           aShape->shapeType() == GeomAPI_Shape::FACE) {
-          return true;
+        // CUT operation supports only FACE or WIRE as a tool base
+        std::shared_ptr<FeaturesPlugin_CompositeBoolean> aComposite =
+            std::dynamic_pointer_cast<FeaturesPlugin_CompositeBoolean>(
+            ModelAPI_Feature::feature(theAttribute->owner()));
+        if (aComposite &&
+            aComposite->operationType() == FeaturesPlugin_CompositeBoolean::BOOL_CUT) {
+          return aShape->shapeType() == GeomAPI_Shape::WIRE ||
+                 aShape->shapeType() == GeomAPI_Shape::FACE;
         }
       }
-      return false;
     }
 
     if(aContextShape.get() && !aShape->isEqual(aContextShape)) {

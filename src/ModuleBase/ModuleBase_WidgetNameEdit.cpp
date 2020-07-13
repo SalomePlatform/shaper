@@ -30,7 +30,7 @@ bool ModuleBase_WidgetNameEdit::storeValueCustom()
     return false;
 
   QString aValue = myLineEdit->text();
-  std::string aName = aValue.toStdString();
+  std::wstring aName = aValue.toStdWString();
   myFeature->data()->setName(aName);
   ResultPtr aRes = myFeature->firstResult();
   if (aRes.get())
@@ -45,7 +45,7 @@ bool ModuleBase_WidgetNameEdit::restoreValueCustom()
     return false;
 
   bool isBlocked = myLineEdit->blockSignals(true);
-  myLineEdit->setText(QString::fromStdString(myFeature->data()->name()));
+  myLineEdit->setText(QString::fromStdWString(myFeature->data()->name()));
   myLineEdit->blockSignals(isBlocked);
 
   return true;

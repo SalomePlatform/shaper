@@ -278,5 +278,13 @@
         <source>Replace</source>
         <translation>Remplacer</translation>
     </message>
+  <message>
+    <source>Trihedron arrows constant size</source>
+    <translation>Flèche trièdre de taille constante</translation>
+  </message>
+    <message>
+        <source>Keep trihedron arrows view size constant</source>
+        <translation>Maintenir la taille de la vue des flèches trièdres constante</translation>
+    </message>
 </context>
 </TS>

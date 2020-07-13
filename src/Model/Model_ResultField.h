@@ -52,7 +52,7 @@ public:
     virtual std::shared_ptr<ModelAPI_Document> document() const { return myParent->document(); }
 
     /// Returns a GUI name of this step
-    virtual std::string name();
+    virtual std::wstring name();
 
   private:
     ModelAPI_ResultField* myParent;

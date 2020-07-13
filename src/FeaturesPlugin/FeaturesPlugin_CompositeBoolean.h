@@ -49,6 +49,8 @@ public:
   /// Performs the algorithm and stores results it in the data structure.
   FEATURESPLUGIN_EXPORT virtual void executeCompositeBoolean();
 
+  const OperationType& operationType() const { return myOperationType; }
+
 protected:
   struct ResultBaseAlgo {
     ResultBodyPtr resultBody;

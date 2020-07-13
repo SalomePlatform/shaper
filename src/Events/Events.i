@@ -48,6 +48,7 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
+%include "std_wstring.i"
 
 // directors
 %feature("director") Events_Listener;

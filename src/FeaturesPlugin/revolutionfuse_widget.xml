@@ -6,14 +6,20 @@
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
-      shape_types="vertices edges wires faces shells compounds">
+      shape_types="Vertices Edges Faces"
+      type_icons=":/icons/extrusion_vertex32.png :/icons/extrusion_edge32.png :/icons/extrusion_face32.png"
+      default_type = "2"
+      use_choice="true">
       <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
     </sketch_launcher>
     <multi_selector id="base"
       label="Select a sketch face"
       icon="icons/Features/sketch.png"
       tooltip="Select a sketch face"
-      shape_types="vertices edges wires faces shells compounds"
+      shape_types="Vertices Edges Faces"
+      type_icons=":/icons/extrusion_vertex32.png :/icons/extrusion_edge32.png :/icons/extrusion_face32.png"
+      default_type = "2"
+      use_choice="true"
       concealment="true">
       <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
     </multi_selector>

@@ -223,7 +223,7 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 }
 
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
-                    const std::string & theExternalName)
+                    const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(
@@ -349,7 +349,7 @@ std::shared_ptr<SketchAPI_Point>
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, theExternal));
 }
-std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & theExternalName)
+std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
@@ -368,7 +368,7 @@ std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPo
   return anIntersection;
 }
 std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
-    const std::string & theExternalName,
+    const std::wstring & theExternalName,
     bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
@@ -401,7 +401,7 @@ std::shared_ptr<SketchAPI_Line>
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternal));
 }
-std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
+std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
@@ -493,7 +493,7 @@ std::shared_ptr<SketchAPI_Circle>
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternal));
 }
 
-std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::string & theExternalName)
+std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
@@ -587,7 +587,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selec
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternal));
 }
 
-std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theExternalName)
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
@@ -662,7 +662,7 @@ std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
 }
 
 std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
-    const std::string & theExternalName)
+    const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_Ellipse::ID());
@@ -713,7 +713,7 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
 }
 
 std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
-    const std::string & theExternalName)
+    const std::wstring & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
@@ -1541,7 +1541,7 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
         aBase->attribute(SketchPlugin_Sketch::DIRX_ID()))->dir();
 
     // Check the plane is coordinate plane
-    std::string aPlaneName = defaultPlane(anOrigin, aNormal, aDirX);
+    std::wstring aPlaneName = defaultPlane(anOrigin, aNormal, aDirX);
     if(anExternal->context()) { // checking for selected planes
       if (!aPlaneName.empty()
           && anExternal->context()->data()

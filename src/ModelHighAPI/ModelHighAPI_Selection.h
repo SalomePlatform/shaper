@@ -37,9 +37,9 @@ class ModelAPI_Result;
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >
   ResultSubShapePair;
-typedef std::pair<std::string, std::string> TypeSubShapeNamePair;
+typedef std::pair<std::string, std::wstring> TypeSubShapeNamePair;
 typedef std::pair<std::string, std::shared_ptr<GeomAPI_Pnt> > TypeInnerPointPair;
-typedef std::pair<std::string, std::pair<std::string, int> > TypeWeakNamingPair;
+typedef std::pair<std::string, std::pair<std::wstring, int> > TypeWeakNamingPair;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Selection
  * \ingroup CPPHighAPI
@@ -70,7 +70,7 @@ public:
   /// Constructor for sub-shape by the textual Name
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
-                         const std::string& theSubShapeName);
+                         const std::wstring& theSubShapeName);
 
   /// Constructor for sub-shape by inner point coordinates
   MODELHIGHAPI_EXPORT
@@ -86,7 +86,7 @@ public:
   /// Constructor for sub-shape by weak naming identifier
   MODELHIGHAPI_EXPORT
     ModelHighAPI_Selection(const std::string& theType,
-      const std::string& theContextName, const int theIndex);
+      const std::wstring& theContextName, const int theIndex);
 
   /// Destructor
   MODELHIGHAPI_EXPORT
@@ -126,11 +126,11 @@ public:
 
   /// Shortcut for result()->data()->setName()
   MODELHIGHAPI_EXPORT
-  void setName(const std::string& theName);
+  void setName(const std::wstring& theName);
 
   /// Shortcut for result()->data()->name()
   MODELHIGHAPI_EXPORT
-  std::string name() const;
+  std::wstring name() const;
 
   /// Change result's color
   MODELHIGHAPI_EXPORT

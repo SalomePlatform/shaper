@@ -135,7 +135,7 @@ class Model_Document : public ModelAPI_Document
   //! \param theName name of the object to search
   //! \returns null if such object is not found
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> objectByName(
-    const std::string& theGroupID, const std::string& theName);
+    const std::string& theGroupID, const std::wstring& theName);
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
   //! \param theObject object of this document
@@ -273,18 +273,20 @@ class Model_Document : public ModelAPI_Document
   void setExecuteFeatures(const bool theFlag);
 
   //! Registers the name of the shape for the topological naming needs
-  void addNamingName(const TDF_Label theLabel, std::string theName);
+  void addNamingName(const TDF_Label theLabel, std::wstring theName);
   //! Updates the name of some object
-  void changeNamingName(std::string theOldName, const std::string theNewName,
+  void changeNamingName(std::wstring theOldName, const std::wstring theNewName,
     const TDF_Label& theLabel);
   //! Returns the label, keeper of the name  for the topological naming needs
-  TDF_Label findNamingName(std::string theName, ResultPtr theContext);
+  TDF_Label findNamingName(std::wstring theName, ResultPtr theContext);
   //! Returns the number of the name in the history relatively to the given object (by label).
   //! Start from 1 (this object).
   int numberOfNameInHistory(const ObjectPtr& theNameObject, const TDF_Label& theStartFrom);
   //! Returns the result by name of the result (names of results must be unique, used for naming
   //! selection by name.
-  ResultPtr findByName(std::string& theName, std::string& theSubShapeName, bool& theUniqueContext);
+  ResultPtr findByName(std::wstring& theName,
+                       std::wstring& theSubShapeName,
+                       bool& theUniqueContext);
 
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
@@ -450,7 +452,7 @@ class Model_Document : public ModelAPI_Document
 
   //! Optimization for finding the shape-label by topological naming names
   //! The name -> list of labels where this name is appeared (the last created name is last here)
-  std::map<std::string, std::list<TDF_Label> > myNamingNames;
+  std::map<std::wstring, std::list<TDF_Label> > myNamingNames;
   //! If it is true, features are not executed on update (on abort, undo, redo)
   bool myExecuteFeatures;
 

@@ -68,11 +68,11 @@ public:
 
   /// Shortcut for feature()->data()->setName()
   MODELHIGHAPI_EXPORT
-  void setName(const std::string& theName);
+  void setName(const std::wstring& theName);
 
   /// Shortcut for feature()->data()->name()
   MODELHIGHAPI_EXPORT
-  std::string name() const;
+  std::wstring name() const;
 
   /// Return firts object of the feature
   MODELHIGHAPI_EXPORT

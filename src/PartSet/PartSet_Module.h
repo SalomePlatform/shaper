@@ -412,7 +412,9 @@ public slots:
 
   /// Called on transformation in current viewer
   /// \param theTrsfType type of tranformation
-  void onViewTransformed(int theTrsfType = 2);
+  virtual void onViewTransformed(int theTrsfType = 2);
+
+  void onConflictingConstraints();
 
 protected slots:
   /// Called when previous operation is finished

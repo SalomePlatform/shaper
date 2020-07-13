@@ -128,12 +128,31 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(myMainLayout);
 
-  QStringList aIconsList = getIconsList(myShapeTypes);
+
+  QStringList aIconsList;
+  std::string aIcons = theData->getProperty("type_icons");
+  if (aIcons.size() > 0)
+    aIconsList = QString(aIcons.c_str()).split(' ', QString::SkipEmptyParts);
+
+  if (aIconsList.size() != myShapeTypes.size())
+    aIconsList = getIconsList(myShapeTypes);
+
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   if (!myShapeTypes.empty()) {
-    myTypeCtrl->setValue(0);
-    myDefMode = myShapeTypes.first().toStdString();
+    std::string aDefType = theData->getProperty("default_type");
+    if (aDefType.size() > 0) {
+      bool aOk = false;
+      int aId = QString(aDefType.c_str()).toInt(&aOk);
+      if (aOk) {
+        myTypeCtrl->setValue(aId);
+        myDefMode = myShapeTypes.at(aId).toStdString();
+      }
+    }
+    if (myDefMode.size() == 0) {
+      myTypeCtrl->setValue(0);
+      myDefMode = myShapeTypes.first().toStdString();
+    }
   }
   myMainLayout->addWidget(myTypeCtrl);
 
@@ -570,6 +589,8 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
+  if (myTypeCtrl->isVisible())
+    result << myTypeCtrl;
   result << myListView->getControl();
   return result;
 }
@@ -618,8 +639,9 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   restoreValue();
   myWorkshop->setSelected(getAttributeSelection());
   // may be the feature's result is not displayed, but attributes should be
-  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments,
-                            true); /// hope that something is redisplayed by object updated
+  // hope that something is redisplayed by object updated
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments, false);
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeResults, true);
   // clear history should follow after set selected to do not increase history by setSelected
   clearSelectedHistory();
 
@@ -777,7 +799,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
-      myListView->addItem(aAttr->namingName().c_str(), i);
+      myListView->addItem(QString::fromStdWString(aAttr->namingName()), i);
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -785,7 +807,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        myListView->addItem(anObject->data()->name().c_str(), i);
+        myListView->addItem(QString::fromStdWString(anObject->data()->name()), i);
       }
     }
   }
@@ -795,13 +817,13 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
       AttributePtr anAttr = aRefAttrListAttr->attribute(i);
       QString aName;
       if (anAttr.get()) {
-        std::string anAttrName = ModuleBase_Tools::generateName(anAttr, myWorkshop);
-        aName = QString::fromStdString(anAttrName);
+        std::wstring anAttrName = ModuleBase_Tools::generateName(anAttr, myWorkshop);
+        aName = QString::fromStdWString(anAttrName);
       }
       else {
         ObjectPtr anObject = aRefAttrListAttr->object(i);
         if (anObject.get()) {
-          aName = anObject->data()->name().c_str();
+          aName = QString::fromStdWString(anObject->data()->name());
         }
       }
       myListView->addItem(aName, i);

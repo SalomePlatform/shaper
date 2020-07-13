@@ -297,12 +297,12 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
     Handle(AIS_TrihedronOwner) aTrihedronOwner = Handle(AIS_TrihedronOwner)::DownCast(theOwner);
     if (!aTrihedronOwner.IsNull()) {
       const Prs3d_DatumParts& aPart = aTrihedronOwner->DatumPart();
-      std::string aName;
+      std::wstring aName;
       switch (aPart) {
-        case Prs3d_DP_Origin: aName = "Origin"; break;
-        case Prs3d_DP_XAxis: aName = "OX"; break;
-        case Prs3d_DP_YAxis: aName = "OY"; break;
-        case Prs3d_DP_ZAxis: aName = "OZ"; break;
+        case Prs3d_DP_Origin: aName = L"Origin"; break;
+        case Prs3d_DP_XAxis: aName = L"OX"; break;
+        case Prs3d_DP_YAxis: aName = L"OY"; break;
+        case Prs3d_DP_ZAxis: aName = L"OZ"; break;
         default: break;
       }
       if (aName.length() > 0) {

@@ -138,7 +138,8 @@ private:
 SHAPERGUI::SHAPERGUI()
     : LightApp_Module("SHAPER"),
       mySelector(0), myIsOpened(0), myPopupMgr(0), myIsInspectionVisible(false),
-  myInspectionPanel(0), myIsFacesPanelVisible(false), myIsToolbarsModified(false)
+  myInspectionPanel(0), myIsFacesPanelVisible(false), myIsToolbarsModified(false),
+  myAxisArrowRate(-1)
 {
   myWorkshop = new XGUI_Workshop(this);
   connect(myWorkshop, SIGNAL(commandStatusUpdated()),
@@ -348,11 +349,6 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     QObjectPtrList aObjList = aDisp->displayedObjects();
 
-    //if (myHighlightPointAspect.IsNull()) {
-    //  Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
-    //  myHighlightPointAspect =
-    //    new Graphic3d_AspectMarker3d(aTrihedron->getHighlightPointAspect()->Aspect().operator*());
-    //}
     if (myOldSelectionColor.size() == 0)
       myOldSelectionColor = aDisp->selectionColor();
 
@@ -448,11 +444,14 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   }
   // Delete selector because it has to be redefined on next activation
   if (mySelector) {
-    //if (!myHighlightPointAspect.IsNull()) {
-    //  Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
-    //  aTrihedron->getHighlightPointAspect()->SetAspect(myHighlightPointAspect);
-    //  myHighlightPointAspect.Nullify();
-    //}
+    // Restore size of arrows of trihedron
+    if (myAxisArrowRate > 0) {
+      Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
+      Handle(Prs3d_DatumAspect) aDatumAspect = aTrihedron->Attributes()->DatumAspect();
+      aDatumAspect->SetAttribute(Prs3d_DP_ShadingConeLengthPercent, myAxisArrowRate);
+      Handle(AIS_InteractiveContext) aContext = mySelector->viewer()->getAISContext();
+      aContext->Redisplay(aTrihedron, false);
+    }
     myWorkshop->displayer()->setSelectionColor(myOldSelectionColor);
     myProxyViewer->setSelector(0);
 
@@ -599,11 +598,11 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
   if (theMgr->getType() == OCCViewer_Viewer::Type()) {
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
 
-    //if (myHighlightPointAspect.IsNull()) {
-    //  Handle(AIS_Trihedron) aTrihedron = aViewer->getTrihedron();
-    //  myHighlightPointAspect =
-    //    new Graphic3d_AspectMarker3d(aTrihedron->getHighlightPointAspect()->Aspect().operator*());
-    //}
+    // Remember current length of arrow of axis
+    Handle(AIS_Trihedron) aTrihedron = aViewer->getTrihedron();
+    Handle(Prs3d_DatumAspect) aDatumAspect = aTrihedron->Attributes()->DatumAspect();
+    myAxisArrowRate = aDatumAspect->Attribute(Prs3d_DP_ShadingConeLengthPercent);
+
     SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer,
                                                                  getApp()->selectionMgr());
 #ifdef SALOME_PATCH_FOR_CTRL_WHEEL
@@ -623,6 +622,10 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
 
     std::vector<int> aColor = Config_PropManager::color("Visualization", "selection_color");
     myWorkshop->displayer()->setSelectionColor(aColor);
+
+    // Cause scaling of arrows of axis and dimensions
+    myWorkshop->module()->onViewTransformed();
+
     return aSelector;
   }
   return 0;

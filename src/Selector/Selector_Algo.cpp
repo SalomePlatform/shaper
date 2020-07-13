@@ -410,11 +410,11 @@ Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab, TDF_Label theBaseDo
 }
 
 Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseDocLab,
-  std::string theName, const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
+  std::wstring theName, const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
   Selector_NameGenerator* theNameGenerator, TDF_Label& theContextLab)
 {
   Selector_Algo* aResult = NULL;
-  if (theName[0] == '[') { // intersection or container
+  if (theName[0] == L'[') { // intersection or container
     switch(theShapeType) {
     case TopAbs_COMPOUND:
     case TopAbs_COMPSOLID:
@@ -429,12 +429,12 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
       break;
     default:;
     }
-  } else if (theName[0] == '(') { // filter by neighbors
+  } else if (theName[0] == L'(') { // filter by neighbors
     aResult = new Selector_FilterByNeighbors;
   } else if (theName.find(pureWeakNameID()) == 0 ||
              theName.find(oldPureWeakNameID()) == 0) { // weak naming identifier
     aResult = new Selector_WeakName;
-  } else if (theName.find('&') != std::string::npos) { // modification
+  } else if (theName.find(L'&') != std::wstring::npos) { // modification
     aResult = new Selector_Modify;
   } else { // primitive
     aResult = new Selector_Primitive;

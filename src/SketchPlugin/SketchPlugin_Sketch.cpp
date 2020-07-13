@@ -413,7 +413,7 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
 {
   FeaturePtr aNewFeature = theSketch->addFeature(theFeature->getKind());
   // addFeature generates a unique name for the feature, it caches the name
-  std::string aUniqueFeatureName = aNewFeature->data()->name();
+  std::wstring aUniqueFeatureName = aNewFeature->data()->name();
   // all attribute values are copied\pasted to the new feature, name is not an exception
   theFeature->data()->copyTo(aNewFeature->data());
   // external state should not be copied as a new object is an object of the current sketch
@@ -582,9 +582,9 @@ void  SketchPlugin_Sketch::updateCoordinateAxis(ObjectPtr theSub, GeomAx3Ptr the
     return;
 
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  ObjectPtr anOX = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OX");
-  ObjectPtr anOY = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OY");
-  ObjectPtr anOZ = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OZ");
+  ObjectPtr anOX = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), L"OX");
+  ObjectPtr anOY = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), L"OY");
+  ObjectPtr anOZ = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), L"OZ");
 
   AttributeSelectionPtr anExtFeature;
   if (aFeature->getKind() == SketchPlugin_Projection::ID())

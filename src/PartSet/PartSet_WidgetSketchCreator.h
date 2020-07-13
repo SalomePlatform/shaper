@@ -30,6 +30,7 @@ class PartSet_Module;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 class PartSet_PreviewPlanes;
+class ModuleBase_ChoiceCtrl;
 
 /**
 * \ingroup Modules
@@ -140,6 +141,9 @@ private:
 private slots:
   void onResumed(ModuleBase_Operation* theOp);
 
+  /// Slot is called on selection type changed
+  void onSelectionTypeChanged();
+
 private:
   /// Append new Sketch, set the selected plane for the sketch and start Edit operation.
   /// \param theValues a selection list
@@ -179,6 +183,12 @@ private:
 
   /// class to show/hide preview planes
   PartSet_PreviewPlanes* myPreviewPlanes;
+
+  bool myIsUseChoice; ///< A flag to store use_choice parameter state
+
+  /// Control for types
+  ModuleBase_ChoiceCtrl* myTypeCtrl;
+  std::string myDefMode;
 };
 
 #endif

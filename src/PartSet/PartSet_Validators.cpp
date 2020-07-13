@@ -53,6 +53,8 @@
 #include <SketchPlugin_Point.h>
 #include <GeomAPI_Edge.h>
 
+#include <Locale_Convert.h>
+
 #include <list>
 #include <unordered_map>
 #ifdef _DEBUG
@@ -435,8 +437,9 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             continue;
           if (isObject) {
             if (aRef->object() == anObject) {
-              theError = errorMessage(EqualObjects, anObject.get() ? anObject->data()->name() : "",
-                                      theAttribute->id(), aRef->id());
+              theError = errorMessage(EqualObjects,
+                anObject.get() ? Locale::Convert::toString(anObject->data()->name()) : "",
+                theAttribute->id(), aRef->id());
               return false;
             }
           }
@@ -512,8 +515,9 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
           // check the object is already presented
           if (aRef->value() == anObject) {
-            theError = errorMessage(EqualObjects, anObject.get() ? anObject->data()->name() : "",
-                                    theAttribute->id(), aRef->id());
+            theError = errorMessage(EqualObjects,
+              anObject.get() ? Locale::Convert::toString(anObject->data()->name()) : "",
+              theAttribute->id(), aRef->id());
             return false;
           }
         }
@@ -608,8 +612,9 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             for (int j = 0; j < aRefSelList->size(); j++) {
               if (aCurSelObject == aRefSelList->object(j)) {
                 theError = errorMessage(EqualObjects,
-                              aCurSelObject.get() ? aCurSelObject->data()->name() : "",
-                              theAttribute->id(), aCurSelList->id());
+                  aCurSelObject.get()?
+                  Locale::Convert::toString(aCurSelObject->data()->name()) : "",
+                  theAttribute->id(), aCurSelList->id());
                 return false;
               }
             }

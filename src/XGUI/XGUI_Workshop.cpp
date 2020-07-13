@@ -1899,7 +1899,7 @@ bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) con
     if (!facesPanel()->isObjectHiddenByPanel(*anObjectsIt))
       continue;
     aHiddenObjects.insert(*anObjectsIt);
-    aHiddenObjectNames.append((*anObjectsIt)->data()->name().c_str());
+    aHiddenObjectNames.append(QString::fromStdWString((*anObjectsIt)->data()->name()));
   }
   if (aHiddenObjects.empty()) // in parameter objects there are no hidden objects in hide face
     return true;
@@ -2105,7 +2105,7 @@ void XGUI_Workshop::cleanHistory()
   if (!anUnusedObjects.empty()) {
     QStringList aNames;
     foreach (const FeaturePtr& aFeature, anUnusedObjects) {
-      aNames.append(aFeature->name().c_str());
+      aNames.append(QString::fromStdWString(aFeature->name()));
     }
     aNames.sort();
     QString anUnusedNames = aNames.join(", ");
@@ -2768,7 +2768,7 @@ void XGUI_Workshop::updateColorScaleVisibility()
             aPrs->dataRange(aMin, aMax);
             myViewerProxy->setColorScaleRange(aMin, aMax);
           }
-          myViewerProxy->setColorScaleTitle(aStep->name().c_str());
+          myViewerProxy->setColorScaleTitle(QString::fromStdWString(aStep->name()));
           myViewerProxy->setColorScaleShown(true);
         }
       }

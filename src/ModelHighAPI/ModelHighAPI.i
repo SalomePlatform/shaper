@@ -32,6 +32,8 @@
 
   // fix for SWIG v2.0.4
   #define SWIGPY_SLICE_ARG(obj) ((PyObject*)(obj))
+
+  #define SWIGPY_UNICODE_ARG(obj) ((PyObject*) (obj))
 %}
 
 %include "doxyhelp.i"
@@ -45,11 +47,7 @@
 #define MODELHIGHAPI_EXPORT
 
 // standard definitions
-%include "typemaps.i"
-%include "std_list.i"
 %include "std_pair.i"
-%include "std_string.i"
-%include "std_shared_ptr.i"
 
 // directors
 %feature("director") ModelHighAPI_Dumper;
@@ -268,6 +266,7 @@
 // std::pair -> []
 %template(ResultSubShapePair) std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >;
 %template(StringsPair) std::pair<std::string, std::string>;
+%template(StringWStringPair) std::pair<std::string, std::wstring>;
 
 
 // fix compilarion error: 'res*' was not declared in this scope

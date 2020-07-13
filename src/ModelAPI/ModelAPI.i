@@ -32,6 +32,8 @@
 
   // fix for SWIG v2.0.4
   #define SWIGPY_SLICE_ARG(obj) ((PyObject*)(obj))
+
+  #define SWIGPY_UNICODE_ARG(obj) ((PyObject*) (obj))
 %}
 
 // import other modules
@@ -42,8 +44,6 @@
 #define MODELAPI_EXPORT
 
 // standard definitions
-%include "typemaps.i"
-%include "std_string.i"
 %include "std_list.i"
 %include "std_shared_ptr.i"
 %include "std_set.i"

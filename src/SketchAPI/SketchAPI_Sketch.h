@@ -140,7 +140,7 @@ public:
   std::shared_ptr<SketchAPI_Point> addPoint(const ModelHighAPI_Selection & theExternal);
   /// Add point
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Point> addPoint(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_Point> addPoint(const std::wstring & theExternalName);
 
   /// Add intersection point
   SKETCHAPI_EXPORT
@@ -150,7 +150,7 @@ public:
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_IntersectionPoint>
-    addIntersectionPoint(const std::string & theExternalName,
+    addIntersectionPoint(const std::wstring & theExternalName,
                          bool theKeepResult = false);
 
   /// Add line
@@ -167,7 +167,7 @@ public:
   std::shared_ptr<SketchAPI_Line> addLine(const ModelHighAPI_Selection & theExternal);
   /// Add line
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Line> addLine(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_Line> addLine(const std::wstring & theExternalName);
 
   /// Add rectangle
   SKETCHAPI_EXPORT
@@ -216,7 +216,7 @@ public:
   std::shared_ptr<SketchAPI_Circle> addCircle(const ModelHighAPI_Selection & theExternal);
   /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_Circle> addCircle(const std::wstring & theExternalName);
 
   /// Add arc
   SKETCHAPI_EXPORT
@@ -270,7 +270,7 @@ public:
 
   /// Add arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_Arc> addArc(const std::wstring & theExternalName);
 
   /// Add ellipse
   SKETCHAPI_EXPORT
@@ -303,7 +303,7 @@ public:
   std::shared_ptr<SketchAPI_Ellipse> addEllipse(const ModelHighAPI_Selection & theExternal);
   /// Add ellipse
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Ellipse> addEllipse(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_Ellipse> addEllipse(const std::wstring & theExternalName);
 
   /// Add elliptic arc
   SKETCHAPI_EXPORT
@@ -326,7 +326,7 @@ public:
   std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const ModelHighAPI_Selection & theExternal);
   /// Add elliptic arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const std::wstring & theExternalName);
 
   /// Add B-spline
   SKETCHAPI_EXPORT
@@ -600,7 +600,7 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
  */
 SKETCHAPI_EXPORT
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
-                    const std::string & theExternalName);
+                    const std::wstring & theExternalName);
 
 /**\ingroup CPPHighAPI
  * \brief Create Sketch feature

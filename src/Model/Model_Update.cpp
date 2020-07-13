@@ -51,6 +51,10 @@
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
 //#define DEB_UPDATE
 
+#ifdef DEB_UPDATE
+#include <Locale_Convert.h>
+#endif
+
 Model_Update::Model_Update()
 {
   Events_Loop* aLoop = Events_Loop::loop();
@@ -116,7 +120,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     else if (myProcessOnFinish.find(theFeature) == myProcessOnFinish.end())
       myProcessOnFinish[theFeature] = std::set<std::shared_ptr<ModelAPI_Feature> >();
 #ifdef DEB_UPDATE
-      std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
+      std::wcout<<L"*** Add process on finish "<<theFeature->name()<<std::endl;
 #endif
     // keeps the currently updated features to avoid infinitive cycling here: where feature on
     // "updateArguments" sends "updated" (in selection attribute) and goes here again
@@ -328,8 +332,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if (!(*anObjIter)->data()->isValid())
         continue;
 #ifdef DEB_UPDATE
-      std::cout<<">>> in event updated "<<(*anObjIter)->groupName()<<
-        " "<<(*anObjIter)->data()->name()<<std::endl;
+      std::wcout<<L">>> in event updated "<<Locale::Convert::toWString((*anObjIter)->groupName())
+                <<L" "<<(*anObjIter)->data()->name()<<std::endl;
 #endif
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
@@ -566,14 +570,14 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   }
 
 #ifdef DEB_UPDATE
-    std::cout<<"* Process feature "<<theFeature->name()<<std::endl;
+    std::wcout<<L"* Process feature "<<theFeature->name()<<std::endl;
 #endif
 
   // update the sketch plane before the sketch sub-elements are recomputed
   // (otherwise sketch will update plane, modify subs, after executed, but with old subs edges)
     if (aIsModified && theFeature->getKind() == "Sketch") {
 #ifdef DEB_UPDATE
-      std::cout << "****** Update sketch args " << theFeature->name() << std::endl;
+      std::wcout << L"****** Update sketch args " << theFeature->name() << std::endl;
 #endif
       AttributeSelectionPtr anExtSel = theFeature->selection("External");
       if (anExtSel.get()) {
@@ -692,7 +696,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   }
 
 #ifdef DEB_UPDATE
-  std::cout<<"Update args "<<theFeature->name()<<std::endl;
+  std::wcout<<L"Update args "<<theFeature->name()<<std::endl;
 #endif
   // TestImport.py : after arguments are updated, theFeature may be removed
   if (!theFeature->data()->isValid())
@@ -715,7 +719,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       // don't disable Part because it will make disabled all the features
       // (performance and problems with the current feature)
   #ifdef DEB_UPDATE
-    std::cout<<"Invalid args "<<theFeature->name()<<std::endl;
+    std::wcout<<L"Invalid args "<<theFeature->name()<<std::endl;
   #endif
     theFeature->eraseResults(false);
     redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
@@ -745,7 +749,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     }
   } else {
     #ifdef DEB_UPDATE
-      std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
+      std::wcout<<L"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
     #endif
     theFeature->eraseResults(false);
     redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
@@ -996,7 +1000,7 @@ bool Model_Update::isReason(std::shared_ptr<ModelAPI_Feature>& theFeature,
 void Model_Update::executeFeature(FeaturePtr theFeature)
 {
 #ifdef DEB_UPDATE
-  std::cout<<"Execute Feature "<<theFeature->name()<<std::endl;
+  std::wcout<<L"Execute Feature "<<theFeature->name()<<std::endl;
 #endif
   // execute in try-catch to avoid internal problems of the feature
   ModelAPI_ExecState aState = ModelAPI_StateDone;

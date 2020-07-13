@@ -58,11 +58,11 @@ public:
 
   /// Shortcut for data()->setName()
   MODELHIGHAPI_EXPORT
-  void setName(const std::string& theName);
+  void setName(const std::wstring& theName);
 
   /// Shortcut for data()->name()
   MODELHIGHAPI_EXPORT
-  std::string name() const;
+  std::wstring name() const;
 
   /// To update the folder state
   /// \param isForce start execution of feature instead of sending events

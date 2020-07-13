@@ -98,21 +98,21 @@ public:
 
   /// Returns a textual string of the selection
   /// \param theDefaultValue a name, which is returned if the naming name can not be obtained
-  MODEL_EXPORT virtual std::string namingName(const std::string& theDefaultValue = "");
+  MODEL_EXPORT virtual std::wstring namingName(const std::wstring& theDefaultValue = L"");
 
   /// Defines the sub-shape by Id
   MODEL_EXPORT virtual void setId(int theID);
 
   /// Selects (i.e. creates Naming data structure) of sub-shape specified by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
-                                           const std::string& theSubShapeName);
+                                           const std::wstring& theSubShapeName);
 
   /// Selects sub-shape by its inner point
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
                                            const std::shared_ptr<GeomAPI_Pnt>& thePoint);
   /// Selects sub-shape by weak naming index
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
-    const std::string& theContextName, const int theIndex);
+    const std::wstring& theContextName, const int theIndex);
 
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
@@ -127,11 +127,11 @@ public:
 
   // Implementation of the name generator method from the Selector package
   // This method returns the context name by the label of the sub-selected shape
-  MODEL_EXPORT virtual std::string contextName(const TDF_Label theSelectionLab) override;
+  MODEL_EXPORT virtual std::wstring contextName(const TDF_Label theSelectionLab) override;
 
   /// This method restores by the context and value name the context label and
   /// sub-label where the value is. Returns true if it is valid.
-  MODEL_EXPORT virtual bool restoreContext(std::string theName,
+  MODEL_EXPORT virtual bool restoreContext(std::wstring theName,
     TDF_Label& theContext, TDF_Label& theValue) override;
 
   /// Returns true if the first result is newer than the second one in the tree of features
@@ -139,7 +139,7 @@ public:
     const override;
 
   /// Returns the name by context. Adds the part name if the context is located in other document
-  MODEL_EXPORT virtual std::string contextName(const ResultPtr& theContext) const;
+  MODEL_EXPORT virtual std::wstring contextName(const ResultPtr& theContext) const;
 
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   MODEL_EXPORT virtual void combineGeometrical();

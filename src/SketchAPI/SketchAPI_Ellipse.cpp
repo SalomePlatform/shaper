@@ -21,15 +21,19 @@
 
 #include <GeomAPI_Pnt2d.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
+
+#include <ModelAPI_Tools.h>
 
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
-static const std::string AUXILIARY_VALUE = "aux";
+static const std::wstring AUXILIARY_VALUE = L"aux";
 static const std::string MAJOR_AXIS_ID = "majorAxis";
 static const std::string MINOR_AXIS_ID = "minorAxis";
 
@@ -71,7 +75,7 @@ SketchAPI_Ellipse::SketchAPI_Ellipse(const std::shared_ptr<ModelAPI_Feature>& th
 }
 
 SketchAPI_Ellipse::SketchAPI_Ellipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::string& theExternalName)
+                                     const std::wstring& theExternalName)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -111,7 +115,7 @@ void SketchAPI_Ellipse::setByExternal(const ModelHighAPI_Selection & theExternal
   execute();
 }
 
-void SketchAPI_Ellipse::setByExternalName(const std::string & theExternalName)
+void SketchAPI_Ellipse::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
   execute();
@@ -191,7 +195,7 @@ static void createInternalConstraint(const CompositeFeaturePtr& theSketch,
 static void createPoint(const CompositeFeaturePtr& theSketch,
                         const FeaturePtr& theEllipse,
                         const std::string& theCoincident,
-                        const std::string& theAuxOrName,
+                        const std::wstring& theAuxOrName,
                         std::list<FeaturePtr>& theEntities)
 {
   if (theAuxOrName.empty())
@@ -207,7 +211,7 @@ static void createPoint(const CompositeFeaturePtr& theSketch,
   aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipse);
   aPointFeature->execute();
 
-  std::string aName = theEllipse->name() + "_" + theCoincident;
+  std::wstring aName = theEllipse->name() + L"_" + Locale::Convert::toWString(theCoincident);
   aPointFeature->data()->setName(aName);
   aPointFeature->lastResult()->data()->setName(aName);
 
@@ -227,7 +231,7 @@ static void createAxis(const CompositeFeaturePtr& theSketch,
                        const FeaturePtr& theEllipse,
                        const std::string& theCoincidentStart,
                        const std::string& theCoincidentEnd,
-                       const std::string& theAuxOrName,
+                       const std::wstring& theAuxOrName,
                        std::list<FeaturePtr>& theEntities)
 {
   if (theAuxOrName.empty())
@@ -248,9 +252,9 @@ static void createAxis(const CompositeFeaturePtr& theSketch,
   aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipse);
   aLineFeature->execute();
 
-  std::string aName = theEllipse->name() + "_" +
+  std::wstring aName = theEllipse->name() + L"_" +
       (theCoincidentStart == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ?
-       "major_axis" : "minor_axis");
+       L"major_axis" : L"minor_axis");
   aLineFeature->data()->setName(aName);
   aLineFeature->lastResult()->data()->setName(aName);
 
@@ -268,15 +272,15 @@ static void createAxis(const CompositeFeaturePtr& theSketch,
 }
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construction(
-    const std::string& center,
-    const std::string& firstFocus,
-    const std::string& secondFocus,
-    const std::string& majorAxisStart,
-    const std::string& majorAxisEnd,
-    const std::string& minorAxisStart,
-    const std::string& minorAxisEnd,
-    const std::string& majorAxis,
-    const std::string& minorAxis) const
+    const std::wstring& center,
+    const std::wstring& firstFocus,
+    const std::wstring& secondFocus,
+    const std::wstring& majorAxisStart,
+    const std::wstring& majorAxisEnd,
+    const std::wstring& minorAxisStart,
+    const std::wstring& minorAxisEnd,
+    const std::wstring& majorAxis,
+    const std::wstring& minorAxis) const
 {
   FeaturePtr anEllipse = feature();
 
@@ -294,15 +298,15 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construct
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::buildConstructionEntities(
       const FeaturePtr& theEllipse,
       const std::list<PairOfStrings>& theAttributes,
-      const std::string& theCenter,
-      const std::string& theFirstFocus,
-      const std::string& theSecondFocus,
-      const std::string& theMajorAxisStart,
-      const std::string& theMajorAxisEnd,
-      const std::string& theMinorAxisStart,
-      const std::string& theMinorAxisEnd,
-      const std::string& theMajorAxis,
-      const std::string& theMinorAxis)
+      const std::wstring& theCenter,
+      const std::wstring& theFirstFocus,
+      const std::wstring& theSecondFocus,
+      const std::wstring& theMajorAxisStart,
+      const std::wstring& theMajorAxisEnd,
+      const std::wstring& theMinorAxisStart,
+      const std::wstring& theMinorAxisEnd,
+      const std::wstring& theMajorAxis,
+      const std::wstring& theMinorAxis)
 {
   CompositeFeaturePtr aSketch = sketchForFeature(theEllipse);
 

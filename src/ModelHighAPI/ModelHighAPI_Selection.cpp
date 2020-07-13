@@ -44,7 +44,7 @@ ModelHighAPI_Selection::ModelHighAPI_Selection(const std::shared_ptr<ModelAPI_Re
 }
 
 ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
-                                               const std::string& theSubShapeName)
+                                               const std::wstring& theSubShapeName)
 : myVariantType(VT_TypeSubShapeNamePair)
 , myTypeSubShapeNamePair(theType, theSubShapeName)
 {
@@ -72,9 +72,9 @@ ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
 }
 
 ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
-  const std::string& theContextName, const int theIndex)
-  : myVariantType(VT_WeakNamingPair)
-  , myWeakNamingPair(theType, std::pair<std::string, int>(theContextName, theIndex))
+  const std::wstring& theContextName, const int theIndex)
+  : myVariantType(VT_WeakNamingPair),
+  myWeakNamingPair(theType, std::pair<std::wstring, int>(theContextName, theIndex))
 {
 }
 
@@ -188,7 +188,7 @@ std::string ModelHighAPI_Selection::shapeType() const
 }
 
 //==================================================================================================
-void ModelHighAPI_Selection::setName(const std::string& theName)
+void ModelHighAPI_Selection::setName(const std::wstring& theName)
 {
   if (myVariantType == VT_ResultSubShapePair) {
     std::shared_ptr<ModelAPI_Result> aResult = myResultSubShapePair.first;
@@ -199,14 +199,14 @@ void ModelHighAPI_Selection::setName(const std::string& theName)
   }
 }
 
-std::string ModelHighAPI_Selection::name() const
+std::wstring ModelHighAPI_Selection::name() const
 {
   if (myVariantType == VT_ResultSubShapePair) {
     std::shared_ptr<ModelAPI_Result> aResult = myResultSubShapePair.first;
     if (aResult.get())
       return aResult->data()->name();
   }
-  return std::string();
+  return std::wstring();
 }
 
 void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)

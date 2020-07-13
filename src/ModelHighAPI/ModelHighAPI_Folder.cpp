@@ -59,13 +59,13 @@ bool ModelHighAPI_Folder::initialize()
   return true;
 }
 
-void ModelHighAPI_Folder::setName(const std::string& theName)
+void ModelHighAPI_Folder::setName(const std::wstring& theName)
 {
   if (myFolder && myFolder->data() && myFolder->data()->isValid())
     myFolder->data()->setName(theName);
 }
 
-std::string ModelHighAPI_Folder::name() const
+std::wstring ModelHighAPI_Folder::name() const
 {
   return myFolder->data()->name();
 }

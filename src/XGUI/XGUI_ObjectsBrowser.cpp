@@ -73,7 +73,7 @@ public:
       XGUI_DataModel* aModel = myTreedView->dataModel();
       ObjectPtr aObj = aModel->object(index);
       if (aObj.get() != NULL) {
-        aEditor->setText(aObj->data()->name().c_str());
+        aEditor->setText(QString::fromStdWString(aObj->data()->name()));
         return;
       }
     }
@@ -131,7 +131,8 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
       if (XGUI_Tools::canRename(aObj, aName)) {
         SessionPtr aMgr = ModelAPI_Session::get();
         aMgr->startOperation("Rename");
-        aObj->data()->setName(aName.toStdString());
+        std::wstring aaa = aName.toStdWString();
+        aObj->data()->setName(aName.toStdWString());
         aMgr->finishOperation();
       }
     }

@@ -68,7 +68,7 @@ public:
     MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
     /// Returns a GUI name of this step
-    MODELAPI_EXPORT virtual std::string name() = 0;
+    MODELAPI_EXPORT virtual std::wstring name() = 0;
 
   protected:
     /// This method is called just after creation of the object: it must initialize

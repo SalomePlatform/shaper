@@ -21,6 +21,8 @@
 
 #include <Selector_NameGenerator.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
 
@@ -47,7 +49,7 @@ bool Selector_Primitive::restore()
   return restoreBaseArray(anEmptyRefList, myFinal);
 }
 
-TDF_Label Selector_Primitive::restoreByName(std::string theName,
+TDF_Label Selector_Primitive::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum /*theShapeType*/, Selector_NameGenerator* theNameGenerator)
 {
   TDF_Label aContext;
@@ -72,13 +74,15 @@ bool Selector_Primitive::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_Primitive::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_Primitive::name(Selector_NameGenerator* theNameGenerator)
 {
   Handle(TDataStd_Name) aName;
   if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
-    return "";
-  std::string aResult = theNameGenerator->contextName(myFinal);
-  if (!aResult.empty())
-    aResult += "/" + std::string(TCollection_AsciiString(aName->Get()).ToCString());
+    return L"";
+  std::wstring aResult = theNameGenerator->contextName(myFinal);
+  if (!aResult.empty()) {
+    aResult += L"/";
+    aResult += Locale::Convert::toWString(aName->Get().ToExtString());
+  }
   return aResult;
 }

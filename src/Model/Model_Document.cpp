@@ -34,6 +34,8 @@
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -524,7 +526,7 @@ bool Model_Document::save(
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
       if (!aPart->isActivated()) {
         // copy not-activated document that is not in the memory
-        std::string aDocName = aPart->data()->name();
+        std::string aDocName = Locale::Convert::toString(aPart->data()->name());
         if (!aDocName.empty()) {
           // just copy file
           TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
@@ -541,8 +543,9 @@ bool Model_Document::save(
           }
         }
       } else { // simply save opened document
+        std::string aDocName = Locale::Convert::toString(aPart->data()->name());
         isDone = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc())->
-          save(theDirName, aPart->data()->name().c_str(), theResults);
+          save(theDirName, aDocName.c_str(), theResults);
       }
     }
   }
@@ -1331,7 +1334,7 @@ ObjectPtr Model_Document::object(const std::string& theGroupID,
 }
 
 std::shared_ptr<ModelAPI_Object> Model_Document::objectByName(
-    const std::string& theGroupID, const std::string& theName)
+    const std::string& theGroupID, const std::wstring& theName)
 {
   return myObjs->objectByName(theGroupID, theName);
 }
@@ -1656,9 +1659,9 @@ ResultPtr Model_Document::resultByLab(const TDF_Label& theLab)
   return ResultPtr(); // not found
 }
 
-void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
+void Model_Document::addNamingName(const TDF_Label theLabel, std::wstring theName)
 {
-  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
+  std::map<std::wstring, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
 
   if (aFind != myNamingNames.end()) { // to avoid duplicate-labels
     // to keep correct order in spite of history line management
@@ -1690,11 +1693,11 @@ void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName
   myNamingNames[theName].push_back(theLabel);
 }
 
-void Model_Document::changeNamingName(const std::string theOldName,
-                                      const std::string theNewName,
+void Model_Document::changeNamingName(const std::wstring theOldName,
+                                      const std::wstring theNewName,
                                       const TDF_Label& theLabel)
 {
-  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theOldName);
+  std::map<std::wstring, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theOldName);
   if (aFind != myNamingNames.end()) {
     std::list<TDF_Label>::iterator aLabIter = aFind->second.begin();
     for(; aLabIter != aFind->second.end(); aLabIter++) {
@@ -1709,9 +1712,9 @@ void Model_Document::changeNamingName(const std::string theOldName,
         TDF_ChildIDIterator aChild(theLabel, TDataStd_Name::GetID());
         for(; aChild.More(); aChild.Next()) {
           Handle(TDataStd_Name) aSubName = Handle(TDataStd_Name)::DownCast(aChild.Value());
-          std::string aName = TCollection_AsciiString(aSubName->Get()).ToCString();
+          std::wstring aName = Locale::Convert::toWString(aSubName->Get().ToExtString());
           if (aName.find(theOldName) == 0) { // started from parent name
-            std::string aNewSubName = theNewName + aName.substr(theOldName.size());
+            std::wstring aNewSubName = theNewName + aName.substr(theOldName.size());
             changeNamingName(aName, aNewSubName, aSubName->Label());
             aSubName->Set(aNewSubName.c_str());
           }
@@ -1768,9 +1771,9 @@ static bool IsExchangedName(const TCollection_ExtendedString& theName1,
   return true;
 }
 
-TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theContext)
+TDF_Label Model_Document::findNamingName(std::wstring theName, ResultPtr theContext)
 {
-  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
+  std::map<std::wstring, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
   if (aFind != myNamingNames.end()) {
       std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
       for(; aLabIter != aFind->second.rend(); aLabIter++) {
@@ -1783,9 +1786,9 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
       return *(aFind->second.rbegin()); // no more variants, so, return the last
   }
   // not found exact name, try to find by sub-components
-  std::string::size_type aSlash = theName.rfind('/');
-  if (aSlash != std::string::npos) {
-    std::string anObjName = theName.substr(0, aSlash);
+  std::wstring::size_type aSlash = theName.rfind(L'/');
+  if (aSlash != std::wstring::npos) {
+    std::wstring anObjName = theName.substr(0, aSlash);
     aFind = myNamingNames.find(anObjName);
     if (aFind != myNamingNames.end()) {
       TCollection_ExtendedString aSubName(theName.substr(aSlash + 1).c_str());
@@ -1881,7 +1884,7 @@ bool Model_Document::isLaterByDep(FeaturePtr theThis, FeaturePtr theOther) {
 int Model_Document::numberOfNameInHistory(
   const ObjectPtr& theNameObject, const TDF_Label& theStartFrom)
 {
-  std::map<std::string, std::list<TDF_Label> >::iterator aFind =
+  std::map<std::wstring, std::list<TDF_Label> >::iterator aFind =
     myNamingNames.find(theNameObject->data()->name());
   if (aFind == myNamingNames.end() || aFind->second.size() < 2) {
     return 1; // no need to specify the name by additional identifiers
@@ -1919,10 +1922,10 @@ int Model_Document::numberOfNameInHistory(
 }
 
 ResultPtr Model_Document::findByName(
-  std::string& theName, std::string& theSubShapeName, bool& theUniqueContext)
+  std::wstring& theName, std::wstring& theSubShapeName, bool& theUniqueContext)
 {
   int aNumInHistory = 0;
-  std::string aName = theName;
+  std::wstring aName = theName;
   ResultPtr aRes = myObjs->findByName(aName);
   theUniqueContext = !(aRes.get() && myNamingNames.find(aName) != myNamingNames.end());
   while(!aRes.get() && aName[0] == '_') { // this may be theContext with the history index
@@ -1931,7 +1934,7 @@ ResultPtr Model_Document::findByName(
     aRes = myObjs->findByName(aName);
   }
   if (aNumInHistory) {
-    std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(aName);
+    std::map<std::wstring, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(aName);
     if (aFind != myNamingNames.end() && (int)aFind->second.size() > aNumInHistory) {
       std::list<TDF_Label>::reverse_iterator aLibIt = aFind->second.rbegin();
       for(; aNumInHistory != 0; aNumInHistory--)
@@ -2076,7 +2079,7 @@ AttributeSelectionListPtr Model_Document::selectionInPartFeature()
     aData->setObject(mySelectionFeature);
     mySelectionFeature->setDoc(myObjs->owner());
     mySelectionFeature->setData(aData);
-    std::string aName = id() + "_Part";
+    std::wstring aName = id() + L"_Part";
     mySelectionFeature->data()->setName(aName);
     mySelectionFeature->setDoc(myObjs->owner());
     mySelectionFeature->initAttributes();

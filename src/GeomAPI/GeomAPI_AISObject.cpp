@@ -369,15 +369,19 @@ bool GeomAPI_AISObject::setColor(int theR, int theG, int theB)
   if (aColor.IsEqual(aCurrentColor))
     return false;
 
+  Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
+    if (!aContext.IsNull())
+      aContext->Redisplay(aDimAIS, false);
   }
-  Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-  if (!aContext.IsNull())
-    aContext->SetColor(anAIS, aColor, false);
-  else
-    anAIS->SetColor(aColor);
+  else {
+    if (!aContext.IsNull())
+      aContext->SetColor(anAIS, aColor, false);
+    else
+      anAIS->SetColor(aColor);
+  }
   return true;
 }
 

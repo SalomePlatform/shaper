@@ -66,16 +66,16 @@ public:
   //! \param theDocName name of the document file
   //! \param theDocID the identifier of the loaded document (to be created)
   //! \returns true if load is ok
-  MODEL_EXPORT bool loadDocument(const std::string theDocName, const int theDocID);
+  MODEL_EXPORT bool loadDocument(const std::wstring theDocName, const int theDocID);
 
   //! Set path for the loaded by demand documents
   void setLoadPath(std::string thePath);
   //! Returns the path for the loaded by demand documents
   const std::string& loadPath() const;
   //! Defines that specified document must be loaded by demand
-  void setLoadByDemand(std::string theID, const int theDocID);
+  void setLoadByDemand(std::wstring theID, const int theDocID);
   //! Returns true if specified document must be loaded by demand
-  bool isLoadByDemand(std::string theID, const int theDocIndex);
+  bool isLoadByDemand(std::wstring theID, const int theDocIndex);
 
   //! produces new unique identifier of the document
   int generateDocumentId();
@@ -98,7 +98,7 @@ public:
   /// Path for the loaded by demand documents
   std::string myPath;
   /// Path for the loaded by demand documents (and the persistent ID as the value)
-  std::map<std::string, int> myLoadedByDemand;
+  std::map<std::wstring, int> myLoadedByDemand;
 };
 
 #endif

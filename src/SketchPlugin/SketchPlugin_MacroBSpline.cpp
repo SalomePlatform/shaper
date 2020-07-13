@@ -27,12 +27,15 @@
 #include <SketchPlugin_Tools.h>
 #include <SketchPlugin_Sketch.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomDataAPI_Point2DArray.h>
 
@@ -266,10 +269,10 @@ void SketchPlugin_MacroBSpline::assignDefaultNameForAux(FeaturePtr theAuxFeature
 {
   FeaturePtr aBSpline = ModelAPI_Feature::feature(theBSplinePoles->owner());
 
-  std::ostringstream aName;
+  std::wostringstream aName;
   aName << aBSpline->name();
   if (theAuxFeature->getKind() == SketchPlugin_Point::ID())
-    aName << "_" << theBSplinePoles->id() << "_" << thePoleIndex1;
+    aName << "_" << Locale::Convert::toWString(theBSplinePoles->id()) << "_" << thePoleIndex1;
   else
     aName << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
 

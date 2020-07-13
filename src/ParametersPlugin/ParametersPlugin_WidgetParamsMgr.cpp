@@ -385,7 +385,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
         } else {
           if (!theFeatureList.contains(aReferenced)) {
             QStringList aValNames;
-            aValNames << aReferenced->data()->name().c_str();
+            aValNames << QString::fromStdWString(aReferenced->data()->name());
 
             std::string aId = aAttr->attributeType();
             if (aId == ModelAPI_AttributeDouble::typeId()) {
@@ -768,7 +768,7 @@ bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
   int aCurrent = myDelegate->editIndex().row();
   int i = 0;
   foreach(FeaturePtr aFeature, myParametersList) {
-    if ((i != aCurrent) && (aFeature->data()->name() == theName.toStdString()))
+    if ((i != aCurrent) && (aFeature->data()->name() == theName.toStdWString()))
       return true;
     i++;
   }

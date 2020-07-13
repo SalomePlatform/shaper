@@ -34,6 +34,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -49,6 +51,7 @@
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <XAO_Xao.hxx>
 #include <XAO_Group.hxx>
@@ -137,7 +140,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 
   // Pass the results into the model
   std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
-  data()->setName(anObjectName);
+  data()->setName(Locale::Convert::toWString(anObjectName));
 
   setResult(createResultBody(aGeomShape));
 }
@@ -161,7 +164,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   std::string aBodyName = aXaoGeometry->getName();
   if (aBodyName.empty())
     aBodyName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
-  data()->setName(aBodyName);
+  data()->setName(Locale::Convert::toWString(aBodyName));
 
   ResultBodyPtr aResultBody = createResultBody(aGeomShape);
   setResult(aResultBody);
@@ -187,7 +190,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
     // group name
     if (!aXaoGroup->getName().empty())
-      aGroupFeature->data()->setName(aXaoGroup->getName());
+      aGroupFeature->data()->setName(Locale::Convert::toWString(aXaoGroup->getName()));
 
     // fill selection
     AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
@@ -217,7 +220,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
     // group name
     if (!aXaoField->getName().empty())
-      aFieldFeature->data()->setName(aXaoField->getName());
+      aFieldFeature->data()->setName(Locale::Convert::toWString(aXaoField->getName()));
 
     // fill selection
     AttributeSelectionListPtr aSelectionList = aFieldFeature->selectionList("selected");

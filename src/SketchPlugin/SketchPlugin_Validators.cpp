@@ -46,6 +46,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -328,7 +330,7 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     if (aRefAttr->isObject()) {
       if (aRefAttr->object() == aRAttr->object()) {
         ObjectPtr anObject = aRefAttr->object();
-        std::string aName = anObject.get() ? anObject->data()->name() : "";
+        std::wstring aName = anObject.get() ? anObject->data()->name() : L"";
         theError = "The object %1 has been already fixed.";
         theError.arg(aName);
         return false;
@@ -336,7 +338,8 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     }
     else if (aRefAttr->attr() == aRAttr->attr()) {
       AttributePtr anAttribute = aRefAttr->attr();
-      std::string aName = anAttribute.get() ? anAttribute->id() : "";
+      std::wstring aName =
+          anAttribute.get() ? Locale::Convert::toWString(anAttribute->id()) : L"";
       theError = "The attribute %1 has been already fixed.";
       theError.arg(aName);
       return false;
@@ -433,7 +436,7 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
       return false;
     }
 
-    std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
+    std::wstring aName = aSelObject.get() ? aSelObject->data()->name() : L"";
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
       if (aSelObject == *aMirIter) {
@@ -560,9 +563,9 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
       bool isFound = aSelObject == *anObjIter;
       if (!isFound) {
         // check in the results of the feature
-        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
-        if (aFeature) {
-          const std::list<ResultPtr>& aResults = aFeature->results();
+        FeaturePtr aCurFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+        if (aCurFeature) {
+          const std::list<ResultPtr>& aResults = aCurFeature->results();
           for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
             aResIt != aResults.end() && !isFound; ++aResIt) {
             isFound = aSelObject == *aResIt;
@@ -570,7 +573,8 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
         }
       }
       if (isFound) {
-        std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
+        std::string aName =
+            aSelObject.get() ? Locale::Convert::toString(aSelObject->data()->name()) : "";
         theError = "The object %1 is a result of copy";
         theError.arg(aName);
         return false;

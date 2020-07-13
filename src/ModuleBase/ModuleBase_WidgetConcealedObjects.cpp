@@ -160,7 +160,8 @@ void ModuleBase_WidgetConcealedObjects::addViewRow(
   aVisibilityBtn->setChecked(false);
 
   myView->setCellWidget(anId, 0, aVisibilityWdg);
-  myView->setItem(anId, 1, new QTableWidgetItem(theResult->data()->name().c_str()));
+  myView->setItem(anId, 1,
+    new QTableWidgetItem(QString::fromStdWString(theResult->data()->name())));
 
   if (anId == 1) {
     myView->setColumnWidth(0, myView->verticalHeader()->defaultSectionSize());

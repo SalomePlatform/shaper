@@ -230,6 +230,9 @@ public:
   /// Dump string
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::string& theString);
+  /// Dump wstring
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::wstring& theString);
   /// Dump boolean
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const bool theValue);

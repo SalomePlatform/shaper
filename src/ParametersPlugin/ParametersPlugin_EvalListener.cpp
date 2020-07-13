@@ -24,6 +24,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
@@ -239,16 +241,16 @@ bool isValidAttribute(const AttributePtr& theAttribute)
 void setParameterName(ResultParameterPtr theResultParameter, const std::string& theName)
 {
   bool aWasBlocked = theResultParameter->data()->blockSendAttributeUpdated(true);
-  theResultParameter->data()->setName(theName);
+  theResultParameter->data()->setName(Locale::Convert::toWString(theName));
   theResultParameter->data()->blockSendAttributeUpdated(aWasBlocked, false);
 
   std::shared_ptr<ParametersPlugin_Parameter> aParameter =
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
           ModelAPI_Feature::feature(theResultParameter));
 
-  std::string anOldName = aParameter->name();
+  std::string anOldName = Locale::Convert::toString(aParameter->name());
   aWasBlocked = aParameter->data()->blockSendAttributeUpdated(true);
-  aParameter->data()->setName(theName);
+  aParameter->data()->setName(Locale::Convert::toWString(theName));
   aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
   aParameter->data()->blockSendAttributeUpdated(aWasBlocked);
 }
@@ -277,7 +279,7 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   if (!aParameter.get())
     return;
 
-  std::string aNotActivatedNames;
+  std::wstring aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     static const std::string aMsgContext("ParametersPlugin");
     static const std::string aMsgText =
@@ -290,28 +292,29 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
         ModuleBase_Tools::translate(aMsg),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes) {
-      setParameterName(aResultParameter, aMessage->oldName());
+      setParameterName(aResultParameter, Locale::Convert::toString(aMessage->oldName()));
       return;
     }
   }
 
   // try to update the parameter feature according the new name
-  setParameterName(aResultParameter, aMessage->newName());
+  setParameterName(aResultParameter, Locale::Convert::toString(aMessage->newName()));
   if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
     //setParameterName(aResultParameter, aMessage->oldName());
     if (myOldNames.find(aParameter.get()) == myOldNames.end())
-      myOldNames[aParameter.get()] = aMessage->oldName();
+      myOldNames[aParameter.get()] = Locale::Convert::toString(aMessage->oldName());
     return;
   }
 
-  std::string anOldName = aMessage->oldName();
+  std::string anOldName = Locale::Convert::toString(aMessage->oldName());
   if (myOldNames.find(aParameter.get()) != myOldNames.end()) {
     anOldName = myOldNames[aParameter.get()];
     myOldNames.erase(aParameter.get());
     aParameter->execute(); // to enable result because of previously incorrect name
   }
 
-  renameInDependents(aResultParameter, anOldName, aMessage->newName());
+  renameInDependents(aResultParameter, anOldName,
+                     Locale::Convert::toString(aMessage->newName()));
 }
 
 void ParametersPlugin_EvalListener::processReplaceParameterEvent(
@@ -336,5 +339,7 @@ void ParametersPlugin_EvalListener::processReplaceParameterEvent(
   double aRealValue = aResultParameter->data()->real(ModelAPI_ResultParameter::VALUE())->value();
   std::string aValue = toStdString(aRealValue);
 
-  renameInDependents(aResultParameter, aResultParameter->data()->name(), aValue);
+  renameInDependents(aResultParameter,
+                     Locale::Convert::toString(aResultParameter->data()->name()),
+                     aValue);
 }

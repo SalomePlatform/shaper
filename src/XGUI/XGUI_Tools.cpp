@@ -105,7 +105,7 @@ QString unionOfObjectNames(const QObjectPtrList& theObjects, const QString& theS
   QStringList aObjectNames;
   foreach (ObjectPtr aObj, theObjects) {
     if (aObj->data()->isValid())
-      aObjectNames << QString::fromStdString(aObj->data()->name());
+      aObjectNames << QString::fromStdWString(aObj->data()->name());
   }
   if (aObjectNames.count() == 0)
     return QString();
@@ -145,14 +145,14 @@ std::string featureInfo(FeaturePtr theFeature)
 bool canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatures)
 {
   bool aResult = true;
-  std::string aNotActivatedNames;
+  std::wstring aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     bool aFoundPartSetObject = ModuleBase_Tools::hasModuleDocumentFeature(theFeatures);
     if (aFoundPartSetObject) {
       const char* aKeyStr = "Selected objects can be used in Part documents which are not loaded: "
                             "%1. Whould you like to continue?";
       QMessageBox::StandardButton aRes = QMessageBox::warning(theParent, QObject::tr("Warning"),
-               QObject::tr(aKeyStr).arg(aNotActivatedNames.c_str()),
+               QObject::tr(aKeyStr).arg(QString::fromStdWString(aNotActivatedNames)),
                QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
       aResult = aRes == QMessageBox::Yes;
     }
@@ -207,7 +207,7 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
   else {
     DocumentPtr aDoc = theObject->document();
     ObjectPtr aObj =
-      aDoc->objectByName(aType, theName.toStdString());
+      aDoc->objectByName(aType, theName.toStdWString());
 
     if (aObj.get() && theObject != aObj) {
       QString aErrMsg(QObject::tr("Name %2 already exists in %1.").
@@ -246,7 +246,7 @@ QString generateName(const ModuleBase_ViewerPrsPtr& thePrs)
     // TODO if there is this case
   }
 
-  QString aName = anObject->data()->name().c_str();
+  QString aName = QString::fromStdWString(anObject->data()->name());
   if (aContext.get()) {
     GeomShapePtr aSubShape(new GeomAPI_Shape());
     TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(thePrs);

@@ -22,6 +22,8 @@
 #include <Selector_NameGenerator.h>
 #include <Selector_NExplode.h>
 
+#include <Locale_Convert.h>
+
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_SameShapeIterator.hxx>
@@ -241,26 +243,26 @@ bool Selector_Modify::restore()
   return false;
 }
 
-TDF_Label Selector_Modify::restoreByName(std::string theName,
+TDF_Label Selector_Modify::restoreByName(std::wstring theName,
   const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator)
 {
   typedef NCollection_DataMap<TopoDS_Shape, bool, TopTools_ShapeMapHasher> MapOfCompsolids;
   MapOfCompsolids aWrongSubsCompsolids;
 
   TDF_Label aContext;
-  for(size_t anEnd, aStart = 0; aStart != std::string::npos; aStart = anEnd) {
+  for(size_t anEnd, aStart = 0; aStart != std::wstring::npos; aStart = anEnd) {
     if (aStart != 0)
       aStart++;
-    anEnd = theName.find('&', aStart);
-    std::string aSubStr =
-      theName.substr(aStart, anEnd == std::string::npos ? anEnd : anEnd - aStart);
+    anEnd = theName.find(L'&', aStart);
+    std::wstring aSubStr =
+      theName.substr(aStart, anEnd == std::wstring::npos ? anEnd : anEnd - aStart);
     size_t aFoundOldWeak = aSubStr.find(oldWeakNameID());
-    size_t aFoundNewWeak = aFoundOldWeak != std::string::npos ?
+    size_t aFoundNewWeak = aFoundOldWeak != std::wstring::npos ?
                            aSubStr.find(weakNameID()) :
                            aFoundOldWeak;
     if (aFoundOldWeak == 0 || aFoundNewWeak == 0) { // weak name identifier
-      std::string aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());
-      myWeakIndex = atoi(aWeakIndex.c_str());
+      std::wstring aWeakIndex = aSubStr.substr(aFoundOldWeak + oldWeakNameID().size());
+      myWeakIndex = atoi(Locale::Convert::toString(aWeakIndex).c_str());
       myRecomputeWeakIndex = aFoundOldWeak == 0;
       continue;
     }
@@ -359,25 +361,25 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
   return false;
 }
 
-std::string Selector_Modify::name(Selector_NameGenerator* theNameGenerator)
+std::wstring Selector_Modify::name(Selector_NameGenerator* theNameGenerator)
 {
   // final&base1&base2 +optionally: [weak_name_1]
-  std::string aResult;
+  std::wstring aResult;
   Handle(TDataStd_Name) aName;
   if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
-    return "";
-  aResult += theNameGenerator->contextName(myFinal) + "/" +
-    std::string(TCollection_AsciiString(aName->Get()).ToCString());
+    return L"";
+  aResult += theNameGenerator->contextName(myFinal) + L"/";
+  aResult += Locale::Convert::toWString(aName->Get().ToExtString());
   for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
     if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
-      return "";
-    aResult += "&";
-    aResult += theNameGenerator->contextName(*aBase) + "/" +
-      std::string(TCollection_AsciiString(aName->Get()).ToCString());
+      return L"";
+    aResult += L"&";
+    aResult += theNameGenerator->contextName(*aBase) + L"/";
+    aResult += Locale::Convert::toWString(aName->Get().ToExtString());
   }
   if (myWeakIndex != -1) {
-    std::ostringstream aWeakStr;
-    aWeakStr<<"&"<<weakNameID()<<myWeakIndex;
+    std::wostringstream aWeakStr;
+    aWeakStr<<L"&"<<weakNameID()<<myWeakIndex;
     aResult += aWeakStr.str();
   }
   return aResult;

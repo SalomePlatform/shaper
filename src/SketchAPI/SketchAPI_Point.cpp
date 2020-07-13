@@ -64,7 +64,7 @@ SketchAPI_Point::SketchAPI_Point(
 
 SketchAPI_Point::SketchAPI_Point(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theExternalName )
+    const std::wstring & theExternalName )
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -101,7 +101,7 @@ void SketchAPI_Point::setByExternal(const ModelHighAPI_Selection & theExternal)
   execute();
 }
 
-void SketchAPI_Point::setByExternalName(const std::string & theExternalName)
+void SketchAPI_Point::setByExternalName(const std::wstring & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("VERTEX", theExternalName), external());
 

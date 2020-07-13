@@ -19,6 +19,8 @@
 
 #include <ExchangePlugin_ImportPart.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeStringArray.h>
@@ -30,6 +32,7 @@
 
 #include <map>
 #include <sstream>
+#include <string>
 
 static const std::string THE_NEW_PART_STR("New Part");
 static const std::string THE_PART_SET_STR("PartSet");
@@ -102,7 +105,7 @@ void ExchangePlugin_ImportPart::attributeChanged(const std::string& theID)
       for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
            aFIt != aSubFeatures.end(); ++aFIt) {
         if ((*aFIt)->getKind() == PartSetPlugin_Part::ID())
-          anAcceptedValues.push_back((*aFIt)->name());
+          anAcceptedValues.push_back(Locale::Convert::toString((*aFIt)->name()));
       }
 
       if ((size_t)aPartsAttr->size() != anAcceptedValues.size())
@@ -119,7 +122,7 @@ void ExchangePlugin_ImportPart::attributeChanged(const std::string& theID)
         FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
 
         aPartsAttr->setSize(1);
-        aPartsAttr->setValue(0, aPartFeature->name());
+        aPartsAttr->setValue(0, Locale::Convert::toString(aPartFeature->name()));
         aTargetAttr->setValue(0);
       }
     }
@@ -147,7 +150,8 @@ DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartNa
       std::list<FeaturePtr> aSubFeatures = thePartSetDoc->allFeatures();
       for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
            aFIt != aSubFeatures.end(); ++aFIt) {
-        if ((*aFIt)->getKind() == PartSetPlugin_Part::ID() && (*aFIt)->name() == thePartName) {
+        if ((*aFIt)->getKind() == PartSetPlugin_Part::ID() &&
+          Locale::Convert::toString((*aFIt)->name()) == thePartName) {
           aPartFeature = *aFIt;
           break;
         }
@@ -164,16 +168,16 @@ DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartNa
   return aDoc;
 }
 
-typedef std::map<std::string, std::map<std::string, std::set<int> > > ObjectNameMap;
+typedef std::map<std::string, std::map<std::wstring, std::set<int> > > ObjectNameMap;
 
-bool splitName(std::string& theName, int& theIndex)
+bool splitName(std::wstring& theName, int& theIndex)
 {
   size_t aLastUndercore = theName.find_last_of('_');
-  bool isOk = aLastUndercore != std::string::npos;
+  bool isOk = aLastUndercore != std::wstring::npos;
   if (isOk) {
-    char* isNumber;
-    std::string anIndexStr = theName.substr(aLastUndercore + 1);
-    theIndex = std::strtol(anIndexStr.c_str(), &isNumber, 10);
+    size_t isNumber;
+    std::wstring anIndexStr = theName.substr(aLastUndercore + 1);
+    theIndex = std::stol(anIndexStr, &isNumber);
     isOk = isNumber != 0;
     if (isOk)
       theName.erase(aLastUndercore);
@@ -183,7 +187,7 @@ bool splitName(std::string& theName, int& theIndex)
 
 void addIndexedName(const ObjectPtr& theObject, ObjectNameMap& theIndexedNames)
 {
-  std::string aName = theObject->data()->name();
+  std::wstring aName =theObject->data()->name();
   std::string aGroup = theObject->groupName();
   int anIndex = 0;
   bool isIndexed = splitName(aName, anIndex);
@@ -220,9 +224,9 @@ static void collectOldNames(DocumentPtr theDocument, std::list<FeaturePtr>& theA
   }
 }
 
-static std::string uniqueName(const ObjectPtr& theObject, ObjectNameMap& theExistingNames)
+static std::wstring uniqueName(const ObjectPtr& theObject, ObjectNameMap& theExistingNames)
 {
-  std::string aName = theObject->data()->name();
+  std::wstring aName = theObject->data()->name();
   std::string aGroup = theObject->groupName();
   int anIndex = 1;
   splitName(aName, anIndex);
@@ -230,7 +234,7 @@ static std::string uniqueName(const ObjectPtr& theObject, ObjectNameMap& theExis
   ObjectNameMap::iterator aFoundGroup = theExistingNames.find(aGroup);
   bool isUnique = aFoundGroup == theExistingNames.end();
 
-  std::map<std::string, std::set<int> >::iterator aFound;
+  std::map<std::wstring, std::set<int> >::iterator aFound;
   if (!isUnique) {
     aFound = aFoundGroup->second.find(aName);
     isUnique = aFound == aFoundGroup->second.end();
@@ -248,7 +252,7 @@ static std::string uniqueName(const ObjectPtr& theObject, ObjectNameMap& theExis
       if (anIndex != *aFoundIndex)
         break;
     // compose the new name
-    std::ostringstream aNewName;
+    std::wostringstream aNewName;
     aNewName << aName << "_" << anIndex;
     aName = aNewName.str();
     // add new index
@@ -266,7 +270,7 @@ void correntNonUniqueNames(DocumentPtr theDocument, std::list<FeaturePtr>& theIm
   for (std::list<FeaturePtr>::iterator anIt = theImported.begin();
        anIt != theImported.end(); ++anIt) {
     // update name of feature
-    std::string aNewName = uniqueName(*anIt, aNames);
+    std::wstring aNewName = uniqueName(*anIt, aNames);
     (*anIt)->data()->setName(aNewName);
     // update names of results
     const std::list<ResultPtr>& aResults = (*anIt)->results();

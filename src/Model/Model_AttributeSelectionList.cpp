@@ -88,7 +88,7 @@ void Model_AttributeSelectionList::append(
 }
 
 void Model_AttributeSelectionList::append(
-  const std::string& theNamingName, const std::string& theType)
+  const std::wstring& theNamingName, const std::string& theType)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
@@ -123,7 +123,7 @@ void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const st
 }
 
 void Model_AttributeSelectionList::append(const std::string& theType,
-  const std::string& theContextName, const int theIndex)
+  const std::wstring& theContextName, const int theIndex)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);

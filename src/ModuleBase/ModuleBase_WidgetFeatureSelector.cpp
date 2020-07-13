@@ -183,8 +183,8 @@ void ModuleBase_WidgetFeatureSelector::updateSelectionName()
 
   ObjectPtr anObject = ModuleBase_Tools::getObject(myFeature->attribute(attributeID()));
   if (anObject.get() != NULL) {
-    std::string aName = anObject->data()->name();
-    myTextLine->setText(QString::fromStdString(aName));
+    std::wstring aName = anObject->data()->name();
+    myTextLine->setText(QString::fromStdWString(aName));
   } else {
     myTextLine->clear();
   }

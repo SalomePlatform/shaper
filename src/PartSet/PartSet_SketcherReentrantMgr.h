@@ -134,6 +134,8 @@ public:
   bool isAutoConstraints() const { return myIsAutoConstraints; }
 
 
+  bool isLastAutoConstraint(const ObjectPtr& theObj) const;
+
 public slots:
   /// The slot is called when user checks "Automatic constraints" button
   /// \param isOn a state of the check box

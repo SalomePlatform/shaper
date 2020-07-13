@@ -73,7 +73,7 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
         new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
     Events_Loop::loop()->send(aMsg);
 
-    FeaturePtr aOrigin = createPoint(aDoc, "Origin", 0., 0., 0.);
+    FeaturePtr aOrigin = createPoint(aDoc, L"Origin", 0., 0., 0.);
     aFeatures.push_back(aOrigin);
     aFeatures.push_back(createAxis(aDoc, aOrigin, 100., 0., 0.));
     aFeatures.push_back(createAxis(aDoc, aOrigin, 0., 100., 0.));
@@ -116,11 +116,11 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   aPlane->real("D")->setValue(0.);
 
   if (theX) {
-    aPlane->data()->setName("YOZ");
+    aPlane->data()->setName(L"YOZ");
   } else if (theY) {
-    aPlane->data()->setName("XOZ");
+    aPlane->data()->setName(L"XOZ");
   } else if (theZ) {
-    aPlane->data()->setName("XOY");
+    aPlane->data()->setName(L"XOY");
   }
     // don't show automatically created feature in the features history
   aPlane->setInHistory(aPlane, false);
@@ -136,7 +136,7 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   return aPlane;
 }
 
-FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const std::string& theName,
+FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const std::wstring& theName,
                                                     double theX, double theY, double theZ)
 {
   std::shared_ptr<ModelAPI_Feature> aPoint = theDoc->addFeature("Point");
@@ -171,11 +171,11 @@ FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePt
   aAxis->real("Z_Direction")->setValue(theZ);
 
   if (theX != 0) {
-    aAxis->data()->setName("OX");
+    aAxis->data()->setName(L"OX");
   } else if (theY != 0) {
-    aAxis->data()->setName("OY");
+    aAxis->data()->setName(L"OY");
   } else if (theZ != 0) {
-    aAxis->data()->setName("OZ");
+    aAxis->data()->setName(L"OZ");
   }
    // don't show automatically created feature in the features history
   aAxis->setInHistory(aAxis, false);
