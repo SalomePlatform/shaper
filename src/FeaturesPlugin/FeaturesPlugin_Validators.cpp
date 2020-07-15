@@ -458,7 +458,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
       }
     }
 
-    if(aContextShape.get() && !aShape->isEqual(aContextShape)) {
+    if(!aConstruction && aContextShape.get() && !aShape->isEqual(aContextShape)) {
       // Local selection on body does not allowed.
       theError =
         "Error: Selected shape is in the local selection. Only global selection is allowed.";
