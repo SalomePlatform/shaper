@@ -70,10 +70,12 @@ MACRO(ADD_UNIT_TESTS)
                COMMAND ${PYTHON_EXECUTABLE} ${aTestFileName})
       if (WIN32) # different path to libraries variable name
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}")
+               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}"
+               LABELS "${aSubprojectName}")
       else()
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}")
+               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}"
+               LABELS "${aSubprojectName}")
       endif()
       # Debug output...
       #MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFileName}")
@@ -111,10 +113,12 @@ MACRO(ADD_UNIT_TESTS_API)
                COMMAND ${PYTHON_EXECUTABLE} ${aTestFileName})
       if (WIN32) # different path to libraries variable name
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}")
+               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}"
+               LABELS "${aSubprojectName}")
       else()
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}")
+               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}"
+               LABELS "${aSubprojectName}")
       endif()
       # Debug output...
       #MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFileName}")
