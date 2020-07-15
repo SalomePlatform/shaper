@@ -52,7 +52,7 @@ The created B-spline curve appears in the view.
 .. centered::
    Interpolation curve (non-closed, periodic and closed)
 
-**See Also** a sample TUI Script of :ref:`tui_create_interpolation` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_sketch_interpolation` operation.
 
 
 Approximation
@@ -86,4 +86,4 @@ The created B-spline curve appears in the view.
 .. centered::
    Approximated curve (non-closed, periodic and closed)
 
-**See Also** a sample TUI Script of :ref:`tui_create_approximation` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_sketch_approximation` operation.

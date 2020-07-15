@@ -45,11 +45,11 @@ Input fields:
 
 **TUI Command**:
 
-.. py:function:: model.addFillet(Part_doc, [wires], radius)
+.. py:function:: model.addFillet(Part_doc, wires, radius)
 
-    :param part: The current part object.
-    :param list: A list of wires subject to fillet operation in format *model.selection(TYPE, shape)*.
-    :param number: Radius value.
+    :param document Part_doc: The current part object.
+    :param list wires: A list of wires subject to fillet operation in format *model.selection(TYPE, shape)*.
+    :param double radius: Radius value.
     :return: Created object.
 
 Result
@@ -83,12 +83,12 @@ Input fields:
 
 **TUI Command**:
 
-.. py:function:: model.addFillet(Part_doc, [vertices], radius)
+.. py:function:: model.addFillet(Part_doc, vertices, radius)
   :noindex:
 
-    :param part: The current part object.
-    :param list: A list of vertices subject to fillet operation in format *model.selection(TYPE, shape)*.
-    :param number: Radius value.
+    :param document Part_doc: The current part object.
+    :param list vertices: A list of vertices subject to fillet operation in format *model.selection(TYPE, shape)*.
+    :param double radius: Radius value.
     :return: Created object.
 
 Result

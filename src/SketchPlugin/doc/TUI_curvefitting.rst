@@ -1,5 +1,5 @@
 
-  .. _tui_create_interpolation:
+  .. _tui_create_sketch_interpolation:
 
 Create interpolation curve
 ==========================
@@ -11,7 +11,7 @@ Create interpolation curve
 :download:`Download this script <examples/interpolation.py>`
 
 
-  .. _tui_create_approximation:
+  .. _tui_create_sketch_approximation:
 
 Create approximation curve
 ==========================
