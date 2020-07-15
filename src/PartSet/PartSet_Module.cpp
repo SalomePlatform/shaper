@@ -1573,7 +1573,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       return;
     XGUI_Workshop* aWorkshop = getWorkshop();
     bool needUpdate = false;
-    XGUI_DataTree* aTreeView;
+    XGUI_DataTree* aTreeView = 0;
     if (aWorkshop->objectBrowser()) {
       aTreeView = aWorkshop->objectBrowser()->treeView();
       QLabel* aLabel = aWorkshop->objectBrowser()->activeDocLabel();

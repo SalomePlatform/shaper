@@ -172,7 +172,6 @@ void GeomAlgoAPI_CurveBuilder::reorderPoints(std::list<GeomPointPtr>& thePoints)
     return;
   }
 
-  int aNbDup = 0;
   std::list<GeomPointPtr>::iterator aPIt = thePoints.begin();
   GeomPointPtr aPrevPnt = *aPIt;
   for (; aPIt != thePoints.end(); ++aPIt) {

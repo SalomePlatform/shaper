@@ -93,6 +93,7 @@ The plug-in includes the following features for creation of 2D objects:
    ellipseFeature.rst
    arcEllipseFeature.rst
    bsplineFeature.rst
+   curveFittingFeature.rst
 
 .. _sketch_constraints:
 

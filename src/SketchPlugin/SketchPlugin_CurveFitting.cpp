@@ -262,7 +262,7 @@ void SketchPlugin_CurveFitting::reorderPoints()
   // to keep mapping between points and attributes
   std::map<GeomPointPtr, std::pair<ObjectPtr, AttributePtr> > aMap;
   std::list<std::pair<ObjectPtr, AttributePtr> > aPointsList = aPointsAttr->list();
-  bool isPointAdded = aCoordinates.size() != aPointsList.size();
+
   std::list<GeomPointPtr>::iterator aCoordIt = aCoordinates.begin();
   std::list<std::pair<ObjectPtr, AttributePtr> >::iterator anAttrIt = aPointsList.begin();
   for (; aCoordIt != aCoordinates.end() && anAttrIt != aPointsList.end(); ++aCoordIt, ++anAttrIt)

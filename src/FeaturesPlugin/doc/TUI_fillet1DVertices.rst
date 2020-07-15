@@ -8,5 +8,5 @@ Create 1D-fillet for special vertices on a wire
     :linenos:
     :language: python
 
-:download:`Download this script <examples/fillet1d_vertices.py >` 
-   
+:download:`Download this script <examples/fillet1d_vertices.py>`
+

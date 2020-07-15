@@ -8,5 +8,5 @@ Create 1D-fillet on a wire
     :linenos:
     :language: python
 
-:download:`Download this script <examples/fillet1d_wire.py >` 
-   
+:download:`Download this script <examples/fillet1d_wire.py>`
+

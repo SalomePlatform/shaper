@@ -15,13 +15,17 @@ To create a 1D-fillet in the active part:
 
 There are 2 types of fillet:
 
-  .. image:: images/fillet1d_wire.png   
-    :align: left
-  fillet all sharp corners on a wire
+.. image:: images/fillet1d_wire.png   
+  :align: left
+  :height: 24px
 
-  .. image:: images/fillet1d_points.png   
-    :align: left
-  fillet only the specified corners
+fillet all sharp corners on a wire
+
+.. image:: images/fillet1d_points.png   
+  :align: left
+  :height: 24px
+
+fillet only the specified corners
 
 Fillet a wire
 -------------
@@ -80,6 +84,7 @@ Input fields:
 **TUI Command**:
 
 .. py:function:: model.addFillet(Part_doc, [vertices], radius)
+  :noindex:
 
     :param part: The current part object.
     :param list: A list of vertices subject to fillet operation in format *model.selection(TYPE, shape)*.

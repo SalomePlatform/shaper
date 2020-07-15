@@ -578,7 +578,7 @@ TopoDS_Edge GEOMImpl_Fillet1d::Result(const gp_Pnt& thePoint,
   aTargetPoint2d.SetCoord(aX, aY);
 
   // choose the nearest circle
-  Standard_Real aDistance, aP;
+  Standard_Real aDistance = Precision::Infinite();
   GEOMImpl_Fillet1dPoint *aNearest;
   Standard_Integer a;
   TColStd_ListIteratorOfListOfReal anIter(myResultParams);
@@ -589,7 +589,7 @@ TopoDS_Edge GEOMImpl_Fillet1d::Result(const gp_Pnt& thePoint,
     fillPoint(aPoint);
     if (!aPoint->HasSolution(myRadius))
       continue;
-    aP = fabs(aPoint->GetCenter().Distance(aTargetPoint2d) - myRadius);
+    Standard_Real aP = fabs(aPoint->GetCenter().Distance(aTargetPoint2d) - myRadius);
     if (!aNearest || aP < aDistance)
     {
       aNearest = aPoint;
@@ -715,7 +715,7 @@ Standard_Boolean GEOMImpl_Fillet1dPoint::ComputeDifference(GEOMImpl_Fillet1dPoin
 {
   Standard_Integer a;
   Standard_Boolean aDiffsSet = (myD.Length() != 0);
-  Standard_Real aDX = thePoint->GetParam() - myParam, aDY;
+  Standard_Real aDX = thePoint->GetParam() - myParam, aDY = 0.0;
   if (thePoint->myV.Length() == myV.Length())
   { // absolutely the same points
     for(a = 1; a <= myV.Length(); a++)
