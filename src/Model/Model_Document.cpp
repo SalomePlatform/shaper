@@ -388,6 +388,10 @@ bool Model_Document::importPart(const char* theFileName,
   if (isOk && !theCheckOnly) {
     // copy features from the temporary document to the current
     Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
+    // add to relocation table source root label to the destination label because
+    // sometimes there could be a reference to root (issue 3267 on import part
+    // with sketch with removed features)
+    aRelocTable->SetRelocation(aTempDoc->Main().Root(), myDoc->Main().Root());
     TDF_LabelList anAllNewFeatures;
     // Perform the copying twice for correct references:
     // 1. copy labels hierarchy and fill the relocation table
