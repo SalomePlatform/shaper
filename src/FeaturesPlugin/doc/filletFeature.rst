@@ -82,12 +82,12 @@ Input fields:
 
 **TUI Command**:
 
-.. py:function:: model.addFillet(Part_doc, [face,edge], R1, R2)
+.. py:function:: model.addFillet(Part_doc, shapes, R1, R2)
 
-    :param part: The current part object.
-    :param list: A list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)*.
-    :param number: Start radius value.
-    :param number: End radius value.
+    :param document Part_doc: The current part object.
+    :param list shapes: A list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)*.
+    :param double R1: Start radius value.
+    :param double R2: End radius value.
     :return: Created object.
 
 Result
