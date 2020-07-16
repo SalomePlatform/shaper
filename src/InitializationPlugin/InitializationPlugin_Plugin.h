@@ -72,6 +72,7 @@ class InitializationPlugin_Plugin : public Events_Listener
 
  private:
   std::shared_ptr<InitializationPlugin_EvalListener> myEvalListener;
+  bool myInitDataModel;
 };
 
 #endif

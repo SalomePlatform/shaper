@@ -42,6 +42,9 @@ static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE =
 
 InitializationPlugin_Plugin::InitializationPlugin_Plugin()
 {
+  char* isUnitTest = getenv("SHAPER_UNIT_TEST_IN_PROGRESS");
+  myInitDataModel = (!isUnitTest || isUnitTest[0] != '1');
+
   Events_Loop* aLoop = Events_Loop::loop();
   const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
   aLoop->registerListener(this, kDocCreatedEvent, NULL, true);
@@ -63,7 +66,8 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     if (aDoc != ModelAPI_Session::get()->moduleDocument())
       return;
 
-    myEvalListener->initDataModel();
+    if (myInitDataModel)
+      myEvalListener->initDataModel();
 
     std::list<FeaturePtr> aFeatures;
 
