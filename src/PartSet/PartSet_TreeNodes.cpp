@@ -133,6 +133,8 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
     }
   case Qt::ForegroundRole:
     if (myObject->groupName() == ModelAPI_Feature::group()) {
+      if (myObject->isDisabled())
+        return PartSet_TreeNode::data(theColumn, theRole);
       std::vector<int> aColor =
         Config_PropManager::color("Visualization", "feature_objectbrowser_color");
       return QColor(aColor[0], aColor[1], aColor[2]);
@@ -1211,9 +1213,11 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& /*the
 QVariant PartSet_ObjectFolderNode::data(int theColumn, int theRole) const
 {
   if (theRole == Qt::ForegroundRole) {
-    std::vector<int> aColor =
-      Config_PropManager::color("Visualization", "feature_objectbrowser_color");
-    return QColor(aColor[0], aColor[1], aColor[2]);
+    if (!myObject->isDisabled()) {
+      std::vector<int> aColor =
+        Config_PropManager::color("Visualization", "feature_objectbrowser_color");
+      return QColor(aColor[0], aColor[1], aColor[2]);
+    }
   }
   return PartSet_ObjectNode::data(theColumn, theRole);
 
