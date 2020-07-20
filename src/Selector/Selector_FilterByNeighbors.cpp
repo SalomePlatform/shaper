@@ -402,6 +402,8 @@ std::wstring Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGen
     if (!*aSubSel)
       continue;
     std::wstring aSubName = (*aSubSel)->name(theNameGenerator);
+    if (aSubName.empty())
+      return L"()";
     aResult += L"(" + aSubName + L")";
     if (*aLevel > 1) {
       std::wostringstream aLevelStr;

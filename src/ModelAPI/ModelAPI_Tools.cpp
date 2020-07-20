@@ -698,7 +698,7 @@ std::pair<std::wstring, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resu
       }
     }
     // check the result is a Body
-    if ((*anObjIt)->groupName() == ModelAPI_ResultBody::group()) {
+    if (anObjIt->get() && (*anObjIt)->groupName() == ModelAPI_ResultBody::group()) {
       // check the result is part of CompSolid
       ResultPtr anObjRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
       ResultBodyPtr aParentBody = ModelAPI_Tools::bodyOwner(anObjRes);

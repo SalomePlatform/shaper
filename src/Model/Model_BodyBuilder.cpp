@@ -303,8 +303,8 @@ TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
   std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
   if (aFind == myBuilders.end()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    myBuilders[theTag] = new TNaming_Builder(
-      theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag));
+    TDF_Label aLab = theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag);
+    myBuilders[theTag] = new TNaming_Builder(aLab);
     aFind = myBuilders.find(theTag);
   }
   return aFind->second;
@@ -430,6 +430,11 @@ void Model_BodyBuilder::clean()
   TDF_ChildIDIterator anEntriesIter(aLab, kEXTERNAL_SHAPE_REF, true);
   for(; anEntriesIter.More(); anEntriesIter.Next()) {
     anEntriesIter.Value()->Label().ForgetAttribute(kEXTERNAL_SHAPE_REF);
+  }
+  // to clear old shapes in all sub-labels (they may be left without builders on Open)
+  TDF_ChildIDIterator aNSIter(aLab, TNaming_NamedShape::GetID(), true);
+  for(; aNSIter.More(); aNSIter.Next()) {
+    aNSIter.Value()->Label().ForgetAttribute(aNSIter.Value());
   }
 }
 
