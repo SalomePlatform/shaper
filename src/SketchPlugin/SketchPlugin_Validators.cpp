@@ -1284,7 +1284,7 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
       if (aBSplinePlane) {
         std::shared_ptr<GeomAPI_Dir> aBSplineNormal = aBSplinePlane->direction();
         double aDot = fabs(aNormal->dot(aBSplineNormal));
-        aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
+        aValid = aDot > tolerance * tolerance;
         if (!aValid) {
           // B-spline's plane is orthogonal to the sketch plane,
           // thus, need to check whether B-spline is planar.

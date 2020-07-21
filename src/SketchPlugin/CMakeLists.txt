@@ -335,6 +335,7 @@ ADD_UNIT_TESTS(
   TestProjection.py
   TestProjectionBSpline.py
   TestProjectionBSplinePeriodic.py
+  TestProjectionBSplinePeriodicError.py
   TestProjectionEllipse.py
   TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
