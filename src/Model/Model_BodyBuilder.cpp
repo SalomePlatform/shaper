@@ -298,13 +298,17 @@ void Model_BodyBuilder::storeGenerated(const std::list<GeomShapePtr>& theFromSha
   }
 }
 
+static TDF_Label builderLabel(DataPtr theData, const int theTag )
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theData);
+  return theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag);
+}
+
 TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
 {
   std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
   if (aFind == myBuilders.end()) {
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    TDF_Label aLab = theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag);
-    myBuilders[theTag] = new TNaming_Builder(aLab);
+    myBuilders[theTag] = new TNaming_Builder(builderLabel(data(), theTag));
     aFind = myBuilders.find(theTag);
   }
   return aFind->second;
@@ -431,11 +435,6 @@ void Model_BodyBuilder::clean()
   for(; anEntriesIter.More(); anEntriesIter.Next()) {
     anEntriesIter.Value()->Label().ForgetAttribute(kEXTERNAL_SHAPE_REF);
   }
-  // to clear old shapes in all sub-labels (they may be left without builders on Open)
-  TDF_ChildIDIterator aNSIter(aLab, TNaming_NamedShape::GetID(), true);
-  for(; aNSIter.More(); aNSIter.Next()) {
-    aNSIter.Value()->Label().ForgetAttribute(aNSIter.Value());
-  }
 }
 
 void Model_BodyBuilder::cleanCash()
@@ -462,7 +461,7 @@ void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
   }
   aName.insert(0, aPrefix);
 
-  TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(), aName.c_str());
+  TDataStd_Name::Set(builderLabel(data(), theTag), aName.c_str());
 }
 bool Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
                                   const std::string& theName,
@@ -735,7 +734,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
         for (TopExp_Explorer anExp(aNewShape_, aShapeTypeToExplore); anExp.More(); anExp.Next()) {
           builder(aTag)->Generated(anOldSubShape_, anExp.Current());
           // store information about the external document reference to restore old shape on open
-          storeExternalReference(anOriginalLabel, builder(aTag)->NamedShape()->Label());
+          storeExternalReference(anOriginalLabel, builderLabel(data(), aTag));
         }
         buildName(aTag, theName);
       } else {
@@ -744,7 +743,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
         builder(aTag)->Generated(anOldSubShape_, aNewShape_);
         buildName(aTag, theName);
         // store information about the external document reference to restore old shape on open
-        storeExternalReference(anOriginalLabel, builder(aTag)->NamedShape()->Label());
+        storeExternalReference(anOriginalLabel, builderLabel(data(), aTag));
       }
     }
   }
