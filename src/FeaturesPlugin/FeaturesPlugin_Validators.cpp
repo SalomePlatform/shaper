@@ -415,6 +415,9 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     case GeomValidators_ShapeType::Face:
       anApplicableTypes.push_back("face");
       anApplicableTypes.push_back("shell");
+      // wire should not be the first in this list to be able to check
+      // the type of selection when evaluating shape by shape
+      anApplicableTypes.push_back("wire");
       break;
     default:
       anApplicableTypes = theArguments;
