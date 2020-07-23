@@ -51,6 +51,7 @@ void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int the
   if(theInitFlags & InitBaseObjectsList) {
     data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
     myCurrentSelectionType = selectionList(BASE_OBJECTS_ID())->selectionType();
+    selectionList(BASE_OBJECTS_ID())->setWholeResultAllowed(true);
   }
 }
 

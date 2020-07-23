@@ -31,6 +31,8 @@
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeIterator.h>
 
+#include <GeomValidators_ShapeType.h>
+
 //==================================================================================================
 void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
                                               const ListOfShape& theBaseShapes,
@@ -201,15 +203,18 @@ bool FeaturesPlugin_Tools::getShape(const AttributeSelectionListPtr theSelection
         theError = "Error: Selected sketches does not have results.";
         return false;
       }
-      int aFacesNum = aConstruction->facesNum();
+      GeomValidators_ShapeType::TypeOfShape aSelType =
+          GeomValidators_ShapeType::shapeType(theSelectionList->selectionType());
+      int aFacesNum = 0;
+      if (aSelType != GeomValidators_ShapeType::Vertex &&
+          aSelType != GeomValidators_ShapeType::Edge)
+        aFacesNum = aConstruction->facesNum();
       if(aFacesNum == 0) {
         // Probably it can be construction.
         aBaseShape = aConstruction->shape();
         if(aBaseShape.get() && !aBaseShape->isNull()) {
           GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE &&
-             aST != GeomAPI_Shape::WIRE &&
-             aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
+          if(aST == GeomAPI_Shape::SOLID || aST == GeomAPI_Shape::COMPSOLID) {
             theError = "Error: Selected shapes has unsupported type.";
             return false;
           }

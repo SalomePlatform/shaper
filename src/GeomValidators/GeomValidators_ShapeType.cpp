@@ -69,7 +69,7 @@ GeomValidators_ShapeType::TypeOfShape
     return MyShapeTypes[aType];
 
 // LCOV_EXCL_START
-  Events_InfoMessage("Shape type defined in XML is not implemented!").send();
+  //Events_InfoMessage("Shape type defined in XML is not implemented!").send();
   return AnyShape;
 // LCOV_EXCL_STOP
 }

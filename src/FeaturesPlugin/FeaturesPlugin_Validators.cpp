@@ -61,6 +61,8 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
+#include <algorithm>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -399,9 +401,29 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
   if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+
+    const std::string& aSelType = aListAttr->selectionType();
+    std::list<std::string> anApplicableTypes;
+    switch (GeomValidators_ShapeType::shapeType(aSelType)) {
+    case GeomValidators_ShapeType::Vertex:
+      anApplicableTypes.push_back("vertex");
+      break;
+    case GeomValidators_ShapeType::Edge:
+      anApplicableTypes.push_back("edge");
+      anApplicableTypes.push_back("wire");
+      break;
+    case GeomValidators_ShapeType::Face:
+      anApplicableTypes.push_back("face");
+      anApplicableTypes.push_back("shell");
+      break;
+    default:
+      anApplicableTypes = theArguments;
+      break;
+    }
+
     for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
       // If at least one attribute is invalid, the result is false.
-      if(!isValidAttribute(aListAttr->value(anIndex), theArguments, theError)) {
+      if(!isValidAttribute(aListAttr->value(anIndex), anApplicableTypes, theError)) {
         return false;
       }
     }
@@ -441,8 +463,9 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
 
       aContextShape = aContext->shape();
       if(aShape->isEqual(aContextShape)) {
-        // Whole construction selected. Check that it have faces.
-        if(aConstruction->facesNum() > 0) {
+        // Whole construction selected. Check that it has faces.
+        if((theArguments.front() == "face" && aConstruction->facesNum() > 0) ||
+            theArguments.front() == "edge") {
           return true;
         }
       } else {
