@@ -2,7 +2,6 @@
   <multi_selector id="base_objects"
                   label="Base objects:"
                   tooltip="Select a base objects"
-                  shape_types="vertices edges wires faces shells compsolids"
                   use_choice="false"
                   concealment="true">
     <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
