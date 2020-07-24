@@ -23,5 +23,8 @@
         <file>icons/extrusion_edge32.png</file>
         <file>icons/extrusion_face32.png</file>
         <file>icons/extrusion_vertex32.png</file>
+        <file>icons/revolution_edge32.png</file>
+        <file>icons/revolution_face32.png</file>
+        <file>icons/revolution_vertex32.png</file>
     </qresource>
 </RCC>
