@@ -320,11 +320,16 @@ bool buildSketchWires(FeaturePtr theSketchFeature, GeomShapePtr theSketchShape, 
     const ListOfShape& aFaces = aSketchBuilder->faces();
     for (ListOfShape::const_iterator anIt = aFaces.begin(); anIt != aFaces.end(); ++anIt) {
       for (GeomAPI_ShapeExplorer aWExp(*anIt, GeomAPI_Shape::WIRE); aWExp.more(); aWExp.next()) {
+        // skip the wire if at least one its edge was already processed
         GeomAPI_ShapeExplorer aEExp(aWExp.current(), GeomAPI_Shape::EDGE);
-        if (aProcessedEdges.find(aEExp.current()) != aProcessedEdges.end())
-          continue; // wire is already processed
+        for (; aEExp.more(); aEExp.next()) {
+          if (aProcessedEdges.find(aEExp.current()) != aProcessedEdges.end())
+            break; // wire is already processed
+        }
+        if (aEExp.more())
+          continue;
         // mark edges as processed
-        for (; aEExp.more(); aEExp.next())
+        for (aEExp.init(aWExp.current(), GeomAPI_Shape::EDGE); aEExp.more(); aEExp.next())
           aProcessedEdges.insert(aEExp.current());
         // store the wire
         theWires.push_back(aWExp.current());
