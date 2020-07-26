@@ -95,8 +95,8 @@ class TestCoincidenceEllipse(unittest.TestCase):
       self.assertGreater(self.myEllipse.minorRadius().value(), 0.0)
 
   def assertPoints(self, thePoint1, thePoint2):
-    self.assertAlmostEqual(thePoint1.x(), thePoint2.x())
-    self.assertAlmostEqual(thePoint1.y(), thePoint2.y())
+    self.assertAlmostEqual(thePoint1.x(), thePoint2.x(), delta = 1.e-6)
+    self.assertAlmostEqual(thePoint1.y(), thePoint2.y(), delta = 1.e-6)
 
   def checkPointOnAxis(self, thePoint):
     self.mySketch.setCoincident(thePoint, self.myOX.result())
