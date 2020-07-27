@@ -23,6 +23,7 @@
 #include <SelectBasics_EntityOwner.hxx>
 #include <Select3D_SensitiveEntity.hxx>
 #include <Standard_DefineHandle.hxx>
+#include <Standard_Version.hxx>
 
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity)
@@ -42,8 +43,11 @@ public:
                                              int theId);
 
   /// Returns number of sub-elements
+#if OCC_VERSION_HEX > 0x070400
+  Standard_EXPORT virtual Standard_Integer NbSubElements() const Standard_OVERRIDE;
+#else
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
-
+#endif
   //! Update location of the point
   Standard_EXPORT virtual Handle(Select3D_SensitiveEntity) GetConnected() Standard_OVERRIDE;
 

@@ -27,6 +27,7 @@
 
 #include <AIS_Dimension.hxx>
 #include <TCollection_ExtendedString.hxx>
+#include <Standard_Version.hxx>
 
 //#ifndef WNT
 //  #define COMPILATION_CORRECTION
@@ -82,7 +83,11 @@ void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
   /// do not show special symbols of dimension:
   ///   previous implementation did not allow to unite them
   theDimension->SetSpecialSymbol(MyEmptySymbol);
+#if OCC_VERSION_HEX > 0x070400
+  theDimension->SetDisplaySpecialSymbol(PrsDim_DisplaySpecialSymbol_No);
+#else
   theDimension->SetDisplaySpecialSymbol(AIS_DSS_No);
+#endif
 
   TCollection_ExtendedString aCustomValue;
   if (theHasParameters) {

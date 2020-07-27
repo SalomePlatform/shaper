@@ -35,7 +35,6 @@
 #include <Events_Message.h>
 
 class GeomDataAPI_Point2D;
-class AIS_Dimension;
 
 namespace SketcherPrs_Tools {
 

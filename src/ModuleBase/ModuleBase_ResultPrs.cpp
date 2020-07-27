@@ -60,6 +60,11 @@
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Edge.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <Standard_Version.hxx>
+
+#if OCC_VERSION_HEX > 0x070400
+#include <StdPrs_ToolTriangulatedShape.hxx>
+#endif
 
 //*******************************************************************************************
 
@@ -427,8 +432,11 @@ bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selectio
     const TopoDS_Shape& aShape = Shape();
 
     int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_VERTEX);
+#if OCC_VERSION_HEX > 0x070400
+    double aDeflection = StdPrs_ToolTriangulatedShape::GetDeflection(aShape, myDrawer);
+#else
     double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
-
+#endif
     /// The cause of this method is the last parameter of BRep owner setting into True.
     /// That means that owner should behave like it comes from decomposition. (In this case, OCCT
     /// visualizes it in Ring style) OCCT version is 7.0.0 with path for SHAPER module.

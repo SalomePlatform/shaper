@@ -98,7 +98,11 @@ Select3D_BndBox3d SketcherPrs_SensitivePoint::BoundingBox()
                             SelectMgr_Vec3 (aPnt.X(), aPnt.Y(), aPnt.Z()));
 }
 
+#if OCC_VERSION_HEX > 0x070400
+Standard_Integer SketcherPrs_SensitivePoint::NbSubElements() const
+#else
 Standard_Integer SketcherPrs_SensitivePoint::NbSubElements()
+#endif
 {
   return 1;
 }

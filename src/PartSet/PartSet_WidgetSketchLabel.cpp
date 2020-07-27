@@ -63,7 +63,6 @@
 #include <gp_Pnt.hxx>
 #include <gp_Dir.hxx>
 #include <AIS_Shape.hxx>
-#include <AIS_DimensionSelectionMode.hxx>
 #include <Bnd_Box.hxx>
 
 #include <Config_WidgetAPI.h>

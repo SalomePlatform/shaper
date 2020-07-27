@@ -55,6 +55,12 @@
 #include <TopExp.hxx>
 #endif
 
+#include <Standard_Version.hxx>
+
+#if OCC_VERSION_HEX > 0x070400
+#include <StdPrs_ToolTriangulatedShape.hxx>
+#endif
+
 //*******************************************************************************************
 
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_ResultSketchPrs, ViewerData_AISShape);
@@ -215,7 +221,11 @@ void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Select
                                                    const TopAbs_ShapeEnum& theTypeOfSelection)
 {
   // POP protection against crash in low layers
+#if OCC_VERSION_HEX > 0x070400
+  Standard_Real aDeflection = StdPrs_ToolTriangulatedShape::GetDeflection(theShape, myDrawer);
+#else
   Standard_Real aDeflection = Prs3d::GetDeflection(theShape, myDrawer);
+#endif
   try {
     StdSelect_BRepSelectionTool::Load(theSelection,
                                       this,

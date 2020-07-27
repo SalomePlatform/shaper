@@ -41,6 +41,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Shape.hxx>
+#include <AIS_Dimension.hxx>
 #include <AIS_LengthDimension.hxx>
 #include <AIS_RadiusDimension.hxx>
 #include <AIS_AngleDimension.hxx>

@@ -38,6 +38,12 @@
 #include <TopExp.hxx>
 #include <BRep_Tool.hxx>
 
+#include <Standard_Version.hxx>
+
+#if OCC_VERSION_HEX > 0x070400
+#include <PrsDim_TypeOfAngleArrowVisibility.hxx>
+#endif
+
 /// Update variable aspect parameters (depending on viewer scale)
 /// \param theDimAspect an aspect to be changed
 /// \param theDimValue an arrow value
@@ -221,12 +227,20 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   double aDist = -1;
 #ifndef COMPILATION_CORRECTION
+#if OCC_VERSION_HEX > 0x070400
+  SetArrowsVisibility(PrsDim_TypeOfAngleArrowVisibility_Both);
+#else
   SetArrowsVisibility(AIS_TOAV_Both);
+#endif
 #endif
   SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
   bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
+#if OCC_VERSION_HEX > 0x070400
+  SetType(!isReversedPlanes ? PrsDim_TypeOfAngle_Exterior : PrsDim_TypeOfAngle_Interior);
+#else
   SetType(!isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
+#endif
 #endif
   if (aDist < 0) /// it was not calculated yet
     aDist = calculateDistanceToFlyoutPoint();

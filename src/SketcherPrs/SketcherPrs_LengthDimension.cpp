@@ -40,7 +40,6 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 
-#include <AIS_DisplaySpecialSymbol.hxx>
 
 #define OCCT_28850_FIXED
 

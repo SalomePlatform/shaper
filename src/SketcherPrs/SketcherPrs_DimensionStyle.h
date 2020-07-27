@@ -23,6 +23,7 @@
 //#include <Events_Listener.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <AIS_Dimension.hxx>
 
 #include "SketcherPrs_Tools.h"
 

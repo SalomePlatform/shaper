@@ -32,6 +32,7 @@
 #include <Quantity_NameOfColor.hxx>
 #include <BRepBndLib.hxx>
 
+#include <AIS_Dimension.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_LengthDimension.hxx>

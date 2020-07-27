@@ -56,7 +56,6 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <AIS_DimensionSelectionMode.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
 #include <AIS_Trihedron.hxx>
