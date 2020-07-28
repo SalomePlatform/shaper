@@ -649,8 +649,10 @@ void Model_Data::updateConcealmentFlag()
     if (aRefsIter->get()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefsIter)->owner());
       if (aFeature.get() && !aFeature->isDisabled() && aFeature->isStable()) {
-        if (ModelAPI_Session::get()->validators()->isConcealed(
-              aFeature->getKind(), (*aRefsIter)->id())) {
+        ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+        bool isCase = aValidators->isCase(aFeature, (*aRefsIter)->id());
+        bool isConcealed = aValidators->isConcealed(aFeature->getKind(), (*aRefsIter)->id());
+        if (isCase && isConcealed) {
           std::shared_ptr<ModelAPI_Result> aRes =
             std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
