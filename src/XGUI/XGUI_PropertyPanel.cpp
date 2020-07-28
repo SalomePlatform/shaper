@@ -72,7 +72,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
     myOperationMgr(theMgr)
 {
   setWindowTitle(tr("Property Panel"));
-  MAYBE_UNUSED QAction* aViewAct = toggleViewAction();
+  //MAYBE_UNUSED QAction* aViewAct = toggleViewAction();
   setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
@@ -542,8 +542,12 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
   }
   if (myActiveWidget)
     emit propertyPanelActivated();
-  else
-    emit propertyPanelDeactivated();
+  // VSV: Do not deactivate whole property panel on non-active widget
+  // because it makes problem for continuing of projection operation
+  // because of redefinition of module selection filters while projection
+  // operation is not finished.
+  //else
+  //  emit propertyPanelDeactivated();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
 
