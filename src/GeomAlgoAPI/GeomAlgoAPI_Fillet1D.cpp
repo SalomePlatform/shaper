@@ -110,14 +110,20 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
 
     // create fillet builder
     GEOMImpl_Fillet1d aFilletBuilder(anEdge1, anEdge2, aPlane->impl<gp_Pln>());
-    if (!aFilletBuilder.Perform(theRadius)) {
-      // store the failed vertex and continue
+    bool isOk = aFilletBuilder.Perform(theRadius);
+    TopoDS_Edge aFilletEdge;
+    if (isOk) {
+      GeomPointPtr aPoint = aVE->first->vertex()->point();
+      aFilletEdge = aFilletBuilder.Result(aPoint->impl<gp_Pnt>(), anEdge1, anEdge2);
+      isOk = !aFilletEdge.IsNull();
+    }
+
+    if (!isOk) {
+      // something gone wrong and the fillet edge is not constructed,
+      // just store the failed vertex and continue
       myFailedVertices.push_back(*aVIt);
       continue;
     }
-
-    GeomPointPtr aPoint = aVE->first->vertex()->point();
-    TopoDS_Edge aFilletEdge = aFilletBuilder.Result(aPoint->impl<gp_Pnt>(), anEdge1, anEdge2);
 
     // store modified shapes
     myGenerated[aVE->first].push_back(convert(aFilletEdge));

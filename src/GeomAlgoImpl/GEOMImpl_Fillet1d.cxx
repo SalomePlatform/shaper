@@ -664,6 +664,10 @@ TopoDS_Edge GEOMImpl_Fillet1d::Result(const gp_Pnt& thePoint,
       else
         theEdge1 = aDivider1.Edge();
   }
+  else {
+    // error: filleted edge becomes degenerated
+    aResult = TopoDS_Edge();
+  }
 
   aCurve = BRep_Tool::Curve(myEdge2, aStart, anEnd);
   aCurve->D1(aNearest->GetParam2(), aPoint2, aDir);
@@ -681,6 +685,10 @@ TopoDS_Edge GEOMImpl_Fillet1d::Result(const gp_Pnt& thePoint,
         theEdge1 = aDivider2.Edge();
       else
         theEdge2 = aDivider2.Edge();
+  }
+  else {
+    // error: filleted edge becomes degenerated
+    aResult = TopoDS_Edge();
   }
 
   delete aNearest;
