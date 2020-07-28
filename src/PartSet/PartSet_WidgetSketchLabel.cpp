@@ -889,12 +889,16 @@ bool PartSet_WidgetSketchLabel::eventFilter(QObject* theObj, QEvent* theEvent)
 void PartSet_WidgetSketchLabel::onShowViewPlane(bool toShow)
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  PartSet_PreviewSketchPlane* aPreviewPlane = aModule->sketchMgr()->previewSketchPlane();
   if (toShow) {
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-    aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    if (aPreviewPlane->isPlaneCreated())
+      aPreviewPlane->displaySketchPlane(myWorkshop);
+    else
+      aPreviewPlane->createSketchPlane(aSketch, myWorkshop);
   }
   else {
-    aModule->sketchMgr()->previewSketchPlane()->eraseSketchPlane(myWorkshop, false);
+    aPreviewPlane->eraseSketchPlane(myWorkshop, false);
   }
   myWorkshop->viewer()->update();
 }

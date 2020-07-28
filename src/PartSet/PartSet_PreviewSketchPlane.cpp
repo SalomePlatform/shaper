@@ -61,6 +61,16 @@ void PartSet_PreviewSketchPlane::eraseSketchPlane(ModuleBase_IWorkshop* theWorks
   }
 }
 
+void PartSet_PreviewSketchPlane::displaySketchPlane(ModuleBase_IWorkshop* theWorkshop)
+{
+  if (myPlane.get() && (!myPreviewIsDisplayed)) {
+    XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
+    aDisp->displayAIS(myPlane, false/*load object in selection*/, 1/*shaded*/, false);
+    myPreviewIsDisplayed = true;
+  }
+}
+
+
 void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& theSketch,
                                                    ModuleBase_IWorkshop* theWorkshop)
 {
@@ -73,7 +83,7 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
   if (!aSelAttr)
     return;
 
-  if (myShape.get() && myShape->isSame(aSelAttr->value()))
+  if (myShape.get() && myShape->isSame(aSelAttr->value()) && myPlane.get())
     return;
 
   XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();

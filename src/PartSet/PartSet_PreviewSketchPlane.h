@@ -74,6 +74,12 @@ public:
   void setSizeOfView(double theSizeOfView, bool isUseSizeOfView,
     const std::shared_ptr<GeomAPI_Pnt>& theCentralPoint = std::shared_ptr<GeomAPI_Pnt>());
 
+  bool isPlaneCreated() const {
+    return myPlane.get();
+  }
+
+  void displaySketchPlane(ModuleBase_IWorkshop* theWorkshop);
+
 private:
   /// Create a square face by parameters
   std::shared_ptr<GeomAPI_AISObject> createPreviewPlane();
