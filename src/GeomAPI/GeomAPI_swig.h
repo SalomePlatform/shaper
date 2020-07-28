@@ -62,6 +62,7 @@
   #include "GeomAPI_Trsf.h"
   #include "GeomAPI_Vertex.h"
   #include "GeomAPI_Wire.h"
+  #include "GeomAPI_WireExplorer.h"
   #include "GeomAPI_XY.h"
   #include "GeomAPI_XYZ.h"
 
