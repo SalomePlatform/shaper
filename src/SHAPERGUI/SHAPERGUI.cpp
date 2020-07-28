@@ -952,11 +952,40 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
   }
   aProp->setValue(aValue);
 
-  if ((theSection == "Visualization") && (theParam == "selection_color")) {
-    std::vector<int> aColor = Config_PropManager::color("Visualization", "selection_color");
-    myWorkshop->displayer()->setSelectionColor(aColor);
-  }
+  if (theSection == "Visualization") {
+    if (theParam == "selection_color") {
+      std::vector<int> aColor = Config_PropManager::color("Visualization", "selection_color");
+      myWorkshop->displayer()->setSelectionColor(aColor);
+    }
+    if ((theParam == "zoom_trihedron_arrows") || (theParam == "axis_arrow_size")) {
+      if (mySelector) {
+        Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
+        if (!aTrihedron.IsNull()) {
+          bool aZoom = Config_PropManager::boolean("Visualization", "zoom_trihedron_arrows");
+          Handle(AIS_InteractiveContext) aContext = mySelector->viewer()->getAISContext();
 
+          ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+          Handle(V3d_View) aView = aViewer->activeView();
+          if (aZoom) {
+            double aAxLen =
+              aView->Convert(Config_PropManager::integer("Visualization", "axis_arrow_size"));
+            Handle(Prs3d_DatumAspect) aDatumAspect = aTrihedron->Attributes()->DatumAspect();
+            double aAxisLen = aDatumAspect->AxisLength(Prs3d_DP_XAxis);
+            myAxisArrowRate = aDatumAspect->Attribute(Prs3d_DP_ShadingConeLengthPercent);
+            aDatumAspect->SetAttribute(Prs3d_DP_ShadingConeLengthPercent, aAxLen / aAxisLen);
+            aTrihedron->Attributes()->SetDatumAspect(aDatumAspect);
+            aContext->Redisplay(aTrihedron, true);
+
+          }
+          else if (myAxisArrowRate > 0) {
+            Handle(Prs3d_DatumAspect) aDatumAspect = aTrihedron->Attributes()->DatumAspect();
+            aDatumAspect->SetAttribute(Prs3d_DP_ShadingConeLengthPercent, myAxisArrowRate);
+            aContext->Redisplay(aTrihedron, true);
+          }
+        }
+      }
+    }
+  }
   myWorkshop->displayer()->redisplayObjects();
 }
 
