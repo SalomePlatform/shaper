@@ -230,7 +230,7 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
         return false;
 
       QTextStream aOut(&aOutFile);
-      aOut << aTrace.toStdString().c_str() << "\n";
+      aOut << aTrace << "\n";
       aOut.flush();
       aOutFile.close();
 
