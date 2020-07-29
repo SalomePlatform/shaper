@@ -37,6 +37,9 @@ public:
 
   /// Returns the node representation according to theRole.
   virtual QVariant data(int theColumn, int theRole) const;
+
+  // Returns color of the Item when it is active
+  virtual QColor activeItemColor() const;
 };
 
 /**
@@ -89,6 +92,9 @@ public:
   virtual int numberOfSubs() const;
 
   virtual ObjectPtr subObject(int theId) const;
+
+  // Returns color of the Item when it is active
+  virtual QColor activeItemColor() const;
 
 protected:
   ObjectPtr myObject;

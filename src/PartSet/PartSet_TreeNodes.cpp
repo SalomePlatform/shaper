@@ -87,9 +87,14 @@ QVariant PartSet_TreeNode::data(int theColumn, int theRole) const
       return QBrush(DISABLED_COLOR);
     if (!aFlags.testFlag(Qt::ItemIsEditable))
       return QBrush(SELECTABLE_COLOR);
-    return ACTIVE_COLOR;
+    return activeItemColor();
   }
   return ModuleBase_ITreeNode::data(theColumn, theRole);
+}
+
+QColor PartSet_TreeNode::activeItemColor() const
+{
+  return ACTIVE_COLOR;
 }
 
 
@@ -131,18 +136,20 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
       else
         return QIcon();
     }
-  case Qt::ForegroundRole:
-    if (myObject->groupName() == ModelAPI_Feature::group()) {
-      if (myObject->isDisabled())
-        return PartSet_TreeNode::data(theColumn, theRole);
-      std::vector<int> aColor =
-        Config_PropManager::color("Visualization", "feature_objectbrowser_color");
-      return QColor(aColor[0], aColor[1], aColor[2]);
-    }
-    break;
   }
   return PartSet_TreeNode::data(theColumn, theRole);
 }
+
+QColor PartSet_ObjectNode::activeItemColor() const
+{
+  if (myObject.get() && myObject->groupName() == ModelAPI_Feature::group()) {
+    std::vector<int> aColor =
+      Config_PropManager::color("Visualization", "feature_objectbrowser_color");
+    return QColor(aColor[0], aColor[1], aColor[2]);
+  }
+  return PartSet_TreeNode::activeItemColor();
+}
+
 
 Qt::ItemFlags PartSet_ObjectNode::flags(int theColumn) const
 {
