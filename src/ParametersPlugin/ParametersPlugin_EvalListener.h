@@ -38,7 +38,7 @@ class ParametersPlugin_EvalListener : public Events_Listener
 {
   /// map of old names, that were valid for perameres, but now parameter name is changed to invalid
   /// stored not shared pointers to features to avoid memory keeping on the feature delete
-  std::map<ParametersPlugin_Parameter*, std::string> myOldNames;
+  std::map<ParametersPlugin_Parameter*, std::wstring> myOldNames;
  public:
   PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener();
   PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_EvalListener();
@@ -54,21 +54,21 @@ class ParametersPlugin_EvalListener : public Events_Listener
   void processReplaceParameterEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Renames theOldName in theExpression by theNewName.
-  std::string renameInPythonExpression(const std::string& theExpression,
-                                       const std::string& theOldName,
-                                       const std::string& theNewName);
+  std::wstring renameInPythonExpression(const std::wstring& theExpression,
+                                        const std::wstring& theOldName,
+                                        const std::wstring& theNewName);
   /// Renames theOldName in the expression attribute of theParameter by theNewName.
   void renameInParameter(std::shared_ptr<ParametersPlugin_Parameter> theParameter,
-                         const std::string& theOldName,
-                         const std::string& theNewName);
+                         const std::wstring& theOldName,
+                         const std::wstring& theNewName);
   /// Renames theOldName in the text fields of theAttribute by theNewName.
   void renameInAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute,
-                         const std::string& theOldName,
-                         const std::string& theNewName);
+                         const std::wstring& theOldName,
+                         const std::wstring& theNewName);
   /// Renames theOldName in all dependents of theResultParameter by theNewName.
   void renameInDependents(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
-                          const std::string& theOldName,
-                          const std::string& theNewName);
+                          const std::wstring& theOldName,
+                          const std::wstring& theNewName);
 };
 
 #endif /* SRC_PARAMETERSPLUGIN_PARAMETERSPLUGIN_EVALLISTENER_H_ */

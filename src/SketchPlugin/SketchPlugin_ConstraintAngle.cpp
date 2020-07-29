@@ -28,6 +28,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <Locale_Convert.h>
+
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Angle2d.h>
@@ -322,38 +324,38 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle,
 }
 
 #if !HAVE_WORKING_REGEX
-static bool parseString(const std::string& theString, std::ostringstream* theResult)
+static bool parseString(const std::wstring& theString, std::wostringstream* theResult)
 {
   // skip leading spaces
   size_t aLength = theString.size();
-  size_t aPos = theString.find_first_not_of(' ');
-  if (aPos == std::string::npos)
+  size_t aPos = theString.find_first_not_of(L' ');
+  if (aPos == std::wstring::npos)
     return false;
   // first should be a value
-  if (theString[aPos] == '-' || theString[aPos] == '+')
+  if (theString[aPos] == L'-' || theString[aPos] == L'+')
     theResult[1] << theString[aPos++];
-  while (aPos < aLength && theString[aPos] >= '0' && theString[aPos] <= '9')
+  while (aPos < aLength && theString[aPos] >= L'0' && theString[aPos] <= L'9')
     theResult[1] << theString[aPos++];
-  if (theString[aPos] != ' ') {
-    if (theString[aPos] != '.')
+  if (theString[aPos] != L' ') {
+    if (theString[aPos] != L'.')
       return false;
     theResult[1] << theString[aPos++];
-    while (aPos < aLength && theString[aPos] >= '0' && theString[aPos] <= '9')
+    while (aPos < aLength && theString[aPos] >= L'0' && theString[aPos] <= L'9')
       theResult[1] << theString[aPos++];
   }
 
   // next, find the sign
-  aPos = theString.find_first_not_of(' ', aPos);
-  if (aPos == std::string::npos)
+  aPos = theString.find_first_not_of(L' ', aPos);
+  if (aPos == std::wstring::npos)
     return false;
-  if (theString[aPos] == '-' || theString[aPos] == '+')
+  if (theString[aPos] == L'-' || theString[aPos] == L'+')
     theResult[2] << theString[aPos++];
 
   // a variable should be at the end
-  aPos = theString.find_first_not_of(' ', aPos);
-  if (aPos == std::string::npos)
+  aPos = theString.find_first_not_of(L' ', aPos);
+  if (aPos == std::wstring::npos)
     return false;
-  if (theString[aPos] != '(' || theString.back() != ')')
+  if (theString[aPos] != L'(' || theString.back() != L')')
     return false;
   theResult[3] << theString.substr(aPos + 1, aLength - aPos - 2);
 
@@ -376,25 +378,25 @@ static void convertAngle(AttributeDoublePtr theAngle,
     }
     else {
       // process the parametric value
-      std::string anAngleText = theAngle->text();
+      std::wstring anAngleText = theAngle->text();
 #if HAVE_WORKING_REGEX
-      std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)$",
-                              std::regex_constants::ECMAScript);
+      std::wregex anAngleRegex(L"\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)$",
+                               std::regex_constants::ECMAScript);
 #endif
 
       double anAnglePrefix = 0.0;
-      static const char aSignPrefix[2] = { '-', '+' };
+      static const wchar_t aSignPrefix[2] = { L'-', L'+' };
       int aSignInd = 1;
 
 #if HAVE_WORKING_REGEX
-      std::smatch aResult;
+      std::wsmatch aResult;
       if (std::regex_search(anAngleText, aResult, anAngleRegex)) {
 #else
       // workaround to support old versions of GCC (less than 4.9)
-      std::ostringstream aResult[4];
+      std::wostringstream aResult[4];
       if (parseString(anAngleText, aResult)) {
 #endif
-        anAnglePrefix = std::atof(aResult[1].str().c_str());
+        anAnglePrefix = std::atof(Locale::Convert::toString(aResult[1].str()).c_str());
         aSignInd = aResult[2].str()[0] == aSignPrefix[0] ? 0 : 1;
         anAngleText = aResult[3].str();
       }
@@ -407,15 +409,15 @@ static void convertAngle(AttributeDoublePtr theAngle,
         aSignInd = 1 - aSignInd;
       anAnglePrefix = angleForType(anAnglePrefix, theNewType);
 
-      std::ostringstream aText;
+      std::wostringstream aText;
       bool isPrintSign = true;
       if (fabs(anAnglePrefix) > tolerance)
         aText << anAnglePrefix;
       else
         isPrintSign = aSignInd == 0;
       if (isPrintSign)
-        aText << " " << aSignPrefix[aSignInd] << " (";
-      aText << anAngleText << (isPrintSign ? ")" : "");
+        aText << L" " << aSignPrefix[aSignInd] << L" (";
+      aText << anAngleText << (isPrintSign ? L")" : L"");
       theAngle->setText(aText.str());
     }
   }

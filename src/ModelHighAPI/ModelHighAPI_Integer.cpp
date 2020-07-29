@@ -31,13 +31,13 @@ ModelHighAPI_Integer::ModelHighAPI_Integer(int theValue)
 {
 }
 
-ModelHighAPI_Integer::ModelHighAPI_Integer(const std::string & theValue)
+ModelHighAPI_Integer::ModelHighAPI_Integer(const std::wstring & theValue)
 : myVariantType(VT_STRING)
 , myString(theValue)
 {
 }
 
-ModelHighAPI_Integer::ModelHighAPI_Integer(const char * theValue)
+ModelHighAPI_Integer::ModelHighAPI_Integer(const wchar_t * theValue)
 : myVariantType(VT_STRING)
 , myString(theValue)
 {
@@ -63,12 +63,12 @@ int ModelHighAPI_Integer::intValue() const
   return myInt;
 }
 
-std::string ModelHighAPI_Integer::string() const
+std::wstring ModelHighAPI_Integer::string() const
 {
   if (myVariantType == VT_STRING)
     return myString;
 
-  std::ostringstream anOut;
+  std::wostringstream anOut;
   anOut << myInt;
   return anOut.str();
 }

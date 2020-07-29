@@ -183,7 +183,8 @@
   } else if (PyFloat_Check($input) || PyLong_Check($input)) {
     temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(ModelHighAPI_Selection(), ModelHighAPI_Double(PyFloat_AsDouble($input)));
   } else if (PyUnicode_Check($input)) {
-    temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(ModelHighAPI_Selection(), ModelHighAPI_Double(PyUnicode_AsUTF8($input)));
+    Py_ssize_t size;
+    temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>(ModelHighAPI_Selection(), ModelHighAPI_Double(PyUnicode_AsWideCharString($input, &size)));
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
     temp = std::pair<ModelHighAPI_Selection, ModelHighAPI_Double>($1->first, $1->second);
   } else {

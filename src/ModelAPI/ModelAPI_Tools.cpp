@@ -171,12 +171,11 @@ std::string getFeatureError(const FeaturePtr& theFeature)
 // LCOV_EXCL_STOP
 
 ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup,
-                       const std::string& theName)
+                       const std::wstring& theName)
 {
-  std::wstring aName = Locale::Convert::toWString(theName);
   for (int anIndex = 0; anIndex < theDocument->size(theGroup); ++anIndex) {
     ObjectPtr anObject = theDocument->object(theGroup, anIndex);
-    if (anObject->data()->name() == aName)
+    if (anObject->data()->name() == theName)
       return anObject;
   }
   // not found
@@ -184,7 +183,7 @@ ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGro
 }
 
 bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,
-                  const std::string& theName, double& outValue, ResultParameterPtr& theParam)
+                  const std::wstring& theName, double& outValue, ResultParameterPtr& theParam)
 {
   ObjectPtr aParamObj = objectByName(theDocument, ModelAPI_ResultParameter::group(), theName);
   theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
@@ -202,7 +201,7 @@ bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,
   return true;
 }
 
-bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& outValue,
+bool findVariable(FeaturePtr theSearcher, const std::wstring& theName, double& outValue,
                   ResultParameterPtr& theParam, const DocumentPtr& theDocument)
 {
   SessionPtr aSession = ModelAPI_Session::get();

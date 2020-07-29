@@ -85,7 +85,7 @@ void GeomData_Point::setX(const double theX)
     setCalculatedValue(theX, 0, 0);
   } else if (x() != theX) {
     myExpression[0]->setValue(theX);
-    myExpression[0]->setText(""); // uninitialize the text
+    myExpression[0]->setText(L""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -96,7 +96,7 @@ void GeomData_Point::setY(const double theY)
     setCalculatedValue(0, theY, 0);
   } else if (y() != theY) {
     myExpression[1]->setValue(theY);
-    myExpression[1]->setText(""); // uninitialize the text
+    myExpression[1]->setText(L""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -108,7 +108,7 @@ void GeomData_Point::setZ(const double theZ)
   }
   else if (z() != theZ) {
     myExpression[2]->setValue(theZ);
-    myExpression[2]->setText(""); // uninitialize the text
+    myExpression[2]->setText(L""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -120,9 +120,9 @@ std::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
   return aResult;
 }
 
-void GeomData_Point::setText(const std::string& theX,
-                             const std::string& theY,
-                             const std::string& theZ)
+void GeomData_Point::setText(const std::wstring& theX,
+                             const std::wstring& theY,
+                             const std::wstring& theZ)
 {
   if (!myIsInitialized || textX() != theX || textY() != theY || textZ() != theZ) {
     myExpression[0]->setText(theX);
@@ -134,10 +134,10 @@ void GeomData_Point::setText(const std::string& theX,
   }
 }
 
-void GeomData_Point::setTextX(const std::string& theX)
+void GeomData_Point::setTextX(const std::wstring& theX)
 {
   if (!myIsInitialized) {
-    static const std::string aDefaultText = "0";
+    static const std::wstring aDefaultText = L"0";
     setText(theX, aDefaultText, aDefaultText);
   }
   else if (textX() != theX) {
@@ -148,10 +148,10 @@ void GeomData_Point::setTextX(const std::string& theX)
   }
 }
 
-void GeomData_Point::setTextY(const std::string& theY)
+void GeomData_Point::setTextY(const std::wstring& theY)
 {
   if (!myIsInitialized) {
-    static const std::string aDefaultText = "0";
+    static const std::wstring aDefaultText = L"0";
     setText(aDefaultText, theY, aDefaultText);
   }
   else if (textY() != theY) {
@@ -162,10 +162,10 @@ void GeomData_Point::setTextY(const std::string& theY)
   }
 }
 
-void GeomData_Point::setTextZ(const std::string& theZ)
+void GeomData_Point::setTextZ(const std::wstring& theZ)
 {
   if (!myIsInitialized) {
-    static const std::string aDefaultText = "0";
+    static const std::wstring aDefaultText = L"0";
     setText(aDefaultText, aDefaultText, theZ);
   }
   else if (textZ() != theZ) {
@@ -176,15 +176,15 @@ void GeomData_Point::setTextZ(const std::string& theZ)
   }
 }
 
-std::string GeomData_Point::textX()
+std::wstring GeomData_Point::textX()
 {
   return myExpression[0]->text();
 }
-std::string GeomData_Point::textY()
+std::wstring GeomData_Point::textY()
 {
   return myExpression[1]->text();
 }
-std::string GeomData_Point::textZ()
+std::wstring GeomData_Point::textZ()
 {
   return myExpression[2]->text();
 }
@@ -216,13 +216,13 @@ std::string GeomData_Point::expressionError(int theComponent)
 }
 
 void GeomData_Point::setUsedParameters(int theComponent,
-                                       const std::set<std::string>& theUsedParameters)
+                                       const std::set<std::wstring>& theUsedParameters)
 {
   assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
   myExpression[theComponent]->setUsedParameters(theUsedParameters);
 }
 
-std::set<std::string> GeomData_Point::usedParameters(int theComponent) const
+std::set<std::wstring> GeomData_Point::usedParameters(int theComponent) const
 {
   assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
   return myExpression[theComponent]->usedParameters();

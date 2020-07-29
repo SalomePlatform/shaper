@@ -211,7 +211,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     if (anAttr->text().empty())
       aResult<<anAttr->value();
     else
-      aResult<<anAttr->text();
+      aResult << Locale::Convert::toString(anAttr->text());
   } else if (aType == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttr);
     if (anAttr->id() == "ConstraintValue") {
@@ -230,7 +230,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       double aVal = anAttr->value();
       dumpArray(aResult, &aVal, 1, aPrecision);
     } else
-      aResult<<anAttr->text();
+      aResult << Locale::Convert::toString(anAttr->text());
   } else if (aType == ModelAPI_AttributeBoolean::typeId()) {
     AttributeBooleanPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttr);
     // do not dump internal flags of ConstraintAngle

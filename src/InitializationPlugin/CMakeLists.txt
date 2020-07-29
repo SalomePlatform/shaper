@@ -24,6 +24,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+                    ${PROJECT_SOURCE_DIR}/src/Locale
                     ${PROJECT_SOURCE_DIR}/src/ParametersPlugin
                     ${SUIT_INCLUDE}
                     ${PYTHON_INCLUDE_DIR}
@@ -48,6 +49,7 @@ SET(PROJECT_LIBRARIES
     Events
     Config
     ModelAPI
+    Locale
     ${PyInterp}
     ${PYTHON_LIBRARIES}
 )

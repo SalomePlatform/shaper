@@ -21,6 +21,8 @@
 %module GeomDataAPI
 %{
   #include "GeomDataAPI_swig.h"
+
+  #define SWIGPY_UNICODE_ARG(obj) ((PyObject*) (obj))
 %}
 
 // import other modules

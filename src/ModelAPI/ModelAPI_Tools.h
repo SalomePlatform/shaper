@@ -56,7 +56,7 @@ MODELAPI_EXPORT std::string getFeatureError(const std::shared_ptr<ModelAPI_Featu
  */
 MODELAPI_EXPORT bool findVariable(const std::shared_ptr<ModelAPI_Document>& theDocument,
                                   std::shared_ptr<ModelAPI_Feature> theSearcher,
-                                  const std::string& theName, double& outValue,
+                                  const std::wstring& theName, double& outValue,
                                   std::shared_ptr<ModelAPI_ResultParameter>& theParam);
 
 /*!
@@ -66,7 +66,7 @@ MODELAPI_EXPORT bool findVariable(const std::shared_ptr<ModelAPI_Document>& theD
  * theSearcher must be located later in the history than the found variable.
  */
 MODELAPI_EXPORT bool findVariable(std::shared_ptr<ModelAPI_Feature> theSearcher,
-  const std::string& theName,
+  const std::wstring& theName,
   double& outValue, std::shared_ptr<ModelAPI_ResultParameter>& theParam,
   const std::shared_ptr<ModelAPI_Document>& theDocument = std::shared_ptr<ModelAPI_Document>());
 

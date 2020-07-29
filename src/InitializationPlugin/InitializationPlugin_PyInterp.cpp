@@ -19,6 +19,8 @@
 
 #include <InitializationPlugin_PyInterp.h>
 
+#include <Locale_Convert.h>
+
 #include <string>
 #include <stdexcept>
 #include <clocale>
@@ -44,17 +46,17 @@ const char* aSearchCode =
 
 // make the expression be correct for the python interpreter even for the
 // beta=alfa*2 expressions
-static std::string adjustExpression(const std::string& theExpression) {
-  std::string anExpression = theExpression;
-  if (!anExpression.empty() && anExpression.back() == '=') {
+static std::wstring adjustExpression(const std::wstring& theExpression) {
+  std::wstring anExpression = theExpression;
+  if (!anExpression.empty() && anExpression.back() == L'=') {
     anExpression = anExpression.substr(0, anExpression.length() - 1);
   }
   return anExpression;
 }
 
 std::list<std::pair<int, int> >
-InitializationPlugin_PyInterp::positions(const std::string& theExpression,
-                                     const std::string& theName)
+InitializationPlugin_PyInterp::positions(const std::wstring& theExpression,
+                                         const std::wstring& theName)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
 
@@ -64,10 +66,11 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
   PyObject* aContext = PyDict_New();
   PyDict_SetItemString(aContext, "__builtins__", PyEval_GetBuiltins());
 
-  std::string anExpression = adjustExpression(theExpression);
+  std::wstring anExpression = adjustExpression(theExpression);
   // extend aContext with variables
-  PyDict_SetItemString(aContext, "expression", PyUnicode_FromString(anExpression.c_str()));
-  PyDict_SetItemString(aContext, "name", PyUnicode_FromString(theName.c_str()));
+  PyDict_SetItemString(aContext, "expression",
+      PyUnicode_FromWideChar(anExpression.c_str(), anExpression.size()));
+  PyDict_SetItemString(aContext, "name", PyUnicode_FromWideChar(theName.c_str(), theName.size()));
   PyDict_SetItemString(aContext, "positions", Py_BuildValue("[]"));
 
   // run the search code
@@ -93,21 +96,21 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
 }
 
 
-std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string& theExpression)
+std::list<std::wstring> InitializationPlugin_PyInterp::compile(const std::wstring& theExpression)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
-  std::list<std::string> aResult;
+  std::list<std::wstring> aResult;
   PyObject *aCodeopModule = PyImport_AddModule("codeop");
   if(!aCodeopModule) { // Fatal error. No way to go on.
     PyErr_Print();
     return aResult;
   }
   // support "variable_name=" expression as "variable_name"
-  std::string anExpression = adjustExpression(theExpression);
+  std::wstring anExpression = adjustExpression(theExpression);
 
   PyObject *aCodePyObj =
     PyObject_CallMethod(aCodeopModule, (char*)"compile_command", (char*)"(s)",
-                        anExpression.c_str());
+                        Locale::Convert::toString(anExpression).c_str());
 
   if(!aCodePyObj || aCodePyObj == Py_None || !PyCode_Check(aCodePyObj)) {
     Py_XDECREF(aCodePyObj);
@@ -126,7 +129,8 @@ std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string&
     for (size_t i = 0; i < params_size; i++) {
       PyObject* aParamObj = PyTuple_GetItem(aCodeObj->co_names, i);
       PyObject* aParamObjStr = PyObject_Str(aParamObj);
-      std::string aParamName(PyUnicode_AsUTF8(aParamObjStr));
+      Py_ssize_t aSize;
+      std::wstring aParamName(PyUnicode_AsWideCharString(aParamObjStr, &aSize));
       aResult.push_back(aParamName);
       Py_XDECREF(aParamObjStr);
     }
@@ -135,14 +139,14 @@ std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string&
   return aResult;
 }
 
-void InitializationPlugin_PyInterp::extendLocalContext(const std::list<std::string>& theParameters)
+void InitializationPlugin_PyInterp::extendLocalContext(const std::list<std::wstring>& theParameters)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
   if (theParameters.empty())
     return;
-  std::list<std::string>::const_iterator it = theParameters.begin();
+  std::list<std::wstring>::const_iterator it = theParameters.begin();
   for ( ; it != theParameters.cend(); it++) {
-    std::string aParamValue = *it;
+    std::string aParamValue = Locale::Convert::toString(*it);
     simpleRun(aParamValue.c_str(), false);
   }
 }
@@ -153,16 +157,17 @@ void InitializationPlugin_PyInterp::clearLocalContext()
   PyDict_Clear(_local_context);
 }
 
-double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
+double InitializationPlugin_PyInterp::evaluate(const std::wstring& theExpression,
                                                std::string& theError)
 {
   // support "variable_name=" expression as "variable_name"
-  std::string anExpression = adjustExpression(theExpression);
+  std::wstring anExpression = adjustExpression(theExpression);
 
   PyLockWrapper lck; // Acquire GIL until the end of the method
   PyCompilerFlags aFlags = {CO_FUTURE_DIVISION};
   aFlags.cf_flags = CO_FUTURE_DIVISION;
-  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileStringFlags(anExpression.c_str(),
+  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileStringFlags(
+                                Locale::Convert::toString(anExpression).c_str(),
                                 "<string>", Py_eval_input, &aFlags);
   if(!anExprCode) {
     theError = errorMessage();

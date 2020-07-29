@@ -242,6 +242,7 @@ SET(PROJECT_LIBRARIES
 	GeomAPI
 	GeomDataAPI
 	GeomAlgoAPI
+        Locale
 	${QT_LIBRARIES}
 	${OpenCASCADE_FoundationClasses_LIBRARIES}
 	${OpenCASCADE_Visualization_LIBRARIES}
@@ -278,6 +279,7 @@ INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
     ${PROJECT_SOURCE_DIR}/src/GeomAPI
     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+    ${PROJECT_SOURCE_DIR}/src/Locale
     ${SUIT_INCLUDE}
 )
 

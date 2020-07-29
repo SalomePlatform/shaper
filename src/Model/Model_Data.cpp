@@ -675,38 +675,38 @@ void Model_Data::updateConcealmentFlag()
   }
 }
 
-std::set<std::string> set_union(const std::set<std::string>& theLeft,
-                                const std::set<std::string>& theRight)
+std::set<std::wstring> set_union(const std::set<std::wstring>& theLeft,
+                                 const std::set<std::wstring>& theRight)
 {
-  std::set<std::string> aResult;
+  std::set<std::wstring> aResult;
   aResult.insert(theLeft.begin(), theLeft.end());
   aResult.insert(theRight.begin(), theRight.end());
   return aResult;
 }
 
-std::set<std::string> usedParameters(const AttributePointPtr& theAttribute)
+std::set<std::wstring> usedParameters(const AttributePointPtr& theAttribute)
 {
-  std::set<std::string> anUsedParameters;
+  std::set<std::wstring> anUsedParameters;
   for (int aComponent = 0; aComponent < 3; ++aComponent)
     anUsedParameters = set_union(anUsedParameters, theAttribute->usedParameters(aComponent));
   return anUsedParameters;
 }
 
-std::set<std::string> usedParameters(const AttributePoint2DPtr& theAttribute)
+std::set<std::wstring> usedParameters(const AttributePoint2DPtr& theAttribute)
 {
-  std::set<std::string> anUsedParameters;
+  std::set<std::wstring> anUsedParameters;
   for (int aComponent = 0; aComponent < 2; ++aComponent)
     anUsedParameters = set_union(anUsedParameters, theAttribute->usedParameters(aComponent));
   return anUsedParameters;
 }
 
-std::list<ResultParameterPtr> findVariables(const std::set<std::string>& theParameters,
+std::list<ResultParameterPtr> findVariables(const std::set<std::wstring>& theParameters,
                                             const DocumentPtr& theDocument)
 {
   std::list<ResultParameterPtr> aResult;
-  std::set<std::string>::const_iterator aParamIt = theParameters.cbegin();
+  std::set<std::wstring>::const_iterator aParamIt = theParameters.cbegin();
   for (; aParamIt != theParameters.cend(); ++aParamIt) {
-    const std::string& aName = *aParamIt;
+    const std::wstring& aName = *aParamIt;
     double aValue;
     ResultParameterPtr aParam;
     // theSearcher is not needed here: in expressions
@@ -790,28 +790,28 @@ void Model_Data::referencesToObjects(
     } else if (aType == ModelAPI_AttributeInteger::typeId()) { // integer attribute
       AttributeIntegerPtr anAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(anAttr);
-      std::set<std::string> anUsedParameters = anAttribute->usedParameters();
+      std::set<std::wstring> anUsedParameters = anAttribute->usedParameters();
       std::list<ResultParameterPtr> aParameters =
         findVariables(anUsedParameters, owner()->document());
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == ModelAPI_AttributeDouble::typeId()) { // double attribute
       AttributeDoublePtr anAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr);
-      std::set<std::string> anUsedParameters = anAttribute->usedParameters();
+      std::set<std::wstring> anUsedParameters = anAttribute->usedParameters();
       std::list<ResultParameterPtr> aParameters =
         findVariables(anUsedParameters, owner()->document());
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point::typeId()) { // point attribute
       AttributePointPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr);
-      std::set<std::string> anUsedParameters = usedParameters(anAttribute);
+      std::set<std::wstring> anUsedParameters = usedParameters(anAttribute);
       std::list<ResultParameterPtr> aParameters =
         findVariables(anUsedParameters, owner()->document());
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point2D::typeId()) { // point attribute
       AttributePoint2DPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
-      std::set<std::string> anUsedParameters = usedParameters(anAttribute);
+      std::set<std::wstring> anUsedParameters = usedParameters(anAttribute);
       std::list<ResultParameterPtr> aParameters =
         findVariables(anUsedParameters, owner()->document());
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());

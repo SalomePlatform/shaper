@@ -86,8 +86,8 @@ std::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
   return aResult;
 }
 
-void GeomData_Point2D::setText(const std::string& theX,
-                               const std::string& theY)
+void GeomData_Point2D::setText(const std::wstring& theX,
+                               const std::wstring& theY)
 {
   if (!myIsInitialized && theX.empty() && theY.empty())
     return; // empty strings are not good initializers
@@ -100,11 +100,11 @@ void GeomData_Point2D::setText(const std::string& theX,
   }
 }
 
-std::string GeomData_Point2D::textX()
+std::wstring GeomData_Point2D::textX()
 {
   return myExpression[0]->text();
 }
-std::string GeomData_Point2D::textY()
+std::wstring GeomData_Point2D::textY()
 {
   return myExpression[1]->text();
 }
@@ -136,13 +136,13 @@ std::string GeomData_Point2D::expressionError(int theComponent)
 }
 
 void GeomData_Point2D::setUsedParameters(int theComponent,
-                                         const std::set<std::string>& theUsedParameters)
+                                         const std::set<std::wstring>& theUsedParameters)
 {
   assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
   myExpression[theComponent]->setUsedParameters(theUsedParameters);
 }
 
-std::set<std::string> GeomData_Point2D::usedParameters(int theComponent) const
+std::set<std::wstring> GeomData_Point2D::usedParameters(int theComponent) const
 {
   assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
   return myExpression[theComponent]->usedParameters();

@@ -40,10 +40,10 @@ public:
   ModelHighAPI_Integer(int theValue = 0);
   /// Constructor for std::string
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Integer(const std::string & theValue);
+  ModelHighAPI_Integer(const std::wstring & theValue);
   /// Constructor for char *
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Integer(const char * theValue);
+  ModelHighAPI_Integer(const wchar_t * theValue);
   /// Destructor
   MODELHIGHAPI_EXPORT
   virtual ~ModelHighAPI_Integer();
@@ -56,12 +56,12 @@ public:
   MODELHIGHAPI_EXPORT virtual int intValue() const;
 
   /// Returns a string representation of the value
-  MODELHIGHAPI_EXPORT virtual std::string string() const;
+  MODELHIGHAPI_EXPORT virtual std::wstring string() const;
 
 private:
   enum VariantType { VT_INT, VT_STRING } myVariantType;
   int myInt;
-  std::string myString;
+  std::wstring myString;
 };
 
 //--------------------------------------------------------------------------------------

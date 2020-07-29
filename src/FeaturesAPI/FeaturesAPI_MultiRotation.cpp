@@ -156,8 +156,8 @@ MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& theP
   if (theNumber.string().empty()) {
     // rotate for the whole circle
     double aStepVal = theStep.value();
-    std::string aStepStr = theStep.string();
-    std::ostringstream aStepValAsStr;
+    std::wstring aStepStr = theStep.string();
+    std::wostringstream aStepValAsStr;
     aStepValAsStr << aStepVal;
 
     ModelHighAPI_Integer aNumber = aStepStr == aStepValAsStr.str()

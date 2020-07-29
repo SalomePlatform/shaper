@@ -66,7 +66,8 @@
     temp = ModelHighAPI_Double(PyFloat_AsDouble($input));
     $1 = &temp;
   } else if (PyUnicode_Check($input)) {
-    temp = ModelHighAPI_Double(PyUnicode_AsUTF8($input));
+    Py_ssize_t size;
+    temp = ModelHighAPI_Double(PyUnicode_AsWideCharString($input, &size));
     $1 = &temp;
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
@@ -83,7 +84,8 @@
     temp = ModelHighAPI_Integer(static_cast<int>(PyLong_AsLong($input)));
     $1 = &temp;
   } else if (PyUnicode_Check($input)) {
-    temp = ModelHighAPI_Integer(PyUnicode_AsUTF8($input));
+    Py_ssize_t size;
+    temp = ModelHighAPI_Integer(PyUnicode_AsWideCharString($input, &size));
     $1 = &temp;
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
@@ -447,7 +449,8 @@
       if (PyFloat_Check(item) || PyLong_Check(item)) {
         temp.push_back(ModelHighAPI_Double(PyFloat_AsDouble(item)));
       } else if (PyUnicode_Check(item)) {
-        temp.push_back(ModelHighAPI_Double(PyUnicode_AsUTF8(item)));
+        Py_ssize_t size;
+        temp.push_back(ModelHighAPI_Double(PyUnicode_AsWideCharString(item, &size)));
       } else if ((SWIG_ConvertPtr(item, (void **)&temp_double, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
         temp.push_back(*temp_double);
       } else {
@@ -485,7 +488,8 @@
       if (PyLong_Check(item)) {
         temp.push_back(ModelHighAPI_Integer(PyLong_AsLong(item)));
       } else if (PyUnicode_Check(item)) {
-        temp.push_back(ModelHighAPI_Integer(PyUnicode_AsUTF8(item)));
+        Py_ssize_t size;
+        temp.push_back(ModelHighAPI_Integer(PyUnicode_AsWideCharString(item, &size)));
       } else if ((SWIG_ConvertPtr(item, (void **)&temp_int, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
         temp.push_back(*temp_int);
       } else {

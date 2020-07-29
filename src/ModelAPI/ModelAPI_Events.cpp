@@ -196,18 +196,18 @@ ModelAPI_ComputePositionsMessage::ModelAPI_ComputePositionsMessage(
 ModelAPI_ComputePositionsMessage::~ModelAPI_ComputePositionsMessage()
 {}
 
-const std::string& ModelAPI_ComputePositionsMessage::expression() const
+const std::wstring& ModelAPI_ComputePositionsMessage::expression() const
 {
   return myExpression;
 }
 
-const std::string& ModelAPI_ComputePositionsMessage::parameter() const
+const std::wstring& ModelAPI_ComputePositionsMessage::parameter() const
 {
   return myParamName;
 }
 
 void ModelAPI_ComputePositionsMessage::set(
-  const std::string& theExpression, const std::string& theParameter)
+  const std::wstring& theExpression, const std::wstring& theParameter)
 {
   myExpression = theExpression;
   myParamName = theParameter;

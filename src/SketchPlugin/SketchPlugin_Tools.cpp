@@ -65,17 +65,17 @@ namespace SketchPlugin_Tools {
 
 void clearExpressions(AttributeDoublePtr theAttribute)
 {
-  theAttribute->setText(std::string());
+  theAttribute->setText(std::wstring());
 }
 
 void clearExpressions(AttributePointPtr theAttribute)
 {
-  theAttribute->setText(std::string(), std::string(), std::string());
+  theAttribute->setText(std::wstring(), std::wstring(), std::wstring());
 }
 
 void clearExpressions(AttributePoint2DPtr theAttribute)
 {
-  theAttribute->setText(std::string(), std::string());
+  theAttribute->setText(std::wstring(), std::wstring());
 }
 
 void clearExpressions(AttributePtr theAttribute)

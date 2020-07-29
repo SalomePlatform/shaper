@@ -32,13 +32,13 @@ ModelHighAPI_Double::ModelHighAPI_Double(double theValue)
 {
 }
 
-ModelHighAPI_Double::ModelHighAPI_Double(const std::string & theValue)
+ModelHighAPI_Double::ModelHighAPI_Double(const std::wstring & theValue)
 : myVariantType(VT_STRING)
 , myString(theValue)
 {
 }
 
-ModelHighAPI_Double::ModelHighAPI_Double(const char * theValue)
+ModelHighAPI_Double::ModelHighAPI_Double(const wchar_t * theValue)
 : myVariantType(VT_STRING)
 , myString(theValue)
 {
@@ -54,12 +54,12 @@ double ModelHighAPI_Double::value() const
   return myDouble;
 }
 
-std::string ModelHighAPI_Double::string() const
+std::wstring ModelHighAPI_Double::string() const
 {
   if (myVariantType == VT_STRING)
     return myString;
 
-  std::ostringstream anOut;
+  std::wostringstream anOut;
   anOut << myDouble;
   return anOut.str();
 }

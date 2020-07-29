@@ -19,6 +19,8 @@
 
 #include "ModelAPI_Expression.h"
 
+#include <Locale_Convert.h>
+
 ModelAPI_Expression::ModelAPI_Expression()
 {
 
@@ -49,17 +51,23 @@ ModelAPI_ExpressionInteger::ModelAPI_ExpressionInteger()
 
 
 }
+
 bool ModelAPI_Expression::isVariable(const std::string& theString)
+{
+  return isVariable(Locale::Convert::toWString(theString));
+}
+
+bool ModelAPI_Expression::isVariable(const std::wstring& theString)
 {
   if (theString.empty())
     return false;
   try {
-    std::string::const_iterator it = theString.begin();
-    if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
+    std::wstring::const_iterator it = theString.begin();
+    if (!(iswalpha(*it) || (*it) == L'_') || it == theString.end())
       return false;
     it++;
     for ( ; it != theString.end(); ++it ) {
-      if(!(isalnum(*it) || (*it) == '_')) {
+      if(!(iswalnum(*it) || (*it) == L'_')) {
         return false;
       }
     }

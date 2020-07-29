@@ -20,6 +20,8 @@
 #include <ModuleBase_WidgetExprEditor.h>
 #include <ModuleBase_Tools.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
@@ -268,7 +270,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom()
   AttributeStringPtr aStringAttr = aData->string(attributeID());
 
   QString aWidgetValue = myEditor->toPlainText();
-  aStringAttr->setValue(aWidgetValue.toStdString());
+  aStringAttr->setValue(aWidgetValue.toStdWString());
   updateObject(myFeature);
 
   // Try to get the value
@@ -303,8 +305,12 @@ bool ModuleBase_WidgetExprEditor::restoreValueCustom()
   bool isBlocked = myEditor->blockSignals(true);
   QTextCursor aCursor = myEditor->textCursor();
   int pos = aCursor.position();
-  std::string aRestoredStr = aStringAttr->value();
-  myEditor->setPlainText(QString::fromStdString(aRestoredStr));
+  QString aRestoredStr;
+  if (aStringAttr->isUValue())
+    aRestoredStr = QString::fromStdWString(Locale::Convert::toWString(aStringAttr->valueU()));
+  else
+    aRestoredStr = QString::fromStdString(aStringAttr->value());
+  myEditor->setPlainText(aRestoredStr);
   aCursor.setPosition(pos);
   myEditor->setTextCursor(aCursor);
   myEditor->blockSignals(isBlocked);

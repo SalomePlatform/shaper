@@ -25,6 +25,8 @@
 
 #include <Events_InfoMessage.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
@@ -46,9 +48,9 @@
 //------------------------------------------------------------------------------
 // Tools
 
-std::string toStdString(double theValue)
+std::wstring toString(double theValue)
 {
-  std::ostringstream sstream;
+  std::wostringstream sstream;
   // write value in scientific format with 16 digits,
   // thus, not check the dot position
   sstream.precision(16);
@@ -56,9 +58,9 @@ std::string toStdString(double theValue)
   return sstream.str();
 }
 
-std::set<std::string> toSet(const std::list<std::string>& theContainer)
+std::set<std::wstring> toSet(const std::list<std::wstring>& theContainer)
 {
-  return std::set<std::string>(theContainer.begin(), theContainer.end());
+  return std::set<std::wstring>(theContainer.begin(), theContainer.end());
 }
 
 //------------------------------------------------------------------------------
@@ -91,7 +93,10 @@ void InitializationPlugin_EvalListener::processEvent(
     std::shared_ptr<ModelAPI_ParameterEvalMessage> aMsg =
       std::dynamic_pointer_cast<ModelAPI_ParameterEvalMessage>(theMessage);
     FeaturePtr aParam = aMsg->parameter();
-    std::string anExp = aParam->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
+    AttributeStringPtr anExprAttr = aParam->string(ParametersPlugin_Parameter::EXPRESSION_ID());
+    std::wstring anExp = anExprAttr->isUValue() ?
+        Locale::Convert::toWString(anExprAttr->valueU()) :
+        Locale::Convert::toWString(anExprAttr->value());
     std::string anError;
     std::list<std::shared_ptr<ModelAPI_ResultParameter> > aParamsList;
     double aResult = evaluate(aParam, anExp, anError, aParamsList, true);
@@ -104,14 +109,14 @@ void InitializationPlugin_EvalListener::processEvent(
 }
 
 double InitializationPlugin_EvalListener::evaluate(FeaturePtr theParameter,
-  const std::string& theExpression, std::string& theError,
+  const std::wstring& theExpression, std::string& theError,
   std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
   const bool theIsParameter)
 {
-  std::list<std::string> anExprParams = myInterp->compile(theExpression);
+  std::list<std::wstring> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
-  std::list<std::string> aContext;
-  std::list<std::string>::iterator it = anExprParams.begin();
+  std::list<std::wstring> aContext;
+  std::list<std::wstring>::iterator it = anExprParams.begin();
   for ( ; it != anExprParams.end(); it++) {
     double aValue;
     ResultParameterPtr aParamRes;
@@ -124,7 +129,7 @@ double InitializationPlugin_EvalListener::evaluate(FeaturePtr theParameter,
 
     if (theIsParameter)
       theParamsList.push_back(aParamRes);
-    aContext.push_back(*it + "=" + toStdString(aValue));
+    aContext.push_back(*it + L"=" + toString(aValue));
   }
   myInterp->extendLocalContext(aContext);
   double result = myInterp->evaluate(theExpression, theError);
@@ -150,7 +155,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
     anAttribute->setUsedParameters(isValid ?
-      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
+      toSet(myInterp->compile(anAttribute->text())) : std::set<std::wstring>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
   } else
@@ -163,14 +168,14 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
     anAttribute->setUsedParameters(isValid ?
-      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
+      toSet(myInterp->compile(anAttribute->text())) : std::set<std::wstring>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
   } else
   if (aMessage->attribute()->attributeType() == GeomDataAPI_Point::typeId()) {
     AttributePointPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(aMessage->attribute());
-    std::string aText[] = {
+    std::wstring aText[] = {
       anAttribute->textX(),
       anAttribute->textY(),
       anAttribute->textZ()
@@ -186,7 +191,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i,
-        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
+        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::wstring>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }
@@ -197,7 +202,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
   if (aMessage->attribute()->attributeType() == GeomDataAPI_Point2D::typeId()) {
     AttributePoint2DPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMessage->attribute());
-    std::string aText[] = {
+    std::wstring aText[] = {
       anAttribute->textX(),
       anAttribute->textY()
     };
@@ -211,7 +216,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i,
-        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
+        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::wstring>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }

@@ -21,6 +21,8 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IconFactory.h>
 
+#include <Locale_Convert.h>
+
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -124,7 +126,7 @@ bool ModuleBase_WidgetLineEdit::storeValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aWidgetValue = myLineEdit->text();
-  aStringAttr->setValue(aWidgetValue.toStdString());
+  aStringAttr->setValue(aWidgetValue.toStdWString());
   updateObject(myFeature);
   return true;
 }
@@ -138,7 +140,12 @@ bool ModuleBase_WidgetLineEdit::restoreValueCustom()
   AttributeStringPtr aStringAttr = aData->string(attributeID());
 
   bool isBlocked = myLineEdit->blockSignals(true);
-  myLineEdit->setText(QString::fromStdString(aStringAttr->value()));
+  QString aText;
+  if (aStringAttr->isUValue())
+    aText = QString::fromStdWString(Locale::Convert::toWString(aStringAttr->valueU()));
+  else
+    aText = QString::fromStdString(aStringAttr->value());
+  myLineEdit->setText(aText);
   myLineEdit->blockSignals(isBlocked);
 
   return true;

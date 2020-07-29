@@ -356,8 +356,8 @@ class ModelAPI_ParameterEvalMessage : public Events_Message
 /// Message to ask compute the positions of parameters in the expression
 class ModelAPI_ComputePositionsMessage : public Events_Message
 {
-  std::string myExpression; ///< the expression string
-  std::string myParamName; ///< name of the parameter to be searched
+  std::wstring myExpression; ///< the expression string
+  std::wstring myParamName; ///< name of the parameter to be searched
   std::list<std::pair<int, int> > myPositions; ///< computation result: start-end position indices
 
 public:
@@ -372,7 +372,7 @@ public:
   /// Useful method that creates and sends the AttributeEvalMessage event
   /// Returns the message, processed, with the resulting fields filled
   MODELAPI_EXPORT static std::shared_ptr<ModelAPI_ComputePositionsMessage>
-    send(const std::string& theExpression, const std::string& theParameter, const void* theSender)
+    send(const std::wstring& theExpression, const std::wstring& theParameter, const void* theSender)
   {
     std::shared_ptr<ModelAPI_ComputePositionsMessage> aMessage =
       std::shared_ptr<ModelAPI_ComputePositionsMessage>(
@@ -389,11 +389,11 @@ public:
   MODELAPI_EXPORT virtual ~ModelAPI_ComputePositionsMessage();
 
   /// Returns an expression stored in the message
-  MODELAPI_EXPORT const std::string& expression() const;
+  MODELAPI_EXPORT const std::wstring& expression() const;
   /// Returns a parameter name stored in the message
-  MODELAPI_EXPORT const std::string& parameter() const;
+  MODELAPI_EXPORT const std::wstring& parameter() const;
   /// Sets an expression and parameter needed for computation
-  MODELAPI_EXPORT void set(const std::string& theExpression, const std::string& theParameter);
+  MODELAPI_EXPORT void set(const std::wstring& theExpression, const std::wstring& theParameter);
   /// Sets the results of processing
   MODELAPI_EXPORT void setPositions(const std::list<std::pair<int, int> >& thePositions);
   /// Returns the results of processing: position start and end indices

@@ -391,21 +391,22 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
             if (aId == ModelAPI_AttributeDouble::typeId()) {
               AttributeDoublePtr aDouble =
                 std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-              aValNames << aDouble->text().c_str();
+              aValNames << QString::fromStdWString(aDouble->text());
               aValNames << QString::number(aDouble->value());
             }
             else if (aId == ModelAPI_AttributeInteger::typeId()) {
               AttributeIntegerPtr aInt =
                 std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-              aValNames << aInt->text().c_str();
+              aValNames << QString::fromStdWString(aInt->text());
               aValNames << QString::number(aInt->value());
             }
             else if (aId == GeomDataAPI_Point::typeId()) {
               std::shared_ptr<GeomDataAPI_Point> aPnt =
                 std::dynamic_pointer_cast<GeomDataAPI_Point>(aAttr);
 
-              QString aExpr = QString("%1,%2,%3").arg(aPnt->textX().c_str()).
-                arg(aPnt->textY().c_str()).arg(aPnt->textZ().c_str());
+              QString aExpr = QString("%1,%2,%3").arg(QString::fromStdWString(aPnt->textX())).
+                                                  arg(QString::fromStdWString(aPnt->textY())).
+                                                  arg(QString::fromStdWString(aPnt->textZ()));
               aValNames << aExpr;
 
               QString aRes = QString("%1,%2,%3").arg(aPnt->x()).arg(aPnt->y()).arg(aPnt->z());
@@ -415,8 +416,8 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
               std::shared_ptr<GeomDataAPI_Point2D> aPnt =
                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
 
-              QString aExpr = QString("%1,%2").arg(aPnt->textX().c_str()).
-                arg(aPnt->textY().c_str());
+              QString aExpr = QString("%1,%2").arg(QString::fromStdWString(aPnt->textX())).
+                                               arg(QString::fromStdWString(aPnt->textY()));
               aValNames << aExpr;
 
               QString aRes = QString("%1,%2").arg(aPnt->x()).arg(aPnt->y());

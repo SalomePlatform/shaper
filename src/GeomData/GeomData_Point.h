@@ -63,22 +63,22 @@ class GeomData_Point : public GeomDataAPI_Point
     void setCalculatedValue(const double theX, const double theY, const double theZ);
 
   /// Defines the text values
-  GEOMDATA_EXPORT virtual void setText(const std::string& theX,
-                                       const std::string& theY,
-                                       const std::string& theZ);
+  GEOMDATA_EXPORT virtual void setText(const std::wstring& theX,
+                                       const std::wstring& theY,
+                                       const std::wstring& theZ);
   /// Defines the X text value
-  GEOMDATA_EXPORT virtual void setTextX(const std::string& theX);
+  GEOMDATA_EXPORT virtual void setTextX(const std::wstring& theX);
   /// Defines the Y text value
-  GEOMDATA_EXPORT virtual void setTextY(const std::string& theY);
+  GEOMDATA_EXPORT virtual void setTextY(const std::wstring& theY);
   /// Defines the Z text value
-  GEOMDATA_EXPORT virtual void setTextZ(const std::string& theZ);
+  GEOMDATA_EXPORT virtual void setTextZ(const std::wstring& theZ);
 
   /// Returns the X text value
-  GEOMDATA_EXPORT virtual std::string textX();
+  GEOMDATA_EXPORT virtual std::wstring textX();
   /// Returns the Y text value
-  GEOMDATA_EXPORT virtual std::string textY();
+  GEOMDATA_EXPORT virtual std::wstring textY();
   /// Returns the Z text value
-  GEOMDATA_EXPORT virtual std::string textZ();
+  GEOMDATA_EXPORT virtual std::wstring textZ();
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
   GEOMDATA_EXPORT virtual void setExpressionInvalid(int, const bool theFlag);
@@ -94,10 +94,10 @@ class GeomData_Point : public GeomDataAPI_Point
 
   /// Defines the used parameters
   GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent,
-    const std::set<std::string>& theUsedParameters);
+    const std::set<std::wstring>& theUsedParameters);
 
   /// Returns the used parameters
-  GEOMDATA_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const;
+  GEOMDATA_EXPORT virtual std::set<std::wstring> usedParameters(int theComponent) const;
 
  protected:
   /// Initializes attributes

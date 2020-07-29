@@ -172,7 +172,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
       // Nullyfy the parameter reference without deletion of the created
       myParameter = FeaturePtr();
     }
-    aReal->setText(aText.toStdString());
+    aReal->setText(aText.toStdWString());
   } else {
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
@@ -181,7 +181,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
       aReal->setExpressionError("");
       aReal->setExpressionInvalid(false);
     }
-    aReal->setText("");
+    aReal->setText(L"");
     aReal->setValue(mySpinBox->value());
   }
   updateObject(myFeature);
@@ -192,9 +192,9 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());
-  std::string aTextRepr = aRef->text();
+  std::wstring aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
-    QString aText = QString::fromStdString(aTextRepr);
+    QString aText = QString::fromStdWString(aTextRepr);
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   }
   else {

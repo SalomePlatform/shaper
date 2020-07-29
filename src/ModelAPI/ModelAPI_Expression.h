@@ -43,10 +43,10 @@ class ModelAPI_Expression
   MODELAPI_EXPORT virtual void setInitialized();
 
   /// Sets the text of this Expression
-  MODELAPI_EXPORT virtual void setText(const std::string& theText) = 0;
+  MODELAPI_EXPORT virtual void setText(const std::wstring& theText) = 0;
 
   /// Returns the text of this Expression
-  MODELAPI_EXPORT virtual std::string text() const = 0;
+  MODELAPI_EXPORT virtual std::wstring text() const = 0;
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
   MODELAPI_EXPORT virtual void setInvalid(const bool theFlag) = 0;
@@ -62,13 +62,16 @@ class ModelAPI_Expression
 
   /// Defines the used parameters (by the parameters listener)
   MODELAPI_EXPORT virtual
-    void setUsedParameters(const std::set<std::string>& theUsedParameters) = 0;
+    void setUsedParameters(const std::set<std::wstring>& theUsedParameters) = 0;
 
   /// Returns the used parameters
-  MODELAPI_EXPORT virtual std::set<std::string> usedParameters() const = 0;
+  MODELAPI_EXPORT virtual std::set<std::wstring> usedParameters() const = 0;
 
   /// Returns True if the given string can be defined as a name of an expression variable
   MODELAPI_EXPORT static bool isVariable(const std::string& theString);
+
+  /// Returns True if the given string can be defined as a name of an expression variable
+  MODELAPI_EXPORT static bool isVariable(const std::wstring& theString);
 
  protected:
   /// Objects are created for features automatically

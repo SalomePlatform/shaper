@@ -62,23 +62,23 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual void setZ(const double theZ) = 0;
 
   /// Defines the text values
-  GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
-                                          const std::string& theY,
-                                          const std::string& theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual void setText(const std::wstring& theX,
+                                          const std::wstring& theY,
+                                          const std::wstring& theZ) = 0;
 
   /// Defines the X text value
-  GEOMDATAAPI_EXPORT virtual void setTextX(const std::string& theX) = 0;
+  GEOMDATAAPI_EXPORT virtual void setTextX(const std::wstring& theX) = 0;
   /// Defines the Y text value
-  GEOMDATAAPI_EXPORT virtual void setTextY(const std::string& theY) = 0;
+  GEOMDATAAPI_EXPORT virtual void setTextY(const std::wstring& theY) = 0;
   /// Defines the Z text value
-  GEOMDATAAPI_EXPORT virtual void setTextZ(const std::string& theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual void setTextZ(const std::wstring& theZ) = 0;
 
   /// Returns the text value for X
-  GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
+  GEOMDATAAPI_EXPORT virtual std::wstring textX() = 0;
   /// Returns the text value for Y
-  GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
+  GEOMDATAAPI_EXPORT virtual std::wstring textY() = 0;
   /// Returns the text value for Z
-  GEOMDATAAPI_EXPORT virtual std::string textZ() = 0;
+  GEOMDATAAPI_EXPORT virtual std::wstring textZ() = 0;
 
   /// Point component (x,y,z)
   enum PointComponent { C_X = 0,
@@ -101,10 +101,10 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
 
   /// Defines the used parameters
   GEOMDATAAPI_EXPORT virtual void setUsedParameters(int theComponent,
-    const std::set<std::string>& theUsedParameters) = 0;
+    const std::set<std::wstring>& theUsedParameters) = 0;
 
   /// Returns the used parameters
-  GEOMDATAAPI_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const = 0;
+  GEOMDATAAPI_EXPORT virtual std::set<std::wstring> usedParameters(int theComponent) const = 0;
 
   /// Returns the type of this class of attributes
   static std::string typeId()

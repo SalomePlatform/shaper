@@ -19,6 +19,8 @@
 
 #include "Model_Expression.h"
 
+#include <Locale_Convert.h>
+
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <TDataStd_ListIteratorOfListOfExtendedString.hxx>
@@ -45,7 +47,7 @@ Model_Expression::Model_Expression(TDF_Label& theLabel)
   }
 }
 
-void Model_Expression::setText(const std::string& theValue)
+void Model_Expression::setText(const std::wstring& theValue)
 {
   if (text() != theValue) {
     myText->Set(TCollection_ExtendedString(theValue.c_str()));
@@ -55,9 +57,9 @@ void Model_Expression::setText(const std::string& theValue)
   setError(text().empty() ? "" : "Not a double value.");
 }
 
-std::string Model_Expression::text() const
+std::wstring Model_Expression::text() const
 {
-  return TCollection_AsciiString(myText->Get()).ToCString();
+  return Locale::Convert::toWString(myText->Get().ToExtString());
 }
 
 void Model_Expression::setError(const std::string& theError)
@@ -71,20 +73,20 @@ std::string Model_Expression::error()
   return TCollection_AsciiString(myError->Get()).ToCString();
 }
 
-void Model_Expression::setUsedParameters(const std::set<std::string>& theUsedParameters)
+void Model_Expression::setUsedParameters(const std::set<std::wstring>& theUsedParameters)
 {
   myUsedParameters->Clear();
-  std::set<std::string>::const_iterator anIt = theUsedParameters.begin();
+  std::set<std::wstring>::const_iterator anIt = theUsedParameters.begin();
   for (; anIt != theUsedParameters.end(); ++anIt)
     myUsedParameters->Append(TCollection_ExtendedString(anIt->c_str()));
 }
 
-std::set<std::string> Model_Expression::usedParameters() const
+std::set<std::wstring> Model_Expression::usedParameters() const
 {
-  std::set<std::string> aResult;
+  std::set<std::wstring> aResult;
   TDataStd_ListIteratorOfListOfExtendedString aIt;
   for (aIt.Initialize(myUsedParameters->List()); aIt.More(); aIt.Next())
-    aResult.insert(TCollection_AsciiString(aIt.Value()).ToCString());
+    aResult.insert(Locale::Convert::toWString(aIt.Value().ToExtString()));
   return aResult;
 }
 

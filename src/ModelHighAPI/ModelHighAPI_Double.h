@@ -41,10 +41,10 @@ public:
   ModelHighAPI_Double(double theValue = 0.);
   /// Constructor for std::string
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Double(const std::string & theValue);
+  ModelHighAPI_Double(const std::wstring & theValue);
   /// Constructor for char *
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Double(const char * theValue);
+  ModelHighAPI_Double(const wchar_t * theValue);
   /// Destructor
   MODELHIGHAPI_EXPORT
   virtual ~ModelHighAPI_Double();
@@ -64,12 +64,12 @@ public:
   MODELHIGHAPI_EXPORT double value() const;
 
   /// Returns a string representation of the value
-  MODELHIGHAPI_EXPORT virtual std::string string() const;
+  MODELHIGHAPI_EXPORT virtual std::wstring string() const;
 
 private:
   enum VariantType { VT_DOUBLE, VT_STRING } myVariantType;
   double myDouble;
-  std::string myString;
+  std::wstring myString;
 };
 
 //--------------------------------------------------------------------------------------

@@ -75,12 +75,14 @@ void ParametersPlugin_Parameter::attributeChanged(const std::string& theID)
 
 void ParametersPlugin_Parameter::updateName()
 {
-  std::string aName = string(VARIABLE_ID())->value();
-  data()->setName(Locale::Convert::toWString(aName));
+  std::wstring aName = string(VARIABLE_ID())->isUValue() ?
+      Locale::Convert::toWString(string(VARIABLE_ID())->valueU()) :
+      Locale::Convert::toWString(string(VARIABLE_ID())->value());
+  data()->setName(aName);
 
   ResultParameterPtr aParam = document()->createParameter(data());
-  std::string anOldName = Locale::Convert::toString(aParam->data()->name());
-  aParam->data()->setName(Locale::Convert::toWString(aName));
+  std::wstring anOldName = aParam->data()->name();
+  aParam->data()->setName(aName);
   setResult(aParam);
 
 
@@ -88,12 +90,12 @@ void ParametersPlugin_Parameter::updateName()
   // update the depended expressions
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (aParam->document() != aRootDoc) {
-    std::list<std::string> aNames; // collect names in the root document that must be checked
+    std::list<std::wstring> aNames; // collect names in the root document that must be checked
     aNames.push_back(aName);
     if (anOldName != aName) {
       aNames.push_back(anOldName);
     }
-    std::list<std::string>::iterator aNIter = aNames.begin();
+    std::list<std::wstring>::iterator aNIter = aNames.begin();
     for (; aNIter != aNames.end(); aNIter++) {
       double aValue;
       ResultParameterPtr aRootParam;
@@ -115,7 +117,9 @@ void ParametersPlugin_Parameter::updateName()
 
 bool ParametersPlugin_Parameter::updateExpression()
 {
-  std::string anExpression = string(EXPRESSION_ID())->value();
+  std::wstring anExpression = string(EXPRESSION_ID())->isUValue() ?
+      Locale::Convert::toWString(string(EXPRESSION_ID())->valueU()) :
+      Locale::Convert::toWString(string(EXPRESSION_ID())->value());
 
   std::string outErrorMessage;
   double aValue = evaluate(anExpression, outErrorMessage);
@@ -139,7 +143,7 @@ void ParametersPlugin_Parameter::execute()
     setError("Expression error.", false);
 }
 
-double ParametersPlugin_Parameter::evaluate(const std::string& /*theExpression*/,
+double ParametersPlugin_Parameter::evaluate(const std::wstring& /*theExpression*/,
                                             std::string& theError)
 {
   FeaturePtr aMyPtr = std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner());

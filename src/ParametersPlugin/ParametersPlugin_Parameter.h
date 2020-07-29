@@ -100,7 +100,7 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
 
  protected:
   /// Evaluates theExpression and returns its value.
-  double evaluate(const std::string& theExpression, std::string& theError);
+  double evaluate(const std::wstring& theExpression, std::string& theError);
   /// Updates name of the parameter
   void updateName();
   /// Updates expression of the parameter

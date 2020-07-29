@@ -45,10 +45,10 @@ class Model_AttributeInteger : public ModelAPI_AttributeInteger
   MODEL_EXPORT virtual void setCalculatedValue(const int theValue);
 
   /// Defines the text value
-  MODEL_EXPORT virtual void setText(const std::string& theText);
+  MODEL_EXPORT virtual void setText(const std::wstring& theText);
 
   /// Returns the text value
-  MODEL_EXPORT virtual std::string text();
+  MODEL_EXPORT virtual std::wstring text();
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
   MODEL_EXPORT virtual void setExpressionInvalid(const bool theFlag);
@@ -63,10 +63,10 @@ class Model_AttributeInteger : public ModelAPI_AttributeInteger
   MODEL_EXPORT virtual std::string expressionError();
 
   /// Defines the used parameters
-  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters);
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::wstring>& theUsedParameters);
 
   /// Returns the used parameters
-  MODEL_EXPORT virtual std::set<std::string> usedParameters() const;
+  MODEL_EXPORT virtual std::set<std::wstring> usedParameters() const;
 
  protected:
   /// Initializes attributes

@@ -34,7 +34,7 @@
 #include <QLabel>
 
 
-#define ERR_STRING "ERROR"
+#define ERR_STRING L"ERROR"
 
 ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
   ModuleBase_IWorkshop* theWorkshop,
@@ -103,7 +103,7 @@ QList<QWidget*> ModuleBase_WidgetPointInput::getControls() const
   return aList;
 }
 
-std::string getParmText(ModuleBase_ParamSpinBox* theSpin, FeaturePtr& theParam)
+std::wstring getParmText(ModuleBase_ParamSpinBox* theSpin, FeaturePtr& theParam)
 {
   QString aText = theSpin->text();
   if (aText.contains('=')) {
@@ -118,7 +118,7 @@ std::string getParmText(ModuleBase_ParamSpinBox* theSpin, FeaturePtr& theParam)
     }
     aText = aText.split('=').at(0);
   }
-  return aText.toStdString();
+  return aText.toStdWString();
 }
 
 //********************************************************************
@@ -128,21 +128,21 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
   if (aAttr.get()) {
     if (aAttr->isInitialized()) {
       if (myXSpin->hasVariable() || myYSpin->hasVariable() || myZSpin->hasVariable()) {
-        std::string aXText = getParmText(myXSpin, myXParam);
+        std::wstring aXText = getParmText(myXSpin, myXParam);
         if (aXText == ERR_STRING) {
           aAttr->setExpressionError(0, "Parameter cannot be created");
           aAttr->setExpressionInvalid(0, true);
           updateObject(myFeature);
           return false;
         }
-        std::string aYText = getParmText(myYSpin, myYParam);
+        std::wstring aYText = getParmText(myYSpin, myYParam);
         if (aYText == ERR_STRING) {
           aAttr->setExpressionError(1, "Parameter cannot be created");
           aAttr->setExpressionInvalid(1, true);
           updateObject(myFeature);
           return false;
         }
-        std::string aZText = getParmText(myZSpin, myZParam);
+        std::wstring aZText = getParmText(myZSpin, myZParam);
         if (aZText == ERR_STRING) {
           aAttr->setExpressionError(2, "Parameter cannot be created");
           aAttr->setExpressionInvalid(2, true);
@@ -151,7 +151,7 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
         }
         aAttr->setText(aXText, aYText, aZText);
       } else {
-        aAttr->setText("", "", "");
+        aAttr->setText(L"", L"", L"");
         aAttr->setValue(myXSpin->value(), myYSpin->value(), myZSpin->value());
       }
     } else {
@@ -169,26 +169,26 @@ bool ModuleBase_WidgetPointInput::restoreValueCustom()
   AttributePointPtr aAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(attribute());
   if (aAttr.get()) {
     if (aAttr->isInitialized()) {
-      std::string aXText = aAttr->textX();
+      std::wstring aXText = aAttr->textX();
       if (aXText.empty()) {
         myXSpin->setValue(aAttr->x());
       }
       else {
-        myXSpin->setText(aXText.c_str());
+        myXSpin->setText(QString::fromStdWString(aXText));
       }
-      std::string aYText = aAttr->textY();
+      std::wstring aYText = aAttr->textY();
       if (aYText.empty()) {
         myYSpin->setValue(aAttr->y());
       }
       else {
-        myYSpin->setText(aYText.c_str());
+        myYSpin->setText(QString::fromStdWString(aYText));
       }
-      std::string aZText = aAttr->textZ();
+      std::wstring aZText = aAttr->textZ();
       if (aZText.empty()) {
         myZSpin->setValue(aAttr->z());
       }
       else {
-        myZSpin->setText(aZText.c_str());
+        myZSpin->setText(QString::fromStdWString(aZText));
       }
     }
     else {

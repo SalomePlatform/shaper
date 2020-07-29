@@ -52,13 +52,13 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual void setCalculatedValue(const double theX, const double theY) = 0;
 
   /// Defines the text values
-  GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
-                                          const std::string& theY) = 0;
+  GEOMDATAAPI_EXPORT virtual void setText(const std::wstring& theX,
+                                          const std::wstring& theY) = 0;
 
   /// Returns the text value for X
-  GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
+  GEOMDATAAPI_EXPORT virtual std::wstring textX() = 0;
   /// Returns the text value for Y
-  GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
+  GEOMDATAAPI_EXPORT virtual std::wstring textY() = 0;
 
   /// Point component (x,y)
   enum PointComponent { C_X = 0,
@@ -80,10 +80,10 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
 
   /// Defines the used parameters
   GEOMDATAAPI_EXPORT virtual void setUsedParameters(int theComponent,
-    const std::set<std::string>& theUsedParameters) = 0;
+    const std::set<std::wstring>& theUsedParameters) = 0;
 
   /// Returns the used parameters
-  GEOMDATAAPI_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const = 0;
+  GEOMDATAAPI_EXPORT virtual std::set<std::wstring> usedParameters(int theComponent) const = 0;
 
   /// Appends the delta values to point
   GEOMDATAAPI_EXPORT void move(const double theDeltaX, const double theDeltaY);

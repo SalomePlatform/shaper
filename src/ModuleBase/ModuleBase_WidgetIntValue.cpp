@@ -160,7 +160,7 @@ bool ModuleBase_WidgetIntValue::storeValueCustom()
       // Nullyfy the parameter reference without deletion of the created
       myParameter = FeaturePtr();
     }
-    anAttribute->setText(aText.toStdString());
+    anAttribute->setText(aText.toStdWString());
   } else {
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
@@ -169,7 +169,7 @@ bool ModuleBase_WidgetIntValue::storeValueCustom()
       anAttribute->setExpressionError("");
       anAttribute->setExpressionInvalid(false);
     }
-    anAttribute->setText("");
+    anAttribute->setText(L"");
     anAttribute->setValue(mySpinBox->value());
   }
   updateObject(myFeature);
@@ -180,9 +180,9 @@ bool ModuleBase_WidgetIntValue::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeIntegerPtr anAttribute = aData->integer(attributeID());
-  std::string aTextRepr = anAttribute->text();
+  std::wstring aTextRepr = anAttribute->text();
   if (!aTextRepr.empty()) {
-    QString aText = QString::fromStdString(aTextRepr);
+    QString aText = QString::fromStdWString(aTextRepr);
     //if (aText.endsWith('=')) {
     //  if (!myParameter.get()) {
     //    QString aName = aText.left(aText.indexOf('=')).trimmed();

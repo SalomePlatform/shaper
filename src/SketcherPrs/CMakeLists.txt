@@ -44,7 +44,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_Mirror.h
     SketcherPrs_Transformation.h
     SketcherPrs_Angle.h
-	SketcherPrs_Offset.h
+    SketcherPrs_Offset.h
 )
 
 SET(PROJECT_SOURCES
@@ -68,7 +68,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_Mirror.cpp
     SketcherPrs_Transformation.cpp
     SketcherPrs_Angle.cpp
-	SketcherPrs_Offset.cpp
+    SketcherPrs_Offset.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -78,6 +78,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomDataAPI
     Events
+    Locale
     ${OpenCASCADE_FoundationClasses_LIBRARIES}
     ${OpenCASCADE_ModelingAlgorithms_LIBRARIES}
     ${OpenCASCADE_Visualization_LIBRARIES}
@@ -117,6 +118,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ModelGeomAlgo
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+  ${PROJECT_SOURCE_DIR}/src/Locale
   ${PROJECT_SOURCE_DIR}/src/SketchPlugin
   ${OpenCASCADE_INCLUDE_DIR}
   ${FREETYPE_INCLUDE_DIRS}

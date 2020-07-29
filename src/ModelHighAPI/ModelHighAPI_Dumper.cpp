@@ -1144,7 +1144,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 {
   static const int aSize = 3;
   double aValues[aSize] = {thePoint->x(), thePoint->y(), thePoint->z()};
-  std::string aTexts[aSize] = {thePoint->textX(), thePoint->textY(), thePoint->textZ()};
+  std::string aTexts[aSize] = {
+      Locale::Convert::toString(thePoint->textX()),
+      Locale::Convert::toString(thePoint->textY()),
+      Locale::Convert::toString(thePoint->textZ())
+  };
   myDumpStorage->dumpArray(aSize, aValues, aTexts);
   return *this;
 }
@@ -1154,7 +1158,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 {
   static const int aSize = 2;
   double aValues[aSize] = {thePoint->x(), thePoint->y()};
-  std::string aTexts[aSize] = {thePoint->textX(), thePoint->textY()};
+  std::string aTexts[aSize] = {
+      Locale::Convert::toString(thePoint->textX()),
+      Locale::Convert::toString(thePoint->textY())
+  };
   myDumpStorage->dumpArray(aSize, aValues, aTexts);
   return *this;
 }
@@ -1206,7 +1213,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeInteger>& theAttrInt)
 {
-  std::string aText = theAttrInt->text();
+  std::string aText = Locale::Convert::toString(theAttrInt->text());
   if (aText.empty())
     *myDumpStorage << theAttrInt->value();
   else
@@ -1231,7 +1238,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeDouble>& theAttrReal)
 {
-  std::string aText = theAttrReal->text();
+  std::string aText = Locale::Convert::toString(theAttrReal->text());
   if (aText.empty())
     *myDumpStorage << theAttrReal->value();
   else

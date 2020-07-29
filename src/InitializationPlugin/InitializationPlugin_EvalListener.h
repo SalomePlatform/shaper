@@ -51,7 +51,7 @@ class InitializationPlugin_EvalListener : public Events_Listener
  protected:
   /// Evaluates theExpression and returns its value.
    double evaluate(std::shared_ptr<ModelAPI_Feature> theParameter,
-                  const std::string& theExpression, std::string& theError,
+                  const std::wstring& theExpression, std::string& theError,
                   std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
                   const bool theIsParameter = false);
 

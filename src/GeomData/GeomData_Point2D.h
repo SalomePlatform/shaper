@@ -53,12 +53,12 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
   GEOMDATA_EXPORT virtual void setCalculatedValue(const double theX, const double theY);
 
   /// Defines the text values
-  GEOMDATA_EXPORT virtual void setText(const std::string& theX,
-                                       const std::string& theY);
+  GEOMDATA_EXPORT virtual void setText(const std::wstring& theX,
+                                       const std::wstring& theY);
 
   /// Returns the text values
-  GEOMDATA_EXPORT virtual std::string textX();
-  GEOMDATA_EXPORT virtual std::string textY();
+  GEOMDATA_EXPORT virtual std::wstring textX();
+  GEOMDATA_EXPORT virtual std::wstring textY();
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
   GEOMDATA_EXPORT virtual void setExpressionInvalid(int, const bool theFlag);
@@ -74,10 +74,10 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
 
   /// Defines the used parameters
   GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent,
-    const std::set<std::string>& theUsedParameters);
+    const std::set<std::wstring>& theUsedParameters);
 
   /// Returns the used parameters
-  GEOMDATA_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const;
+  GEOMDATA_EXPORT virtual std::set<std::wstring> usedParameters(int theComponent) const;
 
  protected:
   /// Initializes attributes

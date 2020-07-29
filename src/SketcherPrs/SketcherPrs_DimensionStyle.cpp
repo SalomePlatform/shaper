@@ -23,6 +23,8 @@
 
 #include <Events_Loop.h>
 
+#include <Locale_Convert.h>
+
 #include <AIS_Dimension.hxx>
 #include <TCollection_ExtendedString.hxx>
 
@@ -49,7 +51,7 @@ void SketcherPrs_DimensionStyle::DimensionValue::init(
 {
   myDoubleValue = theAttributeValue->value();
   myHasParameters = theAttributeValue->usedParameters().size() > 0;
-  myTextValue = theAttributeValue->text();
+  myTextValue = Locale::Convert::toString(theAttributeValue->text());
 }
 
 SketcherPrs_DimensionStyle::SketcherPrs_DimensionStyle()

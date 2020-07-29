@@ -51,14 +51,14 @@
 //------------------------------------------------------------------------------
 // Tools
 
-static std::string toStdString(double theValue)
+static std::wstring toStdWString(double theValue)
 {
-  std::ostringstream sstream;
+  std::wostringstream sstream;
   sstream << theValue;
-  size_t aPos = sstream.str().find(".");
-  std::string aPnt = "";
-  if (aPos == std::string::npos)
-    aPnt = ".";
+  size_t aPos = sstream.str().find(L".");
+  std::wstring aPnt = L"";
+  if (aPos == std::wstring::npos)
+    aPnt = L".";
   return sstream.str() + aPnt;
 }
 
@@ -97,12 +97,12 @@ void ParametersPlugin_EvalListener::processEvent(
   }
 }
 
-std::string ParametersPlugin_EvalListener::renameInPythonExpression(
-    const std::string& theExpression,
-    const std::string& theOldName,
-    const std::string& theNewName)
+std::wstring ParametersPlugin_EvalListener::renameInPythonExpression(
+    const std::wstring& theExpression,
+    const std::wstring& theOldName,
+    const std::wstring& theNewName)
 {
-  std::string anExpressionString = theExpression;
+  std::wstring anExpressionString = theExpression;
 
   // ask interpreter to compute the positions in the expression
   std::shared_ptr<ModelAPI_ComputePositionsMessage> aMsg =
@@ -124,7 +124,7 @@ std::string ParametersPlugin_EvalListener::renameInPythonExpression(
     int aLineNo = ritLine->first - 1;
     size_t aLineStart = 0;
     for (int i = 0; i < aLineNo; ++i)
-      aLineStart = anExpressionString.find("\n", aLineStart) + 1;
+      aLineStart = anExpressionString.find(L"\n", aLineStart) + 1;
 
     const std::list<int>& aColOffsets = ritLine->second;
     std::list<int>::const_reverse_iterator ritOffset = aColOffsets.rbegin();
@@ -139,13 +139,15 @@ std::string ParametersPlugin_EvalListener::renameInPythonExpression(
 
 void ParametersPlugin_EvalListener::renameInParameter(
     std::shared_ptr<ParametersPlugin_Parameter> theParameter,
-    const std::string& theOldName,
-    const std::string& theNewName)
+    const std::wstring& theOldName,
+    const std::wstring& theNewName)
 {
   std::shared_ptr<ModelAPI_AttributeString> anExpressionAttribute =
       theParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID());
 
-  std::string anExpressionString = anExpressionAttribute->value();
+  std::wstring anExpressionString = anExpressionAttribute->isUValue() ?
+      Locale::Convert::toWString(anExpressionAttribute->valueU()) :
+      Locale::Convert::toWString(anExpressionAttribute->value());
   anExpressionString = renameInPythonExpression(anExpressionString,
                                                 theOldName,
                                                 theNewName);
@@ -158,13 +160,13 @@ void ParametersPlugin_EvalListener::renameInParameter(
 
 void ParametersPlugin_EvalListener::renameInAttribute(
     std::shared_ptr<ModelAPI_Attribute> theAttribute,
-    const std::string& theOldName,
-    const std::string& theNewName)
+    const std::wstring& theOldName,
+    const std::wstring& theNewName)
 {
   if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
-    std::string anExpressionString = anAttribute->text();
+    std::wstring anExpressionString = anAttribute->text();
     anExpressionString = renameInPythonExpression(anExpressionString,
                                                   theOldName, theNewName);
     anAttribute->setText(anExpressionString);
@@ -172,7 +174,7 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-    std::string anExpressionString = anAttribute->text();
+    std::wstring anExpressionString = anAttribute->text();
     anExpressionString = renameInPythonExpression(anExpressionString,
                                                   theOldName, theNewName);
     anAttribute->setText(anExpressionString);
@@ -180,7 +182,7 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   if (theAttribute->attributeType() == GeomDataAPI_Point::typeId()) {
     AttributePointPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
-    std::string anExpressionString[3] = {
+    std::wstring anExpressionString[3] = {
       anAttribute->textX(),
       anAttribute->textY(),
       anAttribute->textZ()
@@ -195,7 +197,7 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   if (theAttribute->attributeType() == GeomDataAPI_Point2D::typeId()) {
     AttributePoint2DPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
-    std::string anExpressionString[2] = {
+    std::wstring anExpressionString[2] = {
       anAttribute->textX(),
       anAttribute->textY()
     };
@@ -209,8 +211,8 @@ void ParametersPlugin_EvalListener::renameInAttribute(
 
 void ParametersPlugin_EvalListener::renameInDependents(
               std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
-              const std::string& theOldName,
-              const std::string& theNewName)
+              const std::wstring& theOldName,
+              const std::wstring& theNewName)
 {
   std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
     theResultParameter->data()->refsToMe();
@@ -302,19 +304,18 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
     //setParameterName(aResultParameter, aMessage->oldName());
     if (myOldNames.find(aParameter.get()) == myOldNames.end())
-      myOldNames[aParameter.get()] = Locale::Convert::toString(aMessage->oldName());
+      myOldNames[aParameter.get()] = aMessage->oldName();
     return;
   }
 
-  std::string anOldName = Locale::Convert::toString(aMessage->oldName());
+  std::wstring anOldName = aMessage->oldName();
   if (myOldNames.find(aParameter.get()) != myOldNames.end()) {
     anOldName = myOldNames[aParameter.get()];
     myOldNames.erase(aParameter.get());
     aParameter->execute(); // to enable result because of previously incorrect name
   }
 
-  renameInDependents(aResultParameter, anOldName,
-                     Locale::Convert::toString(aMessage->newName()));
+  renameInDependents(aResultParameter, anOldName, aMessage->newName());
 }
 
 void ParametersPlugin_EvalListener::processReplaceParameterEvent(
@@ -337,9 +338,7 @@ void ParametersPlugin_EvalListener::processReplaceParameterEvent(
     return;
 
   double aRealValue = aResultParameter->data()->real(ModelAPI_ResultParameter::VALUE())->value();
-  std::string aValue = toStdString(aRealValue);
+  std::wstring aValue = toStdWString(aRealValue);
 
-  renameInDependents(aResultParameter,
-                     Locale::Convert::toString(aResultParameter->data()->name()),
-                     aValue);
+  renameInDependents(aResultParameter, aResultParameter->data()->name(), aValue);
 }

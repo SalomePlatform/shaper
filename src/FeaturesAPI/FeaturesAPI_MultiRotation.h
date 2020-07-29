@@ -109,7 +109,7 @@ MultiRotationPtr addMultiRotation(const std::shared_ptr<ModelAPI_Document>& theP
                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                                   const ModelHighAPI_Selection& theAxis,
                                   const ModelHighAPI_Double& theStep,
-                                  const ModelHighAPI_Integer& theNumber = ModelHighAPI_Integer(""),
+                                  const ModelHighAPI_Integer& theNumber = ModelHighAPI_Integer(L""),
                                   const bool keepSubResults = false);
 
 #endif // FEATURESAPI_MULTIROTATION_H_

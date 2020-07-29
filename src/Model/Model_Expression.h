@@ -39,10 +39,10 @@ class Model_Expression : public virtual ModelAPI_Expression
 {
  public:
   /// Sets the text of this Expression
-  MODEL_EXPORT virtual void setText(const std::string& theText);
+  MODEL_EXPORT virtual void setText(const std::wstring& theText);
 
   /// Returns the text of this Expression
-  MODEL_EXPORT virtual std::string text() const;
+  MODEL_EXPORT virtual std::wstring text() const;
 
   /// Allows to set expression (text) error (by the parameters listener)
   MODEL_EXPORT virtual void setError(const std::string& theError);
@@ -51,10 +51,10 @@ class Model_Expression : public virtual ModelAPI_Expression
   MODEL_EXPORT virtual std::string error();
 
   /// Defines the used parameters (by the parameters listener)
-  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters);
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::wstring>& theUsedParameters);
 
   /// Returns the used parameters
-  MODEL_EXPORT virtual std::set<std::string> usedParameters() const;
+  MODEL_EXPORT virtual std::set<std::wstring> usedParameters() const;
 
  protected:
   /// Initializes attributes
@@ -77,12 +77,12 @@ class Model_ExpressionDouble :
 {
  public:
   /// Sets the text of this Expression
-  MODEL_EXPORT virtual void setText(const std::string& theText) {
+  MODEL_EXPORT virtual void setText(const std::wstring& theText) {
     Model_Expression::setText(theText);
   };
 
   /// Returns the text of this Expression
-  MODEL_EXPORT virtual std::string text() const {
+  MODEL_EXPORT virtual std::wstring text() const {
     return Model_Expression::text();
   };
 
@@ -97,12 +97,12 @@ class Model_ExpressionDouble :
   };
 
   /// Defines the used parameters (by the parameters listener)
-  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) {
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::wstring>& theUsedParameters) {
     Model_Expression::setUsedParameters(theUsedParameters);
   };
 
   /// Returns the used parameters
-  MODEL_EXPORT virtual std::set<std::string> usedParameters() const {
+  MODEL_EXPORT virtual std::set<std::wstring> usedParameters() const {
     return Model_Expression::usedParameters();
   };
 
@@ -142,12 +142,12 @@ class Model_ExpressionInteger :
 {
  public:
   /// Sets the text of this Expression
-  MODEL_EXPORT virtual void setText(const std::string& theText) {
+  MODEL_EXPORT virtual void setText(const std::wstring& theText) {
     Model_Expression::setText(theText);
   };
 
   /// Returns the text of this Expression
-  MODEL_EXPORT virtual std::string text() const {
+  MODEL_EXPORT virtual std::wstring text() const {
     return Model_Expression::text();
   };
 
@@ -162,12 +162,12 @@ class Model_ExpressionInteger :
   };
 
   /// Defines the used parameters (by the parameters listener)
-  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) {
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::wstring>& theUsedParameters) {
     Model_Expression::setUsedParameters(theUsedParameters);
   };
 
   /// Returns the used parameters
-  MODEL_EXPORT virtual std::set<std::string> usedParameters() const {
+  MODEL_EXPORT virtual std::set<std::wstring> usedParameters() const {
     return Model_Expression::usedParameters();
   };
 

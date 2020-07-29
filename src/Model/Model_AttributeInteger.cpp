@@ -55,7 +55,7 @@ int Model_AttributeInteger::value()
   return myExpression->value();
 }
 
-void Model_AttributeInteger::setText(const std::string& theValue)
+void Model_AttributeInteger::setText(const std::wstring& theValue)
 {
   if (text() != theValue) {
     myExpression->setText(theValue);
@@ -65,7 +65,7 @@ void Model_AttributeInteger::setText(const std::string& theValue)
   }
 }
 
-std::string Model_AttributeInteger::text()
+std::wstring Model_AttributeInteger::text()
 {
   return myExpression->text();
 }
@@ -91,12 +91,12 @@ std::string Model_AttributeInteger::expressionError()
   return myExpression->error();
 }
 
-void Model_AttributeInteger::setUsedParameters(const std::set<std::string>& theUsedParameters)
+void Model_AttributeInteger::setUsedParameters(const std::set<std::wstring>& theUsedParameters)
 {
   myExpression->setUsedParameters(theUsedParameters);
 }
 
-std::set<std::string> Model_AttributeInteger::usedParameters() const
+std::set<std::wstring> Model_AttributeInteger::usedParameters() const
 {
   return myExpression->usedParameters();
 }

@@ -194,7 +194,7 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
     double aValue;
     ResultParameterPtr aParam;
     if (ModelAPI_Tools::findVariable(theObject->document(),
-          FeaturePtr(), qPrintable(theName), aValue, aParam)) {
+          FeaturePtr(), theName.toStdWString(), aValue, aParam)) {
       const char* aKeyStr = "Selected parameter can not be renamed to: %1. "
                             "There is a parameter with the same name. Its value is: %2.";
       QString aErrMsg(QObject::tr(aKeyStr).arg(theName).arg(aValue));

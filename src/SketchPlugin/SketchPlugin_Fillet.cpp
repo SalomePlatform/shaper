@@ -385,7 +385,7 @@ FeaturePtr SketchPlugin_Fillet::createFilletApex(const GeomPnt2dPtr& theCoordina
 
 struct Length {
   AttributePtr myPoints[2];
-  std::string myValueText;
+  std::wstring myValueText;
   double myValueDouble;
   GeomPnt2dPtr myFlyoutPoint;
   int myLocationType;

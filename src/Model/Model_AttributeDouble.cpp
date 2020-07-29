@@ -61,7 +61,7 @@ double Model_AttributeDouble::value()
   return myExpression->value();
 }
 
-void Model_AttributeDouble::setText(const std::string& theValue)
+void Model_AttributeDouble::setText(const std::wstring& theValue)
 {
   if (text() != theValue) {
     myExpression->setText(theValue);
@@ -71,7 +71,7 @@ void Model_AttributeDouble::setText(const std::string& theValue)
   }
 }
 
-std::string Model_AttributeDouble::text()
+std::wstring Model_AttributeDouble::text()
 {
   return myExpression->text();
 }
@@ -97,12 +97,12 @@ std::string Model_AttributeDouble::expressionError()
   return myExpression->error();
 }
 
-void Model_AttributeDouble::setUsedParameters(const std::set<std::string>& theUsedParameters)
+void Model_AttributeDouble::setUsedParameters(const std::set<std::wstring>& theUsedParameters)
 {
   myExpression->setUsedParameters(theUsedParameters);
 }
 
-std::set<std::string> Model_AttributeDouble::usedParameters() const
+std::set<std::wstring> Model_AttributeDouble::usedParameters() const
 {
   return myExpression->usedParameters();
 }
