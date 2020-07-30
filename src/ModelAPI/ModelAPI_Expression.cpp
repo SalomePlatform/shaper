@@ -21,6 +21,8 @@
 
 #include <Locale_Convert.h>
 
+#include <cwctype>
+
 ModelAPI_Expression::ModelAPI_Expression()
 {
 
