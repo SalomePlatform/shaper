@@ -459,7 +459,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
       aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aConstruction.get()) {
       // Construction selected. Check that it is not infinite.
-      if(aConstruction->isInfinite()) {
+      if(aConstruction->isInfinite() && !aConstruction->shape()->isVertex()) {
         theError = "Error: Infinite constructions is not allowed as base.";
         return false;
       }
