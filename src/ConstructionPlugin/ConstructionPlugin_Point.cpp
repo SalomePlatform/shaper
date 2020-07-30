@@ -143,7 +143,7 @@ void ConstructionPlugin_Point::execute()
 
   removeResults(1); // for case the point type was switched from multi-results type
   std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-  aConstr->setInfinite(true);
+  aConstr->setInfinite(false);
   aConstr->setShape(aShape);
   setResult(aConstr);
 }
