@@ -93,8 +93,9 @@ void ModuleBase_WidgetOptionalBox::onPageClicked()
   storeValue();
   updateControlsVisibility();
 
-  if (!isEditingMode())
-    emit focusOutWidget(this);
+  // The widget doesn't accept a focus
+  //if (!isEditingMode())
+  //  emit focusOutWidget(this);
 }
 
 void ModuleBase_WidgetOptionalBox::addPageStretch()
