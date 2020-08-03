@@ -183,6 +183,20 @@ bool isAscii(const QString& theStr)
 }
 
 //******************************************************************
+bool isValidName(const QString& theName)
+{
+  QChar aChar;
+  for (int i = 0; i < theName.size(); i++) {
+    aChar = theName[i];
+    if (!aChar.isLetterOrNumber()) {
+      if ((aChar != "_") && (!aChar.isSpace()))
+        return false;
+    }
+  }
+  return true;
+}
+
+//******************************************************************
 bool canRename(const ObjectPtr& theObject, const QString& theName)
 {
   std::string aType = theObject->groupName();
@@ -205,6 +219,9 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
     }
   }
   else {
+    if (!isValidName(theName))
+      return false;
+
     DocumentPtr aDoc = theObject->document();
     ObjectPtr aObj =
       aDoc->objectByName(aType, theName.toStdWString());
