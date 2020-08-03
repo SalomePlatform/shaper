@@ -67,6 +67,7 @@
 
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <Standard_Version.hxx>
 
 #include <QDockWidget>
 #include <QAction>

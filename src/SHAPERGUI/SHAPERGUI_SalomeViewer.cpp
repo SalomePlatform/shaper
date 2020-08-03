@@ -28,6 +28,7 @@
 #include <QtxActionToolMgr.h>
 #include <SALOME_AISShape.hxx>
 
+#include <Standard_Version.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #include <QMouseEvent>
