@@ -227,5 +227,5 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
 
 void InitializationPlugin_EvalListener::initDataModel()
 {
-  myInterp->runString("salome_iapp.register_module_in_study(\"Shaper\")");
+  myInterp->runString("import salome_iapp;salome_iapp.register_module_in_study(\"Shaper\")");
 }
