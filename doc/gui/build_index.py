@@ -74,7 +74,9 @@ def main(src_dir, build_dir):
                 shutil.rmtree(dist_dir)
             shutil.copytree(lib_dir, dist_dir)
             ## Collect index file
-            indices.append(osp.join(plugin_name, plugin_name + '.rst'))
+            ## For Sphinks type of slash is important.
+            ## Even for Windows the slash direction has to be the same
+            indices.append(plugin_name + "/" + plugin_name + '.rst')
             ## Collect TUI scripts
             tui_files = sorted(f for f in os.listdir(lib_dir) if \
                                    osp.isfile(osp.join(lib_dir, f)) and re.match('TUI_.*\.rst', f))
