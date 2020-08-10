@@ -92,7 +92,6 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   bool myIsFocusOnCurrentPage;
   QStringList myCaseIds;
   QList<ModuleBase_PageBase*> myPages;
-  bool myIsFirst;
   std::string myDefValue;
 };
 

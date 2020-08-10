@@ -34,7 +34,7 @@ static QMap<std::string, std::string> defaultValues;
 ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myRemeberChoice(true), myIsFocusOnCurrentPage(false), myIsFirst(true)
+  myRemeberChoice(true), myIsFocusOnCurrentPage(false)
 {
   // it is not obligatory to be ignored when property panel tries to activate next active widget
   // but if focus is moved to this control, it can accept it.
@@ -107,7 +107,7 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
       aCaseId = QString::fromStdString(aStringAttr->value());
     else
       aCaseId = QString::fromStdString(aDefVal.empty() ? aStringAttr->value() : aDefVal);
-    if (myIsFirst)
+    if (!aStringAttr->isInitialized())
       storeValueCustom();
     int idx = myCaseIds.indexOf(aCaseId);
     if (idx == -1)
@@ -140,15 +140,13 @@ bool ModuleBase_PagedContainer::storeValueCustom()
 
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   std::string aWidgetValue;
-  if (myIsFirst)
+  if (!aStringAttr->isInitialized())
     aWidgetValue = myDefValue.empty()?
         myCaseIds.at(currentPageIndex()).toStdString() : myDefValue;
   else
     aWidgetValue = myCaseIds.at(currentPageIndex()).toStdString();
   myDefValue = aWidgetValue;
   aStringAttr->setValue(aWidgetValue);
-
-  myIsFirst = false;
 
   updateObject(myFeature); // for preview
   return true;
