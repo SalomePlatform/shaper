@@ -609,6 +609,30 @@ bool Model_AttributeSelection::update()
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
       aNewShape = aNS->Get();
 
+    // check the selected value is a part of the context
+    if (aResult && !aNewShape.IsNull() && !aContextShape.IsNull() &&
+        !aContextShape.IsSame(aNewShape)) {
+      TopoDS_Shape aNewS = aNewShape;
+      // take only sub-shape of composite for checking
+      if (aNewS.ShapeType() == TopAbs_WIRE || aNewS.ShapeType() == TopAbs_SHELL ||
+        aNewS.ShapeType() == TopAbs_COMPOUND || aNewS.ShapeType() == TopAbs_COMPSOLID) {
+        TopoDS_Iterator anIter(aNewS);
+        if (anIter.More())
+          aNewS = anIter.Value();
+      }
+      bool anIsInside = false;
+      TopExp_Explorer anExp(aContextShape, aNewS.ShapeType());
+      for (; anExp.More() && !anIsInside; anExp.Next()) {
+        if (anExp.Current().IsSame(aNewS))
+          anIsInside = true;
+      }
+      if (!anIsInside) {
+        aResult = false;
+        aNewShape.Nullify();
+        setInvalidIfFalse(aSelLab, aResult);
+      }
+    }
+
     if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape) || aWasInvalid)
     {
       // shape type should not be changed: if shape becomes compound of such shapes, then split
@@ -763,16 +787,16 @@ std::wstring Model_AttributeSelection::namingName(const std::wstring& theDefault
     GeomShapePtr aShape = value();
     if (!aShape.get() && context().get())
       aShape = context()->shape();
-    std::wstring aName;
+    std::wstring aNotArgName;
     if (aShape.get()) {
-      aName = Locale::Convert::toWString(aShape->shapeTypeStr());
+      aNotArgName = Locale::Convert::toWString(aShape->shapeTypeStr());
       if (myParent) {
         std::wostringstream aStream;
         aStream << "_" << selectionLabel().Father().Tag();
-        aName += aStream.str();
+        aNotArgName += aStream.str();
       }
     }
-    return aName;
+    return aNotArgName;
   }
 
   CenterType aCenterType = NOT_CENTER;
