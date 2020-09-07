@@ -26,12 +26,12 @@ GeomAlgoAPI_Exception::GeomAlgoAPI_Exception(std::string theMessageError)
 }
 
 //=================================================================================================
-GeomAlgoAPI_Exception::~GeomAlgoAPI_Exception() throw()
+GeomAlgoAPI_Exception::~GeomAlgoAPI_Exception() noexcept
 {
 }
 
 //=================================================================================================
-const char* GeomAlgoAPI_Exception::what() const throw()
+const char* GeomAlgoAPI_Exception::what() const noexcept
 {
   return myMessageError.c_str();
 }
