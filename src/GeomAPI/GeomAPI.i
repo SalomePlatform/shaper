@@ -169,6 +169,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(PointList) std::list<std::shared_ptr<GeomAPI_Pnt> >;
 %template(ShapeList) std::list<std::shared_ptr<GeomAPI_Shape> >;
 // std::set -> []
+%template(CurveSet) std::set<std::shared_ptr<GeomAPI_Curve>, GeomAPI_Curve::Comparator>;
 %template(ShapeSet) std::set<std::shared_ptr<GeomAPI_Shape>, GeomAPI_Shape::Comparator>;
 %template(OriShapeSet) std::set<std::shared_ptr<GeomAPI_Shape>, GeomAPI_Shape::ComparatorWithOri>;
 // std::map -> {}
