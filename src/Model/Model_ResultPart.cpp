@@ -36,6 +36,8 @@
 
 #include <GeomAPI_Trsf.h>
 
+#include <GeomAlgoAPI_Transform.h>
+
 #include <Locale_Convert.h>
 
 #include <TNaming_Tool.hxx>
@@ -197,12 +199,9 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
       ResultPtr anOrigResult = baseRef();
       std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
       if (anOrigShape.get()) {
-        TopoDS_Shape aShape = anOrigShape->impl<TopoDS_Shape>();
-        if (!aShape.IsNull()) {
-          aShape.Move(*(myTrsf.get()));
-          myShape = aShape;
-          aResult->setImpl(new TopoDS_Shape(aShape));
-        }
+        GeomTrsfPtr aTrsf = std::make_shared<GeomAPI_Trsf>(new gp_Trsf(*myTrsf));
+        GeomAlgoAPI_Transform aTransform(anOrigShape, aTrsf);
+        aResult = aTransform.shape();
       }
       if (!myShape.IsNull() && aToSendUpdate) {
         static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
