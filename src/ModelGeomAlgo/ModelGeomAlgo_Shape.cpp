@@ -118,7 +118,7 @@ namespace ModelGeomAlgo_Shape
       if (!anEdge)
         continue;
 
-      if (anEdge->isCircle()) {
+      if (anEdge->isCircle() || anEdge->isArc()) {
         GeomCirclePtr aCircle = anEdge->circle();
         if (aCircle->center()->distance(theCenter) < theTolerance) {
           theCenterType = (int)ModelAPI_AttributeSelection::CIRCLE_CENTER;
