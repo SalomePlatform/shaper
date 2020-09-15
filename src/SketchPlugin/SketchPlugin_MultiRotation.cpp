@@ -100,6 +100,11 @@ void SketchPlugin_MultiRotation::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  // Save the current feature of the document, because new features may appear while executing.
+  // In this case, they will become current. But if the number of copies is updated from outside
+  // of sketch (e.g. by parameter change), the history line should not hold in sketch.
+  keepCurrentFeature();
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
@@ -211,16 +216,7 @@ void SketchPlugin_MultiRotation::execute()
     }
   }
 
-////  if (fabs(anAngle) > 1.e-12) {
-////    // Recalculate positions of features
-////    aTargetList = aRefListOfRotated->list();
-////    aTargetIter = aTargetList.begin();
-////    while (aTargetIter != aTargetList.end()) {
-////      ObjectPtr anInitialObject = *aTargetIter++;
-////      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-//// rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
-////    }
-////  }
+  restoreCurrentFeature();
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
