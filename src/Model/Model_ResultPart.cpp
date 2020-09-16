@@ -202,6 +202,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
         GeomTrsfPtr aTrsf = std::make_shared<GeomAPI_Trsf>(new gp_Trsf(*myTrsf));
         GeomAlgoAPI_Transform aTransform(anOrigShape, aTrsf);
         aResult = aTransform.shape();
+        myShape = aResult->impl<TopoDS_Shape>();
       }
       if (!myShape.IsNull() && aToSendUpdate) {
         static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
