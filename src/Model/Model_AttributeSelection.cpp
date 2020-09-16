@@ -2052,24 +2052,28 @@ ResultPtr Model_AttributeSelection::newestContext(
     //if (aResult->groupName() == ModelAPI_ResultBody::group()) {
       // try to search newer context by the concealment references
       // take references to all results: root one, any sub
-    std::list<ResultPtr> allRes;
+    std::list<DataPtr> allRes;
     ResultPtr aCompContext;
     ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aResult, true);
     if (aCompBody.get()) {
-      ModelAPI_Tools::allSubs(aCompBody, allRes);
-      allRes.push_back(aCompBody);
+      std::list<ResultPtr> allSub;
+      ModelAPI_Tools::allSubs(aCompBody, allSub);
+      for(std::list<ResultPtr>::iterator anIt = allSub.begin(); anIt != allSub.end(); anIt++)
+        allRes.push_back((*anIt)->data());
+      allRes.push_back(aCompBody->data());
       aCompContext = aCompBody;
     }
     if (allRes.empty())
-      allRes.push_back(aResult);
+      allRes.push_back(aResult->data());
+    allRes.push_back(aResult->document()->feature(aResult)->data());
 
     bool aFoundReferernce = false;
-    for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
-      ResultPtr aResCont = *aSub;
-      ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
+    for (std::list<DataPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+      DataPtr aResCont = *aSub;
+      ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont->owner());
       if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
         continue; // only lower and higher level subs are counted
-      const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+      const std::set<AttributePtr>& aRefs = aResCont->refsToMe();
       std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
       for (; !aFindNewContext && aRef != aRefs.end(); aRef++) {
         if (!aRef->get() || !(*aRef)->owner().get())
