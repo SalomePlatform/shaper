@@ -87,7 +87,7 @@ namespace ModelGeomAlgo_Shape
       bool isFound = aDistance < theTolerance;
       // issue #19019: special workaround for faces, because if the face contains B-spline contour,
       // the middle point is calculated with respect to its poles, but not a curve itself.
-      // Thus is some operations (like BOP) the curve may have different number of poles
+      // Thus, in some operations (like BOP) the curve may have different number of poles
       // from time to time, as a result, the face parametric boundaries are floating
       // as well as the middle point.
       // The workaround is to find a distance from the picking point to the face, if the distance
@@ -216,7 +216,7 @@ namespace ModelGeomAlgo_Shape
                            const GeomAPI_Shape::ShapeType& theShapeType,
                            std::list<SubshapeOfResult>& theSelected)
   {
-    static const double TOLERANCE = 1.e-6;
+    static const double TOLERANCE = 1.5e-6;
 
     theSelected.clear();
 

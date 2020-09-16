@@ -1055,7 +1055,22 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   // collect features from PartSet and the current part
   SessionPtr aSession = ModelAPI_Session::get();
   std::list<FeaturePtr> aFeatures = aSession->moduleDocument()->allFeatures();
-  if (aSession->moduleDocument() != owner()->document()) {
+  if (anOwner->getKind() == "ImportResult") {
+    // special case: feature "ImportResult" refers to the results from another parts,
+    // thus, it is necessary to go through the features of these parts too.
+    std::list<FeaturePtr> aPartSetFeatures = aFeatures;
+    aFeatures.clear();
+    for (std::list<FeaturePtr>::iterator it = aPartSetFeatures.begin();
+         it != aPartSetFeatures.end(); ++it) {
+      aFeatures.push_back(*it);
+      if ((*it)->firstResult()->groupName() == ModelAPI_ResultPart::group()) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>((*it)->firstResult());
+        std::list<FeaturePtr> aPartFeatures = aPart->partDoc()->allFeatures();
+        aFeatures.insert(aFeatures.end(), aPartFeatures.begin(), aPartFeatures.end());
+      }
+    }
+  }
+  else if (aSession->moduleDocument() != owner()->document()) {
     std::list<FeaturePtr> aPartFeatures = owner()->document()->allFeatures();
     aFeatures.insert(aFeatures.end(), aPartFeatures.begin(), aPartFeatures.end());
   }
