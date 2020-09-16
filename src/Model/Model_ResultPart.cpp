@@ -189,6 +189,26 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
   return false;
 }
 
+static GeomShapePtr transformShape(const GeomShapePtr theShape, const gp_Trsf& theTrsf)
+{
+  GeomShapePtr aResult(new GeomAPI_Shape);
+  if (theTrsf.ScaleFactor() > 0) {
+    // just update the location of the shape in case of affine transformation
+    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+    if (!aShape.IsNull()) {
+      aShape.Move(theTrsf);
+      aResult->setImpl(new TopoDS_Shape(aShape));
+    }
+  }
+  else {
+    // all other transformations will modify the shape
+    GeomTrsfPtr aTrsf = std::make_shared<GeomAPI_Trsf>(new gp_Trsf(theTrsf));
+    GeomAlgoAPI_Transform aTransform(theShape, aTrsf);
+    aResult = aTransform.shape();
+  }
+  return aResult;
+}
+
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
@@ -199,9 +219,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
       ResultPtr anOrigResult = baseRef();
       std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
       if (anOrigShape.get()) {
-        GeomTrsfPtr aTrsf = std::make_shared<GeomAPI_Trsf>(new gp_Trsf(*myTrsf));
-        GeomAlgoAPI_Transform aTransform(anOrigShape, aTrsf);
-        aResult = aTransform.shape();
+        aResult = transformShape(anOrigShape, *myTrsf);
         myShape = aResult->impl<TopoDS_Shape>();
       }
       if (!myShape.IsNull() && aToSendUpdate) {
