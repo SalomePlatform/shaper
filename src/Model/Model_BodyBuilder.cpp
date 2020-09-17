@@ -338,7 +338,8 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
     TDF_Label anOriginalLabel;
     TopTools_ListOfShape anOldList;
     if (!isShapeInTree(aData->shapeLab(), anAccess2, aShapeOld, anOriginalLabel)) {
-      if (aShapeOld.ShapeType() == TopAbs_COMPOUND)  { // check this could be a compund by a whole feature selection
+      // check this could be a compund by the whole feature selection
+      if (aShapeOld.ShapeType() == TopAbs_COMPOUND)  {
         for(TopoDS_Iterator aCompIter(aShapeOld); aCompIter.More(); aCompIter.Next()) {
           if (isShapeInTree(aData->shapeLab(), anAccess2, aCompIter.Value(), anOriginalLabel)) {
             anOldList.Append(aCompIter.Value());
