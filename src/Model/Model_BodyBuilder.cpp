@@ -336,7 +336,22 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
     TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
       ModelAPI_Session::get()->moduleDocument())->generalLabel();
     TDF_Label anOriginalLabel;
+    TopTools_ListOfShape anOldList;
     if (!isShapeInTree(aData->shapeLab(), anAccess2, aShapeOld, anOriginalLabel)) {
+      if (aShapeOld.ShapeType() == TopAbs_COMPOUND)  { // check this could be a compund by a whole feature selection
+        for(TopoDS_Iterator aCompIter(aShapeOld); aCompIter.More(); aCompIter.Next()) {
+          if (isShapeInTree(aData->shapeLab(), anAccess2, aCompIter.Value(), anOriginalLabel)) {
+            anOldList.Append(aCompIter.Value());
+          } else {
+            anOldList.Clear();
+            break;
+          }
+        }
+      }
+    } else {
+      anOldList.Append(aShapeOld);
+    }
+    if (anOldList.IsEmpty()) {
       if (aBuilder->NamedShape()->Get().IsNull()) { // store as primitive if alone anyway
         aBuilder->Generated(aShapeNew);
       }
@@ -345,8 +360,10 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
         myBuilders.erase(0);
         aBuilder = builder(0);
       }
-
-      aBuilder->Modify(aShapeOld, aShapeNew);
+      TopTools_ListIteratorOfListOfShape anOldIter(anOldList);
+      for(; anOldIter.More(); anOldIter.Next()) {
+        aBuilder->Modify(anOldIter.Value(), aShapeNew);
+      }
       // store information about the external document reference to restore old shape on open
       storeExternalReference(anOriginalLabel, aBuilder->NamedShape()->Label());
     }
