@@ -41,6 +41,22 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+static void explodeCompound(const GeomShapePtr& theShape, ListOfShape& theResult)
+{
+  if (theShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+    GeomAPI_ShapeIterator it(theShape);
+    for (; it.more(); it.next())
+      theResult.push_back(it.current());
+  } else
+    theResult.push_back(theShape);
+}
+
+static void collectSolids(const ListOfShape& theShapes, ListOfShape& theResult)
+{
+  for (ListOfShape::const_iterator it = theShapes.begin(); it != theShapes.end(); ++it)
+    explodeCompound(*it, theResult);
+}
+
 //==================================================================================================
 FeaturesPlugin_BooleanFuse::FeaturesPlugin_BooleanFuse()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_FUSE)
@@ -105,9 +121,13 @@ void FeaturesPlugin_BooleanFuse::execute()
   const std::string aFuseVersion = data()->version();
 
   // Collecting all solids which will be fused.
+  // We explode the top-level compounds here because of issue #19931. It performs Fuse operation
+  // on a set of compounds, one of which is treated as self-intersected.
+  // But this problem is eliminated after the exploding, because in this case,
+  // the shapes are intersected, but not self-intersected.
   ListOfShape aSolidsToFuse;
-  aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
-  aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
+  collectSolids(anObjects, aSolidsToFuse);
+  collectSolids(aTools, aSolidsToFuse);
 
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
