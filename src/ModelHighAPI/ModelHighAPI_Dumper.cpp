@@ -1505,12 +1505,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       }
 
       if(isAdded) {
-        *myDumpStorage << ", ";
         // print each attribute on separate line with the appropriate shift
         if (aNbSpaces > 0) {
           std::string aSpaces(aNbSpaces + 1, ' ');
-          *myDumpStorage << "\n" << aSpaces;
-        }
+          *myDumpStorage << ",\n" << aSpaces;
+        } else
+          *myDumpStorage << ", ";
       } else {
         isAdded = true;
       }
