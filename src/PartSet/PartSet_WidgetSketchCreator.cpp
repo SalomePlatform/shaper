@@ -307,11 +307,17 @@ QIntList PartSet_WidgetSketchCreator::shapeTypes() const
 {
   QIntList aShapeTypes;
   if (myShapeTypes.length() > 1 && myIsUseChoice) {
-    aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCtrl->textValue()));
+    QStringList aTypes = myTypeCtrl->textValue().split("|", QString::SkipEmptyParts);
+    foreach(QString aType, aTypes) {
+      aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+    }
   }
   else {
     foreach(QString aType, myShapeTypes) {
-      aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+      QStringList aSubTypes = aType.split("|", QString::SkipEmptyParts);
+      foreach(QString asubType, aSubTypes) {
+        aShapeTypes.append(ModuleBase_Tools::shapeType(asubType));
+      }
     }
   }
   return aShapeTypes;
