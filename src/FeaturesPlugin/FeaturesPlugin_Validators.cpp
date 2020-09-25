@@ -402,7 +402,11 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     AttributeSelectionListPtr aListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
 
-    const std::string& aSelType = aListAttr->selectionType();
+    const std::string& aVersion = theAttribute->owner()->data()->version();
+    std::string aSelType;
+    if (!aVersion.empty())
+      aSelType = aListAttr->selectionType();
+
     std::list<std::string> anApplicableTypes;
     switch (GeomValidators_ShapeType::shapeType(aSelType)) {
     case GeomValidators_ShapeType::Vertex:
