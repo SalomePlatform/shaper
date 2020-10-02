@@ -31,5 +31,63 @@
                    placeholder="Please input the geometry name">
       </stringvalue>
     </case>
+    <case id="STL" title="STL">
+      <export_file_selector id="stl_file_path"
+                            type="save"
+                            title="Export file"
+                            path="">
+        <validator id="ExchangePlugin_ExportFormat"
+                   parameters="stl:STL" />
+      </export_file_selector>
+      <shape_selector id="stl_object_selected"
+                          label="Object"
+                          tooltip="Object to export."
+                          shape_types="vertices edges wires faces shells solids compsolids compounds">
+            <validator id="GeomValidators_Finite"/>
+      </shape_selector>
+      <groupbox title="Deflection">
+        <radiobox id="stl_deflection_type">
+          <radio id="stl_deflection_type_relative"
+              title="Relative"
+              tooltip="Calculate by size of shape">
+            <doublevalue id="stl_relative"
+              tooltip="Relative value."
+              min="0.0"
+              step="0.001"
+              default="0.001">
+            </doublevalue>
+          </radio>
+          <radio id="stl_deflection_type_absolute"
+              title="Absolute"
+              tooltip="Value indicate by user">
+            <doublevalue id="stl_absolute"
+              tooltip="Absolute value."
+              min="0.0"
+              max="1.0"
+              step="0.1"
+              default="0.5">
+            </doublevalue>
+          </radio>
+        </radiobox>
+      </groupbox >
+      <groupbox title="File type">
+        <radiobox id="stl_file_type">
+          <radio id="stl_file_type_binary"
+              title="Binary">
+          </radio>
+          <radio id="stl_file_type_acii"
+              title="ASCII">
+          </radio>
+        </radiobox>
+      </groupbox >
+      <!--stringvalue id="xao_author"
+                   label="Author"
+                   placeholder="Please input the author">
+      </stringvalue>
+      <stringvalue id="xao_geometry_name"
+                   label="Geometry name"
+                   placeholder="Please input the geometry name">
+      </stringvalue-->
+    </case>
   </switch>
 </source>

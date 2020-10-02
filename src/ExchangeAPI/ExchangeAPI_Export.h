@@ -51,6 +51,16 @@ public:
                               const std::string & theFilePath,
                               const std::string & theAuthor = std::string(),
                               const std::string & theGeometryName = std::string());
+  
+  /// Constructor with values for STL of selected result export.
+  EXCHANGEAPI_EXPORT
+    explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                const std::string & theFilePath,
+                                const ModelHighAPI_Selection& theSelectedShape,
+                                double  aDeflectionRelative ,
+                                double  aDeflectionAbsolute,
+                                const bool anIsRelative, 
+                                const bool anIsASCII);
 
   /// Constructor with values for XAO of selected result export.
   EXCHANGEAPI_EXPORT
@@ -71,7 +81,7 @@ public:
   EXCHANGEAPI_EXPORT
   virtual ~ExchangeAPI_Export();
 
-  INTERFACE_7(ExchangePlugin_ExportFeature::ID(),
+  INTERFACE_15(ExchangePlugin_ExportFeature::ID(),
              exportType, ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(),
              ModelAPI_AttributeString, /** ExportType */,
              filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(),
@@ -85,7 +95,23 @@ public:
              xaoAuthor, ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(),
              ModelAPI_AttributeString, /** xao author */,
              xaoGeometryName, ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(),
-             ModelAPI_AttributeString, /** xao geometry name */)
+             ModelAPI_AttributeString, /** xao geometry name */,
+             stlFilePath, ExchangePlugin_ExportFeature::STL_FILE_PATH_ID(),
+             ModelAPI_AttributeString, /** stl_file_path */,
+             stlobjectselected, ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED(),
+             ModelAPI_AttributeSelection, /** Object selected to export in stl file*/,
+             stldeflectionType, ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE(),
+             ModelAPI_AttributeString, /** Type of the defelection */,
+             stlrelative, ExchangePlugin_ExportFeature::STL_RELATIVE(),
+             ModelAPI_AttributeDouble, /** Relative*/,
+             stlabsolute, ExchangePlugin_ExportFeature::STL_ABSOLUTE(),
+             ModelAPI_AttributeDouble, /** Absolute */,
+             stlfileType, ExchangePlugin_ExportFeature::STL_FILE_TYPE(),
+             ModelAPI_AttributeString, /** Type of the stl file*/,
+             stldeflectionTypeabsolute, ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_ABSOLUTE(),
+             ModelAPI_AttributeString, /** Type of the defelection */,
+             stldeflectionTyperelative, ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(),
+             ModelAPI_AttributeString, /** Type of the defelection */)
 
   /// Dump wrapped feature
   EXCHANGEAPI_EXPORT
@@ -112,6 +138,18 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
                  const std::string & theFilePath,
                  const std::string & theAuthor = std::string(),
                  const std::string & theGeometryName = std::string());
+
+/**\ingroup CPPHighAPI
+ * \brief Exports to STL file the result of the current document
+ */
+EXCHANGEAPI_EXPORT
+ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
+      const std::string & theFilePath,
+      const ModelHighAPI_Selection& theSelectedShape,
+      double  aDeflectionRelative,
+      double  aDeflectionAbsolute,
+      const bool anIsRelative, 
+      const bool anIsASCII);
 
 /**\ingroup CPPHighAPI
 * \brief Exports to XAO file the selected result with groups parts related to it only.
