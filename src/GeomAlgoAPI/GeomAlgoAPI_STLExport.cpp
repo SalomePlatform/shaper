@@ -38,12 +38,11 @@
 #define MAX3(X, Y, Z)   ( MAX2 ( MAX2(X, Y) , Z ) )
 
 bool STLExport(const std::string& theFileName,
-                const std::string& /*theFormatName*/,
-                const std::shared_ptr<GeomAPI_Shape>& theShape,
-                const double aDeflection,
-                const bool anIsRelative, 
-                const bool anIsASCII,
-                std::string& theError)
+               const std::shared_ptr<GeomAPI_Shape>& theShape,
+               const double theDeflection,
+               const bool theIsRelative,
+               const bool theIsASCII,
+               std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export STl into file " << theFileName << std::endl;
@@ -56,25 +55,22 @@ bool STLExport(const std::string& theFileName,
 
   try
   {
-    // Set "C" numeric locale to save numbers correctly
-    GeomAlgoAPI_Tools::Localizer loc;
 
-    double lDeflection = aDeflection;
+    double lDeflection = theDeflection;
     StlAPI_Writer aWriter;
     // copy source shape
     BRepBuilderAPI_Copy aCopy( theShape->impl<TopoDS_Shape>(), Standard_False );
     TopoDS_Shape aCopyShape = aCopy.Shape();
     // ASCII mode
-    aWriter.ASCIIMode() = anIsASCII;
-    if ( anIsRelative ) {
+    aWriter.ASCIIMode() = theIsASCII;
+    if ( theIsRelative ) {
       Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
       Bnd_Box bndBox;
       BRepBndLib::Add( theShape->impl<TopoDS_Shape>(), bndBox );
       bndBox.Get( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
-      lDeflection = MAX3( aXmax-aXmin, aYmax-aYmin, aZmax-aZmin ) * aDeflection;
+      lDeflection = MAX3( aXmax-aXmin, aYmax-aYmin, aZmax-aZmin ) * theDeflection;
     }
     //Compute triangulation
-    BRepTools::Clean( aCopyShape );
     BRepMesh_IncrementalMesh aMesh( aCopyShape, lDeflection );
     aWriter.Write( aCopyShape, theFileName.c_str() );
 
