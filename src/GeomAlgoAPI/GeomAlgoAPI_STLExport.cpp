@@ -72,8 +72,10 @@ bool STLExport(const std::string& theFileName,
     }
     //Compute triangulation
     BRepMesh_IncrementalMesh aMesh( aCopyShape, lDeflection );
-    aWriter.Write( aCopyShape, theFileName.c_str() );
-
+    if (!aWriter.Write( aCopyShape, theFileName.c_str())) {
+      theError = "STL Export failed";
+      return false;
+    }
     return true;
   }
   catch( Standard_Failure )

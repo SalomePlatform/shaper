@@ -59,38 +59,39 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
                                        const ModelHighAPI_Selection& theSelectedShape,
                                        double aDeflectionRelative,
                                        double aDeflectionAbsolute,
-                                       const bool anIsRelative, 
+                                       const bool anIsRelative,
                                        const bool anIsASCII)
   : ModelHighAPI_Interface(theFeature)
 {
   initialize();
   fillAttribute("STL", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
   fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID()));
-   
+
   if (anIsRelative) {
-    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(), 
+    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
-    fillAttribute(aDeflectionRelative, 
-      theFeature->real(ExchangePlugin_ExportFeature::STL_RELATIVE()) ); 
+    fillAttribute(aDeflectionRelative,
+      theFeature->real(ExchangePlugin_ExportFeature::STL_RELATIVE()) );
   }
   else {
-    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_ABSOLUTE(), 
+    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_ABSOLUTE(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
-    fillAttribute(aDeflectionAbsolute, 
+    fillAttribute(aDeflectionAbsolute,
       theFeature->real(ExchangePlugin_ExportFeature::STL_ABSOLUTE()) );
   }
 
   if(anIsASCII){
-    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_ASCII(), 
+    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_ASCII(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_TYPE()));
   }
   else
   {
-    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_BINARY(), 
+    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_BINARY(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_TYPE()));
   }
-  
-  fillAttribute(theSelectedShape,theFeature->selection(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED()));
+
+  fillAttribute(theSelectedShape,
+                theFeature->selection(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED()));
   fillAttribute("STL", theFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
   execute();
   apply(); // finish operation to make sure the export is done on the current state of the history
@@ -202,7 +203,8 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper <<","<<  stlabsolute() <<","<< stlrelative();
 
-    if (stldeflectionType()->value() == ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE()) {
+    if (stldeflectionType()->value()
+         == ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE()){
       theDumper <<","<< "True";
     }
     else {
@@ -270,7 +272,7 @@ ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
                                           theDeflectionRelative,
                                           theDeflectionAbsolute,
                                           theIsRelative,
-                                          theIsASCII));                                    
+                                          theIsASCII));
 }
 
 ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
