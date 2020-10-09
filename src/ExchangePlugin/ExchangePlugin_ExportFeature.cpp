@@ -109,7 +109,7 @@ void ExchangePlugin_ExportFeature::initAttributes()
    ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::STL_RELATIVE(),
     ModelAPI_AttributeDouble::typeId());
-   
+
   double defelection = Config_PropManager::real("Visualization", "body_deflection");
   real(ExchangePlugin_ExportFeature::STL_RELATIVE())->setValue(defelection);
 
