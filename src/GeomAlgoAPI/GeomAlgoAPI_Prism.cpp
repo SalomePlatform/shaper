@@ -299,7 +299,7 @@ void GeomAlgoAPI_Prism::buildBySizes(const GeomShapePtr             theBaseShape
 
   // Making prism.
   BRepPrimAPI_MakePrism* aPrismBuilder =
-      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * (theFromSize + theToSize));
+      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * (theFromSize + theToSize), true);
   if (!aPrismBuilder || !aPrismBuilder->IsDone()) {
     return;
   }
@@ -407,7 +407,7 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
 
   // Making prism.
   BRepPrimAPI_MakePrism* aPrismBuilder =
-    new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength);
+    new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength, true);
   if(!aPrismBuilder || !aPrismBuilder->IsDone()) {
     return;
   }
@@ -457,7 +457,7 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   // Solid based on "To" bounding plane
   gp_Vec aNormal = aToDir->impl<gp_Dir>();
   BRepPrimAPI_MakePrism* aToPrismBuilder =
-      new BRepPrimAPI_MakePrism(aToShape, aNormal * (-2.0 * aBndBoxSize));
+      new BRepPrimAPI_MakePrism(aToShape, aNormal * (-2.0 * aBndBoxSize), true);
   if (!aToPrismBuilder || !aToPrismBuilder->IsDone()) {
     return;
   }
@@ -494,7 +494,7 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   // Solid based on "From" bounding plane
   aNormal = aFromDir->impl<gp_Dir>();
   BRepPrimAPI_MakePrism* aFromPrismBuilder =
-      new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-2.0 * aBndBoxSize));
+      new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-2.0 * aBndBoxSize), true);
   if (!aFromPrismBuilder || !aFromPrismBuilder->IsDone()) {
     return;
   }
@@ -595,7 +595,7 @@ void GeomAlgoAPI_Prism::buildByFaces(const GeomShapePtr             theBaseShape
 
   // Making prism.
   BRepPrimAPI_MakePrism* aPrismBuilder =
-      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength);
+      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength, true);
   if (!aPrismBuilder || !aPrismBuilder->IsDone()) {
     return;
   }

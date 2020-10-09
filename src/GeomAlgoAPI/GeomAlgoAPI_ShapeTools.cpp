@@ -1196,6 +1196,10 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
     return;
   }
 
+  // the value to enlarge the bounding box of each object to make the extruded shape
+  // a little bit larger than overall objects to get the correct result of Boolean CUT operation
+  double anEnlargement = 0.1 * aBndObjs.front()->distance(aBndObjs.back());
+
   // Prism direction
   if (theDir.get()) {
     // One direction for all prisms
@@ -1235,7 +1239,7 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
 
       // Bounding box of the base
       std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases =
-          GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i);
+          GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i, anEnlargement);
       if (aBndBases.size() != 8) {
         return;
       }
