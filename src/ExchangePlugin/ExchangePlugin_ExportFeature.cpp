@@ -103,17 +103,17 @@ void ExchangePlugin_ExportFeature::initAttributes()
     ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID(),
     ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED(), 
+  data()->addAttribute(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED(),
     ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE(),
    ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::STL_RELATIVE(), 
+  data()->addAttribute(ExchangePlugin_ExportFeature::STL_RELATIVE(),
     ModelAPI_AttributeDouble::typeId());
    
   double defelection = Config_PropManager::real("Visualization", "body_deflection");
   real(ExchangePlugin_ExportFeature::STL_RELATIVE())->setValue(defelection);
 
-  data()->addAttribute(ExchangePlugin_ExportFeature::STL_ABSOLUTE(), 
+  data()->addAttribute(ExchangePlugin_ExportFeature::STL_ABSOLUTE(),
     ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE(),
    ModelAPI_AttributeString::typeId());
@@ -368,16 +368,15 @@ void ExchangePlugin_ExportFeature::exportSTL(const std::string& theFileName)
 
   if (string(STL_FILE_TYPE())->value() == STL_FILE_TYPE_ASCII()) {
     anIsASCII = true;
-  }            
+  }
   // Perform the export
   std::string anError;
   bool aResult = false;
 
   aResult = STLExport(theFileName,
-                      "STL",
                       aShape,
                       aValue,
-                      anIsRelative, 
+                      anIsRelative,
                       anIsASCII,
                       anError);
 

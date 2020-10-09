@@ -57,18 +57,18 @@ public:
     explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                 const std::string & theFilePath,
                                 const ModelHighAPI_Selection& theSelectedShape,
-                                double  aDeflectionRelative ,
-                                double  aDeflectionAbsolute,
-                                const bool anIsRelative, 
-                                const bool anIsASCII);
+                                double theDeflectionRelative ,
+                                double theDeflectionAbsolute,
+                                const bool theIsRelative,
+                                const bool theIsASCII);
 
   /// Constructor with values for XAO of selected result export.
   EXCHANGEAPI_EXPORT
     explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-      const std::string & theFilePath,
-      const ModelHighAPI_Selection& theResult,
-      const std::string & theAuthor,
-      const std::string & theGeometryName = std::string());
+                                const std::string & theFilePath,
+                                const ModelHighAPI_Selection& theResult,
+                                const std::string & theAuthor,
+                                const std::string & theGeometryName = std::string());
 
   /// Constructor with values for export in other formats than XAO.
   EXCHANGEAPI_EXPORT
@@ -126,30 +126,30 @@ typedef std::shared_ptr<ExchangeAPI_Export> ExportPtr;
  */
 EXCHANGEAPI_EXPORT
 ExportPtr exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
-                  const std::string & theFilePath,
-                  const std::list<ModelHighAPI_Selection> & theSelectionList,
-                  const std::string & theFileFormat = std::string());
+                       const std::string & theFilePath,
+                       const std::list<ModelHighAPI_Selection> & theSelectionList,
+                       const std::string & theFileFormat = std::string());
 
 /**\ingroup CPPHighAPI
  * \brief Exports to XAO file all results of the current document
  */
 EXCHANGEAPI_EXPORT
 ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
-                 const std::string & theFilePath,
-                 const std::string & theAuthor = std::string(),
-                 const std::string & theGeometryName = std::string());
+                      const std::string & theFilePath,
+                      const std::string & theAuthor = std::string(),
+                      const std::string & theGeometryName = std::string());
 
 /**\ingroup CPPHighAPI
  * \brief Exports to STL file the result of the current document
  */
 EXCHANGEAPI_EXPORT
 ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
-      const std::string & theFilePath,
-      const ModelHighAPI_Selection& theSelectedShape,
-      double  aDeflectionRelative,
-      double  aDeflectionAbsolute,
-      const bool anIsRelative, 
-      const bool anIsASCII);
+                      const std::string & theFilePath,
+                      const ModelHighAPI_Selection& theSelectedShape,
+                      double theDeflectionRelative,
+                      double theDeflectionAbsolute,
+                      const bool theIsRelative,
+                      const bool theIsASCII);
 
 /**\ingroup CPPHighAPI
 * \brief Exports to XAO file the selected result with groups parts related to it only.

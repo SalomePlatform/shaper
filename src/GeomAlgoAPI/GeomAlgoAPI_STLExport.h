@@ -29,11 +29,10 @@
 /// Implementation of the export STL files algorithms
 GEOMALGOAPI_EXPORT
 bool STLExport(const std::string& theFileName,
-                const std::string& /*theFormatName*/,
-                const std::shared_ptr<GeomAPI_Shape>& theShape,
-                const double aDeflection,
-                const bool anIsRelative, 
-                const bool anIsASCII,
-                std::string& theError);
+               const std::shared_ptr<GeomAPI_Shape>& theShape,
+               const double theDeflection,
+               const bool theIsRelative, 
+               const bool theIsASCII,
+               std::string& theError);
 
 #endif /* GEOMALGOAPI_STLEXPORT_H_ */
