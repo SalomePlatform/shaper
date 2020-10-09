@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = @CMAKE_PROJECT_NAME@
-PROJECT_NUMBER         = @SHAPER_Version@
+PROJECT_NUMBER         = @SHAPER_VERSION@
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       =
