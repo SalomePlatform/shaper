@@ -1096,6 +1096,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
   double aSizeOfView = 0;
   std::shared_ptr<GeomAPI_Pnt> aCentralPoint;
+  // Reset size of view from previous launches
+  mySketchPlane->setSizeOfView(aSizeOfView, false, aCentralPoint);
   if (aFOperation->isEditOperation() &&
       mySketchPlane->getDefaultSizeOfView(myCurrentSketch, aSizeOfView, aCentralPoint)) {
     mySketchPlane->setSizeOfView(aSizeOfView, true, aCentralPoint);

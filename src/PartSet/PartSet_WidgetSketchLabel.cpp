@@ -365,6 +365,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, isSetSizeOfView);
     if (myViewVisible->isChecked())
       aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    else
+      aModule->sketchMgr()->previewSketchPlane()->clearPlanePreview();
   }
   // 2. if the planes were displayed, change the view projection
 

@@ -105,14 +105,15 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
   if (aStringAttr->isInitialized()) {
     if (myIsEditing)
       aCaseId = QString::fromStdString(aStringAttr->value());
-    else
+    else {
       aCaseId = QString::fromStdString(aDefVal.empty() ? aStringAttr->value() : aDefVal);
-    if (!aStringAttr->isInitialized())
-      storeValueCustom();
+    }
     int idx = myCaseIds.indexOf(aCaseId);
     if (idx == -1)
       idx = currentPageIndex();
     setCurrentPageIndex(idx);
+    if (aStringAttr->value() != aCaseId.toStdString())
+      storeValueCustom();
   }
   else {
     // It is added because if user edits the feature created from Python

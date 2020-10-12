@@ -190,13 +190,14 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 #endif
   }
   // clear processed and fill modified recursively
+  std::set<FeaturePtr> aRefSet;
   const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = theFeature->data()->refsToMe();
   std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
   for(; aRefIter != aRefs.cend(); aRefIter++) {
     if ((*aRefIter)->isArgument()) {
       FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
       if (aReferenced.get()) {
-        addModified(aReferenced, theFeature);
+        aRefSet.insert(aReferenced);
       }
     }
   }
@@ -211,19 +212,21 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       if ((*aRIter)->isArgument()) {
         FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRIter)->owner());
         if (aReferenced.get()) {
-          addModified(aReferenced, theFeature);
+          aRefSet.insert(aReferenced);
         }
       }
     }
   }
-
   // also add part feature that contains this feature to the modified
   if (theFeature->document()->kind() != "PartSet") {
     FeaturePtr aPart = ModelAPI_Tools::findPartFeature(
       ModelAPI_Session::get()->moduleDocument(), theFeature->document());
     if (aPart.get())
-      addModified(aPart, theFeature);
+      aRefSet.insert(aPart);
   }
+  for(std::set<FeaturePtr>::iterator aRef = aRefSet.begin(); aRef != aRefSet.end(); aRef++)
+    addModified(*aRef, theFeature);
+
   return true;
 }
 
