@@ -31,7 +31,7 @@ GEOMALGOAPI_EXPORT
 bool STLExport(const std::string& theFileName,
                const std::shared_ptr<GeomAPI_Shape>& theShape,
                const double theDeflection,
-               const bool theIsRelative, 
+               const bool theIsRelative,
                const bool theIsASCII,
                std::string& theError);
 
