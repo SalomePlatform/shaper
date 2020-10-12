@@ -53,6 +53,52 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
   apply(); // finish operation to make sure the export is done on the current state of the history
 }
 
+// Constructor with values for STL of selected result export.
+ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                       const std::string & theFilePath,
+                                       const ModelHighAPI_Selection& theSelectedShape,
+                                       double aDeflectionRelative,
+                                       double aDeflectionAbsolute,
+                                       const bool anIsRelative,
+                                       const bool anIsASCII)
+  : ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+  fillAttribute("STL", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
+  fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID()));
+
+  if (anIsRelative) {
+    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(),
+      theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
+    fillAttribute(aDeflectionRelative,
+      theFeature->real(ExchangePlugin_ExportFeature::STL_RELATIVE()) );
+  }
+  else {
+    fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_ABSOLUTE(),
+      theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
+    fillAttribute(aDeflectionAbsolute,
+      theFeature->real(ExchangePlugin_ExportFeature::STL_ABSOLUTE()) );
+  }
+
+  if(anIsASCII){
+    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_ASCII(),
+      theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_TYPE()));
+  }
+  else
+  {
+    fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_BINARY(),
+      theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_TYPE()));
+  }
+
+  fillAttribute(theSelectedShape,
+                theFeature->selection(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED()));
+  fillAttribute("STL", theFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
+  execute();
+  apply(); // finish operation to make sure the export is done on the current state of the history
+}
+
+
+
 ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::string & theFilePath, const ModelHighAPI_Selection& theResult,
   const std::string & theAuthor, const std::string & theGeometryName)
@@ -72,6 +118,7 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
   execute();
   apply(); // finish operation to make sure the export is done on the current state of the history
 }
+
 
 
 /// Constructor with values for export in other formats than XAO.
@@ -144,6 +191,34 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << ", '" << theGeometryName << "'";
     theDumper << ")" << std::endl;
   }
+  else if (exportType == "STL") {
+    std::string aTmpSTLFile =
+                aBase->string(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID())->value();
+    correctSeparators(aTmpSTLFile);
+    theDumper << "exportToSTL(" << aDocName << ", '" << aTmpSTLFile << "'" ;
+    AttributeSelectionPtr aShapeSelected =
+      aBase->selection(ExchangePlugin_ExportFeature::STL_OBJECT_SELECTED());
+
+    theDumper<<","<< aShapeSelected;
+
+    theDumper <<","<<  stlabsolute() <<","<< stlrelative();
+
+    if (stldeflectionType()->value()
+         == ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE()){
+      theDumper <<","<< "True";
+    }
+    else {
+      theDumper <<","<< "False";
+    }
+
+    if (stlfileType()->value() == ExchangePlugin_ExportFeature::STL_FILE_TYPE_BINARY()) {
+      theDumper << "False";
+    }
+    else {
+      theDumper <<  "True";
+    }
+    theDumper << ")" << std::endl;
+  }
   else {
     std::string aFilePath = aBase->string(ExchangePlugin_ExportFeature::FILE_PATH_ID())->value();
     correctSeparators(aFilePath);
@@ -177,6 +252,27 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
   return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theAuthor, theGeometryName));
+}
+
+ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
+      const std::string & theFilePath,
+      const ModelHighAPI_Selection& theSelectedShape,
+      double  theDeflectionRelative,
+      double  theDeflectionAbsolute,
+      const bool theIsRelative,
+      const bool theIsASCII)
+{
+  apply(); // finish previous operation to make sure all previous operations are done
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    thePart->addFeature(ExchangePlugin_ExportFeature::ID());
+
+  return ExportPtr(new ExchangeAPI_Export(aFeature,
+                                          theFilePath,
+                                          theSelectedShape,
+                                          theDeflectionRelative,
+                                          theDeflectionAbsolute,
+                                          theIsRelative,
+                                          theIsASCII));
 }
 
 ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,

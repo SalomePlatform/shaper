@@ -134,6 +134,10 @@
       <source>XAO</source>
       <translation>XAO</translation>
     </message>
+    <message>
+      <source>STL</source>
+      <translation>STL</translation>
+    </message>
   </context>
   <context>
     <name>Export:file_path</name>
@@ -191,6 +195,81 @@
     <message>
       <source>Please input the geometry name</source>
       <translation>Veuillez saisir le nom de la géométrie</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_file_path</name>
+    <message>
+      <source>Export file</source>
+      <translation>Fichier d&apos;export</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_file_path:ExchangePlugin_ExportFormat</name>
+    <message>
+      <source>%1 is not initialized.</source>
+      <translation>%1 n&apos;est pas initialisé.</translation>
+    </message>
+    <message>
+      <source>File name is empty.</source>
+      <translation>Le nom du fichier est vide.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_object_selected</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Object to export.</source>
+      <translation>Objet à exporter.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_file_type</name> 
+    <message>
+      <source>File type</source>
+      <translation>type du fichier</translation>
+    </message>
+    <message>
+      <source>Binary</source>
+      <translation>Binaire</translation>
+    </message>
+    <message>
+      <source>ASCII</source>
+      <translation>ASCII</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:Deflection</name>
+    <message>
+      <source>Deflection</source>
+      <translation>Déflection</translation>
+    </message>
+    <message>
+      <source>Relative</source>
+      <translation>Relative</translation>
+    </message>
+    <message>
+      <source>Relative value.</source>
+      <translation>Valeur relative</translation>
+    </message>
+    <message>
+      <source>Calculate by size of shape</source>
+      <translation>Calcul par rapport à la taille de la shape</translation>
+    </message>
+    <message>
+      <source>Absolute</source>
+      <translation>Absolue</translation>
+    </message>
+    <message>
+      <source>Value indicate by user</source>
+      <translation>Valeur indiquée par l&apos;utilisateur</translation>
+    </message>
+    <message>
+      <source>Absolute value.</source>
+      <translation>Valeur absolue.</translation>
     </message>
   </context>
 
