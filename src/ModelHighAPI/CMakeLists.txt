@@ -128,4 +128,5 @@ ADD_UNIT_TESTS(
   Test19031.py
   Test19990_1.py
   Test19990_2.py
+  Test20167.py
 )

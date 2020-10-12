@@ -683,4 +683,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillet1D_Wire_4.py
                TestFillet1D_Wire_5.py
                Test19931.py
+               Test20027.py
 )
