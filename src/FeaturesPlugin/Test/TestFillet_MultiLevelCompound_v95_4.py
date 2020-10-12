@@ -142,7 +142,7 @@ VOLUME = 5565.117188528191
 assertResult(Fillet_5)
 
 Fillet_6 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Compound_1_1_7_2/Modified_Face&Box_2_1/Top][Compound_1_1_7_2/Modified_Face&Box_2_1/Front]"), model.selection("FACE", "Compound_1_1_7_2/Modified_Face&Box_2_1/Right")], RADIUS_1, RADIUS_2, keepSubResults = True)
-REFERENCE[6] = GeomAPI_Pnt(2.7448, 2.7448, 5)
+REFERENCE[6] = GeomAPI_Pnt(2.50004995, 2.50004995, 5.00005)
 NB_FACES += 6
 NB_EDGES += 29
 NB_VERTICES += 58
@@ -150,7 +150,7 @@ VOLUME = 5541.63666
 assertResult(Fillet_6)
 
 Fillet_7 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Compound_1_1_8_1/Modified_Face&Box_3_1/Back][Compound_1_1_8_1/Modified_Face&Box_3_1/Top]"), model.selection("FACE", "Compound_1_1_8_2/Modified_Face&Box_3_1/Left")], RADIUS_1, RADIUS_2, keepSubResults = True)
-REFERENCE[7] = GeomAPI_Pnt(-20.9807621135, 42.806, 5)
+REFERENCE[7] = GeomAPI_Pnt(-20.9807621135, 42.5, 5)
 NB_FACES += 5
 NB_EDGES += 26
 NB_VERTICES += 52
@@ -163,7 +163,7 @@ NB_EDGES += 12
 NB_VERTICES += 24
 VOLUME = 5507.602043482
 REFERENCE[5] = GeomAPI_Pnt(55.041662114, 5.021870383, 5.009557179275)
-REFERENCE[7] = GeomAPI_Pnt(-20.9807621135, 42.5409962, 5)
+REFERENCE[7] = GeomAPI_Pnt(-20.9807621135, 42.5, 5)
 assertResult(Fillet_8)
 
 model.end()

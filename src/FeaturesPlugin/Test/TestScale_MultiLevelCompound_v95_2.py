@@ -107,14 +107,14 @@ assert(Scale_1.feature().error() != "")
 model.begin()
 Scale_1.setMainObjects([model.selection("COMPSOLID", "Compound_2_1_1")])
 REFERENCE[0] = GeomAPI_Pnt(REFERENCE[0].x() * SCALE_X, REFERENCE[0].y() * SCALE_Y, REFERENCE[0].z() * SCALE_Z)
-REFERENCE[0].setX(0) # <= B-spline poles are used to calculate the bounding box and thus the middle point
+##REFERENCE[0].setX(0) # <= B-spline poles are used to calculate the bounding box and thus the middle point
 assertResult(Scale_1, 74139.07479)
 
 Scale_2 = model.addScale(Part_1_doc, [model.selection("SOLID", "Scale_1_1_2_1")], model.selection("VERTEX", "PartSet/Origin"), SCALE_X, SCALE_Y, SCALE_Z, keepSubResults = True)
 subs = subsRefPoints(Compound_2.result().subResult(1))
 subs[0] = GeomAPI_Pnt(subs[0].xyz().added(GeomAPI_XYZ(5, -5, 5)))
 subs[0] = GeomAPI_Pnt(subs[0].x() * SCALE_X, subs[0].y() * SCALE_Y, subs[0].z() * SCALE_Z)
-subs[0].setY(-117.3204876) # <= B-spline poles are used to calculate the bounding box and thus the middle point
+##subs[0].setY(-117.3204876) # <= B-spline poles are used to calculate the bounding box and thus the middle point
 subs[1] = GeomAPI_Pnt(subs[1].xyz().added(GeomAPI_XYZ(-5, 5, -5)))
 REFERENCE[1] = average(subs)
 assertResult(Scale_2, 78066.07487341)
@@ -133,8 +133,8 @@ Scale_4.setMainObjects([model.selection("COMPSOLID", "Scale_3_1_1"), model.selec
 REFERENCE[0] = GeomAPI_Pnt(REFERENCE[0].x() / SCALE_X, REFERENCE[0].y() / SCALE_Y, REFERENCE[0].z() / SCALE_Z)
 subs[1] = GeomAPI_Pnt(subs[1].x() / SCALE_X, subs[1].y() / SCALE_Y, subs[1].z() / SCALE_Z)
 # B-spline poles are used to calculate the bounding box and thus the middle point
-subs[1].setX(-30.59017)
-subs[1].setY(-2.83826244)
+##subs[1].setX(-30.59017)
+##subs[1].setY(-2.83826244)
 REFERENCE[1] = average(subs)
 REFERENCE[2] = GeomAPI_Pnt(REFERENCE[2].x() / SCALE_X, REFERENCE[2].y() / SCALE_Y, REFERENCE[2].z() / SCALE_Z)
 assertResult(Scale_4, 17592.5112883)
