@@ -561,7 +561,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   bool aHasPoint = false;
   if (aFirstValue.get()) {
     GeomShapePtr aShape = aFirstValue->shape();
-    if (aShape->shapeType() == TopAbs_VERTEX) {
+    if (aShape->shapeType() == GeomAPI_Shape::VERTEX) {
       const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
       GeomPnt2dPtr aPnt = PartSet_Tools::getPnt2d(aView, aTDShape, mySketch);
       aX = aPnt->x();
