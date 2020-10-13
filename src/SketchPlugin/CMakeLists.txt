@@ -406,3 +406,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
     TestMovePoint.py
   )
 endif()
+
+ADD_RESTRICTED_TESTS(
+  Test20204.py
+)
