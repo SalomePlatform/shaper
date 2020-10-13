@@ -714,7 +714,9 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     bool anOldSubShapeNotInTree =
       !isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_, anOriginalLabel);
     if (anOldSubShapeAlreadyProcessed || anOldSubShapeNotInTree) {
-      if (theSaveOldIfNotInTree) {
+      // The second condition is added due to #20170 because sub-shape must be added to real parent shape,
+      // not the reference. The naming name of pure reference is not registered in the document.
+      if (theSaveOldIfNotInTree && !aData->shapeLab().IsAttribute(TDF_Reference::GetID())) {
         std::string aSelectionName = theName + "Selected";
         generated(anOldSubShape, aSelectionName, false);
       } else
