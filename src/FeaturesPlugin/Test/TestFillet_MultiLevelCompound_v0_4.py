@@ -127,7 +127,7 @@ model.testNbSubShapes(Fillet_6, GeomAPI_Shape.FACE, [23])
 model.testNbSubShapes(Fillet_6, GeomAPI_Shape.EDGE, [95])
 model.testNbSubShapes(Fillet_6, GeomAPI_Shape.VERTEX, [190])
 model.testResultsVolumes(Fillet_6, [1565.568094166])
-refPoint = GeomAPI_Pnt(2.50004995, 2.50004995, 5.00005)
+refPoint = GeomAPI_Pnt(2.7448, 2.7448, 5)
 midPoint = Fillet_6.defaultResult().shape().middlePoint()
 assert(midPoint.distance(refPoint) < TOLERANCE)
 
