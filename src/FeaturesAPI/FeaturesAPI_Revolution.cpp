@@ -52,11 +52,14 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(
   const std::list<ModelHighAPI_Selection>& theBaseObjects,
   const ModelHighAPI_Selection& theAxis,
   const ModelHighAPI_Double& theToAngle,
-  const ModelHighAPI_Double& theFromAngle)
+  const ModelHighAPI_Double& theFromAngle,
+  const std::string& theSelectionType)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    if (!theSelectionType.empty())
+      mybaseObjects->setSelectionType(theSelectionType);
     fillAttribute(theAxis, myaxis);
     setAngles(theToAngle, theFromAngle);
   }
@@ -70,11 +73,14 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(
   const ModelHighAPI_Selection& theToObject,
   const ModelHighAPI_Double& theToOffset,
   const ModelHighAPI_Selection& theFromObject,
-  const ModelHighAPI_Double& theFromOffset)
+  const ModelHighAPI_Double& theFromOffset,
+  const std::string& theSelectionType)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    if (!theSelectionType.empty())
+      mybaseObjects->setSelectionType(theSelectionType);
     fillAttribute(theAxis, myaxis);
     setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
   }
@@ -191,6 +197,18 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
       ", " << anAttrFromObject << ", " << anAttrFromOffset;
   }
 
+  // write explicitly the type of selection if it does not correspond
+  // to the type of first selected shape
+  if (!anAttrSketch->isInitialized()) {
+    std::string aListSelType = anAttrObjects->selectionType();
+    AttributeSelectionPtr aFirstSelection = anAttrObjects->value(0);
+    GeomShapePtr aFirstShape = aFirstSelection->value();
+    if (!aFirstShape)
+      aFirstShape = aFirstSelection->context()->shape();
+    if (!aFirstShape || aFirstShape->shapeType() != GeomAPI_Shape::shapeTypeByStr(aListSelType))
+      theDumper << ", \"" << aListSelType << "\"";
+  }
+
   theDumper << ")" << std::endl;
 
   if(anAttrSketch->isInitialized()) {
@@ -221,14 +239,16 @@ RevolutionPtr addRevolution(const std::shared_ptr<ModelAPI_Document>& thePart,
                             const std::list<ModelHighAPI_Selection>& theBaseObjects,
                             const ModelHighAPI_Selection& theAxis,
                             const ModelHighAPI_Double& theToAngle,
-                            const ModelHighAPI_Double& theFromAngle)
+                            const ModelHighAPI_Double& theFromAngle,
+                            const std::string& theSelectionType)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Revolution::ID());
   return RevolutionPtr(new FeaturesAPI_Revolution(aFeature,
                                                 theBaseObjects,
                                                 theAxis,
                                                 theToAngle,
-                                                theFromAngle));
+                                                theFromAngle,
+                                                theSelectionType));
 }
 
 //==================================================================================================
@@ -238,7 +258,8 @@ RevolutionPtr addRevolution(const std::shared_ptr<ModelAPI_Document>& thePart,
                             const ModelHighAPI_Selection& theToObject,
                             const ModelHighAPI_Double& theToOffset,
                             const ModelHighAPI_Selection& theFromObject,
-                            const ModelHighAPI_Double& theFromOffset)
+                            const ModelHighAPI_Double& theFromOffset,
+                            const std::string& theSelectionType)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Revolution::ID());
   return RevolutionPtr(new FeaturesAPI_Revolution(aFeature,
@@ -247,5 +268,6 @@ RevolutionPtr addRevolution(const std::shared_ptr<ModelAPI_Document>& thePart,
                                                 theToObject,
                                                 theToOffset,
                                                 theFromObject,
-                                                theFromOffset));
+                                                theFromOffset,
+                                                theSelectionType));
 }
