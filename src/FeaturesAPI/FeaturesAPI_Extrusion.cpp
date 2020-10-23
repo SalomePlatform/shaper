@@ -80,9 +80,9 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theBaseObjects, mybaseObjects);
     if (!theSelectionType.empty())
       mybaseObjects->setSelectionType(theSelectionType);
+    fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
     setSizes(theToSize, theFromSize);
   }
@@ -115,9 +115,9 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theBaseObjects, mybaseObjects);
     if (!theSelectionType.empty())
       mybaseObjects->setSelectionType(theSelectionType);
+    fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
     setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
   }
