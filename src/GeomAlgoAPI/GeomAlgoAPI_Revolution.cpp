@@ -70,6 +70,9 @@ static gp_Pnt centreOfMass(const TopoDS_Shape& theShape);
 /// \return solid.
 static TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint);
 
+/// \brief Create plane by 3 points. Return empty handle if failed.
+static Handle(Geom_Plane) makePlane(const gp_Pnt& theP1, const gp_Pnt& theP2, const gp_Pnt& theP3);
+
 static void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
                                    const TopoDS_Shape& theBase,
                                    const TopAbs_ShapeEnum theType,
@@ -146,31 +149,21 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aBasePlane = aFindPlane.Plane();
   } else {
     gp_Pnt aPnt1 = anAxis.Location();
-    gp_Pnt aPnt2 = aPnt1;
-    aPnt2.Translate(anAxis.Direction());
-    gp_Pnt aPnt3;
 
-    for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+    TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX);
+    gp_Pnt aPnt2 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
+    gp_Pnt aPnt3 = aPnt1;
+
+    for (anExp.Next(); anExp.More() && aBasePlane.IsNull(); anExp.Next()) {
       aPnt3 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
-
-      GC_MakePlane aMkPlane(aPnt1, aPnt2, aPnt3);
-      if(aMkPlane.IsDone() != Standard_True) {
-        continue;
-      }
-
-      aBasePlane = aMkPlane.Value();
-      break;
+      aBasePlane = makePlane(aPnt1, aPnt2, aPnt3);
     }
 
     if(aBasePlane.IsNull()) {
-      aPnt3 = centreOfMass(aBaseShape);
-
-      GC_MakePlane aMkPlane(aPnt1, aPnt2, aPnt3);
-      if(aMkPlane.IsDone() != Standard_True) {
-        return;
-      }
-
-      aBasePlane = aMkPlane.Value();
+      gp_Pnt aPossiblePoints[] = { aPnt1.Translated(anAxis.Direction()), centreOfMass(aBaseShape) };
+      for (auto it = std::begin(aPossiblePoints);
+           it != std::end(aPossiblePoints) && aBasePlane.IsNull(); ++it)
+        aBasePlane = makePlane(aPnt1, aPnt2, *it);
     }
   }
 
@@ -589,6 +582,16 @@ TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint)
   }
 
   return aResult;
+}
+
+//================================================================================================
+Handle(Geom_Plane) makePlane(const gp_Pnt& theP1, const gp_Pnt& theP2, const gp_Pnt& theP3)
+{
+  Handle(Geom_Plane) aPlane;
+  GC_MakePlane aMkPlane(theP1, theP2, theP3);
+  if (aMkPlane.IsDone())
+    aPlane = aMkPlane.Value();
+  return aPlane;
 }
 
 //================================================================================================

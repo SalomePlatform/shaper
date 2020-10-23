@@ -57,9 +57,9 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theBaseObjects, mybaseObjects);
     if (!theSelectionType.empty())
       mybaseObjects->setSelectionType(theSelectionType);
+    fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
     setAngles(theToAngle, theFromAngle);
   }
@@ -78,9 +78,9 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theBaseObjects, mybaseObjects);
     if (!theSelectionType.empty())
       mybaseObjects->setSelectionType(theSelectionType);
+    fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
     setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
   }
