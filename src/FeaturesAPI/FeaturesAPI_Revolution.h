@@ -54,7 +54,8 @@ public:
                                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                   const ModelHighAPI_Selection& theAxis,
                                   const ModelHighAPI_Double& theToAngle,
-                                  const ModelHighAPI_Double& theFromAngle);
+                                  const ModelHighAPI_Double& theFromAngle,
+                                  const std::string& theSelectionType = std::string());
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
@@ -64,7 +65,8 @@ public:
                                   const ModelHighAPI_Selection& theToObject,
                                   const ModelHighAPI_Double& theToOffset,
                                   const ModelHighAPI_Selection& theFromObject,
-                                  const ModelHighAPI_Double& theFromOffset);
+                                  const ModelHighAPI_Double& theFromOffset,
+                                  const std::string& theSelectionType = std::string());
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -147,7 +149,8 @@ RevolutionPtr addRevolution(const std::shared_ptr<ModelAPI_Document>& thePart,
                             const std::list<ModelHighAPI_Selection>& theBaseObjects,
                             const ModelHighAPI_Selection& theAxis,
                             const ModelHighAPI_Double& theToAngle,
-                            const ModelHighAPI_Double& theFromAngle);
+                            const ModelHighAPI_Double& theFromAngle,
+                            const std::string& theSelectionType = std::string());
 
 /// \ingroup CPPHighAPI
 /// \brief Create Revolution feature.
@@ -158,6 +161,7 @@ RevolutionPtr addRevolution(const std::shared_ptr<ModelAPI_Document>& thePart,
                             const ModelHighAPI_Selection& theToObject,
                             const ModelHighAPI_Double& theToOffset,
                             const ModelHighAPI_Selection& theFromObject,
-                            const ModelHighAPI_Double& theFromOffset);
+                            const ModelHighAPI_Double& theFromOffset,
+                            const std::string& theSelectionType = std::string());
 
 #endif // FeaturesAPI_Revolution_H_
