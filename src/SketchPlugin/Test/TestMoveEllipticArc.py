@@ -61,7 +61,7 @@ class TestMoveEllipticArc(unittest.TestCase):
       aCoord = [theCoordinates.x(), theCoordinates.y()]
     else:
       aCoord = theCoordinates
-    DIGITS = 7 - math.floor(math.log10(math.hypot(aCoord[0], aCoord[1])))
+    DIGITS = 7 - math.ceil(math.log10(math.hypot(aCoord[0], aCoord[1])))
     self.assertAlmostEqual(thePoint.x(), aCoord[0], DIGITS)
     self.assertAlmostEqual(thePoint.y(), aCoord[1], DIGITS)
 
@@ -71,7 +71,12 @@ class TestMoveEllipticArc(unittest.TestCase):
     distPF1 = model.distancePointPoint(firstFocus2d,  point)
     secondFocus2d = GeomAPI_Pnt2d(theEllipticArc.secondFocus().x(), theEllipticArc.secondFocus().y())
     distPF2 = model.distancePointPoint(secondFocus2d,  point)
-    self.assertAlmostEqual(distPF1 + distPF2, 2.0 * theEllipticArc.majorRadius().value(), 7 - math.floor(math.log10(theEllipticArc.majorRadius().value())))
+    DIGITS = 7 - math.ceil(math.log10(theEllipticArc.majorRadius().value()))
+    self.assertAlmostEqual(distPF1 + distPF2, 2.0 * theEllipticArc.majorRadius().value(), DIGITS)
+
+  def checkAlmostEqual(self, theValue1, theValue2):
+    DIGITS = 7 - math.ceil(math.log10(theValue1))
+    self.assertAlmostEqual(theValue1, theValue2, DIGITS)
 
   def fixMajorRadius(self):
     self.mySketch.setDistance(self.myEllipticArc.center(), self.myEllipticArc.majorAxisPositive(), self.myMajorRadius)
@@ -120,7 +125,7 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.mySketch.move(self.myEllipticArc.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipticArc.center(), newPosition)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
 
   def test_move_ellipse_fixed_major_radius(self):
     """ Test 4. Movement of ellipse with fixed major radius
@@ -132,7 +137,7 @@ class TestMoveEllipticArc(unittest.TestCase):
     model.do()
     self.checkPointOnEllipse(newPosition, self.myEllipticArc)
     self.assertNotEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
 
   def test_move_center_ellipse_fixed_minor_radius(self):
     """ Test 5. Movement of central point of ellipse with fixed minor radius
@@ -143,7 +148,7 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.mySketch.move(self.myEllipticArc.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipticArc.center(), newPosition)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
 
   def test_move_ellipse_fixed_minor_radius(self):
     """ Test 6. Movement of ellipse with fixed minor radius
@@ -154,7 +159,7 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.mySketch.move(self.myEllipticArc.defaultResult(), newPosition.x(), newPosition.y())
     model.do()
     self.checkPointOnEllipse(newPosition, self.myEllipticArc)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
     self.assertNotEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
 
   def test_move_center_ellipse_fixed_center(self):
@@ -166,8 +171,8 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.mySketch.move(self.myEllipticArc.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipticArc.center(), self.myCenter)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
 
   def test_move_ellipse_fixed_center(self):
     """ Test 8. Movement of ellipse with fixed center
@@ -205,8 +210,8 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.mySketch.move(self.myEllipticArc.firstFocus(), newPosition.x(), newPosition.y())
     model.do()
     self.checkPointCoordinates(self.myEllipticArc.firstFocus(), focus)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
 
   def test_move_ellipse_fixed_focus(self):
     """ Test 11. Movement of ellipse with fixed focus
@@ -237,8 +242,8 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.checkPointCoordinates(self.myEllipticArc.majorAxisPositive(), self.myAxisPoint)
     self.checkPointCoordinates(self.myEllipticArc.startPoint(), self.myStartPoint)
     self.checkPointCoordinates(self.myEllipticArc.endPoint(), self.myEndPoint)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
 
   def test_move_start_point_free_ellipse(self):
     """ Test 13. Trying to move start point of elliptic arc
@@ -271,8 +276,8 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.checkPointCoordinates(self.myEllipticArc.majorAxisPositive(), self.myAxisPoint)
     self.checkPointCoordinates(self.myEllipticArc.startPoint(), self.myStartPoint)
     self.checkPointCoordinates(self.myEllipticArc.endPoint(), self.myEndPoint)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
 
   def test_move_end_point_fixed_ellipse(self):
     """ Test 16. Trying to move end point of fully fixed ellipse
@@ -289,8 +294,8 @@ class TestMoveEllipticArc(unittest.TestCase):
     self.checkPointCoordinates(self.myEllipticArc.majorAxisPositive(), self.myAxisPoint)
     self.checkPointCoordinates(self.myEllipticArc.startPoint(), self.myStartPoint)
     self.checkPointCoordinates(self.myEllipticArc.endPoint(), self.myEndPoint)
-    self.assertAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
-    self.assertAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.majorRadius().value(), self.myMajorRadius)
+    self.checkAlmostEqual(self.myEllipticArc.minorRadius().value(), self.myMinorRadius)
 
 
 if __name__ == "__main__":
