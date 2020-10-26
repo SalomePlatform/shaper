@@ -772,8 +772,10 @@ QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const QString& theShapeType)
 {
   int idx = 0;
+  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::shapeTypeByStr(theShapeType.toStdString());
   foreach (QString aShapeTypeName, myShapeTypes) {
-    if(aShapeTypeName == theShapeType && idx != myTypeCtrl->value()) {
+    if(GeomAPI_Shape::shapeTypeByStr(aShapeTypeName.toStdString()) == aShapeType &&
+       idx != myTypeCtrl->value()) {
       updateSelectionModesAndFilters(false);
       bool isBlocked = myTypeCtrl->blockSignals(true);
       myTypeCtrl->setValue(idx);
