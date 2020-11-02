@@ -118,4 +118,9 @@ SET(TEST_NAMES
   Test17924.py
   Test17962.py
   Test19190.py
+  TestFilter_FaceSize.py
+  TestFilter_EdgeSize.py
+  TestFilter_FeatureEdges.py
+  TestFilter_ContinuousFaces.py
+  TestFilter_VolumeSize.py
 )

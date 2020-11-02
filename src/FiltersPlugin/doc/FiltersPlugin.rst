@@ -57,6 +57,39 @@ By default, the result of Selection feature all selectable entities from all Sha
 - **Argument:** Any result object, multiple OR selection accepted
 - **Algorithm:** Returns only shapes that belong to selected results.
 
+**Edge size**
+
+- **Result type:** Edge
+- **Argument:** 
+    - **Comparator:** <, <=, >, >=, is between, is strictly between
+    - **Size** or  **Min size** and **Max size**
+- **Algorithm:** Returns all edges whose length respect comparator rules.
+
+**Face size**
+
+- **Result type:** Face
+- **Argument:** 
+    - **Comparator:** <, <=, >, >=, is between, is strictly between
+    - **Size** or  **Min size** and **Max size**
+- **Algorithm:** Returns all faces whose area respect comparator rules.
+
+**Volume size**
+
+- **Result type:** Solid
+- **Argument:** 
+    - **Comparator:** <, <=, >, >=, is between, is strictly between
+    - **Size** or  **Min size** and **Max size**
+- **Algorithm:** Returns all solids whose volume respect comparator rules.
+
+**Feature edges**
+
+This algorithm identifies edges between two faces discontinuous with an angular tolerance.
+
+- **Result type:** Edge
+- **Argument:** 
+    - **Angle** an angular tolerance used by G1 continuity criterion for comparing the angle between the normals 
+- **Algorithm:** Returns all edges between two discontinuous faces.
+
 **On a plane**
 
 - **Result type:** Vertex, Edge, Face
@@ -88,6 +121,16 @@ This algorithm is based on the Propagate geompy function. It works on a model pa
 - **Result type:** Edge
 - **Argument:** An edge belonging to a quadrangular face
 - **Algorithm:** Returns all Edges opposite to the given Edge on all quadrangular faces connected to this Edge. The algorithm is recursive: after an edge is found on one face, it adds edges opposite to this new one.
+
+**Continuous Faces**
+
+This algorithm identifies continuous faces with an angular tolerance given by topological propagation.
+
+- **Result type:** Face
+- **Argument:** 
+    - **Angle:** an angular tolerance used by G1 continuity criterion for comparing the angle between the normals. 
+    - **Faces:** Faces to start the propagation.    
+- **Algorithm:** Returns continuous faces.
 
 **On/In/Out a Solid**
 

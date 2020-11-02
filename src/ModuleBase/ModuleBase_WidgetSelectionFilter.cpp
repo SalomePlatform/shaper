@@ -180,6 +180,7 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
       connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
         theParent, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)));
       connect(aWidget, SIGNAL(objectUpdated()), theParent, SLOT(onObjectUpdated()));
+      aWidget->enableFocusProcessing();
     }
     aLayout->addWidget(aParamsWgt);
   }

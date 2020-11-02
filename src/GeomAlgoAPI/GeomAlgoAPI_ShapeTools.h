@@ -24,6 +24,7 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_Pnt.h>
 #include <map>
 #include <set>
 #ifdef WIN32
@@ -55,6 +56,19 @@ public:
 
   /// \return the total area of the faces of the current shape or 0.0 if it can be computed.
   GEOMALGOAPI_EXPORT static double area(const std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// indicate if two faces are continuous
+  /// with an angular tolerance used for G1 continuity to compare the angle between the normals
+  /// \param theFace1  the first face
+  /// \param theFace2  the second face
+  /// \param thePoint  the point for the normal
+  /// \param theAngle  the angular tolerance
+  /// \param theError  error
+  GEOMALGOAPI_EXPORT static bool isContinuousFaces(const GeomShapePtr& theFace1,
+                                                   const GeomShapePtr& theFace2,
+                                                   const GeomPointPtr& thePoint,
+                                                   const double & theAngle,
+                                                   std::string& theError);
 
   /// \return the center of mass of the current face.
   /// The coordinates returned for the center of mass

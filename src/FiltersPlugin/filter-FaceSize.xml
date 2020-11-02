@@ -1,0 +1,72 @@
+<filter id="FaceSize">
+  <switch id="FaceSize__comparatorType">
+    <case id="inf" title="&lt;">
+      <doublevalue id="FaceSize__value"
+                   label="Size"
+                   min="0"
+                   default="1"
+                   tooltip="&lt; to">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </case>
+    <case id="infEq" title="&lt;=">
+      <doublevalue id="FaceSize__value"
+                   label="Size"
+                   min="0" step="0.1"
+                   default="1"
+                   tooltip="&lt;= to">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </case>
+    <case id="sup" title="&gt;">
+      <doublevalue id="FaceSize__value"
+                   label="Size"
+                   min="0" step="0.1"
+                   default="1"
+                   tooltip="&gt; to">
+        <validator id="GeomValidators_Positive" parameters="-1.e-10"/>
+      </doublevalue>
+    </case>
+    <case id="supEq" title="&gt;=">
+      <doublevalue id="FaceSize__value"
+                   label="Size"
+                   min="0" step="0.1"
+                   default="1"
+                   tooltip="&gt;= to">
+        <validator id="GeomValidators_Positive" parameters="-1.e-10"/>
+      </doublevalue>
+    </case>
+    <case id="isBetween" title="is between">
+      <doublevalue id="FaceSize__value"
+                   label="Min size"
+                   min="0" step="0.1"
+                   default="1"
+                   tooltip="Min value">
+        <validator id="GeomValidators_Positive" parameters="-1.e-10"/>
+      </doublevalue>
+      <doublevalue id="FaceSize__valueMax"
+                   label="Max size"
+                   min="0" step="0.1"
+                   default="10"
+                   tooltip="Max value">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </case>
+    <case id="isStrictlyBetween" title="is strictly between">
+      <doublevalue id="FaceSize__value"
+                   label="Min size"
+                   min="0" step="0.1"
+                   default="1"
+                   tooltip="Min value">
+        <validator id="GeomValidators_Positive" parameters="-1.e-10"/>
+      </doublevalue>
+      <doublevalue id="FaceSize__valueMax"
+                   label="Max size"
+                   min="0" step="0.1"
+                   default="10"
+                   tooltip="Max value">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </case>
+  </switch>
+</filter>

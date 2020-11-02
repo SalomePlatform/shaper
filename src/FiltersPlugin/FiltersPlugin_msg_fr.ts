@@ -64,8 +64,24 @@
       <translation>Appartient à</translation>
     </message>
     <message>
+      <source>Edge size</source>
+      <translation>Taille d'arête</translation>
+    </message>
+    <message>
       <source>External faces</source>
       <translation>Externe faces</translation>
+    </message>
+    <message>
+      <source>Continuous faces</source>
+      <translation>Faces continues</translation>
+    </message>
+    <message>
+      <source>Feature edges</source>
+      <translation>Arêtes caractéristiques</translation>
+    </message>
+    <message>
+      <source>Face size</source>
+      <translation>Surface de face</translation>
     </message>
     <message>
       <source>Horizontal faces</source>
@@ -104,6 +120,10 @@
       <translation>Faces verticales</translation>
     </message>
     <message>
+      <source>Volume size</source>
+      <translation>volume</translation>
+    </message>
+    <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un objet.</translation>
     </message>
@@ -137,6 +157,81 @@
     <message>
       <source>Select objects to limit selection.</source>
       <translation>Sélectionner des objets pour limiter la sélection</translation>
+    </message>
+  </context>
+
+  <!-- Edge size -->
+  <context>
+    <name>EdgeSize</name>
+    <message>
+      <source>Size</source>
+      <translation>Longueur</translation>
+    </message>
+    <message>
+      <source>Min size</source>
+      <translation>Longueur Min</translation>
+    </message>
+    <message>
+      <source>Max size</source>
+      <translation>Longueur Max</translation>
+    </message>
+    <message>
+      <source>is between</source>
+      <translation>est compris entre</translation>
+    </message>
+    <message>
+      <source>is strictly between</source>
+      <translation>est compris strictement entre</translation>
+    </message>
+  </context>
+
+  <!-- Face size -->
+  <context>
+    <name>FaceSize</name>
+    <message>
+      <source>Size</source>
+      <translation>Longueur</translation>
+    </message>
+    <message>
+      <source>Min size</source>
+      <translation>Longueur Min</translation>
+    </message>
+    <message>
+      <source>Max size</source>
+      <translation>Longueur Max</translation>
+    </message>
+    <message>
+      <source>is between</source>
+      <translation>est compris entre</translation>
+    </message>
+    <message>
+      <source>is strictly between</source>
+      <translation>est compris strictement entre</translation>
+    </message>
+  </context>
+
+  <!-- Volume size -->
+  <context>
+    <name>VolumeSize</name>
+    <message>
+      <source>Size</source>
+      <translation>Longueur</translation>
+    </message>
+    <message>
+      <source>Min size</source>
+      <translation>Longueur min</translation>
+    </message>
+    <message>
+      <source>Max size</source>
+      <translation>Longueur max</translation>
+    </message>
+    <message>
+      <source>is between</source>
+      <translation>est compris entre</translation>
+    </message>
+    <message>
+      <source>is strictly between</source>
+      <translation>est compris strictement entre</translation>
     </message>
   </context>
 

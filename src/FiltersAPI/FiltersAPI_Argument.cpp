@@ -28,6 +28,16 @@ FiltersAPI_Argument::FiltersAPI_Argument(const bool theValue)
 {
 }
 
+FiltersAPI_Argument::FiltersAPI_Argument(const ModelHighAPI_Double theValue)
+  : myDouble(theValue)
+{
+}
+
+FiltersAPI_Argument::FiltersAPI_Argument(const double& theValue)
+{
+  myDouble = theValue;
+}
+
 FiltersAPI_Argument::FiltersAPI_Argument(const std::string& theValue)
   : myValue(theValue)
 {
@@ -54,9 +64,14 @@ void FiltersAPI_Argument::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << "model.selection()"; // mySelectionAttr;
   }
   else if (mySelection.variantType() == ModelHighAPI_Selection::VT_Empty) {
-    if (myValue.empty())
+    if (myDouble.value() > std::numeric_limits<double>::lowest() ) {
+      theDumper << myDouble.value();
+    }
+    else if (myValue.empty()) {
       theDumper << myBoolean;
-    else
+    }
+    else{
       theDumper << "\"" << myValue << "\"";
+    }
   }
 }

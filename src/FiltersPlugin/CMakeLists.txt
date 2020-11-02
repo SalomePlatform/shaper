@@ -35,6 +35,11 @@ SET(PROJECT_HEADERS
     FiltersPlugin_RelativeToSolid.h
     FiltersPlugin_ExternalFaces.h
     FiltersPlugin_Validators.h
+    FiltersPlugin_EdgeSize.h
+    FiltersPlugin_FaceSize.h
+    FiltersPlugin_VolumeSize.h
+    FiltersPlugin_FeatureEdges.h
+    FiltersPlugin_ContinuousFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -51,6 +56,11 @@ SET(PROJECT_SOURCES
     FiltersPlugin_RelativeToSolid.cpp
     FiltersPlugin_ExternalFaces.cpp
     FiltersPlugin_Validators.cpp
+    FiltersPlugin_EdgeSize.cpp
+    FiltersPlugin_FaceSize.cpp
+    FiltersPlugin_VolumeSize.cpp
+    FiltersPlugin_FeatureEdges.cpp
+    FiltersPlugin_ContinuousFaces.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -76,6 +86,11 @@ SET(XML_RESOURCES
   filter-OppositeToEdge.xml
   filter-RelativeToSolid.xml
   filter-TopoConnectedFaces.xml
+  filter-EdgeSize.xml
+  filter-FaceSize.xml
+  filter-VolumeSize.xml
+  filter-FeatureEdges.xml
+  filter-ContinuousFaces.xml
 )
 
 SET(TEXT_RESOURCES
@@ -114,17 +129,16 @@ ADD_UNIT_TESTS(${TEST_NAMES})
 if(${HAVE_SALOME})
   enable_testing()
   set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/FiltersPlugin")
-  
+
   install(FILES CTestTestfileInstall.cmake
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)
   install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-  
+
   set(TMP_TESTS_NAMES)
   foreach(tfile ${TEST_NAMES})
     list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
   endforeach(tfile ${TEST_NAMES})
-  
+
   install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
 endif(${HAVE_SALOME})
-
