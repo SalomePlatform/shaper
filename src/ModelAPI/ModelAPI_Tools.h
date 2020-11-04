@@ -50,7 +50,7 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(
 MODELAPI_EXPORT std::string getFeatureError(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
 /*!
- * Searches for variable with name \param theName in \param theDocument. 
+ * Searches for variable with name \param theName in \param theDocument.
  * If found, set it value in the \param outValue and returns true.
  * theSearcher must be located later in the history than the found variable.
  */
@@ -302,6 +302,16 @@ MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result> the
 MODELAPI_EXPORT std::list<std::shared_ptr<ModelAPI_Feature> > referencedFeatures(
   std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
   const bool theSortResults);
+
+
+/*! Returns a container with the current color value.
+*   These are tree int values for RGB definition.
+*   It returns the next random color.
+* \param theValues vector of values
+* \param theReset flag to call when disabling Auto-color
+*/
+MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues, bool theReset = false);
+
 }
 
 #endif

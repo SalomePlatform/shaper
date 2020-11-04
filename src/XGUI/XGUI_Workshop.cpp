@@ -154,6 +154,7 @@
 #include <QSpinBox>
 #include <QDialogButtonBox>
 
+#include <sstream>
 #include <iterator>
 
 #ifdef TINSPECTOR
@@ -1055,8 +1056,8 @@ void XGUI_Workshop::openFile(const QString& theDirectory)
   if (aNewPart) {
     int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
     if (aSize > 0 ) {
-      ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), 0);
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+      ObjectPtr anObject = aRootDoc->object(ModelAPI_ResultPart::group(), 0);
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anObject);
       if (aPart.get())
         aPart->activate();
     }
@@ -1731,7 +1732,7 @@ ModuleBase_IViewer* XGUI_Workshop::salomeViewer() const
 //**************************************************************
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   if (theId == "DELETE_CMD")
     deleteObjects();
   else if (theId == "CLEAN_HISTORY_CMD")
@@ -1739,11 +1740,13 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   else if (theId == "MOVE_CMD" || theId == "MOVE_SPLIT_CMD")
     moveObjects(theId == "MOVE_SPLIT_CMD");
   else if (theId == "COLOR_CMD")
-    changeColor(aObjects);
+    changeColor(anObjects);
+  else if (theId == "AUTOCOLOR_CMD")
+    changeAutoColor(anObjects);
   else if (theId == "ISOLINES_CMD")
-    changeIsoLines(aObjects);
+    changeIsoLines(anObjects);
   else if (theId == "SHOW_ISOLINES_CMD") {
-    foreach(ObjectPtr aObj, aObjects) {
+    foreach(ObjectPtr aObj, anObjects) {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       if (aResult.get())
         ModelAPI_Tools::showIsoLines(aResult, !ModelAPI_Tools::isShownIsoLines(aResult));
@@ -1752,27 +1755,27 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
   else if (theId == "DEFLECTION_CMD")
-    changeDeflection(aObjects);
+    changeDeflection(anObjects);
   else if (theId == "TRANSPARENCY_CMD")
-    changeTransparency(aObjects);
+    changeTransparency(anObjects);
   else if (theId == "SHOW_CMD") {
-    showObjects(aObjects, true);
+    showObjects(anObjects, true);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
     updateCommandStatus();
   }
   else if (theId == "HIDE_CMD") {
-    showObjects(aObjects, false);
+    showObjects(anObjects, false);
     updateCommandStatus();
   }
   else if (theId == "SHOW_ONLY_CMD") {
-    showOnlyObjects(aObjects);
+    showOnlyObjects(anObjects);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
     updateCommandStatus();
   }
   else if (theId == "SHADING_CMD")
-    setDisplayMode(aObjects, XGUI_Displayer::Shading);
+    setDisplayMode(anObjects, XGUI_Displayer::Shading);
   else if (theId == "WIREFRAME_CMD")
-    setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
+    setDisplayMode(anObjects, XGUI_Displayer::Wireframe);
   else if (theId == "HIDEALL_CMD") {
     QObjectPtrList aList = myDisplayer->displayedObjects();
     foreach (ObjectPtr aObj, aList) {
@@ -1809,9 +1812,9 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(ModuleBase_ResultPrs::Sel_Result);
     setViewerSelectionMode(TopAbs_COMPSOLID);
   } else if (theId == "SHOW_RESULTS_CMD") {
-    highlightResults(aObjects);
+    highlightResults(anObjects);
   } else if (theId == "SHOW_FEATURE_CMD") {
-    highlightFeature(aObjects);
+    highlightFeature(anObjects);
   } else if (theId == "SET_VIEW_NORMAL_CMD") {
     setNormalView();
   } else if (theId == "SET_VIEW_INVERTEDNORMAL_CMD") {
@@ -2313,9 +2316,9 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
   DocumentPtr aDocument = theObject->document();
   std::list<FeaturePtr> anAllFeatures = allFeatures(aDocument);
   // find the object iterator
-  std::list<FeaturePtr>::iterator aObjectIt =
+  std::list<FeaturePtr>::iterator anObjectIt =
     std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
-  if (aObjectIt == anAllFeatures.end())
+  if (anObjectIt == anAllFeatures.end())
     return aResult;
   // find the current feature iterator
   std::list<FeaturePtr>::iterator aCurrentIt =
@@ -2323,14 +2326,14 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
   if (aCurrentIt == anAllFeatures.end())
     return aResult;
   // check the right order
-  if (std::distance(aObjectIt, anAllFeatures.end()) <=
+  if (std::distance(anObjectIt, anAllFeatures.end()) <=
       std::distance(aCurrentIt, anAllFeatures.end()))
     return aResult;
   // exclude the object
-  std::advance(aObjectIt, 1);
+  std::advance(anObjectIt, 1);
   // include the current feature
   std::advance(aCurrentIt, 1);
-  return std::list<FeaturePtr>(aObjectIt, aCurrentIt);
+  return std::list<FeaturePtr>(anObjectIt, aCurrentIt);
 }
 
 //******************************************************
@@ -2338,29 +2341,29 @@ bool XGUI_Workshop::canMoveFeature()
 {
   QString anActionId = "MOVE_CMD";
 
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   QObjectPtrList aValidatedObjects;
-  foreach (ObjectPtr aObject, aObjects) {
-    if (!myModule->canApplyAction(aObject, anActionId))
+  foreach (ObjectPtr anObject, anObjects) {
+    if (!myModule->canApplyAction(anObject, anActionId))
       continue;
     // To be moved feature should be in active document
-    if (aObject->document() != ModelAPI_Session::get()->activeDocument())
+    if (anObject->document() != ModelAPI_Session::get()->activeDocument())
       continue;
-    aValidatedObjects.append(aObject);
+    aValidatedObjects.append(anObject);
   }
-  if (aValidatedObjects.size() != aObjects.size())
-    aObjects = aValidatedObjects;
+  if (aValidatedObjects.size() != anObjects.size())
+    anObjects = aValidatedObjects;
 
-  bool aCanMove = !aObjects.empty();
+  bool aCanMove = !anObjects.empty();
 
-  QObjectPtrList::const_iterator anIt = aObjects.begin(), aLast = aObjects.end();
+  QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
   for (; anIt != aLast && aCanMove; anIt++) {
-    ObjectPtr aObject = *anIt;
-    if (!aObject.get() || !aObject->data().get() || !aObject->data()->isValid()) {
+    ObjectPtr anObject = *anIt;
+    if (!anObject.get() || !anObject->data().get() || !anObject->data()->isValid()) {
       aCanMove = false;
       break;
     }
-    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
     // only groups can be moved to the end for now (#2451)
     if (aFeat.get() && aFeat->getKind() != "Group") {
       aCanMove = false;
@@ -2368,15 +2371,15 @@ bool XGUI_Workshop::canMoveFeature()
     }
 
     // 1. Get features placed between selected and current in the document
-    std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(aObject);
-    // if aFeaturesBetween is empty it means wrong order or aObject is the current feature
+    std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(anObject);
+    // if aFeaturesBetween is empty it means wrong order or anObject is the current feature
     if (aFeaturesBetween.empty())
       aCanMove = false;
     else {
       std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
       // 2. Get all reference features to the selected object in the document
       std::set<FeaturePtr> aRefFeatures;
-      ModuleBase_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
+      ModuleBase_Tools::refsToFeatureInFeatureDocument(anObject, aRefFeatures);
 
       if (aRefFeatures.empty())
         continue;
@@ -2419,7 +2422,7 @@ bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
   if (theActionName == "COLOR_CMD" ||
       theActionName == "DEFLECTION_CMD" ||
       theActionName == "TRANSPARENCY_CMD") {
-    QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+    QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
 
     std::set<std::string> aTypes;
     aTypes.insert(ModelAPI_ResultGroup::group());
@@ -2427,7 +2430,16 @@ bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
     aTypes.insert(ModelAPI_ResultBody::group());
     aTypes.insert(ModelAPI_ResultPart::group());
 
-    return hasResults(aObjects, aTypes);
+    return hasResults(anObjects, aTypes);
+  }
+  if (theActionName == "AUTOCOLOR_CMD") {
+
+    QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+
+    std::set<std::string> aTypes;
+    aTypes.insert(ModelAPI_ResultGroup::group());
+
+    return hasResults(anObjects, aTypes);
   }
   return false;
 }
@@ -2497,6 +2509,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   // 3. abort the previous operation and start a new one
   SessionPtr aMgr = ModelAPI_Session::get();
   QString aDescription = contextMenuMgr()->action("COLOR_CMD")->text();
+
   aMgr->startOperation(aDescription.toStdString());
 
   // 4. set the value to all results
@@ -2519,6 +2532,62 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   aMgr->finishOperation();
   updateCommandStatus();
   myViewerProxy->update();
+}
+
+//**************************************************************
+void XGUI_Workshop::changeAutoColor(const QObjectPtrList& theObjects)
+{
+  if (!abortAllOperations())
+  return;
+
+  std::vector<int> aColor;
+
+  // abort the previous operation and start a new one
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QString aDescription = contextMenuMgr()->action("AUTOCOLOR_CMD")->text();
+  aMgr->startOperation(aDescription.toStdString());
+
+  Config_Prop* aProp = Config_PropManager::findProp("Visualization", "result_group_auto_color");
+
+  if (aProp) {
+    bool anIsAutoColor = Config_PropManager::boolean("Visualization", "result_group_auto_color");
+
+    if (anIsAutoColor) {
+      contextMenuMgr()->action("AUTOCOLOR_CMD")->setText(tr("Auto color"));
+      aProp->setValue("false");
+      ModelAPI_Tools::findRandomColor(aColor, true);
+    } else {
+      // set the value to all results
+      foreach (ObjectPtr anObj, theObjects) {
+        DocumentPtr aDocument = anObj->document();
+        std::list<FeaturePtr> anAllFeatures = allFeatures(aDocument);
+        // find the object iterator
+        std::list<FeaturePtr>::iterator anObjectIt = anAllFeatures.begin();
+        for (; anObjectIt !=  anAllFeatures.end(); ++ anObjectIt) {
+          FeaturePtr aFeature = *anObjectIt;
+          if (aFeature.get()) {
+            std::list<ResultPtr> aResults;
+            ModelAPI_Tools::allResults(aFeature, aResults);
+            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+            for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+              ResultPtr aGroupResult = *aIt;
+              if (aGroupResult.get() &&
+                  aGroupResult->groupName() == ModelAPI_ResultGroup::group()) {
+                ModelAPI_Tools::findRandomColor(aColor);
+                ModelAPI_Tools::setColor(aGroupResult, aColor);
+              }
+            }
+          }
+        }
+      }
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      aMgr->finishOperation();
+      updateCommandStatus();
+      myViewerProxy->update();
+      contextMenuMgr()->action("AUTOCOLOR_CMD")->setText(tr("Disable auto color"));
+      aProp->setValue("true");
+    }
+  }
 }
 
 //**************************************************************
@@ -2775,11 +2844,11 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 //**************************************************************
 void XGUI_Workshop::updateColorScaleVisibility()
 {
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   viewer()->setColorScaleShown(false);
-  if (aObjects.size() == 1) {
+  if (anObjects.size() == 1) {
     FieldStepPtr aStep =
-      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObjects.first());
+      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(anObjects.first());
     if (aStep.get() && myDisplayer->isVisible(aStep)) {
       AISObjectPtr aAisPtr = myDisplayer->getAISObject(aStep);
       Handle(AIS_InteractiveObject) aIO = aAisPtr->impl<Handle(AIS_InteractiveObject)>();
@@ -3093,10 +3162,10 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
 
 void XGUI_Workshop::insertFeatureFolder()
 {
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
-  if (aObjects.isEmpty())
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  if (anObjects.isEmpty())
     return;
-  ObjectPtr aObj = aObjects.first();
+  ObjectPtr aObj = anObjects.first();
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
   if (aFeature.get() == NULL)
     return;

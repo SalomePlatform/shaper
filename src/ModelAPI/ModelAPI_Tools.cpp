@@ -17,34 +17,36 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "ModelAPI_Tools.h"
-#include <ModelAPI_Session.h>
+#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
-#include <ModelAPI_ResultGroup.h>
-#include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_Session.h>
+#include "ModelAPI_Tools.h"
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_AttributeIntArray.h>
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_AttributeBoolean.h>
-#include <list>
-#include <map>
-#include <iostream>
-#include <sstream>
 
+#include <Config_Translator.h>
 #include <Events_Loop.h>
 #include <Locale_Convert.h>
-#include <ModelAPI_Events.h>
-#include <Config_Translator.h>
 
 #include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_ShapeIterator.h>
+
+#include <algorithm>
+#include <iostream>
+#include <list>
+#include <map>
+#include <sstream>
 
 #define RECURSE_TOP_LEVEL 50
 
@@ -1114,6 +1116,90 @@ std::list<FeaturePtr> referencedFeatures(
       aResList.push_back(*aResIter);
   }
   return aResList;
+}
+
+void setValues(std::vector<int>& theRGB, const int theRed, const int theGreen, const int theBlue)
+{
+  theRGB.push_back(theRed);
+  theRGB.push_back(theGreen);
+  theRGB.push_back(theBlue);
+}
+
+std::vector<int> HSVtoRGB(int theH, int theS, int theV)
+{
+  std::vector<int> aRGB;
+  if (theH < 0 || theH > 360 ||
+      theS < 0 || theS > 100 ||
+      theV < 0 || theV > 100)
+    return aRGB;
+
+  int aHi = (int)theH/60;
+  double aV = theV;
+  double aVmin = (100 - theS)*theV/100;
+  double anA = (theV - aVmin)* (theH % 60) / 60;
+  double aVinc = aVmin + anA;
+  double aVdec = theV - anA;
+  double aPercentToValue = 255./100;
+  int aV_int    = (int)(aV*aPercentToValue);
+  int aVinc_int = (int)(aVinc*aPercentToValue);
+  int aVmin_int = (int)(aVmin*aPercentToValue);
+  int aVdec_int = (int)(aVdec*aPercentToValue);
+
+  switch(aHi) {
+    case 0: setValues(aRGB, aV_int,    aVinc_int, aVmin_int); break;
+    case 1: setValues(aRGB, aVdec_int, aV_int,    aVmin_int); break;
+    case 2: setValues(aRGB, aVmin_int, aV_int,    aVinc_int); break;
+    case 3: setValues(aRGB, aVmin_int, aVdec_int, aV_int); break;
+    case 4: setValues(aRGB, aVinc_int, aVmin_int, aV_int); break;
+    case 5: setValues(aRGB, aV_int,    aVmin_int, aVdec_int); break;
+    default: break;
+  }
+  return aRGB;
+}
+
+std::array<std::vector<int>, 10> myColorTab = {
+  std::vector<int> {255, 0, 0},
+  std::vector<int> {0, 255, 0},
+  std::vector<int> {0, 0, 255},
+  std::vector<int> {255, 255, 0},
+  std::vector<int> {0, 255, 255},
+  std::vector<int> {255, 0, 255},
+  std::vector<int> {255, 94, 0},
+  std::vector<int> {132, 255, 0},
+  std::vector<int> {132, 0, 255},
+  std::vector<int> {0, 0, 0},
+};
+
+void findRandomColor(std::vector<int>& theValues, bool theReset)
+{
+  static int i = 0;
+  static std::vector<std::vector<int>> usedGeneratedColor;
+
+  // True when disabling auto-color
+  if ( theReset ) {
+    i = 0;
+    return;
+  }
+
+  theValues.clear();
+  if (i < myColorTab.size()) {
+    theValues = myColorTab[i++];
+  } else {
+      int timeout = 0;
+      std::vector<int> aHSVColor;
+      std::vector<int> aRGBColor;
+      do {
+        aHSVColor = {rand() % 360 , rand() % (100 - 50 + 1) + 50, rand() % (100 - 50 + 1) + 50};
+        aRGBColor = HSVtoRGB(aHSVColor[0], aHSVColor[1], aHSVColor[2]);
+        timeout++;
+      } while (
+        timeout < 20 &&
+        std::find(usedGeneratedColor.begin(), usedGeneratedColor.end(), aHSVColor)
+        != usedGeneratedColor.end() &&
+        std::find(myColorTab.begin(), myColorTab.end(), aRGBColor) != myColorTab.end());
+      usedGeneratedColor.push_back(aHSVColor);
+      theValues = aRGBColor;
+  }
 }
 
 // LCOV_EXCL_STOP

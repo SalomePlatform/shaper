@@ -85,71 +85,74 @@ void XGUI_ContextMenuMgr::createActions()
   QMainWindow* aDesktop = myWorkshop->mainWindow();
 #endif
 
-  QAction* aAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
+  QAction* anAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
                                                     aDesktop);
-  aDesktop->addAction(aAction);
+  aDesktop->addAction(anAction);
 
-  addAction("DELETE_CMD", aAction);
-  aAction->setShortcutContext(Qt::ApplicationShortcut);
+  addAction("DELETE_CMD", anAction);
+  anAction->setShortcutContext(Qt::ApplicationShortcut);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/rename_edit.png"), tr("Rename"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/rename_edit.png"), tr("Rename"),
                                            aDesktop, this, SLOT(onRename()));
-  aAction->setShortcut(Qt::Key_F2);
-  addAction("RENAME_CMD", aAction);
+  anAction->setShortcut(Qt::Key_F2);
+  addAction("RENAME_CMD", anAction);
 
 #ifdef HAVE_SALOME
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end.png"),
                                            XGUI_Workshop::MOVE_TO_END_COMMAND, this);
-  addAction("MOVE_CMD", aAction);
+  addAction("MOVE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end_split.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end_split.png"),
     XGUI_Workshop::MOVE_TO_END_SPLIT_COMMAND, this);
-  addAction("MOVE_SPLIT_CMD", aAction);
+  addAction("MOVE_SPLIT_CMD", anAction);
 #endif
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"),
                                            tr("Clean history"), aDesktop);
-  addAction("CLEAN_HISTORY_CMD", aAction);
+  addAction("CLEAN_HISTORY_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/color.png"), tr("Color..."), aDesktop);
-  addAction("COLOR_CMD", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/color.png"), tr("Color..."), aDesktop);
+  addAction("COLOR_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(""), tr("Deflection..."), aDesktop);
-  addAction("DEFLECTION_CMD", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/autocolor.png"), tr("Auto color"), aDesktop);
+  addAction("AUTOCOLOR_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/transparency.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(""), tr("Deflection..."), aDesktop);
+  addAction("DEFLECTION_CMD", anAction);
+
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/transparency.png"),
                                            tr("Transparency..."), aDesktop);
-  addAction("TRANSPARENCY_CMD", aAction);
+  addAction("TRANSPARENCY_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), aDesktop);
-  addAction("SHOW_CMD", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), aDesktop);
+  addAction("SHOW_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"),
                                            aDesktop);
-  addAction("SHOW_ONLY_CMD", aAction);
+  addAction("SHOW_ONLY_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"),
                                            aDesktop);
-  addAction("HIDE_CMD", aAction);
+  addAction("HIDE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"),
                                            aDesktop);
-  addAction("HIDEALL_CMD", aAction);
+  addAction("HIDEALL_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/shading.png"), tr("Shading"), aDesktop);
-  addAction("SHADING_CMD", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/shading.png"), tr("Shading"), aDesktop);
+  addAction("SHADING_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"),
                                            aDesktop);
-  addAction("WIREFRAME_CMD", aAction);
+  addAction("WIREFRAME_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/iso_lines.png"), tr("Define Isos..."),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/iso_lines.png"), tr("Define Isos..."),
                                            aDesktop);
-  addAction("ISOLINES_CMD", aAction);
+  addAction("ISOLINES_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Show Isos"), aDesktop);
-  aAction->setCheckable(true);
-  addAction("SHOW_ISOLINES_CMD", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(), tr("Show Isos"), aDesktop);
+  anAction->setCheckable(true);
+  addAction("SHOW_ISOLINES_CMD", anAction);
 
   mySeparator1 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator1->setSeparator(true);
@@ -160,69 +163,69 @@ void XGUI_ContextMenuMgr::createActions()
   mySeparator3 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator3->setSeparator(true);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/vertex.png"), tr("Vertices"), aDesktop,
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/vertex.png"), tr("Vertices"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
-  aAction->setCheckable(true);
-  addAction("SELECT_VERTEX_CMD", aAction);
+  anAction->setCheckable(true);
+  addAction("SELECT_VERTEX_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/edge.png"), tr("Edges"), aDesktop,
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/edge.png"), tr("Edges"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
-  aAction->setCheckable(true);
-  addAction("SELECT_EDGE_CMD", aAction);
+  anAction->setCheckable(true);
+  addAction("SELECT_EDGE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/face.png"), tr("Faces"), aDesktop,
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/face.png"), tr("Faces"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
-  aAction->setCheckable(true);
-  addAction("SELECT_FACE_CMD", aAction);
+  anAction->setCheckable(true);
+  addAction("SELECT_FACE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Results"), aDesktop,
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Results"), aDesktop,
                                            this, SLOT(onResultSelection(bool)));
-  aAction->setCheckable(true);
-  addAction("SELECT_RESULT_CMD", aAction);
+  anAction->setCheckable(true);
+  addAction("SELECT_RESULT_CMD", anAction);
 
-  aAction->setChecked(true);
+  anAction->setChecked(true);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
                                            tr("Select results"), aDesktop);
-  addAction("SHOW_RESULTS_CMD", aAction);
+  addAction("SHOW_RESULTS_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
                                            tr("Select parent feature"), aDesktop);
-  addAction("SHOW_FEATURE_CMD", aAction);
+  addAction("SHOW_FEATURE_CMD", anAction);
 
 #ifdef TINSPECTOR
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("TInspector"), aDesktop);
-  addAction("TINSPECTOR_VIEW", aAction);
+  anAction = ModuleBase_Tools::createAction(QIcon(), tr("TInspector"), aDesktop);
+  addAction("TINSPECTOR_VIEW", anAction);
 #endif
 
   // Features folders actions
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/create_folder.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/create_folder.png"),
                                            tr("Insert a folder before"), aDesktop);
-  addAction("INSERT_FOLDER_CMD", aAction);
+  addAction("INSERT_FOLDER_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_before.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_before.png"),
                                            tr("Move into the previous folder"), aDesktop);
-  addAction("ADD_TO_FOLDER_BEFORE_CMD", aAction);
+  addAction("ADD_TO_FOLDER_BEFORE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_after.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_after.png"),
                                            tr("Move into the next folder"), aDesktop);
-  addAction("ADD_TO_FOLDER_AFTER_CMD", aAction);
+  addAction("ADD_TO_FOLDER_AFTER_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_before.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_before.png"),
                                            tr("Move out before the folder"), aDesktop);
-  addAction("ADD_OUT_FOLDER_BEFORE_CMD", aAction);
+  addAction("ADD_OUT_FOLDER_BEFORE_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_after.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_after.png"),
                                            tr("Move out after the folder"), aDesktop);
-  addAction("ADD_OUT_FOLDER_AFTER_CMD", aAction);
+  addAction("ADD_OUT_FOLDER_AFTER_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view-inversed.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view-inversed.png"),
                                            tr("Set view by inverted normal to face"), aDesktop);
-  addAction("SET_VIEW_INVERTEDNORMAL_CMD", aAction);
+  addAction("SET_VIEW_INVERTEDNORMAL_CMD", anAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view.png"),
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view.png"),
                                            tr("Set view by normal to face"), aDesktop);
-  addAction("SET_VIEW_NORMAL_CMD", aAction);
+  addAction("SET_VIEW_NORMAL_CMD", anAction);
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -261,8 +264,8 @@ QStringList XGUI_ContextMenuMgr::actionIds() const
 
 void XGUI_ContextMenuMgr::onAction(bool isChecked)
 {
-  QAction* aAction = static_cast<QAction*>(sender());
-  emit actionTriggered(aAction->data().toString(), isChecked);
+  QAction* anAction = static_cast<QAction*>(sender());
+  emit actionTriggered(anAction->data().toString(), isChecked);
 }
 
 void XGUI_ContextMenuMgr::updateCommandsStatus()
@@ -293,8 +296,8 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
 
 void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
 {
-  foreach(QAction* aAction, myActions)
-    aAction->setEnabled(false);
+  foreach(QAction* anAction, myActions)
+    anAction->setEnabled(false);
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
@@ -506,6 +509,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
   action("COLOR_CMD")->setEnabled(myWorkshop->canChangeProperty("COLOR_CMD"));
   action("DEFLECTION_CMD")->setEnabled(myWorkshop->canChangeProperty("DEFLECTION_CMD"));
   action("TRANSPARENCY_CMD")->setEnabled(myWorkshop->canChangeProperty("TRANSPARENCY_CMD"));
+  action("AUTOCOLOR_CMD")->setEnabled(myWorkshop->canChangeProperty("AUTOCOLOR_CMD"));
+
   #ifdef _DEBUG
     #ifdef TINSPECTOR
       action("TINSPECTOR_VIEW")->setEnabled(true);
@@ -520,8 +525,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
 
 void XGUI_ContextMenuMgr::updateViewerMenu()
 {
-  foreach(QAction* aAction, myActions)
-    aAction->setEnabled(false);
+  foreach(QAction* anAction, myActions)
+    anAction->setEnabled(false);
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
@@ -685,10 +690,31 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
-  myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
   myObjBrowserMenus[ModelAPI_ResultField::group()] = aList;
   // Result part menu
   myObjBrowserMenus[ModelAPI_ResultPart::group()] = aList;
+
+  aList.clear();
+  aList.append(action("WIREFRAME_CMD"));
+  aList.append(action("SHADING_CMD"));
+  aList.append(mySeparator1); // this separator is not shown as this action is added after show only
+  // qt list container contains only one instance of the same action
+  aList.append(action("SHOW_CMD"));
+  aList.append(action("HIDE_CMD"));
+  aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(mySeparator2);
+  aList.append(action("AUTOCOLOR_CMD"));
+  aList.append(action("RENAME_CMD"));
+  aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
+  aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(action("SHOW_ISOLINES_CMD"));
+  aList.append(action("ISOLINES_CMD"));
+  aList.append(action("SHOW_FEATURE_CMD"));
+  aList.append(mySeparator3);
+  aList.append(action("DELETE_CMD"));
+  // Group menu
+  myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
   //-------------------------------------
   // Feature menu
   aList.clear();
@@ -786,43 +812,43 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   int aSelected = aObjects.size();
-  QActionsList aActions;
+  QActionsList anActions;
   if (aSelected == 1) {
     ObjectPtr aObject = aObjects.first();
     std::string aName = aObject->groupName();
     if (myObjBrowserMenus.contains(aName))
-      aActions = myObjBrowserMenus[aName];
+      anActions = myObjBrowserMenus[aName];
   } else if (aSelected > 1) {
-      aActions.append(action("WIREFRAME_CMD"));
-      aActions.append(action("SHADING_CMD"));
-      aActions.append(mySeparator1);
-      aActions.append(action("SHOW_CMD"));
-      aActions.append(action("HIDE_CMD"));
-      aActions.append(action("SHOW_ONLY_CMD"));
-      aActions.append(mySeparator2);
-      aActions.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
-      aActions.append(action("ADD_TO_FOLDER_AFTER_CMD"));
-      aActions.append(action("ADD_OUT_FOLDER_BEFORE_CMD"));
-      aActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
-      aActions.append(mySeparator3);
-      aActions.append(action("MOVE_CMD"));
-      aActions.append(action("MOVE_SPLIT_CMD"));
-      aActions.append(action("COLOR_CMD"));
-      aActions.append(action("DEFLECTION_CMD"));
-      aActions.append(action("TRANSPARENCY_CMD"));
-      aActions.append(action("SHOW_ISOLINES_CMD"));
-      aActions.append(action("ISOLINES_CMD"));
-      aActions.append(action("CLEAN_HISTORY_CMD"));
-      aActions.append(action("DELETE_CMD"));
+      anActions.append(action("WIREFRAME_CMD"));
+      anActions.append(action("SHADING_CMD"));
+      anActions.append(mySeparator1);
+      anActions.append(action("SHOW_CMD"));
+      anActions.append(action("HIDE_CMD"));
+      anActions.append(action("SHOW_ONLY_CMD"));
+      anActions.append(mySeparator2);
+      anActions.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
+      anActions.append(action("ADD_TO_FOLDER_AFTER_CMD"));
+      anActions.append(action("ADD_OUT_FOLDER_BEFORE_CMD"));
+      anActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
+      anActions.append(mySeparator3);
+      anActions.append(action("MOVE_CMD"));
+      anActions.append(action("MOVE_SPLIT_CMD"));
+      anActions.append(action("COLOR_CMD"));
+      anActions.append(action("DEFLECTION_CMD"));
+      anActions.append(action("TRANSPARENCY_CMD"));
+      anActions.append(action("SHOW_ISOLINES_CMD"));
+      anActions.append(action("ISOLINES_CMD"));
+      anActions.append(action("CLEAN_HISTORY_CMD"));
+      anActions.append(action("DELETE_CMD"));
   }
 #ifdef _DEBUG
   if (aSelected == 0) {
     #ifdef TINSPECTOR
-    aActions.append(action("TINSPECTOR_VIEW"));
+    anActions.append(action("TINSPECTOR_VIEW"));
     #endif
   }
 #endif
-  theMenu->addActions(aActions);
+  theMenu->addActions(anActions);
   addFeatures(theMenu);
 
   // It is commented out because Object Browser does not have actions
@@ -836,7 +862,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   QList<ModuleBase_ViewerPrsPtr> aPrsList =
     aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
-  QActionsList aActions;
+  QActionsList anActions;
 
   // Create selection menu
   XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
@@ -857,19 +883,19 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
     if (aObject.get() != NULL) {
       std::string aName = aObject->groupName();
       if (myViewerMenu.contains(aName))
-        aActions = myViewerMenu[aName];
+        anActions = myViewerMenu[aName];
     }
   } else if (aSelected > 1) {
-    aActions.append(action("COLOR_CMD"));
-    aActions.append(action("DEFLECTION_CMD"));
-    aActions.append(action("TRANSPARENCY_CMD"));
-    aActions.append(mySeparator1);
-    aActions.append(action("SHOW_ONLY_CMD"));
-    aActions.append(action("HIDE_CMD"));
+    anActions.append(action("COLOR_CMD"));
+    anActions.append(action("DEFLECTION_CMD"));
+    anActions.append(action("TRANSPARENCY_CMD"));
+    anActions.append(mySeparator1);
+    anActions.append(action("SHOW_ONLY_CMD"));
+    anActions.append(action("HIDE_CMD"));
   }
   // hide all is shown always even if selection in the viewer is empty
-  aActions.append(action("HIDEALL_CMD"));
-  theMenu->addActions(aActions);
+  anActions.append(action("HIDEALL_CMD"));
+  theMenu->addActions(anActions);
 
   QMap<int, QAction*> aMenuActions;
   ModuleBase_IModule* aModule = myWorkshop->module();
@@ -880,12 +906,12 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 
   // insert the module menu items on specific positions in the popup menu: some actions should be
   // in the begin of the list, Delete action should be the last by #1343 issue
-  QList<QAction*> anActions = theMenu->actions();
-  int anActionsSize = anActions.size();
-  QAction* aFirstAction = anActions[0];
+  QList<QAction*> anActionsList = theMenu->actions();
+  int anActionsListSize = anActionsList.size();
+  QAction* aFirstAction = anActionsList[0];
   QMap<int, QAction*>::const_iterator anIt = aMenuActions.begin(), aLast = aMenuActions.end();
   for (; anIt != aLast; anIt++) {
-    if (anIt.key() > anActionsSize)
+    if (anIt.key() > anActionsListSize)
       theMenu->addAction(anIt.value());
     else
       theMenu->insertAction(aFirstAction, *anIt);
@@ -935,10 +961,10 @@ void XGUI_ContextMenuMgr::onRename()
 void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aActiveDoc = aMgr->activeDocument();
+  DocumentPtr anActiveDoc = aMgr->activeDocument();
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  XGUI_ActionsMgr* aActionMgr = myWorkshop->actionsMgr();
+  XGUI_ActionsMgr* anActionMgr = myWorkshop->actionsMgr();
   const Config_DataModelReader* aDataModelXML = myWorkshop->dataModelXMLReader();
   QModelIndexList aSelectedIndexes = aSelMgr->selection()->selectedIndexes();
 
@@ -950,7 +976,7 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
     if (aIdx.column() == 1) {
       aIsRoot = !aIdx.parent().isValid();
       // Exit if the selected index belongs to non active document
-      if (aIsRoot && (aActiveDoc != aMgr->moduleDocument()))
+      if (aIsRoot && (anActiveDoc != aMgr->moduleDocument()))
         return;
 
       // Get name of the selected index
@@ -966,9 +992,9 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
           QStringList aFeturesList =
             QString(aFeaturesStr.c_str()).split(",", QString::SkipEmptyParts);
           foreach(QString aFea, aFeturesList) {
-            QAction* aAction = aActionMgr->action(aFea);
-            if (aAction)
-              theMenu->addAction(aAction);
+            QAction* anAction = anActionMgr->action(aFea);
+            if (anAction)
+              theMenu->addAction(anAction);
           }
         }
     }
@@ -976,11 +1002,11 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
 }
 
 #define UNCHECK_ACTION(NAME) \
-{ QAction* aAction = action(NAME); \
-bool isBlock = aAction->signalsBlocked(); \
-aAction->blockSignals(true); \
-aAction->setChecked(false); \
-  aAction->blockSignals(isBlock); }
+{ QAction* anAction = action(NAME); \
+bool isBlock = anAction->signalsBlocked(); \
+anAction->blockSignals(true); \
+anAction->setChecked(false); \
+  anAction->blockSignals(isBlock); }
 
 
 void XGUI_ContextMenuMgr::onResultSelection(bool theChecked)

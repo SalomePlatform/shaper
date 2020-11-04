@@ -203,6 +203,11 @@ Q_OBJECT
   /// theObjects a list of selected objects
   void changeColor(const QObjectPtrList& theObjects);
 
+  /// Change Autocolor of the results if it is possible
+  /// The operation is available for group results
+  /// theObjects a list of selected objects
+  void changeAutoColor(const QObjectPtrList& theObjects);
+
   /// Change deflection of the results if it is possible
   /// The operation is available for construction, body and group results
   /// theObjects a list of selected objects
@@ -440,7 +445,7 @@ signals:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
   /// and set them into the operation. Secondly, it asks the module about ids of granted operations.
   /// \param theOperation an operation
-   void setGrantedFeatures(ModuleBase_Operation* theOperation);
+  void setGrantedFeatures(ModuleBase_Operation* theOperation);
 
 private:
   /// Display results from document
