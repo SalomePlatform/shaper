@@ -317,6 +317,8 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
   if (isOk) {
+    // keep handle to avoid destruction of the document until myObjs works on it
+    Handle(TDocStd_Document) anOldDoc = myDoc;
     myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
 
@@ -325,6 +327,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     aSession->setCheckTransactions(false);
     if (myObjs)
       delete myObjs;
+    anOldDoc.Nullify();
     myObjs = new Model_Objects(myDoc->Main()); // synchronization is inside
     myObjs->setOwner(theThis);
     // update the current features status
@@ -2309,6 +2312,8 @@ void Model_Document::appendTransactionToPrevious()
 {
   Transaction anAppended =  myTransactions.back();
   myTransactions.pop_back();
+  if (!myNestedNum.empty())
+    (*myNestedNum.rbegin())--;
   if (!myTransactions.empty()) { // if it is empty, just forget the appended
     myTransactions.back().myOCAFNum += anAppended.myOCAFNum;
   }

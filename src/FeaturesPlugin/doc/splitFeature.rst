@@ -15,7 +15,7 @@ To perform Split in the active part:
 
 The following property panel will be opened:
 
-.. figure:: images/Split.png
+.. figure:: images/Split_panel.png
    :align: center
 
    **Split operation**
