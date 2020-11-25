@@ -204,14 +204,36 @@ double GeomAlgoAPI_ShapeTools::radius(const std::shared_ptr<GeomAPI_Face>& theCy
 }
 
 //==================================================================================================
-double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
-                                               const GeomShapePtr& theShape2)
+namespace {
+
+auto getExtemaDistShape = [](const GeomShapePtr& theShape1,
+    const GeomShapePtr& theShape2) -> BRepExtrema_DistShapeShape
 {
   const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
   const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
 
   BRepExtrema_DistShapeShape aDist(aShape1, aShape2);
   aDist.Perform();
+  return aDist;
+};
+}
+
+double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
+                                               const GeomShapePtr& theShape2)
+{
+  BRepExtrema_DistShapeShape aDist = getExtemaDistShape(theShape1, theShape2);
+  return aDist.IsDone() ? aDist.Value() : Precision::Infinite();
+}
+
+double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
+                                               const GeomShapePtr& theShape2, std::array<double, 3> & fromShape1To2)
+{
+  BRepExtrema_DistShapeShape aDist = getExtemaDistShape(theShape1, theShape2);
+  const auto & pt1 = aDist.PointOnShape1(1);
+  const auto & pt2 = aDist.PointOnShape2(1) ;
+  fromShape1To2[0] = pt2.X() - pt1.X();
+  fromShape1To2[1] = pt2.Y() - pt1.Y();
+  fromShape1To2[2] = pt2.Z() - pt1.Z();
   return aDist.IsDone() ? aDist.Value() : Precision::Infinite();
 }
 
