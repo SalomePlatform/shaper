@@ -36,6 +36,8 @@
 class ModelAPI_ResultConstruction : public ModelAPI_Result
 {
  public:
+  ModelAPI_ResultConstruction();
+
   /// Returns the group identifier of this result
   MODELAPI_EXPORT virtual std::string groupName();
 
@@ -81,6 +83,56 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   virtual bool isInfinite() = 0;
   /// Sets the flag that it is infinite
   virtual void setInfinite(const bool theInfinite) = 0;
+
+  /*************************************************************************/
+  /// Changes for custom point color
+
+  inline static const std::string& DEFAULT_COLOR_CONFIG_NAME()
+  {
+    static const std::string RESULT_CONSTRUCTION_COLOR_CONFIG_NAME("result_construction_color");
+    return RESULT_CONSTRUCTION_COLOR_CONFIG_NAME;
+  }
+
+  inline void setColor(const std::string myColor, const std::string & myColorConfigName)
+  {
+    color = myColor;
+    colorConfigName = myColorConfigName;
+  }
+
+  inline const std::string & getColor() const
+  {
+    return color;
+  }
+
+  inline const std::string & getColorConfigName() const
+  {
+    return  colorConfigName;
+  }
+
+private:
+  std::string color;
+  std::string colorConfigName;
+
+public:
+
+  /// Specific properties for point
+  class ModelApi_PointColor
+  {
+  public:
+    /// default color for a point construction
+    inline static const std::string& DEFAULT_COLOR()
+    {
+      static const std::string POINT_CONSTRUCTION_COLOR("85,85,0");
+      return POINT_CONSTRUCTION_COLOR;
+    }
+
+    inline static const std::string COLOR_CONFIG_NAME()
+    {
+      static const std::string POINT_CONFIG_COLOR_NAME("result_point_color");
+      return POINT_CONFIG_COLOR_NAME;
+    }
+  };
+  /*************************************************************************/
 };
 
 //! Pointer on feature object
