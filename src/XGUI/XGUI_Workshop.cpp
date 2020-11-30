@@ -1212,6 +1212,15 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
     if (anActiveWidget->processAction(theActionType, aParam))
       return;
   }
+  else
+  {
+    XGUI_FacesPanel *  anFacePannel = facesPanel();
+    if(ActionUndo == theActionType && anFacePannel->isActivePanel())
+    {
+      anFacePannel->processUndo();
+      return;
+    }
+  }
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked
