@@ -30,6 +30,7 @@
 #include <GeomAlgoAPI_STEPImport.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_XAOImport.h>
+#include <GeomAlgoAPI_STLImport.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Face.h>
@@ -187,6 +188,8 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
                                      theMaterialShape, anError);
   } else if (anExtension == "IGES" || anExtension == "IGS") {
     aGeomShape = IGESImport(theFileName, anExtension, anError);
+  } else if (anExtension == "STL") {
+    aGeomShape = STLImport(theFileName, anError);
   } else {
     anError = "Unsupported format: " + anExtension;
   }
