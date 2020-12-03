@@ -992,6 +992,18 @@ bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
   return true;
 }
 
+size_t ModelHighAPI_Dumper::indexOfFirstNotDumped(
+    const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const
+{
+  size_t anIndex = 0;
+  std::list<ObjectPtr> anObjects = theRefList->list();
+  for (std::list<ObjectPtr>::const_iterator anIt = anObjects.begin();
+       anIt != anObjects.end(); ++anIt, ++anIndex)
+    if (!isDumped(ModelAPI_Feature::feature(*anIt)))
+      break;
+  return anIndex;
+}
+
 static bool isSketchSub(const FeaturePtr& theFeature)
 {
   static const std::string SKETCH("Sketch");
@@ -1071,7 +1083,7 @@ bool ModelHighAPI_Dumper::dumpCommentBeforeFeature(const FeaturePtr& theFeature)
   if (aFilters)
     return false;
   // all other features should be commented before the dump
-  return true;
+  return !isDumped(theFeature);
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -1445,6 +1457,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     bool isAdded = false;
     std::list<ObjectPtr>::const_iterator anIt = aList.begin();
     for (; anIt != aList.end(); ++anIt) {
+      if (!isDumped(ModelAPI_Feature::feature(*anIt)))
+        break; // stop if the object is not dumped yet (parent feature should be postponed)
+
       if (isAdded)
         *myDumpStorage << ", ";
       else

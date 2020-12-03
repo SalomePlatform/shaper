@@ -78,6 +78,10 @@ public:
               ModelAPI_AttributeRefList, /** Rotated objects */
   )
 
+  /// Set list of objects to be rotated
+  SKETCHAPI_EXPORT
+  void setRotationList(const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects);
+
   /// List of rotated objects
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > rotated() const;

@@ -64,6 +64,10 @@ public:
               ModelAPI_AttributeRefList, /** Mirrored objects */
   )
 
+  /// Set list of original objects
+  SKETCHAPI_EXPORT
+  void setMirrorList(const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects);
+
   /// List of mirrored objects
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > mirrored() const;

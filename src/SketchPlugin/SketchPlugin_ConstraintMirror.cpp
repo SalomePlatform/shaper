@@ -62,6 +62,11 @@ void SketchPlugin_ConstraintMirror::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  // Save the current feature of the document, because new features may appear while executing.
+  // In this case, they will become current. But if the number of copies is updated from outside
+  // of sketch (e.g. by parameter change), the history line should not hold in sketch.
+  keepCurrentFeature();
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
@@ -197,6 +202,8 @@ void SketchPlugin_ConstraintMirror::execute()
       aRefListOfMirrored->append(aNewFeature);
     }
   }
+
+  restoreCurrentFeature();
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)

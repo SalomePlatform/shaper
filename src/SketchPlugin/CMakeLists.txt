@@ -233,6 +233,10 @@ ADD_UNIT_TESTS(
   Test3240.py
   Test19089.py
   Test19101.py
+  Test20274_1.py
+  Test20274_2.py
+  Test20274_3.py
+
   TestArcBehavior.py
   TestBSplineAddPole.py
   TestChangeSketchPlane1.py

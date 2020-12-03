@@ -74,6 +74,10 @@ public:
               ModelAPI_AttributeRefList, /** Translationed objects */
   )
 
+  /// Set list of objects to be translated
+  SKETCHAPI_EXPORT
+  void setTranslationList(const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects);
+
   /// List of translated objects
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > translated() const;

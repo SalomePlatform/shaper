@@ -127,6 +127,11 @@ void SketchPlugin_Offset::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  // Save the current feature of the document, because new features may appear while executing.
+  // In this case, they will become current. But if the number of copies is updated from outside
+  // of sketch (e.g. by parameter change), the history line should not hold in sketch.
+  keepCurrentFeature();
+
   // 5. Gather wires and make offset for each wire
   ListOfMakeShape anOffsetAlgos;
   std::set<FeaturePtr> aProcessedEdgesSet;
@@ -198,6 +203,8 @@ void SketchPlugin_Offset::execute()
   //    Create sketch feature for each edge of anOffsetShape, and also store
   //    created features in CREATED_ID() to remove them on next execute()
   addToSketch(anOffsetAlgos);
+
+  restoreCurrentFeature();
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
