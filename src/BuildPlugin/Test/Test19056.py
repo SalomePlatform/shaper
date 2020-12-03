@@ -50,7 +50,7 @@ SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchArc_3.startPoint(),
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchArc_1.startPoint(), SketchArc_3.startPoint())
 SketchMultiRotation_1_objects = [SketchArc_1.results()[1], SketchLine_2.result(), SketchLine_4.result(), SketchArc_2.results()[1]]
 SketchMultiRotation_1 = Sketch_1.addRotation(SketchMultiRotation_1_objects, SketchAPI_Line(SketchLine_1).startPoint(), 360, "nb", True)
-[SketchArc_4, SketchArc_5, SketchArc_6, SketchArc_7, SketchArc_8, SketchArc_9, SketchArc_10, SketchLine_5, SketchLine_6, SketchLine_7, SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_4, SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchArc_2, SketchArc_11, SketchArc_12, SketchArc_13, SketchArc_14, SketchArc_15, SketchArc_16, SketchArc_17] = SketchMultiRotation_1.rotated()
+[SketchArc_4, SketchArc_5, SketchArc_6, SketchArc_7, SketchArc_8, SketchArc_9, SketchArc_10, SketchLine_5, SketchLine_6, SketchLine_7, SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchArc_11, SketchArc_12, SketchArc_13, SketchArc_14, SketchArc_15, SketchArc_16, SketchArc_17] = SketchMultiRotation_1.rotated()
 SketchArc_13.setName("SketchArc_9")
 SketchArc_13.result().setName("SketchArc_9")
 SketchArc_13.results()[1].setName("SketchArc_9_2")

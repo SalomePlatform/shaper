@@ -64,11 +64,16 @@ void SketchAPI_Translation::setTranslationList(
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Translation::translated() const
 {
-  std::list<ObjectPtr> aList = translatedObjects()->list();
+  std::list<ObjectPtr> aList = translationList()->list();
+  std::set<ObjectPtr> anOriginalObjects;
+  anOriginalObjects.insert(aList.begin(), aList.end());
   // remove all initial features
   std::list<FeaturePtr> anIntermediate;
+  aList = translatedObjects()->list();
   std::list<ObjectPtr>::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
+    if (anOriginalObjects.find(*anIt) != anOriginalObjects.end())
+      continue; // skip initial object
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
     AttributeBooleanPtr isCopy = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
     if (isCopy.get() && isCopy->value())
