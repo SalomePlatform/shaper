@@ -65,7 +65,7 @@ SketchConstraintMirror_1 = Sketch_1.addMirror(SketchLine_6.result(), SketchConst
 [SketchLine_7, SketchArc_2, SketchLine_8, SketchLine_9, SketchLine_10] = SketchConstraintMirror_1.mirrored()
 SketchMultiRotation_1_objects = [SketchLine_10.result(), SketchLine_9.result(), SketchLine_8.result(), SketchArc_2.results()[1], SketchLine_7.result(), SketchLine_1.result(), SketchArc_1.results()[1], SketchLine_2.result(), SketchLine_3.result(), SketchLine_4.result()]
 SketchMultiRotation_1 = Sketch_1.addRotation(SketchMultiRotation_1_objects, SketchAPI_Line(SketchLine_6).startPoint(), 360, 4, True)
-[SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_9, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_8, SketchLine_17, SketchLine_18, SketchLine_19, SketchArc_2, SketchArc_3, SketchArc_4, SketchArc_5, SketchLine_7, SketchLine_20, SketchLine_21, SketchLine_22, SketchLine_23, SketchLine_24, SketchLine_25, SketchArc_6, SketchArc_7, SketchArc_8, SketchLine_26, SketchLine_27, SketchLine_28, SketchLine_29, SketchLine_30, SketchLine_31, SketchLine_32, SketchLine_33, SketchLine_34] = SketchMultiRotation_1.rotated()
+[SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchLine_19, SketchArc_3, SketchArc_4, SketchArc_5, SketchLine_20, SketchLine_21, SketchLine_22, SketchLine_23, SketchLine_24, SketchLine_25, SketchArc_6, SketchArc_7, SketchArc_8, SketchLine_26, SketchLine_27, SketchLine_28, SketchLine_29, SketchLine_30, SketchLine_31, SketchLine_32, SketchLine_33, SketchLine_34] = SketchMultiRotation_1.rotated()
 model.do()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
