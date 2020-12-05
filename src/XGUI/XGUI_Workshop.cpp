@@ -490,6 +490,12 @@ void XGUI_Workshop::initMenu()
     QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportShape()));
 
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_IMAGE_CMD", tr("Picture..."),
+    tr("Import a picture from an image file"),
+    QIcon(),
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportImage()));
+
   // Export sub-menu
   aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Part set..."),
                                              tr("Export the current document into a native file"),
@@ -1333,6 +1339,19 @@ void XGUI_Workshop::onImportShape()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_Import::ID()));
+    anImportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "importFeature.html");
+    myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
+    operationMgr()->startOperation(anImportOp);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onImportImage()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_Import_Image::ID()));
     anImportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
       "importFeature.html");
     myPropertyPanel->updateApplyPlusButton(anImportOp->feature());

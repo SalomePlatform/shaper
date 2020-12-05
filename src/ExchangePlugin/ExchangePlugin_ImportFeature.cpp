@@ -31,6 +31,7 @@
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_XAOImport.h>
 #include <GeomAlgoAPI_STLImport.h>
+#include <GeomAlgoAPI_ImageImport.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Face.h>
@@ -65,36 +66,32 @@
 #include <ExchangePlugin_Tools.h>
 
 
-
-ExchangePlugin_ImportFeature::ExchangePlugin_ImportFeature()
-{
-}
-
-ExchangePlugin_ImportFeature::~ExchangePlugin_ImportFeature()
-{
-  // TODO Auto-generated destructor stub
-}
-
 /*
  * Request for initialization of data model of the feature: adding all attributes
  */
-void ExchangePlugin_ImportFeature::initAttributes()
+void ExchangePlugin_ImportFeatureBase::initAttributes()
 {
-  data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(),
+  data()->addAttribute(ExchangePlugin_ImportFeatureBase::FILE_PATH_ID(),
                        ModelAPI_AttributeString::typeId());
   AttributePtr aFeaturesAttribute =
-  data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(),
+    data()->addAttribute(ExchangePlugin_ImportFeatureBase::FEATURES_ID(),
                          ModelAPI_AttributeRefList::typeId());
+  aFeaturesAttribute->setIsArgument(false);
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeatureBase::FEATURES_ID());
+}
+
+void ExchangePlugin_ImportFeature::initAttributes()
+{
+  ExchangePlugin_ImportFeatureBase::initAttributes();
+   
   data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_COLORS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_SCALE_INTER_UNITS_ID(), ModelAPI_AttributeBoolean::typeId());
-
-  aFeaturesAttribute->setIsArgument(false);
-
-  ModelAPI_Session::get()->validators()->registerNotObligatory(
-      getKind(), ExchangePlugin_ImportFeature::FEATURES_ID());
+ 
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::STEP_COLORS_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
@@ -106,7 +103,6 @@ void ExchangePlugin_ImportFeature::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::FILE_PATH_ID());
 }
-
 /*
  * Computes or recomputes the results
  */
@@ -130,12 +126,23 @@ void ExchangePlugin_ImportFeature::execute()
   importFile(aFilePath);
 }
 
-std::shared_ptr<ModelAPI_ResultBody> ExchangePlugin_ImportFeature::createResultBody(
-                        std::shared_ptr<GeomAPI_Shape> theGeomShape)
+void ExchangePlugin_Import_ImageFeature::execute()
+{
+  AttributeStringPtr aFilePathAttr = string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID());
+  std::string aFilePath = aFilePathAttr->value();
+  if (aFilePath.empty()) {
+    setError("File path is empty.");
+    return;
+  }
+  importFile(aFilePath);
+}
+
+std::shared_ptr<ModelAPI_ResultBody> ExchangePlugin_ImportFeatureBase::createResultBody(
+    std::shared_ptr<GeomAPI_Shape> aGeomShape)
 {
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   //LoadNamingDS of the imported shape
-  loadNamingDS(theGeomShape, aResultBody);
+  loadNamingDS(aGeomShape, aResultBody);
   return aResultBody;
 }
 
@@ -152,7 +159,6 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   // Perform the import
   std::string anError;
   std::shared_ptr<GeomAPI_Shape> aGeomShape;
-
   std::map<std::wstring, std::list<std::wstring>> theMaterialShape;
 
   std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
@@ -163,7 +169,6 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   bool anColorGroupSelected = boolean(ExchangePlugin_ImportFeature::STEP_COLORS_ID())->value();
   bool anMaterialsGroupSelected =
                         boolean(ExchangePlugin_ImportFeature::STEP_MATERIALS_ID())->value();
-
   if (anExtension == "BREP" || anExtension == "BRP") {
     aGeomShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
@@ -190,7 +195,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
     aGeomShape = IGESImport(theFileName, anExtension, anError);
   } else if (anExtension == "STL") {
     aGeomShape = STLImport(theFileName, anError);
-  } else {
+  }  else {
     anError = "Unsupported format: " + anExtension;
   }
 
@@ -201,7 +206,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   }
 
   // Pass the results into the model
-
+ 
   loadNamingDS(aGeomShape, aResult);
 
   // create color group
@@ -536,7 +541,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 }
 
 //============================================================================
-std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::addFeature(
+std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeatureBase::addFeature(
     std::string theID)
 {
   std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
@@ -548,7 +553,7 @@ std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::addFeature(
 }
 
 // LCOV_EXCL_START
-void ExchangePlugin_ImportFeature::removeFeature(
+void ExchangePlugin_ImportFeatureBase::removeFeature(
     std::shared_ptr<ModelAPI_Feature> theFeature)
 {
   if (!data()->isValid())
@@ -558,12 +563,12 @@ void ExchangePlugin_ImportFeature::removeFeature(
 }
 // LCOV_EXCL_STOP
 
-int ExchangePlugin_ImportFeature::numberOfSubs(bool /*forTree*/) const
+int ExchangePlugin_ImportFeatureBase::numberOfSubs(bool /*forTree*/) const
 {
   return data()->reflist(FEATURES_ID())->size(true);
 }
 
-std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
+std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeatureBase::subFeature(
     const int theIndex, bool /*forTree*/)
 {
   ObjectPtr anObj = data()->reflist(FEATURES_ID())->object(theIndex, false);
@@ -572,7 +577,7 @@ std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
 }
 
 // LCOV_EXCL_START
-int ExchangePlugin_ImportFeature::subFeatureId(const int theIndex) const
+int ExchangePlugin_ImportFeatureBase::subFeatureId(const int theIndex) const
 {
   std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
@@ -591,7 +596,7 @@ int ExchangePlugin_ImportFeature::subFeatureId(const int theIndex) const
 }
 // LCOV_EXCL_STOP
 
-bool ExchangePlugin_ImportFeature::isSub(ObjectPtr theObject) const
+bool ExchangePlugin_ImportFeatureBase::isSub(ObjectPtr theObject) const
 {
   // check is this feature of result
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -601,12 +606,48 @@ bool ExchangePlugin_ImportFeature::isSub(ObjectPtr theObject) const
 }
 
 //============================================================================
-void ExchangePlugin_ImportFeature::loadNamingDS(
+void ExchangePlugin_ImportFeatureBase::loadNamingDS(
     std::shared_ptr<GeomAPI_Shape> theGeomShape,
     std::shared_ptr<ModelAPI_ResultBody> theResultBody)
 {
   //load result
   theResultBody->store(theGeomShape);
+
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS);
+}
+
+void ExchangePlugin_Import_ImageFeature::importFile(const std::string& theFileName)
+{
+
+  std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFileName);
+  std::string theTextureFileName = "";
+  // Perform the import
+  std::string anError;
+  std::shared_ptr<GeomAPI_Shape> aGeomShape;
+   if (anExtension == "PNG" || anExtension == "GIF" ||
+             anExtension == "TIFF" || anExtension == "JPE" ||
+             anExtension == "JPG" || anExtension == "JPEG" ||
+             anExtension == "BMP"|| anExtension == "PPM"
+             ) {
+     aGeomShape = ImageImport(theFileName, anError);
+     if(anError == "")
+       theTextureFileName = theFileName;
+    } else {
+    anError = "Unsupported format: " + anExtension;
+  }
+
+  // Check if shape is valid
+  if (!anError.empty()) {
+    setError("An error occurred while importing " + theFileName + ": " + anError);
+    return;
+  }
+
+  // Pass the results into the model
+  std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
+  data()->setName(Locale::Convert::toWString(anObjectName));
+
+  auto resultBody = createResultBody(aGeomShape);
+  resultBody->setTextureFile(theTextureFileName);
+  setResult(resultBody);
 }

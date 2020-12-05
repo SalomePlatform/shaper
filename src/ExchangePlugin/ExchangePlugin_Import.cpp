@@ -67,25 +67,22 @@ DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::wstring& thePartN
 }
 
 
-ExchangePlugin_Import::ExchangePlugin_Import()
-{
-}
-
-ExchangePlugin_Import::~ExchangePlugin_Import()
-{
-  // TODO Auto-generated destructor stub
-}
-
 /*
  * Request for initialization of data model of the feature: adding all attributes
  */
-void ExchangePlugin_Import::initAttributes()
+void ExchangePlugin_ImportBase::initAttributes()
 {
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(TARGET_PART_ID(), ModelAPI_AttributeInteger::typeId());
-  data()->addAttribute(TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId());
+  data()->addAttribute(TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId()); 
+}
+
+void ExchangePlugin_Import::initAttributes()
+{
+  ExchangePlugin_ImportBase::initAttributes();
+
+  data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId()); 
   data()->addAttribute(STEP_TARGET_PART_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(STEP_TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId());
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
@@ -96,12 +93,12 @@ void ExchangePlugin_Import::initAttributes()
 /*
  * Computes or recomputes the results
  */
+
 void ExchangePlugin_Import::execute()
 {
   AttributeStringPtr aFormatAttr =
       this->string(ExchangePlugin_Import::IMPORT_TYPE_ID());
   std::string aFormat = aFormatAttr->value();
-
   AttributeStringPtr aFilePathAttr;
   std::string aFilePath;
   AttributeStringArrayPtr aPartsAttr;
@@ -142,23 +139,45 @@ void ExchangePlugin_Import::execute()
     }
 
     AttributeStringPtr aImportTypeAttr =
-                        aData->string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
+        aData->string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
 
     aData->boolean(ExchangePlugin_ImportFeature::STEP_MATERIALS_ID())
-         ->setValue(boolean(ExchangePlugin_Import::STEP_MATERIALS_ID())->value());
+        ->setValue(boolean(ExchangePlugin_Import::STEP_MATERIALS_ID())->value());
     aData->boolean(ExchangePlugin_ImportFeature::STEP_COLORS_ID())
-         ->setValue(boolean(ExchangePlugin_Import::STEP_COLORS_ID())->value());
+        ->setValue(boolean(ExchangePlugin_Import::STEP_COLORS_ID())->value());
     aData->boolean(ExchangePlugin_ImportFeature::STEP_SCALE_INTER_UNITS_ID())
-         ->setValue(boolean(ExchangePlugin_Import::STEP_SCALE_INTER_UNITS_ID())->value());
+        ->setValue(boolean(ExchangePlugin_Import::STEP_SCALE_INTER_UNITS_ID())->value());
 
     aPathAttr->setValue(aFilePathAttr->value());
     aImportTypeAttr->setValue(aFormat);
-
     aImportFeature->execute();
   }
 }
 
+void ExchangePlugin_Import_Image::execute()
+{
+ AttributeStringPtr aFilePathAttr = string(ExchangePlugin_ImportBase::FILE_PATH_ID());
+  std::string aFilePath = aFilePathAttr->value();
+  if (aFilePath.empty()) {
+    setError("File path is empty.");
+    return;
+  }
 
+  // get the document where to import
+  AttributeStringArrayPtr aPartsAttr = stringArray(TARGET_PARTS_LIST_ID());
+  AttributeIntegerPtr aTargetAttr = integer(TARGET_PART_ID());
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aDoc = findDocument(aSession->moduleDocument(),
+      Locale::Convert::toWString(aPartsAttr->value(aTargetAttr->value())));
+
+  if (aDoc.get()) {
+    FeaturePtr aImportFeature = aDoc->addFeature(ExchangePlugin_Import_ImageFeature::ID());
+    DataPtr aData = aImportFeature->data();
+    AttributeStringPtr aPathAttr = aData->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID());
+    aPathAttr->setValue(aFilePathAttr->value());
+    aImportFeature->execute();
+  }
+}
 void ExchangePlugin_Import::attributeChanged(const std::string& theID)
 {
   AttributeStringPtr aFilePathAttr;
@@ -184,41 +203,55 @@ void ExchangePlugin_Import::attributeChanged(const std::string& theID)
    }
 }
 
-void ExchangePlugin_Import::updatePart(AttributeStringArrayPtr& thePartsAttr,
-                                       AttributeIntegerPtr& theTargetAttr)
+void ExchangePlugin_Import_Image::attributeChanged(const std::string& theID)
 {
-    // update the list of target parts
-    SessionPtr aSession = ModelAPI_Session::get();
-    DocumentPtr aDoc = document();
-    bool isPartSet = aDoc == aSession->moduleDocument();
-    if (isPartSet) {
-      std::list<std::wstring> anAcceptedValues;
-      anAcceptedValues.push_back(THE_NEW_PART_STR);
+  if (theID == FILE_PATH_ID()) {
+    AttributeStringPtr aFilePathAttr = string(FILE_PATH_ID());
+    if (aFilePathAttr->value().empty())
+      return;
 
-      // append names of all parts
-      std::list<FeaturePtr> aSubFeatures = aDoc->allFeatures();
-      for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
-        aFIt != aSubFeatures.end(); ++aFIt) {
-        if ((*aFIt)->getKind() == PartSetPlugin_Part::ID())
-          anAcceptedValues.push_back((*aFIt)->name());
-      }
+    AttributeStringArrayPtr aPartsAttr = stringArray(TARGET_PARTS_LIST_ID());
+    AttributeIntegerPtr aTargetAttr = integer(TARGET_PART_ID());
+    updatePart(aPartsAttr, aTargetAttr);
+  }
+}
 
-      if ((size_t)thePartsAttr->size() != anAcceptedValues.size())
-        theTargetAttr->setValue(0);
+void ExchangePlugin_ImportBase::updatePart(AttributeStringArrayPtr& aPartsAttr,
+                                       AttributeIntegerPtr& aTargetAttr)
+{
 
-      thePartsAttr->setSize((int)anAcceptedValues.size());
-      std::list<std::wstring>::iterator anIt = anAcceptedValues.begin();
-      for (int anInd = 0; anIt != anAcceptedValues.end(); ++anIt, ++anInd)
-        thePartsAttr->setValue(anInd, Locale::Convert::toString(*anIt));
+  // update the list of target parts
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aDoc = document();
+  bool isPartSet = aDoc == aSession->moduleDocument();
+  if (isPartSet) {
+    std::list<std::wstring> anAcceptedValues;
+    anAcceptedValues.push_back(THE_NEW_PART_STR);
+
+    // append names of all parts
+    std::list<FeaturePtr> aSubFeatures = aDoc->allFeatures();
+    for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
+         aFIt != aSubFeatures.end(); ++aFIt) {
+      if ((*aFIt)->getKind() == PartSetPlugin_Part::ID())
+        anAcceptedValues.push_back((*aFIt)->name());
     }
-    else {
-      // keep only the name of the current part
-      if (thePartsAttr->size() == 0) {
-        FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
 
-        thePartsAttr->setSize(1);
-        thePartsAttr->setValue(0, Locale::Convert::toString(aPartFeature->name()));
-        theTargetAttr->setValue(0);
-      }
+    if ((size_t)aPartsAttr->size() != anAcceptedValues.size())
+      aTargetAttr->setValue(0);
+
+    aPartsAttr->setSize((int)anAcceptedValues.size());
+    std::list<std::wstring>::iterator anIt = anAcceptedValues.begin();
+    for (int anInd = 0; anIt != anAcceptedValues.end(); ++anIt, ++anInd)
+      aPartsAttr->setValue(anInd, Locale::Convert::toString(*anIt));
+  }
+  else {
+    // keep only the name of the current part
+    if (aPartsAttr->size() == 0) {
+      FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
+
+      aPartsAttr->setSize(1);
+      aPartsAttr->setValue(0, Locale::Convert::toString(aPartFeature->name()));
+      aTargetAttr->setValue(0);
     }
+  }
 }

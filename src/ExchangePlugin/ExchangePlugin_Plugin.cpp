@@ -54,6 +54,9 @@ FeaturePtr ExchangePlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == ExchangePlugin_ImportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ImportFeature);
+  }  else
+  if (theFeatureID == ExchangePlugin_Import_ImageFeature::ID()) {
+      return FeaturePtr(new ExchangePlugin_Import_ImageFeature);
   } else
   if (theFeatureID == ExchangePlugin_ExportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ExportFeature);
@@ -69,6 +72,9 @@ FeaturePtr ExchangePlugin_Plugin::createFeature(std::string theFeatureID)
   } else
   if (theFeatureID == ExchangePlugin_Import::ID()) {
     return FeaturePtr(new ExchangePlugin_Import);
+  } else
+  if (theFeatureID == ExchangePlugin_Import_Image::ID()) {
+     return FeaturePtr(new ExchangePlugin_Import_Image);
   }
   // feature of such kind is not found
   return FeaturePtr();

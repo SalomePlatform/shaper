@@ -51,6 +51,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_STEPExport.h
     GeomAlgoAPI_STLExport.h
     GeomAlgoAPI_STLImport.h
+    GeomAlgoAPI_ImageImport.h
     GeomAlgoAPI_IGESExport.h
     GeomAlgoAPI_Transform.h
     GeomAlgoAPI_ShapeTools.h
@@ -119,6 +120,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_STEPExport.cpp
     GeomAlgoAPI_STLExport.cpp
     GeomAlgoAPI_STLImport.cpp
+    GeomAlgoAPI_ImageImport.cpp
     GeomAlgoAPI_IGESExport.cpp
     GeomAlgoAPI_Transform.cpp
     GeomAlgoAPI_ShapeTools.cpp
@@ -176,6 +178,10 @@ SET(CMAKE_SWIG_FLAGS -w325,321,362,383,302)
 
 SET_SOURCE_FILES_PROPERTIES(GeomAlgoAPI.i PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(GeomAlgoAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
+
+INCLUDE(UseQtExt)
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
 
 INCLUDE_DIRECTORIES(
   ../GeomAPI
