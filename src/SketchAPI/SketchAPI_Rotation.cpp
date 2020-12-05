@@ -67,6 +67,21 @@ void SketchAPI_Rotation::setRotationList(
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rotation::rotated() const
 {
+  std::list<ObjectPtr> aList = rotatedObjects()->list();
+  // remove all initial features
+  std::list<FeaturePtr> anIntermediate;
+  std::list<ObjectPtr>::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    AttributeBooleanPtr isCopy = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+    if (isCopy.get() && isCopy->value())
+      anIntermediate.push_back(aFeature);
+  }
+  return SketchAPI_SketchEntity::wrap(anIntermediate);
+}
+
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rotation::rotatedList() const
+{
   std::list<ObjectPtr> aList = rotationList()->list();
   std::set<ObjectPtr> anOriginalObjects;
   anOriginalObjects.insert(aList.begin(), aList.end());
@@ -137,7 +152,7 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
 
   // Dump variables for a list of rotated features
   theDumper << "[";
-  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = rotated();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = rotatedList();
   std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
   for (size_t anIndex = 0; anIndex < aFirstNotDumped; ++anIndex)
     for (int i = 1; i < aNbCopies->value() && anIt != aList.end(); ++i, ++anIt) {
@@ -145,7 +160,7 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
         theDumper << ", ";
       theDumper << (*anIt)->feature();
     }
-  theDumper << "] = " << theDumper.name(aBase) << ".rotated()" << std::endl;
+  theDumper << "] = " << theDumper.name(aBase) << ".rotatedList()" << std::endl;
 
   if (theDumper.isDumped(aRotObjects)) {
     aNbDumpedArguments.erase(aBase);

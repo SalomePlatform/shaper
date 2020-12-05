@@ -49,7 +49,7 @@ SketchConstraintMirror_1 = Sketch_1.addMirror(SketchLine_3.result(), SketchConst
 [SketchLine_5, SketchLine_6, SketchLine_7] = SketchConstraintMirror_1.mirrored()
 SketchMultiTranslation_1_objects = [SketchLine_1.result(), SketchLine_4.result(), SketchLine_3.result(), SketchLine_5.result(), SketchLine_6.result()]
 SketchMultiTranslation_1 = Sketch_1.addTranslation(SketchMultiTranslation_1_objects, SketchLine_2.endPoint(), SketchLine_4.startPoint(), 4)
-[SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchLine_19, SketchLine_20, SketchLine_21, SketchLine_22] = SketchMultiTranslation_1.translated()
+[SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_5, SketchLine_17, SketchLine_18, SketchLine_19, SketchLine_6, SketchLine_20, SketchLine_21, SketchLine_22] = SketchMultiTranslation_1.translated()
 model.do()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()

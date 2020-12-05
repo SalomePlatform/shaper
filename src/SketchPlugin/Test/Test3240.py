@@ -32,7 +32,7 @@ Sketch_1 = model.addSketch(partSet, model.defaultPlane("XOY"))
 SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "OX"), True)
 SketchLine_1 = SketchProjection_1.createdFeature()
 SketchMultiRotation_1 = Sketch_1.addRotation([SketchLine_1.result()], SketchAPI_Line(SketchLine_1).startPoint(), 360, NB_COPIES, True)
-[SketchLine_2, SketchLine_3, SketchLine_4, SketchLine_5, SketchLine_6, SketchLine_7, SketchLine_8] = SketchMultiRotation_1.rotated()
+[SketchLine_1, SketchLine_2, SketchLine_3, SketchLine_4, SketchLine_5, SketchLine_6, SketchLine_7, SketchLine_8] = SketchMultiRotation_1.rotated()
 model.do()
 model.end()
 

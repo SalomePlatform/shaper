@@ -78,9 +78,14 @@ public:
   SKETCHAPI_EXPORT
   void setTranslationList(const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
-  /// List of translated objects
+  /// List of translated objects.
+  /// [DEPRECATED]: use translatedList() instead.
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > translated() const;
+
+  /// List of translated objects.
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > translatedList() const;
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

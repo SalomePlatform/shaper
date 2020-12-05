@@ -70,7 +70,7 @@ Sketch_1.setCoincident(SketchCircle_1.center(), SketchLine_5.result())
 ### Create SketchMultiTranslation
 SketchMultiTranslation_1_objects = [SketchLine_1.result(), SketchLine_3.result(), SketchLine_5.result()]
 SketchMultiTranslation_1 = Sketch_1.addTranslation(SketchMultiTranslation_1_objects, SketchAPI_Line(SketchLine_4).startPoint(), SketchLine_5.endPoint(), 2)
-[SketchLine_7, SketchLine_8, SketchLine_9] = SketchMultiTranslation_1.translated()
+[SketchLine_7, SketchLine_8, SketchLine_9] = SketchMultiTranslation_1.translatedList()
 model.do()
 
 ### Create Extrusion

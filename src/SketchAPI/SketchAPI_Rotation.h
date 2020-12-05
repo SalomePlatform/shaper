@@ -82,9 +82,14 @@ public:
   SKETCHAPI_EXPORT
   void setRotationList(const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
-  /// List of rotated objects
+  /// List of rotated objects.
+  /// [DEPRECATED]: use rotatedList() instead.
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > rotated() const;
+
+  /// List of rotated objects.
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > rotatedList() const;
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

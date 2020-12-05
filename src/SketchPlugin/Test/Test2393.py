@@ -40,7 +40,7 @@ SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchProjection_2 = Sketch_1.addProjection(model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Top]"), True)
 SketchLine_1 = SketchProjection_2.createdFeature()
 SketchMultiRotation_1 = Sketch_1.addRotation([SketchLine_1.result()], SketchAPI_Point(SketchPoint_1).coordinates(), 90, 3)
-[SketchLine_2, SketchLine_3] = SketchMultiRotation_1.rotated()
+[SketchLine_1, SketchLine_2, SketchLine_3] = SketchMultiRotation_1.rotated()
 model.do()
 
 model.checkSketch(Sketch_1, 0)

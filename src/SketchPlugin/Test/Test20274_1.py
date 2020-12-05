@@ -70,7 +70,7 @@ Sketch_1.setCoincident(SketchCircle_1.center(), SketchLine_5.result())
 ### Create SketchMultiRotation
 SketchMultiRotation_1_objects = [SketchLine_1.result(), SketchLine_3.result(), SketchLine_5.result()]
 SketchMultiRotation_1 = Sketch_1.addRotation(SketchMultiRotation_1_objects, SketchCircle_1.center(), 360, 4, True)
-[SketchLine_6, SketchLine_7, SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14] = SketchMultiRotation_1.rotated()
+[SketchLine_6, SketchLine_7, SketchLine_8, SketchLine_9, SketchLine_10, SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_14] = SketchMultiRotation_1.rotatedList()
 model.do()
 
 ### Create Extrusion
