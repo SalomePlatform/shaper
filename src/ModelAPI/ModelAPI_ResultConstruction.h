@@ -33,10 +33,10 @@
  * Provides a shape that may be displayed in the viewer.
  * Intermediate, light result that in many cases produces a result on the fly.
  */
-class ModelAPI_ResultConstruction : public ModelAPI_Result
+MODELAPI_EXPORT class ModelAPI_ResultConstruction : public ModelAPI_Result
 {
  public:
-  ModelAPI_ResultConstruction();
+  MODELAPI_EXPORT ModelAPI_ResultConstruction();
 
   /// Returns the group identifier of this result
   MODELAPI_EXPORT virtual std::string groupName();

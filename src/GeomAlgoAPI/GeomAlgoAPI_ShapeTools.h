@@ -26,6 +26,9 @@
 #include <GeomAPI_Vertex.h>
 #include <map>
 #include <set>
+#ifdef WIN32
+ #include<array>
+#endif WIN32
 
 class GeomAPI_Ax1;
 class GeomAPI_Edge;

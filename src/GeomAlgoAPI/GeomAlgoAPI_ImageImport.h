@@ -23,7 +23,7 @@
 #include <GeomAPI_Shape.h>
 
 #include <string>
-
+#include <QPixmap>
 /// Implementation of the import STL files algorithms
 GEOMALGOAPI_EXPORT
 std::shared_ptr<GeomAPI_Shape>  ImageImport(const std::string& theFileName,
