@@ -32,6 +32,7 @@
 #include <ExchangePlugin_ExportFeature.h>
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
+class ModelHighAPI_Double;
 //--------------------------------------------------------------------------------------
 
 
@@ -57,10 +58,10 @@ public:
     explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                 const std::string & theFilePath,
                                 const ModelHighAPI_Selection& theSelectedShape,
-                                double  aDeflectionRelative ,
-                                double  aDeflectionAbsolute,
-                                const bool anIsRelative,
-                                const bool anIsASCII);
+                                const ModelHighAPI_Double&  theDeflectionRelative ,
+                                const ModelHighAPI_Double&  theDeflectionAbsolute,
+                                const bool theIsRelative,
+                                const bool theIsASCII);
 
   /// Constructor with values for XAO of selected result export.
   EXCHANGEAPI_EXPORT
@@ -146,12 +147,12 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
  */
 EXCHANGEAPI_EXPORT
 ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
-      const std::string & theFilePath,
-      const ModelHighAPI_Selection& theSelectedShape,
-      double  aDeflectionRelative,
-      double  aDeflectionAbsolute,
-      const bool anIsRelative,
-      const bool anIsASCII);
+                      const std::string & theFilePath,
+                      const ModelHighAPI_Selection& theSelectedShape,
+                      const ModelHighAPI_Double&  theDeflectionRelative,
+                      const ModelHighAPI_Double&  theDeflectionAbsolute,
+                      const bool theIsRelative,
+                      const bool theIsASCII);
 
 /**\ingroup CPPHighAPI
 * \brief Exports to XAO file the selected result with groups parts related to it only.

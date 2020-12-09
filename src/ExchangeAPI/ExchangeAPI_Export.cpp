@@ -57,30 +57,30 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
 ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                        const std::string & theFilePath,
                                        const ModelHighAPI_Selection& theSelectedShape,
-                                       double aDeflectionRelative,
-                                       double aDeflectionAbsolute,
-                                       const bool anIsRelative,
-                                       const bool anIsASCII)
+                                       const ModelHighAPI_Double& theDeflectionRelative,
+                                       const ModelHighAPI_Double& theDeflectionAbsolute,
+                                       const bool theIsRelative,
+                                       const bool theIsASCII)
   : ModelHighAPI_Interface(theFeature)
 {
   initialize();
   fillAttribute("STL", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
   fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID()));
 
-  if (anIsRelative) {
+  if (theIsRelative) {
     fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
-    fillAttribute(aDeflectionRelative,
+    fillAttribute(theDeflectionRelative,
       theFeature->real(ExchangePlugin_ExportFeature::STL_RELATIVE()) );
   }
   else {
     fillAttribute(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_ABSOLUTE(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE()) );
-    fillAttribute(aDeflectionAbsolute,
+    fillAttribute(theDeflectionAbsolute,
       theFeature->real(ExchangePlugin_ExportFeature::STL_ABSOLUTE()) );
   }
 
-  if(anIsASCII){
+  if(theIsASCII){
     fillAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE_ASCII(),
       theFeature->string(ExchangePlugin_ExportFeature::STL_FILE_TYPE()));
   }
@@ -257,8 +257,8 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
 ExportPtr exportToSTL(const std::shared_ptr<ModelAPI_Document> & thePart,
       const std::string & theFilePath,
       const ModelHighAPI_Selection& theSelectedShape,
-      double  theDeflectionRelative,
-      double  theDeflectionAbsolute,
+      const ModelHighAPI_Double&  theDeflectionRelative,
+      const ModelHighAPI_Double&  theDeflectionAbsolute,
       const bool theIsRelative,
       const bool theIsASCII)
 {
