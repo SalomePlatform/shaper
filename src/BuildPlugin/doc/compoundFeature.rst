@@ -12,7 +12,7 @@ To create a compound in the active part:
 
 The following property panel will be opened:
 
-.. figure:: images/Compound.png
+.. figure:: images/CompoundPanel.png
   :align: center
 
   Create a compound
