@@ -32,6 +32,7 @@
 #include <GeomAlgoAPI_XAOImport.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <Locale_Convert.h>
@@ -42,6 +43,8 @@
 #include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeTables.h>
+#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -60,6 +63,10 @@
 
 #include <ExchangePlugin_Tools.h>
 
+#include <TopExp_Explorer.hxx>
+#include <OSD_Exception.hxx>
+
+
 ExchangePlugin_ImportFeature::ExchangePlugin_ImportFeature()
 {
 }
@@ -77,12 +84,28 @@ void ExchangePlugin_ImportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(),
                        ModelAPI_AttributeString::typeId());
   AttributePtr aFeaturesAttribute =
-    data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(),
+  data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(),
                          ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(STEP_COLORS_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(STEP_SCALE_INTER_UNITS_ID(), ModelAPI_AttributeBoolean::typeId());
+
   aFeaturesAttribute->setIsArgument(false);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::FEATURES_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::STEP_COLORS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::STEP_MATERIALS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::STEP_SCALE_INTER_UNITS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::FILE_PATH_ID());
 }
 
 /*
@@ -90,7 +113,15 @@ void ExchangePlugin_ImportFeature::initAttributes()
  */
 void ExchangePlugin_ImportFeature::execute()
 {
-  AttributeStringPtr aFilePathAttr = string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
+  AttributeStringPtr aImportTypeAttr = string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
+  std::string aFormat = aImportTypeAttr->value();
+  AttributeStringPtr aFilePathAttr;
+  if (aFormat == "STEP" || aFormat == "STP")
+  {
+    aFilePathAttr = string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID());
+  } else {
+    aFilePathAttr = string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
+  }
   std::string aFilePath = aFilePathAttr->value();
   if (aFilePath.empty()) {
     setError("File path is empty.");
@@ -101,11 +132,11 @@ void ExchangePlugin_ImportFeature::execute()
 }
 
 std::shared_ptr<ModelAPI_ResultBody> ExchangePlugin_ImportFeature::createResultBody(
-    std::shared_ptr<GeomAPI_Shape> aGeomShape)
+                        std::shared_ptr<GeomAPI_Shape> theGeomShape)
 {
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   //LoadNamingDS of the imported shape
-  loadNamingDS(aGeomShape, aResultBody);
+  loadNamingDS(theGeomShape, aResultBody);
   return aResultBody;
 }
 
@@ -122,10 +153,49 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   // Perform the import
   std::string anError;
   std::shared_ptr<GeomAPI_Shape> aGeomShape;
+
+  std::map< std::wstring, std::list<std::wstring>> theMaterialShape;
+
+  std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
+  data()->setName(Locale::Convert::toWString(anObjectName));
+
+  ResultBodyPtr aResult = document()->createBody(data());
+
+  bool anColorGroupSelected = boolean(ExchangePlugin_ImportFeature::STEP_COLORS_ID())->value();
+  bool anMaterialsGroupSelected =
+                        boolean(ExchangePlugin_ImportFeature::STEP_MATERIALS_ID())->value();
+
   if (anExtension == "BREP" || anExtension == "BRP") {
     aGeomShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
-    aGeomShape = STEPImport(theFileName, anExtension, anError);
+    bool anScalInterUnits =
+            boolean(ExchangePlugin_ImportFeature::STEP_SCALE_INTER_UNITS_ID())->value();
+
+    try{
+
+      aResult->clearShapeNameAndColor();
+      // Process groups/fields
+      std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
+
+      // Remove previous groups/fields stored in RefList
+      std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
+      std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
+      for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
+        std::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_Feature::feature(*anGroupIt);
+        if (aFeature)
+        document()->removeFeature(aFeature);
+      }
+
+      aGeomShape = STEPImportAttributs(theFileName, aResult, anScalInterUnits,
+                                       anMaterialsGroupSelected, anColorGroupSelected,
+                                       theMaterialShape,anError);
+
+    }
+    catch (OSD_Exception& e) {
+      //Try to load STEP file without colors...
+      aGeomShape = STEPImport(theFileName, anExtension,anScalInterUnits,anError);
+    }
   } else if (anExtension == "IGES" || anExtension == "IGS") {
     aGeomShape = IGESImport(theFileName, anExtension, anError);
   } else {
@@ -139,10 +209,140 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   }
 
   // Pass the results into the model
-  std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
-  data()->setName(Locale::Convert::toWString(anObjectName));
 
-  setResult(createResultBody(aGeomShape));
+  loadNamingDS(aGeomShape, aResult);
+
+  // create color group
+  if (anColorGroupSelected)
+  {
+    setColorGroups(aResult);
+  }
+
+  // create Materiel group
+  if (anMaterialsGroupSelected){
+    setMaterielGroup(aResult,theMaterialShape);
+  }
+
+  setResult(aResult);
+
+}
+
+void ExchangePlugin_ImportFeature::setColorGroups(
+                                    std::shared_ptr<ModelAPI_ResultBody> theResultBody)
+{
+  std::vector<int> aColor;
+  int anIndice = 1;
+  std::list< std::vector<int> > aColorsRead;
+
+  ModelAPI_Tools::getColor(theResultBody, aColor);
+  if (!aColor.empty() ){
+    std::wstringstream aColorName;
+    aColorName <<L"Color_"<< anIndice;
+    setColorGroup( theResultBody, aColor, aColorName.str());
+    anIndice++;
+    aColorsRead.push_back(aColor);
+  }
+
+  std::list<ResultPtr> allRes;
+  ModelAPI_Tools::allSubs(theResultBody, allRes);
+  for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); ++aRes) {
+    ModelAPI_Tools::getColor(*aRes, aColor);
+    if (!aColor.empty() ){
+      auto it = std::find(aColorsRead.begin(), aColorsRead.end(), aColor);
+      if ( it == aColorsRead.end() ){
+        std::wstringstream aColorName;
+        aColorName<<L"Color_"<< anIndice;
+        setColorGroup(theResultBody, aColor, aColorName.str());
+        anIndice++;
+        aColorsRead.push_back(aColor);
+      }
+    }
+  }
+}
+
+void ExchangePlugin_ImportFeature::setColorGroup(
+                                        std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                        std::vector<int> &theColor,
+                                        const std::wstring& theName )
+{
+  std::vector<int> aColor;
+  std::shared_ptr<ModelAPI_Feature> aGroupFeature = addFeature("Group");
+
+   // group name
+  aGroupFeature->data()->setName(theName);
+
+  // fill selection
+  AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
+
+  ModelAPI_Tools::getColor(theResultBody, aColor);
+  if (!aColor.empty() ){
+    if (aColor == theColor ) {
+      GeomShapePtr aShape = theResultBody->shape();
+      aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+      aSelectionList->append(theResultBody,aShape);
+    }
+  }
+  // add element with the same color
+  std::list<ResultPtr> allRes;
+  ModelAPI_Tools::allSubs(theResultBody, allRes);
+  for(std::list<ResultPtr>::iterator aRes = allRes.begin();
+      aRes != allRes.end(); ++aRes) {
+    ModelAPI_Tools::getColor(*aRes, aColor);
+    GeomShapePtr aShape = (*aRes)->shape();
+
+    if (!aColor.empty() ){
+      if (aRes->get() &&  aColor == theColor ) {
+        aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+        aSelectionList->append(theResultBody,aShape);
+      }
+    }
+  }
+
+  // Create the group in the document to be able to set its color
+  ResultPtr aGroup = document()->createGroup(aGroupFeature->data());
+  aGroupFeature->setResult(aGroup);
+
+  ModelAPI_Tools::setColor(aGroupFeature->lastResult(),theColor);
+
+  if (aSelectionList->size() == 0 ){
+    document()->removeFeature(aGroupFeature);
+  }
+}
+
+void ExchangePlugin_ImportFeature::setMaterielGroup(
+                                std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                std::map< std::wstring,std::list<std::wstring>>& theMaterialShape)
+{
+  std::map< std::wstring, std::list<std::wstring>>::iterator anIt;
+  for( anIt = theMaterialShape.begin(); anIt != theMaterialShape.end(); ++anIt) {
+
+    std::shared_ptr<ModelAPI_Feature> aGroupFeature = addFeature("Group");
+    // group name
+    aGroupFeature->data()->setName((*anIt).first);
+
+    // fill selection
+    AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
+    GeomShapePtr aShape = theResultBody->shape();
+
+    std::list<ResultPtr> allRes;
+    ModelAPI_Tools::allSubs(theResultBody, allRes);
+    for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); ++aRes) {
+
+      GeomShapePtr aShape = (*aRes)->shape();
+      for(std::list<std::wstring>::iterator aResMat = anIt->second.begin();
+                                 aResMat != anIt->second.end(); ++aResMat) {
+        if (aRes->get() && ((*aRes)->data()->name() == (*aResMat)))
+        {
+          aSelectionList->append(theResultBody,aShape);
+          aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+          break;
+        }
+      }
+    }
+    if (aSelectionList->size() == 0){
+      document()->removeFeature(aGroupFeature);
+    }
+  }
 }
 
 void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
@@ -415,7 +615,6 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
 {
   //load result
   theResultBody->store(theGeomShape);
-
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS);
 }

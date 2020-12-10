@@ -24,6 +24,8 @@
 
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeStringArray.h>
 
 #include <map>
 
@@ -43,6 +45,12 @@ class ExchangePlugin_Import : public ModelAPI_Feature
     static const std::string MY_IMPORT_ID("ImportMacro");
     return MY_IMPORT_ID;
   }
+  /// Feature kind
+  inline static const std::string& IMPORT_TYPE_ID()
+  {
+    static const std::string MY_IMPORT_TYPE_ID("ImportType");
+    return MY_IMPORT_TYPE_ID;
+  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
@@ -61,6 +69,42 @@ class ExchangePlugin_Import : public ModelAPI_Feature
     static const std::string MY_TARGET_PARTS_LIST_ID("target_parts_list");
     return MY_TARGET_PARTS_LIST_ID;
   }
+  /// attribute name of step file path
+  inline static const std::string& STEP_FILE_PATH_ID()
+  {
+    static const std::string MY_STEP_FILE_PATH_ID("step_file_path");
+    return MY_STEP_FILE_PATH_ID;
+  }
+  /// attribute name of step target part
+  inline static const std::string& STEP_TARGET_PART_ID()
+  {
+    static const std::string MY_STEP_TARGET_PART_ID("step_target_part");
+    return MY_STEP_TARGET_PART_ID;
+  }
+  /// attribute name of list ofstep target parts
+  inline static const std::string& STEP_TARGET_PARTS_LIST_ID()
+  {
+    static const std::string MY_STEP_TARGET_PARTS_LIST_ID("step_target_parts_list");
+    return MY_STEP_TARGET_PARTS_LIST_ID;
+  }
+  /// attribute name of step Scale to International System Units
+  inline static const std::string& STEP_SCALE_INTER_UNITS_ID()
+  {
+    static const std::string MY_STEP_SCALE_INTER_UNITS_ID("step_scale_inter_units");
+    return MY_STEP_SCALE_INTER_UNITS_ID;
+  }
+  /// attribute name of step materiels
+  inline static const std::string& STEP_MATERIALS_ID()
+  {
+    static const std::string MY_STEP_MATERIALS_ID("step_materials");
+    return MY_STEP_MATERIALS_ID;
+  }
+  /// attribute name of step colors
+  inline static const std::string& STEP_COLORS_ID()
+  {
+    static const std::string MY_STEP_COLORS_ID("step_colors");
+    return MY_STEP_COLORS_ID;
+  }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_Import();
   /// Default destructor
@@ -78,6 +122,10 @@ class ExchangePlugin_Import : public ModelAPI_Feature
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   EXCHANGEPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// Called to update part
+  EXCHANGEPLUGIN_EXPORT
+  void updatePart(AttributeStringArrayPtr& thePartsAttr, AttributeIntegerPtr& theTargetAttr);
 
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();

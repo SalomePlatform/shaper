@@ -28,6 +28,7 @@
 #include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <GeomAlgoAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <algorithm>
 
@@ -47,17 +48,49 @@ ExchangeAPI_Import::ExchangeAPI_Import(
     setFilePath(theFilePath);
 }
 
+ExchangeAPI_Import::ExchangeAPI_Import(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    const std::string & theFilePath,
+    const bool theScalInterUnits,
+    const bool theMaterials,
+    const bool theColor)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+    setParameters(theFilePath, theScalInterUnits, theMaterials, theColor);
+}
+
 ExchangeAPI_Import::~ExchangeAPI_Import()
 {
 
 }
 
 //--------------------------------------------------------------------------------------
+void ExchangeAPI_Import::setParameters(const std::string & theFilePath,
+                                       const bool theScalInterUnits,
+                                       const bool theMaterials,
+                                       const bool theColor)
+{
+  fillAttribute(theFilePath, mystepFilePath);
+  fillAttribute("STEP", myimportType);
+  fillAttribute(theScalInterUnits, myscalInterUnits);
+  fillAttribute(theMaterials,mymaterials);
+  fillAttribute(theColor,mycolors);
+  execute();
+}
+
+//--------------------------------------------------------------------------------------
 void ExchangeAPI_Import::setFilePath(const std::string & theFilePath)
 {
-  fillAttribute(theFilePath, myfilePath);
 
-  execute();
+  std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFilePath);
+  if (anExtension == "STEP" || anExtension == "STP") {
+    setParameters(theFilePath,true,false,false);
+  } else {
+    fillAttribute(theFilePath, myfilePath);
+    fillAttribute(anExtension, myimportType);
+    execute();
+  }
 }
 
 //--------------------------------------------------------------------------------------
@@ -66,7 +99,17 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   std::string aPartName = theDumper.name(aBase->document());
 
-  std::string aFilePath = aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID())->value();
+  AttributeStringPtr aImportTypeAttr =
+                    aBase->string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
+  std::string aFormat = aImportTypeAttr->value();
+  std::string aFilePath;
+  if (aFormat == "STEP" || aFormat == "STP")
+  {
+    aFilePath = aBase->string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID())->value();
+  } else {
+    aFilePath = aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID())->value();
+  }
+
   std::string aFrom = "\\";
   std::string aTo = "\\\\";
   for(std::size_t aPos = aFilePath.find(aFrom);
@@ -75,15 +118,25 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
     aFilePath.replace(aPos, aFrom.size(), aTo);
     aPos += aTo.size();
   }
+  std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(aFilePath);
+  if (anExtension == "STP" || anExtension == "STEP"){
+      theDumper << aBase << " = model.addImportSTEP(" << aPartName << ", \""
+                << aFilePath << "\"" ;
 
-  theDumper << aBase << " = model.addImport(" << aPartName << ", \""
+      theDumper << ", " << scalInterUnits()->value()
+                << ", " << materials()->value()
+                << ", " << colors()->value() << ")"<< std::endl;
+  } else {
+      theDumper << aBase << " = model.addImport(" << aPartName << ", \""
             << aFilePath << "\")" << std::endl;
+  }
+
   // to make import have results
   theDumper << "model.do()" << std::endl;
 
   CompositeFeaturePtr aCompositeFeature =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
-  if(aCompositeFeature.get()) {
+  if (aCompositeFeature.get()) {
     int aNbOfSubs = aCompositeFeature->numberOfSubs();
     for(int anIndex = 0; anIndex < aNbOfSubs; ++anIndex) {
       std::string aSubFeatureGet =
@@ -100,6 +153,18 @@ ImportPtr addImport(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
   return ImportPtr(new ExchangeAPI_Import(aFeature, theFilePath));
+}
+
+ImportPtr addImportSTEP(
+    const std::shared_ptr<ModelAPI_Document> & thePart,
+    const std::string & theFilePath,
+    const bool theScalInterUnits,
+    const bool theMaterials,
+    const bool theColor )
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
+  return ImportPtr(new ExchangeAPI_Import(aFeature, theFilePath,
+                                          theScalInterUnits, theMaterials, theColor));
 }
 
 void importPart(const std::shared_ptr<ModelAPI_Document> & thePart,

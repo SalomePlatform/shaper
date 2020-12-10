@@ -54,10 +54,23 @@ def testImport(theType, theFile, theVolume, theDelta, theErrorExpected = False):
     aFeatureKind = "Import"
     anImportFeature = aPart.addFeature(aFeatureKind)
     assert anImportFeature, "{0}: Can not create a feature {1}".format(theType, aFeatureKind)
+    if theType == "STP" or theType == "STEP":
+        aFieldName = "step_file_path"  
+        file = anImportFeature.string(aFieldName)
+        assert file, "{0}: Can not receive string field {1}".format(theType, aFieldName)
+        file.setValue(theFile)
+        aFieldName = "step_scale_inter_units"
+        units = anImportFeature.boolean(aFieldName)
+        assert units, "{0}: Can not receive string field {1}".format(theType, aFieldName)
+        units.setValue(True)
     aFieldName = "file_path"
     file = anImportFeature.string(aFieldName)
     assert file, "{0}: Can not receive string field {1}".format(theType, aFieldName)
     file.setValue(theFile)
+    aFieldName = "ImportType"
+    type = anImportFeature.string(aFieldName)
+    assert type, "{0}: Can not receive string field {1}".format(theType, aFieldName)
+    type.setValue(theType)
     aSession.finishOperation()
 
     if theErrorExpected:
@@ -86,6 +99,9 @@ def testImportXAO():
     aSession.startOperation("Import XAO")
     anImportFeature = aPart.addFeature("Import")
     anImportFeature.string("file_path").setValue(getShapePath("Xao/box1.xao"))
+    aFieldName = "ImportType"
+    type = anImportFeature.string(aFieldName)
+    type.setValue("XAO")
     aSession.finishOperation()
 
     # Check results
@@ -140,21 +156,28 @@ if __name__ == '__main__':
         # Create a shape imported from STEP
         #=========================================================================
         shape_path = getShapePath("Step/screw.step")
-        testImport("STP", shape_path, 3.78827401738e-06, 10 ** -17)
+        testImport("STEP", shape_path, 3.78827401738e-06, 10 ** -17)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "screw.stp"))
         testImport("STEP", shape_path, 3.78827401738e-06, 10 ** -17)
         #=========================================================================
         # Create a shape imported from IGES
         #=========================================================================
         shape_path = getShapePath("Iges/bearing.igs")
-        testImport("IGES", shape_path, 1.3407098545036494e-08, 10 ** -25)
-        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "bearing.iges"))
         testImport("IGS", shape_path, 1.3407098545036494e-08, 10 ** -25)
+        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "bearing.iges"))
+        testImport("IGES", shape_path, 1.3407098545036494e-08, 10 ** -25)
 
         #=========================================================================
         # Create a shape imported from XAO
         #=========================================================================
         testImportXAO()
+
+        #=========================================================================
+        # End of test
+        #=========================================================================
+
+        from salome.shaper import model
+        assert(model.checkPythonDump())
 
         #=========================================================================
         # Check import errors
@@ -164,10 +187,3 @@ if __name__ == '__main__':
         testImport("BREP", shape_path, 0, 10 ** -25, True)
         shape_path = getShapePath("Xao/wrong_file.xao")
         testImport("XAO", shape_path, 0, 10 ** -25, True)
-
-        #=========================================================================
-        # End of test
-        #=========================================================================
-
-        from salome.shaper import model
-        assert(model.checkPythonDump())
