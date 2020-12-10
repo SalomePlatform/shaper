@@ -396,7 +396,9 @@ bool buildSketchWires(FeaturePtr theSketchFeature, GeomShapePtr theSketchShape, 
       else {
         // both vertices are found
         aFoundStart->second->push_back(anEdge);
-        if (aFoundStart->second != aFoundEnd->second) {
+        if (aFoundStart->second == aFoundEnd->second)
+          aMapVW.erase(aFoundStart);
+        else {
           // different wires => merge segments
           aFoundStart->second->insert(aFoundStart->second->end(),
               aFoundEnd->second->begin(), aFoundEnd->second->end());
@@ -407,9 +409,8 @@ bool buildSketchWires(FeaturePtr theSketchFeature, GeomShapePtr theSketchShape, 
               break;
             }
           aNewWires.erase(aFoundEnd->second);
+          aMapVW.erase(aFoundEnd);
         }
-        aMapVW.erase(aFoundStart);
-        aMapVW.erase(aFoundEnd);
         continue;
       }
     }
