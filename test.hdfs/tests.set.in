@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020  CEA/DEN, EDF R&D
+# Copyright (C) 2020  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,20 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(tests.set)
+SET(PUBLIC_TESTS @PUBLIC_TESTS@)
 
-SET(COMPONENT_NAME     SHAPER)
-SET(SALOME_TEST_DRIVER "testme.py")
-SET(TIMEOUT            600)
-
-FOREACH(tfile ${PUBLIC_TESTS})
-  SET(TEST_NAME ${COMPONENT_NAME}_HDF_${tfile})
-  ADD_TEST(${TEST_NAME} ${SALOME_TEST_DRIVER} "${TIMEOUT}" "${tfile}.hdf" "${tfile}.py")
-  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES LABELS "${COMPONENT_NAME}")
-ENDFOREACH()
-
-FOREACH(tfile ${RESTRICTED_TESTS})
-  SET(TEST_NAME ${COMPONENT_NAME}_HDF_${tfile})
-  ADD_TEST(${TEST_NAME} ${SALOME_TEST_DRIVER} "${TIMEOUT}" "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/${tfile}.hdf" "${tfile}.py")
-  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES LABELS "${COMPONENT_NAME}")
-ENDFOREACH()
+IF(EXISTS $ENV{RESTRICTED_ROOT_DIR})
+  SET(RESTRICTED_TESTS @RESTRICTED_TESTS@)
+ELSE()
+  SET(RESTRICTED_TESTS "")
+ENDIF()

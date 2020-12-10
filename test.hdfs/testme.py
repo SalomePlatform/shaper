@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (C) 2020  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -17,20 +19,25 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-#!/usr/bin/env python
-
 if __name__ == '__main__':
 
   import subprocess
   from time import sleep
   import sys, os
+  import tempfile
 
-  salomeKernelDir = sys.argv[1]
-  sourceDir = sys.argv[2]
-  testfile = sys.argv[3]
+  testTimeout = 600
+  if len(sys.argv) > 3:
+    testTimeout = int(sys.argv[1])
+    hdffile = sys.argv[2]
+    testdatafile = sys.argv[3]
+  else:
+    hdffile = sys.argv[1]
+    testdatafile = sys.argv[2]
 
-  portlogfile = os.getcwd() + "/.salome_port"
-  testlogfile = os.getcwd() + "/test.log"
+  tempdir = tempfile.gettempdir()
+  portlogfile = tempdir + "/.salome_port"
+  testlogfile = tempdir + "/test.log"
   # remove port file if any
   try:
     os.remove(portlogfile)
@@ -40,9 +47,9 @@ if __name__ == '__main__':
   isOk = True
   error = ""
 
-  proc = subprocess.Popen([salomeKernelDir + "/bin/salome/runSalome.py", "--modules", "SHAPER,GEOM", "--gui", "--splash", "0", "--ns-port-log=" + portlogfile, sourceDir + "/test_hdf.py", "args:" + testfile + "," + portlogfile + "," + testlogfile + "," + salomeKernelDir + "," + sourceDir], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  proc = subprocess.Popen(["runSalome.py", "--modules", "SHAPER,GEOM", "--gui", "--splash", "0", "--ns-port-log=" + portlogfile, "test_hdf.py", "args:" + hdffile + "," + testdatafile + "," + portlogfile + "," + testlogfile], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   try:
-    proc.communicate(timeout = 600)
+    proc.communicate(timeout = testTimeout)
   except TimeoutExpired:
     isOk = False
     proc.kill()

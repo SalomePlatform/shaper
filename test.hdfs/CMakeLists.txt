@@ -19,7 +19,27 @@
 
 ENABLE_TESTING()
 
-INCLUDE(tests.set)
+# get all restricted HDF tests
+SET(hdfFilesRestr "")
+IF (EXISTS $ENV{RESTRICTED_ROOT_DIR})
+  FILE(GLOB hdfFilesRestr "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/*.hdf")
+ENDIF()
+
+# get all HDF tests from the current drectory
+file(GLOB hdfFilesCur "${CMAKE_CURRENT_SOURCE_DIR}/*.hdf")
+
+# collect test names
+set(TEST_NAMES "")
+foreach(eachFilePath IN LISTS hdfFilesCur hdfFilesRestr)
+  # Strip the ".hdf" suffix
+  get_filename_component(aTestName ${eachFilePath} NAME_WE)
+  # Check corresponding ".py" file with reference data exists
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${aTestName}.py")
+    set(TEST_NAMES ${TEST_NAMES} ${aTestName})
+  else()
+    message(WARNING "File ${aTestName}.py containing reference data for ${aTestName}.hdf does not exist")
+  endif()
+endforeach()
 
 SET(COMPONENT_NAME SHAPER)
 SET(TIMEOUT 600)
@@ -28,11 +48,21 @@ SET(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/HDFs")
 
 SALOME_GENERATE_TESTS_ENVIRONMENT(tests_env)
 
+SET(PUBLIC_TESTS "")
+SET(RESTRICTED_TESTS "")
 FOREACH(tfile ${TEST_NAMES})
   SET(TEST_NAME ${COMPONENT_NAME}_HDF_${tfile})
-  GET_HDF(HDF_TEST_FILE ${tfile})
+
+  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf")
+    SET(HDF_TEST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf")
+    SET(PUBLIC_TESTS ${PUBLIC_TESTS} ${tfile})
+  ELSEIF(EXISTS "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/${tfile}.hdf")
+    SET(HDF_TEST_FILE "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/${tfile}.hdf")
+    SET(RESTRICTED_TESTS ${RESTRICTED_TESTS} ${tfile})
+  ENDIF()
+
   ADD_TEST(NAME ${TEST_NAME}
-           COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/testme.py" "$ENV{KERNEL_ROOT_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" "${HDF_TEST_FILE}")
+           COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/testme.py" "${HDF_TEST_FILE}" "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py")
   SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES ENVIRONMENT "${tests_env};SHAPER_UNIT_TEST_IN_PROGRESS=1")
   SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES LABELS "${COMPONENT_NAME};models_hdf")
   SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES TIMEOUT ${TIMEOUT})
@@ -54,5 +84,10 @@ INSTALL(FILES CTestTestfileInstall.cmake
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)
 
-INSTALL(FILES testme.py DESTINATION ${TEST_INSTALL_DIRECTORY})
-INSTALL(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+INSTALL(FILES testme.py DESTINATION ${TEST_INSTALL_DIRECTORY}
+                        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                                    GROUP_READ GROUP_EXECUTE
+                                    WORLD_READ WORLD_EXECUTE)
+FILE(COPY test_hdf.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+CONFIGURE_FILE(tests.set.in ${CMAKE_CURRENT_BINARY_DIR}/tests.set @ONLY)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
