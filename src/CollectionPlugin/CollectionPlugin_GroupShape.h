@@ -17,31 +17,31 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef COLLECTIONPLUGIN_GROUPADDITION_H_
-#define COLLECTIONPLUGIN_GROUPADDITION_H_
+#ifndef COLLECTIONPLUGIN_GROUPSHAPE_H_
+#define COLLECTIONPLUGIN_GROUPSHAPE_H_
 
 #include "CollectionPlugin.h"
 #include "CollectionPlugin_GroupOperation.h"
 #include "CollectionPlugin_GroupMerge.h"
 
-/**\class CollectionPlugin_GroupAddition
+/**\class CollectionPlugin_GroupShape
  * \ingroup Plugins
- * \brief Merge several groups of same shape type into single group.
+ * \brief Merge several groups of different shape type into a single shape.
  */
-class CollectionPlugin_GroupAddition : public CollectionPlugin_GroupMerge
+class CollectionPlugin_GroupShape: public CollectionPlugin_GroupMerge
 {
 public:
   /// Extrusion kind
   inline static const std::string& ID()
   {
-    static const std::string MY_GROUP_ID("GroupAddition");
+    static const std::string MY_GROUP_ID("GroupShape");
     return MY_GROUP_ID;
   }  
 
   /// Returns the kind of a feature
   COLLECTIONPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = CollectionPlugin_GroupAddition::ID();
+    static std::string MY_KIND = CollectionPlugin_GroupShape::ID();
     return MY_KIND;
   }
 
@@ -49,7 +49,7 @@ public:
   COLLECTIONPLUGIN_EXPORT void execute();
 
   /// Use plugin manager for features creation
-  CollectionPlugin_GroupAddition() = default;
+  CollectionPlugin_GroupShape() = default;
 
 };
 

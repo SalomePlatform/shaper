@@ -16,3 +16,4 @@ Collection plug-in deals with groups of geometrical entities created by selectio
    groupAdditionFeature.rst
    groupIntersectionFeature.rst
    groupSubstractionFeature.rst
+   groupShapeFeature.rst

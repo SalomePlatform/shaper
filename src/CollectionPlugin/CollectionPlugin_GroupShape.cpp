@@ -17,12 +17,17 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "CollectionPlugin_GroupAddition.h"
+#include "CollectionPlugin_GroupShape.h"
+#include "ModelAPI_ResultBody.h"
 
-
-void CollectionPlugin_GroupAddition::execute()
-{
+void CollectionPlugin_GroupShape::execute()
+{  
   ResultGroupPtr aGroup;
   CollectionPlugin_GroupMerge::execute(aGroup);
-  setResult(aGroup);
+  GeomShapePtr aCompound = aGroup->shape();
+  std::shared_ptr<ModelAPI_ResultBody> theResultBody = document()->createBody(data());
+  theResultBody->store(GeomShapePtr());
+  if(!aCompound->empty())
+    theResultBody->store(aCompound);
+  setResult(theResultBody);
 }

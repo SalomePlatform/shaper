@@ -17,39 +17,37 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef COLLECTIONPLUGIN_GROUPADDITION_H_
-#define COLLECTIONPLUGIN_GROUPADDITION_H_
+#ifndef COLLECTIONPLUGIN_GROUPMERGE_H_
+#define COLLECTIONPLUGIN_GROUPMERGE_H_
 
 #include "CollectionPlugin.h"
 #include "CollectionPlugin_GroupOperation.h"
-#include "CollectionPlugin_GroupMerge.h"
+#include "ModelAPI_ResultGroup.h"
 
-/**\class CollectionPlugin_GroupAddition
+/**\class CollectionPlugin_GroupMerge
  * \ingroup Plugins
- * \brief Merge several groups of same shape type into single group.
+ * \brief Merge several groups of same or different shape type,
+ * \the validator being used for the shape type.
  */
-class CollectionPlugin_GroupAddition : public CollectionPlugin_GroupMerge
+class CollectionPlugin_GroupMerge: public CollectionPlugin_GroupOperation
 {
-public:
-  /// Extrusion kind
-  inline static const std::string& ID()
+public:  
+  /// attribute name of selected entities list
+  inline static const std::string& LIST_ID()
   {
-    static const std::string MY_GROUP_ID("GroupAddition");
-    return MY_GROUP_ID;
-  }  
-
-  /// Returns the kind of a feature
-  COLLECTIONPLUGIN_EXPORT virtual const std::string& getKind()
-  {
-    static std::string MY_KIND = CollectionPlugin_GroupAddition::ID();
-    return MY_KIND;
+    static const std::string MY_GROUP_LIST_ID("group_list");
+    return MY_GROUP_LIST_ID;
   }
 
+
   /// Creates a new group result if needed
-  COLLECTIONPLUGIN_EXPORT void execute();
+  COLLECTIONPLUGIN_EXPORT void execute(ResultGroupPtr & aGroup);
+
+  /// Request for initialization of data model of the feature: adding all attributes
+  COLLECTIONPLUGIN_EXPORT virtual void initAttributes();
 
   /// Use plugin manager for features creation
-  CollectionPlugin_GroupAddition() = default;
+  CollectionPlugin_GroupMerge() = default;
 
 };
 
