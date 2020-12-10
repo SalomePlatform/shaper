@@ -1455,25 +1455,27 @@ void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
         Handle(AIS_InteractiveObject) anAIS = thePrs->impl<Handle(AIS_InteractiveObject)>();
         if (!anAIS.IsNull())
         {
-          std::vector<int> aColor = {167, 167, 167 };
-          thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-          Quantity_Color myShadingColor(NCollection_Vec3<float>(aColor[0]/255.,  aColor[1]/255., aColor[2]/255.));
-
+          /// set color to white and change material aspect,
+          /// in order to keep a natural apect of the image.
+          thePrs->setColor(255, 255, 255);
+          Quantity_Color myShadingColor(NCollection_Vec3<float>(1.,  1., 1.));
           Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
           if (!anAISShape.IsNull())
           {
-            auto myDrawer = new Prs3d_ShadingAspect();
-            if (!anAISShape->Attributes()->HasOwnShadingAspect())
-            {
-              anAISShape->Attributes()->SetShadingAspect (myDrawer);
-            }
+            auto myDrawer = anAISShape->Attributes();
 
-            myDrawer->SetColor(myShadingColor);
+            myDrawer->ShadingAspect()->SetColor(myShadingColor);
+            myDrawer->ShadingAspect()->Aspect()->SetDistinguishOn();
+            Graphic3d_MaterialAspect aMatAspect(Graphic3d_NOM_PLASTIC);
+            aMatAspect.SetTransparency(0.0);
+            myDrawer->ShadingAspect()->Aspect()->SetFrontMaterial(aMatAspect);
+            myDrawer->ShadingAspect()->Aspect()->SetBackMaterial(aMatAspect);
 
             Handle(Image_PixMap) aPixmap;
             QPixmap px(aResult->getTextureFile().c_str());
+
             if (!px.isNull() )
-              aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage() );
+              aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage());
 
             anAISShape->Attributes()->ShadingAspect()->Aspect()->SetTextureMap
                 (new Graphic3d_Texture2Dmanual(aPixmap));
