@@ -409,6 +409,7 @@ bool buildSketchWires(FeaturePtr theSketchFeature, GeomShapePtr theSketchShape, 
               break;
             }
           aNewWires.erase(aFoundEnd->second);
+          aMapVW.erase(aFoundStart);
           aMapVW.erase(aFoundEnd);
         }
         continue;
