@@ -21,7 +21,9 @@
 #include "GeomAlgoAPI_Tools.h"
 #include <TopoDS_Shape.hxx>
 #include <StlAPI_Reader.hxx>
-
+#include <TopoDS_Shell.hxx>
+#include <TopoDS.hxx>
+#include <BRepBuilderAPI_MakeSolid.hxx>
 
 std::shared_ptr<GeomAPI_Shape> STLImport(const std::string& theFileName,
                                          std::string& theError)
@@ -35,6 +37,13 @@ std::shared_ptr<GeomAPI_Shape> STLImport(const std::string& theFileName,
     {
       theError = "Can't import file.";
       aResShape.Nullify();
+    }
+    if(aResShape.ShapeType() == TopAbs_SHELL)
+    {
+      BRepBuilderAPI_MakeSolid soliMaker(TopoDS::Shell(aResShape));
+      soliMaker.Build();
+      if(soliMaker.IsDone())
+        aResShape = soliMaker.Shape();
     }
   }
   catch (Standard_Failure const& anException) {
