@@ -92,9 +92,10 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   // Getting the center point
@@ -142,6 +143,7 @@ void FeaturesPlugin_Scale::performScaleByFactor()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Scaled");
+    aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }
 
@@ -157,9 +159,10 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   // Getting the center point
@@ -212,6 +215,7 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Scaled");
+    aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }
 

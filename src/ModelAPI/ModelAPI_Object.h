@@ -106,7 +106,7 @@ class ModelAPI_Object: public ModelAPI_Entity
     return (textureFile != "");
   }
 
-  MODELAPI_EXPORT void setTextureFile(const std::string & theTextureFile)
+  MODELAPI_EXPORT virtual void setTextureFile(const std::string & theTextureFile)
   {
     textureFile = theTextureFile;
   }

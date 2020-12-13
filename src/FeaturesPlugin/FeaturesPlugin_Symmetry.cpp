@@ -203,12 +203,13 @@ GeomTrsfPtr FeaturesPlugin_Symmetry::symmetryByPlane()
 void FeaturesPlugin_Symmetry::buildResult(
     const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
-    std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex)
+    std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex, std::string & theTextureFile)
 {
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
   FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
                                            theAlgo, theTargetShape, "Symmetried");
+  aResultBody->setTextureFile(theTextureFile);
   setResult(aResultBody, theResultIndex++);
 }
 
@@ -279,9 +280,10 @@ void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   std::string anError;
@@ -309,7 +311,7 @@ void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
   ListOfShape aTopLevel;
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt)
-    buildResult(aMakeShapeList, anOriginalShapes, *anIt, aResultIndex);
+    buildResult(aMakeShapeList, anOriginalShapes, *anIt, aResultIndex, theTextureFile);
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);

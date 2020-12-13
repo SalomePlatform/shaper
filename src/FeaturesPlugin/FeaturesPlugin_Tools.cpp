@@ -259,13 +259,35 @@ bool FeaturesPlugin_Tools::getShape(const AttributeSelectionListPtr theSelection
 }
 
 //==================================================================================================
-bool FeaturesPlugin_Tools::shapesFromSelectionList(
-    const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
+bool FeaturesPlugin_Tools::shapesFromSelectionList(const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
     const bool theStoreFullHierarchy,
     GeomAPI_ShapeHierarchy& theHierarchy,
-    std::list<ResultPtr>& theParts)
+    std::list<ResultPtr>& theParts, std::string &theTextureFile)
 {
   int aSize = theSelectionList->size();
+  if(aSize == 1)
+  {
+    auto anObjectAttr = theSelectionList->value(0);
+    if(anObjectAttr.get())
+    {
+      FeaturePtr aFeature = anObjectAttr->contextFeature();      
+      if(aFeature.get() &&  aFeature->results().size() == 1)
+      {
+        theTextureFile = aFeature->firstResult()->getTextureFile();
+      }
+      else
+      {
+        if(!aFeature.get())
+        {
+          auto aResult =  anObjectAttr->context();
+          if(aResult.get())
+          {
+            theTextureFile = aResult->getTextureFile();
+          }
+        }
+      }
+    }
+  }
   for (int anObjectsIndex = 0; anObjectsIndex < aSize; anObjectsIndex++) {
     AttributeSelectionPtr anObjectAttr = theSelectionList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();

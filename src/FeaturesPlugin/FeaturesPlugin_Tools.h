@@ -69,7 +69,7 @@ public:
       const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
       const bool theStoreFullHierarchy,
       GeomAPI_ShapeHierarchy& theHierarchy,
-      std::list<ResultPtr>& theParts);
+      std::list<ResultPtr>& theParts, std::string& theTextureFile);
 };
 
 #endif /* FeaturesPlugin_Tools_H_ */

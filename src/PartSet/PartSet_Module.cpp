@@ -1422,6 +1422,46 @@ double getResultTransparency(const ResultPtr& theResult)
 
 
 //******************************************************
+void PartSet_Module::setTexture(const std::string & theTextureFile, const AISObjectPtr& thePrs)
+{
+  Handle(AIS_InteractiveObject) anAIS = thePrs->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull())
+  {
+    /// set color to white and change material aspect,
+    /// in order to keep a natural apect of the image.
+    thePrs->setColor(255, 255, 255);
+    Quantity_Color myShadingColor(NCollection_Vec3<float>(1.,  1., 1.));
+    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!anAISShape.IsNull())
+    {
+      auto myDrawer = anAISShape->Attributes();
+
+      myDrawer->ShadingAspect()->SetColor(myShadingColor);
+      myDrawer->ShadingAspect()->Aspect()->SetDistinguishOn();
+      Graphic3d_MaterialAspect aMatAspect(Graphic3d_NOM_PLASTIC);
+      aMatAspect.SetTransparency(0.0);
+      myDrawer->ShadingAspect()->Aspect()->SetFrontMaterial(aMatAspect);
+      myDrawer->ShadingAspect()->Aspect()->SetBackMaterial(aMatAspect);
+
+      Handle(Image_PixMap) aPixmap;
+      QPixmap px(theTextureFile.c_str());
+
+      if (!px.isNull() )
+        aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage());
+
+      anAISShape->Attributes()->ShadingAspect()->Aspect()->SetTextureMap
+          (new Graphic3d_Texture2Dmanual(aPixmap));
+      anAISShape->Attributes()->ShadingAspect()->Aspect()->SetTextureMapOn();
+
+      anAISShape->SetDisplayMode(AIS_Shaded);
+    }
+  }
+
+}
+
+
+
+//******************************************************
 void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
                                            const AISObjectPtr& thePrs) const
 {
@@ -1452,38 +1492,7 @@ void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
       /// set texture  parameters
       if(aResult->hasTextureFile())
       {
-        Handle(AIS_InteractiveObject) anAIS = thePrs->impl<Handle(AIS_InteractiveObject)>();
-        if (!anAIS.IsNull())
-        {
-          /// set color to white and change material aspect,
-          /// in order to keep a natural apect of the image.
-          thePrs->setColor(255, 255, 255);
-          Quantity_Color myShadingColor(NCollection_Vec3<float>(1.,  1., 1.));
-          Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
-          if (!anAISShape.IsNull())
-          {
-            auto myDrawer = anAISShape->Attributes();
-
-            myDrawer->ShadingAspect()->SetColor(myShadingColor);
-            myDrawer->ShadingAspect()->Aspect()->SetDistinguishOn();
-            Graphic3d_MaterialAspect aMatAspect(Graphic3d_NOM_PLASTIC);
-            aMatAspect.SetTransparency(0.0);
-            myDrawer->ShadingAspect()->Aspect()->SetFrontMaterial(aMatAspect);
-            myDrawer->ShadingAspect()->Aspect()->SetBackMaterial(aMatAspect);
-
-            Handle(Image_PixMap) aPixmap;
-            QPixmap px(aResult->getTextureFile().c_str());
-
-            if (!px.isNull() )
-              aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage());
-
-            anAISShape->Attributes()->ShadingAspect()->Aspect()->SetTextureMap
-                (new Graphic3d_Texture2Dmanual(aPixmap));
-            anAISShape->Attributes()->ShadingAspect()->Aspect()->SetTextureMapOn();
-
-            anAISShape->SetDisplayMode(AIS_Shaded);
-          }
-        }
+        setTexture(aResult->getTextureFile(), thePrs);
       }
     }
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);

@@ -113,6 +113,10 @@ public:
   /// Cleans cash related to the already stored elements
   MODEL_EXPORT virtual void cleanCash() override;
 
+  /// sets the texture file
+  MODEL_EXPORT virtual void  setTextureFile(const std::string & theTextureFile) override;
+
+
 protected:
   /// Makes a body on the given feature
   Model_ResultBody();

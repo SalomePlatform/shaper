@@ -399,6 +399,9 @@ public:
   /// Reads description of features from XML file
   virtual void createFeatures();
 
+  /// add texture
+  PARTSET_EXPORT static void setTexture(const std::string &theTextureFile, const AISObjectPtr& thePrs);
+
 public slots:
   /// Slolt called on object display
   /// \param theObject a data object

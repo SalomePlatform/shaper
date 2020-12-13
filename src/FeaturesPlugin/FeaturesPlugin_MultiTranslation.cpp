@@ -91,8 +91,9 @@ void FeaturesPlugin_MultiTranslation::execute()
 
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   std::shared_ptr<GeomAPI_Dir> aFirstDir, aSecondDir;
@@ -170,6 +171,7 @@ void FeaturesPlugin_MultiTranslation::execute()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Translated");
+    aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }
 
