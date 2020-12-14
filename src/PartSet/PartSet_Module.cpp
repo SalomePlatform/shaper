@@ -1420,7 +1420,6 @@ double getResultTransparency(const ResultPtr& theResult)
   return aTransparency;
 }
 
-
 //******************************************************
 void PartSet_Module::setTexture(const std::string & theTextureFile, const AISObjectPtr& thePrs)
 {
@@ -1456,10 +1455,7 @@ void PartSet_Module::setTexture(const std::string & theTextureFile, const AISObj
       anAISShape->SetDisplayMode(AIS_Shaded);
     }
   }
-
 }
-
-
 
 //******************************************************
 void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
@@ -1490,8 +1486,7 @@ void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
       thePrs->setTransparency(getResultTransparency(aResult));
 
       /// set texture  parameters
-      if(aResult->hasTextureFile())
-      {
+      if(aResult->hasTextureFile()){
         setTexture(aResult->getTextureFile(), thePrs);
       }
     }
