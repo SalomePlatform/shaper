@@ -23,7 +23,7 @@
 
 using namespace XAO;
 
-DoubleStep::DoubleStep(const int& step, const int& stamp, const int& nbElements, const int& nbComponents)
+DoubleStep::DoubleStep(int step, int stamp, int nbElements, int nbComponents)
 {
     m_nbElements = nbElements;
     m_nbComponents = nbComponents;
@@ -56,8 +56,8 @@ std::vector<double> DoubleStep::getValues()
     return result;
 }
 
-std::vector<double> DoubleStep::getElement(const int& element)
-throw (XAO_Exception)
+std::vector<double> DoubleStep::getElement(int element)
+
 {
     checkElementIndex(element);
 
@@ -65,8 +65,8 @@ throw (XAO_Exception)
     return result;
 }
 
-std::vector<double> DoubleStep::getComponent(const int& component)
-throw (XAO_Exception)
+std::vector<double> DoubleStep::getComponent(int component)
+
 {
     checkComponentIndex(component);
 
@@ -83,8 +83,8 @@ throw (XAO_Exception)
     return result;
 }
 
-const double DoubleStep::getValue(const int& element, const int& component)
-throw (XAO_Exception)
+double DoubleStep::getValue(int element, int component)
+
 {
     checkElementIndex(element);
     checkComponentIndex(component);
@@ -92,16 +92,16 @@ throw (XAO_Exception)
     return m_values[element][component];
 }
 
-const std::string DoubleStep::getStringValue(const int& element, const int& component)
-throw (XAO_Exception)
+const std::string DoubleStep::getStringValue(int element, int component)
+
 {
     return XaoUtils::doubleToString(getValue(element, component));
 }
 
 void DoubleStep::setValues(const std::vector<double>& values)
-throw (XAO_Exception)
+
 {
-    checkNbValues((int)values.size());
+    checkNbValues(values.size());
 
     for (int i = 0; i < m_nbElements; ++i)
     {
@@ -112,28 +112,28 @@ throw (XAO_Exception)
     }
 }
 
-void DoubleStep::setElement(const int& element, const std::vector<double>& elements)
-throw (XAO_Exception)
+void DoubleStep::setElement(int element, const std::vector<double>& elements)
+
 {
     checkElementIndex(element);
-    checkNbComponents((int)elements.size());
+    checkNbComponents(elements.size());
 
     for (int i = 0; i < m_nbComponents; ++i)
         m_values[element][i] = elements[i];
 }
 
-void DoubleStep::setComponent(const int& component, const std::vector<double>& components)
-throw (XAO_Exception)
+void DoubleStep::setComponent(int component, const std::vector<double>& components)
+
 {
     checkElementIndex(component);
-    checkNbElements((int)components.size());
+    checkNbElements(components.size());
 
     for (int i = 0; i < m_nbElements; ++i)
         m_values[i][component] = components[i];
 }
 
-void DoubleStep::setValue(const int& element, const int& component, const double& value)
-throw (XAO_Exception)
+void DoubleStep::setValue(int element, int component, double value)
+
 {
     checkElementIndex(element);
     checkComponentIndex(component);
@@ -141,8 +141,8 @@ throw (XAO_Exception)
     m_values[element][component] = value;
 }
 
-void DoubleStep::setStringValue(const int& element, const int& component, const std::string& value)
-throw (XAO_Exception)
+void DoubleStep::setStringValue(int element, int component, const std::string& value)
+
 {
     setValue(element, component, XaoUtils::stringToDouble(value));
 }

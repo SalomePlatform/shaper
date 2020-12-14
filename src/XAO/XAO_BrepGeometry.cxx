@@ -66,7 +66,6 @@ void BrepGeometry::setShapeString(const std::string& shape)
 }
 
 void BrepGeometry::writeShapeFile(const std::string& fileName)
-throw (XAO_Exception)
 {
     bool res = BRepTools::Write(m_shape, fileName.c_str());
     if (!res)
@@ -74,7 +73,6 @@ throw (XAO_Exception)
 }
 
 void BrepGeometry::readShapeFile(const std::string& fileName)
-throw (XAO_Exception)
  {
     BRep_Builder builder;
     bool res = BRepTools::Read(m_shape, fileName.c_str(), builder);
@@ -136,8 +134,7 @@ void BrepGeometry::initListIds(const TopAbs_ShapeEnum& shapeType, GeometricEleme
     }
 }
 
-TopoDS_Shape BrepGeometry::getSubShape(const TopoDS_Shape& mainShape, const TopAbs_ShapeEnum& shapeType, const int& shapeIndex)
-throw (XAO_Exception)
+TopoDS_Shape BrepGeometry::getSubShape(const TopoDS_Shape& mainShape, const TopAbs_ShapeEnum& shapeType, int shapeIndex)
 {
     TopTools_MapOfShape mapShape;
     TopTools_ListOfShape listShape;
@@ -166,7 +163,7 @@ throw (XAO_Exception)
 }
 
 // -----------------------------
-const int BrepGeometry::countGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType)
+int BrepGeometry::countGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType)
 {
     int res = 0;
     TopExp_Explorer exp(shape, shapeType);
@@ -176,7 +173,7 @@ const int BrepGeometry::countGeometricalElements(const TopoDS_Shape& shape, cons
     return res;
 }
 
-std::vector<int> BrepGeometry::getGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType, const XAO::Dimension& dim)
+std::vector<int> BrepGeometry::getGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType, XAO::Dimension dim)
 {
     std::vector<int> indexList;
 
@@ -208,7 +205,7 @@ std::vector<int> BrepGeometry::getGeometricalElements(const TopoDS_Shape& shape,
     return indexList;
 }
 
-void BrepGeometry::getEdgeVertices(const int& edgeIndex, int& vertexA, int& vertexB)
+void BrepGeometry::getEdgeVertices(int edgeIndex, int& vertexA, int& vertexB)
 {
     TopoDS_Shape edge = getSubShape(m_shape, TopAbs_EDGE, edgeIndex);
     std::vector<int> vertices = getGeometricalElements(edge, TopAbs_VERTEX, XAO::VERTEX);
@@ -218,13 +215,13 @@ void BrepGeometry::getEdgeVertices(const int& edgeIndex, int& vertexA, int& vert
     vertexB = vertices[1];
 }
 
-const int BrepGeometry::countFaceWires(const int& faceIndex)
+int BrepGeometry::countFaceWires(int faceIndex)
 {
     TopoDS_Shape face = getSubShape(m_shape, TopAbs_FACE, faceIndex);
     return countGeometricalElements(face, TopAbs_WIRE);
 }
 
-std::vector<int> BrepGeometry::getFaceEdges(const int& faceIndex, const int& wireIndex)
+std::vector<int> BrepGeometry::getFaceEdges(int faceIndex, int wireIndex)
 {
     // get the face
     TopoDS_Shape face = getSubShape(m_shape, TopAbs_FACE, faceIndex);
@@ -233,21 +230,20 @@ std::vector<int> BrepGeometry::getFaceEdges(const int& faceIndex, const int& wir
     return getGeometricalElements(wire, TopAbs_EDGE, XAO::EDGE);
 }
 
-const int BrepGeometry::countSolidShells(const int& solidIndex)
+int BrepGeometry::countSolidShells(int solidIndex)
 {
     TopoDS_Shape solid = getSubShape(m_shape, TopAbs_SOLID, solidIndex);
     return countGeometricalElements(solid, TopAbs_SHELL);
 }
 
-std::vector<int> BrepGeometry::getSolidFaces(const int& solidIndex, const int& shellIndex)
+std::vector<int> BrepGeometry::getSolidFaces(int solidIndex, int shellIndex)
 {
     TopoDS_Shape solid = getSubShape(m_shape, TopAbs_SOLID, solidIndex);
     TopoDS_Shape shell = getSubShape(solid, TopAbs_SHELL, shellIndex);
     return getGeometricalElements(shell, TopAbs_FACE, XAO::FACE);
 }
 
-void BrepGeometry::getVertexXYZ(const int& vertexIndex, double& xCoord, double& yCoord, double& zCoord)
-throw (XAO_Exception)
+void BrepGeometry::getVertexXYZ(int vertexIndex, double& xCoord, double& yCoord, double& zCoord)
 {
     xCoord = 0.;
     yCoord = 0.;
@@ -268,7 +264,7 @@ throw (XAO_Exception)
 }
 
 // -----------------------------
-const double BrepGeometry::getEdgeLength(const int& edgeIndex)
+double BrepGeometry::getEdgeLength(int edgeIndex)
 {
     TopoDS_Shape edge = getSubShape(m_shape, TopAbs_EDGE, edgeIndex);
     GProp_GProps system;
@@ -276,7 +272,7 @@ const double BrepGeometry::getEdgeLength(const int& edgeIndex)
     return system.Mass();
 }
 
-const double BrepGeometry::getFaceArea(const int& faceIndex)
+double BrepGeometry::getFaceArea(int faceIndex)
 {
     TopoDS_Shape face = getSubShape(m_shape, TopAbs_FACE, faceIndex);
     GProp_GProps system;
@@ -284,7 +280,7 @@ const double BrepGeometry::getFaceArea(const int& faceIndex)
     return system.Mass();
 }
 
-const double BrepGeometry::getSolidVolume(const int& solidIndex)
+double BrepGeometry::getSolidVolume(int solidIndex)
 {
     TopoDS_Shape solid = getSubShape(m_shape, TopAbs_SOLID, solidIndex);
     GProp_GProps system;
@@ -293,50 +289,49 @@ const double BrepGeometry::getSolidVolume(const int& solidIndex)
 }
 
 // -----------------------------
-const int BrepGeometry::getVertexID(const int& index)
+int BrepGeometry::getVertexID(int index)
 {
     return XaoUtils::stringToInt(getVertexReference(index));
 }
 
-const int BrepGeometry::getEdgeID(const int& index)
+int BrepGeometry::getEdgeID(int index)
 {
     return XaoUtils::stringToInt(getEdgeReference(index));
 }
 
-const int BrepGeometry::getFaceID(const int& index)
+int BrepGeometry::getFaceID(int index)
 {
     return XaoUtils::stringToInt(getFaceReference(index));
 }
 
-const int BrepGeometry::getSolidID(const int& index)
+int BrepGeometry::getSolidID(int index)
 {
     return XaoUtils::stringToInt(getSolidReference(index));
 }
 
 // -----------------------------
-void BrepGeometry::setVertexID(const int& index, const int& id)
+void BrepGeometry::setVertexID(int index, int id)
 {
     setVertexReference(index, XaoUtils::intToString(id));
 }
 
-void BrepGeometry::setEdgeID(const int& index, const int& id)
+void BrepGeometry::setEdgeID(int index, int id)
 {
     setEdgeReference(index, XaoUtils::intToString(id));
 }
 
-void BrepGeometry::setFaceID(const int& index, const int& id)
+void BrepGeometry::setFaceID(int index, int id)
 {
     setEdgeReference(index, XaoUtils::intToString(id));
 }
 
-void BrepGeometry::setSolidID(const int& index, const int& id)
+void BrepGeometry::setSolidID(int index, int id)
 {
     setEdgeReference(index, XaoUtils::intToString(id));
 }
 
 // -----------------------------
-const int BrepGeometry::findElement(const XAO::Dimension& dim, const int& id)
-throw (XAO_Exception)
+int BrepGeometry::findElement(XAO::Dimension dim, int id)
 {
     if (dim == XAO::VERTEX)
         return findVertex(id);
@@ -350,68 +345,64 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown Dimension: " << dim);
 }
 
-const int BrepGeometry::findVertex(const int& id)
+int BrepGeometry::findVertex(int id)
 {
     return getVertexIndexByReference(XaoUtils::intToString(id));
 }
 
-const int BrepGeometry::findEdge(const int& id)
+int BrepGeometry::findEdge(int id)
 {
     return getEdgeIndexByReference(XaoUtils::intToString(id));
 }
 
-const int BrepGeometry::findFace(const int& id)
+int BrepGeometry::findFace(int id)
 {
     return getFaceIndexByReference(XaoUtils::intToString(id));
 }
 
-const int BrepGeometry::findSolid(const int& id)
+int BrepGeometry::findSolid(int id)
 {
     return getSolidIndexByReference(XaoUtils::intToString(id));
 }
 
 // -----------------------------
-const std::string BrepGeometry::findVertexName(const int& id)
+const std::string BrepGeometry::findVertexName(int id)
 {
     return getVertexName(findVertex(id));
 }
 
-const std::string BrepGeometry::findEdgeName(const int& id)
+const std::string BrepGeometry::findEdgeName(int id)
 {
     return getEdgeName(findEdge(id));
 }
 
-const std::string BrepGeometry::findFaceName(const int& id)
+const std::string BrepGeometry::findFaceName(int id)
 {
     return getFaceName(findFace(id));
 }
 
-const std::string BrepGeometry::findSolidName(const int& id)
+const std::string BrepGeometry::findSolidName(int id)
 {
     return getSolidName(findSolid(id));
 }
 
 // -----------------------------
-void BrepGeometry::changeVertexName(const int& id, const std::string& name)
-throw (XAO_Exception)
+void BrepGeometry::changeVertexName(int id, const std::string& name)
 {
     setVertexName(findVertex(id), name);
 }
 
-void BrepGeometry::changeEdgeName(const int& id, const std::string& name)
-throw (XAO_Exception)
+void BrepGeometry::changeEdgeName(int id, const std::string& name)
 {
     setEdgeName(findEdge(id), name);
 }
 
-void BrepGeometry::changeFaceName(const int& id, const std::string& name)
-throw (XAO_Exception)
+void BrepGeometry::changeFaceName(int id, const std::string& name)
 {
     setFaceName(findFace(id), name);
 }
 
-void BrepGeometry::changeSolidName(const int& id, const std::string& name)
-throw (XAO_Exception)
+void BrepGeometry::changeSolidName(int id, const std::string& name)
 {
     setSolidName(findSolid(id), name);
 }

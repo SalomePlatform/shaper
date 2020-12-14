@@ -44,8 +44,7 @@ namespace XAO
          * @param nbElements the number of geometrical elements for the dimension in the geometry.
          * @param name the name of the group.
          */
-        Group(const XAO::Dimension& dim, const int& nbElements, const std::string& name = std::string(""))
-        throw (XAO_Exception);
+        Group(XAO::Dimension dim, int nbElements, const std::string& name = std::string(""));
 
         /**
          * Destructor.
@@ -73,7 +72,7 @@ namespace XAO
          * Gets the dimension of the group.
          * \return the dimension of the group.
          */
-        const XAO::Dimension getDimension()
+        XAO::Dimension getDimension()
         {
             return m_dimension;
         }
@@ -82,7 +81,7 @@ namespace XAO
          * Gets the numbers of elements in the geometry of the same type than the group.
          * \return the number of elements in the associated geometry.
          */
-        const int getNbElements()
+        int getNbElements()
         {
             return m_nbElements;
         }
@@ -91,9 +90,9 @@ namespace XAO
          * Gets the number of elements in the group.
          * \return the number of elements.
          */
-        const int count() const
+        int count() const
         {
-            return (int)m_elements.size();
+            return m_elements.size();
         }
 
         /**
@@ -102,7 +101,7 @@ namespace XAO
          * \return the reference of the element.
          * \note use begin() and end() if you need to iterate.
          */
-        const int get(const int& index)
+        int get(int index)
         {
             checkIndex(index);
             std::set<int>::iterator it = m_elements.begin();
@@ -114,13 +113,13 @@ namespace XAO
          * Adds an element to the group.
          * \param value the index of the element to add.
          */
-        void add(const int& value);
+        void add(int value);
 
         /**
          * Removes an element from the group.
          * \param value the index of the element to remove.
          */
-        void remove(const int& value);
+        void remove(int value);
 
         /**
          * Gets an iterator on the first element in the group.
@@ -140,8 +139,7 @@ namespace XAO
          * @param element
          * @throw XAO_Exception if element is bigger than the number of elements.
          */
-        void checkIndex(const int& element)
-        throw (XAO_Exception);
+        void checkIndex(int element);
 
     private:
         /** The name of the group. */

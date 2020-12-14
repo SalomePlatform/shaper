@@ -49,9 +49,9 @@ namespace XAO
          * @param nbElements the number elements of the geometry.
          * @param nbComponents the number of components of the field.
          */
-        IntegerStep(const int& step, const int& stamp, const int& nbElements, const int& nbComponents);
+        IntegerStep(int step, int stamp, int nbElements, int nbComponents);
 
-        virtual const XAO::Type getType() { return XAO::INTEGER; }
+        virtual XAO::Type getType() { return XAO::INTEGER; }
 
         /**
          * Gets all the values of the step as a list.
@@ -64,14 +64,14 @@ namespace XAO
          * @param element the index of the element.
          * @return a vector containing all the values for the given element.
          */
-        std::vector<int> getElement(const int& element) throw (XAO_Exception);
+        std::vector<int> getElement(int element) ;
 
         /**
          * Gets all the values for a given component.
          * @param component the index of the component.
          * @return a vector containing all the values for the given component.
          */
-        std::vector<int> getComponent(const int& component) throw (XAO_Exception);
+        std::vector<int> getComponent(int component) ;
 
         /**
          * Gets the value for an element and a component.
@@ -79,27 +79,27 @@ namespace XAO
          * @param component the index of the component.
          * @return the value for the given element and component.
          */
-        const int getValue(const int& element, const int& component) throw (XAO_Exception);
+        int getValue(int element, int component) ;
 
         /**
          * Sets all the values from a list.
          * @param values the list of values to set.
          */
-        void setValues(const std::vector<int>& values) throw (XAO_Exception);
+        void setValues(const std::vector<int>& values) ;
 
         /**
          * Sets the values for an element.
          * @param element the index of the element to set.
          * @param elements the values to set.
          */
-        void setElement(const int& element, const std::vector<int>& elements) throw (XAO_Exception);
+        void setElement(int element, const std::vector<int>& elements) ;
 
         /**
          * Sets the values for a component.
          * @param component the index of the component to set.
          * @param components the values to set.
          */
-        void setComponent(const int& component, const std::vector<int>& components) throw (XAO_Exception);
+        void setComponent(int component, const std::vector<int>& components) ;
 
         /**
          * Sets the value for an element and a component.
@@ -107,10 +107,10 @@ namespace XAO
          * @param component the index of the component.
          * @param value the value.
          */
-        void setValue(const int& element, const int& component, const int& value) throw (XAO_Exception);
+        void setValue(int element, int component, int value) ;
 
-        virtual const std::string getStringValue(const int& element, const int& component) throw (XAO_Exception);
-        virtual void setStringValue(const int& element, const int& component, const std::string& value)  throw (XAO_Exception);
+        virtual const std::string getStringValue(int element, int component) ;
+        virtual void setStringValue(int element, int component, const std::string& value)  ;
 
     private:
         std::vector< std::vector<int> > m_values;

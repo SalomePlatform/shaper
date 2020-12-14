@@ -24,25 +24,25 @@
 
 using namespace XAO;
 
-DoubleField::DoubleField(const XAO::Dimension& dimension, const int& nbElements, const int& nbComponents, const std::string& name)
+DoubleField::DoubleField(XAO::Dimension dimension, int nbElements, int nbComponents, const std::string& name)
     : Field(dimension, nbElements, nbComponents, name)
 {
 }
 
-Step* DoubleField::addNewStep(const int& step)
-throw (XAO_Exception)
+Step* DoubleField::addNewStep(int step)
+
 {
     return addStep(step, 0);
 }
 
-DoubleStep* DoubleField::addStep(const int& step)
-throw (XAO_Exception)
+DoubleStep* DoubleField::addStep(int step)
+
 {
     return addStep(step, 0);
 }
 
-DoubleStep* DoubleField::addStep(const int& step, const int& stamp)
-throw (XAO_Exception)
+DoubleStep* DoubleField::addStep(int step, int stamp)
+
 {
     if (hasStep(step))
         throw XAO_Exception(MsgBuilder() << "Step with number " << step << " already exists.");
@@ -52,8 +52,8 @@ throw (XAO_Exception)
     return bstep;
 }
 
-DoubleStep* DoubleField::getStep(const int& index)
-throw (XAO_Exception)
+DoubleStep* DoubleField::getStep(int index)
+
 {
     checkStepIndex(index);
     return (DoubleStep*)m_steps[index];

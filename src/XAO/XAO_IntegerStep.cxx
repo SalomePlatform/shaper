@@ -23,7 +23,7 @@
 
 using namespace XAO;
 
-IntegerStep::IntegerStep(const int& step, const int& stamp, const int& nbElements, const int& nbComponents)
+IntegerStep::IntegerStep(int step, int stamp, int nbElements, int nbComponents)
 {
     m_nbElements = nbElements;
     m_nbComponents = nbComponents;
@@ -56,8 +56,8 @@ std::vector<int> IntegerStep::getValues()
     return result;
 }
 
-std::vector<int> IntegerStep::getElement(const int& element)
-throw (XAO_Exception)
+std::vector<int> IntegerStep::getElement(int element)
+
 {
     checkElementIndex(element);
 
@@ -65,8 +65,8 @@ throw (XAO_Exception)
     return result;
 }
 
-std::vector<int> IntegerStep::getComponent(const int& component)
-throw (XAO_Exception)
+std::vector<int> IntegerStep::getComponent(int component)
+
 {
     checkComponentIndex(component);
 
@@ -83,8 +83,8 @@ throw (XAO_Exception)
     return result;
 }
 
-const int IntegerStep::getValue(const int& element, const int& component)
-throw (XAO_Exception)
+int IntegerStep::getValue(int element, int component)
+
 {
     checkElementIndex(element);
     checkComponentIndex(component);
@@ -92,16 +92,16 @@ throw (XAO_Exception)
     return m_values[element][component];
 }
 
-const std::string IntegerStep::getStringValue(const int& element, const int& component)
-throw (XAO_Exception)
+const std::string IntegerStep::getStringValue(int element, int component)
+
 {
     return XaoUtils::intToString(getValue(element, component));
 }
 
 void IntegerStep::setValues(const std::vector<int>& values)
-throw (XAO_Exception)
+
 {
-    checkNbValues((int)values.size());
+    checkNbValues(values.size());
 
     for (int i = 0; i < m_nbElements; ++i)
     {
@@ -112,28 +112,28 @@ throw (XAO_Exception)
     }
 }
 
-void IntegerStep::setElement(const int& element, const std::vector<int>& elements)
-throw (XAO_Exception)
+void IntegerStep::setElement(int element, const std::vector<int>& elements)
+
 {
     checkElementIndex(element);
-    checkNbComponents((int)elements.size());
+    checkNbComponents(elements.size());
 
     for (int i = 0; i < m_nbComponents; ++i)
         m_values[element][i] = elements[i];
 }
 
-void IntegerStep::setComponent(const int& component, const std::vector<int>& components)
-throw (XAO_Exception)
+void IntegerStep::setComponent(int component, const std::vector<int>& components)
+
 {
     checkElementIndex(component);
-    checkNbElements((int)components.size());
+    checkNbElements(components.size());
 
     for (int i = 0; i < m_nbElements; ++i)
         m_values[i][component] = components[i];
 }
 
-void IntegerStep::setValue(const int& element, const int& component, const int& value)
-throw (XAO_Exception)
+void IntegerStep::setValue(int element, int component, int value)
+
 {
     checkElementIndex(element);
     checkComponentIndex(component);
@@ -141,8 +141,8 @@ throw (XAO_Exception)
     m_values[element][component] = value;
 }
 
-void IntegerStep::setStringValue(const int& element, const int& component, const std::string& value)
-throw (XAO_Exception)
+void IntegerStep::setStringValue(int element, int component, const std::string& value)
+
 {
     setValue(element, component, XaoUtils::stringToInt(value));
 }

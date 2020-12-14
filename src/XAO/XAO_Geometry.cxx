@@ -30,14 +30,12 @@ Geometry::Geometry(const std::string& name)
     m_readOnly = false;
 }
 
-Geometry* Geometry::createGeometry(const XAO::Format& format)
-throw (XAO_Exception)
+Geometry* Geometry::createGeometry(XAO::Format format)
 {
     return createGeometry(format, "");
 }
 
-Geometry* Geometry::createGeometry(const XAO::Format& format, const std::string& name)
-throw (XAO_Exception)
+Geometry* Geometry::createGeometry(XAO::Format format, const std::string& name)
 {
     if (format == XAO::BREP)
         return new BrepGeometry(name);
@@ -50,14 +48,12 @@ Geometry::~Geometry()
 }
 
 void Geometry::checkReadOnly()
-throw (XAO_Exception)
 {
     if (m_readOnly)
         throw XAO_Exception("Geometry is read only.");
 }
 
-const int Geometry::countElements(const XAO::Dimension& dim) const
-throw (XAO_Exception)
+int Geometry::countElements(XAO::Dimension dim) const
 {
     if (dim == XAO::VERTEX)
         return countVertices();
@@ -73,8 +69,7 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown dimension:" << dim);
 }
 
-const std::string Geometry::getElementReference(const XAO::Dimension& dim, const int& index)
-throw (XAO_Exception)
+const std::string Geometry::getElementReference(XAO::Dimension dim, int index)
 {
     if (dim == XAO::VERTEX)
         return getVertexReference(index);
@@ -88,8 +83,7 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown dimension:" << dim);
 }
 
-const int Geometry::getElementIndexByReference(const XAO::Dimension& dim, const std::string& reference)
-throw (XAO_Exception)
+int Geometry::getElementIndexByReference(XAO::Dimension dim, const std::string& reference)
 {
     if (dim == XAO::VERTEX)
         return getVertexIndexByReference(reference);
@@ -103,8 +97,7 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown dimension:" << dim);
 }
 
-GeometricElementList::iterator Geometry::begin(const XAO::Dimension& dim)
-throw (XAO_Exception)
+GeometricElementList::iterator Geometry::begin(XAO::Dimension dim)
 {
     if (dim == XAO::VERTEX)
         return m_vertices.begin();
@@ -118,8 +111,7 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown dimension:" << dim);
 }
 
-GeometricElementList::iterator Geometry::end(const XAO::Dimension& dim)
-throw (XAO_Exception)
+GeometricElementList::iterator Geometry::end(XAO::Dimension dim)
 {
     if (dim == XAO::VERTEX)
         return m_vertices.end();
@@ -133,64 +125,64 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Unknown dimension:" << dim);
 }
 
-void Geometry::setCountVertices(const int& nb) throw (XAO_Exception)
+void Geometry::setCountVertices(int nb) 
 {
     checkReadOnly();
     m_vertices.setSize(nb);
 }
-void Geometry::setCountEdges(const int& nb) throw (XAO_Exception)
+void Geometry::setCountEdges(int nb) 
 {
     checkReadOnly();
     m_edges.setSize(nb);
 }
-void Geometry::setCountFaces(const int& nb) throw (XAO_Exception)
+void Geometry::setCountFaces(int nb) 
 {
     checkReadOnly();
     m_faces.setSize(nb);
 }
-void Geometry::setCountSolids(const int& nb) throw (XAO_Exception)
+void Geometry::setCountSolids(int nb) 
 {
     checkReadOnly();
     m_solids.setSize(nb);
 }
 
-void Geometry::setVertexReference(const int& index, const std::string& reference) throw (XAO_Exception)
+void Geometry::setVertexReference(int index, const std::string& reference) 
 {
     checkReadOnly();
     m_vertices.setReference(index, reference);
 }
-void Geometry::setEdgeReference(const int& index, const std::string& reference) throw (XAO_Exception)
+void Geometry::setEdgeReference(int index, const std::string& reference) 
 {
     checkReadOnly();
     m_edges.setReference(index, reference);
 }
-void Geometry::setFaceReference(const int& index, const std::string& reference) throw (XAO_Exception)
+void Geometry::setFaceReference(int index, const std::string& reference) 
 {
     checkReadOnly();
     m_faces.setReference(index, reference);
 }
-void Geometry::setSolidReference(const int& index, const std::string& reference) throw (XAO_Exception)
+void Geometry::setSolidReference(int index, const std::string& reference) 
 {
     checkReadOnly();
     m_solids.setReference(index, reference);
 }
 
-void Geometry::setVertex(const int& index, const std::string& name, const std::string& reference) throw (XAO_Exception)
+void Geometry::setVertex(int index, const std::string& name, const std::string& reference) 
 {
     checkReadOnly();
     m_vertices.setElement(index, name, reference);
 }
-void Geometry::setEdge(const int& index, const std::string& name, const std::string& reference) throw (XAO_Exception)
+void Geometry::setEdge(int index, const std::string& name, const std::string& reference) 
 {
     checkReadOnly();
     m_edges.setElement(index, name, reference);
 }
-void Geometry::setFace(const int& index, const std::string& name, const std::string& reference) throw (XAO_Exception)
+void Geometry::setFace(int index, const std::string& name, const std::string& reference) 
 {
     checkReadOnly();
     m_faces.setElement(index, name, reference);
 }
-void Geometry::setSolid(const int& index, const std::string& name, const std::string& reference) throw (XAO_Exception)
+void Geometry::setSolid(int index, const std::string& name, const std::string& reference) 
 {
     checkReadOnly();
     m_solids.setElement(index, name, reference);

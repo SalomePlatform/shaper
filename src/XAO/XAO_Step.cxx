@@ -28,8 +28,7 @@
 
 using namespace XAO;
 
-void Step::checkElementIndex(const int& element)
-throw (XAO_Exception)
+void Step::checkElementIndex(int element)
 {
     if (element < m_nbElements && element >= 0)
         return;
@@ -38,8 +37,7 @@ throw (XAO_Exception)
                                      << m_nbElements-1 << "]: " << element);
 }
 
-void Step::checkComponentIndex(const int& component)
-throw (XAO_Exception)
+void Step::checkComponentIndex(int component)
 {
     if (component < m_nbComponents && component >= 0)
         return;
@@ -48,8 +46,7 @@ throw (XAO_Exception)
                                      << m_nbComponents-1 << "]: " << component);
 }
 
-void Step::checkNbElements(const int& nbElements)
-throw (XAO_Exception)
+void Step::checkNbElements(int nbElements)
 {
     if (nbElements == m_nbElements)
         return;
@@ -58,8 +55,7 @@ throw (XAO_Exception)
                                         << ", expected " << m_nbElements);
 }
 
-void Step::checkNbComponents(const int& nbComponents)
-throw (XAO_Exception)
+void Step::checkNbComponents(int nbComponents)
 {
     if (nbComponents == m_nbComponents)
         return;
@@ -68,8 +64,7 @@ throw (XAO_Exception)
                                         << ", expected " << m_nbComponents);
 }
 
-void Step::checkNbValues(const int& nbValues)
-throw (XAO_Exception)
+void Step::checkNbValues(int nbValues)
 {
     if (nbValues == m_nbElements * m_nbComponents)
         return;

@@ -115,7 +115,7 @@ namespace XAO
          * Sets the geometry.
          * \param geometry the geometry to set.
          */
-        void setGeometry(Geometry* geometry) throw (XAO_Exception)
+        void setGeometry(Geometry* geometry) 
         {
             if (m_geometry != NULL)
                 throw XAO_Exception("Geometry already set.");
@@ -131,20 +131,20 @@ namespace XAO
          * Gets the number of groups.
          * \return the number of groups.
          */
-        const int countGroups() const;
+        int countGroups() const;
         /**
          * Gets a group.
          * \param index the index of the wanted group.
          * \return the group.
          */
-        Group* getGroup(const int& index) throw (XAO_Exception);
+        Group* getGroup(int index) ;
         /**
          * Adds a group.
          * \param dim the dimension of the group.
          * \param name the name of the group.
          * \return the created group.
          */
-        Group* addGroup(const XAO::Dimension& dim, const std::string& name = std::string("")) throw (XAO_Exception);
+        Group* addGroup(XAO::Dimension dim, const std::string& name = std::string("")) ;
         /**
          * Removes a group.
          * \param group the group to remove.
@@ -160,26 +160,26 @@ namespace XAO
          * Gets the number of fields.
          * \return the number of fields.
          */
-        const int countFields() const;
+        int countFields() const;
 
         /**
          * Gets the type of a field.
          * \param index the index of the wanted field.
          * \return the type of the field.
          */
-        const XAO::Type getFieldType(const int& index) throw (XAO_Exception);
+        XAO::Type getFieldType(int index) ;
 
         /**
          * Gets a field.
          * \param index the index of the wanted field.
          * \return the field.
          */
-        Field* getField(const int& index) throw (XAO_Exception);
+        Field* getField(int index) ;
 
-        BooleanField* getBooleanField(const int& index) throw (XAO_Exception);
-        DoubleField* getDoubleField(const int& index) throw (XAO_Exception);
-        IntegerField* getIntegerField(const int& index) throw (XAO_Exception);
-        StringField* getStringField(const int& index) throw (XAO_Exception);
+        BooleanField* getBooleanField(int index) ;
+        DoubleField* getDoubleField(int index) ;
+        IntegerField* getIntegerField(int index) ;
+        StringField* getStringField(int index) ;
 
         /**
          * Adds a field.
@@ -189,18 +189,18 @@ namespace XAO
          * \param name the name of the field.
          * \return the created field.
          */
-        Field* addField(const XAO::Type& type, const XAO::Dimension& dim, const int& nbComponents,
+        Field* addField(XAO::Type type, XAO::Dimension dim, int nbComponents,
                 const std::string& name = std::string(""))
-        throw (XAO_Exception);
+        ;
 
-        BooleanField* addBooleanField(const XAO::Dimension& dim, const int& nbComponents,
-                const std::string& name = std::string("")) throw (XAO_Exception);
-        IntegerField* addIntegerField(const XAO::Dimension& dim, const int& nbComponents,
-                const std::string& name = std::string("")) throw (XAO_Exception);
-        DoubleField* addDoubleField(const XAO::Dimension& dim, const int& nbComponents,
-                const std::string& name = std::string("")) throw (XAO_Exception);
-        StringField* addStringField(const XAO::Dimension& dim, const int& nbComponents,
-                const std::string& name = std::string("")) throw (XAO_Exception);
+        BooleanField* addBooleanField(XAO::Dimension dim, int nbComponents,
+                const std::string& name = std::string("")) ;
+        IntegerField* addIntegerField(XAO::Dimension dim, int nbComponents,
+                const std::string& name = std::string("")) ;
+        DoubleField* addDoubleField(XAO::Dimension dim, int nbComponents,
+                const std::string& name = std::string("")) ;
+        StringField* addStringField(XAO::Dimension dim, int nbComponents,
+                const std::string& name = std::string("")) ;
 
         /**
          * Removes a field.
@@ -218,7 +218,7 @@ namespace XAO
          * \param shapeFileName if not empty, export the shape to this external file.
          * \return true is the export is successful.
          */
-        const bool exportXAO(const std::string& fileName, const std::string& shapeFileName);
+        bool exportXAO(const std::string& fileName, const std::string& shapeFileName);
         /**
          * Gets the XML corresponding to this XAO.
          * \return the XML as a string.
@@ -230,19 +230,19 @@ namespace XAO
          * \param fileName the name of the file to import.
          * \return true if the import is successful.
          */
-        const bool importXAO(const std::string& fileName);
+        bool importXAO(const std::string& fileName);
         /**
          * Sets an XML describing an XAO format to this object.
          * \param xml the XML to set.
          * \return true if the import is successful.
          */
-        const bool setXML(const std::string& xml);
+        bool setXML(const std::string& xml);
 
     private:
-        void checkGeometry() const throw (XAO_Exception);
-        void checkGroupIndex(const int& index) const throw (XAO_Exception);
-        void checkFieldIndex(const int& index) const throw (XAO_Exception);
-        void checkGroupDimension(const XAO::Dimension& dim) const throw (XAO_Exception);
+        void checkGeometry() const ;
+        void checkGroupIndex(int index) const ;
+        void checkFieldIndex(int index) const ;
+        void checkGroupDimension(XAO::Dimension dim) const ;
 
     private:
         /** The author of the file. */

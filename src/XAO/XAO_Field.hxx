@@ -52,8 +52,8 @@ namespace XAO
          * @param nbComponents the number of components.
          * @param name the name of the field.
          */
-        Field(const XAO::Dimension& dimension,
-              const int& nbElements, const int& nbComponents, const std::string& name);
+        Field(XAO::Dimension dimension,
+              int nbElements, int nbComponents, const std::string& name);
 
     public:
         /**
@@ -65,10 +65,9 @@ namespace XAO
          * @name the name of the field.
          * @return the created field.
          */
-        static Field* createField(const XAO::Type& type, const XAO::Dimension& dimension,
-                                  const int& nbElements, const int& nbComponents,
-                                  const std::string& name = std::string(""))
-        throw (XAO_Exception);
+        static Field* createField(XAO::Type type, XAO::Dimension dimension,
+                                  int nbElements, int nbComponents,
+                                  const std::string& name = std::string(""));
 
         /**
          * Destructor.
@@ -79,7 +78,7 @@ namespace XAO
          * Gets the Type of the field.
          * @return the Type of the field.
          */
-        virtual const XAO::Type getType() = 0;
+        virtual XAO::Type getType() = 0;
 
         /**
          * Gets the name of the Field.
@@ -103,7 +102,7 @@ namespace XAO
          * Gets the Dimension of the Field.
          * @return the Dimension of the Field.
          */
-        const XAO::Dimension getDimension() const
+        XAO::Dimension getDimension() const
         {
             return m_dimension;
         }
@@ -112,7 +111,7 @@ namespace XAO
          * Gets the number of elements of each step.
          * @return the number of elements of each step.
          */
-        const int countElements() const
+        int countElements() const
         {
             return m_nbElements;
         }
@@ -121,7 +120,7 @@ namespace XAO
          * Gets the number of components.
          * @return the number of components.
          */
-        const int countComponents() const
+        int countComponents() const
         {
             return m_nbComponents;
         }
@@ -130,7 +129,7 @@ namespace XAO
          * Gets the number of values for each step.
          * @return the number of values for each step.
          */
-        const int countValues() const
+        int countValues() const
         {
             return m_nbElements * m_nbComponents;
         }
@@ -139,34 +138,34 @@ namespace XAO
          * Gets the number of the steps.
          * @return the number of steps.
          */
-        const int countSteps() const { return (int)m_steps.size(); }
+        int countSteps() const { return m_steps.size(); }
 
         /**
          * Gets the name of a component.
          * @param index the index of the component to get.
          * @return the name of the component for the given index.
          */
-        const std::string getComponentName(const int& index) throw (XAO_Exception);
+        const std::string getComponentName(int index);
 
         /**
          * Sets the name of a component.
          * @param componentIndex the index of the component to set.
          * @param name the name to set.
          */
-        void setComponentName(const int& componentIndex, const std::string& name) throw (XAO_Exception);
+        void setComponentName(int componentIndex, const std::string& name);
 
         /**
          * Sets the name of the components.
          * @param names the names to set.
          */
-        void setComponentsNames(const std::vector<std::string>& names) throw (XAO_Exception);
+        void setComponentsNames(const std::vector<std::string>& names);
 
         /**
          * Adds a new step of the same type than the field.
          * @param number the numer of the step.
          * @return the new create step.
          */
-        virtual Step* addNewStep(const int& number) throw (XAO_Exception) = 0;
+        virtual Step* addNewStep(int number) = 0;
 
         /**
          * Remove a step.
@@ -180,7 +179,7 @@ namespace XAO
          * @param step the step number.
          * @return true if the field has a step for the given number.
          */
-        bool hasStep(const int& step);
+        bool hasStep(int step);
 
         /**
          * Returns the first step.
@@ -195,8 +194,8 @@ namespace XAO
         stepIterator end() { return m_steps.end(); }
 
     protected:
-        void checkComponent(const int& component) throw (XAO_Exception);
-        void checkStepIndex(const int& step) throw (XAO_Exception);
+        void checkComponent(int component) ;
+        void checkStepIndex(int step) ;
 
     protected:
         /** The name of the Field. */

@@ -51,49 +51,49 @@ namespace XAO
          * Gets the type of the step.
          * @return
          */
-        virtual const XAO::Type getType() = 0;
+        virtual XAO::Type getType() = 0;
 
         /**
          * Gets the step index.
          * @return the index of the step.
          */
-        const int getStep() { return m_step; }
+        int getStep() { return m_step; }
 
         /**
          * Sets the number of the step.
          * @param step the index to set.
          */
-        void setStep(const int& step) { m_step = step; }
+        void setStep(int step) { m_step = step; }
 
         /**
          * Gets the stamp of the index.
          * @return the stamp of the index.
          */
-        const int getStamp() { return m_stamp; }
+        int getStamp() { return m_stamp; }
 
         /**
          * Sets the stamp of the index.
          * @param stamp the stamp to set.
          */
-        void setStamp(const int& stamp) { m_stamp = stamp; }
+        void setStamp(int stamp) { m_stamp = stamp; }
 
         /**
          * Gets the number of components of the step.
          * @return the number of components.
          */
-        const int countComponents() { return m_nbComponents; }
+        int countComponents() { return m_nbComponents; }
 
         /**
          * Gets the number of elements for the step.
          * @return the number of elements.
          */
-        const int countElements() { return m_nbElements; }
+        int countElements() { return m_nbElements; }
 
         /**
          * Gets the number of values for the step.
          * @return the number of values.
          */
-        const int countValues() { return m_nbElements * m_nbComponents; }
+        int countValues() { return m_nbElements * m_nbComponents; }
 
         /**
          * Gets a value as a string.
@@ -101,7 +101,7 @@ namespace XAO
          * @param component the index of the component.
          * @return the value as a string.
          */
-        virtual const std::string getStringValue(const int& element, const int& component) = 0;
+        virtual const std::string getStringValue(int element, int component) = 0;
 
         /**
          * Sets a value as a string
@@ -110,37 +110,37 @@ namespace XAO
          * @param value the string value.
          * @throw XAO_Exception if the value is not valid.
          */
-        virtual void setStringValue(const int& element, const int& component, const std::string& value) = 0;
+        virtual void setStringValue(int element, int component, const std::string& value) = 0;
 
     protected:
         /**
          * Checks that given element index is in the range of element indexes.
          * @param element the index to check.
          */
-        void checkElementIndex(const int& element) throw (XAO_Exception);
+        void checkElementIndex(int element);
         /**
          * Checks that given component index is in the range of component indexes.
          * @param component the index to check.
          */
-        void checkComponentIndex(const int& component)throw (XAO_Exception);
+        void checkComponentIndex(int component);
 
         /**
          * Checks that the given number of elements is correct.
          * @param nbElements the number of elements to check.
          */
-        void checkNbElements(const int& nbElements)throw (XAO_Exception);
+        void checkNbElements(int nbElements);
 
         /**
          * Checks that the given number of components is correct.
          * @param nbComponents the number of components to check.
          */
-        void checkNbComponents(const int& nbComponents)throw (XAO_Exception);
+        void checkNbComponents(int nbComponents);
 
         /**
          * checks that the given number of values is correct.
          * @param nbValues the number of values to check.
          */
-        void checkNbValues(const int& nbValues)throw (XAO_Exception);
+        void checkNbValues(int nbValues);
 
     protected:
         /** the index of the step. */

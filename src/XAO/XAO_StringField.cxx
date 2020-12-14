@@ -24,25 +24,25 @@
 
 using namespace XAO;
 
-StringField::StringField(const XAO::Dimension& dimension, const int& nbElements, const int& nbComponents, const std::string& name)
+StringField::StringField(XAO::Dimension dimension, int nbElements, int nbComponents, const std::string& name)
     : Field(dimension, nbElements, nbComponents, name)
 {
 }
 
-Step* StringField::addNewStep(const int& step)
-throw (XAO_Exception)
+Step* StringField::addNewStep(int step)
+
 {
     return addStep(step, 0);
 }
 
-StringStep* StringField::addStep(const int& step)
-throw (XAO_Exception)
+StringStep* StringField::addStep(int step)
+
 {
     return addStep(step, 0);
 }
 
-StringStep* StringField::addStep(const int& step, const int& stamp)
-throw (XAO_Exception)
+StringStep* StringField::addStep(int step, int stamp)
+
 {
     if (hasStep(step))
         throw XAO_Exception(MsgBuilder() << "Step with number " << step << " already exists.");
@@ -52,8 +52,8 @@ throw (XAO_Exception)
     return bstep;
 }
 
-StringStep* StringField::getStep(const int& index)
-throw (XAO_Exception)
+StringStep* StringField::getStep(int index)
+
 {
     checkStepIndex(index);
     return (StringStep*)m_steps[index];
