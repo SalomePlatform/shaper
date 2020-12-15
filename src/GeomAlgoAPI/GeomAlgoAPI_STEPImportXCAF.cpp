@@ -329,12 +329,12 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
     Handle(StepRepr_ProductDefinitionShape)::DownCast(theEnti);
   Handle(StepBasic_ProductDefinition)     aProdDef;
 
-  if (aPDS.IsNull() == Standard_False) {
+  if (!aPDS.IsNull()) {
     // Product Definition Shape ==> Product Definition
     aProdDef = aPDS->Definition().ProductDefinition();
   }
 
-  if (aProdDef.IsNull() == Standard_False) {
+  if (!aProdDef.IsNull()) {
     // Product Definition ==> Property Definition
     const Interface_Graph    &aGraph = theTP->Graph();
     Interface_EntityIterator  aSubs  = aGraph.Sharings(aProdDef);
@@ -344,7 +344,7 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
       Handle(StepRepr_PropertyDefinition) aPropD =
         Handle(StepRepr_PropertyDefinition)::DownCast(aSubs.Value());
 
-      if (aPropD.IsNull() == Standard_False) {
+      if (!aPropD.IsNull()) {
         // Property Definition ==> Representation.
         Interface_EntityIterator aSubs1 = aGraph.Sharings(aPropD);
 
@@ -353,11 +353,11 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
             Handle(StepRepr_PropertyDefinitionRepresentation)::
             DownCast(aSubs1.Value());
 
-          if (aPDR.IsNull() == Standard_False) {
+          if (!aPDR.IsNull()) {
             // Property Definition ==> Material Name.
             Handle(StepRepr_Representation) aRepr = aPDR->UsedRepresentation();
 
-            if (aRepr.IsNull() == Standard_False) {
+            if (!aRepr.IsNull()) {
               Standard_Integer anIr;
 
               for(anIr = 1; anIr <= aRepr->NbItems(); anIr++) {
@@ -365,10 +365,10 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
                 Handle(StepRepr_DescriptiveRepresentationItem) aDRI =
                   Handle(StepRepr_DescriptiveRepresentationItem)::DownCast(aRI);
 
-                if (aDRI.IsNull() == Standard_False) {
+                if (!aDRI.IsNull()) {
                   // Get shape from Product Definition
                   Handle(TCollection_HAsciiString) aMatName = aDRI->Name();
-                  if (aMatName.IsNull() == Standard_False) {
+                  if (!aMatName.IsNull()) {
                     TCollection_ExtendedString
                       aMatNameExt (aMatName->ToCString());
 

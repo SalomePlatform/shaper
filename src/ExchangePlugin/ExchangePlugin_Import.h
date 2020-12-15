@@ -123,10 +123,6 @@ class ExchangePlugin_Import : public ModelAPI_Feature
   /// \param theID identifier of changed attribute
   EXCHANGEPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
-  /// Called to update part
-  EXCHANGEPLUGIN_EXPORT
-  void updatePart(AttributeStringArrayPtr& thePartsAttr, AttributeIntegerPtr& theTargetAttr);
-
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();
 
@@ -135,6 +131,11 @@ class ExchangePlugin_Import : public ModelAPI_Feature
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
+
+ private:
+  /// Called to update part
+  EXCHANGEPLUGIN_EXPORT
+  void updatePart(AttributeStringArrayPtr& thePartsAttr, AttributeIntegerPtr& theTargetAttr);
 };
 
 #endif /* IMPORT_IMPORTFEATURE_H_ */

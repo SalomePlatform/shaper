@@ -63,8 +63,6 @@
 
 #include <ExchangePlugin_Tools.h>
 
-#include <TopExp_Explorer.hxx>
-#include <OSD_Exception.hxx>
 
 
 ExchangePlugin_ImportFeature::ExchangePlugin_ImportFeature()
@@ -154,7 +152,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   std::string anError;
   std::shared_ptr<GeomAPI_Shape> aGeomShape;
 
-  std::map< std::wstring, std::list<std::wstring>> theMaterialShape;
+  std::map<std::wstring, std::list<std::wstring>> theMaterialShape;
 
   std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
   data()->setName(Locale::Convert::toWString(anObjectName));
@@ -171,31 +169,22 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
     bool anScalInterUnits =
             boolean(ExchangePlugin_ImportFeature::STEP_SCALE_INTER_UNITS_ID())->value();
 
-    try{
+    // Process groups/fields
+    std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
 
-      aResult->clearShapeNameAndColor();
-      // Process groups/fields
-      std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
-
-      // Remove previous groups/fields stored in RefList
-      std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
-      std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
-      for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
-        std::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_Feature::feature(*anGroupIt);
-        if (aFeature)
+    // Remove previous groups/fields stored in RefList
+    std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
+    std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
+    for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
+      std::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_Feature::feature(*anGroupIt);
+      if (aFeature)
         document()->removeFeature(aFeature);
-      }
-
-      aGeomShape = STEPImportAttributs(theFileName, aResult, anScalInterUnits,
-                                       anMaterialsGroupSelected, anColorGroupSelected,
-                                       theMaterialShape,anError);
-
     }
-    catch (OSD_Exception& e) {
-      //Try to load STEP file without colors...
-      aGeomShape = STEPImport(theFileName, anExtension,anScalInterUnits,anError);
-    }
+
+    aGeomShape = STEPImportAttributs(theFileName, aResult, anScalInterUnits,
+                                     anMaterialsGroupSelected, anColorGroupSelected,
+                                     theMaterialShape, anError);
   } else if (anExtension == "IGES" || anExtension == "IGS") {
     aGeomShape = IGESImport(theFileName, anExtension, anError);
   } else {
@@ -224,6 +213,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   }
 
   setResult(aResult);
+  aResult->clearShapeNameAndColor();
 
 }
 
@@ -232,13 +222,13 @@ void ExchangePlugin_ImportFeature::setColorGroups(
 {
   std::vector<int> aColor;
   int anIndice = 1;
-  std::list< std::vector<int> > aColorsRead;
+  std::list<std::vector<int>> aColorsRead;
 
   ModelAPI_Tools::getColor(theResultBody, aColor);
   if (!aColor.empty() ){
     std::wstringstream aColorName;
     aColorName <<L"Color_"<< anIndice;
-    setColorGroup( theResultBody, aColor, aColorName.str());
+    setColorGroup(theResultBody, aColor, aColorName.str());
     anIndice++;
     aColorsRead.push_back(aColor);
   }
@@ -275,10 +265,10 @@ void ExchangePlugin_ImportFeature::setColorGroup(
   AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
 
   ModelAPI_Tools::getColor(theResultBody, aColor);
-  if (!aColor.empty() ){
-    if (aColor == theColor ) {
+  if (!aColor.empty()){
+    if (aColor == theColor) {
       GeomShapePtr aShape = theResultBody->shape();
-      aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+      aSelectionList->setSelectionType(aShape->shapeTypeStr());
       aSelectionList->append(theResultBody,aShape);
     }
   }
@@ -290,9 +280,9 @@ void ExchangePlugin_ImportFeature::setColorGroup(
     ModelAPI_Tools::getColor(*aRes, aColor);
     GeomShapePtr aShape = (*aRes)->shape();
 
-    if (!aColor.empty() ){
-      if (aRes->get() &&  aColor == theColor ) {
-        aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+    if (!aColor.empty()){
+      if (aRes->get() &&  aColor == theColor) {
+        aSelectionList->setSelectionType(aShape->shapeTypeStr());
         aSelectionList->append(theResultBody,aShape);
       }
     }
@@ -304,7 +294,7 @@ void ExchangePlugin_ImportFeature::setColorGroup(
 
   ModelAPI_Tools::setColor(aGroupFeature->lastResult(),theColor);
 
-  if (aSelectionList->size() == 0 ){
+  if (aSelectionList->size() == 0) {
     document()->removeFeature(aGroupFeature);
   }
 }
@@ -314,7 +304,7 @@ void ExchangePlugin_ImportFeature::setMaterielGroup(
                                 std::map< std::wstring,std::list<std::wstring>>& theMaterialShape)
 {
   std::map< std::wstring, std::list<std::wstring>>::iterator anIt;
-  for( anIt = theMaterialShape.begin(); anIt != theMaterialShape.end(); ++anIt) {
+  for (anIt = theMaterialShape.begin(); anIt != theMaterialShape.end(); ++anIt) {
 
     std::shared_ptr<ModelAPI_Feature> aGroupFeature = addFeature("Group");
     // group name
@@ -322,19 +312,18 @@ void ExchangePlugin_ImportFeature::setMaterielGroup(
 
     // fill selection
     AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
-    GeomShapePtr aShape = theResultBody->shape();
 
     std::list<ResultPtr> allRes;
     ModelAPI_Tools::allSubs(theResultBody, allRes);
-    for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); ++aRes) {
+    for (std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); ++aRes) {
 
       GeomShapePtr aShape = (*aRes)->shape();
-      for(std::list<std::wstring>::iterator aResMat = anIt->second.begin();
+      for (std::list<std::wstring>::iterator aResMat = anIt->second.begin();
                                  aResMat != anIt->second.end(); ++aResMat) {
         if (aRes->get() && ((*aRes)->data()->name() == (*aResMat)))
         {
           aSelectionList->append(theResultBody,aShape);
-          aSelectionList->setSelectionType(aShape->shapeTypeStr() );
+          aSelectionList->setSelectionType(aShape->shapeTypeStr());
           break;
         }
       }
