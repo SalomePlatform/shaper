@@ -19,12 +19,30 @@
 
 #include "CollectionPlugin_GroupShape.h"
 #include "ModelAPI_ResultBody.h"
+#include <TopoDS.hxx>
+#include <TopoDS_Iterator.hxx>
 
 void CollectionPlugin_GroupShape::execute()
 {  
   ResultGroupPtr aGroup;
   CollectionPlugin_GroupMerge::execute(aGroup);
   GeomShapePtr aCompound = aGroup->shape();
+
+  const TopoDS_Shape & aShape = aCompound->impl<TopoDS_Shape>();
+
+  if(aShape.NbChildren() == 1)
+  {
+    /// unique shape, remove compound on type
+
+    TopoDS_Iterator anIt(aShape);
+    TopoDS_Shape aShape = anIt.Value();
+    std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+    aRes->setImpl(new TopoDS_Shape(aShape));
+    aGroup->store(GeomShapePtr());
+    aGroup->store(aRes);
+    aCompound = aGroup->shape();
+  }
+
   std::shared_ptr<ModelAPI_ResultBody> theResultBody = document()->createBody(data());
   theResultBody->store(GeomShapePtr());
   if(!aCompound->empty())
