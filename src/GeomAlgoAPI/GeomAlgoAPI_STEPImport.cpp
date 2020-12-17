@@ -62,7 +62,7 @@
 #include <OSD_Exception.hxx>
 
 //=================================================================================================
-bool readUnits(const STEPControl_Reader& aReader,
+bool readUnits(STEPControl_Reader& aReader,
                const bool theScalInterUnits,
                std::string& theError)
 {
