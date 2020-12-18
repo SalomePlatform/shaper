@@ -35,6 +35,19 @@
 %include "std_list.i"
 %include "std_shared_ptr.i"
 
+%exceptionclass GeomAlgoAPI_Exception;
+
+%exception {
+  try {
+    $action
+  }
+  catch (GeomAlgoAPI_Exception exc) {
+    // Reraise with SWIG_Python_Raise
+    SWIG_Python_Raise(SWIG_NewPointerObj((new GeomAlgoAPI_Exception(static_cast< const GeomAlgoAPI_Exception& >(exc))), SWIGTYPE_p_GeomAlgoAPI_Exception, SWIG_POINTER_OWN), "GeomAlgoAPI_Exception", SWIGTYPE_p_GeomAlgoAPI_Exception);
+    SWIG_fail;
+  }
+}
+
 // shared pointers
 %shared_ptr(GeomAlgoAPI_Boolean)
 %shared_ptr(GeomAlgoAPI_Intersection)
