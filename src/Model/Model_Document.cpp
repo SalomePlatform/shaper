@@ -73,8 +73,12 @@
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
 #include <OSD_Protection.hxx>
+
+#ifdef TINSPECTOR
 #include <CDF_Session.hxx>
 #include <CDF_Directory.hxx>
+#endif
+
 #include <UTL.hxx>
 
 #include <climits>
