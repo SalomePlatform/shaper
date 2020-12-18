@@ -34,6 +34,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <Locale_Convert.h>
 
@@ -282,8 +283,16 @@ void ExchangePlugin_ImportFeature::setColorGroup(
 
     if (!aColor.empty()){
       if (aRes->get() &&  aColor == theColor) {
-        aSelectionList->setSelectionType(aShape->shapeTypeStr());
-        aSelectionList->append(theResultBody,aShape);
+        if (aShape->isCompound() || aShape->isCompSolid()) {
+          GeomAPI_ShapeIterator anIt(aShape);
+          for (; anIt.more(); anIt.next()) {
+            aSelectionList->setSelectionType(anIt.current()->shapeTypeStr());
+            aSelectionList->append(theResultBody,anIt.current());
+          }
+        } else {
+          aSelectionList->setSelectionType(aShape->shapeTypeStr());
+          aSelectionList->append(theResultBody,aShape);
+        }
       }
     }
   }
@@ -322,8 +331,16 @@ void ExchangePlugin_ImportFeature::setMaterielGroup(
                                  aResMat != anIt->second.end(); ++aResMat) {
         if (aRes->get() && ((*aRes)->data()->name() == (*aResMat)))
         {
-          aSelectionList->append(theResultBody,aShape);
-          aSelectionList->setSelectionType(aShape->shapeTypeStr());
+          if (aShape->isCompound() || aShape->isCompSolid()) {
+            GeomAPI_ShapeIterator anIt(aShape);
+            for (; anIt.more(); anIt.next()) {
+              aSelectionList->setSelectionType(anIt.current()->shapeTypeStr());
+              aSelectionList->append(theResultBody,anIt.current());
+            }
+          } else {
+            aSelectionList->setSelectionType(aShape->shapeTypeStr());
+            aSelectionList->append(theResultBody,aShape);
+          }
           break;
         }
       }
