@@ -18,6 +18,7 @@
 //
 
 #include <GeomAlgoAPI_STEPImport.h>
+#include <GeomAlgoAPI_STEPImportXCAF.h>
 
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_Label.hxx>
@@ -31,6 +32,8 @@
 #include <Interface_Graph.hxx>
 #include <Interface_InterfaceModel.hxx>
 #include <Interface_Static.hxx>
+
+#include <STEPCAFControl_Reader.hxx>
 #include <STEPControl_Reader.hxx>
 #include <StepBasic_Product.hxx>
 #include <StepBasic_ProductDefinition.hxx>
@@ -54,17 +57,57 @@
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Iterator.hxx>
-#include <TopoDS_Shape.hxx>
 
-
-#include <TColStd_SequenceOfAsciiString.hxx>
-
-#include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx> // CAREFUL ! position of this file is critic : see Lucien PIGNOLONI / OCC
+#include <OSD_Exception.hxx>
+
+//=================================================================================================
+bool readUnits(STEPControl_Reader& aReader,
+               const bool theScalInterUnits,
+               std::string& theError)
+{
+  // Regard or not the model units
+  if (!theScalInterUnits) {
+    // set UnitFlag to units from file
+    TColStd_SequenceOfAsciiString anUnitLengthNames;
+    TColStd_SequenceOfAsciiString anUnitAngleNames;
+    TColStd_SequenceOfAsciiString anUnitSolidAngleNames;
+    aReader.FileUnits(anUnitLengthNames, anUnitAngleNames, anUnitSolidAngleNames);
+    if (anUnitLengthNames.Length() > 0) {
+      TCollection_AsciiString aLenUnits = anUnitLengthNames.First();
+      if (aLenUnits == "millimetre")
+        Interface_Static::SetCVal("xstep.cascade.unit", "MM");
+      else if (aLenUnits == "centimetre")
+        Interface_Static::SetCVal("xstep.cascade.unit", "CM");
+      else if (aLenUnits == "metre" || aLenUnits.IsEmpty())
+        Interface_Static::SetCVal("xstep.cascade.unit", "M");
+      else if (aLenUnits == "INCH")
+        Interface_Static::SetCVal("xstep.cascade.unit", "INCH");
+      else {
+        theError = "The file contains not supported units.";
+        return false;
+      }
+      // TODO (for other units than mm, cm, m or inch)
+      //else if (aLenUnits == "")
+      //  Interface_Static::SetCVal("xstep.cascade.unit", "???");
+    }
+  }
+  else {
+    //cout<<"need re-scale a model"<<endl;
+    // set UnitFlag to 'meter'
+    Interface_Static::SetCVal("xstep.cascade.unit","M");
+  }
+  return true;
+}
+
+
+//==================================================================================================
 std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
                                           const std::string& theFormatName,
+                                          const bool theScalInterUnits,
                                           std::string& theError)
 {
+
   TopoDS_Shape aResShape;
 
   // Set "C" numeric locale to save numbers correctly
@@ -87,39 +130,11 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
     IFSelect_ReturnStatus status = aReader.ReadFile(theFileName.c_str());
 
     if (status == IFSelect_RetDone) {
-
       // Regard or not the model units
-      if (theFormatName == "STEP_SCALE") {
-        // set UnitFlag to units from file
-        TColStd_SequenceOfAsciiString anUnitLengthNames;
-        TColStd_SequenceOfAsciiString anUnitAngleNames;
-        TColStd_SequenceOfAsciiString anUnitSolidAngleNames;
-        aReader.FileUnits(anUnitLengthNames, anUnitAngleNames, anUnitSolidAngleNames);
-        if (anUnitLengthNames.Length() > 0) {
-          TCollection_AsciiString aLenUnits = anUnitLengthNames.First();
-          if (aLenUnits == "millimetre")
-            Interface_Static::SetCVal("xstep.cascade.unit", "MM");
-          else if (aLenUnits == "centimetre")
-            Interface_Static::SetCVal("xstep.cascade.unit", "CM");
-          else if (aLenUnits == "metre" || aLenUnits.IsEmpty())
-            Interface_Static::SetCVal("xstep.cascade.unit", "M");
-          else if (aLenUnits == "INCH")
-            Interface_Static::SetCVal("xstep.cascade.unit", "INCH");
-          else {
-            theError = "The file contains not supported units.";
-            std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-            aGeomShape->setImpl(new TopoDS_Shape(aResShape));
-            return aGeomShape;
-          }
-          // TODO (for other units than mm, cm, m or inch)
-          //else if (aLenUnits == "")
-          //  Interface_Static::SetCVal("xstep.cascade.unit", "???");
-        }
-      }
-      else {
-        //cout<<"need re-scale a model"<<endl;
-        // set UnitFlag to 'meter'
-        Interface_Static::SetCVal("xstep.cascade.unit","M");
+      if( !readUnits(aReader,theScalInterUnits,theError)) {
+        std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+        aGeomShape->setImpl(new TopoDS_Shape());
+        return aGeomShape;
       }
 
       Standard_Boolean failsonly = Standard_False;
@@ -193,4 +208,64 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
   aGeomShape->setImpl(new TopoDS_Shape(aResShape));
   return aGeomShape;
+}
+
+//==================================================================================================
+GeomShapePtr STEPImportAttributs(const std::string& theFileName,
+                                 std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                 const bool theScalInterUnits,
+                                 const bool theMaterials,
+                                 const bool theColor,
+                                 std::map< std::wstring,
+                                 std::list<std::wstring>>& theMaterialShape,
+                                 std::string& theError)
+{
+
+  try {
+    STEPControl_Reader aReader;
+    std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+
+    Interface_Static::SetCVal("xstep.cascade.unit","M");
+    Interface_Static::SetIVal("read.step.ideas", 1);
+    Interface_Static::SetIVal("read.step.nonmanifold", 1);
+
+    try {
+      OCC_CATCH_SIGNALS;
+
+      IFSelect_ReturnStatus status = aReader.ReadFile(theFileName.c_str());
+
+      if (status == IFSelect_RetDone) {
+        // Regard or not the model units
+        if( !readUnits(aReader,theScalInterUnits,theError)) {
+          aGeomShape->setImpl(new TopoDS_Shape());
+          return aGeomShape;
+        }
+      }
+    } catch (Standard_Failure const& anException) {
+      theError = anException.GetMessageString();
+      aGeomShape->setImpl(new TopoDS_Shape());
+      return aGeomShape;
+    }
+
+    STEPCAFControl_Reader aCafreader;
+    aCafreader.SetColorMode(true);
+    aCafreader.SetNameMode(true);
+    aCafreader.SetMatMode(true);
+
+    if (aCafreader.ReadFile(theFileName.c_str()) != IFSelect_RetDone) {
+      theError = "Wrong format of the imported file. Can't import file.";
+      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+      aGeomShape->setImpl(new TopoDS_Shape());
+      return aGeomShape;
+    }
+
+    return readAttributes(aCafreader,
+                          theResultBody,
+                          theMaterials,
+                          theMaterialShape,
+                          theError);
+  } catch (OSD_Exception& e) {
+    //Try to load STEP file without colors...
+    return STEPImport(theFileName,"",theScalInterUnits,theError);
+  }
 }

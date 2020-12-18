@@ -69,8 +69,9 @@ The Result of operation is an exported file.
 Export to CAD format
 --------------------
 
-It is possible to export objects to files in the following CAD-neutral formats: BREP, STEP, IGES, XAO.
+It is possible to export objects to files in the following CAD-neutral formats: BREP, STEP, IGES, XAO, STL.
 To export objects to a file select in the Main Menu *File -> Export -> To CAD  formats...* item.
+
 
 The following property panel will be opened:
 
@@ -79,14 +80,21 @@ The following property panel will be opened:
 
    **Export property panel**
 
-In this panel, it is necessary to select desirable format of export file. It can be **'BREP, STEP, IGES'** or **'XAO'**. In case of first choice the format of exported file will be defined according to file extension. The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box:
+In this panel, it is necessary to select desirable format of export file. It can be **'BREP, STEP, IGES'** , **'XAO'** or **'STL'** . 
+
+
+Export to BREP, STEP, IGES
+""""""""""""""""""""""""""
+
+In case of first choice the format of exported file will be defined according to file extension. The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box:
 
 .. figure:: images/ExportFileDlg.png
    :align: center
 
-   **Dialog box tp export in CAD-neutral format**
+   **Dialog box to export in CAD-neutral format**
 
 Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.
+
 
 **Apply** button exports the file.
   
@@ -115,3 +123,50 @@ Result
 The Result of operation is an exported file.
 
 **See Also** a sample TUI Script of :ref:`tui_export_file` operation.
+
+Result
+""""""
+
+The Result of operation is an exported file.
+
+**See Also** a sample TUI Script of :ref:`tui_export_file` operation.
+
+Export to STL
+"""""""""""""
+In this case, the following property panel will be opened:
+
+.. figure:: images/ExportSTL.png
+   :align: center
+
+   **Dialog box to export in STL format**
+
+
+The file name and path can be defined in **Export file**  field by direct input or browsing with ‘…’ button, which opens Export file dialog box.
+
+**Object** field contains an exported object which can be selected in a viewer or object browser.
+
+**Deflection** (**Relative** or **Absolute**) has to be chosen and defined in the corresponding field as well as the **File type** which can defined as **Binary** or as **ASCII**. 
+
+
+**Apply** button exports the file.
+  
+**Cancel** button cancels the operation.
+
+**TUI Command**:
+
+.. py:function:: model.exportToSTL(Part_doc, FileNameString, selectedShape, relative, absolute, isRelative, isASCII)
+
+    :param part: The current part object
+    :param string: The file name
+    :param object: An exporting object
+    :param real: value of the relative deflection
+    :param real: value of the absolute deflection
+    :param boolean: indicate if use deflection relative
+    :param boolean: indicate if the file is in ASCII type 
+
+Result
+""""""
+
+The Result of operation is an exported STL file.
+
+**See Also** a sample TUI Script of :ref:`tui_export_file_STL` operation.

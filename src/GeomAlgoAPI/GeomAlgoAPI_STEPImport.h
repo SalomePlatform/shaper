@@ -23,13 +23,27 @@
 #include <GeomAlgoAPI.h>
 
 #include <string>
-
 #include <GeomAPI_Shape.h>
+
+#include <ModelAPI_ResultBody.h>
+
 
 /// Implementation of the import STEP files algorithms
 GEOMALGOAPI_EXPORT
 std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
                                           const std::string& theFormatName,
+                                          const bool theScalInterUnits,
                                           std::string& theError);
+
+/// Implementation of the import STEP files algorithms with Attributs (Name, Color, Materials)
+GEOMALGOAPI_EXPORT
+GeomShapePtr  STEPImportAttributs(const std::string& theFileName,
+                                  std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                  const bool theScalInterUnits,
+                                  const bool theMaterials,
+                                  const bool theColor,
+                                  std::map< std::wstring,
+                                  std::list<std::wstring>>& theMaterialShape,
+                                  std::string& theError);
 
 #endif /* GEOMALGOAPI_STEPIMPORT_H_ */

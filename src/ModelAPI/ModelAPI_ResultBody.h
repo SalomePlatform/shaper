@@ -24,6 +24,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <string>
+#include <map>
+#include <vector>
 
 class ModelAPI_BodyBuilder;
 class GeomAlgoAPI_MakeShape;
@@ -182,6 +184,26 @@ public:
 
   /// Cleans cash related to the already stored elements
   MODELAPI_EXPORT virtual void cleanCash() = 0;
+
+  /// Add shape Name for read shape in step file
+  MODELAPI_EXPORT virtual std::wstring addShapeName
+                              (std::shared_ptr<GeomAPI_Shape>,const std::wstring& theName) = 0;
+
+  /// Add color for shape Name read shape in step file
+  MODELAPI_EXPORT virtual void addShapeColor
+                              (const std::wstring& theName,std::vector<int>& theColor) = 0;
+
+  /// Set the map of name and color read shape in step file
+  MODELAPI_EXPORT virtual void setShapeName
+                          (std::map< std::wstring, std::shared_ptr<GeomAPI_Shape> > &theShapeName,
+                           std::map< std::wstring, std::vector<int>> & theColorsShape) = 0;
+
+  /// Clear the map of name and color read shape in step file
+  MODELAPI_EXPORT virtual void clearShapeNameAndColor() = 0;
+
+  /// find the name of shapp read in step file
+  MODELAPI_EXPORT virtual std::wstring findShapeName(std::shared_ptr<GeomAPI_Shape> theShape) = 0;
+
 
 protected:
   /// Default constructor accessible only from Model_Objects

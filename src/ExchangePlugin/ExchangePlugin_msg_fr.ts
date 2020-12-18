@@ -295,8 +295,12 @@
       <translation>Importer</translation>
     </message>
     <message>
-      <source>Import a file</source>
-      <translation>Importer un fichier</translation>
+      <source>Create groups from</source>
+      <translation>Créer des groupes à partir</translation>
+    </message>
+    <message>
+      <source>Materials</source>
+      <translation>Matériels</translation>
     </message>
   </context>
   <context>
@@ -306,7 +310,34 @@
       <translation>Importer un fichier</translation>
     </message>
   </context>
-
+  <context>
+    <name>Import:step_file_path</name>
+    <message>
+      <source>Import file</source>
+      <translation>Importer un fichier</translation>
+    </message>
+  </context>
+  <context>
+    <name>Import:step_scale_inter_units</name>
+    <message>
+      <source>Scale to International System of Units</source>
+      <translation>Mettre à l'échelle du système international d'unités</translation>
+    </message>
+  </context>
+  <context>
+    <name>Import:step_materials</name>
+    <message>
+      <source>Materials</source>
+      <translation>Matériels</translation>
+    </message>
+  </context>
+  <context>
+    <name>Import:step_colors</name>
+    <message>
+      <source>Colors</source>
+      <translation>Couleurs</translation>
+    </message>
+  </context>
   <context>
     <name>ImportMacro</name>
     <message>
@@ -317,7 +348,11 @@
       <source>Import a file</source>
       <translation>Importer un fichier</translation>
     </message>
-  </context>
+    <message>
+      <source>Create groups from</source>
+      <translation>Créer des groupes à partir</translation>
+    </message>
+  </context> 
   <context>
     <name>ImportMacro:target_part</name>
     <message>
@@ -326,10 +361,45 @@
     </message>
   </context>
   <context>
+    <name>ImportMacro:step_target_part</name>
+    <message>
+      <source>Import to</source>
+      <translation>Importer vers</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:step_scale_inter_units</name>
+    <message>
+      <source>Scale to International System of Units</source>
+      <translation>Mettre à l'échelle du système international d'unités</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:step_materials</name>
+    <message>
+      <source>Materials</source>
+      <translation>Matériels</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:step_colors</name>
+    <message>
+      <source>Colors</source>
+      <translation>Couleurs</translation>
+    </message>
+  </context>
+  <context>
     <name>ImportMacro:file_path</name>
     <message>
       <source>Import file</source>
       <translation>Fichier à importer</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:step_file_path</name>
+    <message>
+      <source>Import file</source>
+      <translation>Importer un fichier</translation>
     </message>
   </context>
   <context>

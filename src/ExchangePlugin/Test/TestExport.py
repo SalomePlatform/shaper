@@ -59,7 +59,9 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta, theErrorExpecte
     aSession.startOperation("Import screw")
     anImportFeature = aPart.addFeature("Import")
     aShapePath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Step", "screw.step")
-    anImportFeature.string("file_path").setValue(aShapePath)
+    anImportFeature.string("step_file_path").setValue(aShapePath)
+    anImportFeature.string("ImportType").setValue("STEP")
+    anImportFeature.boolean("step_scale_inter_units").setValue(True)
     aSession.finishOperation()
 
     removeFile(theFile)
@@ -101,6 +103,7 @@ def testExportXAO(theFile, theEmptyFormat = False):
     anImportFeature = aPart.addFeature("Import")
     aShapePath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Brep", "box1.brep")
     anImportFeature.string("file_path").setValue(aShapePath)
+    anImportFeature.string("ImportType").setValue("BREP")
     aSession.finishOperation()
 
     # Create groups
@@ -175,21 +178,21 @@ if __name__ == '__main__':
         aRealVolume = 3.78827401738e-06
         testExport("BREP", "BREP", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
         testExport("BRP", "BREP", os.path.join(tmp_dir, "screw_export.brp"), aRealVolume, 10 ** -17)
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
+        testExport("BREP", "", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
         #=========================================================================
         # Export a shape into STEP
         #=========================================================================
         testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.step"), 3.788258075329978e-06, 10 ** -17)
-        testExport("STP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.788258075329978e-06, 10 ** -17)
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.step"), 3.788258075329978e-06, 10 ** -17)
+        testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.788258075329978e-06, 10 ** -17)
+        testExport("STEP", "", os.path.join(tmp_dir, "screw_export.step"), 3.788258075329978e-06, 10 ** -17)
         #=========================================================================
         # Export a shape into IGES
         #=========================================================================
-        testExport("IGES-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
-        testExport("IGS-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 0.0019293313766693052, 10 ** -17)
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
-        testExport("IGES-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
-        testExport("IGS-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
+        testExport("IGES", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
+        testExport("IGS", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 0.0019293313766693052, 10 ** -17)
+        testExport("IGES", "", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
+        testExport("IGES", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
+        testExport("IGS", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
         #=========================================================================
         # Export a shape into XAO
         #=========================================================================
@@ -198,7 +201,7 @@ if __name__ == '__main__':
         #=========================================================================
         # Check error when export to unsupported format
         #=========================================================================
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.dwg"), 3.78825807533e-06, 10 ** -17, True)
+        testExport("BREP", "", os.path.join(tmp_dir, "screw_export.dwg"), 3.78825807533e-06, 10 ** -17, True)
         #=========================================================================
         # End of test
         #=========================================================================

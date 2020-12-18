@@ -56,7 +56,7 @@ bool STLExport(const std::string& theFileName,
   try
   {
 
-    double lDeflection = theDeflection;
+    double aDeflection = theDeflection;
     StlAPI_Writer aWriter;
     // copy source shape
     BRepBuilderAPI_Copy aCopy( theShape->impl<TopoDS_Shape>(), Standard_False );
@@ -65,13 +65,15 @@ bool STLExport(const std::string& theFileName,
     aWriter.ASCIIMode() = theIsASCII;
     if ( theIsRelative ) {
       Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
-      Bnd_Box bndBox;
-      BRepBndLib::Add( theShape->impl<TopoDS_Shape>(), bndBox );
-      bndBox.Get( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
-      lDeflection = MAX3( aXmax-aXmin, aYmax-aYmin, aZmax-aZmin ) * theDeflection;
+      Bnd_Box aBndBox;
+      BRepBndLib::Add( theShape->impl<TopoDS_Shape>(), aBndBox );
+      aBndBox.Get( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
+      aDeflection = MAX3( aXmax-aXmin, aYmax-aYmin, aZmax-aZmin ) * theDeflection;
     }
     //Compute triangulation
-    BRepMesh_IncrementalMesh aMesh( aCopyShape, lDeflection );
+    BRepTools::Clean( aCopyShape );
+    BRepMesh_IncrementalMesh aMesh( aCopyShape, aDeflection );
+
     if (!aWriter.Write( aCopyShape, theFileName.c_str())) {
       theError = "STL Export failed";
       return false;
