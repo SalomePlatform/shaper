@@ -36,7 +36,7 @@
 
 #include <math.h>
 
-static GeomShapePtr runAlgo(GeomAlgoAPI_MakeShape& theAlgo)
+static GeomShapePtr runAlgo(GeomAlgoAPI_MakeShape& theAlgo)  throw (GeomAlgoAPI_Exception)
 {
   if (!theAlgo.check())
     throw GeomAlgoAPI_Exception(theAlgo.getError());
@@ -50,6 +50,7 @@ static GeomShapePtr runAlgo(GeomAlgoAPI_MakeShape& theAlgo)
 }
 
 static GeomShapePtr runAlgoAndCheckShape(GeomAlgoAPI_MakeShape& theAlgo, const std::string& theMsg)
+throw (GeomAlgoAPI_Exception)
 {
   if (!theAlgo.check())
     throw GeomAlgoAPI_Exception(theAlgo.getError());
@@ -67,7 +68,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(
     const double theDx, const double theDy,
-    const double theDz)
+    const double theDz) throw (GeomAlgoAPI_Exception)
   {
     static const std::string aMsg("Box builder with dimensions");
     GeomAlgoAPI_Box aBoxAlgo(theDx,theDy,theDz);
@@ -77,7 +78,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(
     std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
-    std::shared_ptr<GeomAPI_Pnt> theSecondPoint)
+    std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
   {
     static const std::string aMsg("Box builder with two points");
     GeomAlgoAPI_Box aBoxAlgo(theFirstPoint, theSecondPoint);
@@ -87,7 +88,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCylinder(
     std::shared_ptr<GeomAPI_Pnt> theBasePoint, std::shared_ptr<GeomAPI_Edge> theEdge,
-    double theRadius, double theHeight)
+    double theRadius, double theHeight) throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
     if (!theBasePoint) {
@@ -111,7 +112,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCylinder(
     std::shared_ptr<GeomAPI_Pnt> theBasePoint, std::shared_ptr<GeomAPI_Edge> theEdge,
-    double theRadius, double theHeight, double theAngle)
+    double theRadius, double theHeight, double theAngle) throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
     if (!theBasePoint) {
@@ -134,7 +135,7 @@ namespace GeomAlgoAPI_ShapeAPI
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCylinder(
-    double theRadius, double theHeight)
+    double theRadius, double theHeight) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -151,7 +152,7 @@ namespace GeomAlgoAPI_ShapeAPI
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCylinder(
-    double theRadius, double theHeight, double theAngle)
+    double theRadius, double theHeight, double theAngle) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -168,7 +169,7 @@ namespace GeomAlgoAPI_ShapeAPI
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSphere(
-      std::shared_ptr<GeomAPI_Pnt> theCenterPoint, double theRadius)
+      std::shared_ptr<GeomAPI_Pnt> theCenterPoint, double theRadius) throw (GeomAlgoAPI_Exception)
   {
     static const std::string aMsg("Sphere builder");
     GeomAlgoAPI_Sphere aSphereAlgo(theCenterPoint, theRadius);
@@ -177,6 +178,7 @@ namespace GeomAlgoAPI_ShapeAPI
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSphere(double theRadius)
+      throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aCenterPoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -191,6 +193,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTorus(
       std::shared_ptr<GeomAPI_Pnt> theBasePoint,
       std::shared_ptr<GeomAPI_Edge> theEdge,double theRadius, double theRingRadius)
+      throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
     if (!theBasePoint) {
@@ -213,7 +216,7 @@ namespace GeomAlgoAPI_ShapeAPI
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTorus(double theRadius,
-      double theRingRadius)
+      double theRingRadius) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -233,7 +236,7 @@ namespace GeomAlgoAPI_ShapeAPI
       std::shared_ptr<GeomAPI_Pnt> theBasePoint,
       std::shared_ptr<GeomAPI_Edge> theEdge,
       double theBaseRadius, double theTopRadius,
-      double theHeight)
+      double theHeight) throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
     if (!theBasePoint) {
@@ -257,7 +260,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCone(
       double theBaseRadius, double theTopRadius,
-      double theHeight)
+      double theHeight) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -276,7 +279,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1>   theAxis,
-    const double theDistance)
+    const double theDistance) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theAxis, theDistance);
     return runAlgo(aTranslationAlgo);
@@ -287,7 +290,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     const double theDx,
     const double theDy,
-    const double theDz)
+    const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theDx, theDy, theDz);
     return runAlgo(aTranslationAlgo);
@@ -297,7 +300,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
-    std::shared_ptr<GeomAPI_Pnt>   theEndPoint)
+    std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theStartPoint, theEndPoint);
     return runAlgo(aTranslationAlgo);
@@ -307,7 +310,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeRotation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
-    const double theAngle)
+    const double theAngle) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theAxis, theAngle);
     return runAlgo(aRotationAlgo);
@@ -318,7 +321,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
     std::shared_ptr<GeomAPI_Pnt> theStartPoint,
-    std::shared_ptr<GeomAPI_Pnt> theEndPoint)
+    std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theCenterPoint, theStartPoint, theEndPoint);
     return runAlgo(aRotationAlgo);
@@ -327,7 +330,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Pnt>   thePoint)
+    std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePoint);
     return runAlgo(aSymmetryAlgo);
@@ -336,7 +339,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Ax1>   theAxis)
+    std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, theAxis);
     return runAlgo(aSymmetryAlgo);
@@ -345,7 +348,7 @@ namespace GeomAlgoAPI_ShapeAPI
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Ax2>   thePlane)
+    std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePlane);
     return runAlgo(aSymmetryAlgo);
@@ -355,7 +358,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeScale(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
-    const double                   theScaleFactor)
+    const double                   theScaleFactor) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint, theScaleFactor);
     return runAlgo(aScaleAlgo);
@@ -367,7 +370,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
     const double                   theScaleFactorX,
     const double                   theScaleFactorY,
-    const double                   theScaleFactorZ)
+    const double                   theScaleFactorZ) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint,
                                  theScaleFactorX, theScaleFactorY, theScaleFactorZ);
@@ -379,7 +382,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
     const double theStep,
-    const int theNumber)
+    const int theNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theAxis) {
       std::string aError = "Multitranslation builder ";
@@ -409,7 +412,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const int theFirstNumber,
     std::shared_ptr<GeomAPI_Ax1> theSecondAxis,
     const double theSecondStep,
-    const int theSecondNumber)
+    const int theSecondNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theFirstAxis) {
       std::string aError = "Multitranslation builder ";
@@ -463,7 +466,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiRotation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
-    const int theNumber)
+    const int theNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theAxis) {
       std::string aError = "Multirotation builder ";
@@ -492,7 +495,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
     const double theStep,
-    const int theNumber)
+    const int theNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theAxis) {
       std::string aError = "Multirotation builder ";
@@ -519,7 +522,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theRMin1, const double theRMax1,
     const double theRMin2, const double theRMax2,
     const double theZ,
-    const double theStartPhi, const double theDeltaPhi)
+    const double theStartPhi, const double theDeltaPhi) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_ConeSegment aConeSegmentAlgo(theRMin1, theRMax1, theRMin2, theRMax2,
                                              theZ, theStartPhi, theDeltaPhi);
