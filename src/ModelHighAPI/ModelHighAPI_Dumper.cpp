@@ -1457,6 +1457,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     bool isAdded = false;
     std::list<ObjectPtr>::const_iterator anIt = aList.begin();
     for (; anIt != aList.end(); ++anIt) {
+      if (!(*anIt))
+        continue;
       if (!isDumped(ModelAPI_Feature::feature(*anIt)))
         break; // stop if the object is not dumped yet (parent feature should be postponed)
 

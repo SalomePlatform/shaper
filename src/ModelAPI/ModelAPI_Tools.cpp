@@ -706,7 +706,8 @@ std::pair<std::wstring, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resu
 
       // return name of reference result only if it has been renamed by the user,
       // in other case compose a default name
-      if (anObjRes->data()->hasUserDefinedName()) {
+      if (anObjRes->data()->hasUserDefinedName() ||
+          anObjRes->data()->name() != getDefaultName(anObjRes).first) {
         std::wstringstream aName;
         aName << anObjRes->data()->name();
         std::map<ResultPtr, int>::iterator aFound = aNbRefToObject.find(anObjRes);
