@@ -160,4 +160,5 @@ ADD_UNIT_TESTS(TestVertex.py
                Test3271.py
                Test19056.py
                Test20469.py
+               Test20513.py
 )

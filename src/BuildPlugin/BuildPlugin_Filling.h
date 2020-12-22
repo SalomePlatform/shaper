@@ -171,8 +171,7 @@ private:
   void restoreDefaultParameters();
 
 private:
-  std::shared_ptr<GeomAPI_Pnt> myLastEdgeStartPoint;
-  std::shared_ptr<GeomAPI_Pnt> myLastEdgeEndPoint;
+  std::shared_ptr<GeomAPI_Edge> myLastEdge;
 };
 
 #endif

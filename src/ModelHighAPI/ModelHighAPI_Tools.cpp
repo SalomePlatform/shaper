@@ -359,7 +359,7 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
     case ModelHighAPI_Selection::VT_ResultSubShapePair: {
       ResultSubShapePair aPair = theSelection.resultSubShapePair();
       GeomShapePtr aShape = aPair.second;
-      if(!aShape.get()) {
+      if(!aShape.get() && aPair.first.get()) {
         aShape = aPair.first->shape();
       }
       if(!aShape.get()) {

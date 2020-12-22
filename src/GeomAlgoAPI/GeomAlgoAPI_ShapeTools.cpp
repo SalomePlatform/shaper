@@ -1135,7 +1135,8 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
     // on the curve and second is placed at the start, this workaround copies second curve to avoid
     // treating these edges as a single curve by setting trim parameters.
     aWire = fixParametricGaps(aWire);
-    TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire);
+    aWire = BRepAlgo::ConcatenateWire(aWire, GeomAbs_G1); // join smooth parts of wire
+    TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire); // join C0 parts of wire
     anEdge = GeomEdgePtr(new GeomAPI_Edge);
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));
   }

@@ -30,10 +30,13 @@
 #include <GeomAlgoAPI_Filling.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_WireBuilder.h>
 
+#include <GeomAPI_Curve.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_Wire.h>
+#include <GeomAPI_WireExplorer.h>
 
 #include <cmath>
 
@@ -47,6 +50,15 @@ struct FillingParameters
   double tol3D;
   bool isApprox;
 };
+
+static bool isReverseClosedCurve(const GeomEdgePtr& theEdge1,
+                                 const GeomEdgePtr& theEdge2);
+static bool isReverseOpenedCurve(const GeomEdgePtr& theEdge1,
+                                 const GeomEdgePtr& theEdge2,
+                                 const double theTolerance);
+static void shiftStartPoint(GeomWirePtr& theWire,
+                            const GeomEdgePtr& theRefEdge,
+                            const double theTolerance);
 
 
 //=================================================================================================
@@ -104,15 +116,11 @@ void BuildPlugin_Filling::execute()
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomEdgePtr anEdge = toEdge(aSelection->value(), aParameters.method);
-    if (!anEdge) {
-      myLastEdgeStartPoint = GeomPointPtr();
-      myLastEdgeEndPoint = GeomPointPtr();
+    if (!anEdge)
       return;
-    }
     aFilling->add(anEdge);
   }
-  myLastEdgeStartPoint = GeomPointPtr();
-  myLastEdgeEndPoint = GeomPointPtr();
+  myLastEdge = GeomEdgePtr();
 
   // build result
   aFilling->build(aParameters.isApprox);
@@ -148,15 +156,20 @@ void BuildPlugin_Filling::attributeChanged(const std::string& theID)
 //=================================================================================================
 GeomEdgePtr BuildPlugin_Filling::toEdge(const GeomShapePtr& theShape, const std::string& theMethod)
 {
+  static const double TOLERANCE = 1.e-7;
+
   GeomEdgePtr anEdge;
   switch (theShape->shapeType()) {
   case GeomAPI_Shape::EDGE:
     anEdge = GeomEdgePtr(new GeomAPI_Edge(GeomAlgoAPI_Copy(theShape).shape()));
     break;
-  case GeomAPI_Shape::WIRE:
-    anEdge = GeomAlgoAPI_ShapeTools::wireToEdge(
-        GeomWirePtr(new GeomAPI_Wire(theShape)));
+  case GeomAPI_Shape::WIRE: {
+    GeomWirePtr aWire(new GeomAPI_Wire(theShape));
+    if (myLastEdge && theMethod == Method::AUTO_CORRECT_ORIENTATION())
+      shiftStartPoint(aWire, myLastEdge, TOLERANCE);
+    anEdge = GeomAlgoAPI_ShapeTools::wireToEdge(aWire);
     break;
+  }
   default:
     break;
   }
@@ -171,34 +184,18 @@ GeomEdgePtr BuildPlugin_Filling::toEdge(const GeomShapePtr& theShape, const std:
   // correct edge orientation according to filling method
   if (theMethod == Method::AUTO_CORRECT_ORIENTATION()) {
     // check the distance to previous edge boundaries, reverse edge if necessary
-    GeomPointPtr aStartPnt = anEdge->firstPoint();
-    GeomPointPtr aEndPnt = anEdge->lastPoint();
-    if (anEdge->orientation() == GeomAPI_Shape::REVERSED) {
-      aStartPnt = anEdge->lastPoint();
-      aEndPnt = anEdge->firstPoint();
-    }
     bool isReverse = false;
-    if (myLastEdgeStartPoint) {
-      double d1 = myLastEdgeStartPoint->distance(aStartPnt)
-                + myLastEdgeEndPoint->distance(aEndPnt);
-      double d2 = myLastEdgeStartPoint->distance(aEndPnt)
-                + myLastEdgeEndPoint->distance(aStartPnt);
-      if (fabs(d1 - d2) < 1.e-7) {
-        // undefined case => check distance to start point only
-        d1 = myLastEdgeStartPoint->distance(aStartPnt);
-        d2 = myLastEdgeStartPoint->distance(aEndPnt);
-      }
-      isReverse = d2 < d1;
+    if (myLastEdge) {
+      if (myLastEdge->firstPoint()->distance(myLastEdge->lastPoint()) < TOLERANCE &&
+          anEdge->firstPoint()->distance(anEdge->lastPoint()) < TOLERANCE)
+        isReverse = isReverseClosedCurve(myLastEdge, anEdge);
+      else
+        isReverse = isReverseOpenedCurve(myLastEdge, anEdge, TOLERANCE);
     }
 
-    if (isReverse) {
+    myLastEdge = anEdge;
+    if (isReverse)
       anEdge->reverse();
-      myLastEdgeStartPoint = aEndPnt;
-      myLastEdgeEndPoint = aStartPnt;
-    } else {
-      myLastEdgeStartPoint = aStartPnt;
-      myLastEdgeEndPoint = aEndPnt;
-    }
   }
   else if (theMethod == Method::USE_CURVE_INFORMATION()) {
     // make all edges FORWARD to avoid reversing the curves by GeomAlgoAPI_Filling algorithm
@@ -217,4 +214,94 @@ void BuildPlugin_Filling::restoreDefaultParameters()
   real(TOLERANCE_2D_ID())->setValue(TOLERANCE_2D_DEFAULT());
   real(TOLERANCE_3D_ID())->setValue(TOLERANCE_3D_DEFAULT());
   boolean(APPROXIMATION_ID())->setValue(APPROXIMATION_DEFAULT());
+}
+
+
+//============     Auxiliary functions     ========================================================
+
+static std::pair<GeomPointPtr, GeomPointPtr> edgeBoundaries(const GeomEdgePtr& theEdge)
+{
+  GeomPointPtr aStart = theEdge->firstPoint();
+  GeomPointPtr anEnd = theEdge->lastPoint();
+  if (theEdge->orientation() == GeomAPI_Shape::REVERSED)
+    std::swap(aStart, anEnd);
+  return std::pair<GeomPointPtr, GeomPointPtr>(aStart, anEnd);
+}
+
+static void edgePoints(const GeomEdgePtr& theEdge, std::list<GeomPointPtr>& thePoints)
+{
+  GeomAPI_Curve aCurve(theEdge);
+  static const int aNbSegments = 10;
+  double aStart = aCurve.startParam();
+  double aEnd = aCurve.endParam();
+  for (int i = 0; i <= aNbSegments; ++i)
+    thePoints.push_back(aCurve.getPoint(aStart * (1.0 - (double)i / aNbSegments) +
+                                        aEnd * (double)i / aNbSegments ));
+  if (theEdge->orientation() == GeomAPI_Shape::REVERSED)
+    thePoints.reverse();
+}
+
+bool isReverseClosedCurve(const GeomEdgePtr& theEdge1,
+                          const GeomEdgePtr& theEdge2)
+{
+  std::list<GeomPointPtr> anEdge1Points, anEdge2Points;
+  edgePoints(theEdge1, anEdge1Points);
+  edgePoints(theEdge2, anEdge2Points);
+
+  double d1 = 0.0;
+  double d2 = 0.0;
+  std::list<GeomPointPtr>::const_iterator anIt1 = anEdge1Points.begin();
+  std::list<GeomPointPtr>::const_iterator anIt2 = anEdge2Points.begin();
+  std::list<GeomPointPtr>::const_reverse_iterator anIt2Rev = anEdge2Points.rbegin();
+  for (; anIt1 != anEdge1Points.end(); ++anIt1, ++anIt2, ++anIt2Rev) {
+    d1 += (*anIt1)->distance(*anIt2);
+    d2 += (*anIt1)->distance(*anIt2Rev);
+  }
+  return d2 < d1;
+}
+
+bool isReverseOpenedCurve(const GeomEdgePtr& theEdge1,
+                          const GeomEdgePtr& theEdge2,
+                          const double theTolerance)
+{
+  std::pair<GeomPointPtr, GeomPointPtr> anEdge1Points = edgeBoundaries(theEdge1);
+  std::pair<GeomPointPtr, GeomPointPtr> anEdge2Points = edgeBoundaries(theEdge2);
+  double d1 = anEdge1Points.first->distance(anEdge2Points.first)
+            + anEdge1Points.second->distance(anEdge2Points.second);
+  double d2 = anEdge1Points.first->distance(anEdge2Points.second)
+            + anEdge1Points.second->distance(anEdge2Points.first);
+  if (fabs(d1 - d2) < theTolerance) {
+    // undefined case => check distance to start point only
+    d1 = anEdge1Points.first->distance(anEdge2Points.first);
+    d2 = anEdge1Points.first->distance(anEdge2Points.second);
+  }
+  return d2 < d1;
+}
+
+void shiftStartPoint(GeomWirePtr& theWire, const GeomEdgePtr& theRefEdge, const double theTolerance)
+{
+  if (!theWire->isClosed()) {
+    GeomVertexPtr aV1, aV2;
+    GeomAlgoAPI_ShapeTools::findBounds(theWire, aV1, aV2);
+    if (aV1->point()->distance(aV2->point()) > theTolerance)
+      return;
+  }
+
+  // find closest vertex on the wire to the start point on the edge
+  GeomPointPtr aFirstRefPnt = theRefEdge->firstPoint();
+  ListOfShape aBegin, aEnd;
+  double aMinDist = 1.e100;
+  for (GeomAPI_WireExplorer anExp(theWire); anExp.more(); anExp.next()) {
+    double aDist = anExp.currentVertex()->point()->distance(aFirstRefPnt);
+    if (aDist < aMinDist) {
+      aMinDist = aDist;
+      aEnd.insert(aEnd.end(), aBegin.begin(), aBegin.end());
+      aBegin.clear();
+    }
+    aBegin.push_back(anExp.current());
+  }
+  aBegin.insert(aBegin.end(), aEnd.begin(), aEnd.end());
+
+  GeomShapePtr aShape = GeomAlgoAPI_WireBuilder::wire(aBegin);
+  theWire.reset(new GeomAPI_Wire(aShape));
 }
