@@ -687,7 +687,7 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
   std::list<ResultPtr> allRes;
   ModelAPI_Tools::allResults(theFeature, allRes);
   for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-    std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(*aRes);
+    std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(*aRes, true, true);
     std::string aDefaultName = Locale::Convert::toString(aName.first);
     std::string aResName = Locale::Convert::toString((*aRes)->data()->name());
     bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
