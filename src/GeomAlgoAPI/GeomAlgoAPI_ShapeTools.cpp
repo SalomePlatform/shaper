@@ -1130,13 +1130,18 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
   GeomEdgePtr anEdge;
   if (theWire) {
     TopoDS_Wire aWire = theWire->impl<TopoDS_Wire>();
-    // Workaround: when concatenate a wire consisting of two edges based on the same B-spline curve
-    // (non-periodic, but having equal start and end points), first of which is placed at the end
-    // on the curve and second is placed at the start, this workaround copies second curve to avoid
-    // treating these edges as a single curve by setting trim parameters.
-    aWire = fixParametricGaps(aWire);
-    aWire = BRepAlgo::ConcatenateWire(aWire, GeomAbs_G1); // join smooth parts of wire
-    TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire); // join C0 parts of wire
+    BRepTools_WireExplorer aWExp(aWire);
+    TopoDS_Edge aNewEdge = aWExp.Current();
+    aWExp.Next();
+    if (aWExp.More()) {
+      // Workaround: when concatenate a wire consisting of two edges based on the same B-spline
+      // curve (non-periodic, but having equal start and end points), first of which is placed
+      // at the end on the curve and second is placed at the start, this workaround copies
+      // second curve to avoid treating these edges as a single curve by setting trim parameters.
+      aWire = fixParametricGaps(aWire);
+      aWire = BRepAlgo::ConcatenateWire(aWire, GeomAbs_G1); // join smooth parts of wire
+      aNewEdge = BRepAlgo::ConcatenateWireC0(aWire); // join C0 parts of wire
+    }
     anEdge = GeomEdgePtr(new GeomAPI_Edge);
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));
   }
