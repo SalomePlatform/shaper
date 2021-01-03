@@ -61,6 +61,10 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
   std::string aStyleSheet = theData->getProperty(ATTR_STYLE_SHEET);
   if (!aStyleSheet.empty())
     myLabel->setStyleSheet(QString("QLabel {%1}").arg(aStyleSheet.c_str()));
+
+  aStyleSheet = theData->getProperty(ATTR_IS_SELECTABLE);
+  if ( aStyleSheet == "true")
+    myLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
 ModuleBase_WidgetLabel::~ModuleBase_WidgetLabel()

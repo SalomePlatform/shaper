@@ -33,6 +33,7 @@
 #include <FeaturesPlugin_Fillet1D.h>
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Measurement.h>
+#include <FeaturesPlugin_PointCoordinates.h>
 #include <FeaturesPlugin_MultiRotation.h>
 #include <FeaturesPlugin_MultiTranslation.h>
 #include <FeaturesPlugin_Partition.h>
@@ -197,6 +198,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_ImportResult);
   } else if (theFeatureID == FeaturesPlugin_Defeaturing::ID()) {
     return FeaturePtr(new FeaturesPlugin_Defeaturing);
+  } else if (theFeatureID == FeaturesPlugin_PointCoordinates::ID()) {
+    return FeaturePtr(new FeaturesPlugin_PointCoordinates);
   }
 
 

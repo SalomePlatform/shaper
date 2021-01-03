@@ -124,6 +124,10 @@
       <translation>Mesure</translation>
     </message>
     <message>
+      <source>Point coordinates</source>
+      <translation>Coordonnées d'un point</translation>
+    </message>
+    <message>
       <source>Placement</source>
       <translation>Placement</translation>
     </message>
@@ -4454,7 +4458,14 @@
       <translation>Deuxième direction</translation>
     </message>
   </context>
-
+  <!-- PointCoordinates -->
+  <context>
+    <name>PointCoordinates</name>
+    <message>
+      <source>Point coordinates</source>
+      <translation>Coordonnées d'un point</translation>
+    </message>
+  </context>
   <!-- Measurement -->
   <context>
     <name>Measurement</name>

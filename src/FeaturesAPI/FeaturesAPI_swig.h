@@ -53,5 +53,6 @@
   #include "FeaturesAPI_RemoveResults.h"
   #include "FeaturesAPI_Copy.h"
   #include "FeaturesAPI_ImportResult.h"
+  #include "FeaturesAPI_PointCoordinates.h"
 
 #endif // FeaturesAPI_swig_H_

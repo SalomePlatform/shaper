@@ -51,6 +51,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Copy.h
   FeaturesAPI_ImportResult.h
   FeaturesAPI_Defeaturing.h
+  FeaturesAPI_PointCoordinates.h
 )
 
 SET(PROJECT_SOURCES
@@ -84,6 +85,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Copy.cpp
   FeaturesAPI_ImportResult.cpp
   FeaturesAPI_Defeaturing.cpp
+  FeaturesAPI_PointCoordinates.cpp
 )
 
 SET(PROJECT_LIBRARIES
