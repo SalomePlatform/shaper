@@ -24,6 +24,8 @@
 #include "SketchAPI.h"
 
 #include "SketchAPI_SketchEntity.h"
+#include "SketchPlugin_Rectangle.h"
+
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
@@ -50,10 +52,10 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rectangle();
 
-  INTERFACE_3("SketchRectangle",
-              startPoint, "RectStartPoint", GeomDataAPI_Point2D, /** Start point */,
-              endPoint, "RectEndPoint", GeomDataAPI_Point2D, /** End point */,
-              linesList, "RectangleList", ModelAPI_AttributeRefList, /** Lines list */
+  INTERFACE_3(SketchPlugin_Rectangle::ID(),
+              startPoint, SketchPlugin_Rectangle::START_ID(), GeomDataAPI_Point2D, /** Start point */,
+              endPoint,  SketchPlugin_Rectangle::END_ID(), GeomDataAPI_Point2D, /** End point */,
+              linesList,  SketchPlugin_Rectangle::LINES_LIST_ID(), ModelAPI_AttributeRefList, /** Lines list */
   )
 
   /// Set by coordinates
@@ -67,7 +69,10 @@ public:
 
   /// List of lines composing rectangle
   SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;
-};
+
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+  };
 
 //! Pointer on Rectangle object
 typedef std::shared_ptr<SketchAPI_Rectangle> RectanglePtr;

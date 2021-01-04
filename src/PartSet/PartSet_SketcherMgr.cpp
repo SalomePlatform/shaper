@@ -368,7 +368,7 @@ bool PartSet_SketcherMgr::isDragModeCreation() const
   // Acceptable features;
   QStringList aList;
   aList << "SketchLine" << "SketchMacroCircle" << "SketchMacroArc" <<
-    "SketchMacroEllipse" << "SketchMacroEllipticArc" << "SketchRectangle";
+    "SketchMacroEllipse" << "SketchMacroEllipticArc" << "SketchMacroRectangle";
   return aList.contains(aId);
 }
 

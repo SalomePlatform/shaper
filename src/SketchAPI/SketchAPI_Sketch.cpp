@@ -67,6 +67,7 @@
 #include "SketchAPI_MacroCircle.h"
 #include "SketchAPI_MacroEllipse.h"
 #include "SketchAPI_MacroEllipticArc.h"
+#include "SketchAPI_MacroRectangle.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Offset.h"
 #include "SketchAPI_Point.h"
@@ -424,7 +425,23 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
     compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theStartPoint, theEndPoint));
 }
-
+/*
+std::shared_ptr<SketchAPI_MacroRectangle> SketchAPI_Sketch::addRectangle(
+    double theX1, double theY1, double theX2, double theY2, bool thePoint2IsCenter)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchAPI_MacroRectangle::ID());
+  return MacroRectanglePtr(new SketchAPI_MacroRectangle(aFeature, theX1, theY1, theX2, theY2, thePoint2IsCenter));
+}
+std::shared_ptr<SketchAPI_MacroRectangle> SketchAPI_Sketch::addRectangle(
+    const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool theEndPointIsCenter)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchAPI_MacroRectangle::ID());
+  return MacroRectanglePtr(new SketchAPI_MacroRectangle(aFeature, theStartPoint, theEndPoint, theEndPointIsCenter));
+}
+*/
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,
@@ -1587,6 +1604,34 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
   if (isCustomFacesOrder(aCompFeat)) {
     std::list<std::list<ResultPtr> > aFaces;
     edgesOfSketchFaces(aCompFeat, aFaces);
+
+    /// remove faces that must not be dumped
+    std::vector< std::list<std::list<ResultPtr>>::iterator> aFacesToRemove;
+    for(auto itFaces = aFaces.begin(); itFaces != aFaces.end(); ++itFaces)
+    {
+      auto & facesGroup = *itFaces;
+      std::vector<std::list<ResultPtr>::iterator> subFacestoRemove;
+      for(auto itGroup = facesGroup.begin(); itGroup != facesGroup.end(); ++itGroup)
+      {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*itGroup);
+        if(theDumper.isDumped(aFeature)){
+          subFacestoRemove.push_back(itGroup);
+        }
+      }
+      for(auto itGroup :subFacestoRemove){
+        facesGroup.erase(itGroup);
+      }
+
+      if(!facesGroup.size()){
+        aFacesToRemove.push_back(itFaces);
+      }
+    }
+    for(auto itFaces :aFacesToRemove){
+      aFaces.erase(itFaces);
+    }
+
+    if(!aFaces.size())
+      return;
 
     const std::string& aSketchName = theDumper.name(aBase);
     std::string aMethodName(".changeFacesOrder");

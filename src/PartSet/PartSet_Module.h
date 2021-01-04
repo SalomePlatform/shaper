@@ -400,7 +400,7 @@ public:
   virtual void createFeatures();
 
   /// add texture
-  PARTSET_EXPORT static void setTexture(const std::string &theTextureFile, const AISObjectPtr& thePrs);
+  static void setTexture(const std::string &theTextureFile, const AISObjectPtr& thePrs);
 
 public slots:
   /// Slolt called on object display

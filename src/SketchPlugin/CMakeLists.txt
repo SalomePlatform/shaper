@@ -62,12 +62,14 @@ SET(PROJECT_HEADERS
     SketchPlugin_MacroCircle.h
     SketchPlugin_MacroEllipse.h
     SketchPlugin_MacroEllipticArc.h
+    SketchPlugin_MacroRectangle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Offset.h
     SketchPlugin_Plugin.h
     SketchPlugin_Point.h
     SketchPlugin_Projection.h
+    SketchPlugin_Rectangle.h
     SketchPlugin_Sketch.h
     SketchPlugin_SketchCopy.h
     SketchPlugin_SketchDrawer.h
@@ -117,12 +119,14 @@ SET(PROJECT_SOURCES
     SketchPlugin_MacroCircle.cpp
     SketchPlugin_MacroEllipse.cpp
     SketchPlugin_MacroEllipticArc.cpp
+    SketchPlugin_MacroRectangle.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Offset.cpp
     SketchPlugin_Plugin.cpp
     SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp
+    SketchPlugin_Rectangle.cpp
     SketchPlugin_Sketch.cpp
     SketchPlugin_SketchCopy.cpp
     SketchPlugin_SketchDrawer.cpp

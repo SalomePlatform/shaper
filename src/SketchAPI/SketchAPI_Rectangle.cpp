@@ -23,10 +23,12 @@
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
+#include <ModelHighAPI_Dumper.h>
+
 //--------------------------------------------------------------------------------------
 SketchAPI_Rectangle::SketchAPI_Rectangle(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
-: SketchAPI_SketchEntity(theFeature)
+  : SketchAPI_SketchEntity(theFeature)
 {
   initialize();
 }
@@ -34,7 +36,7 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(
 SketchAPI_Rectangle::SketchAPI_Rectangle(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     double theX1, double theY1, double theX2, double theY2)
-: SketchAPI_SketchEntity(theFeature)
+  : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByCoordinates(theX1, theY1, theX2, theY2);
@@ -45,7 +47,7 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
     const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
-: SketchAPI_SketchEntity(theFeature)
+  : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByPoints(theStartPoint, theEndPoint);
@@ -86,4 +88,35 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rectangle::lines()
   for (; anIt != aList.end(); ++anIt)
     aFeatures.push_back(ModelAPI_Feature::feature(*anIt));
   return SketchAPI_SketchEntity::wrap(aFeatures);
+}
+
+//==================================================================================================
+void SketchAPI_Rectangle::dump(ModelHighAPI_Dumper& theDumper) const
+{
+
+ FeaturePtr aBase = feature();
+
+  /// do not dump sub-features eg: lines and lines constraints
+  AttributeRefListPtr noToDumpList =  aBase->reflist(SketchPlugin_Rectangle::NOT_TO_DUMP_LIST_ID());
+  for( int i = 0; i < noToDumpList->size(); i++){
+    theDumper.doNotDumpFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(noToDumpList->object(i)));
+  }
+
+  if (isCopy())
+    return; // no need to dump copied feature
+
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->context()) {
+    // rectangle is external
+    theDumper << aBase << " = " << aSketchName << ".addRectangle(" << anExternal << ")" << std::endl;
+  } else {
+    // rectangle given by start and end points
+    theDumper << aBase << " = " << aSketchName << ".addRectangle("
+              << startPoint() << ", " << endPoint() << ")" << std::endl;
+  }
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
+
 }

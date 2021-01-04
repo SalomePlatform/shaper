@@ -21,7 +21,7 @@
 """
 
 import ModelAPI
-from macros.rectangle.feature import SketchPlugin_Rectangle
+#from macros.rectangle.feature import SketchPlugin_Rectangle
 from macros.compoundVertices.feature import compoundVertices
 from macros.importParameters.feature import importParameters
 
@@ -43,9 +43,10 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
         """Override ModelAPI_Plugin.createFeature()"""
         aFeature = None
 
-        if theFeatureID == SketchPlugin_Rectangle.ID():
-            aFeature = SketchPlugin_Rectangle().__disown__()
-        elif theFeatureID == compoundVertices.ID():
+        #if theFeatureID == SketchPlugin_Rectangle.ID():
+         #   aFeature = SketchPlugin_Rectangle().__disown__()
+        #el
+        if theFeatureID == compoundVertices.ID():
             aFeature = compoundVertices().__disown__()
         elif theFeatureID == importParameters.ID():
             aFeature = importParameters().__disown__()
