@@ -37,6 +37,9 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
 : ModuleBase_ModelWidget(theParent, theData)
 {
   QString aText = translate(theData->getProperty("title"));
+
+  myPrefix  = theData->getProperty(ATTR_LABEL);
+
   bool aIsHtml = theData->getBooleanAttribute(ATTR_HTML_STYLE, false);
 
   QString aLabelIcon = QString::fromStdString(theData->getProperty("icon"));
@@ -99,7 +102,11 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
         aText = ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
       }
     }
-    myLabel->setText(aText);
+    if (myPrefix == "") {
+      myLabel->setText(aText);
+    } else {
+      myLabel->setText(ModuleBase_Tools::translate(myFeature->getKind(), myPrefix) + aText);
+    }
   }
   return true;
 }

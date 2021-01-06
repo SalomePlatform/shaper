@@ -22,6 +22,9 @@
     <parameter name="PartSet" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
     <parameter name="XGUI" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
   </section>
+  <section name="Sketch">
+    <parameter name="operation_cursor" value="1"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="face-selection" value="true" />

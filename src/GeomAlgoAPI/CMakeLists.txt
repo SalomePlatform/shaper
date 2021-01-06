@@ -88,6 +88,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Projection.h
     GeomAlgoAPI_Chamfer.h
     GeomAlgoAPI_Defeaturing.h
+    GeomAlgoAPI_GeometryCalculation.h
 )
 
 SET(PROJECT_SOURCES
@@ -155,6 +156,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Projection.cpp
     GeomAlgoAPI_Chamfer.cpp
     GeomAlgoAPI_Defeaturing.cpp
+    GeomAlgoAPI_GeometryCalculation.cpp
 )
 
 SET(PROJECT_LIBRARIES

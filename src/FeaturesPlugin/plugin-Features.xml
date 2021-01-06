@@ -179,6 +179,10 @@
       </feature>
     </group>
     <group id="Calculation">
+     <feature id="GeometryCalculation" title="Geometry calculation" tooltip="Calculate properties of objects"
+               icon="icons/Features/geometryCalculation.png" helpfile="geometryCalculationFeature.html" abort_confirmation="false">
+        <source path="geometry_calculation_widget.xml"/>
+      </feature>
       <feature id="Measurement" title="Measurement" tooltip="Calculate properties of objects"
                icon="icons/Features/measurement.png" helpfile="measurementFeature.html" abort_confirmation="false">
         <source path="measurement_widget.xml"/>

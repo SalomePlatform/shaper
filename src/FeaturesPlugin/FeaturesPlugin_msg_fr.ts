@@ -128,6 +128,10 @@
       <translation>Coordonnées d'un point</translation>
     </message>
     <message>
+      <source>Geometry calculation</source>
+      <translation>Calcul de la géométrie</translation>
+    </message>
+    <message>
       <source>Placement</source>
       <translation>Placement</translation>
     </message>
@@ -4464,6 +4468,36 @@
     <message>
       <source>Point coordinates</source>
       <translation>Coordonnées d'un point</translation>
+    </message>
+  </context>
+  <!--Geometry calculation-->
+  <context>
+    <name>GeometryCalculation</name>
+    <message>
+      <source>Geometry calculation</source>
+      <translation>Calcul de la géometrie</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeometryCalculation:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeometryCalculation</name>
+    <message>
+      <source>Length = </source>
+      <translation>Longueur = </translation>
+    </message>
+    <message>
+      <source>Area = </source>
+      <translation>Surface = </translation>
+    </message>
+    <message>
+      <source>Volume = </source>
+      <translation>Volume = </translation>
     </message>
   </context>
   <!-- Measurement -->
