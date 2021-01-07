@@ -34,10 +34,6 @@ class TestHDF(unittest.TestCase):
   def setUp(self):
     salome.salome_close()
 
-    # leave file name only (trim path and extension)
-    fileName = os.path.basename(self.testfile)
-    self.reffile = self.reffile + "/" + os.path.splitext(fileName)[0] + ".py"
-
     salome.salome_init(self.testfile, embedded=1)
     myStudyName = salome.myStudy._get_Name()
     self.session = salome.naming_service.Resolve('/Kernel/Session')
@@ -77,13 +73,11 @@ if __name__ == "__main__":
   if len(sys.argv) > 1:
     TestHDF.testfile = sys.argv[1]
   if len(sys.argv) > 2:
-    salomePortFile = sys.argv[2]
+    TestHDF.reffile = sys.argv[2]
   if len(sys.argv) > 3:
-    errFile = open(sys.argv[3], 'w')
+    salomePortFile = sys.argv[3]
   if len(sys.argv) > 4:
-    salomeKernelDir = sys.argv[4]
-  if len(sys.argv) > 5:
-    TestHDF.reffile = sys.argv[5]
+    errFile = open(sys.argv[4], 'w')
 
   aTest = unittest.TestLoader().loadTestsFromTestCase(TestHDF)
   unittest.TextTestRunner(stream=errFile).run(aTest)
@@ -91,7 +85,7 @@ if __name__ == "__main__":
 
   # close Salome GUI
   port = salome_utils.getPortNumber()
-  proc = subprocess.Popen([salomeKernelDir + "/bin/salome/killSalomeWithPort.py", "{}".format(port)])
+  proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])
 
   try:
     os.remove(salomePortFile)

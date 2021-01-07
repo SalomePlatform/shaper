@@ -45,9 +45,11 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Placement.h
     GeomAlgoAPI_BREPImport.h
     GeomAlgoAPI_STEPImport.h
+    GeomAlgoAPI_STEPImportXCAF.h
     GeomAlgoAPI_IGESImport.h
     GeomAlgoAPI_BREPExport.h
     GeomAlgoAPI_STEPExport.h
+    GeomAlgoAPI_STLExport.h
     GeomAlgoAPI_IGESExport.h
     GeomAlgoAPI_Transform.h
     GeomAlgoAPI_ShapeTools.h
@@ -110,9 +112,11 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Placement.cpp
     GeomAlgoAPI_BREPImport.cpp
     GeomAlgoAPI_STEPImport.cpp
+    GeomAlgoAPI_STEPImportXCAF.cpp
     GeomAlgoAPI_IGESImport.cpp
     GeomAlgoAPI_BREPExport.cpp
     GeomAlgoAPI_STEPExport.cpp
+    GeomAlgoAPI_STLExport.cpp
     GeomAlgoAPI_IGESExport.cpp
     GeomAlgoAPI_Transform.cpp
     GeomAlgoAPI_ShapeTools.cpp
@@ -176,6 +180,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoImpl
   ../ModelAPI
   ../XAO
+  ${PROJECT_SOURCE_DIR}/src/Locale
   ${OpenCASCADE_INCLUDE_DIR}
 )
 

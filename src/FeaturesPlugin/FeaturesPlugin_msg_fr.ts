@@ -522,8 +522,8 @@
   <context>
     <name>Extrusion:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 
@@ -696,8 +696,8 @@
   <context>
     <name>ExtrusionCut:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
@@ -880,8 +880,8 @@
   <context>
     <name>ExtrusionFuse:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
@@ -1685,8 +1685,8 @@
   <context>
     <name>Revolution:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
   <context>
@@ -1866,8 +1866,8 @@
   <context>
     <name>RevolutionCut:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 
@@ -2028,8 +2028,8 @@
   <context>
     <name>RevolutionFuse:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
-      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edges/vertices. Extrusion will be filled by it.</source>
+      <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l&apos;esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d&apos;esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arêtes / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
 

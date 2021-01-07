@@ -60,6 +60,66 @@ public:
     static const std::string MY_XAO_FILE_PATH_ID("xao_file_path");
     return MY_XAO_FILE_PATH_ID;
   }
+  /// attribute name of stl file path
+  inline static const std::string& STL_FILE_PATH_ID()
+  {
+    static const std::string MY_STL_FILE_PATH_ID("stl_file_path");
+    return MY_STL_FILE_PATH_ID;
+  }
+  /// Attribute name for selected object to export in stl file path.
+  inline static const std::string& STL_OBJECT_SELECTED()
+  {
+    static const std::string ATTR_ID("stl_object_selected");
+    return ATTR_ID;
+  }
+  /// Attribute name for deflection type.
+  inline static const std::string& STL_DEFLECTION_TYPE()
+  {
+    static const std::string ATTR_ID("stl_deflection_type");
+    return ATTR_ID;
+  }
+  /// Attribute name for deflection type relative.
+  inline static const std::string& STL_DEFLECTION_TYPE_RELATIVE()
+  {
+    static const std::string ATTR_ID("stl_deflection_type_relative");
+    return ATTR_ID;
+  }
+  /// Attribute name for deflection type absolute.
+  inline static const std::string& STL_DEFLECTION_TYPE_ABSOLUTE()
+  {
+    static const std::string ATTR_ID("stl_deflection_type_absolute");
+    return ATTR_ID;
+  }
+  /// Attribute name for relative.
+  inline static const std::string& STL_RELATIVE()
+  {
+    static const std::string ATTR_ID("stl_relative");
+    return ATTR_ID;
+  }
+  /// Attribute name for absolute.
+  inline static const std::string& STL_ABSOLUTE()
+  {
+    static const std::string ATTR_ID("stl_absolute");
+    return ATTR_ID;
+  }
+  /// Attribute name for stl file type.
+  inline static const std::string& STL_FILE_TYPE()
+  {
+    static const std::string ATTR_ID("stl_file_type");
+    return ATTR_ID;
+  }
+  /// Attribute name for stl file type ascii.
+  inline static const std::string& STL_FILE_TYPE_ASCII()
+  {
+    static const std::string ATTR_ID("stl_file_type_acii");
+    return ATTR_ID;
+  }
+  /// Attribute name for stl file type binary.
+  inline static const std::string& STL_FILE_TYPE_BINARY()
+  {
+    static const std::string ATTR_ID("stl_file_type_binary");
+    return ATTR_ID;
+  }
   /// attribute name of file format
   inline static const std::string& FILE_FORMAT_ID()
   {
@@ -129,6 +189,9 @@ protected:
 
   /// Performs export to XAO file
   EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName);
+
+  /// Performs export to STL file
+  EXCHANGEPLUGIN_EXPORT void exportSTL(const std::string& theFileName);
 };
 
 #endif /* EXPORT_EXPORTFEATURE_H_ */

@@ -71,6 +71,13 @@ void PartSet_PreviewSketchPlane::displaySketchPlane(ModuleBase_IWorkshop* theWor
 }
 
 
+void PartSet_PreviewSketchPlane::clearPlanePreview()
+{
+  myPlane = std::shared_ptr<GeomAPI_AISObject>();
+  myShape = std::shared_ptr<GeomAPI_Shape>();
+}
+
+
 void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& theSketch,
                                                    ModuleBase_IWorkshop* theWorkshop)
 {

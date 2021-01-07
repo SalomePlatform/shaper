@@ -19,57 +19,79 @@
 
 ENABLE_TESTING()
 
-SET(RESTRICTED_ROOT_DIR $ENV{RESTRICTED_ROOT_DIR} CACHE PATH "Path to the restricted repository")
+# get all restricted HDF tests
+SET(hdfFilesRestr "")
+IF (EXISTS $ENV{RESTRICTED_ROOT_DIR})
+  FILE(GLOB hdfFilesRestr "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/*.hdf")
+ENDIF()
 
-set(hdfFilesRestr "")
-if (EXISTS ${RESTRICTED_ROOT_DIR})
-  file(GLOB hdfFilesRestr "${RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/*.hdf")
-endif()
-
+# get all HDF tests from the current drectory
 file(GLOB hdfFilesCur "${CMAKE_CURRENT_SOURCE_DIR}/*.hdf")
-set(hdfFilesRestr ${hdfFilesCur} ${hdfFilesRestr})
 
-if (WIN32) # different separators and path to libraries variable name
-  SET(_JUSTPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${SUIT_LIB_DIR};$ENV{PATH}")
-  STRING(REPLACE "\\" "/" _JUSTPATH "${_JUSTPATH}")
-  STRING(REPLACE ";" "\\;" _JUSTPATH "${_JUSTPATH}")
-  SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS};$ENV{PYTHONPATH}")
-  STRING(REPLACE "\\" "/" _PYTHONPATH "${_PYTHONPATH}")
-  STRING(REPLACE ";" "\\;" _PYTHONPATH "${_PYTHONPATH}")
-else()
-  SET(_LD_LIBRARY_PATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${SUIT_LIB_DIR}:$ENV{LD_LIBRARY_PATH}")
-  SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS}:$ENV{PYTHONPATH}")
-endif()
-
-foreach(eachFilePath ${hdfFilesRestr})
+# collect test names
+set(TEST_NAMES "")
+foreach(eachFilePath IN LISTS hdfFilesCur hdfFilesRestr)
   # Strip the ".hdf" suffix
-  GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
+  get_filename_component(aTestName ${eachFilePath} NAME_WE)
   # Check corresponding ".py" file with reference data exists
-  IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${aTestName}.py")
-    MESSAGE(WARNING "File ${aTestName}.py containing reference data does not exist")
-    continue()
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${aTestName}.py")
+    set(TEST_NAMES ${TEST_NAMES} ${aTestName})
+  else()
+    message(WARNING "File ${aTestName}.py containing reference data for ${aTestName}.hdf does not exist")
+  endif()
+endforeach()
+
+SET(COMPONENT_NAME SHAPER)
+SET(TIMEOUT 600)
+
+SET(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/HDFs")
+
+SALOME_GENERATE_TESTS_ENVIRONMENT(tests_env)
+
+SET(PUBLIC_TESTS "")
+SET(RESTRICTED_TESTS "")
+FOREACH(tfile ${TEST_NAMES})
+  SET(TEST_NAME ${COMPONENT_NAME}_HDF_${tfile})
+
+  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf")
+    SET(HDF_TEST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf")
+    SET(PUBLIC_TESTS ${PUBLIC_TESTS} ${tfile})
+  ELSEIF(EXISTS "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/${tfile}.hdf")
+    SET(HDF_TEST_FILE "$ENV{RESTRICTED_ROOT_DIR}/SHAPER/test.hdfs/${tfile}.hdf")
+    SET(RESTRICTED_TESTS ${RESTRICTED_TESTS} ${tfile})
   ENDIF()
 
-  # Add "SubprojectName_" prefix
-  GET_FILENAME_COMPONENT(aSubprojectName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  SET(aTestName "${aSubprojectName}_${aTestName}")
-
-  # Full path to the python test file being executed
-  SET(aTestFilePath "${eachFilePath}")
-  IF(EXISTS ${aTestFilePath})
-    ADD_TEST(NAME ${aTestName} COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/test.py" "$ENV{KERNEL_ROOT_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" "${aTestFilePath}")
-    if (WIN32) # different path to libraries variable name
-      SET_TESTS_PROPERTIES(${aTestName} PROPERTIES ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH};SHAPER_UNIT_TEST_IN_PROGRESS=1"
-        LABELS "models_hdf")
-    else()
-      SET_TESTS_PROPERTIES(${aTestName} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH};SHAPER_UNIT_TEST_IN_PROGRESS=1"
-        LABELS "models_hdf")
-    endif()
-    # Debug output...
-    # MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFilePath}")
-  ELSE(EXISTS ${aTestFilePath})
-    MESSAGE(WARNING "Can not find the test file: ${aTestFilePath}")
-  ENDIF(EXISTS ${aTestFilePath})
-endforeach(eachFilePath ${ARGN})
+  ADD_TEST(NAME ${TEST_NAME}
+           COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/testme.py" "${HDF_TEST_FILE}" "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py")
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES ENVIRONMENT "${tests_env};SHAPER_UNIT_TEST_IN_PROGRESS=1")
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES LABELS "${COMPONENT_NAME};models_hdf")
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES TIMEOUT ${TIMEOUT})
+ENDFOREACH()
 
 ADD_CUSTOM_TARGET(run_hdf_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -L "models_hdf")
+
+# salome test
+FOREACH(tfile ${TEST_NAMES})
+  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+          DESTINATION ${TEST_INSTALL_DIRECTORY})
+  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf")
+    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.hdf
+            DESTINATION ${TEST_INSTALL_DIRECTORY})
+  ENDIF()
+ENDFOREACH()
+
+INSTALL(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+
+INSTALL(FILES testme.py DESTINATION ${TEST_INSTALL_DIRECTORY}
+                        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                                    GROUP_READ GROUP_EXECUTE
+                                    WORLD_READ WORLD_EXECUTE)
+FILE(COPY test_hdf.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+INSTALL(FILES test_hdf.py DESTINATION ${TEST_INSTALL_DIRECTORY}
+                          PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                                      GROUP_READ GROUP_EXECUTE
+                                      WORLD_READ WORLD_EXECUTE)
+CONFIGURE_FILE(tests.set.in ${CMAKE_CURRENT_BINARY_DIR}/tests.set @ONLY)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})

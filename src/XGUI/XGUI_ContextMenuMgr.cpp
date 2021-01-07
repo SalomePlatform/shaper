@@ -97,6 +97,7 @@ void XGUI_ContextMenuMgr::createActions()
   aAction->setShortcut(Qt::Key_F2);
   addAction("RENAME_CMD", aAction);
 
+#ifdef HAVE_SALOME
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end.png"),
                                            XGUI_Workshop::MOVE_TO_END_COMMAND, this);
   addAction("MOVE_CMD", aAction);
@@ -104,6 +105,7 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end_split.png"),
     XGUI_Workshop::MOVE_TO_END_SPLIT_COMMAND, this);
   addAction("MOVE_SPLIT_CMD", aAction);
+#endif
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"),
                                            tr("Clean history"), aDesktop);
@@ -344,10 +346,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           if (!(hasParameter || hasFeature))
             action("SHOW_ONLY_CMD")->setEnabled(true);
         }
+#ifdef HAVE_SALOME
         else if (hasFeature && myWorkshop->canMoveFeature()) {
           action("MOVE_CMD")->setEnabled(true);
           action("MOVE_SPLIT_CMD")->setEnabled(true);
         }
+#endif
 
         if( aMgr->activeDocument() == aObject->document() )
         {

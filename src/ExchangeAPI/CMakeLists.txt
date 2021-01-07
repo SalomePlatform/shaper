@@ -33,12 +33,14 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
   ModelAPI
   ModelHighAPI
+  GeomAlgoAPI
 )
 
 INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Events
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
 )
 
 # Plugin headers dependency

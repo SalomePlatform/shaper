@@ -35,9 +35,9 @@ class GeomAlgoAPI_Exception : public std::exception
   /// \param theMessageError Error message to be displayed
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Exception(std::string theMessageError);
   /// Destroyer
-  GEOMALGOAPI_EXPORT ~GeomAlgoAPI_Exception() throw();
+  GEOMALGOAPI_EXPORT ~GeomAlgoAPI_Exception() noexcept;
   /// Allows to collet the error
-  GEOMALGOAPI_EXPORT const char* what() const throw();
+  GEOMALGOAPI_EXPORT const char* what() const noexcept;
 
 private:
   std::string myMessageError; /// Error message to be displayed.

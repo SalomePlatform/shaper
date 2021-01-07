@@ -416,6 +416,8 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   TopoDS_Shape aResult = aPrismBuilder->Shape();
 
   BRepBndLib::Add(aResult, aBndBox);
+  aBndBox.Add(aFromPnt->impl<gp_Pnt>());
+  aBndBox.Add(aToPnt->impl<gp_Pnt>());
   Standard_Real aBndBoxSize = aBndBox.CornerMin().Distance(aBndBox.CornerMax());
 
   // Orienting bounding planes.

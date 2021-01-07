@@ -1130,12 +1130,18 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
   GeomEdgePtr anEdge;
   if (theWire) {
     TopoDS_Wire aWire = theWire->impl<TopoDS_Wire>();
-    // Workaround: when concatenate a wire consisting of two edges based on the same B-spline curve
-    // (non-periodic, but having equal start and end points), first of which is placed at the end
-    // on the curve and second is placed at the start, this workaround copies second curve to avoid
-    // treating these edges as a single curve by setting trim parameters.
-    aWire = fixParametricGaps(aWire);
-    TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire);
+    BRepTools_WireExplorer aWExp(aWire);
+    TopoDS_Edge aNewEdge = aWExp.Current();
+    aWExp.Next();
+    if (aWExp.More()) {
+      // Workaround: when concatenate a wire consisting of two edges based on the same B-spline
+      // curve (non-periodic, but having equal start and end points), first of which is placed
+      // at the end on the curve and second is placed at the start, this workaround copies
+      // second curve to avoid treating these edges as a single curve by setting trim parameters.
+      aWire = fixParametricGaps(aWire);
+      aWire = BRepAlgo::ConcatenateWire(aWire, GeomAbs_G1); // join smooth parts of wire
+      aNewEdge = BRepAlgo::ConcatenateWireC0(aWire); // join C0 parts of wire
+    }
     anEdge = GeomEdgePtr(new GeomAPI_Edge);
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));
   }
@@ -1196,6 +1202,10 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
     return;
   }
 
+  // the value to enlarge the bounding box of each object to make the extruded shape
+  // a little bit larger than overall objects to get the correct result of Boolean CUT operation
+  double anEnlargement = 0.1 * aBndObjs.front()->distance(aBndObjs.back());
+
   // Prism direction
   if (theDir.get()) {
     // One direction for all prisms
@@ -1235,7 +1245,7 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
 
       // Bounding box of the base
       std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases =
-          GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i);
+          GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i, anEnlargement);
       if (aBndBases.size() != 8) {
         return;
       }

@@ -111,7 +111,7 @@ SketchConstraintDistance_2 = Sketch_8.setDistance(SketchLine_9.startPoint(), Ske
 SketchConstraintDistance_3 = Sketch_8.setDistance(SketchLine_8.endPoint(), SketchLine_9.startPoint(), 30)
 SketchMultiRotation_2_objects = [SketchLine_11.result(), SketchLine_10.result(), SketchLine_8.result(), SketchLine_7.result()]
 SketchMultiRotation_2 = Sketch_8.addRotation(SketchMultiRotation_2_objects, SketchLine_9.startPoint(), 120, 3)
-[SketchLine_11, SketchLine_12, SketchLine_13, SketchLine_10, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchLine_19] = SketchMultiRotation_2.rotated()
+[SketchLine_12, SketchLine_13, SketchLine_14, SketchLine_15, SketchLine_16, SketchLine_17, SketchLine_18, SketchLine_19] = SketchMultiRotation_2.rotatedList()
 SketchLine_18.setName("SketchLine_15")
 SketchLine_18.result().setName("SketchLine_15")
 SketchLine_17.setName("SketchLine_18")

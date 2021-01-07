@@ -127,6 +127,11 @@ void SketchPlugin_Offset::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  // Save the current feature of the document, because new features may appear while executing.
+  // In this case, they will become current. But if the number of copies is updated from outside
+  // of sketch (e.g. by parameter change), the history line should not hold in sketch.
+  keepCurrentFeature();
+
   // 5. Gather wires and make offset for each wire
   ListOfMakeShape anOffsetAlgos;
   std::set<FeaturePtr> aProcessedEdgesSet;
@@ -187,10 +192,15 @@ void SketchPlugin_Offset::execute()
       std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape(
           new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign));
 
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
-      aMakeList->appendAlgo(aWireBuilder);
-      aMakeList->appendAlgo(anOffsetShape);
-      anOffsetAlgos.push_back(aMakeList);
+      if (anOffsetShape->isDone()) {
+        std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
+        aMakeList->appendAlgo(aWireBuilder);
+        aMakeList->appendAlgo(anOffsetShape);
+        anOffsetAlgos.push_back(aMakeList);
+      }
+      else {
+        setError("Offset algorithm failed");
+      }
     }
   }
 
@@ -198,6 +208,8 @@ void SketchPlugin_Offset::execute()
   //    Create sketch feature for each edge of anOffsetShape, and also store
   //    created features in CREATED_ID() to remove them on next execute()
   addToSketch(anOffsetAlgos);
+
+  restoreCurrentFeature();
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
@@ -626,9 +638,9 @@ void SketchPlugin_Offset::mkBSpline (FeaturePtr& theResult,
   }
   else { // non-rational B-spline
     aWeightsAttr->setSize((int)aWeights.size());
-    std::list<double>::iterator anIt = aWeights.begin();
-    for (int anIndex = 0; anIt != aWeights.end(); ++anIt, ++anIndex)
-      aWeightsAttr->setValue(anIndex, *anIt);
+    std::list<double>::iterator aWIt = aWeights.begin();
+    for (int anIndex = 0; aWIt != aWeights.end(); ++aWIt, ++anIndex)
+      aWeightsAttr->setValue(anIndex, *aWIt);
   }
 
   AttributeDoubleArrayPtr aKnotsAttr =

@@ -134,7 +134,7 @@
         <source path="chamfer_widget.xml"/>
       </feature>
       <feature id="FusionFaces" title="Fuse Faces" tooltip="Performs fusion of connected faces"
-               icon="icons/Features/fusion_faces.png" auto_preview="true" helpfile="FeaturesPlugin/fusionFacesFeature.html">
+               icon="icons/Features/fusion_faces.png" auto_preview="true" helpfile="fuseFeatureFaces.html">
         <source path="fusion_faces_widget.xml"/>
       </feature>
       <feature id="Defeaturing" title="Defeaturing" tooltip="Perform removing faces from solid"

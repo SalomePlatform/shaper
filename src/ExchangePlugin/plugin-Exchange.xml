@@ -4,19 +4,67 @@
       <feature id="ImportMacro" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
                helpfile="importFeature.html"
                internal="1">
-        <file_selector id="file_path" title="Import file" path="">
-          <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
-        </file_selector>
+      <switch id="ImportType">
+        <case id="Regular" title="BREP, XAO, IGES">
+          <file_selector id="file_path" title="Import file" path="">
+              <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO" />
+          </file_selector>
         <choice id="target_part"
                 string_list_attribute="target_parts_list"
                 label="Import to"
                 tooltip="Select the part to import the document" />
+        </case>
+        <case id="STEP" title="STEP">
+            <file_selector id="step_file_path" title="Import file" path="">
+              <validator id="ExchangePlugin_ImportFormat" parameters="STEP|STP:STEP" />
+            </file_selector>
+            <choice id="step_target_part"
+                string_list_attribute="step_target_parts_list"
+                label="Import to"
+                tooltip="Select the part to import the document" />
+            <groupbox title="STEP options">
+              <boolvalue id="step_scale_inter_units"
+                        label="Scale to International System of Units"
+                        default="true"/>
+              <groupbox title="Create groups from">
+                <boolvalue id="step_materials"
+                          label="Materials"
+                          default="false"/>
+                <boolvalue id="step_colors"
+                          label="Colors"
+                          default="false"/>
+              </groupbox>
+            </groupbox>
+          </case>
+        </switch>
       </feature>
       <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
                helpfile="importFeature.html" internal="1">
-        <file_selector id="file_path" title="Import file" path="">
-          <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
-        </file_selector>
+        <switch id="ImportType">
+          <case id="Regular" title="BREP, XAO, IGES">
+            <file_selector id="file_path" title="Import file" path="">
+                <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO" />
+            </file_selector>
+          </case>
+          <case id="STEP" title="STEP">
+            <file_selector id="step_file_path" title="Import file" path="">
+              <validator id="ExchangePlugin_ImportFormat" parameters="STEP|STP:STEP" />
+            </file_selector>
+            <groupbox title="STEP options">
+              <boolvalue id="step_scale_inter_units"
+                        label="Scale to International System of Units"
+                        default="true"/>
+              <groupbox title="Create groups from">
+                <boolvalue id="step_materials"
+                          label="Materials"
+                          default="false"/>
+                <boolvalue id="step_colors"
+                          label="Colors"
+                          default="false"/>
+              </groupbox>
+            </groupbox>
+          </case>
+        </switch>
       </feature>
       <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png"
                helpfile="exportFeature.html" internal="1">

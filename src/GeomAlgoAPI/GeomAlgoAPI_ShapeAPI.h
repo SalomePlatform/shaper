@@ -47,14 +47,14 @@ public:
   /// \param theDz The dimension on Z
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeBox(const double theDx, const double theDy,
-                                                const double theDz) throw (GeomAlgoAPI_Exception);
+                                                const double theDz);
 
   /// Creates a box using the two points that defined a diagonal.
   /// \param theFirstPoint One extermity of the diagonal
   /// \param theSecondPoint The other extremity of the diagonal
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
-                     std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> theSecondPoint);
 
   /// Creates a cylinder using a center, an axis, a radius and a height.
   /// \param theBasePoint The center of the lower base of the cylinder
@@ -62,8 +62,7 @@ public:
   /// \param theRadius The radius of the cylinder
   /// \param theHeight The heigth of the cylinder
   static std::shared_ptr<GeomAPI_Shape> makeCylinder(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
-                     std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theHeight)
-                     throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theHeight);
 
   /// Creates a portion of cylinder using a center, an axis, a radius, a height and an angle.
   /// \param theBasePoint The center of the lower base of the cylinder
@@ -73,31 +72,29 @@ public:
   /// \param theAngle The angle defining the portion
   static std::shared_ptr<GeomAPI_Shape> makeCylinder(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
                      std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theHeight,
-                     double theAngle) throw (GeomAlgoAPI_Exception);
+                     double theAngle);
 
   /// Creates a cylinder using the origin, the OZ axis, a radius and a height.
   /// \param theRadius The radius of the cylinder
   /// \param theHeight The heigth of the cylinder
-  static std::shared_ptr<GeomAPI_Shape> makeCylinder(double theRadius, double theHeight)
-                     throw (GeomAlgoAPI_Exception);
+  static std::shared_ptr<GeomAPI_Shape> makeCylinder(double theRadius, double theHeight);
 
   /// Creates a portion of cylinder using the origin, the OZ axis, a radius, a height and an angle.
   /// \param theRadius The radius of the cylinder
   /// \param theHeight The heigth of the cylinder
   /// \param theAngle The angle defining the portion
   static std::shared_ptr<GeomAPI_Shape> makeCylinder(double theRadius, double theHeight,
-                     double theAngle) throw (GeomAlgoAPI_Exception);
+                     double theAngle);
 
   /// Creates a sphere using a center and a radius.
   /// \param theCenterPoint The center of the sphere
   /// \param theRadius The radius of the sphere
   static std::shared_ptr<GeomAPI_Shape> makeSphere(std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
-                     double theRadius) throw (GeomAlgoAPI_Exception);
+                     double theRadius);
 
   /// Creates a sphere using the origin and a radius.
   /// \param theRadius The radius of the sphere
-  static std::shared_ptr<GeomAPI_Shape> makeSphere(double theRadius)
-                     throw (GeomAlgoAPI_Exception);
+  static std::shared_ptr<GeomAPI_Shape> makeSphere(double theRadius);
 
   /// Creates a torus using a base point, an axis, a radius and a ring radius.
   /// \param theBasePoint The center of the torus
@@ -105,14 +102,12 @@ public:
   /// \param theRadius The radius of the torus
   /// \param theRingRadius The ring radius of the torus
   static std::shared_ptr<GeomAPI_Shape> makeTorus(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
-                     std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theRingRadius)
-                     throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theRingRadius);
 
   /// Creates a torus using a radius and a ring radius.
   /// \param theRadius The radius of the torus
   /// \param theRingRadius The ring radius of the torus
-  static std::shared_ptr<GeomAPI_Shape> makeTorus(double theRadius, double theRingRadius)
-                     throw (GeomAlgoAPI_Exception);
+  static std::shared_ptr<GeomAPI_Shape> makeTorus(double theRadius, double theRingRadius);
 
   /// Creates a cone using a base point, an axis, a base radius, a top radius and a height.
   /// \param theBasePoint The center of the lower base of the cone
@@ -122,14 +117,14 @@ public:
   /// \param theHeight The height of the cone
   static std::shared_ptr<GeomAPI_Shape> makeCone(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
                      std::shared_ptr<GeomAPI_Edge> theEdge, double theBaseRadius,
-                     double theTopRadius, double theHeight) throw (GeomAlgoAPI_Exception);
+                     double theTopRadius, double theHeight);
 
   /// Creates a cone using a base radius, a top radius and a height.
   /// \param theBaseRadius The base radius of the cone
   /// \param theTopRadius The top radius of the cone
   /// \param theHeight The height of the cone
   static std::shared_ptr<GeomAPI_Shape> makeCone(double theBaseRadius, double theTopRadius,
-                     double theHeight) throw (GeomAlgoAPI_Exception);
+                     double theHeight);
 
   /// Performs a translation from an axis and a distance.
   /// \param theSourceShape Shape to be moved
@@ -139,7 +134,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeTranslation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
-                     const double theDistance) throw (GeomAlgoAPI_Exception);
+                     const double theDistance);
 
   /// Performs a translation from dimensions.
   /// \param theSourceShape Shape to be moved
@@ -151,7 +146,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      const double theDx,
                      const double theDy,
-                     const double theDz) throw (GeomAlgoAPI_Exception);
+                     const double theDz);
 
   /// Performs a translation from two points.
   /// \param theSourceShape Shape to be moved
@@ -161,7 +156,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeTranslation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt> theStartPoint,
-                     std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> theEndPoint);
 
   /// Performs a rotation from an axis and an angle.
   /// \param theSourceShape Shape to be rotated
@@ -171,7 +166,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeRotation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
-                     const double theAngle) throw (GeomAlgoAPI_Exception);
+                     const double theAngle);
 
   /// Performs a rotation from three points.
   /// \param theSourceShape Shape to be rotated
@@ -183,28 +178,28 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
                      std::shared_ptr<GeomAPI_Pnt> theStartPoint,
-                     std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> theEndPoint);
 
   /// Performs a symmetry by a point.
   /// \param theSourceShape Shape be symmetrized
   /// \param thePoint Point of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Pnt> thePoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> thePoint);
 
   /// Performs a symmetry by an axis.
   /// \param theSourceShape Shape be symmetrized
   /// \param theAxis Axis of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Ax1> theAxis) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Ax1> theAxis);
 
   /// Performs a symmetry by a plane.
   /// \param theSourceShape Shape be symmetrized
   /// \param thePlane Plane of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Ax2> thePlane) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Ax2> thePlane);
 
   /// Performs a scale by a scale factor.
   /// \param theSourceShape Shape be scaled
@@ -213,7 +208,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeScale(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
-                     const double theScaleFactor) throw (GeomAlgoAPI_Exception);
+                     const double theScaleFactor);
 
   /// Performs a scale by dimensions.
   /// \param theSourceShape Shape be scaled
@@ -226,7 +221,7 @@ public:
                      std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
                      const double theScaleFactorX,
                      const double theScaleFactorY,
-                     const double theScaleFactorZ) throw (GeomAlgoAPI_Exception);
+                     const double theScaleFactorZ);
 
   /// Performs a multi translation along one axis, at a distance and a number of times
   /// \param theSourceShape Shape to be moved
@@ -238,7 +233,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
                      const double theStep,
-                     const int theNumber) throw (GeomAlgoAPI_Exception);
+                     const int theNumber);
 
   /// Performs a multi translation along two axis : a different distance on each axis
   /// and a different number of times for each axis
@@ -257,7 +252,7 @@ public:
                      const int theFirstNumber,
                      std::shared_ptr<GeomAPI_Ax1> theSecondAxis,
                      const double theSecondStep,
-                     const int theSecondNumber) throw (GeomAlgoAPI_Exception);
+                     const int theSecondNumber);
 
   /// Performs a multi rotation along one axis and a number of times
   /// \param[in] theSourceShape Shape to be rotated
@@ -266,7 +261,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeMultiRotation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
-                     const int theNumber) throw (GeomAlgoAPI_Exception);
+                     const int theNumber);
 
   /// Performs a multi rotation along one axis, at a step and a number of times
   /// \param theSourceShape Shape to be moved
@@ -277,7 +272,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
                      const double theStep,
-                     const int theNumber) throw (GeomAlgoAPI_Exception);
+                     const int theNumber);
 
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Inner radius at base of cone
@@ -294,7 +289,7 @@ public:
                      const double theRMax2,
                      const double theZ,
                      const double theStartPhi,
-                     const double theDeltaPhi) throw (GeomAlgoAPI_Exception);
+                     const double theDeltaPhi);
 };
 }
 #endif

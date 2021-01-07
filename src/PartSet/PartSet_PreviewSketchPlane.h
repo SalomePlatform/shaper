@@ -74,11 +74,21 @@ public:
   void setSizeOfView(double theSizeOfView, bool isUseSizeOfView,
     const std::shared_ptr<GeomAPI_Pnt>& theCentralPoint = std::shared_ptr<GeomAPI_Pnt>());
 
+  /// Returns True if the plane preview is already created
   bool isPlaneCreated() const {
     return myPlane.get();
   }
 
+  /// Returns current state of the plane preview visibility
+  bool isDisplayed() const { return myPreviewIsDisplayed; }
+
+  /// Displays preview planes
+ /// \param theWorkshop the application workshop
   void displaySketchPlane(ModuleBase_IWorkshop* theWorkshop);
+
+  /// Nullyfies current plane preview object.
+  /// Important: Before call of this function the plane has to be erased from viewer
+  void clearPlanePreview();
 
 private:
   /// Create a square face by parameters

@@ -66,7 +66,8 @@ public:
                                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                  const ModelHighAPI_Selection& theDirection,
                                  const ModelHighAPI_Double& theToSize,
-                                 const ModelHighAPI_Double& theFromSize);
+                                 const ModelHighAPI_Double& theFromSize,
+                                 const std::string& theSelectionType = std::string());
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
@@ -85,7 +86,8 @@ public:
                                  const ModelHighAPI_Selection& theToObject,
                                  const ModelHighAPI_Double& theToOffset,
                                  const ModelHighAPI_Selection& theFromObject,
-                                 const ModelHighAPI_Double& theFromOffset);
+                                 const ModelHighAPI_Double& theFromOffset,
+                                 const std::string& theSelectionType = std::string());
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -183,7 +185,8 @@ ExtrusionPtr addExtrusion(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
                           const ModelHighAPI_Selection& theDirection,
                           const ModelHighAPI_Double& theToSize,
-                          const ModelHighAPI_Double& theFromSize);
+                          const ModelHighAPI_Double& theFromSize,
+                          const std::string& theSelectionType = std::string());
 
 /// \ingroup CPPHighAPI
 /// \brief Create Extrusion feature.
@@ -204,6 +207,7 @@ ExtrusionPtr addExtrusion(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const ModelHighAPI_Selection& theToObject,
                           const ModelHighAPI_Double& theToOffset,
                           const ModelHighAPI_Selection& theFromObject,
-                          const ModelHighAPI_Double& theFromOffset);
+                          const ModelHighAPI_Double& theFromOffset,
+                          const std::string& theSelectionType = std::string());
 
 #endif // FeaturesAPI_Extrusion_H_

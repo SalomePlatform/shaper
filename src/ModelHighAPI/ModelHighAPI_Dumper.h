@@ -354,6 +354,10 @@ public:
   MODELHIGHAPI_EXPORT
   bool isDumped(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const;
 
+  /// Returns the index of the first object in the list which is not dumped yet.
+  MODELHIGHAPI_EXPORT
+  size_t indexOfFirstNotDumped(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const;
+
   /// Export variables names to another module (calls exportVariable implemented in python)
   MODELHIGHAPI_EXPORT virtual void exportVariables() const;
 

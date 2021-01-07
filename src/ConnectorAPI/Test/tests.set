@@ -27,4 +27,6 @@ SET(TEST_NAMES
   Test17917
   Test18887
   Test3195
+  TestExportSTL
+  TestImportSTEP
 )

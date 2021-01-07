@@ -30,6 +30,8 @@
 #include <Events_Loop.h>
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Pnt.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -233,6 +235,57 @@ void Model_ResultBody::updateConcealment()
   }
 }
 
+void Model_ResultBody::addShapeColor( const std::wstring& theName,std::vector<int>& color) {
+
+  if (myColorsShape.find(theName) == myColorsShape.end())
+    myColorsShape[ theName ] =  color;
+}
+
+std::wstring Model_ResultBody::addShapeName(std::shared_ptr<GeomAPI_Shape> theshape,
+                                            const std::wstring& theName ){
+
+  int indice = 1;
+  std::wstringstream aName;
+  aName << theName;
+  while(myNamesShape.find(aName.str()) != myNamesShape.end() ){
+    aName.str(L"");
+    aName << theName << L"__" << indice;
+    indice++;
+  }
+  myNamesShape[ aName.str() ] = theshape;
+
+  return aName.str();
+}
+
+std::wstring Model_ResultBody::findShapeName(std::shared_ptr<GeomAPI_Shape> theShape){
+
+  TopoDS_Shape  aShape =  theShape->impl<TopoDS_Shape>();
+  for (std::map< std::wstring, std::shared_ptr<GeomAPI_Shape> >::iterator it =
+                                                                myNamesShape.begin();
+        it != myNamesShape.end();
+        ++it)
+  {
+    TopoDS_Shape curSelectedShape = (*it).second->impl<TopoDS_Shape>();
+    if ((aShape.IsSame(curSelectedShape)))  {
+      return (*it).first;
+    }
+  }
+  return  L"material not found" ;
+}
+
+void Model_ResultBody::setShapeName(
+                std::map< std::wstring, std::shared_ptr<GeomAPI_Shape>>& theShapeName,
+                std::map< std::wstring, std::vector<int>>& theColorsShape)
+{
+  myNamesShape = theShapeName;
+  myColorsShape = theColorsShape;
+}
+
+void Model_ResultBody::clearShapeNameAndColor(){
+  myNamesShape.clear();
+  myColorsShape.clear();
+}
+
 void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
                                   const bool theShapeChanged)
 {
@@ -262,13 +315,33 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       aShape->setImpl(new TopoDS_Shape(aShapesIter.Value()));
       ResultBodyPtr aSub;
       if (mySubs.size() <= aSubIndex) { // it is needed to create a new sub-result
-        aSub = anObjects->createBody(this->data(), aSubIndex);
+        std::wstring thenameshape = L"";
+        // find shape name read
+        for (std::map< std::wstring, std::shared_ptr<GeomAPI_Shape> >::iterator it =
+                                                                            myNamesShape.begin();
+           it != myNamesShape.end();
+           ++it)
+        {
+            TopoDS_Shape curSelectedShape = (*it).second->impl<TopoDS_Shape>();
+            if (!(aShapesIter.Value().IsSame(curSelectedShape))) continue;
+            thenameshape = (*it).first;
+            break;
+        }
+        aSub = anObjects->createBody(this->data(), aSubIndex,thenameshape);
+        //finf color read
+        std::map< std::wstring, std::vector<int>>::iterator itColor =
+                                                          myColorsShape.find(thenameshape);
+        if (itColor != myColorsShape.end()){
+            ModelAPI_Tools::setColor(aSub,(*itColor).second);
+        }
+        aSub->setShapeName(myNamesShape,myColorsShape);
         mySubs.push_back(aSub);
         mySubsMap[aSub] = int(mySubs.size() - 1);
         if (isConcealed()) { // for issue #2579 note7
           aSub->ModelAPI_ResultBody::setIsConcealed(true);
           std::dynamic_pointer_cast<Model_ResultBody>(aSub)->updateConcealment();
         }
+
       } else { // just update shape of this result
         aSub = mySubs[aSubIndex];
       }

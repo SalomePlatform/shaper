@@ -182,7 +182,9 @@ ObjectPtr Model_AttributeRefList::iteratedObject(TDF_ListIteratorOfLabelList& th
       }
       theExtIter.Next();
     } else { // internal document object
-      anObj = theDoc->objects()->object(theLIter.Value());
+      TDF_Label aLab = theLIter.Value();
+      if (!aLab.IsNull())
+        anObj = theDoc->objects()->object(theLIter.Value());
     }
   }
   return anObj;

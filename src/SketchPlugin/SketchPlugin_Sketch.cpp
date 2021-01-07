@@ -153,6 +153,19 @@ void SketchPlugin_Sketch::execute()
 
 std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string theID)
 {
+  // It is necessary to keep and restore the current feature in the document,
+  // if the sketch is updated from Python API. Because in that case, the current feature
+  // may be a non-sketch feature, so it is required to set it back, after adding a sketch feature,
+  // to keep the sequence of non-sketch features within the document.
+  FeaturePtr aCurFeature = document()->currentFeature(false);
+  std::shared_ptr<SketchPlugin_Feature> aCurSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aCurFeature);
+  std::shared_ptr<SketchPlugin_Sketch> aCurSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Sketch>(aCurFeature);
+  if ((aCurSketch && aCurSketch.get() == this) ||
+      (aCurSketchFeature && aCurSketchFeature->sketch() == this))
+    aCurFeature = FeaturePtr(); // no need to restore feature if it is from the current sketch
+
   // Set last feature of the sketch as current feature.
   // Reason: Changing of parameter through Python API may lead to creation of new features
   //         (e.g. changing number of copies in MultiRotation). If the sketch is not the last
@@ -177,8 +190,10 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
       aSketchFeature->setSketch(this);
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(aNew);
   }
-   // set as current also after it becomes sub to set correctly enabled for other sketch subs
-  document()->setCurrentFeature(aNew, false);
+
+  // set as current also after it becomes sub to set correctly enabled for other sketch subs
+  // or restore the previous current feature
+  document()->setCurrentFeature(aCurFeature ? aCurFeature : aNew, false);
 
   return aNew;
 }

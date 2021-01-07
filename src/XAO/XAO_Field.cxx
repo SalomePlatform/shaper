@@ -33,8 +33,8 @@ using namespace XAO;
 
 // -------------------------------------------------------
 
-Field::Field(const XAO::Dimension& dimension,
-             const int& nbElements, const int& nbComponents, const std::string& name)
+Field::Field(XAO::Dimension dimension,
+             int nbElements, int nbComponents, const std::string& name)
   : m_name(name), m_dimension(dimension),
     m_nbComponents(nbComponents), m_components(nbComponents, ""),
     m_nbElements(nbElements)
@@ -47,9 +47,8 @@ Field::~Field()
     delete m_steps[i];
 }
 
-Field* Field::createField(const XAO::Type& type, const XAO::Dimension& dimension,
-        const int& nbElements, const int& nbComponents, const std::string& name)
-throw (XAO_Exception)
+Field* Field::createField(XAO::Type type, XAO::Dimension dimension,
+        int nbElements, int nbComponents, const std::string& name)
 {
     if (type == XAO::BOOLEAN)
         return new BooleanField(dimension, nbElements, nbComponents, name);
@@ -63,22 +62,19 @@ throw (XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad Type: " << type);
 }
 
-const std::string Field::getComponentName(const int& index)
-throw (XAO_Exception)
+const std::string Field::getComponentName(int index)
 {
     checkComponent(index);
     return m_components[index];
 }
 
-void Field::setComponentName(const int& index, const std::string& name)
-throw (XAO_Exception)
+void Field::setComponentName(int index, const std::string& name)
 {
     checkComponent(index);
     m_components[index] = name;
 }
 
 void Field::setComponentsNames(const std::vector<std::string>& names)
-throw (XAO_Exception)
 {
     for (unsigned int  i = 0; i < names.size(); ++i)
     {
@@ -103,7 +99,7 @@ bool Field::removeStep(Step* step)
     return false;
 }
 
-bool Field::hasStep(const int& step)
+bool Field::hasStep(int step)
 {
     std::vector<Step*>::iterator it = m_steps.begin();
     for (; it != m_steps.end(); ++it)
@@ -116,8 +112,7 @@ bool Field::hasStep(const int& step)
     return false;
 }
 
-void Field::checkComponent(const int& component)
-throw (XAO_Exception)
+void Field::checkComponent(int component)
 {
     if (component < m_nbComponents && component >= 0)
         return;
@@ -126,8 +121,7 @@ throw (XAO_Exception)
                                      << m_nbComponents-1 << "]: " << component);
 }
 
-void Field::checkStepIndex(const int& step)
-throw (XAO_Exception)
+void Field::checkStepIndex(int step)
 {
   if (step < (int)m_steps.size() && step >= 0)
         return;

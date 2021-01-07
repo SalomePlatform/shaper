@@ -19,7 +19,7 @@
 """Package for Exchange plugin for the Parametric Geometry API of the Modeler.
 """
 
-from ExchangeAPI import addImport, exportToFile, exportToXAO
+from ExchangeAPI import addImport, addImportSTEP, exportToFile, exportToXAO, exportToSTL
 from ExchangeAPI import exportPart, importPart
 
 from .tools import *

@@ -687,7 +687,7 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
   std::list<ResultPtr> allRes;
   ModelAPI_Tools::allResults(theFeature, allRes);
   for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-    std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(*aRes);
+    std::pair<std::wstring, bool> aName = ModelAPI_Tools::getDefaultName(*aRes, true, true);
     std::string aDefaultName = Locale::Convert::toString(aName.first);
     std::string aResName = Locale::Convert::toString((*aRes)->data()->name());
     bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
@@ -992,6 +992,18 @@ bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
   return true;
 }
 
+size_t ModelHighAPI_Dumper::indexOfFirstNotDumped(
+    const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const
+{
+  size_t anIndex = 0;
+  std::list<ObjectPtr> anObjects = theRefList->list();
+  for (std::list<ObjectPtr>::const_iterator anIt = anObjects.begin();
+       anIt != anObjects.end(); ++anIt, ++anIndex)
+    if (!isDumped(ModelAPI_Feature::feature(*anIt)))
+      break;
+  return anIndex;
+}
+
 static bool isSketchSub(const FeaturePtr& theFeature)
 {
   static const std::string SKETCH("Sketch");
@@ -1071,7 +1083,7 @@ bool ModelHighAPI_Dumper::dumpCommentBeforeFeature(const FeaturePtr& theFeature)
   if (aFilters)
     return false;
   // all other features should be commented before the dump
-  return true;
+  return !isDumped(theFeature);
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -1445,6 +1457,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     bool isAdded = false;
     std::list<ObjectPtr>::const_iterator anIt = aList.begin();
     for (; anIt != aList.end(); ++anIt) {
+      if (!(*anIt))
+        continue;
+      if (!isDumped(ModelAPI_Feature::feature(*anIt)))
+        break; // stop if the object is not dumped yet (parent feature should be postponed)
+
       if (isAdded)
         *myDumpStorage << ", ";
       else
@@ -1505,12 +1522,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       }
 
       if(isAdded) {
-        *myDumpStorage << ", ";
         // print each attribute on separate line with the appropriate shift
         if (aNbSpaces > 0) {
           std::string aSpaces(aNbSpaces + 1, ' ');
-          *myDumpStorage << "\n" << aSpaces;
-        }
+          *myDumpStorage << ",\n" << aSpaces;
+        } else
+          *myDumpStorage << ", ";
       } else {
         isAdded = true;
       }

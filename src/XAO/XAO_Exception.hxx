@@ -24,10 +24,6 @@
 #include "XAO.hxx"
 #include <exception>
 
-#ifdef WIN32
-#pragma warning(disable : 4275) // for std::exception
-#endif
-
 namespace XAO
 {
     /**
@@ -45,13 +41,13 @@ namespace XAO
         {
         }
 
-        virtual ~XAO_Exception() throw() {};
+        virtual ~XAO_Exception() noexcept {};
 
         /**
          * Returns the error message.
          * @return the error message.
          */
-        virtual const char* what() const throw ()
+        virtual const char* what() const noexcept
         {
             return m_message;
         }

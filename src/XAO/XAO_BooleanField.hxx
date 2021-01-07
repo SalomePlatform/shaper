@@ -49,18 +49,18 @@ namespace XAO
          * @param nbComponents the number of components.
          * @param name the name of the field.
          */
-        BooleanField(const XAO::Dimension& dimension, const int& nbElements, const int& nbComponents, const std::string& name);
+        BooleanField(XAO::Dimension dimension, int nbElements, int nbComponents, const std::string& name);
 
-        virtual const XAO::Type getType() { return XAO::BOOLEAN; }
+        virtual XAO::Type getType() { return XAO::BOOLEAN; }
 
-        virtual Step* addNewStep(const int& step) throw (XAO_Exception);
+        virtual Step* addNewStep(int step);
 
         /**
          * Adds a new step.
          * @param step the number of the step.
          * @return the newly created step.
          */
-        BooleanStep* addStep(const int& step) throw (XAO_Exception);
+        BooleanStep* addStep(int step);
 
         /**
          * Adds a new step.
@@ -68,15 +68,14 @@ namespace XAO
          * @param stamp the stamp of the step.
          * @return the newly created step.
          */
-        BooleanStep* addStep(const int& step, const int& stamp)
-        throw (XAO_Exception);
+        BooleanStep* addStep(int step, int stamp);
 
         /**
          * Gets the step of given index.
          * @param index the index.
          * @return the step for the given index.
          */
-        BooleanStep* getStep(const int& index) throw (XAO_Exception);
+        BooleanStep* getStep(int index);
     };
 }
 

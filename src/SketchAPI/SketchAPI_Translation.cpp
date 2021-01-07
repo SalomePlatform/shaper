@@ -42,19 +42,24 @@ SketchAPI_Translation::SketchAPI_Translation(
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
-    fillAttribute(theObjects, translationList());
     fillAttribute(thePoint1, startPoint());
     fillAttribute(thePoint2, endPoint());
     fillAttribute(theNumberOfObjects, numberOfObjects());
     fillAttribute(theFullValue ? "FullValue" : "SingleValue", valueType());
 
-    execute(true);
+    setTranslationList(theObjects);
   }
 }
 
 SketchAPI_Translation::~SketchAPI_Translation()
 {
+}
 
+void SketchAPI_Translation::setTranslationList(
+    const std::list<std::shared_ptr<ModelAPI_Object> >& theObjects)
+{
+  fillAttribute(theObjects, translationList());
+  execute(true);
 }
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Translation::translated() const
@@ -64,6 +69,26 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Translation::trans
   std::list<FeaturePtr> anIntermediate;
   std::list<ObjectPtr>::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    AttributeBooleanPtr isCopy = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+    if (isCopy.get() && isCopy->value())
+      anIntermediate.push_back(aFeature);
+  }
+  return SketchAPI_SketchEntity::wrap(anIntermediate);
+}
+
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Translation::translatedList() const
+{
+  std::list<ObjectPtr> aList = translationList()->list();
+  std::set<ObjectPtr> anOriginalObjects;
+  anOriginalObjects.insert(aList.begin(), aList.end());
+  // remove all initial features
+  std::list<FeaturePtr> anIntermediate;
+  aList = translatedObjects()->list();
+  std::list<ObjectPtr>::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    if (anOriginalObjects.find(*anIt) != anOriginalObjects.end())
+      continue; // skip initial object
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
     AttributeBooleanPtr isCopy = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
     if (isCopy.get() && isCopy->value())
@@ -86,46 +111,73 @@ void SketchAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
   bool isFullValue = valueType()->value() != "SingleValue";
 
   // Check all attributes are already dumped. If not, store the constraint as postponed.
-  if (!theDumper.isDumped(aStart) || !theDumper.isDumped(aEnd) ||
-      !theDumper.isDumped(aTransObjects)) {
+  size_t aFirstNotDumped = theDumper.indexOfFirstNotDumped(aTransObjects);
+  if (!theDumper.isDumped(aStart) || !theDumper.isDumped(aEnd) || aFirstNotDumped == 0) {
     theDumper.postpone(aBase);
     return;
   }
 
-  theDumper << aBase << " = " << aSketchName << ".addTranslation("
-            << aTransObjects << ", " << aStart << ", " << aEnd << ", " << aNbCopies;
-  if (isFullValue)
-    theDumper << ", " << isFullValue;
-  theDumper << ")" << std::endl;
+  // the number of dumped aTransObjects is not changed, no need to dump anything
+  static std::map<FeaturePtr, size_t> aNbDumpedArguments;
+  std::map<FeaturePtr, size_t>::iterator aFound = aNbDumpedArguments.find(aBase);
+  if (aFound != aNbDumpedArguments.end() && aFound->second == aFirstNotDumped) {
+    theDumper.postpone(aBase);
+    return;
+  }
+  else
+    aNbDumpedArguments[aBase] = aFirstNotDumped;
+
+  if (theDumper.isDumped(aBase)) {
+    // the feature is already dumped, but it was postponed, because of some arguments
+    // were not dumped yet, thus, it is necessary to update the list of rotated objects
+    theDumper << "\n### Update " << aBase->getKind() << std::endl;
+    theDumper << aBase << ".setTranslationList(" << aTransObjects << ")" << std::endl;
+  }
+  else {
+    // the feature is not dumped yet, make the full dump
+    theDumper << aBase << " = " << aSketchName << ".addTranslation("
+              << aTransObjects << ", " << aStart << ", " << aEnd << ", " << aNbCopies;
+    if (isFullValue)
+      theDumper << ", " << isFullValue;
+    theDumper << ")" << std::endl;
+  }
 
   // Dump variables for a list of translated features
   theDumper << "[";
-  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = translated();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = translatedList();
   std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
-  for (; anIt != aList.end(); ++anIt) {
-    if (anIt != aList.begin())
-      theDumper << ", ";
-    theDumper << (*anIt)->feature();
-  }
-  theDumper << "] = " << theDumper.name(aBase) << ".translated()" << std::endl;
-
-  // Set necessary "auxiliary" flag for translated features
-  // (flag is set if it differs to base entity)
-  std::list<ObjectPtr> aTransList = aTransObjects->list();
-  std::list<ObjectPtr>::const_iterator aTrIt = aTransList.begin();
-  anIt = aList.begin();
-  for (; aTrIt != aTransList.end(); ++aTrIt) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(*aTrIt);
-    if (!aFeature)
-      continue;
-    bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
-
-    for (int i = 1; i < aNbCopies->value(); ++i, ++anIt) {
-      aFeature = (*anIt)->feature();
-      bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
-      if (aFeatAux != aBaseAux)
-        theDumper << theDumper.name((*anIt)->feature(), false)
-                  << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
+  for (size_t anIndex = 0; anIndex < aFirstNotDumped; ++anIndex)
+    for (int i = 1; i < aNbCopies->value() && anIt != aList.end(); ++i, ++anIt) {
+      if (anIt != aList.begin())
+        theDumper << ", ";
+      theDumper << (*anIt)->feature();
     }
+  theDumper << "] = " << theDumper.name(aBase) << ".translatedList()" << std::endl;
+
+  if (theDumper.isDumped(aTransObjects)) {
+    aNbDumpedArguments.erase(aBase);
+    // Set necessary "auxiliary" flag for translated features
+    // (flag is set if it differs to base entity)
+    std::list<ObjectPtr> aTransList = aTransObjects->list();
+    std::list<ObjectPtr>::const_iterator aTrIt = aTransList.begin();
+    anIt = aList.begin();
+    for (; aTrIt != aTransList.end(); ++aTrIt) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(*aTrIt);
+      if (!aFeature)
+        continue;
+      bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+
+      for (int i = 1; i < aNbCopies->value(); ++i, ++anIt) {
+        aFeature = (*anIt)->feature();
+        bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+        if (aFeatAux != aBaseAux)
+          theDumper << theDumper.name((*anIt)->feature(), false)
+                    << ".setAuxiliary(" << aFeatAux << ")" << std::endl;
+      }
+    }
+  }
+  else {
+    // If all refereced objects are not dumped yet, mark the feature as postponed.
+    theDumper.postpone(aBase);
   }
 }

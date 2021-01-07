@@ -395,7 +395,7 @@ bool SketchPlugin_Projection::projectEdge(FeaturePtr& theProjection, const GeomE
   if (aProjectedCurve->isCircle()) {
     if (aProjectedCurve->isTrimmed()) {
       // ARC is a projection
-      isOk = fillArc(theProjection, aProjectedCurve, aSketchPlane);
+      isOk = fillArc(theProjection, aProjectedCurve, aSketchPlane, theEdge);
     }
     else {
       // CIRCLE is a projection
@@ -405,7 +405,7 @@ bool SketchPlugin_Projection::projectEdge(FeaturePtr& theProjection, const GeomE
   else if (aProjectedCurve->isEllipse()) {
     if (aProjectedCurve->isTrimmed()) {
       // ELLIPTIC ARC is a projection
-      isOk = fillEllipticArc(theProjection, aProjectedCurve, aSketchPlane);
+      isOk = fillEllipticArc(theProjection, aProjectedCurve, aSketchPlane, theEdge);
     }
     else {
       // ELLIPSE is a projection
@@ -420,7 +420,8 @@ bool SketchPlugin_Projection::projectEdge(FeaturePtr& theProjection, const GeomE
 
 bool SketchPlugin_Projection::fillArc(FeaturePtr& theProjection,
                                       const GeomCurvePtr& theArc,
-                                      const GeomPlanePtr& thePlane)
+                                      const GeomPlanePtr& thePlane,
+                                      const GeomEdgePtr& theOriginalEdge)
 {
   rebuildProjectedFeature(theProjection, ARC_PROJECTION(), SketchPlugin_Arc::ID());
 
@@ -431,6 +432,13 @@ bool SketchPlugin_Projection::fillArc(FeaturePtr& theProjection,
     return false; // arc is not in the plane, parallel to the sketch plane
 
   bool isInversed = aNormalsDot < 0.;
+
+  GeomCirclePtr anOriginalCircle = theOriginalEdge->circle();
+  if (anOriginalCircle) {
+    double aCirclesDot = anOriginalCircle->normal()->dot(aCircle.normal());
+    if (aCirclesDot < 0.)
+      isInversed = !isInversed;
+  }
 
   GeomPointPtr aCenter = thePlane->project(aCircle.center());
   GeomPnt2dPtr aCenterInSketch = sketch()->to2D(aCenter);
@@ -508,7 +516,8 @@ bool SketchPlugin_Projection::fillEllipse(FeaturePtr& theProjection,
 
 bool SketchPlugin_Projection::fillEllipticArc(FeaturePtr& theProjection,
                                               const GeomCurvePtr& theEllipticArc,
-                                              const GeomPlanePtr& thePlane)
+                                              const GeomPlanePtr& thePlane,
+                                              const GeomEdgePtr& theOriginalEdge)
 {
   rebuildProjectedFeature(theProjection, ARC_PROJECTION(), SketchPlugin_EllipticArc::ID());
 
@@ -519,6 +528,13 @@ bool SketchPlugin_Projection::fillEllipticArc(FeaturePtr& theProjection,
     return false; // arc is not in the plane, parallel to the sketch plane
 
   bool isInversed = aNormalsDot < 0.;
+
+  GeomEllipsePtr anOriginalEllipse = theOriginalEdge->ellipse();
+  if (anOriginalEllipse) {
+    double anEllipsesDot = anOriginalEllipse->normal()->dot(anEllipse.normal());
+    if (anEllipsesDot < 0.)
+      isInversed = !isInversed;
+  }
 
   GeomPointPtr aCenter = thePlane->project(anEllipse.center());
   GeomPnt2dPtr aCenterInSketch = sketch()->to2D(aCenter);

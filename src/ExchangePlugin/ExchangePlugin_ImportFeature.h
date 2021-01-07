@@ -24,6 +24,7 @@
 
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
+#include <GeomAPI_Shape.h>
 
 #include <map>
 
@@ -43,17 +44,47 @@ class ExchangePlugin_ImportFeature : public ModelAPI_CompositeFeature
     static const std::string MY_IMPORT_ID("Import");
     return MY_IMPORT_ID;
   }
+  /// Feature kind
+  inline static const std::string& IMPORT_TYPE_ID()
+  {
+    static const std::string MY_IMPORT_TYPE_ID("ImportType");
+    return MY_IMPORT_TYPE_ID;
+  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
+  /// attribute name of file path
+  inline static const std::string& STEP_FILE_PATH_ID()
+  {
+    static const std::string MY_STEP_FILE_PATH_ID("step_file_path");
+    return MY_STEP_FILE_PATH_ID;
+  }
   /// All features (list of references)
   inline static const std::string& FEATURES_ID()
   {
     static const std::string MY_FEATURES_ID("Features");
     return MY_FEATURES_ID;
+  }
+  /// attribute name of step Scale to International System Units
+  inline static const std::string& STEP_SCALE_INTER_UNITS_ID()
+  {
+    static const std::string MY_STEP_SCALE_INTER_UNITS_ID("step_scale_inter_units");
+    return MY_STEP_SCALE_INTER_UNITS_ID;
+  }
+  /// attribute name of step materiels
+  inline static const std::string& STEP_MATERIALS_ID()
+  {
+    static const std::string MY_STEP_MATERIALS_ID("step_materials");
+    return MY_STEP_MATERIALS_ID;
+  }
+  /// attribute name of step colors
+  inline static const std::string& STEP_COLORS_ID()
+  {
+    static const std::string MY_STEP_COLORS_ID("step_colors");
+    return MY_STEP_COLORS_ID;
   }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
@@ -108,6 +139,18 @@ private:
   /// Loads Naming data structure to the document
   void loadNamingDS(std::shared_ptr<GeomAPI_Shape> theGeomShape,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody);
+  /// Set groups of color
+  void setColorGroups(std::shared_ptr<ModelAPI_ResultBody> theResultBody);
+
+  /// set a group of color
+  void setColorGroup(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                     std::vector<int>& theColor,
+                     const std::wstring& theName );
+
+  /// set Materiel group of color
+  void setMaterielGroup(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                        std::map< std::wstring, std::list<std::wstring>>& theMaterialShape);
+
 };
 
 #endif /* IMPORT_IMPORTFEATURE_H_ */

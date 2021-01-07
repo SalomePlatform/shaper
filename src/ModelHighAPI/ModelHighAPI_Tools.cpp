@@ -168,8 +168,18 @@ void fillAttribute(const std::shared_ptr<ModelAPI_Object> & theValue,
 void fillAttribute(const std::list<std::shared_ptr<ModelAPI_Object> > & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute)
 {
-  theAttribute->clear();
-  for (auto it = theValue.begin(); it != theValue.end(); ++it)
+  int aSize = theAttribute->size();
+  // keep objects at the beginning of the list if they the same
+  auto it = theValue.begin();
+  for (int anIndex = 0; it != theValue.end() && anIndex < aSize; ++it, ++anIndex)
+    if (theAttribute->object(anIndex) != *it) {
+      // remove the tail of the list
+      while (++anIndex <= aSize)
+        theAttribute->removeLast();
+      break;
+    }
+  // append the rest of elements
+  for (; it != theValue.end(); ++it)
     theAttribute->append(*it);
 }
 
@@ -349,7 +359,7 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
     case ModelHighAPI_Selection::VT_ResultSubShapePair: {
       ResultSubShapePair aPair = theSelection.resultSubShapePair();
       GeomShapePtr aShape = aPair.second;
-      if(!aShape.get()) {
+      if(!aShape.get() && aPair.first.get()) {
         aShape = aPair.first->shape();
       }
       if(!aShape.get()) {

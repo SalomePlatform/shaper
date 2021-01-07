@@ -190,13 +190,14 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 #endif
   }
   // clear processed and fill modified recursively
+  std::set<FeaturePtr> aRefSet;
   const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = theFeature->data()->refsToMe();
   std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
   for(; aRefIter != aRefs.cend(); aRefIter++) {
     if ((*aRefIter)->isArgument()) {
       FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
       if (aReferenced.get()) {
-        addModified(aReferenced, theFeature);
+        aRefSet.insert(aReferenced);
       }
     }
   }
@@ -211,19 +212,21 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       if ((*aRIter)->isArgument()) {
         FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRIter)->owner());
         if (aReferenced.get()) {
-          addModified(aReferenced, theFeature);
+          aRefSet.insert(aReferenced);
         }
       }
     }
   }
-
   // also add part feature that contains this feature to the modified
   if (theFeature->document()->kind() != "PartSet") {
     FeaturePtr aPart = ModelAPI_Tools::findPartFeature(
       ModelAPI_Session::get()->moduleDocument(), theFeature->document());
     if (aPart.get())
-      addModified(aPart, theFeature);
+      aRefSet.insert(aPart);
   }
+  for(std::set<FeaturePtr>::iterator aRef = aRefSet.begin(); aRef != aRefSet.end(); aRef++)
+    addModified(*aRef, theFeature);
+
   return true;
 }
 
@@ -343,18 +346,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if (anUpdated.get()) {
         if (addModified(anUpdated, FeaturePtr()))
           aSomeModified = true;
-        if (myUpdateBlocked) { // execute this feature anyway to show the current result
-          /*if (!anUpdated->isStable() && anUpdated->results().size() && (
-              anUpdated->firstResult()->groupName() == ModelAPI_ResultBody::group() ||
-              anUpdated->firstResult()->groupName() == ModelAPI_ResultPart::group())) {
-            if (aFactory->validate(anUpdated)) {
-              executeFeature(anUpdated);
-              redisplayWithResults(anUpdated, ModelAPI_StateNothing, false);
-              static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-              aLoop->flush(EVENT_DISP);
-            }
-          }*/
-        }
       } else {
         // process the updated result as update of features that refers to this result
         const std::set<std::shared_ptr<ModelAPI_Attribute> >&
@@ -732,7 +723,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     if (!isPostponedMain) {
       bool aDoExecute = true;
       if (myUpdateBlocked) {
-        if (!theFeature->isStable()) {
+        if (!theFeature->isStable() || (theFeature->getKind().size() > 6 &&
+            theFeature->getKind().substr(0, 6) == "Sketch")) { // automatic update sketch elements
           aDoExecute = true;
         } else if (theFeature->results().size()) { // execute only not persistent results features
           aDoExecute = !theFeature->isPersistentResult();

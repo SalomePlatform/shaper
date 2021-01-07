@@ -49,18 +49,18 @@ namespace XAO
          * @param nbComponents the number of components.
          * @param name the name of the field.
          */
-        DoubleField(const XAO::Dimension& dimension, const int& nbElements, const int& nbComponents, const std::string& name);
+        DoubleField(XAO::Dimension dimension, int nbElements, int nbComponents, const std::string& name);
 
-        virtual const XAO::Type getType() { return XAO::DOUBLE; }
+        virtual XAO::Type getType() { return XAO::DOUBLE; }
 
-        virtual Step* addNewStep(const int& step) throw (XAO_Exception);
+        virtual Step* addNewStep(int step) ;
 
         /**
          * Adds a new step.
          * @param step the number of the step.
          * @return the newly created step.
          */
-        DoubleStep* addStep(const int& step) throw (XAO_Exception);
+        DoubleStep* addStep(int step) ;
 
         /**
          * Adds a new step.
@@ -68,14 +68,14 @@ namespace XAO
          * @param stamp the stamp of the step.
          * @return the newly created step.
          */
-        DoubleStep* addStep(const int& step, const int& stamp) throw (XAO_Exception);
+        DoubleStep* addStep(int step, int stamp) ;
 
         /**
          * Gets the step of given index.
          * @param index the index.
          * @return the step for the given index.
          */
-        DoubleStep* getStep(const int& index) throw (XAO_Exception);
+        DoubleStep* getStep(int index) ;
     };
 }
 

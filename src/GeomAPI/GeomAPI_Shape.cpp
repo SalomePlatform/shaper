@@ -593,7 +593,19 @@ bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmi
   if (aShape.IsNull())
     return false;
   Bnd_Box aBndBox;
-  BRepBndLib::Add(aShape, aBndBox, false);
+  // Workaround: compute optimal bounding box for the compounds of edges/vertices, because sometimes
+  // the bounding box of sketch is calculated if the transformation is applied twice (issue #20167).
+  bool isShape1D = false;
+  if (aShape.ShapeType() == TopAbs_COMPOUND) {
+    isShape1D = true;
+    for (TopoDS_Iterator anIt(aShape); anIt.More() && isShape1D; anIt.Next())
+      if (anIt.Value().ShapeType() < TopAbs_WIRE)
+        isShape1D = false;
+  }
+  if (isShape1D)
+    BRepBndLib::AddOptimal(aShape, aBndBox, false, true);
+  else
+    BRepBndLib::Add(aShape, aBndBox, false);
   if (aBndBox.IsVoid())
     return false;
   aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);

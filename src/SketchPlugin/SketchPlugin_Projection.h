@@ -126,7 +126,8 @@ private:
   /// \brief Fill attributes of the Arc feature
   bool fillArc(FeaturePtr& theProjection,
                const std::shared_ptr<GeomAPI_Curve>& theArc,
-               const std::shared_ptr<GeomAPI_Pln>& thePlane);
+               const std::shared_ptr<GeomAPI_Pln>& thePlane,
+               const std::shared_ptr<GeomAPI_Edge>& theOriginalEdge);
   /// \brief Fill attributes of the Circle feature
   bool fillCircle(FeaturePtr& theProjection,
                   const std::shared_ptr<GeomAPI_Curve>& theCircle,
@@ -138,7 +139,8 @@ private:
   /// \brief Fill attributes of the EllipticArc feature
   bool fillEllipticArc(FeaturePtr& theProjection,
                        const std::shared_ptr<GeomAPI_Curve>& theEllipticArc,
-                       const std::shared_ptr<GeomAPI_Pln>& thePlane);
+                       const std::shared_ptr<GeomAPI_Pln>& thePlane,
+                       const std::shared_ptr<GeomAPI_Edge>& theOriginalEdge);
   /// \brief Fill attributes of the B-spline feature
   bool fillBSpline(FeaturePtr& theProjection,
                    const std::shared_ptr<GeomAPI_Curve>& theCurve,

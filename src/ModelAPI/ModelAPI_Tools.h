@@ -198,9 +198,12 @@ MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>
 /*! Return the default name of the result according the features it depends or name of the feature.
  *  Return also whether the name is get from the concealing result of parent object
  *  (means that concealing result has user-defined name).
+ * \param[in] theRecursive  recursively check the concealed results if they have user-defined names
  */
 MODELAPI_EXPORT std::pair<std::wstring, bool> getDefaultName(
-  const std::shared_ptr<ModelAPI_Result>& theResult, const bool theInherited = true);
+  const std::shared_ptr<ModelAPI_Result>& theResult,
+  const bool theInherited = true,
+  const bool theRecursive = false);
 
 /*! Collect all parents for the given feature, including the Part
  */

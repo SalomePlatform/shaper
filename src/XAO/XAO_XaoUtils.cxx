@@ -27,15 +27,14 @@
 using namespace XAO;
 
 
-const std::string XaoUtils::intToString(const int& value)
+std::string XaoUtils::intToString(int value)
 {
     std::ostringstream str;
     str << value;
     return str.str();
 }
 
-const int XaoUtils::stringToInt(const std::string& value)
-throw(XAO_Exception)
+int XaoUtils::stringToInt(const std::string& value)
 {
     int res;
     std::istringstream convert(value);
@@ -44,15 +43,14 @@ throw(XAO_Exception)
     return res;
 }
 
-const std::string XaoUtils::doubleToString(const double& value)
+std::string XaoUtils::doubleToString(double value)
 {
     std::ostringstream str;
     str << value;
     return str.str();
 }
 
-const double XaoUtils::stringToDouble(const std::string& value)
-throw(XAO_Exception)
+double XaoUtils::stringToDouble(const std::string& value)
 {
     double res;
     std::istringstream convert(value);
@@ -61,15 +59,12 @@ throw(XAO_Exception)
     return res;
 }
 
-const std::string XaoUtils::booleanToString(const bool& value)
+std::string XaoUtils::booleanToString(bool value)
 {
-    if (value)
-        return "true";
-    return "false";
+    return value ? "true" : "false";
 }
 
-const bool XaoUtils::stringToBoolean(const std::string& value)
-throw(XAO_Exception)
+bool XaoUtils::stringToBoolean(const std::string& value)
 {
     if (value == "true" || value == "1")
         return true;
@@ -79,8 +74,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Invalid boolean value: " << value);
 }
 
-const std::string XaoUtils::dimensionToString(const XAO::Dimension& dimension)
-throw(XAO_Exception)
+std::string XaoUtils::dimensionToString(XAO::Dimension dimension)
 {
     if (dimension == XAO::VERTEX)
         return "vertex";
@@ -96,8 +90,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad dimension: " << dimension);
 }
 
-const XAO::Dimension XaoUtils::stringToDimension(const std::string& dimension)
-throw(XAO_Exception)
+XAO::Dimension XaoUtils::stringToDimension(const std::string& dimension)
 {
     if (dimension == "vertex")
         return XAO::VERTEX;
@@ -113,8 +106,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad dimension: " << dimension);
 }
 
-const std::string XaoUtils::fieldTypeToString(const XAO::Type& type)
-throw(XAO_Exception)
+std::string XaoUtils::fieldTypeToString(XAO::Type type)
 {
     if (type ==XAO:: BOOLEAN)
         return "boolean";
@@ -128,8 +120,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad type: " << type);
 }
 
-const XAO::Type XaoUtils::stringToFieldType(const std::string& type)
-throw(XAO_Exception)
+XAO::Type XaoUtils::stringToFieldType(const std::string& type)
 {
     if (type == "boolean")
         return XAO::BOOLEAN;
@@ -143,8 +134,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad type: " << type);
 }
 
-const std::string XaoUtils::shapeFormatToString(const XAO::Format& format)
-throw(XAO_Exception)
+std::string XaoUtils::shapeFormatToString(XAO::Format format)
 {
     if (format == XAO::BREP)
         return "BREP";
@@ -154,8 +144,7 @@ throw(XAO_Exception)
     throw XAO_Exception(MsgBuilder() << "Bad format: " << format);
 }
 
-const XAO::Format XaoUtils::stringToShapeFormat(const std::string& format)
-throw(XAO_Exception)
+XAO::Format XaoUtils::stringToShapeFormat(const std::string& format)
 {
     if (format == "BREP")
         return XAO::BREP;

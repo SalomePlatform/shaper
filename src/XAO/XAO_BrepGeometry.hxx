@@ -61,7 +61,7 @@ namespace XAO
          * Gets the format of the geometry.
          * @return the format of the geometry.
          */
-        virtual const XAO::Format getFormat() { return XAO::BREP; }
+        virtual XAO::Format getFormat() { return XAO::BREP; }
 
         /**
          * Gets the shape as a string.
@@ -79,13 +79,13 @@ namespace XAO
          * Writes shape to a file
          * @param fileName the path to the file
          */
-        virtual void writeShapeFile(const std::string& fileName) throw (XAO_Exception);
+        virtual void writeShapeFile(const std::string& fileName) ;
 
         /**
          * Reads shape from a file
          * @param fileName the path to the file
          */
-        virtual void readShapeFile(const std::string& fileName) throw (XAO_Exception);
+        virtual void readShapeFile(const std::string& fileName) ;
 
 #ifdef SWIG
         %pythoncode %{
@@ -115,14 +115,14 @@ namespace XAO
          * @param vertexA
          * @param vertexB
          */
-        void getEdgeVertices(const int& edgeIndex, int& vertexA, int& vertexB);
+        void getEdgeVertices(int edgeIndex, int& vertexA, int& vertexB);
 
         /**
          * Gets the number of wires of a face (including holes).
          * @param faceIndex the index of the face.
          * @return the number of wires.
          */
-        const int countFaceWires(const int& faceIndex);
+        int countFaceWires(int faceIndex);
 
         /**
          * Gets the indices of the wires of the face.
@@ -130,14 +130,14 @@ namespace XAO
          * @param wireIndex the index of the wire.
          * @return the list of wires for the given face.
          */
-        std::vector<int> getFaceEdges(const int& faceIndex, const int& wireIndex);
+        std::vector<int> getFaceEdges(int faceIndex, int wireIndex);
 
         /**
          * Gets the number of shells of a solid (including cavities).
          * @param solidIndex the index of the solid.
          * @return the number of shells.
          */
-        const int countSolidShells(const int& solidIndex);
+        int countSolidShells(int solidIndex);
 
         /**
          * Gets the indices of the shells of the solids.
@@ -145,7 +145,7 @@ namespace XAO
          * @param shellIndex the index of the shell (for the given solid).
          * @return the list of shells for the given solid.
          */
-        std::vector<int> getSolidFaces(const int& solidIndex, const int& shellIndex);
+        std::vector<int> getSolidFaces(int solidIndex, int shellIndex);
 
         /**
          * Gets the coordinates of a vertex.
@@ -154,179 +154,179 @@ namespace XAO
          * @param yCoord the Y coordinate.
          * @param zCoord the Z coordinate.
          */
-        void getVertexXYZ(const int& vertexIndex, double& xCoord, double& yCoord, double& zCoord)
-        throw (XAO_Exception);
+        void getVertexXYZ(int vertexIndex, double& xCoord, double& yCoord, double& zCoord)
+        ;
 
         /**
          * Gets the length of an edge.
          * @param index the index of the edge.
          * @return the length of the edge.
          */
-        const double getEdgeLength(const int& index);
+        double getEdgeLength(int index);
 
         /**
          * Gets the are of a face.
          * @param index the index of a face.
          * @return the area of the face.
          */
-        const double getFaceArea(const int& index);
+        double getFaceArea(int index);
 
         /**
          * Gets the volume of a solid.
          * @param index the index of the solid.
          * @return the volume of the solid.
          */
-        const double getSolidVolume(const int& index);
+        double getSolidVolume(int index);
 
         /**
          * Gets the ID of a vertex.
          * @param index the index of the vertex.
          * @return the ID of the vertex.
          */
-        const int getVertexID(const int& index);
+        int getVertexID(int index);
 
         /**
          * Gets the ID of an edge.
          * @param index the index of the edge.
          * @return the ID of the edge.
          */
-        const int getEdgeID(const int& index);
+        int getEdgeID(int index);
 
         /**
          * Gets the ID of a face.
          * @param index the index of the face.
          * @return the ID of the face.
          */
-        const int getFaceID(const int& index);
+        int getFaceID(int index);
 
         /**
          * Gets the ID of a solid.
          * @param index the index of the solid.
          * @return the ID of the solid.
          */
-        const int getSolidID(const int& index);
+        int getSolidID(int index);
 
         /**
          * Sets the ID of a vertex.
          * @param index the index of the vertex to set.
          * @param id the id to set.
          */
-        void setVertexID(const int& index, const int& id);
+        void setVertexID(int index, int id);
 
         /**
          * Sets the ID of an edge.
          * @param index the index of the edge to set.
          * @param id the id to set.
          */
-        void setEdgeID(const int& index, const int& id);
+        void setEdgeID(int index, int id);
 
         /**
          * Sets the ID of a face.
          * @param index the index of the face to set.
          * @param id the id to set.
          */
-        void setFaceID(const int& index, const int& id);
+        void setFaceID(int index, int id);
 
         /**
          * Sets the ID of a solid.
          * @param index the index of the solid to set.
          * @param id the id to set.
          */
-        void setSolidID(const int& index, const int& id);
+        void setSolidID(int index, int id);
 
         /**
          * Finds a vertex with its ID.
          * @param id the ID of the vertex.
          * @return the index of the vertex.
          */
-        const int findVertex(const int& id);
+        int findVertex(int id);
 
         /**
          * Finds an edge with its ID.
          * @param id the ID of the edge.
          * @return the index of the edge.
          */
-        const int findEdge(const int& id);
+        int findEdge(int id);
 
         /**
          * Finds a face with its ID.
          * @param id the ID of the face.
          * @return the index of the face.
          */
-        const int findFace(const int& id);
+        int findFace(int id);
 
         /**
          * Finds a solid with its ID.
          * @param id the ID of the solid.
          * @return th index of the solid.
          */
-        const int findSolid(const int& id);
+        int findSolid(int id);
 
         /**
          * Finds the name of a vertex with its ID.
          * @param id the ID of the vertex.
          * @return the name of the vertex.
          */
-        const std::string findVertexName(const int& id);
+        const std::string findVertexName(int id);
 
         /**
          * Finds the name of an edge with its ID.
          * @param id the ID of the edge.
          * @return the name of the edge.
          */
-        const std::string findEdgeName(const int& id);
+        const std::string findEdgeName(int id);
 
         /**
          * Finds the name of a face with its ID.
          * @param id the ID of the face.
          * @return the name of the face.
          */
-        const std::string findFaceName(const int& id);
+        const std::string findFaceName(int id);
 
         /**
          * Finds the name of a solid with its ID.
          * @param id the ID of the solid.
          * @return the name of the solid.
          */
-        const std::string findSolidName(const int& id);
+        const std::string findSolidName(int id);
 
         /**
          * Changes the name of a vertex.
          * @param id the ID of the vertex.
          * @param name the name to set.
          */
-        void changeVertexName(const int& id, const std::string& name) throw (XAO_Exception);
+        void changeVertexName(int id, const std::string& name) ;
 
         /**
          * Changes the name of an edge.
          * @param id the ID of the edge
          * @param name the name to set.
          */
-        void changeEdgeName(const int& id, const std::string& name) throw (XAO_Exception);
+        void changeEdgeName(int id, const std::string& name) ;
 
         /**
          * Changes the name of a face.
          * @param id the ID of the face.
          * @param name the name to set.
          */
-        void changeFaceName(const int& id, const std::string& name) throw (XAO_Exception);
+        void changeFaceName(int id, const std::string& name) ;
 
         /**
          * Changes the name of a solid.
          * @param id the ID of the solid.
          * @param name the name to set.
          */
-        void changeSolidName(const int& id, const std::string& name) throw (XAO_Exception);
+        void changeSolidName(int id, const std::string& name) ;
 
     private:
         void initIds();
         void initListIds(const TopAbs_ShapeEnum& shapeType, GeometricElementList& eltList);
-        TopoDS_Shape getSubShape(const TopoDS_Shape& mainShape, const TopAbs_ShapeEnum& shapeType, const int& shapeIndex)
-            throw (XAO_Exception);
-        const int countGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType);
-        std::vector<int> getGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType, const XAO::Dimension& dim);
-        const int findElement(const XAO::Dimension& dim, const int& id)
-            throw (XAO_Exception);
+        TopoDS_Shape getSubShape(const TopoDS_Shape& mainShape, const TopAbs_ShapeEnum& shapeType, int shapeIndex)
+            ;
+        int countGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType);
+        std::vector<int> getGeometricalElements(const TopoDS_Shape& shape, const TopAbs_ShapeEnum& shapeType, XAO::Dimension dim);
+        int findElement(XAO::Dimension dim, int id)
+            ;
 
     private:
         TopoDS_Shape m_shape;

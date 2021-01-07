@@ -682,4 +682,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillet1D_Wire_3.py
                TestFillet1D_Wire_4.py
                TestFillet1D_Wire_5.py
+               Test19931.py
+               Test20027.py
+               Test20245_1.py
+               Test20245_2.py
+               Test20245_3.py
+               Test20247.py
 )

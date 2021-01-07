@@ -32,6 +32,8 @@
 #include <GeomAPI_ShapeExplorer.h>
 
 
+static const std::string COMPOSITESKETCH_VERSION_1("v9.6");
+
 static void storeSubShape(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                           ResultBodyPtr theResultBody,
                           const GeomShapePtr theShape,
@@ -49,9 +51,15 @@ void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int the
 
   // Initialize selection list.
   if(theInitFlags & InitBaseObjectsList) {
-    data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
+    AttributeSelectionListPtr anObjectsAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(
+        data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId()));
     myCurrentSelectionType = selectionList(BASE_OBJECTS_ID())->selectionType();
-    selectionList(BASE_OBJECTS_ID())->setWholeResultAllowed(true);
+    anObjectsAttr->setWholeResultAllowed(true);
+    if (!anObjectsAttr->isInitialized()) {
+      // new feature, specify the version
+      data()->setVersion(COMPOSITESKETCH_VERSION_1);
+    }
   }
 }
 
