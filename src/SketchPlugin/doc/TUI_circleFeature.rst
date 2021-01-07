@@ -1,7 +1,7 @@
 
   .. _tui_create_circle:
 
-Create Skecth Circle
+Create Sketch Circle
 ====================
 
 .. literalinclude:: examples/circle.py

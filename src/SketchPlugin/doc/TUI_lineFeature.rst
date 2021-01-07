@@ -1,7 +1,7 @@
 
   .. _tui_create_line:
 
-Create Skecth Line
+Create Sketch Line
 ==================
 
 .. literalinclude:: examples/line.py

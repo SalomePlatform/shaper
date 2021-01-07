@@ -1,7 +1,7 @@
 
   .. _tui_create_point:
 
-Create Skecth Point
+Create Sketch Point
 ===================
 
 .. literalinclude:: examples/point.py
