@@ -130,7 +130,7 @@
     </message>
     <message>
       <source>Vertical</source>
-      <translation>Verticale</translation>
+      <translation>Vertical</translation>
     </message>
     <message>
       <source>Vertical Distance</source>
@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>Vertical</source>
-      <translation>Verticale</translation>
+      <translation>Vertical</translation>
     </message>
   </context>
   <context>
