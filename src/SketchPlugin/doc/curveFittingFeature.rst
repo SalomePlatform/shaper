@@ -39,12 +39,12 @@ Clicking the **Reorder points** button will change the order of selected points 
     :param list: points for the curve.
     :param boolean: flag to make the curve periodic.
     :param boolean: flag to make the curve closed but not periodic.
-    :return: Created B-spline curve.
+    :return: interpolated curve.
 
 Result
 """"""
 
-The created B-spline curve appears in the view.
+The interpolated curve appears in the view.
 
 .. image:: images/curvefitting_interpolation_res.png
 	   :align: center
@@ -73,12 +73,12 @@ Clicking the **Reorder points** button will change the order of selected points 
     :param double: how close the curve should pass according to the points.
     :param boolean: flag to make the curve periodic.
     :param boolean: flag to make the curve closed but not periodic.
-    :return: Created B-spline curve.
+    :return: interpolated curve.
 
 Result
 """"""
 
-The created B-spline curve appears in the view.
+The interpolated curve appears in the view.
 
 .. image:: images/curvefitting_approximation_res.png
 	   :align: center
