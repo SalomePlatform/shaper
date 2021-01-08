@@ -1,7 +1,7 @@
 
   .. _tui_create_ellipse:
 
-Create Skecth Ellipse
+Create Sketch Ellipse
 =====================
 
 .. literalinclude:: examples/ellipse.py

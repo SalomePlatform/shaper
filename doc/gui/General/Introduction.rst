@@ -337,7 +337,7 @@ Hide Faces panel
 - If user selects a group of faces (or at least a one face of this group) then whole group will be hidden and also all faces from all objects referenced by this group.
 - If user will display the hidden group again (by a show operation) then the group will be removed from Hide Faces list and visibility of all referenced faces will be restored.
 
-Also it is possible do not to hide faces, but make them transparent. For this purpose **"Transparent"** check-box can be used. Value of the transparency can be changed in **Visualization** tab of **Preferences** dialog box.
+It is also possible not to hide faces, but make them transparent. For this purpose **"Transparent"** check-box can be used. Value of the transparency can be changed in **Visualization** tab of **Preferences** dialog box.
 Closing of **Hide Faces** panel restores visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then user has to press **"Esc"** button.
 
 .. _python console:

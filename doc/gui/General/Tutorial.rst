@@ -22,10 +22,10 @@ At this step we will create a regular hexagon.
 .. figure:: /images/tutorial1_1.png
    :align: center
 
-   Skecth plane XOY
+   Sketch plane XOY
 
 - Start :ref:`Line <sketchLine>` creation via Main Menu *Sketch - > Line*
-- Pick 3 points in the view one by one and select the first one at the end to get a triangle:
+- Pick 3 points in the view one by one and select the first one at the end to get a triangle
 
 .. figure:: /images/tutorial1_2.png
    :align: center
@@ -51,7 +51,7 @@ At this step we will create a regular hexagon.
 
 - Show trihedron
 - Select both **OY** axis and the upper side of the triangle in the view
-- Create :ref:`Perpendicular <sketchPerpendicular>` constraint via **Pependicular** button in Sketch toolbar
+- Create :ref:`Perpendicular <sketchPerpendicular>` constraint via **Perpendicular** button in Sketch toolbar
 
 .. figure:: /images/tutorial1_5.png
    :align: center
@@ -108,7 +108,7 @@ At this step we will create a regular hexagon.
 
    Fully fixed regular hexagon
 
-- Click **Apply** button in the *Skecth* property panel to finish the sketch creation
+- Click **Apply** button in the *Sketch* property panel to finish the sketch creation
 
 .. figure:: /images/tutorial1_12.png
    :align: center

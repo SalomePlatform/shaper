@@ -10,6 +10,8 @@
     </message>
   </context>
 
+  <!-- Validators -->
+
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
@@ -80,7 +82,7 @@
       <translation>Can not compute the solver error</translation>
     </message>
   </context>
-  
+
   <context>
     <name>SketchMacroCircle:center_point</name>
     <message>

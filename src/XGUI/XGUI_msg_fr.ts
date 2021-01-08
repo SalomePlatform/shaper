@@ -308,7 +308,7 @@
     </message>
     <message>
         <source>Type:</source>
-        <translation>Type:</translation>
+        <translation>Type :</translation>
     </message>
     <message>
         <source>Vertex</source>
@@ -498,11 +498,11 @@
     </message>
     <message>
         <source>%1 operation will be aborted.</source>
-        <translation>%1 opération sera abandonnée.</translation>
+        <translation>L'opération '%1' sera abandonnée.</translation>
     </message>
     <message>
         <source>Please validate your %1 before saving.</source>
-        <translation>Veuillez valider votre %1 avant de sauvegarder.</translation>
+        <translation>Veuillez valider votre opération '%1' avant de sauvegarder.</translation>
     </message>
 </context>
 <context>
@@ -607,7 +607,7 @@
     </message>
     <message>
         <source>The document is modified, save before opening another?</source>
-        <translation>Le document est modifié, sauvegarder avant d&apos;en ouvrir un autre?</translation>
+        <translation>Le document est modifié, sauvegarder avant d&apos;en ouvrir un autre ?</translation>
     </message>
     <message>
         <source>Open file</source>

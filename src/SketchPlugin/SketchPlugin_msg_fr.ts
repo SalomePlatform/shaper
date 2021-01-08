@@ -73,10 +73,6 @@
       <translation>Distance horizontale</translation>
     </message>
     <message>
-      <source>Curve fitting</source>
-      <translation>Courbe d&apos;ajustement</translation>
-    </message>
-    <message>
       <source>Length</source>
       <translation>Longueur</translation>
     </message>
@@ -134,11 +130,15 @@
     </message>
     <message>
       <source>Vertical</source>
-      <translation>Verticale</translation>
+      <translation>Vertical</translation>
     </message>
     <message>
       <source>Vertical Distance</source>
       <translation>Distance verticale</translation>
+    </message>
+    <message>
+      <source>Curve fitting</source>
+      <translation>Courbe d&apos;ajustement</translation>
     </message>
   </context>
 
@@ -195,7 +195,6 @@
       <translation>Les objets d&apos;esquisse ne sont pas définis</translation>
     </message>
   </context>
-
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
@@ -644,7 +643,7 @@
     </message>
     <message>
       <source>Vertical</source>
-      <translation>Verticale</translation>
+      <translation>Vertical</translation>
     </message>
   </context>
   <context>
@@ -2789,7 +2788,7 @@
     <name>SketchCopy</name>
     <message>
       <source>Sketch copy</source>
-      <translation>Copie s&apos;esquisse</translation>
+      <translation>Copie d'esquisse</translation>
     </message>
     <message>
       <source>Copy sketch and all its elements to the same plane</source>

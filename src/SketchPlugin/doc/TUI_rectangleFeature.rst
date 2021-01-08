@@ -1,7 +1,7 @@
 
   .. _tui_create_rectangle:
 
-Create Skecth Rectangle
+Create Sketch Rectangle
 =======================
 
 .. literalinclude:: examples/rectangle.py

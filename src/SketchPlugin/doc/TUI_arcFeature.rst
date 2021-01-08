@@ -1,7 +1,7 @@
 
   .. _tui_create_arc:
 
-Create Skecth Arc
+Create Sketch Arc
 =================
 
 .. literalinclude:: examples/arc.py

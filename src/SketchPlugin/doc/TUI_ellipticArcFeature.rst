@@ -1,7 +1,7 @@
 
   .. _tui_create_elliptic_arc:
 
-Create Skecth Elliptic Arc
+Create Sketch Elliptic Arc
 ==========================
 
 .. literalinclude:: examples/elliptic_arc.py
