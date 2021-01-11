@@ -280,6 +280,7 @@ INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/src/GeomAPI
     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
     ${PROJECT_SOURCE_DIR}/src/Locale
+    ${PROJECT_SOURCE_DIR}/src/BuildPlugin
     ${SUIT_INCLUDE}
 )
 
