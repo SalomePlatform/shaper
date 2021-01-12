@@ -20,6 +20,6 @@
 """
 
 from ExchangeAPI import addImport, addImportSTEP, exportToFile, exportToXAO, exportToSTL
-from ExchangeAPI import exportPart, importPart
+from ExchangeAPI import exportPart, importPart, addImportImage
 
 from .tools import *
