@@ -56,7 +56,7 @@ class SketchAPI_Projection;
 class SketchAPI_Rectangle;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
-class SketchAPI_MacroRectangle;
+
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> PointOrReference;
 //--------------------------------------------------------------------------------------
@@ -180,15 +180,15 @@ public:
       const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
       const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
   /// Add rectangle
-  /*SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_MacroRectangle> addRectangle(
-      double theX1, double theY1, double theX2, double theY2, bool thePoint2IsCenter);
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
+      double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter);
   /// Add rectangle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_MacroRectangle> addRectangle(
-      const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
-      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool theEndPointIsCenter);
-*/
+  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
+      const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool isFirstPointCenter);
+
   /// Add circle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(

@@ -101,20 +101,20 @@
                                      enable_value="enable_by_preferences"/>
             <validator id="GeomValidators_Different" parameters="rectangle_start_point1,rectangle_end_point1"/>
          </box>
-         <box id="rectangle_type_by_start_and_center_points"
+         <box id="rectangle_type_by_center_and_end_points"
               icon="icons/Sketch/rectangle_pt_rad_32x32.png"
-              title="Start and center points">
-           <sketch-2dpoint_selector id="rectangle_start_point2"
-                                    accept_expressions="0"
-                                    title="Rectangle start point"
-                                    tooltip="Start point coordinates"
-                                    enable_value="enable_by_preferences"/>
+              title="Center and end points">
            <sketch-2dpoint_selector id="rectangle_center_point"
                                     accept_expressions="0"
                                     title="Rectangle center point"
                                     tooltip="Center point coordinates"
                                     enable_value="enable_by_preferences"/>
-           <validator id="GeomValidators_Different" parameters="rectangle_start_point2,rectangle_center_point"/>
+           <sketch-2dpoint_selector id="rectangle_end_point2"
+                                    accept_expressions="0"
+                                    title="Rectangle end point"
+                                    tooltip="End point coordinates"
+                                    enable_value="enable_by_preferences"/>
+           <validator id="GeomValidators_Different" parameters="rectangle_end_point2,rectangle_center_point"/>
         </box>
        </toolbox>
        <boolvalue id="Auxiliary"

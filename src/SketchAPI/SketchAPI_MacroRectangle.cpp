@@ -39,12 +39,12 @@ SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAP
                                                    double theStartX,
                                                    double theStartY,
                                                    double theSecondX,
-                                                   double theSecondY, bool isSecondPointCenter):
+                                                   double theSecondY, bool isFirstPointCenter):
   SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    if(isSecondPointCenter)
-      setByStartAndCenterPoints(theStartX, theStartY, theSecondX, theSecondY);
+    if(isFirstPointCenter)
+      setByCenterAndEndPoints(theStartX, theStartY, theSecondX, theSecondY);
     else
       setByStartAndEndPoints(theStartX, theStartY, theSecondX, theSecondY);
   }
@@ -53,12 +53,12 @@ SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAP
 //==================================================================================================
 SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                    const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isSecondPointCenter):
+                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isFirstPointCenter):
   SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    if(isSecondPointCenter)
-      setByStartAndCenterPoints(theStartPoint, theSecondPoint);
+    if(isFirstPointCenter)
+      setByCenterAndEndPoints(theStartPoint, theSecondPoint);
     else
       setByStartAndEndPoints(theStartPoint, theSecondPoint);
   }
@@ -91,20 +91,18 @@ void SketchAPI_MacroRectangle::setByStartAndEndPoints(const std::shared_ptr<Geom
 }
 
 //==================================================================================================
-void SketchAPI_MacroRectangle::setByStartAndCenterPoints(double theStartX, double theStartY,
-                                                         double theCenterX, double theCenterY)
+void SketchAPI_MacroRectangle::setByCenterAndEndPoints(double theCenterX, double theCenterY, double theEndX, double theEndY)
 {
-  fillAttribute(SketchPlugin_MacroRectangle::START_CENTER_POINT_TYPE_ID(), rectangleType());
-  fillAttribute(startPoint2(), theStartX, theStartY);
+  fillAttribute(SketchPlugin_MacroRectangle::CENTER_END_POINT_TYPE_ID(), rectangleType());
+  fillAttribute(endPoint2(), theEndX, theEndY);
   fillAttribute(centerPoint(), theCenterX, theCenterY);
   execute();
 }
 
 //==================================================================================================
-void SketchAPI_MacroRectangle::setByStartAndCenterPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                                                         const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint){
-  fillAttribute(SketchPlugin_MacroRectangle::START_END_POINT_TYPE_ID(), rectangleType());
-  fillAttribute(theStartPoint, startPoint2());
+void SketchAPI_MacroRectangle::setByCenterAndEndPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint, const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint){
+  fillAttribute(SketchPlugin_MacroRectangle::CENTER_END_POINT_TYPE_ID(), rectangleType());
+  fillAttribute(theEndPoint, endPoint2());
   fillAttribute(theCenterPoint, centerPoint());
 
   execute();

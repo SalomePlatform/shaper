@@ -42,13 +42,13 @@ public:
                         double theStartX,
                         double theStartY,
                         double theSecondX,
-                        double theSecondY, bool isSecondPointCenter = false);
+                        double theSecondY, bool isFirstPointCenter = false);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isSecondPointCenter = false);
+                        const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isFirstPointCenter = false);
 
 
   /// Destructor.
@@ -56,13 +56,13 @@ public:
   virtual ~SketchAPI_MacroRectangle();
 
   INTERFACE_5(SketchPlugin_MacroRectangle::ID(),
-              rectangleType, SketchPlugin_MacroRectangle::TYPE_ID(),
+              rectangleType, SketchPlugin_MacroRectangle::RECTANGLE_TYPE_ID(),
               ModelAPI_AttributeString, /** Rectangle type */,
               startPoint1, SketchPlugin_MacroRectangle::START1_ID(),
               GeomDataAPI_Point2D, /** Start point 1 */,
               endPoint1, SketchPlugin_MacroRectangle::END1_ID(),
               GeomDataAPI_Point2D, /** End point 1 */,
-              startPoint2, SketchPlugin_MacroRectangle::START2_ID(),
+              endPoint2, SketchPlugin_MacroRectangle::END2_ID(),
               GeomDataAPI_Point2D, /** First point 2 */,
               centerPoint, SketchPlugin_MacroRectangle::CENTER_ID(),
               GeomDataAPI_Point2D, /** Center point */)
@@ -80,12 +80,12 @@ private:
                                   const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint);
 
   /// Set by start  and center points.
-  void setByStartAndCenterPoints(double theStartX, double theStartY,
-                                  double theCenterX, double theCenterY);
+  void setByCenterAndEndPoints(double theCenterX, double theCenterY,
+                                  double theEndX, double theEndY);
 
   /// Set by start and center points.
-  void setByStartAndCenterPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint);
+  void setByCenterAndEndPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint);
 };
 
 /// Pointer on Rectangle object.

@@ -31,6 +31,8 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_Events.h>
+
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
@@ -43,65 +45,68 @@ const double tolerance = 1e-7;
 
 
 SketchPlugin_MacroRectangle::SketchPlugin_MacroRectangle()
-  : SketchPlugin_SketchEntity()
+  : SketchPlugin_SketchEntity(), myHasCenterPoint(false)
 {  
 }
 
 void SketchPlugin_MacroRectangle::initAttributes()
 {
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
-
   data()->addAttribute(START1_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END1_ID(), GeomDataAPI_Point2D::typeId());
-
-  data()->addAttribute(START2_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END2_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(RECTANGLE_TYPE_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(EDIT_RECTANGLE_TYPE_ID(), ModelAPI_AttributeString::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_RECTANGLE_TYPE_ID());
 
-  data()->addAttribute(TYPE_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(EDIT_TYPE_ID(), ModelAPI_AttributeString::typeId());
-
-  string(EDIT_TYPE_ID())->setValue("");
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_TYPE_ID());
-}
-
-void SketchPlugin_MacroRectangle::startPoint()
-{
-  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint;
-  if(string(TYPE_ID())->value() == START_END_POINT_TYPE_ID())
-    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START1_ID()));
-  else
-    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START2_ID()));
-  if(aStartPoint->isInitialized())
-    myStartPoint = std::make_shared<GeomAPI_Pnt2d>(aStartPoint->x(), aStartPoint->y());
-  else
-    myStartPoint.reset();
+  string(EDIT_RECTANGLE_TYPE_ID())->setValue("");
 }
 
 void SketchPlugin_MacroRectangle::endPoint()
 {
-  if(string(TYPE_ID())->value() == START_END_POINT_TYPE_ID())
+  std::shared_ptr<GeomDataAPI_Point2D> aEndPoint;
+  if(string(RECTANGLE_TYPE_ID())->value() == START_END_POINT_TYPE_ID())
+    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END1_ID()));
+  else
+    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END2_ID()));
+  if(aEndPoint->isInitialized())
+    myEndPoint = std::make_shared<GeomAPI_Pnt2d>(aEndPoint->x(), aEndPoint->y());
+  else
+    myEndPoint.reset();
+}
+
+void SketchPlugin_MacroRectangle::startPoint()
+{
+  if(string(RECTANGLE_TYPE_ID())->value() == START_END_POINT_TYPE_ID())
   {
-    std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END1_ID()));
-    if(aEndPoint->isInitialized())
-      myEndPoint = std::make_shared<GeomAPI_Pnt2d>(aEndPoint->x(), aEndPoint->y());
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START1_ID()));
+    if(aStartPoint->isInitialized())
+      myStartPoint = std::make_shared<GeomAPI_Pnt2d>(aStartPoint->x(), aStartPoint->y());
     else
-      myEndPoint.reset();
+      myStartPoint.reset();
   }
   else
   {
     /// Compute end point as the symmetric of start point w.r.t. center
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START2_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END2_ID()));
     std::shared_ptr<GeomDataAPI_Point2D> aCenterPoint =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-    double xEnd = 2.0*aCenterPoint->x() - aStartPoint->x();
-    double yEnd = 2.0*aCenterPoint->y() - aStartPoint->y();
 
-    if(aStartPoint ->isInitialized() && aCenterPoint->isInitialized())
-      myEndPoint =  std::make_shared<GeomAPI_Pnt2d>(xEnd, yEnd);
+    if(aCenterPoint->isInitialized())
+    {
+      myCenterPoint = std::make_shared<GeomAPI_Pnt2d>(aCenterPoint->x(), aCenterPoint->y());
+      myHasCenterPoint = true;
+    }
+    double xStart = 2.0*aCenterPoint->x() - aEndPoint->x();
+    double yStart = 2.0*aCenterPoint->y() - aEndPoint->y();
+
+    if(aEndPoint->isInitialized() && aCenterPoint->isInitialized())
+      myStartPoint =  std::make_shared<GeomAPI_Pnt2d>(xStart, yStart);
     else
-      myEndPoint.reset();
+      myStartPoint.reset();
   }
 }
 
@@ -112,11 +117,22 @@ void SketchPlugin_MacroRectangle::execute()
   if(!myStartPoint || !myEndPoint || !aSketch) {
     return ;
   }
+  // Wait all constraints being created, then send update events
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
   /// create a rectangle sketch
   FeaturePtr myRectangleFeature = aSketch->addFeature(SketchPlugin_Rectangle::ID());
   if(!myRectangleFeature)
     return;
+
+  if(myHasCenterPoint){
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          myRectangleFeature->attribute(SketchPlugin_Rectangle::CENTER_ID()))->setValue(myCenterPoint->x(),
+                                                                                       myCenterPoint->y());
+  }
 
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         myRectangleFeature->attribute(SketchPlugin_Rectangle::START_ID()))->setValue(myStartPoint->x(),
@@ -128,18 +144,22 @@ void SketchPlugin_MacroRectangle::execute()
   myRectangleFeature->boolean(SketchPlugin_Rectangle::AUXILIARY_ID())
       ->setValue(boolean(AUXILIARY_ID())->value());
   myRectangleFeature->execute();
+
+  /// Send events to update the sub-features by the solver.
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);  
 }
 
 void SketchPlugin_MacroRectangle::attributeChanged(const std::string& theID)
 {
-  if(theID == TYPE_ID()) {
+  if(theID == RECTANGLE_TYPE_ID()) {
     SketchPlugin_Tools::resetAttribute(this, START1_ID());
     SketchPlugin_Tools::resetAttribute(this, END1_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_ID());
-    SketchPlugin_Tools::resetAttribute(this, START2_ID());
+    SketchPlugin_Tools::resetAttribute(this, END2_ID());
   }
   else if (theID == START1_ID() || theID == END1_ID() ||
-           theID == START2_ID() || theID == CENTER_ID())
+           theID == END2_ID() || theID == CENTER_ID())
   {
     // update points
     startPoint();
@@ -183,13 +203,13 @@ AISObjectPtr SketchPlugin_MacroRectangle::getAISObject(AISObjectPtr thePrevious)
     }
   }
 
-  if(string(TYPE_ID())->value() == START_CENTER_POINT_TYPE_ID()){
-    /// draw  a line start->center
+  if(string(RECTANGLE_TYPE_ID())->value() == CENTER_END_POINT_TYPE_ID()){
+    /// draw  a line center->end
     std::shared_ptr<GeomDataAPI_Point2D> aCenterPoint =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
 
-    std::shared_ptr<GeomAPI_Pnt> theStart(aSketch->to3D(myStartPoint->x(), myStartPoint->y()));
-    std::shared_ptr<GeomAPI_Pnt> theEnd(aSketch->to3D(aCenterPoint->x(), aCenterPoint->y()));
+    std::shared_ptr<GeomAPI_Pnt> theEnd(aSketch->to3D(myEndPoint->x(), myEndPoint->y()));
+    std::shared_ptr<GeomAPI_Pnt> theStart(aSketch->to3D(aCenterPoint->x(), aCenterPoint->y()));
     GeomShapePtr aLine = GeomAlgoAPI_EdgeBuilder::line(theStart, theEnd);
     if(aLine)
       aShapes.push_back(aLine);
@@ -209,3 +229,4 @@ AISObjectPtr SketchPlugin_MacroRectangle::getAISObject(AISObjectPtr thePrevious)
 
   return anAIS;
 }
+

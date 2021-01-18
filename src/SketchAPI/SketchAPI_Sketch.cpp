@@ -67,7 +67,6 @@
 #include "SketchAPI_MacroCircle.h"
 #include "SketchAPI_MacroEllipse.h"
 #include "SketchAPI_MacroEllipticArc.h"
-#include "SketchAPI_MacroRectangle.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Offset.h"
 #include "SketchAPI_Point.h"
@@ -425,23 +424,23 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
     compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theStartPoint, theEndPoint));
 }
-/*
-std::shared_ptr<SketchAPI_MacroRectangle> SketchAPI_Sketch::addRectangle(
-    double theX1, double theY1, double theX2, double theY2, bool thePoint2IsCenter)
+
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
+    double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchAPI_MacroRectangle::ID());
-  return MacroRectanglePtr(new SketchAPI_MacroRectangle(aFeature, theX1, theY1, theX2, theY2, thePoint2IsCenter));
+    compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theX1, theY1, theX2, theY2, isFirstPointCenter));
 }
-std::shared_ptr<SketchAPI_MacroRectangle> SketchAPI_Sketch::addRectangle(
-    const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
-    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool theEndPointIsCenter)
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
+    const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool isFirstPointCenter)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchAPI_MacroRectangle::ID());
-  return MacroRectanglePtr(new SketchAPI_MacroRectangle(aFeature, theStartPoint, theEndPoint, theEndPointIsCenter));
+    compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theFirstPoint, theEndPoint, isFirstPointCenter));
 }
-*/
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,

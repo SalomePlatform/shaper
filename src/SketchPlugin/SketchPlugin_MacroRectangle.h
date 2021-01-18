@@ -30,7 +30,8 @@ class GeomAPI_Pnt2d;
  * \ingroup Plugins
  * \brief Feature for creation of the new Rectangle in Sketch.
  */
-class SketchPlugin_MacroRectangle: public SketchPlugin_SketchEntity,  public GeomAPI_IPresentable
+class SketchPlugin_MacroRectangle: public SketchPlugin_SketchEntity,
+    public GeomAPI_IPresentable
 {
 public:
   /// Rectangle feature kind
@@ -40,13 +41,13 @@ public:
     return ID;
   }
 
-  inline static const std::string& TYPE_ID()
+  inline static const std::string& RECTANGLE_TYPE_ID()
   {
     static const std::string ID("rectangle_type");
     return ID;
   }
 
-  inline static const std::string& EDIT_TYPE_ID()
+  inline static const std::string& EDIT_RECTANGLE_TYPE_ID()
   {
     static const std::string ID("edit_rectangle_type");
     return ID;
@@ -58,9 +59,9 @@ public:
     return ID;
   }
 
-  inline static const std::string& START_CENTER_POINT_TYPE_ID()
+  inline static const std::string& CENTER_END_POINT_TYPE_ID()
   {
-    static const std::string ID("rectangle_type_by_start_and_center_points");
+    static const std::string ID("rectangle_type_by_center_and_end_points");
     return ID;
   }
 
@@ -69,7 +70,8 @@ public:
   {
     static const std::string ID("rectangle_start_point1");
     return ID;
-  } 
+  }
+
   /// 2D point - end point of the Rectangle
   inline static const std::string& END1_ID()
   {
@@ -77,18 +79,18 @@ public:
     return ID;
   }
   /// 2D point - start point of the second Rectangle type
-  inline static const std::string& START2_ID()
+  inline static const std::string& END2_ID()
   {
-    static const std::string ID("rectangle_start_point2");
+    static const std::string ID("rectangle_end_point2");
     return ID;
   }
 
-   /// 2D point - center point of the second Rectangle type
+  /// 2D point - center point of the second Rectangle type
   inline static const std::string& CENTER_ID()
   {
     static const std::string ID("rectangle_center_point");
     return ID;
-  } 
+  }
 
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
@@ -97,7 +99,7 @@ public:
     return MY_KIND;
   }
 
-   /// Called on change of any argument-attribute of this object
+  /// Called on change of any argument-attribute of this object
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Creates a new part document if needed
@@ -120,7 +122,8 @@ private:
 
   std::shared_ptr<GeomAPI_Pnt2d> myStartPoint;
   std::shared_ptr<GeomAPI_Pnt2d> myEndPoint;
-
+  std::shared_ptr<GeomAPI_Pnt2d> myCenterPoint;
+  bool myHasCenterPoint;
   void startPoint();
   void endPoint();
   FeaturePtr createRectangle();

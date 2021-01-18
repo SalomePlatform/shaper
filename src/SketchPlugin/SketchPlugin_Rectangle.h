@@ -22,14 +22,12 @@
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_SketchEntity.h"
-#include "SketchPlugin_Sketch.h"
 
 /**\class SketchPlugin_Rectangle
  * \ingroup Plugins
  * \brief Feature for creation of the new Rectangle in Sketch.
  */
 class SketchPlugin_Rectangle: public SketchPlugin_SketchEntity
-
 {
  public:
   /// Rectangle feature kind
@@ -53,10 +51,31 @@ class SketchPlugin_Rectangle: public SketchPlugin_SketchEntity
     return ID;
   }
 
+  /// 2D point - center point of the Rectangle
+  inline static const std::string& CENTER_ID()
+  {
+    static const std::string ID("rectangle_center_point");
+    return ID;
+  }
+
+  /// 2D point - center point of the Rectangle
+  inline static const std::string& CENTER_REF_ID()
+  {
+    static const std::string ID("rectangle_center_point_ref");
+    return ID;
+  }
+
   /// 2D point - list of Rectangle lines
   inline static const std::string& LINES_LIST_ID()
   {
-    static const std::string ID("RectangleList");
+    static const std::string ID("RectangleLinesList");
+    return ID;
+  }
+
+  /// 2D point - list of Diagonal lines
+  inline static const std::string& DIAGONAL_LIST_ID()
+  {
+    static const std::string ID("RectangleDiagonalLinesList");
     return ID;
   }
 
@@ -79,8 +98,8 @@ class SketchPlugin_Rectangle: public SketchPlugin_SketchEntity
     return MY_KIND;
   }
 
-  /// Returns true is sketch element is under the rigid constraint
-  SKETCHPLUGIN_EXPORT virtual bool isFixed();
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const
+  { return true;}
 
   /// Called on change of any argument-attribute of this object
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
@@ -98,6 +117,8 @@ protected:
 private:
   /// \brief updateLines crates lines from start and en points
   void updateLines(); 
+  void updateStartPoint(); 
 };
+
 
 #endif
