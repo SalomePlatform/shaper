@@ -69,6 +69,9 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_VersionedChFi.h
     FeaturesPlugin_PointCoordinates.h
     FeaturesPlugin_GeometryCalculation.h
+    FeaturesPlugin_BoundingBox.h
+    FeaturesPlugin_CommonBoundingBox.h
+    FeaturesPlugin_CreateBoundingBox.h
 )
 
 SET(PROJECT_SOURCES
@@ -118,6 +121,9 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_VersionedChFi.cpp
     FeaturesPlugin_PointCoordinates.cpp
     FeaturesPlugin_GeometryCalculation.cpp
+    FeaturesPlugin_BoundingBox.cpp
+    FeaturesPlugin_CommonBoundingBox.cpp
+    FeaturesPlugin_CreateBoundingBox.cpp
 )
 
 SET(XML_RESOURCES
@@ -156,6 +162,8 @@ SET(XML_RESOURCES
   defeaturing_widget.xml
   point_coordinates_widget.xml
   geometry_calculation_widget.xml
+  bounding_box_widget.xml
+  create_bounding_box_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -698,4 +706,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test20247.py
                TestPointCoordinates.py
                TestGeometryCalculation.py
+               TestBoundingBox.py
 )

@@ -12,6 +12,7 @@ Features plug-in provides a set of common topological operations. It implements 
 
    booleanOperations.rst
    angularCopyFeature.rst
+   boundingBoxFeature.rst
    chamferFeature.rst
    copyFeature.rst
    defeaturingFeature.rst

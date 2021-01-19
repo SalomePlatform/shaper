@@ -132,6 +132,10 @@
       <translation>Calcul de la géométrie</translation>
     </message>
     <message>
+      <source>Bounding box</source>
+      <translation>Boîte englobante</translation>
+    </message>
+    <message>
       <source>Placement</source>
       <translation>Placement</translation>
     </message>
@@ -146,6 +150,30 @@
     <message>
       <source>Translation</source>
       <translation>Translation</translation>
+    </message>
+  </context>
+
+  <!-- Bounding Box -->
+  <context>
+    <name>BoundingBox</name>
+    <message>
+      <source>BoundingBox</source>
+      <translation>Boîte englobante</translation>
+    </message>
+    <message>
+      <source>Create box</source>
+      <translation>Créer la boîte</translation>
+    </message>
+  </context>
+  <context>
+    <name>BoundingBoxMacro</name>
+    <message>
+      <source>BoundingBox</source>
+      <translation>Boîte englobante</translation>
+    </message>
+    <message>
+      <source>Create box</source>
+      <translation>Créer la boîte</translation>
     </message>
   </context>
 
@@ -4462,14 +4490,44 @@
       <translation>Deuxième direction</translation>
     </message>
   </context>
-  <!-- PointCoordinates -->
+
+  <!--Bounding box-->
   <context>
-    <name>PointCoordinates</name>
+    <name>BoundingBoxMacro</name>
     <message>
-      <source>Point coordinates</source>
-      <translation>Coordonnées d'un point</translation>
+      <source>Bounding box</source>
+      <translation>Boîte englobante</translation>
     </message>
   </context>
+  <context>
+    <name>BoundingBoxMacro:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+  </context>
+  <context>
+  <name>BoundingBoxMacro:createbox</name>
+    <message>
+      <source>Create box</source>
+      <translation>Créer la boîte</translation>
+    </message>
+  </context>
+  <context>
+    <name>BoundingBox</name>
+    <message>
+      <source>Bounding box</source>
+      <translation>Boîte englobante</translation>
+    </message>
+  </context>
+  <context>
+    <name>BoundingBox:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+  </context>
+
   <!--Geometry calculation-->
   <context>
     <name>GeometryCalculation</name>
@@ -4500,6 +4558,7 @@
       <translation>Volume = </translation>
     </message>
   </context>
+
   <!-- Measurement -->
   <context>
     <name>Measurement</name>
@@ -4768,6 +4827,15 @@
     <message>
       <source>Error: Context is empty.</source>
       <translation>Erreur : le contexte est vide.</translation>
+    </message>
+  </context>
+
+  <!-- PointCoordinates -->
+  <context>
+    <name>PointCoordinates</name>
+    <message>
+      <source>Point coordinates</source>
+      <translation>Coordonnées d'un point</translation>
     </message>
   </context>
 

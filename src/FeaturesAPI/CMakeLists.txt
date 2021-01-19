@@ -53,6 +53,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Defeaturing.h
   FeaturesAPI_PointCoordinates.h
   FeaturesAPI_GeometryCalculation.h
+  FeaturesAPI_BoundingBox.h
 )
 
 SET(PROJECT_SOURCES
@@ -88,6 +89,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Defeaturing.cpp
   FeaturesAPI_PointCoordinates.cpp
   FeaturesAPI_GeometryCalculation.cpp
+  FeaturesAPI_BoundingBox.cpp
 )
 
 SET(PROJECT_LIBRARIES

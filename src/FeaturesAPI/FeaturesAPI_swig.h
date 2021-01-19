@@ -55,5 +55,6 @@
   #include "FeaturesAPI_ImportResult.h"
   #include "FeaturesAPI_PointCoordinates.h"
   #include "FeaturesAPI_GeometryCalculation.h"
+  #include "FeaturesAPI_BoundingBox.h"
 
 #endif // FeaturesAPI_swig_H_
