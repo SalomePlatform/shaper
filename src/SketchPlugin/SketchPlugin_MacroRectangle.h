@@ -72,12 +72,25 @@ public:
     return ID;
   }
 
+  inline static const std::string& START1_REF_ID()
+  {
+    static const std::string ID("rectangle_start_point1_ref");
+    return ID;
+  }
+
   /// 2D point - end point of the Rectangle
   inline static const std::string& END1_ID()
   {
     static const std::string ID("rectangle_end_point1");
     return ID;
   }
+
+  inline static const std::string& END1_REF_ID()
+  {
+    static const std::string ID("rectangle_end_point1_ref");
+    return ID;
+  }
+
   /// 2D point - start point of the second Rectangle type
   inline static const std::string& END2_ID()
   {
@@ -85,10 +98,22 @@ public:
     return ID;
   }
 
+  inline static const std::string& END2_REF_ID()
+  {
+    static const std::string ID("rectangle_end_point2_ref");
+    return ID;
+  }
+
   /// 2D point - center point of the second Rectangle type
   inline static const std::string& CENTER_ID()
   {
     static const std::string ID("rectangle_center_point");
+    return ID;
+  }
+  /// Reference for center point selection.
+  inline static const std::string& CENTER_REF_ID()
+  {
+    static const std::string ID("rectangle_center_point_ref");
     return ID;
   }
 

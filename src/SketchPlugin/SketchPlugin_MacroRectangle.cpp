@@ -21,6 +21,7 @@
 #include "SketchPlugin_Rectangle.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
+#include "SketchPlugin_Line.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -53,12 +54,20 @@ void SketchPlugin_MacroRectangle::initAttributes()
 {
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(START1_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(START1_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(END1_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END1_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(END2_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END2_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(CENTER_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(RECTANGLE_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EDIT_RECTANGLE_TYPE_ID(), ModelAPI_AttributeString::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_RECTANGLE_TYPE_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), END2_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), END1_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), START1_REF_ID());
 
   string(EDIT_RECTANGLE_TYPE_ID())->setValue("");
 }
@@ -131,7 +140,7 @@ void SketchPlugin_MacroRectangle::execute()
   if(myHasCenterPoint){
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
           myRectangleFeature->attribute(SketchPlugin_Rectangle::CENTER_ID()))->setValue(myCenterPoint->x(),
-                                                                                       myCenterPoint->y());
+                                                                                        myCenterPoint->y());
   }
 
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -145,9 +154,32 @@ void SketchPlugin_MacroRectangle::execute()
       ->setValue(boolean(AUXILIARY_ID())->value());
   myRectangleFeature->execute();
 
+  /// create coincidences with rectangle start/center and  end points
+  AttributeRefListPtr aLinesList = myRectangleFeature->reflist(SketchPlugin_Rectangle::LINES_LIST_ID());
+  FeaturePtr aRectangleStartLineFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(0));
+  FeaturePtr aRectangleEndLineFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(2));
+  std::shared_ptr<GeomDataAPI_Point2D> aRectanglePointEndAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRectangleEndLineFeature->attribute(SketchPlugin_Line::END_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aRectanglePointStartAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRectangleStartLineFeature->attribute(SketchPlugin_Line::END_ID()));
+
+  if(myHasCenterPoint){
+    FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myRectangleFeature->refattr(CENTER_REF_ID())->object());
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+          this, CENTER_REF_ID(), AttributePtr(), aCenterPointFeature, false);
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+          this, END2_REF_ID(), aRectanglePointEndAttr, ObjectPtr(), false);
+  }
+  else{
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+          this, START1_REF_ID(), aRectanglePointStartAttr, ObjectPtr(), false);
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+          this, END1_REF_ID(), aRectanglePointEndAttr, ObjectPtr(), false);
+  }
+
   /// Send events to update the sub-features by the solver.
   if (isUpdateFlushed)
-    Events_Loop::loop()->setFlushed(anUpdateEvent, true);  
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
 }
 
 void SketchPlugin_MacroRectangle::attributeChanged(const std::string& theID)
@@ -157,9 +189,19 @@ void SketchPlugin_MacroRectangle::attributeChanged(const std::string& theID)
     SketchPlugin_Tools::resetAttribute(this, END1_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_ID());
     SketchPlugin_Tools::resetAttribute(this, END2_ID());
+    SketchPlugin_Tools::resetAttribute(this, START1_REF_ID());
+    SketchPlugin_Tools::resetAttribute(this, END1_REF_ID());
+    SketchPlugin_Tools::resetAttribute(this, CENTER_REF_ID());
+    SketchPlugin_Tools::resetAttribute(this, END2_REF_ID());
+    myStartPoint.reset();
+    myEndPoint.reset();
+    myCenterPoint.reset();
+    myHasCenterPoint = false;
   }
   else if (theID == START1_ID() || theID == END1_ID() ||
-           theID == END2_ID() || theID == CENTER_ID())
+           theID == START1_REF_ID() || theID == END1_REF_ID() ||
+           theID == END2_ID() || theID == CENTER_ID() ||
+           theID == END2_REF_ID() || theID == CENTER_REF_ID())
   {
     // update points
     startPoint();
@@ -229,4 +271,3 @@ AISObjectPtr SketchPlugin_MacroRectangle::getAISObject(AISObjectPtr thePrevious)
 
   return anAIS;
 }
-
