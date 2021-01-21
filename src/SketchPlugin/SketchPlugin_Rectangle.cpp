@@ -33,7 +33,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintVertical.h>
-#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 
 #include <cmath>
 
@@ -196,7 +195,7 @@ void SketchPlugin_Rectangle::execute()
       for(int i = 0; i < 2; i++)
       {
         FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(aDiagonalList->object(i));
-        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrObject(aSketch, SketchPlugin_ConstraintCoincidenceInternal::ID(),
+        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrObject(aSketch, SketchPlugin_ConstraintCoincidence::ID(),
                                                                                 aCoord, aDiagonal);
         aNotToDumpList->append(aConstraint);
       }
@@ -219,7 +218,7 @@ void SketchPlugin_Rectangle::execute()
       {
         auto aDiagonalPoint = cornerToDiagonalLinePoints[i];
         FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(aDiagonalList->object(aDiagonalPoint.first));
-        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(aSketch, SketchPlugin_ConstraintCoincidenceInternal::ID(),
+        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(aSketch, SketchPlugin_ConstraintCoincidence::ID(),
                                                                               aDiagonal->attribute(aDiagonalPoint.second),
                                                                               aLine->attribute(SketchPlugin_Line::START_ID()));
         aNotToDumpList->append(aConstraint);
