@@ -362,7 +362,7 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
   if (theOperation && theOperation->isModified()) {
     ModuleBase_OperationFeature* aOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     std::string aContext;
-    if (aOp)
+    if (aOp && aOp->feature())
       aContext = aOp->feature()->getKind();
     QString aTitle = Config_Translator::translate(aContext,
       theOperation->getDescription()->description().toStdString()).c_str();
