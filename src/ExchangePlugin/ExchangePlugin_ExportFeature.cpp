@@ -207,6 +207,13 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   std::list<GeomShapePtr> aShapes;
   for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
     AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
+
+    /// do not export pictures
+    ResultPtr aBodyContext =
+      std::dynamic_pointer_cast<ModelAPI_Result>(anAttrSelection->context());
+    if(aBodyContext->hasTextureFile())
+      continue;
+
     std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
     if (aCurShape.get() == NULL)
       aCurShape = anAttrSelection->context()->shape();
@@ -412,7 +419,9 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       AttributeSelectionPtr anAttr = aSelection->value(a);
       ResultPtr aBodyContext =
         std::dynamic_pointer_cast<ModelAPI_Result>(anAttr->context());
-      if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()) {
+      if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()
+          /// do not export pictures
+          && !aBodyContext->hasTextureFile()) {
         aResults.push_back(aBodyContext);
         GeomShapePtr aShape = anAttr->value();
         if (!aShape.get())
