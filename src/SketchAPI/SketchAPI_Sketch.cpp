@@ -441,6 +441,22 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theFirstPoint, theEndPoint, isFirstPointCenter));
 }
 
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
+    double theX1, double theY1, double theX2, double theY2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theX1, theY1, theX2, theY2, true));
+}
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
+    const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theFirstPoint, theEndPoint, true));
+}
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,

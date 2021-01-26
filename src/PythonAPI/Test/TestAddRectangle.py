@@ -39,6 +39,12 @@ endPoint2 = geom.Pnt2d(120, 75)
 rectangle_3 = sketch.addRectangle(centerPoint, endPoint2, True)
 rectangle_4 = sketch.addRectangle(10, 5, 25, 75, True)
 
+# rectangles from center and end points second version
+centerPoint2 = geom.Pnt2d(200, 180)
+endPoint3 = geom.Pnt2d(220, 175)
+rectangle_5 = sketch.addRectangleCentered(centerPoint2, endPoint3)
+rectangle_6 = sketch.addRectangleCentered(108, 59, 125, 175)
+
 model.end()
 
 
