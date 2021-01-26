@@ -24,6 +24,10 @@
       <source>Group Substraction</source>
       <translation>Soustraction de groupes</translation>
     </message>
+    <message>
+      <source>Group Shape</source>
+      <translation>Forme à partir de groupes</translation>
+    </message>
   </context>
 
   <!-- Field -->
@@ -242,6 +246,15 @@
     <message>
       <source>Tool groups:</source>
       <translation>Groupes d&apos;outils:</translation>
+    </message>
+  </context>
+
+  <!-- GroupShape -->
+  <context>
+    <name>GroupShape</name>
+    <message>
+      <source>Group Shape</source>
+      <translation>Forme à partir de groupes</translation>
     </message>
   </context>
 

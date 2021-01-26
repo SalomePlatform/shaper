@@ -694,6 +694,10 @@ Supprimer des objets du panneau à afficher ?</translation>
         <translation>Importer une forme à partir d&apos;un fichier au format CAO</translation>
     </message>
     <message>
+        <source>Picture...</source>
+        <translation>Une image...</translation>
+    </message>
+    <message>
         <source>Export</source>
         <translation>Exporter</translation>
     </message>
