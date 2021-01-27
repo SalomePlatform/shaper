@@ -229,6 +229,57 @@ bool FeaturesPlugin_ValidatorPipeLocationsNumber::isValid(
 // LCOV_EXCL_STOP
 
 //==================================================================================================
+bool FeaturesPlugin_ValidatorLoftSameTypeShape::isValid(
+                                                const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                const std::list<std::string>& theArguments,
+                                                Events_InfoMessage& theError) const
+{
+  static const std::string aFirstObjetcID = "first_object";
+  static const std::string aSecondObjetcID = "second_object";
+
+  if (theFeature->getKind() != "Loft") {
+    theError = "Error: Feature \"%1\" does not supported by this validator.";
+    theError.arg(theFeature->getKind());
+    return false;
+  }
+
+  AttributeSelectionPtr aFirstObjectsSelection = theFeature->selection(aFirstObjetcID);
+  if ( !aFirstObjectsSelection->isInitialized()) {
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aFirstObjetcID);
+    return false;
+  }
+
+  AttributeSelectionPtr aSecondObjectsSelection = theFeature->selection(aSecondObjetcID);
+  if (!aSecondObjectsSelection->isInitialized()) {
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aSecondObjetcID);
+    return false;
+  }
+
+  GeomShapePtr aFirstShape  = aFirstObjectsSelection->value();
+  if (!aFirstShape.get()) {
+    aFirstShape = aFirstObjectsSelection->context()->shape();
+  }
+  GeomShapePtr aSecondShape  = aSecondObjectsSelection->value();
+  if (!aSecondShape.get()) {
+    aSecondShape = aSecondObjectsSelection->context()->shape();
+  }
+
+  if (aFirstShape->isEqual(aSecondShape)) {
+    theError = "Error: the shapes are equal";
+    return false;
+  }
+
+  if (aFirstShape->shapeType()!=aSecondShape->shapeType()) {
+    theError = "Error: the shapes have different type";
+    return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         Events_InfoMessage& theError) const

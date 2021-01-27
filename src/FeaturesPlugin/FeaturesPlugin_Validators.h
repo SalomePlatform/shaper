@@ -68,6 +68,21 @@ class FeaturesPlugin_ValidatorPipeLocationsNumber: public ModelAPI_FeatureValida
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorLoftSameTypeShape
+/// \ingroup Validators
+/// \brief Validator for the same type of shape.
+class FeaturesPlugin_ValidatorLoftSameTypeShape: public ModelAPI_FeatureValidator
+{
+ public:
+  //! \return true if the type of selected are the same
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /// \class FeaturesPlugin_ValidatorBaseForGeneration
 /// \ingroup Validators
 /// \brief A validator for selection base for generation. Allows to select faces on sketch,

@@ -76,6 +76,7 @@
 %shared_ptr(FeaturesAPI_MultiTranslation)
 %shared_ptr(FeaturesAPI_Partition)
 %shared_ptr(FeaturesAPI_Pipe)
+%shared_ptr(FeaturesAPI_Loft)
 %shared_ptr(FeaturesAPI_Placement)
 %shared_ptr(FeaturesAPI_PointCloudOnFace)
 %shared_ptr(FeaturesAPI_Recover)
@@ -219,6 +220,7 @@
 %include "FeaturesAPI_MultiTranslation.h"
 %include "FeaturesAPI_Partition.h"
 %include "FeaturesAPI_Pipe.h"
+%include "FeaturesAPI_Loft.h"
 %include "FeaturesAPI_Placement.h"
 %include "FeaturesAPI_PointCloudOnFace.h"
 %include "FeaturesAPI_Recover.h"

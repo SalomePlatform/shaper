@@ -23,7 +23,7 @@ from FeaturesAPI import addPlacement, addRotation, addScale, addSymmetry, addTra
 from FeaturesAPI import addMultiTranslation, addMultiRotation
 from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
 from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
-from FeaturesAPI import addPipe
+from FeaturesAPI import addPipe, addLoft
 from FeaturesAPI import addCut, addFuse, addCommon, addSmash, addSplit
 from FeaturesAPI import addIntersection, addPartition, addUnion, addRemoveSubShapes
 from FeaturesAPI import addRecover

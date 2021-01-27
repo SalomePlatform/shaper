@@ -178,7 +178,7 @@ SET(TEST_NAMES
                TestMeasurementAngle3Points.py
                TestMeasurementPresentation.py
                TestFusionFaces.py
-               TestFusionFaces2697.py 
+               TestFusionFaces2697.py
                Test1379.py
                Test1922.py
                Test1942.py
@@ -527,4 +527,5 @@ SET(TEST_NAMES
                TestBoundingBox.py
                Test23885.py
                TestNormalToFace.py
+               TestLoft.py
 )
