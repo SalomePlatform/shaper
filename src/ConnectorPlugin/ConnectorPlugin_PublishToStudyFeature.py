@@ -90,8 +90,11 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
           # Map from feature index to index of result. If index is zero (initial), no surrfix to entry is added.
           aFeaturesIndices = {}
           for aResId in range(aPartDoc.size(model.ModelAPI_ResultBody_group())):
-            aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)
+            aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)         
             aRes = model.objectToResult(aResObject)
+            #do not export images
+            if aRes.hasTextureFile() is True:
+              continue    
             aResFeatureId = str(aPartDoc.feature(aRes).data().featureId())
             if aResFeatureId in aFeaturesIndices:
               aFeaturesIndices[aResFeatureId] += 1
