@@ -184,11 +184,11 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
           Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
         aSurface = aTrimSurface->BasisSurface();
       }
-      if(aSurface->DynamicType() != STANDARD_TYPE(Geom_Plane)) {
-        return;
-      }
-      aPlane = Handle(Geom_Plane)::DownCast(aSurface);
-    } else {
+      if (aSurface->DynamicType() == STANDARD_TYPE(Geom_Plane))
+        aPlane = Handle(Geom_Plane)::DownCast(aSurface);
+    }
+
+    if (aPlane.IsNull()) {
       aPlane = aFindPlane.Plane();
       checkOrientation = true;
     }
