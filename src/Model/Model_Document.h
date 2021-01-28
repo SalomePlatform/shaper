@@ -325,6 +325,9 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> nextFeature(
     std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theReverse = false) const;
 
+  //! Erases the document structure.
+  ~Model_Document();
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

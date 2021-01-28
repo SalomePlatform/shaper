@@ -132,7 +132,7 @@ static bool isShapeInTree(const TDF_Label& theAccess1, const TDF_Label& theAcces
   if (aResult) { //check evolution and a label of this shape
     for(TNaming_SameShapeIterator aShapes(theShape, theAccess1); aShapes.More(); aShapes.Next())
     {
-      static Handle(TNaming_NamedShape) aNS;
+      Handle(TNaming_NamedShape) aNS;
       if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
         if (aNS->Evolution() != TNaming_SELECTED) {
           theOriginalLabel = aNS->Label();

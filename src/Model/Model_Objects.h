@@ -27,7 +27,6 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
 
-#include <TDocStd_Document.hxx>
 #include <NCollection_DataMap.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_LabelList.hxx>

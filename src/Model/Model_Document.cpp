@@ -132,6 +132,15 @@ Model_Document::Model_Document(const int theID, const std::string theKind)
   myDoc->CommitCommand();
 }
 
+Model_Document::~Model_Document()
+{
+  if (!myDoc.IsNull())
+  {
+    myDoc->ClearUndos();
+    myDoc->ClearRedos();
+  }
+}
+
 void Model_Document::setThis(DocumentPtr theDoc)
 {
   myObjs->setOwner(theDoc);
@@ -331,6 +340,8 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     aSession->setCheckTransactions(false);
     if (myObjs)
       delete myObjs;
+    anOldDoc->ClearRedos();
+    anOldDoc->ClearUndos();
     anOldDoc.Nullify();
     myObjs = new Model_Objects(myDoc->Main()); // synchronization is inside
     myObjs->setOwner(theThis);
