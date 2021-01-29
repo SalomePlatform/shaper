@@ -123,7 +123,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
     int& theResultIndex,
-    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
     GeomShapePtr theResultCompound)
 {
@@ -187,7 +187,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
       ListOfShape aUsedTools = theTools;
       aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
 
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+      ModelAPI_Tools::loadModifiedShapes(aResultBody,
                                                aListWithObject,
                                                aUsedTools,
                                                aMakeShapeList,
@@ -197,7 +197,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
     }
 
 
-    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    ModelAPI_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
     aRBA.baseShape = theObject;
     aRBA.makeShape = aMakeShapeList;
@@ -215,7 +215,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
     int& theResultIndex,
-    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
     GeomShapePtr theResultCompound)
 {
@@ -283,7 +283,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
       ListOfShape aUsedTools = theTools;
       aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
 
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+      ModelAPI_Tools::loadModifiedShapes(aResultBody,
                                                aCompSolidList,
                                                aUsedTools,
                                                aMakeShapeList,
@@ -292,7 +292,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
       ++theResultIndex;
     }
 
-    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    ModelAPI_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
     aRBA.baseShape = theCompsolid;
     aRBA.makeShape = aMakeShapeList;
@@ -309,7 +309,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
     const GeomShapePtr& theCompound,
     const ListOfShape& theTools,
     int& theResultIndex,
-    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
     GeomShapePtr theResultCompound)
 {
@@ -372,7 +372,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 
       ListOfShape aCompoundList;
       aCompoundList.push_back(theCompound);
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+      ModelAPI_Tools::loadModifiedShapes(aResultBody,
                                                aCompoundList,
                                                theTools,
                                                aMakeShapeList,
@@ -381,7 +381,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
       ++theResultIndex;
     }
 
-    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    ModelAPI_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
     aRBA.baseShape = theCompound;
     aRBA.makeShape = aMakeShapeList;

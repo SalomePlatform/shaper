@@ -18,7 +18,6 @@
 //
 
 #include "FeaturesPlugin_FusionFaces.h"
-#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -26,6 +25,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -73,7 +73,7 @@ void FeaturesPlugin_FusionFaces::execute()
 
   ListOfShape aBaseShapesList;
   aBaseShapesList.push_back(aBaseShape);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapesList, ListOfShape(),
-                                           anAlgo, aResultShape);
+  ModelAPI_Tools::loadModifiedShapes(aResultBody, aBaseShapesList, ListOfShape(),
+                                     anAlgo, aResultShape);
   setResult(aResultBody);
 }

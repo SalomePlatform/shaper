@@ -18,7 +18,6 @@
 //
 
 #include "FeaturesPlugin_VersionedChFi.h"
-#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -89,8 +88,8 @@ void FeaturesPlugin_VersionedChFi::execute()
   anObjectHierarchy.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalSolids, ListOfShape(),
-                                             aMakeShapeList, *anIt, aPrefix);
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalSolids, ListOfShape(),
+                                       aMakeShapeList, *anIt, aPrefix);
     setResult(aResultBody, aResultIndex++);
 
     for (ListOfShape::iterator aEIt = anEdges.begin(); aEIt != anEdges.end(); ++aEIt) {
@@ -99,8 +98,8 @@ void FeaturesPlugin_VersionedChFi::execute()
       aResultBody->loadGeneratedShapes(aMakeShapeList, aBase, GeomAPI_Shape::EDGE, aPrefix, true);
     }
 
-    FeaturesPlugin_Tools::loadDeletedShapes(aResultBody, GeomShapePtr(), anOriginalSolids,
-                                            aMakeShapeList, *anIt);
+    ModelAPI_Tools::loadDeletedShapes(aResultBody, GeomShapePtr(), anOriginalSolids,
+                                      aMakeShapeList, *anIt);
   }
 
   removeResults(aResultIndex);

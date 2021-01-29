@@ -18,7 +18,6 @@
 //
 
 #include <FeaturesPlugin_Fillet1D.h>
-#include <FeaturesPlugin_Tools.h>
 
 #include <GeomAlgoAPI_Fillet1D.h>
 #include <GeomAlgoAPI_MapShapesAndAncestors.h>
@@ -33,6 +32,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Tools.h>
 
 void sendMessageWithFailedShapes(const ListOfShape& theVertices)
 {
@@ -190,8 +190,8 @@ bool FeaturesPlugin_Fillet1D::performFillet(const GeomShapePtr& theWire,
   ResultBodyPtr aResult = document()->createBody(data(), theResultIndex);
   ListOfShape anOriginal;
   anOriginal.push_back(theWire);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResult, anOriginal, ListOfShape(),
-                                           aFilletBuilder, aFilletBuilder->shape(), THE_PREFIX);
+  ModelAPI_Tools::loadModifiedShapes(aResult, anOriginal, ListOfShape(),
+                                     aFilletBuilder, aFilletBuilder->shape(), THE_PREFIX);
   setResult(aResult, theResultIndex);
   // store new edges generated from vertices
   for (ListOfShape::const_iterator anIt = theVertices.begin(); anIt != theVertices.end(); ++anIt)

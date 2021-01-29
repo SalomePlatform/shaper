@@ -44,6 +44,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <math.h>
 #include <iostream>
@@ -223,8 +224,8 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Rotated");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Rotated");
     aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }

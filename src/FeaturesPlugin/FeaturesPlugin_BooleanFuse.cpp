@@ -19,8 +19,6 @@
 
 #include "FeaturesPlugin_BooleanFuse.h"
 
-#include "FeaturesPlugin_Tools.h"
-
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -271,19 +269,19 @@ void FeaturesPlugin_BooleanFuse::execute()
   ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
 
   ListOfShape anEmptyTools;
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                           anOriginalShapes,
-                                           anEmptyTools,
-                                           aMakeShapeList,
-                                           aShape);
+  ModelAPI_Tools::loadModifiedShapes(aResultBody,
+                                     anOriginalShapes,
+                                     anEmptyTools,
+                                     aMakeShapeList,
+                                     aShape);
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
-                                          GeomShapePtr(),
-                                          anOriginalShapes,
-                                          aMakeShapeList,
-                                          aShape);
+  ModelAPI_Tools::loadDeletedShapes(aResultBody,
+                                    GeomShapePtr(),
+                                    anOriginalShapes,
+                                    aMakeShapeList,
+                                    aShape);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

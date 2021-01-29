@@ -94,7 +94,7 @@ void FeaturesPlugin_BooleanCommon::execute()
 
   std::string anError;
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
-  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  std::vector<ModelAPI_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
 
   if (isSimpleMode) {
@@ -128,7 +128,7 @@ void FeaturesPlugin_BooleanCommon::execute()
 
       ListOfShape anObjectList = anObjects.objects();
       ListOfShape aToolsList;
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+      ModelAPI_Tools::loadModifiedShapes(aResultBody,
                                                anObjectList,
                                                aToolsList,
                                                aMakeShapeList,
@@ -139,7 +139,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       aResultIndex++;
 
       aToolsList = anObjectList;
-      FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+      ModelAPI_Tools::ResultBaseAlgo aRBA;
       aRBA.resultBody = aResultBody;
       aRBA.baseShape = aBaseShape;
       aRBA.makeShape = aMakeShapeList;
@@ -194,7 +194,7 @@ void FeaturesPlugin_BooleanCommon::execute()
   // result shape has been deleted, but in another it was modified or stayed.
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
+  ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
                                           aTools.objects(),
                                           aResultCompound);
 

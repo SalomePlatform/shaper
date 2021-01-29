@@ -26,6 +26,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
@@ -239,8 +240,8 @@ void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     //LoadNamingDS
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Translated");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Translated");
     aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }

@@ -27,6 +27,7 @@
 #include <GeomAlgoAPI_Tools.h>
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Tools.h>
 
 class ModelAPI_Attribute;
 class ModelAPI_Result;
@@ -70,7 +71,7 @@ protected:
                      const ListOfShape& theTools,
                      const ListOfShape& thePlanes,
                      int& theResultIndex,
-                     std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                     std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
                      ListOfShape& theResultShapesList,
                      GeomShapePtr theResulCompound = GeomShapePtr());
 
@@ -84,7 +85,7 @@ protected:
                         const ListOfShape& theTools,
                         const ListOfShape& thePlanes,
                         int& theResultIndex,
-                        std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                        std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
                         ListOfShape& theResultShapesList,
                         GeomShapePtr theResulCompound = GeomShapePtr());
 
@@ -97,7 +98,7 @@ protected:
                        const GeomShapePtr& theCompound,
                        const ListOfShape& theTools,
                        int& theResultIndex,
-                       std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                       std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
                        ListOfShape& theResultShapesList,
                        GeomShapePtr theResulCompound = GeomShapePtr());
 

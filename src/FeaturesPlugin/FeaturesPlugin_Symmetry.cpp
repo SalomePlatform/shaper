@@ -41,6 +41,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <FeaturesPlugin_Tools.h>
 
@@ -208,8 +209,8 @@ void FeaturesPlugin_Symmetry::buildResult(
 {
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
-                                           theAlgo, theTargetShape, "Symmetried");
+  ModelAPI_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
+                                     theAlgo, theTargetShape, "Symmetried");
   aResultBody->setTextureFile(theTextureFile);
   setResult(aResultBody, theResultIndex++);
 }

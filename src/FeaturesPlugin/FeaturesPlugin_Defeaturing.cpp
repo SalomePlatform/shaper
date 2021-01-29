@@ -18,7 +18,6 @@
 //
 
 #include <FeaturesPlugin_Defeaturing.h>
-#include <FeaturesPlugin_Tools.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -72,7 +71,7 @@ void FeaturesPlugin_Defeaturing::execute()
   int aResultIndex = 0;
   std::string anError;
 
-  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  std::vector<ModelAPI_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape anOriginalShapesList, aResultShapesList;
 
   for (SolidFaces::iterator anIt = aBodiesAndFacesToRemove.begin();
@@ -90,13 +89,13 @@ void FeaturesPlugin_Defeaturing::execute()
       aBaseShapes.push_back(anExp.current());
 
     std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
-                                             anAlgo, aResult, "Defeaturing");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
+                                       anAlgo, aResult, "Defeaturing");
 
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
 
-    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    ModelAPI_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
     aRBA.baseShape = aParent;
     aRBA.makeShape = anAlgo;
@@ -108,7 +107,7 @@ void FeaturesPlugin_Defeaturing::execute()
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
   // result shape has been deleted, but in another it was modified or stayed.
   GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
+  ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
       anOriginalShapesList, aResultShapesCompound);
 
   removeResults(aResultIndex);
