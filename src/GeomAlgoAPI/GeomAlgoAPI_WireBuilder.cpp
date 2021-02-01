@@ -34,6 +34,7 @@
 #include <TopoDS_Wire.hxx>
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
+#include <ShapeFix_Wire.hxx>
 
 #include <cmath>
 #include <map>
@@ -164,8 +165,15 @@ GeomAlgoAPI_WireBuilder::GeomAlgoAPI_WireBuilder(const ListOfShape& theShapes,
     setImpl(aWireBuilder);
     setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-    // split the result wire
+    // fix edges order (bos #20546)
     TopoDS_Wire aWire = aWireBuilder->Wire();
+    Handle(ShapeFix_Wire) aFW = new ShapeFix_Wire;
+    aFW->Load(aWire);
+    aFW->FixReorder();
+    if (aFW->StatusReorder(ShapeExtend_DONE))
+      aWire = aFW->WireAPIMake();
+
+    // split the result wire
     if (isSplitWire && BRep_Tool::IsClosed(aWire)) {
       TopoDS_Wire aNewWire;
       BRep_Builder aBuilder;
