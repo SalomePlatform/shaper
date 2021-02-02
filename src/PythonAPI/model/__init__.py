@@ -44,3 +44,14 @@ from .partset import *
 from .primitives import *
 from .gdml import *
 from .tests import *
+
+# Add-on features
+
+from .addons import *
+# move functions from .addons to top level (model) package
+import inspect
+for attribute_name in dir(addons):
+    attribute = getattr(addons, attribute_name)
+    if inspect.isfunction(attribute):
+        globals()[attribute_name] = attribute
+del inspect
