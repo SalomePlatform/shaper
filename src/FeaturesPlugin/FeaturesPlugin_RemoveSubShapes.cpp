@@ -290,7 +290,9 @@ void FeaturesPlugin_RemoveSubShapes::execute()
 
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
-  aResultBody->storeModified(aBaseShape, aResultShape);
+  std::list<GeomShapePtr> anOldShapes;
+  anOldShapes.push_back(aBaseShape);
+  aResultBody->storeModified(anOldShapes, aResultShape, aMakeShapeList);
   for (std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
        aTypeIter != aTypes.end();
        ++aTypeIter)
