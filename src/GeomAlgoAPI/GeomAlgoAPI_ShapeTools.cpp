@@ -37,10 +37,12 @@
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_Copy.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepExtrema_ExtCF.hxx>
@@ -1134,6 +1136,21 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
     TopoDS_Edge aNewEdge = aWExp.Current();
     aWExp.Next();
     if (aWExp.More()) {
+      // Workaround for the closed wire to avoid jumping of its start point:
+      // split this wire for two parts, convert them to edges, then compose together
+      if (BRep_Tool::IsClosed(aWire)) {
+        aWire = TopoDS::Wire(BRepBuilderAPI_Copy(aWire).Shape());
+        aWExp.Init(aWire);
+        aNewEdge = aWExp.Current();
+
+        BRep_Builder().Remove(aWire, aNewEdge);
+        GeomWirePtr aSplitWire(new GeomAPI_Wire);
+        aSplitWire->setImpl(new TopoDS_Wire(aWire));
+        GeomEdgePtr aMergedEdge = wireToEdge(aSplitWire);
+
+        aWire = BRepBuilderAPI_MakeWire(aNewEdge, aMergedEdge->impl<TopoDS_Edge>());
+      }
+
       // Workaround: when concatenate a wire consisting of two edges based on the same B-spline
       // curve (non-periodic, but having equal start and end points), first of which is placed
       // at the end on the curve and second is placed at the start, this workaround copies
