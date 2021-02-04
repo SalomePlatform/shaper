@@ -95,6 +95,7 @@ In case of first choice the format of exported file will be defined according to
 
 Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.
 
+*Note*: For XAO format, selection list is not available, the whole part is exported.
 
 **Apply** button exports the file.
   
@@ -109,20 +110,14 @@ Selection list in the property panel contains a list of exported objects which c
     :param list: A list of exporting objects
 
 
-.. py:function:: model.exportToXAO(Part_doc, FileNameString, [ObjectsList, Author, GeometryName])
+.. py:function:: model.exportToXAO(Part_doc, FileNameString, Author="", GeometryName="")
+.. py:function:: model.exportToXAO(Part_doc, FileNameString, Object, Author="", GeometryName="")
 
     :param part: The current part object
     :param string: The file name
-    :param list: A list of exporting objects, if necessary
-    :param string: The name of the author 
-    :param string: The name for the shape processed in GEOMETRY module
-
-Result
-""""""
-
-The Result of operation is an exported file.
-
-**See Also** a sample TUI Script of :ref:`tui_export_file` operation.
+    :param object: An exporting object, if necessary
+    :param string: The name of the author, empty by default
+    :param string: The name for the shape processed in GEOMETRY module, empty by default
 
 Result
 """"""
