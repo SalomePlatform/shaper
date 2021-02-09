@@ -37,6 +37,6 @@ model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.FACE, [3])
 model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.EDGE, [12])
 model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.VERTEX, [24])
-model.testResultsVolumes(GroupAddition_1, [300])
+model.testResultsAreas(GroupAddition_1, [300])
 
 assert(model.checkPythonDump())

@@ -102,7 +102,7 @@ for ref in REF_DATA:
     model.testNbSubShapes(ref[0], GeomAPI_Shape.FACE, [1])
     model.testNbSubShapes(ref[0], GeomAPI_Shape.EDGE, [4])
     model.testNbSubShapes(ref[0], GeomAPI_Shape.VERTEX, [8])
-    model.testResultsVolumes(ref[0], [ref[1]])
+    model.testResultsAreas(ref[0], [ref[1]])
 
 model.end()
 

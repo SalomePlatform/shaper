@@ -56,7 +56,7 @@ assert(Filling_1.feature().error() == "")
 from GeomAPI import GeomAPI_Shape
 model.testNbResults(Filling_1, 1)
 model.testNbSubShapes(Filling_1, GeomAPI_Shape.FACE, [1])
-model.testResultsVolumes(Filling_1, [3500])
+model.testResultsAreas(Filling_1, [3500])
 
 model.end()
 

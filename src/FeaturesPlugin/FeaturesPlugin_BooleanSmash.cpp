@@ -110,7 +110,7 @@ void FeaturesPlugin_BooleanSmash::execute()
                               aShapesToAdd,
                               GeomAlgoAPI_Tools::BOOL_CUT));
 
-    if (GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-27) {
+    if (GeomAlgoAPI_ShapeTools::area(anObjectsCutAlgo->shape()) > 1.e-27) {
       aShapesToSmash.clear();
       aShapesToSmash.push_back(anObjectsCutAlgo->shape());
       aMakeShapeList->appendAlgo(anObjectsCutAlgo);
@@ -122,7 +122,7 @@ void FeaturesPlugin_BooleanSmash::execute()
                               aShapesToAdd,
                               GeomAlgoAPI_Tools::BOOL_CUT));
 
-    if (GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-27) {
+    if (GeomAlgoAPI_ShapeTools::area(aToolsCutAlgo->shape()) > 1.e-27) {
       aTools.clear();
       aTools.push_back(aToolsCutAlgo->shape());
       aMakeShapeList->appendAlgo(aToolsCutAlgo);

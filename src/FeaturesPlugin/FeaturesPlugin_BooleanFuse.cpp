@@ -185,7 +185,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(
         new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Tools::BOOL_CUT));
 
-      if (GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
+      if (GeomAlgoAPI_ShapeTools::area(aCutAlgo->shape()) > 1.e-27) {
         aSolidsToFuse.push_back(aCutAlgo->shape());
         aMakeShapeList->appendAlgo(aCutAlgo);
       }

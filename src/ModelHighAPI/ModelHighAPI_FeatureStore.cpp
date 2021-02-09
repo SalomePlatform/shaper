@@ -423,6 +423,16 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
       aResult<<std::fixed<<std::setprecision(3);
     aResult<<aVolume<<std::endl;
   }
+  double anArea = GeomAlgoAPI_ShapeTools::area(theShape);
+  if (anArea > 1.e-5) {
+    aResult << "Area: ";
+    // volumes of too huge shapes write in the scientific format
+    if (anArea >= 1.e5)
+      aResult << std::scientific << std::setprecision(7);
+    else
+      aResult << std::fixed << std::setprecision(3);
+    aResult << anArea << std::endl;
+  }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";
   double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};

@@ -85,7 +85,7 @@ model.testNbSubShapes(Pipe_2, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Pipe_2, GeomAPI_Shape.FACE, [5])
 model.testNbSubShapes(Pipe_2, GeomAPI_Shape.EDGE, [20])
 model.testNbSubShapes(Pipe_2, GeomAPI_Shape.VERTEX, [40])
-model.testResultsVolumes(Pipe_2, [26549.49767585])
+model.testResultsAreas(Pipe_2, [26549.49767585])
 
 # Cut should have no results
 model.testNbResults(Cut_1, 0)

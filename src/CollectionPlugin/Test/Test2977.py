@@ -39,6 +39,6 @@ model.testNbSubShapes(GroupSubstraction_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(GroupSubstraction_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(GroupSubstraction_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(GroupSubstraction_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(GroupSubstraction_1, [200])
+model.testResultsAreas(GroupSubstraction_1, [200])
 
 assert(model.checkPythonDump())

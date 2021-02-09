@@ -181,7 +181,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           return false;
         }
 
-        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo->shape()) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::area(aBoolAlgo->shape()) > 1.e-27) {
           theObjects.push_back(anObject);
           theMakeShapes.push_back(aBoolAlgo);
         }
@@ -238,7 +238,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           aMakeShapeList->appendAlgo(aFillerAlgo);
         }
 
-        if(GeomAlgoAPI_ShapeTools::volume(aBoolRes) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::area(aBoolRes) > 1.e-27) {
           theObjects.push_back(aCompSolid);
           theMakeShapes.push_back(aMakeShapeList);
         }
@@ -323,7 +323,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aSolidsToFuse,
                                                               aShapesToAdd,
                                                               GeomAlgoAPI_Tools::BOOL_CUT));
-        if(aCutAlgo->isDone() && GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
+        if(aCutAlgo->isDone() && GeomAlgoAPI_ShapeTools::area(aCutAlgo->shape()) > 1.e-27) {
           aSolidsToFuse.clear();
           aSolidsToFuse.push_back(aCutAlgo->shape());
           aMakeShapeList->appendAlgo(aCutAlgo);

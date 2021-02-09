@@ -61,7 +61,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [6470.575165134267])
+model.testResultsAreas(Extrusion_1, [6470.575165134267])
 
 # change radius of cylinder
 ParamR.setValue(10)
@@ -72,7 +72,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [8])
-model.testResultsVolumes(Extrusion_1, [314.159265359])
+model.testResultsAreas(Extrusion_1, [314.159265359])
 
 ParamR.setValue(30)
 model.do()
@@ -82,7 +82,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [3])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [10])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [20])
-model.testResultsVolumes(Extrusion_1, [2964.89877572])
+model.testResultsAreas(Extrusion_1, [2964.89877572])
 
 # check the intersected boundaries are processed well
 ParamR.setValue(40);
@@ -93,7 +93,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [4903.173668915])
+model.testResultsAreas(Extrusion_1, [4903.173668915])
 
 # change offsetting "To" face
 ParamTo.setValue(-20)
@@ -104,7 +104,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [8])
-model.testResultsVolumes(Extrusion_1, [1256.637061267])
+model.testResultsAreas(Extrusion_1, [1256.637061267])
 
 ParamTo.setValue(20)
 model.do()
@@ -114,7 +114,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [7969.186376787])
+model.testResultsAreas(Extrusion_1, [7969.186376787])
 
 # offset "From" face
 ParamFrom.setValue(20)
@@ -125,7 +125,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [5169.186376787])
+model.testResultsAreas(Extrusion_1, [5169.186376787])
 
 ParamFrom.setValue(-20)
 model.do()
@@ -135,7 +135,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [4])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [16])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [32])
-model.testResultsVolumes(Extrusion_1, [10769.186376787])
+model.testResultsAreas(Extrusion_1, [10769.186376787])
 
 model.testHaveNamingSubshapes(Extrusion_1, model, Part_1_doc)
 

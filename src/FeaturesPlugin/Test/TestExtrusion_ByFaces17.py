@@ -51,7 +51,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [2178.8497332])
+model.testResultsAreas(Extrusion_1, [2178.8497332])
 
 # change radius of sketch circle
 ParamRCir.setValue(17)
@@ -62,7 +62,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [10])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [20])
-model.testResultsVolumes(Extrusion_1, [3960.00723])
+model.testResultsAreas(Extrusion_1, [3960.00723])
 
 # change radius of sphere
 ParamRSph.setValue(10)
@@ -73,7 +73,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [5])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [10])
-model.testResultsVolumes(Extrusion_1, [3658.7714])
+model.testResultsAreas(Extrusion_1, [3658.7714])
 
 # change radius of sketch circle and check failure
 ParamRCir.setValue(10)
@@ -89,7 +89,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [1398.72992867])
+model.testResultsAreas(Extrusion_1, [1398.72992867])
 
 # change radius of cylinder
 ParamRCyl.setValue(10)
@@ -100,7 +100,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [6])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [12])
-model.testResultsVolumes(Extrusion_1, [4194.25709])
+model.testResultsAreas(Extrusion_1, [4194.25709])
 
 ParamRCyl.setValue(50)
 model.do()
@@ -110,7 +110,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [1433.0518])
+model.testResultsAreas(Extrusion_1, [1433.0518])
 
 # change offsetting "To" face
 ParamTo.setValue(-20)
@@ -121,7 +121,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [10])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [20])
-model.testResultsVolumes(Extrusion_1, [5078.347278])
+model.testResultsAreas(Extrusion_1, [5078.347278])
 
 # revert failure
 ParamTo.setValue(20)
@@ -132,7 +132,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [1504.36096473])
+model.testResultsAreas(Extrusion_1, [1504.36096473])
 
 # offset "From" face
 ParamFrom.setValue(20)
@@ -143,7 +143,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [4336.142699])
+model.testResultsAreas(Extrusion_1, [4336.142699])
 
 ParamFrom.setValue(-20)
 model.do()
@@ -153,7 +153,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [8])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [16])
-model.testResultsVolumes(Extrusion_1, [1118.8887326])
+model.testResultsAreas(Extrusion_1, [1118.8887326])
 
 model.testHaveNamingSubshapes(Extrusion_1, model, Part_1_doc)
 

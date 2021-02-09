@@ -40,6 +40,6 @@ model.testNbSubShapes(GroupIntersection_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(GroupIntersection_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(GroupIntersection_1, GeomAPI_Shape.EDGE, [4])
 model.testNbSubShapes(GroupIntersection_1, GeomAPI_Shape.VERTEX, [8])
-model.testResultsVolumes(GroupIntersection_1, [100])
+model.testResultsAreas(GroupIntersection_1, [100])
 
 assert(model.checkPythonDump())

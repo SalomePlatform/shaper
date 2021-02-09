@@ -36,7 +36,7 @@ model.testNbSubShapes(Revolution_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.EDGE, [4])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.VERTEX, [8])
-model.testResultsVolumes(Revolution_1, [666.43244])
+model.testResultsAreas(Revolution_1, [666.43244])
 
 Revolution_1.setPlanesAndOffsets(model.selection("FACE", "PartSet/YOZ"), 0, model.selection("FACE", "PartSet/XOZ"), 0)
 
@@ -46,7 +46,7 @@ model.testNbSubShapes(Revolution_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.FACE, [1])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.EDGE, [4])
 model.testNbSubShapes(Revolution_1, GeomAPI_Shape.VERTEX, [8])
-model.testResultsVolumes(Revolution_1, [333.21622])
+model.testResultsAreas(Revolution_1, [333.21622])
 
 model.end()
 
