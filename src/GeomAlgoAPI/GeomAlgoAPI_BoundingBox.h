@@ -36,7 +36,6 @@
   /// \param theError  error
 GEOMALGOAPI_EXPORT
 bool GetBoundingBox(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                    const bool thePrecise,
                     Standard_Real& theXmin,Standard_Real& theXmax,
                     Standard_Real& theYmin,Standard_Real& theYmax,
                     Standard_Real& theZmin,Standard_Real& theZmax,

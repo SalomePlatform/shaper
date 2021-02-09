@@ -278,8 +278,7 @@ Standard_Real GetMinDistance(const TopoDS_Shape& theShape1,
 //=======================================================================
 // function : PreciseBoundingBox
 //=======================================================================
-Standard_Boolean PreciseBoundingBox
-                          (const TopoDS_Shape &theShape, Bnd_Box &theBox)
+Standard_Boolean PreciseBoundingBox(const TopoDS_Shape &theShape, Bnd_Box &theBox)
 {
   if (theBox.IsVoid()) BRepBndLib::Add( theShape, theBox );
   if (theBox.IsVoid()) return Standard_False;
@@ -343,7 +342,6 @@ Standard_Boolean PreciseBoundingBox
 
 //=================================================================================================
 bool GetBoundingBox(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                    const bool thePrecise,
                     Standard_Real& theXmin,Standard_Real& theXmax,
                     Standard_Real& theYmin,Standard_Real& theYmax,
                     Standard_Real& theZmin,Standard_Real& theZmax,
@@ -377,11 +375,9 @@ bool GetBoundingBox(const std::shared_ptr<GeomAPI_Shape>& theShape,
 
     BRepBndLib::Add(aShape, B);
 
-    if (thePrecise) {
-      if (!PreciseBoundingBox(aShape, B)) {
-        theError = "GetBoundingBox Error: Bounding box cannot be precised";
-        return false;
-      }
+    if (!PreciseBoundingBox(aShape, B)) {
+      theError = "GetBoundingBox Error: Bounding box cannot be precised";
+      return false;
     }
 
     B.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);

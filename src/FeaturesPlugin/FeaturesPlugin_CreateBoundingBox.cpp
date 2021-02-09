@@ -73,7 +73,9 @@ void FeaturesPlugin_CreateBoundingBox::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_CreateBoundingBox::execute()
 {
-  updateValues();
+  if (!updateValues())
+    return;
+
   createBoxByTwoPoints();
 }
 
@@ -83,7 +85,7 @@ void FeaturesPlugin_CreateBoundingBox::attributeChanged(const std::string& theID
 }
 
 //=================================================================================================
-void FeaturesPlugin_CreateBoundingBox::updateValues()
+bool FeaturesPlugin_CreateBoundingBox::updateValues()
 {
   AttributeSelectionPtr aSelection = selection(OBJECT_ID());
   AttributeDoubleArrayPtr aValues =
@@ -111,15 +113,16 @@ void FeaturesPlugin_CreateBoundingBox::updateValues()
     }
 
     if (aShape && !aShape->isEqual(myShape)) {
-      double aXmin, aXmax, aYmin,aYmax,aZmin,aZmax;
-      std::string aError;
+      double aXmin, aXmax, aYmin, aYmax, aZmin, aZmax;
+      std::string anError;
       if (!GetBoundingBox(aShape,
-                          true,
                           aXmin, aXmax,
-                          aYmin,aYmax,
-                          aZmin,aZmax,
-                          aError))
-          setError("Error in bounding box calculation :" +  aError);
+                          aYmin, aYmax,
+                          aZmin, aZmax,
+                          anError)) {
+        setError("Error in bounding box calculation :" +  anError);
+        return false;
+      }
       myShape = aShape;
       streamxmin << std::setprecision(14) << aXmin;
       aValues->setValue(0, aXmin);
@@ -149,6 +152,7 @@ void FeaturesPlugin_CreateBoundingBox::updateValues()
     string(Y_MAX_COORD_ID() )->setValue( "Y = " +  streamymax.str() );
     string(Z_MAX_COORD_ID() )->setValue( "Z = " +  streamzmax.str() );
   }
+  return true;
 }
 
 //=================================================================================================

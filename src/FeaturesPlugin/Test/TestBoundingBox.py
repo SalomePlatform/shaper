@@ -41,14 +41,15 @@ __updated__ = "2020-11-12"
 def test_Bounding_Box():
 
     model.begin()
-    file_path = os.path.join(os.getenv("DATA_DIR"),"Shapes","Step","screw.step")
     partSet = model.moduleDocument()
     Part_1 = model.addPart(partSet)
     Part_1_doc = Part_1.document()
-    Import_1 = model.addImport(Part_1_doc,file_path)
+    ### Create Cone
+    Cone_1 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 5, 10)
+
     model.do()
     ### Create BoundingBox
-    BoundingBox_1 = model.getBoundingBox(Part_1_doc, model.selection("SOLID", "screw_1"))
+    BoundingBox_1 = model.getBoundingBox(Part_1_doc, model.selection("SOLID", "Cone_1_1"))
     model.end()
 
     myDelta = 1e-6
@@ -59,15 +60,15 @@ def test_Bounding_Box():
     print(" Surface area: ", Props[1])
     print(" Volume      : ", Props[2]) 
     
-    aReflength = 0.32855301948678
+    aReflength = 200
     aReslength = Props[0]
     assert (math.fabs(aReslength - aReflength) < myDelta), "The surface is wrong: expected = {0}, real = {1}".format(aReflength, aReslength)
 
-    aRefSurface = 0.0041640657342782
+    aRefSurface = 1600
     aResSurface = Props[1]
     assert (math.fabs(aResSurface - aRefSurface) < myDelta), "The surface is wrong: expected = {0}, real = {1}".format(aRefSurface, aResSurface)
 
-    aRefVolume = 1.6785355394103e-05
+    aRefVolume = 4000
     aResVolume = Props[2]
     assert (math.fabs(aResVolume - aRefVolume) < myDelta), "The volume is wrong: expected = {0}, real = {1}".format(aRefVolume, aResVolume)
 

@@ -123,7 +123,7 @@ public:
 
 private:
   /// Update values displayed.
-  void updateValues();
+  bool updateValues();
 
 };
 

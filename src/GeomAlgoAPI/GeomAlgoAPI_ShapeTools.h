@@ -45,6 +45,9 @@ class ModelAPI_Object;
 class GeomAlgoAPI_ShapeTools
 {
 public:
+  /// \return the lenth of the edges of the current shape or 0.0 if it can be computed.
+  GEOMALGOAPI_EXPORT static double length(const std::shared_ptr<GeomAPI_Shape> theShape);
+
   /// \return the total volume of the solids of the current shape or 0.0 if it can be computed.
   GEOMALGOAPI_EXPORT static double volume(const std::shared_ptr<GeomAPI_Shape> theShape);
 

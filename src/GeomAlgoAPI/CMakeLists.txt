@@ -88,7 +88,6 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Projection.h
     GeomAlgoAPI_Chamfer.h
     GeomAlgoAPI_Defeaturing.h
-    GeomAlgoAPI_GeometryCalculation.h
     GeomAlgoAPI_BoundingBox.h
 )
 
@@ -157,7 +156,6 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Projection.cpp
     GeomAlgoAPI_Chamfer.cpp
     GeomAlgoAPI_Defeaturing.cpp
-    GeomAlgoAPI_GeometryCalculation.cpp
     GeomAlgoAPI_BoundingBox.cpp
 )
 

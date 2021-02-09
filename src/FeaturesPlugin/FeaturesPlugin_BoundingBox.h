@@ -126,7 +126,7 @@ private:
   virtual AttributePtr attributResultValues();
 
   /// Update values displayed.
-  void updateValues();
+  bool updateValues();
   /// Create Box
   void createBox();
   /// Update Box
