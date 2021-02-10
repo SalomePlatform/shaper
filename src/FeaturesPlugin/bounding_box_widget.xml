@@ -1,0 +1,22 @@
+<source>
+  <shape_selector id="main_object"
+                  label="Object"
+                  tooltip="Select a object"
+                  shape_types="vertex edge face solid compsolid compound object"
+                  default=""
+                  geometrical_selection="true">
+    <validator id="GeomValidators_ConstructionComposite"/>
+    <validator id="GeomValidators_ShapeType" parameters="vertex,line,edge,wire,face,shell,solid,compsolid,compound"/>
+  </shape_selector>
+  <groupbox title="Min">
+    <label id="xmincoordinate" isSelectable = "true"/>
+    <label id="ymincoordinate" isSelectable = "true"/>
+    <label id="zmincoordinate" isSelectable = "true"/>
+  </groupbox>
+  <groupbox title="Max">
+    <label id="xmaxcoordinate" isSelectable = "true"/>
+    <label id="ymaxcoordinate" isSelectable = "true"/>
+    <label id="zmaxcoordinate" isSelectable = "true"/>
+  </groupbox>
+  <boolvalue id="createbox" label="Create box" default="false"/>
+</source>

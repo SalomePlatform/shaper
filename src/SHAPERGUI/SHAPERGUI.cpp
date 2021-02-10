@@ -174,7 +174,6 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   }
 
   int aMenu = createMenu(tr("Inspection"), -1, -1, 30);
-  int aSubMenu = createMenu(tr("Information"), aMenu, -1, -1, 0);
 
   int aId = getNextCommandId();
   myActionsList.append(aId);
@@ -184,7 +183,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
     aTip, QKeySequence(), aDesk, true, this, SLOT(onWhatIs(bool)));
   myWhatIsAction->setStatusTip(aTip);
   myWhatIsAction->setData("INSPECTION_CMD");
-  createMenu(aId, aSubMenu, 0);
+  createMenu(aId, aMenu, 0);
 
   QString aToolName = tr("Inspection");
   int aTool = createTool(aToolName);
@@ -690,7 +689,12 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
 #ifdef _DEBUG
   int aItemId =
 #endif
-    createMenu(aId, aWBMenu);
+
+  if( theId == "PointCoordinates" )
+    createMenu(separator(), aWBMenu);
+
+  createMenu(aId, aWBMenu);
+
   if (isAddSeparator)
     createMenu(separator(), aWBMenu);
 

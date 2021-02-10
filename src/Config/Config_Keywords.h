@@ -100,6 +100,7 @@ MAYBE_UNUSED const static char* ATTR_TOOLTIP = FEATURE_TOOLTIP;
 MAYBE_UNUSED const static char* ATTR_ICON = FEATURE_ICON;
 MAYBE_UNUSED const static char* ATTR_LABEL = "label";
 MAYBE_UNUSED const static char* ATTR_STYLE_SHEET = "styleSheet";
+MAYBE_UNUSED const static char* ATTR_IS_SELECTABLE = "isSelectable";
 MAYBE_UNUSED const static char* ATTR_HTML_STYLE = "isHTML";
 MAYBE_UNUSED const static char* ATTR_DEFAULT = "default";
 MAYBE_UNUSED const static char* ATTR_INTERNAL = "internal";

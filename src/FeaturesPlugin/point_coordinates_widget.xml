@@ -1,0 +1,14 @@
+<source>
+  <shape_selector id="point_selected"
+                      icon="icons/Features/point.png"
+                      label="Edge"
+                      tooltip="Select a point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
+  </shape_selector>
+  <label id="xcoordinate" isSelectable="true"/>
+  <label id="ycoordinate" isSelectable="true"/>
+  <label id="zcoordinate" isSelectable="true"/>
+</source>
