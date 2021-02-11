@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
   QString gui_root_dir( QDir::fromNativeSeparators(pe.value(GUI_ROOT_DIR)) );
   QString shaper_root_dir( QDir::fromNativeSeparators(pe.value(SHAPER_ROOT_DIR)) );
   QString lightappconfig_val( QString("%1:%2")
-  .arg(QDir::toNativeSeparators(QString("%1/share/salome/resources/gui").arg(gui_root_dir)))
-  .arg(QDir::toNativeSeparators(QString("%1/share/salome/resources/shaper").arg(shaper_root_dir))));
+  .arg( QDir::toNativeSeparators( QString("%1/share/salome/resources/gui").arg(gui_root_dir) ) )
+  .arg( QDir::toNativeSeparators( QString("%1/share/salome/resources/shaper").arg(shaper_root_dir) ) ) );
   pe.insert(LIGHTAPPCONFIG,lightappconfig_val);
   //tells shutup to salome.salome_init invoked at shaper engine ignition
   pe.insert("SALOME_EMB_SERVANT","1");
