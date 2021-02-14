@@ -43,7 +43,7 @@ def getShapePath(path):
     shapes_dir = os.path.join(os.getenv("DATA_DIR"), "Shapes")
     return os.path.join(shapes_dir, path)
 
-def testImport(theType, theFile, theVolume, theDelta, theErrorExpected = False):
+def testImport(theType, theFile, theVolume, theArea, theDelta, theErrorExpected = False):
     # Create a part for import
     aSession.startOperation("Create part for import")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
@@ -88,6 +88,10 @@ def testImport(theType, theFile, theVolume, theDelta, theErrorExpected = False):
         aRefVolume = theVolume
         aResVolume = GeomAlgoAPI_ShapeTools.volume(aShape)
         assert (math.fabs(aResVolume - aRefVolume) < theDelta), "{0}: The volume is wrong: expected = {1}, real = {2}".format(theType, aRefVolume, aResVolume)
+        # Check shape area
+        aRefArea = theArea
+        aResArea = GeomAlgoAPI_ShapeTools.area(aShape)
+        assert (math.fabs(aResArea - aRefArea) < theDelta), "{0}: The area is wrong: expected = {1}, real = {2}".format(theType, aRefArea, aResArea)
 
 def testImportXAO():
     # Create a part for import
@@ -149,23 +153,23 @@ if __name__ == '__main__':
         # Create a shape imported from BREP
         #=========================================================================
         shape_path = getShapePath("Brep/solid.brep")
-        testImport("BREP", shape_path, 259982.297176, 10 ** -5)
+        testImport("BREP", shape_path, 259982.297176, 39481.415022205365, 10 ** -5)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "solid.brp"))
-        testImport("BRP", shape_path, 259982.297176, 10 ** -5)
+        testImport("BRP", shape_path, 259982.297176, 39481.415022205365, 10 ** -5)
         #=========================================================================
         # Create a shape imported from STEP
         #=========================================================================
         shape_path = getShapePath("Step/screw.step")
-        testImport("STEP", shape_path, 3.78827401738e-06, 10 ** -17)
+        testImport("STEP", shape_path, 3.78827401738e-06, 0.0019293313778547085, 10 ** -17)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "screw.stp"))
-        testImport("STEP", shape_path, 3.78827401738e-06, 10 ** -17)
+        testImport("STEP", shape_path, 3.78827401738e-06, 0.0019293313778547085, 10 ** -17)
         #=========================================================================
         # Create a shape imported from IGES
         #=========================================================================
         shape_path = getShapePath("Iges/bearing.igs")
-        testImport("IGS", shape_path, 1.3407098545036494e-08, 10 ** -25)
+        testImport("IGS", shape_path, 0.0, 1.3407098545036494e-08, 10 ** -25)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "bearing.iges"))
-        testImport("IGES", shape_path, 1.3407098545036494e-08, 10 ** -25)
+        testImport("IGES", shape_path, 0.0, 1.3407098545036494e-08, 10 ** -25)
 
         #=========================================================================
         # Create a shape imported from XAO
@@ -182,8 +186,8 @@ if __name__ == '__main__':
         #=========================================================================
         # Check import errors
         #=========================================================================
-        testImport("BREP", "", 0, 10 ** -25, True)
+        testImport("BREP", "", 0, 0, 10 ** -25, True)
         shape_path = getShapePath("Brep/solid.dwg")
-        testImport("BREP", shape_path, 0, 10 ** -25, True)
+        testImport("BREP", shape_path, 0, 0, 10 ** -25, True)
         shape_path = getShapePath("Xao/wrong_file.xao")
-        testImport("XAO", shape_path, 0, 10 ** -25, True)
+        testImport("XAO", shape_path, 0, 0, 10 ** -25, True)
