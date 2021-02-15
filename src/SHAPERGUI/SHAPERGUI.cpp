@@ -1282,6 +1282,12 @@ void SHAPERGUI::resetToolbars()
 
 void SHAPERGUI::publishToStudy()
 {
-  if (isActiveModule() && ModelAPI_Session::get()->hasModuleDocument())
+  if (isActiveModule() && ModelAPI_Session::get()->hasModuleDocument()) {
     myWorkshop->module()->launchOperation("PublishToStudy", false);
+
+    // update SHAPERSTUDY objects in OCC and VTK viewers
+    QStringList aVMList;
+    aVMList << "OCCViewer" << "VTKViewer";
+    getApp()->updatePresentations("SHAPERSTUDY", aVMList);
+  }
 }
