@@ -93,13 +93,12 @@ void SketchAPI_Offset::dump (ModelHighAPI_Dumper& theDumper) const
   }
   theDumper << "] = " << theDumper.name(aBase) << ".offset()" << std::endl;
 
-////  // Set necessary "auxiliary" flag for created features
-////  // (flag is set if it differs to anAux)
-////  for (anIt = aList.begin(); anIt != aList.end(); ++anIt) {
-////    FeaturePtr aFeature = (*anIt)->feature();
-////    bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
-////    if (aFeatAux != anAux->value())
-////      theDumper << theDumper.name((*anIt)->feature(), false)
-////                << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
-////  }
+  // Set necessary "auxiliary" flag for created features
+  for (anIt = aList.begin(); anIt != aList.end(); ++anIt) {
+    FeaturePtr aFeature = (*anIt)->feature();
+    bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+    if (aFeatAux)
+      theDumper << theDumper.name((*anIt)->feature(), false)
+                << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
+  }
 }
