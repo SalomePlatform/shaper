@@ -708,4 +708,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPointCoordinates.py
                TestGeometryCalculation.py
                TestBoundingBox.py
+               Test23885.py
 )
