@@ -126,7 +126,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
   // Getting objects.
   ListOfShape anObjects, anEdgesAndFaces, aCompSolids;
   std::map<GeomShapePtr, ListOfShape> aCompSolidsObjects;
-  bool aCompoundsOnly = true; // if there are only compounds and no compsolids, do not use filler to restore compsolids
+  bool aCompoundsOnly = true;// if there are only compounds, do not use filler restoring compsolids
   AttributeSelectionListPtr anObjectsSelList = myFeature->selectionList(OBJECTS_ID());
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
     AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
@@ -232,20 +232,21 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         GeomShapePtr aBoolRes = aBoolAlgo->shape();
         if (!aShapesToAdd.empty()) {
           aShapesToAdd.push_back(aBoolRes);
-          if (aCompoundsOnly) // 23885: if there are no compsolids in input, do not use filler to make compsolids
-          {
+          if (aCompoundsOnly)
+          {  // 23885: if there are no compsolids in input, do not use filler to make compsolids
             aBoolRes = GeomAlgoAPI_CompoundBuilder::compound(aShapesToAdd);
-            std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aComp(new GeomAlgoAPI_MakeShapeCustom);
-            aComp->setResult(aBoolRes);
-            for(ListOfShape::iterator aComps = aCompSolids.begin(); aComps != aCompSolids.end(); aComps++)
-              aComp->addModified(*aComps, aBoolRes);
-            aMakeShapeList->appendAlgo(aComp);
+            std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aCompMkr(new GeomAlgoAPI_MakeShapeCustom);
+            aCompMkr->setResult(aBoolRes);
+            for(ListOfShape::iterator aCS = aCompSolids.begin(); aCS != aCompSolids.end(); aCS++)
+              aCompMkr->addModified(*aCS, aBoolRes);
+            aMakeShapeList->appendAlgo(aCompMkr);
           }
           else
           {
             std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
               new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-            if (!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
+            if (!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid())
+            {
               myFeature->setError("Error: PaveFiller algorithm failed.");
               return false;
             }
