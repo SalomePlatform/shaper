@@ -23,11 +23,15 @@ INCLUDE(UnitTest)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/Config
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
+                    ${PROJECT_SOURCE_DIR}/src/Locale
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomValidators
                     ${PROJECT_SOURCE_DIR}/src/SketchPlugin
+                    ${PROJECT_SOURCE_DIR}/src/InitializationPlugin
+                    ${SUIT_INCLUDE}
+                    ${PYTHON_INCLUDE_DIR}
 )
 
 SET(PROJECT_HEADERS
@@ -98,6 +102,8 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     GeomValidators
+    ${PyInterp}
+    ${PYTHON_LIBRARIES}
 )
 
 ADD_DEFINITIONS(-DBUILDPLUGIN_EXPORTS)

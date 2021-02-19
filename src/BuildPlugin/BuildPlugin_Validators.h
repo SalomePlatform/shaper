@@ -133,4 +133,19 @@ public:
                         Events_InfoMessage& theError) const;
 };
 
+ /// \class BuildPlugin_ValidatorExpression
+ /// \ingroup Validators
+ /// \brief Validator for the expression of parameter.
+class BuildPlugin_ValidatorExpressionInterpolation: public ModelAPI_AttributeValidator
+{
+public:
+   //! Returns true if attribute has a valid parameter expression.
+   //! \param theAttribute the checked attribute
+   //! \param theArguments arguments of the attribute
+   //! \param theError the error string message if validation fails
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        Events_InfoMessage& theError) const;
+};
+
 #endif

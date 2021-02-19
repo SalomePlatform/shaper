@@ -1,32 +1,67 @@
 <source>
-  <multi_selector id="base_objects"
-                  label="Points and vertices:"
-                  tooltip="Select points or vertices objects."
-                  shape_types="vertices"
-                  concealment="true">
-    <validator id="GeomValidators_DifferentShapes"/>
-  </multi_selector>
-  <boolvalue id="reorder" label="Reorder" tooltip="Changes the order of points to construct the shortest curve." default="false"/>
-  <optionalbox id="closed" title="Closed" tooltip="Makes the curve closed or not." default="false"
-               has_frame="false" enable_on_check="false">
-    <optionalbox id="use_tangents" title="Tangents" default="false">
-      <shape_selector id="tangent_start"
-                      icon="icons/Features/axis.png"
-                      label="Start"
-                      tooltip="Select vector tangent to the start of curve"
-                      shape_types="edge"
-                      default="&lt;start&gt;">
-        <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
-      </shape_selector>
-      <shape_selector id="tangent_end"
-                      icon="icons/Features/axis.png"
-                      label="End"
-                      tooltip="Select vector tangent to the end of curve"
-                      shape_types="edge"
-                      default="&lt;end&gt;">
-        <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
-      </shape_selector>
-    </optionalbox>
-  </optionalbox>
-  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
+  <toolbox id="interpolation_method">
+    <box id="by_selection" 
+         title="Curve by selection"
+         icon="icons/Build/feature_interpolation_by_selection.png">
+      <multi_selector id="base_objects"
+                      label="Points and vertices:"
+                      tooltip="Select points or vertices objects."
+                      shape_types="vertices"
+                      concealment="true">
+        <validator id="GeomValidators_DifferentShapes"/>
+      </multi_selector>
+      <boolvalue id="reorder" label="Reorder" tooltip="Changes the order of points to construct the shortest curve." default="false"/>
+      <optionalbox id="closed" title="Closed" tooltip="Makes the curve closed or not." default="false"
+                  has_frame="false" enable_on_check="false">
+        <optionalbox id="use_tangents" title="Tangents" default="false">
+          <shape_selector id="tangent_start"
+                          icon="icons/Features/axis.png"
+                          label="Start"
+                          tooltip="Select vector tangent to the start of curve"
+                          shape_types="edge"
+                          default="&lt;start&gt;">
+            <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+          </shape_selector>
+          <shape_selector id="tangent_end"
+                          icon="icons/Features/axis.png"
+                          label="End"
+                          tooltip="Select vector tangent to the end of curve"
+                          shape_types="edge"
+                          default="&lt;end&gt;">
+            <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+          </shape_selector>
+        </optionalbox>
+      </optionalbox>
+      <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
+    </box>
+    <box id="analytical"
+         title="Curve analytical"
+         icon="icons/Build/feature_interpolation_analytical.png">
+      <groupbox id="curves_parameters" title="Curves parameters">
+        <stringvalue id="xt" label="X(t) equation">
+            <validator id="BuildPlugin_ValidatorExpressionInterpolation"/>
+          </stringvalue>
+        <stringvalue id="yt" label="Y(t) equation">
+          <validator id="BuildPlugin_ValidatorExpressionInterpolation"/>
+        </stringvalue>
+        <stringvalue id="zt" label="Z(t) equation">
+          <validator id="BuildPlugin_ValidatorExpressionInterpolation"/>
+        </stringvalue>
+        <doublevalue id="mint"
+                     label="Min t"
+                     default="0">
+        </doublevalue>
+        <doublevalue id="maxt"
+                     label="Max t"
+                     default="100">
+        </doublevalue>
+        <integervalue id="numstep"
+                      label="Number of steps"
+                      min="0"
+                      default="10">
+          <validator id="GeomValidators_Positive"/>
+        </integervalue>
+      </groupbox>
+    </box>
+  </toolbox>
 </source>

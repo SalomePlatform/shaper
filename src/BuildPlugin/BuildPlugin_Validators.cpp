@@ -20,6 +20,7 @@
 #include "BuildPlugin_Validators.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_PlanarEdges.h>
@@ -38,6 +39,8 @@
 
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
+
+#include <BuildPlugin_Interpolation.h>
 
 #include <SketchPlugin_Sketch.h>
 
@@ -569,3 +572,28 @@ bool BuildPlugin_ValidatorBaseForVertex::isValid(const AttributePtr& theAttribut
 
   return true;
 }
+
+//=================================================================================================
+bool BuildPlugin_ValidatorExpressionInterpolation::isValid(const AttributePtr& theAttribute,
+                                                   const std::list<std::string>& /*theArguments*/,
+                                                   Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+
+  AttributeStringPtr aStrAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+  if (!aStrAttr->isInitialized()) {
+    theError = "Attribute \"%1\" is not initialized.";
+    theError.arg(aStrAttr->id());
+    return false;
+  }
+  bool isEmptyExpr = aStrAttr->value().empty();
+  if (isEmptyExpr) {
+    theError = "Expression is empty.";
+    return false;
+  }
+
+  theError = aFeature->string(BuildPlugin_Interpolation::EXPRESSION_ERROR_ID())->value();
+  return theError.empty();
+}
+

@@ -1,8 +1,8 @@
 
-  .. _tui_create_interpolation:
+  .. _tui_create_interpolation_by_selection:
 
-Create Interpolation
-====================
+Create Interpolation by selection
+=================================
 
 .. literalinclude:: examples/interpolation.py
     :linenos:

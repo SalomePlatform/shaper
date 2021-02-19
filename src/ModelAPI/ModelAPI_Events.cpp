@@ -188,6 +188,49 @@ const std::string& ModelAPI_ParameterEvalMessage::error() const
   return myError;
 }
 
+ModelAPI_BuildEvalMessage::ModelAPI_BuildEvalMessage(
+  const Events_ID theID, const void* theSender)
+  : Events_Message(theID, theSender), myIsProcessed(false)
+{}
+
+ModelAPI_BuildEvalMessage::~ModelAPI_BuildEvalMessage()
+{}
+
+FeaturePtr ModelAPI_BuildEvalMessage::parameter() const
+{
+  return myParam;
+}
+
+void ModelAPI_BuildEvalMessage::setParameter(FeaturePtr theParam)
+{
+  myParam = theParam;
+}
+
+void ModelAPI_BuildEvalMessage::setResults(
+            const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
+            const std::string& theError)
+{
+  myParamsList = theParamsList;
+  myError = theError;
+  myIsProcessed = true;
+}
+
+const std::list<std::shared_ptr<ModelAPI_ResultParameter> >&
+  ModelAPI_BuildEvalMessage::params() const
+{
+  return myParamsList;
+}
+
+bool ModelAPI_BuildEvalMessage::isProcessed()
+{
+  return myIsProcessed;
+}
+
+const std::string& ModelAPI_BuildEvalMessage::error() const
+{
+  return myError;
+}
+
 ModelAPI_ComputePositionsMessage::ModelAPI_ComputePositionsMessage(
   const Events_ID theID, const void* theSender)
   : Events_Message(theID, theSender)

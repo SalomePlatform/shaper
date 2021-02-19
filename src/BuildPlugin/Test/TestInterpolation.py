@@ -172,6 +172,16 @@ model.testHaveNamingSubshapes(Interpolation_9, model, Part_3_doc)
 model.end()
 
 # =============================================================================
-# Test 12. Check Python dump
+# Test 12. Create curve using an analytical expression
+# =============================================================================
+Part_5 = model.addPart(partSet)
+Part_5_doc = Part_5.document()
+
+Interpolation_11 = model.addInterpolation(Part_5_doc, "sin(t)","cos(t)","t", 0, 100, 10)
+model.do()
+model.testNbResults(Interpolation_11, 1)
+model.end()
+# =============================================================================
+# Test 13. Check Python dump
 # =============================================================================
 assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))

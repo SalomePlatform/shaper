@@ -20,8 +20,11 @@
 #include <pyconfig.h>
 
 #include <InitializationPlugin_EvalListener.h>
-#include <ParametersPlugin_Parameter.h>
 #include <InitializationPlugin_PyInterp.h>
+
+#include <BuildPlugin_Interpolation.h>
+
+#include <ParametersPlugin_Parameter.h>
 
 #include <Events_InfoMessage.h>
 
@@ -31,6 +34,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
@@ -44,8 +48,10 @@
 #include <string>
 #include <set>
 #include <sstream>
+#include <iostream>
+#include <algorithm>
 
-//------------------------------------------------------------------------------
+//=================================================================================================
 // Tools
 
 std::wstring toString(double theValue)
@@ -63,24 +69,26 @@ std::set<std::wstring> toSet(const std::list<std::wstring>& theContainer)
   return std::set<std::wstring>(theContainer.begin(), theContainer.end());
 }
 
-//------------------------------------------------------------------------------
-
+//=================================================================================================
 InitializationPlugin_EvalListener::InitializationPlugin_EvalListener()
 {
   Events_Loop* aLoop = Events_Loop::loop();
 
   aLoop->registerListener(this, ModelAPI_AttributeEvalMessage::eventId(), NULL, true);
   aLoop->registerListener(this, ModelAPI_ParameterEvalMessage::eventId(), NULL, true);
+  aLoop->registerListener(this, ModelAPI_BuildEvalMessage::eventId(), NULL, true);
   aLoop->registerListener(this, ModelAPI_ComputePositionsMessage::eventId(), NULL, true);
 
   myInterp = std::shared_ptr<InitializationPlugin_PyInterp>(new InitializationPlugin_PyInterp());
   myInterp->initialize();
 }
 
+//=================================================================================================
 InitializationPlugin_EvalListener::~InitializationPlugin_EvalListener()
 {
 }
 
+//=================================================================================================
 void InitializationPlugin_EvalListener::processEvent(
     const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -105,9 +113,116 @@ void InitializationPlugin_EvalListener::processEvent(
     std::shared_ptr<ModelAPI_ComputePositionsMessage> aMsg =
       std::dynamic_pointer_cast<ModelAPI_ComputePositionsMessage>(theMessage);
     aMsg->setPositions(myInterp->positions(aMsg->expression(), aMsg->parameter()));
+  } else if (theMessage->eventID() == ModelAPI_BuildEvalMessage::eventId()) {
+    std::shared_ptr<ModelAPI_BuildEvalMessage> aMsg =
+      std::dynamic_pointer_cast<ModelAPI_BuildEvalMessage>(theMessage);
+    FeaturePtr aParam = aMsg->parameter();
+
+    AttributeStringPtr anVariableAttr = aParam->string(BuildPlugin_Interpolation::VARIABLE_ID());
+    std::wstring anVar = anVariableAttr->isUValue() ?
+        Locale::Convert::toWString(anVariableAttr->valueU()) :
+        Locale::Convert::toWString(anVariableAttr->value());
+    AttributeTablesPtr anValueAttr = aParam->tables(BuildPlugin_Interpolation::VALUE_ID());
+    std::string anError;
+
+    std::list<std::shared_ptr<ModelAPI_ResultParameter> > aParamsList;
+
+    AttributeStringPtr anExprAttr;
+    ModelAPI_AttributeTables::Value aVal;
+    bool anIsFirstTime = true;
+    anExprAttr = aParam->string(BuildPlugin_Interpolation::XT_ID());
+    std::wstring anExpX = anExprAttr->isUValue() ?
+    Locale::Convert::toWString(anExprAttr->valueU()) :
+    Locale::Convert::toWString(anExprAttr->value());
+    anExpX.erase(std::remove(anExpX.begin(), anExpX.end(), ' '), anExpX.end());
+    anExprAttr = aParam->string(BuildPlugin_Interpolation::YT_ID());
+    std::wstring anExpY = anExprAttr->isUValue() ?
+    Locale::Convert::toWString(anExprAttr->valueU()) :
+    Locale::Convert::toWString(anExprAttr->value());
+    anExpY.erase(std::remove(anExpY.begin(), anExpY.end(), ' '), anExpY.end());
+    anExprAttr = aParam->string(BuildPlugin_Interpolation::ZT_ID());
+    std::wstring anExpZ = anExprAttr->isUValue() ?
+    Locale::Convert::toWString(anExprAttr->valueU()) :
+    Locale::Convert::toWString(anExprAttr->value());
+    anExpZ.erase(std::remove(anExpZ.begin(),anExpZ.end(), ' '), anExpZ.end());
+
+    for (int step =0; step < anValueAttr->rows(); step++) {
+      aVal.myDouble = evaluate(anVar,
+                                anValueAttr->value(step,0).myDouble,
+                                aParam,
+                                anExpX,
+                                anError,
+                                aParamsList,
+                                anIsFirstTime);
+      if (!anError.empty()) break;
+      anValueAttr->setValue(aVal,step,1);
+      aVal.myDouble = evaluate(anVar,
+                              anValueAttr->value(step,0).myDouble,
+                              aParam,
+                              anExpY,
+                              anError,
+                              aParamsList,
+                              anIsFirstTime);
+      if (!anError.empty()) break;
+      anValueAttr->setValue(aVal,step,2);
+      aVal.myDouble = evaluate(anVar,
+                                anValueAttr->value(step,0).myDouble,
+                                aParam,
+                                anExpZ,
+                                anError,
+                                aParamsList,
+                                anIsFirstTime);
+      if (!anError.empty()) break;
+      anValueAttr->setValue(aVal,step,3);
+      if (anIsFirstTime)
+          anIsFirstTime = false;
+    }
+    aMsg->setResults(aParamsList, anError);
   }
 }
 
+//=================================================================================================
+double InitializationPlugin_EvalListener::evaluate(std::wstring& theVariable,
+                              double theValueVariable,
+                              FeaturePtr theParameter,
+                              const std::wstring& theExpression,
+                              std::string& theError,
+                              std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
+                              bool theIsFirstTime)
+{
+  std::list<std::wstring> aContext;
+  aContext.push_back(theVariable + L"=" + toString(theValueVariable));
+  myInterp->extendLocalContext(aContext);
+  aContext.clear();
+
+  std::list<std::wstring> anExprParams = myInterp->compile(theExpression);
+  // find expression's params in the model
+  std::list<std::wstring>::iterator it = anExprParams.begin();
+  for (; it != anExprParams.end(); it++) {
+    double aValue;
+    ResultParameterPtr aParamRes;
+    // If variable does not exist python interpreter will generate an error.
+    if (!ModelAPI_Tools::findVariable(FeaturePtr(),
+                           *it, aValue, aParamRes, theParameter->document()))
+      continue;
+
+    if (theIsFirstTime)
+    {
+      std::list<ResultParameterPtr>::iterator anIter =
+                          std::find(theParamsList.begin(),theParamsList.end(), aParamRes);
+      if (anIter == theParamsList.end())
+        theParamsList.push_back(aParamRes);
+    }
+
+    aContext.push_back(*it + L"=" + toString(aValue));
+  }
+  myInterp->extendLocalContext(aContext);
+  double result = myInterp->evaluate(theExpression, theError);
+  myInterp->clearLocalContext();
+  return result;
+}
+
+//=================================================================================================
 double InitializationPlugin_EvalListener::evaluate(FeaturePtr theParameter,
   const std::wstring& theExpression, std::string& theError,
   std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
@@ -117,7 +232,7 @@ double InitializationPlugin_EvalListener::evaluate(FeaturePtr theParameter,
   // find expression's params in the model
   std::list<std::wstring> aContext;
   std::list<std::wstring>::iterator it = anExprParams.begin();
-  for ( ; it != anExprParams.end(); it++) {
+  for (; it != anExprParams.end(); it++) {
     double aValue;
     ResultParameterPtr aParamRes;
     // If variable does not exist python interpreter will generate an error. It is OK.
@@ -137,6 +252,7 @@ double InitializationPlugin_EvalListener::evaluate(FeaturePtr theParameter,
   return result;
 }
 
+//=================================================================================================
 void InitializationPlugin_EvalListener::processEvaluationEvent(
     const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -158,8 +274,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
       toSet(myInterp->compile(anAttribute->text())) : std::set<std::wstring>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
-  } else
-  if (aMessage->attribute()->attributeType() == ModelAPI_AttributeDouble::typeId()) {
+  } else if (aMessage->attribute()->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
     std::string anError;
@@ -171,8 +286,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
       toSet(myInterp->compile(anAttribute->text())) : std::set<std::wstring>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
-  } else
-  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point::typeId()) {
+  } else if (aMessage->attribute()->attributeType() == GeomDataAPI_Point::typeId()) {
     AttributePointPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(aMessage->attribute());
     std::wstring aText[] = {
@@ -198,8 +312,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
     anAttribute->setCalculatedValue(aCalculatedValue[0],
                                     aCalculatedValue[1],
                                     aCalculatedValue[2]);
-  } else
-  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point2D::typeId()) {
+  } else if (aMessage->attribute()->attributeType() == GeomDataAPI_Point2D::typeId()) {
     AttributePoint2DPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMessage->attribute());
     std::wstring aText[] = {
@@ -225,6 +338,7 @@ void InitializationPlugin_EvalListener::processEvaluationEvent(
   }
 }
 
+//=================================================================================================
 void InitializationPlugin_EvalListener::initDataModel()
 {
   myInterp->runString("import salome_iapp;salome_iapp.register_module_in_study(\"Shaper\")");
