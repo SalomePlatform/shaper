@@ -10,6 +10,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import importlib
 import sys
 import os
 import sphinx
@@ -35,15 +36,21 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
 ]
-try:
-  import sphinx_rtd_theme
-  extensions += ['sphinx_rtd_theme']
-  use_rtd_theme = True
-except:
-  use_rtd_theme = False
+# Optional extensions
+extra_extensions = ['sphinx_rtd_theme']
+if sphinx.version_info[:2] < (1,3):
+    extra_extensions += ['sphinxcontrib.napoleon']
+else:
+    extra_extensions += ['sphinx.ext.napoleon']
+for ext in extra_extensions:
+    try:
+        importlib.import_module(ext)
+        extensions.append(ext)
+        globals().update({'use_{}'.format(ext):True})
+    except:
+        globals().update({'use_{}'.format(ext):False})
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -113,7 +120,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-if use_rtd_theme:
+if use_sphinx_rtd_theme:
   html_theme = 'sphinx_rtd_theme'
 else:
   html_theme = 'default' if sphinx.version_info[:2] < (1,3) else 'classic'
