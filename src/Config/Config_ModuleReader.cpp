@@ -103,6 +103,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
+    std::string aPluginDocSection = getProperty(theNode, PLUGIN_DOCSECTION);
     std::string aUsesPlugin = getProperty(theNode, PLUGIN_USES);
     if (!aUsesPlugin.empty()) { // send information about the plugin dependencies
       std::shared_ptr<Config_PluginMessage> aMess(new Config_PluginMessage(
@@ -111,7 +112,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
       Events_Loop::loop()->send(aMess);
     }
 
-    std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf);
+    std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf, aPluginDocSection);
     std::list<std::string>::iterator it = aFeatures.begin();
     for (; it != aFeatures.end(); it++) {
       addFeature(*it, aPluginConf);
@@ -137,7 +138,8 @@ bool Config_ModuleReader::hasRequiredModules(xmlNodePtr theNode) const
 }
 
 std::list<std::string> Config_ModuleReader::importPlugin(const std::string& thePluginLibrary,
-                                                         const std::string& thePluginXmlConf)
+                                                         const std::string& thePluginXmlConf,
+                                                         const std::string& thePluginDocSection)
 {
   if (thePluginXmlConf.empty()) {  //probably a third party library
     loadLibrary(thePluginLibrary);
@@ -146,6 +148,7 @@ std::list<std::string> Config_ModuleReader::importPlugin(const std::string& theP
 
   Config_FeatureReader aReader = Config_FeatureReader(thePluginXmlConf,
                                                       thePluginLibrary,
+                                                      thePluginDocSection,
                                                       myEventGenerated);
   aReader.readAll();
   return aReader.features();

@@ -77,7 +77,8 @@ class Config_ModuleReader : public Config_XMLReader
   bool hasRequiredModules(xmlNodePtr aNode) const;
   /// reads info about plugin's features from plugin xml description
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
-                                      const std::string& thePluginFile);
+                                      const std::string& thePluginFile,
+                                      const std::string& thePluginDocSection);
   /// stores information about plugin in the internal cache
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,

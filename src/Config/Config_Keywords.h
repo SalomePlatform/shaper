@@ -145,6 +145,7 @@ MAYBE_UNUSED const static char* PLUGIN_LIBRARY = "library";
 MAYBE_UNUSED const static char* PLUGIN_SCRIPT = "script";
 MAYBE_UNUSED const static char* PLUGIN_DEPENDENCY = "dependency";
 MAYBE_UNUSED const static char* PLUGIN_USES = "uses";
+MAYBE_UNUSED const static char* PLUGIN_DOCSECTION = "docsection";
 
 /*
  * Hardcoded xml entities of dataModel.xml

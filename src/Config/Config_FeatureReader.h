@@ -40,6 +40,7 @@ class Config_FeatureReader : public Config_XMLReader
   /// Constructor
   Config_FeatureReader(const std::string& theXmlFile,
                        const std::string& theLibraryName,
+                       const std::string& theDocSection = std::string(),
                        const char* theEventGenerated = 0);
   virtual ~Config_FeatureReader();
   /// Returns list of all features defined in reader's file
@@ -61,6 +62,7 @@ class Config_FeatureReader : public Config_XMLReader
 
  private:
   std::string myLibraryName;
+  std::string myLibraryDocSection;
 
   std::list<std::string> myFeatures;
   /// event generated on feature data sending, by default it is Config_FeatureMessage::GUI_EVENT()

@@ -40,9 +40,11 @@
 
 Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile,
                                            const std::string& theLibraryName,
+                                           const std::string& theDocSection,
                                            const char* theEventGenerated)
     : Config_XMLReader(theXmlFile),
       myLibraryName(theLibraryName),
+      myLibraryDocSection(theDocSection),
       myEventGenerated(theEventGenerated ? theEventGenerated : Config_FeatureMessage::GUI_EVENT()),
       myIsProcessWidgets(theEventGenerated != NULL)
 {
@@ -176,8 +178,11 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setInternal(isInternal);
 
   std::string aHelpFile = getProperty(theFeatureNode, HELP_FILE);
-  if (!aHelpFile.empty())
-    outFeatureMessage->setHelpFileName(myLibraryName + "/" + aHelpFile);
+  if (!aHelpFile.empty()) {
+    aHelpFile =
+      (myLibraryDocSection.empty() ? myLibraryName : myLibraryDocSection) + "/" + aHelpFile;
+    outFeatureMessage->setHelpFileName(aHelpFile);
+  }
 
   bool isHideFaces = getBooleanAttribute(theFeatureNode, HIDEFACES_PANEL, false);
   outFeatureMessage->setHideFacesPanel(isHideFaces);
