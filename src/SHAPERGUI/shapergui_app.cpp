@@ -55,6 +55,6 @@ int main(int argc, char *argv[])
   proc.setArguments({"--modules=SHAPER"});
   proc.setProcessChannelMode( QProcess::ForwardedErrorChannel );
   proc.start();
-  proc.waitForFinished();
+  proc.waitForFinished(-1);
   return proc.exitCode();
 }
