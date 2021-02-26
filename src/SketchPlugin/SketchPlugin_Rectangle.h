@@ -116,8 +116,8 @@ protected:
 
 private:
   /// \brief updateLines crates lines from start and en points
-  void updateLines(); 
-  void updateStartPoint(); 
+  void updateLines();
+  void updateStartPoint();
 };
 
 

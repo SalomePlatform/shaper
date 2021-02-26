@@ -31,7 +31,7 @@
  */
 class CollectionPlugin_GroupMerge: public CollectionPlugin_GroupOperation
 {
-public:  
+public:
   /// attribute name of selected entities list
   inline static const std::string& LIST_ID()
   {

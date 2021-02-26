@@ -102,9 +102,11 @@ void SketchPlugin_Rectangle::updateLines()
   {
     FeaturePtr aLine = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(i));
     std::shared_ptr<GeomDataAPI_Point2D> aLineStart =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aLine->attribute(SketchPlugin_Line::START_ID()));
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aLine->attribute(SketchPlugin_Line::START_ID()));
     std::shared_ptr<GeomDataAPI_Point2D> aLineEnd =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aLine->attribute(SketchPlugin_Line::END_ID()));
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aLine->attribute(SketchPlugin_Line::END_ID()));
     aLineStart->setValue(aX[(i+3)%4], aY[(i+3)%4]);
     aLineEnd->setValue(aX[i], aY[i]);
     aLine->data()->boolean(AUXILIARY_ID())->setValue(anAuxiliary);
@@ -112,8 +114,10 @@ void SketchPlugin_Rectangle::updateLines()
     if(aDiagonalList->size())
     {
       auto aDiagonalPoint = cornerToDiagonalLinePoints[i];
-      FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(aDiagonalList->object(aDiagonalPoint.first));
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aDiagonal->attribute(aDiagonalPoint.second))->setValue(aX[(i+3)%4], aY[(i+3)%4]);
+      FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(
+            aDiagonalList->object(aDiagonalPoint.first));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aDiagonal->attribute(aDiagonalPoint.second))->setValue(aX[(i+3)%4], aY[(i+3)%4]);
     }
   }
 }
@@ -134,7 +138,8 @@ void SketchPlugin_Rectangle::updateStartPoint()
   {
     FeaturePtr aLine = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(i));
     std::shared_ptr<GeomDataAPI_Point2D> aLineStart =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aLine->attribute(SketchPlugin_Line::END_ID()));
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aLine->attribute(SketchPlugin_Line::END_ID()));
     aLineStart->setValue(aXStart, aYStart);
   }
 }
@@ -194,9 +199,11 @@ void SketchPlugin_Rectangle::execute()
 
       for(int i = 0; i < 2; i++)
       {
-        FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(aDiagonalList->object(i));
-        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrObject(aSketch, SketchPlugin_ConstraintCoincidence::ID(),
-                                                                                aCoord, aDiagonal);
+        FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(
+              aDiagonalList->object(i));
+        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrObject(
+              aSketch, SketchPlugin_ConstraintCoincidence::ID(),
+              aCoord, aDiagonal);
         aNotToDumpList->append(aConstraint);
       }
     }
@@ -208,19 +215,22 @@ void SketchPlugin_Rectangle::execute()
       /// connect neighbor lines by coincidence
       unsigned iPrev = (i+3)%4;
       FeaturePtr aPrevLine = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(iPrev));
-      FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(aSketch, SketchPlugin_ConstraintCoincidence::ID(),
-                                                                            aPrevLine->attribute(SketchPlugin_Line::END_ID()),
-                                                                            aLine->attribute(SketchPlugin_Line::START_ID()));
+      FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(
+            aSketch, SketchPlugin_ConstraintCoincidence::ID(),
+            aPrevLine->attribute(SketchPlugin_Line::END_ID()),
+            aLine->attribute(SketchPlugin_Line::START_ID()));
       aNotToDumpList->append(aConstraint);
 
       /// case of  rectangle created from its center
       if(aDiagonalList->size())
       {
         auto aDiagonalPoint = cornerToDiagonalLinePoints[i];
-        FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(aDiagonalList->object(aDiagonalPoint.first));
-        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(aSketch, SketchPlugin_ConstraintCoincidence::ID(),
-                                                                              aDiagonal->attribute(aDiagonalPoint.second),
-                                                                              aLine->attribute(SketchPlugin_Line::START_ID()));
+        FeaturePtr aDiagonal = std::dynamic_pointer_cast<ModelAPI_Feature>(
+              aDiagonalList->object(aDiagonalPoint.first));
+        FeaturePtr aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(
+              aSketch, SketchPlugin_ConstraintCoincidence::ID(),
+              aDiagonal->attribute(aDiagonalPoint.second),
+              aLine->attribute(SketchPlugin_Line::START_ID()));
         aNotToDumpList->append(aConstraint);
       }
     }
@@ -283,7 +293,8 @@ void SketchPlugin_Rectangle::execute()
     aSubs.push_back(aDiagonalResult->shape());
   }
 
-  FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(refattr(CENTER_REF_ID())->object());
+  FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+        refattr(CENTER_REF_ID())->object());
   if(aCenterPointFeature)
   {
     ResultPtr aCenterResult = aCenterPointFeature->lastResult();

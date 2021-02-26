@@ -74,7 +74,7 @@ void ExchangePlugin_ImportBase::initAttributes()
 {
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(TARGET_PART_ID(), ModelAPI_AttributeInteger::typeId());
-  data()->addAttribute(TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId()); 
+  data()->addAttribute(TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId());
 }
 
 void ExchangePlugin_Import::initAttributes()
@@ -82,7 +82,7 @@ void ExchangePlugin_Import::initAttributes()
   ExchangePlugin_ImportBase::initAttributes();
 
   data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId()); 
+  data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(STEP_TARGET_PART_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(STEP_TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId());
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
@@ -173,7 +173,8 @@ void ExchangePlugin_Import_Image::execute()
   if (aDoc.get()) {
     FeaturePtr aImportFeature = aDoc->addFeature(ExchangePlugin_Import_ImageFeature::ID());
     DataPtr aData = aImportFeature->data();
-    AttributeStringPtr aPathAttr = aData->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID());
+    AttributeStringPtr aPathAttr =
+        aData->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID());
     aPathAttr->setValue(aFilePathAttr->value());
     aImportFeature->execute();
   }

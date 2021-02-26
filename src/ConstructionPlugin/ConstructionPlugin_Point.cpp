@@ -144,9 +144,10 @@ void ConstructionPlugin_Point::execute()
   removeResults(1); // for case the point type was switched from multi-results type
   std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setInfinite(true);
-  aConstr->setShape(aShape);  
+  aConstr->setShape(aShape);
+  /// set point color
   aConstr->setColor(ModelAPI_ResultConstruction::ModelApi_PointColor::DEFAULT_COLOR(),
-                    ModelAPI_ResultConstruction::ModelApi_PointColor::COLOR_CONFIG_NAME()); /// set point color
+                    ModelAPI_ResultConstruction::ModelApi_PointColor::COLOR_CONFIG_NAME());
   setResult(aConstr);
 }
 

@@ -23,7 +23,7 @@
 #include <TopoDS_Iterator.hxx>
 
 void CollectionPlugin_GroupShape::execute()
-{  
+{
   ResultGroupPtr aGroup;
   CollectionPlugin_GroupMerge::execute(aGroup);
   GeomShapePtr aCompound = aGroup->shape();

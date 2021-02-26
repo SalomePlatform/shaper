@@ -34,7 +34,8 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(
 }
 
 SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                                         double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter)
+                                         double theX1, double theY1, double theX2, double theY2,
+                                         bool isFirstPointCenter)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -44,7 +45,8 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature>
 
 SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                                          const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                                         const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint, bool isFirstPointCenter)
+                                         const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,
+                                         bool isFirstPointCenter)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -59,7 +61,7 @@ SketchAPI_Rectangle::~SketchAPI_Rectangle()
 //--------------------------------------------------------------------------------------
 void SketchAPI_Rectangle::setByCoordinates(
     double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter)
-{  
+{
   if(isFirstPointCenter){
     fillAttribute(centerPoint(), theX1, theY1);
     double xStart = 2.0*theX1 - theX2;
@@ -74,7 +76,8 @@ void SketchAPI_Rectangle::setByCoordinates(
 }
 
 void SketchAPI_Rectangle::setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                                      const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint, bool isFirstPointCenter)
+                                      const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint,
+                                      bool isFirstPointCenter)
 {  
   if(isFirstPointCenter){
     fillAttribute(theFirstPoint, centerPoint());
@@ -112,7 +115,8 @@ void SketchAPI_Rectangle::dump(ModelHighAPI_Dumper& theDumper) const
   /// do not dump sub-features eg: lines and lines constraints
   AttributeRefListPtr noToDumpList =  aBase->reflist(SketchPlugin_Rectangle::NOT_TO_DUMP_LIST_ID());
   for( int i = 0; i < noToDumpList->size(); i++){
-    theDumper.doNotDumpFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(noToDumpList->object(i)));
+    theDumper.doNotDumpFeature(
+          std::dynamic_pointer_cast<ModelAPI_Feature>(noToDumpList->object(i)));
   }
 
   if (isCopy())
@@ -120,7 +124,8 @@ void SketchAPI_Rectangle::dump(ModelHighAPI_Dumper& theDumper) const
 
   const std::string& aSketchName = theDumper.parentName(aBase);
 
-  FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aBase->refattr(SketchPlugin_Rectangle::CENTER_REF_ID())->object());
+  FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+        aBase->refattr(SketchPlugin_Rectangle::CENTER_REF_ID())->object());
   if(aCenterPointFeature){
     // rectangle has center
     theDumper << aBase << " = " << aSketchName << ".addRectangle("

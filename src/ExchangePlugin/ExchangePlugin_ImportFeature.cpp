@@ -85,13 +85,13 @@ void ExchangePlugin_ImportFeatureBase::initAttributes()
 void ExchangePlugin_ImportFeature::initAttributes()
 {
   ExchangePlugin_ImportFeatureBase::initAttributes();
-   
+
   data()->addAttribute(STEP_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(IMPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_COLORS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_SCALE_INTER_UNITS_ID(), ModelAPI_AttributeBoolean::typeId());
- 
+
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::STEP_COLORS_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
@@ -206,7 +206,6 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   }
 
   // Pass the results into the model
- 
   loadNamingDS(aGeomShape, aResult);
 
   // create color group

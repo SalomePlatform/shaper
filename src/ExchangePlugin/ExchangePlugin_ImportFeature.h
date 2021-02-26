@@ -168,7 +168,7 @@ protected:
   /// Performs the import of XAO file
   EXCHANGEPLUGIN_EXPORT void importXAO(const std::string& theFileName);
 
-private:                   
+private:
   /// Set groups of color
   void setColorGroups(std::shared_ptr<ModelAPI_ResultBody> theResultBody);
 

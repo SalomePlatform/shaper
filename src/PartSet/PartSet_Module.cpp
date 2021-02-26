@@ -210,10 +210,11 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
                                    "Construction color",  Config_Prop::Color,
                                    ModelAPI_ResultConstruction::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization",
-                                   ModelAPI_ResultConstruction::ModelApi_PointColor::COLOR_CONFIG_NAME(),
-                                   "Construction point color", Config_Prop::Color,
-                                   ModelAPI_ResultConstruction::ModelApi_PointColor::DEFAULT_COLOR());
+  Config_PropManager::registerProp(
+        "Visualization",
+        ModelAPI_ResultConstruction::ModelApi_PointColor::COLOR_CONFIG_NAME(),
+        "Construction point color", Config_Prop::Color,
+        ModelAPI_ResultConstruction::ModelApi_PointColor::DEFAULT_COLOR());
 
 
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",

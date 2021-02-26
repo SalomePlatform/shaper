@@ -61,7 +61,8 @@ std::shared_ptr<GeomAPI_Shape> ImageImport(const std::string& theFileName,
     aTriVertexes[2] = BRepBuilderAPI_MakeVertex (aPnt3);
     aTriVertexes[3] = BRepBuilderAPI_MakeVertex (aPnt4);
 
-    aWire = BRepBuilderAPI_MakePolygon (aTriVertexes[0], aTriVertexes[1], aTriVertexes[2], aTriVertexes[3], Standard_True);
+    aWire = BRepBuilderAPI_MakePolygon (aTriVertexes[0], aTriVertexes[1], aTriVertexes[2],
+        aTriVertexes[3], Standard_True);
 
     BRepBuilderAPI_Sewing aSewingTool;
     aSewingTool.Init (1.0e-06, Standard_True);
@@ -93,7 +94,7 @@ std::shared_ptr<GeomAPI_Shape> ImageImport(const std::string& theFileName,
   }
 
   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-  aGeomShape->setImpl(new TopoDS_Shape(aResShape));  
+  aGeomShape->setImpl(new TopoDS_Shape(aResShape));
 
   return aGeomShape;
 }

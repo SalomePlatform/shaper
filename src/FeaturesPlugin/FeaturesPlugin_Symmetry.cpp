@@ -203,7 +203,8 @@ GeomTrsfPtr FeaturesPlugin_Symmetry::symmetryByPlane()
 void FeaturesPlugin_Symmetry::buildResult(
     const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
-    std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex, std::string & theTextureFile)
+    std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex,
+    std::string & theTextureFile)
 {
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);

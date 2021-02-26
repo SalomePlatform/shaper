@@ -244,7 +244,8 @@ void ExchangeAPI_Import_Image::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   std::string aPartName = theDumper.name(aBase->document());
 
-  std::string aFilePath = aBase->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID())->value();
+  std::string aFilePath =
+      aBase->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID())->value();
 
   theDumper << aBase << " = model.addImportImage(" << aPartName << ", \""
             << aFilePath << "\")" << std::endl;

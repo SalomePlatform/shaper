@@ -28,18 +28,21 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(
+    const std::shared_ptr<ModelAPI_Feature>& theFeature)
   : SketchAPI_SketchEntity(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                   double theStartX,
-                                                   double theStartY,
-                                                   double theSecondX,
-                                                   double theSecondY, bool isFirstPointCenter):
+SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(
+    const std::shared_ptr<ModelAPI_Feature>& theFeature,
+    double theStartX,
+    double theStartY,
+    double theSecondX,
+    double theSecondY,
+    bool isFirstPointCenter):
   SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
@@ -51,9 +54,10 @@ SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAP
 }
 
 //==================================================================================================
-SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isFirstPointCenter):
+SketchAPI_MacroRectangle::SketchAPI_MacroRectangle(
+    const std::shared_ptr<ModelAPI_Feature>& theFeature,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isFirstPointCenter):
   SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
@@ -80,8 +84,9 @@ void SketchAPI_MacroRectangle::setByStartAndEndPoints(double theStartX, double t
 }
 
 //==================================================================================================
-void SketchAPI_MacroRectangle::setByStartAndEndPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                                                      const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint)
+void SketchAPI_MacroRectangle::setByStartAndEndPoints(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint)
 {
   fillAttribute(SketchPlugin_MacroRectangle::START_END_POINT_TYPE_ID(), rectangleType());
   fillAttribute(theStartPoint, startPoint1());
@@ -91,7 +96,8 @@ void SketchAPI_MacroRectangle::setByStartAndEndPoints(const std::shared_ptr<Geom
 }
 
 //==================================================================================================
-void SketchAPI_MacroRectangle::setByCenterAndEndPoints(double theCenterX, double theCenterY, double theEndX, double theEndY)
+void SketchAPI_MacroRectangle::setByCenterAndEndPoints(double theCenterX, double theCenterY,
+                                                       double theEndX, double theEndY)
 {
   fillAttribute(SketchPlugin_MacroRectangle::CENTER_END_POINT_TYPE_ID(), rectangleType());
   fillAttribute(endPoint2(), theEndX, theEndY);
@@ -100,7 +106,9 @@ void SketchAPI_MacroRectangle::setByCenterAndEndPoints(double theCenterX, double
 }
 
 //==================================================================================================
-void SketchAPI_MacroRectangle::setByCenterAndEndPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint, const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint){
+void SketchAPI_MacroRectangle::setByCenterAndEndPoints(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint){
   fillAttribute(SketchPlugin_MacroRectangle::CENTER_END_POINT_TYPE_ID(), rectangleType());
   fillAttribute(theEndPoint, endPoint2());
   fillAttribute(theCenterPoint, centerPoint());

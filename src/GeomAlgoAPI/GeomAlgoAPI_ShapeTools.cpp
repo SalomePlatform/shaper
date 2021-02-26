@@ -226,7 +226,8 @@ double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
 }
 
 double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
-                                               const GeomShapePtr& theShape2, std::array<double, 3> & fromShape1To2)
+                                               const GeomShapePtr& theShape2,
+                                               std::array<double, 3> & fromShape1To2)
 {
   BRepExtrema_DistShapeShape aDist = getExtemaDistShape(theShape1, theShape2);
   const auto & pt1 = aDist.PointOnShape1(1);

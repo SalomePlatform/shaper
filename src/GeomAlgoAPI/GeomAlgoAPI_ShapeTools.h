@@ -68,7 +68,8 @@ public:
   GEOMALGOAPI_EXPORT static double minimalDistance(const GeomShapePtr& theShape1,
                                                    const GeomShapePtr& theShape2);
   GEOMALGOAPI_EXPORT static double minimalDistance(const GeomShapePtr& theShape1,
-                                                   const GeomShapePtr& theShape2, std::array<double, 3> & fromShape1To2);
+                                                   const GeomShapePtr& theShape2,
+                                                   std::array<double, 3> & fromShape1To2);
 
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.

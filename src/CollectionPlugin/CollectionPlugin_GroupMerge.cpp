@@ -80,5 +80,5 @@ void CollectionPlugin_GroupMerge::execute(ResultGroupPtr & aGroup)
   aGroup->store(aCompound);
 
   // update the type of selection
-  updateGroupType(LIST_ID());  
+  updateGroupType(LIST_ID());
 }

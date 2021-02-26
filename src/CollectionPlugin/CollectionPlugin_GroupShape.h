@@ -36,7 +36,7 @@ public:
   {
     static const std::string MY_GROUP_ID("GroupShape");
     return MY_GROUP_ID;
-  }  
+  }
 
   /// Returns the kind of a feature
   COLLECTIONPLUGIN_EXPORT virtual const std::string& getKind()

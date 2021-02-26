@@ -38,7 +38,7 @@
  */
 class ExchangePlugin_ImportBase : public ModelAPI_Feature
 {
- public:  
+ public:
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {

@@ -47,8 +47,7 @@ const double tolerance = 1e-7;
 
 SketchPlugin_MacroRectangle::SketchPlugin_MacroRectangle()
   : SketchPlugin_SketchEntity(), myHasCenterPoint(false)
-{  
-}
+{}
 
 void SketchPlugin_MacroRectangle::initAttributes()
 {
@@ -139,32 +138,41 @@ void SketchPlugin_MacroRectangle::execute()
 
   if(myHasCenterPoint){
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          myRectangleFeature->attribute(SketchPlugin_Rectangle::CENTER_ID()))->setValue(myCenterPoint->x(),
-                                                                                        myCenterPoint->y());
+          myRectangleFeature->attribute(
+            SketchPlugin_Rectangle::CENTER_ID()))->setValue(myCenterPoint->x(),
+                                                            myCenterPoint->y());
   }
 
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        myRectangleFeature->attribute(SketchPlugin_Rectangle::START_ID()))->setValue(myStartPoint->x(),
-                                                                                     myStartPoint->y());
+        myRectangleFeature->attribute(
+          SketchPlugin_Rectangle::START_ID()))->setValue(myStartPoint->x(),
+                                                         myStartPoint->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        myRectangleFeature->attribute(SketchPlugin_Rectangle::END_ID()))->setValue(myEndPoint->x(),
-                                                                                   myEndPoint->y());
+        myRectangleFeature->attribute(
+          SketchPlugin_Rectangle::END_ID()))->setValue(myEndPoint->x(),
+                                                       myEndPoint->y());
 
   myRectangleFeature->boolean(SketchPlugin_Rectangle::AUXILIARY_ID())
       ->setValue(boolean(AUXILIARY_ID())->value());
   myRectangleFeature->execute();
 
   /// create coincidences with rectangle start/center and  end points
-  AttributeRefListPtr aLinesList = myRectangleFeature->reflist(SketchPlugin_Rectangle::LINES_LIST_ID());
-  FeaturePtr aRectangleStartLineFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(0));
-  FeaturePtr aRectangleEndLineFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(2));
+  AttributeRefListPtr aLinesList =
+      myRectangleFeature->reflist(SketchPlugin_Rectangle::LINES_LIST_ID());
+  FeaturePtr aRectangleStartLineFeature =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(0));
+  FeaturePtr aRectangleEndLineFeature =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(aLinesList->object(2));
   std::shared_ptr<GeomDataAPI_Point2D> aRectanglePointEndAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRectangleEndLineFeature->attribute(SketchPlugin_Line::END_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aRectangleEndLineFeature->attribute(SketchPlugin_Line::END_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aRectanglePointStartAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRectangleStartLineFeature->attribute(SketchPlugin_Line::END_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aRectangleStartLineFeature->attribute(SketchPlugin_Line::END_ID()));
 
   if(myHasCenterPoint){
-    FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myRectangleFeature->refattr(CENTER_REF_ID())->object());
+    FeaturePtr aCenterPointFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+          myRectangleFeature->refattr(CENTER_REF_ID())->object());
     SketchPlugin_Tools::createCoincidenceOrTangency(
           this, CENTER_REF_ID(), AttributePtr(), aCenterPointFeature, false);
     SketchPlugin_Tools::createCoincidenceOrTangency(

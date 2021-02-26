@@ -48,7 +48,8 @@ public:
   SKETCHAPI_EXPORT
   SketchAPI_MacroRectangle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint, bool isFirstPointCenter = false);
+                        const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint,
+                           bool isFirstPointCenter = false);
 
 
   /// Destructor.

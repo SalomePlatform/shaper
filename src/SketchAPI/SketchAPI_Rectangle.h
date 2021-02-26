@@ -42,26 +42,33 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter = false);
+                      double theX1, double theY1, double theX2, double theY2,
+                      bool isFirstPointCenter = false);
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                       const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint, bool isFirstPointCenter = false);
+                      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,
+                      bool isFirstPointCenter = false);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rectangle();
 
   INTERFACE_4(SketchPlugin_Rectangle::ID(),
-              startPoint, SketchPlugin_Rectangle::START_ID(), GeomDataAPI_Point2D, /** Start point */,
-              endPoint, SketchPlugin_Rectangle::END_ID(), GeomDataAPI_Point2D, /** End point */,
-              centerPoint, SketchPlugin_Rectangle::CENTER_ID(), GeomDataAPI_Point2D, /** Center point */,
-              linesList, SketchPlugin_Rectangle::LINES_LIST_ID(), ModelAPI_AttributeRefList, /** Lines list */
+              startPoint, SketchPlugin_Rectangle::START_ID(), GeomDataAPI_Point2D,
+              /** Start point */,
+              endPoint, SketchPlugin_Rectangle::END_ID(), GeomDataAPI_Point2D,
+              /** End point */,
+              centerPoint, SketchPlugin_Rectangle::CENTER_ID(), GeomDataAPI_Point2D,
+              /** Center point */,
+              linesList, SketchPlugin_Rectangle::LINES_LIST_ID(), ModelAPI_AttributeRefList,
+              /** Lines list */
   )
 
   /// Set by coordinates
   SKETCHAPI_EXPORT
-  void setByCoordinates(double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter);
+  void setByCoordinates(double theX1, double theY1, double theX2, double theY2,
+                        bool isFirstPointCenter);
 
   /// Set by points
   SKETCHAPI_EXPORT

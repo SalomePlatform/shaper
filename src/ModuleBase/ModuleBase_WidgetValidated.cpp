@@ -504,7 +504,8 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetValidated::getFilteredSelected()
 
     std::vector<ModuleBase_ViewerPrsPtr> aRemove;
 
-    if (myFeatureId == BuildPlugin_Face::ID() && shapeTypes.find(GeomAPI_Shape::FACE) != shapeTypes.end())
+    if (myFeatureId == BuildPlugin_Face::ID() && shapeTypes.find(GeomAPI_Shape::FACE)
+        != shapeTypes.end())
     {
       for(auto aSelection: aSelected){
         auto aType = aSelection->shape()->shapeType();
@@ -512,7 +513,8 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetValidated::getFilteredSelected()
           aRemove.push_back(aSelection);
       }
     }
-    else if (myFeatureId == BuildPlugin_Wire::ID() && shapeTypes.find(GeomAPI_Shape::WIRE) != shapeTypes.end())
+    else if (myFeatureId == BuildPlugin_Wire::ID() && shapeTypes.find(GeomAPI_Shape::WIRE)
+             != shapeTypes.end())
     {
       for(auto aSelection: aSelected){
         auto aType = aSelection->shape()->shapeType();
