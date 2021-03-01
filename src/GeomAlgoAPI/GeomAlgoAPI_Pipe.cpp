@@ -31,6 +31,7 @@
 #include <BRepOffsetAPI_MakePipe.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BOPAlgo_ArgumentAnalyzer.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <gp_Lin.hxx>
@@ -113,10 +114,23 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   aPipeBuilder->Build();
 
   // Checking result.
-  if(!aPipeBuilder->IsDone() || aPipeBuilder->Shape().IsNull()) {
+  if (!aPipeBuilder->IsDone() || aPipeBuilder->Shape().IsNull()) {
     delete aPipeBuilder;
     return;
   }
+
+  // Check for self-interfering result
+  BOPAlgo_ArgumentAnalyzer aChecker;
+  aChecker.SetShape1(aPipeBuilder->Shape());
+  aChecker.SelfInterMode() = Standard_True;
+  aChecker.StopOnFirstFaulty() = Standard_True;
+  aChecker.Perform();
+  if (aChecker.HasFaulty()) {
+    myError = "Self-interfering result.";
+    delete aPipeBuilder;
+    return;
+  }
+
   this->initialize(aPipeBuilder);
 
   // Setting naming.
