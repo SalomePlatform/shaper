@@ -239,6 +239,7 @@ ADD_UNIT_TESTS(
 
   TestArcBehavior.py
   TestBSplineAddPole.py
+  TestCenteredRectangle.py
   TestChangeSketchPlane1.py
   TestChangeSketchPlane2.py
   TestChangeSketchPlane3.py
