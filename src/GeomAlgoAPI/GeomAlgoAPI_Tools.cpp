@@ -76,14 +76,14 @@ bool AlgoError::isAlgorithmFailed(const GeomMakeShapePtr& theAlgorithm,
   if (!theAlgorithm->shape() || theAlgorithm->shape()->isNull()) {
     theError = "Error: Resulting shape";
     if (!theFeature.empty())
-      theError += "of " + theFeature;
+      theError += " of " + theFeature;
     theError += " is Null.";
     return true;
   }
   if (!theAlgorithm->isValid()) {
     theError = "Error: Resulting shape";
     if (!theFeature.empty())
-      theError += "of " + theFeature;
+      theError += " of " + theFeature;
     theError += " is not valid.";
     return true;
   }
