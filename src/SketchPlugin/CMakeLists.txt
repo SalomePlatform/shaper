@@ -236,6 +236,7 @@ ADD_UNIT_TESTS(
   Test20274_1.py
   Test20274_2.py
   Test20274_3.py
+  Test24015.py
 
   TestArcBehavior.py
   TestBSplineAddPole.py

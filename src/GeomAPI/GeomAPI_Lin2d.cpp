@@ -80,8 +80,8 @@ const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::intersect(
     const std::shared_ptr<GeomAPI_Lin2d>& theLine) const
 {
   IntAna2d_AnaIntersection anInter(*MY_LIN2D, theLine->impl<gp_Lin2d>());
-  if (!anInter.IsDone() || anInter.IsEmpty())
-  return std::shared_ptr<GeomAPI_Pnt2d>();
+  if (!anInter.IsDone() || anInter.NbPoints() == 0)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
   const gp_Pnt2d& aResult = anInter.Point(1).Value();
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
