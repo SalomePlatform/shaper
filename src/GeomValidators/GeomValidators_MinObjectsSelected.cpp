@@ -21,7 +21,10 @@
 
 #include <Events_InfoMessage.h>
 
+#include <BuildPlugin_Interpolation.h>
+
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
 //=================================================================================================
@@ -29,17 +32,25 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
                                                 const std::list<std::string>& theArguments,
                                                 Events_InfoMessage& theError) const
 {
-  if(theArguments.size() != 2) {
+  if (theArguments.size() != 2) {
 // LCOV_EXCL_START
     theError =
       "Error: Wrong number of arguments (expected 2): selection list id and min number of objects";
     return false;
 // LCOV_EXCL_STOP
   }
+  //"Interpolation"
+  if (theFeature->name().substr(0, 6) == L"Interp")
+  {
+    AttributeStringPtr anAttr =theFeature->string(BuildPlugin_Interpolation::CREATION_METHOD_ID());
+    if (anAttr->isInitialized())
+      if (anAttr->value() == BuildPlugin_Interpolation::CREATION_METHOD_ANALYTICAL_ID())
+        return true;
+  }
 
   std::string aSelectionListId = theArguments.front();
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(aSelectionListId);
-  if(!anAttrSelList.get()) {
+  if (!anAttrSelList.get()) {
 // LCOV_EXCL_START
     theError = "Error: Could not get attribute \"%1\".";
     theError.arg(aSelectionListId);
@@ -50,7 +61,7 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
 
   int aMinObjectsNb = atoi(theArguments.back().c_str());
 
-  if(anObjectsNb < aMinObjectsNb) {
+  if (anObjectsNb < aMinObjectsNb) {
     theError = "Error: Attribute \"%1\" should contain at least %2 items.";
     theError.arg(aSelectionListId).arg(aMinObjectsNb);
     return false;

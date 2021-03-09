@@ -24,6 +24,8 @@
 
 #include <BuildPlugin_Interpolation.h>
 
+#include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 #include <ModelHighAPI_Selection.h>
@@ -54,11 +56,21 @@ public:
                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                     const bool theIsClosed, const bool theIsToReorder);
 
+  /// Constructor with expression analytical of X,Y andZ
+  BUILDAPI_EXPORT
+    explicit BuildAPI_Interpolation(const FeaturePtr& theFeature,
+                                    const std::string & theXTexpression,
+                                    const std::string & theYTexpression,
+                                    const std::string & theZTexpression,
+                                    const ModelHighAPI_Double& theMinT,
+                                    const ModelHighAPI_Double& theMaxT,
+                                    const ModelHighAPI_Integer& theNbStep);
+
   /// Destructor.
   BUILDAPI_EXPORT
   virtual ~BuildAPI_Interpolation();
 
-  INTERFACE_6(BuildPlugin_Interpolation::ID(),
+  INTERFACE_13(BuildPlugin_Interpolation::ID(),
               baseObjects, BuildPlugin_Interpolation::BASE_OBJECTS_ID(),
               ModelAPI_AttributeSelectionList, /** Base objects */,
               closed, BuildPlugin_Interpolation::CLOSED_ID(),
@@ -70,7 +82,21 @@ public:
               startTangent, BuildPlugin_Interpolation::TANGENT_START_ID(),
               ModelAPI_AttributeSelection, /** Start point tangent */,
               endTangent, BuildPlugin_Interpolation::TANGENT_END_ID(),
-              ModelAPI_AttributeSelection, /** End point tangent */)
+              ModelAPI_AttributeSelection, /** End point tangent */,
+              xt, BuildPlugin_Interpolation::XT_ID(),
+              ModelAPI_AttributeString, /** xt expression*/,
+              yt, BuildPlugin_Interpolation::YT_ID(),
+              ModelAPI_AttributeString, /** yt expression*/,
+              zt, BuildPlugin_Interpolation::ZT_ID(),
+              ModelAPI_AttributeString, /** zt expression*/,
+              mint, BuildPlugin_Interpolation::MINT_ID(),
+              ModelAPI_AttributeDouble, /** Min*/,
+              maxt, BuildPlugin_Interpolation::MAXT_ID(),
+              ModelAPI_AttributeDouble, /** Max*/,
+              numstep, BuildPlugin_Interpolation::NUMSTEP_ID(),
+              ModelAPI_AttributeInteger, /** Number of steps*/,
+              creationmethod, BuildPlugin_Interpolation::CREATION_METHOD_ID(),
+              ModelAPI_AttributeString, /** Creation method*/)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
@@ -117,5 +143,16 @@ InterpolationPtr addInterpolation(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Selection& theEndTangent,
                                   const bool theIsClosed = false,
                                   const bool theIsToReorder = false);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Interpolation feature using tangents.
+BUILDAPI_EXPORT
+InterpolationPtr addInterpolation(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::string & theXTexpression,
+                                  const std::string & theYTexpression,
+                                  const std::string & theZTexpression,
+                                  const ModelHighAPI_Double& theMinT,
+                                  const ModelHighAPI_Double& theMaxT,
+                                  const ModelHighAPI_Integer& theNbStep);
 
 #endif // BuildAPI_Interpolation_H_

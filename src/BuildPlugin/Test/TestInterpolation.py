@@ -19,6 +19,8 @@
 
 from salome.shaper import model
 
+import math
+
 # Create document
 model.begin()
 partSet = model.moduleDocument()
@@ -172,6 +174,22 @@ model.testHaveNamingSubshapes(Interpolation_9, model, Part_3_doc)
 model.end()
 
 # =============================================================================
-# Test 12. Check Python dump
+# Test 12. Create curve using an analytical expression
+# =============================================================================
+Part_5 = model.addPart(partSet)
+Part_5_doc = Part_5.document()
+
+Interpolation_11 = model.addInterpolation(Part_5_doc, "sin(t)","cos(t)","t", 0, 100, 100)
+model.do()
+model.testNbResults(Interpolation_11, 1)
+myDelta = 1e-6
+Props = model.getGeometryCalculation(Part_5_doc,model.selection("EDGE", "Interpolation_1_1"))
+model.do()
+aRefLength = 141.32010978124
+aResLength = Props[0]
+assert (math.fabs(aResLength - aRefLength) < myDelta), "The length is wrong: expected = {0}, real = {1}".format(aRefLength, aResLength)
+model.end()
+# =============================================================================
+# Test 13. Check Python dump
 # =============================================================================
 assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))
