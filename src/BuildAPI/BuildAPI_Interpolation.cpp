@@ -173,7 +173,7 @@ void BuildAPI_Interpolation::dump(ModelHighAPI_Dumper& theDumper) const
     AttributeIntegerPtr nbStepAttr = numstep();
     int nbStep = nbStepAttr->value();
 
-    theDumper<< ", \""  << xt << "\",\"" << yt << "\",\""<< zt<< "\", " ;
+    theDumper<< ", \""  << xt << "\", \"" << yt << "\", \""<< zt<< "\", " ;
     theDumper << mint << ", " << maxt << ", "<< nbStep<< ")"<<std::endl;
   }
 }

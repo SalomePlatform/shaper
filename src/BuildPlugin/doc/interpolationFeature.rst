@@ -26,7 +26,7 @@ Interpolation analytical
 
 Interpolation by selection
 """"""""""""""""""""""""""
-The  property panel is shown below.
+The property panel is shown below.
 
 .. figure:: images/Interpolation.png
   :align: center
@@ -80,14 +80,12 @@ The result of the operation will be a curve created from the selected shapes:
 Interpolation analytical
 """"""""""""""""""""""""
 
-The  property panel is shown below.
+The property panel is shown below.
 
 .. figure:: images/InterpolationAnalytical.png
   :align: center
 
   Create an interpolation analytical
-
-Select one or several vertices or points in the viewer.
 
 - **Curves parameters** panel allows to define the mathematical expression for creating the interpolated curve.
    - **X(t) equation** define the expression of X with t variable.
