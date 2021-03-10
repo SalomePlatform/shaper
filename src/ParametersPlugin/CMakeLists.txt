@@ -118,14 +118,23 @@ INSTALL(TARGETS ParametersPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(FILES ${QM_RESOURCES} DESTINATION ${SHAPER_INSTALL_QM_RESOURCES})
 
-ADD_UNIT_TESTS(TestParameterCreation.py
-               TestParameterRename.py
-               TestParameterChangeValue.py
-               TestParameterDelete.py
-               TestParameterErrorMsg.py
-               TestParametersMgr.py
-               Test1806.py
-               Test2392.py
-               Test2474.py
-               Test19036.py
-              )
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/ParametersPlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

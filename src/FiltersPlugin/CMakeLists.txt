@@ -107,106 +107,24 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(FILES ${PROJECT_PYFILES} DESTINATION ${SHAPER_INSTALL_ADDONS})
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
+include(tests.set)
 
-ADD_UNIT_TESTS(
-  TestFilters.py
-  TestFilters_Mixed1.py
-  TestFilters_Mixed2.py
-  TestFilters_Supported.py
-  TestFilters_Validator.py
-  TestFilters_Xml.py
-  TestFilters_FilterName.py
-  TestFilters_IsReversed.py
-  TestFilters_Remove.py
-  TestFilter_BelongsTo.py
-  TestFilter_BelongsTo_Exclude.py
-  TestFilter_OnPlane.py
-  TestFilter_OnPlane_Exclude.py
-  TestFilter_OnPlane_Multi.py
-  TestFilter_OnLine.py
-  TestFilter_OnLine_Exclude.py
-  TestFilter_OnLine_Multi.py
-  TestFilter_OnGeometry_Edge1.py
-  TestFilter_OnGeometry_Edge2.py
-  TestFilter_OnGeometry_Face1.py
-  TestFilter_OnGeometry_Face2.py
-  TestFilter_OnGeometry_Face3.py
-  TestFilter_OnGeometry_Face4.py
-  TestFilter_OnGeometry_Exclude_Edge1.py
-  TestFilter_OnGeometry_Exclude_Edge2.py
-  TestFilter_OnGeometry_Exclude_Face1.py
-  TestFilter_OnGeometry_Exclude_Face2.py
-  TestFilter_OnGeometry_Exclude_Face3.py
-  TestFilter_OnGeometry_Exclude_Face4.py
-  TestFilter_OnPlaneSide_Face.py
-  TestFilter_OnPlaneSide_Plane.py
-  TestFilter_OnPlaneSide_Exclude_Face.py
-  TestFilter_OnPlaneSide_Exclude_Plane.py
-  TestFilter_OnPlaneSide_Multi.py
-  TestFilter_OppositeToEdge.py
-  TestFilter_OppositeToEdge_Exclude.py
-  TestFilter_RelativeToSolid_In.py
-  TestFilter_RelativeToSolid_Out.py
-  TestFilter_RelativeToSolid_On.py
-  TestFilter_RelativeToSolid_NotOn.py
-  TestFilter_RelativeToSolid_InAndOn.py
-  TestFilter_RelativeToSolid_OutAndOn.py
-  TestFilter_RelativeToSolid_Exclude_In.py
-  TestFilter_RelativeToSolid_Exclude_Out.py
-  TestFilter_RelativeToSolid_Exclude_On.py
-  TestFilter_RelativeToSolid_Exclude_NotOn.py
-  TestFilter_RelativeToSolid_Exclude_InAndOn.py
-  TestFilter_RelativeToSolid_Exclude_OutAndOn.py
-  TestFilter_RelativeToSolid_Multi.py
-  TestFilter_ExternalFaces1.py
-  TestFilter_ExternalFaces2.py
-  TestFilter_ExternalFaces_Exclude1.py
-  TestFilter_ExternalFaces_Exclude2.py
-  TestFilter_HorizontalFaces.py
-  TestFilter_HorizontalFaces_Exclude.py
-  TestFilter_VerticalFaces.py
-  TestFilter_VerticalFaces_Exclude.py
-  TestFilter_TopoConnectedFaces_Vertex1.py
-  TestFilter_TopoConnectedFaces_Vertex2.py
-  TestFilter_TopoConnectedFaces_Vertex3.py
-  TestFilter_TopoConnectedFaces_Prop_Vertex1.py
-  TestFilter_TopoConnectedFaces_Prop_Vertex2.py
-  TestFilter_TopoConnectedFaces_Prop_Vertex3.py
-  TestFilter_TopoConnectedFaces_Edge1.py
-  TestFilter_TopoConnectedFaces_Edge2.py
-  TestFilter_TopoConnectedFaces_Edge3.py
-  TestFilter_TopoConnectedFaces_Prop_Edge1.py
-  TestFilter_TopoConnectedFaces_Prop_Edge2.py
-  TestFilter_TopoConnectedFaces_Prop_Edge3.py
-  TestFilter_TopoConnectedFaces_Face1.py
-  TestFilter_TopoConnectedFaces_Face2.py
-  TestFilter_TopoConnectedFaces_Face3.py
-  TestFilter_TopoConnectedFaces_Prop_Face1.py
-  TestFilter_TopoConnectedFaces_Prop_Face2.py
-  TestFilter_TopoConnectedFaces_Prop_Face3.py
-  TestFilter_TopoConnectedFaces_Exclude_Vertex1.py
-  TestFilter_TopoConnectedFaces_Exclude_Vertex2.py
-  TestFilter_TopoConnectedFaces_Exclude_Vertex3.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex1.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex2.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex3.py
-  TestFilter_TopoConnectedFaces_Exclude_Edge1.py
-  TestFilter_TopoConnectedFaces_Exclude_Edge2.py
-  TestFilter_TopoConnectedFaces_Exclude_Edge3.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge1.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge2.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge3.py
-  TestFilter_TopoConnectedFaces_Exclude_Face1.py
-  TestFilter_TopoConnectedFaces_Exclude_Face2.py
-  TestFilter_TopoConnectedFaces_Exclude_Face3.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Face1.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Face2.py
-  TestFilter_TopoConnectedFaces_Prop_Exclude_Face3.py
-  TestFilter_TopoConnectedFaces_Multi.py
-  Test2946.py
-  Test2951.py
-  Test3241.py
-  Test17924.py
-  Test17962.py
-  Test19190.py
-)
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/FiltersPlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})
+

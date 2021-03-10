@@ -1,0 +1,234 @@
+# Copyright (C) 2021  CEA/DEN, EDF R&D
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+SET(TEST_NAMES
+  Test1061.py
+  Test1577.py
+  Test1578.py
+  Test1673.py
+  Test1779.py
+  Test1924.py
+  Test1963.py
+  Test1966.py
+  Test1967.py
+  Test2034_1.py
+  Test2034_2.py
+  Test2034_3.py
+  Test2062.py
+  Test2095.py
+  Test2115.py
+  Test2119.py
+  Test2134.py
+  Test2157.py
+  Test2157_2.py
+  Test2224.py
+  Test2229.py
+  Test2239.py
+  Test2273.py
+  Test2280.py
+  Test2287.py
+  Test2341.py
+  Test2376.py
+  Test2390.py
+  Test2393.py
+  Test2425.py
+  Test2427.py
+  Test2440.py
+  Test2481.py
+  Test2654.py
+  Test2711.py
+  Test2741.py
+  Test2810.py
+  Test2824.py
+  Test2860.py
+  Test2894.py
+  Test3019.py
+  Test3087_1.py
+  Test3087_2.py
+  Test3132.py
+  Test3154.py
+  Test3170.py
+  Test3240.py
+  Test19089.py
+  Test19101.py
+  Test20274_1.py
+  Test20274_2.py
+  Test20274_3.py
+  Test24015.py
+
+  TestArcBehavior.py
+  TestBSplineAddPole.py
+  TestCenteredRectangle.py
+  TestChangeSketchPlane1.py
+  TestChangeSketchPlane2.py
+  TestChangeSketchPlane3.py
+  TestChangeSketchPlane4.py
+  TestConstraintAngle.py
+  TestConstraintAngle_v0_1.py
+  TestConstraintAngle_v0_2.py
+  TestConstraintAngle_v20191210_1.py
+  TestConstraintAngle_v20191210_2.py
+  TestConstraintAngleBehaviorDirect.py
+  TestConstraintAngleBehaviorSupplementary_1.py
+  TestConstraintAngleBehaviorSupplementary_2.py
+  TestConstraintAngleBehaviorBackward_1.py
+  TestConstraintAngleBehaviorBackward_2.py
+  TestConstraintAngleEllipse.py
+  TestConstraintCoincidence.py
+  TestConstraintCoincidenceBSpline.py
+  TestConstraintCoincidenceEllipse.py
+  TestConstraintCoincidenceEllipticArc.py
+  TestConstraintCollinear.py
+  TestConstraintCollinearEllipse.py
+  TestConstraintDistance.py
+  TestConstraintDistanceEllipse.py
+  TestConstraintDistanceBehavior.py
+  TestConstraintDistanceHorizontal.py
+  TestConstraintDistanceVertical.py
+  TestConstraintDistanceZero.py
+  TestConstraintDistanceHorizontalZero.py
+  TestConstraintDistanceVerticalZero.py
+  TestConstraintEqual.py
+  TestConstraintEqualEllipse.py
+  TestConstraintFixed.py
+  TestConstraintHorizontal.py
+  TestConstraintHorizontalValidator.py
+  TestConstraintLength.py
+  TestConstraintMiddlePoint.py
+  TestConstraintMiddlePointOnArc.py
+  TestConstraintMiddlePointOnEllipticArc.py
+  TestConstraintParallel.py
+  TestConstraintPerpendicular.py
+  TestConstraintPerpendicularArcLine.py
+  TestConstraintPerpendicularEllipseLine.py
+  TestConstraintRadius.py
+  TestConstraintRadiusFailure.py
+  TestConstraintTangent.py
+  TestConstraintTangentBSpline.py
+  TestConstraintTangentEllipse.py
+  TestConstraintTangentEllipticArc.py
+  TestConstraintVertical.py
+  TestCreateArcByCenterStartEnd.py
+  TestCreateArcByTangentEdge.py
+  TestCreateArcByThreePoints.py
+  TestCreateArcByTransversalLine.py
+  TestCreateArcChangeType.py
+  TestCreateBSpline.py
+  TestCreateBSplinePeriodic.py
+  TestCreateCircleByCenterAndPassed.py
+  TestCreateCircleByThreePoints.py
+  TestCreateCircleChangeType.py
+  TestCreateEllipseByCenterSemiaxisAndPassed.py
+  TestCreateEllipseByMajorAxisAndPassed.py
+  TestCreateEllipseByExternal.py
+  TestCreateEllipticArc.py
+  TestCreateEllipticArcByExternal.py
+  TestCreateMacroBSpline.py
+  TestCurveFitting1.py
+  TestCurveFitting2.py
+  TestCurveFitting3.py
+  TestCurveFitting4.py
+  TestDegeneratedGeometry.py
+  TestDistanceDump.py
+  TestDistanceSignedVsUnsigned01.py
+  TestDistanceSignedVsUnsigned02.py
+  TestDistanceSignedVsUnsigned03.py
+  TestDistanceSignedVsUnsigned04.py
+  TestDistanceSignedVsUnsigned05.py
+  TestEdgesOrder.py
+  TestFillet.py
+  TestFilletAfterFolder.py
+  TestFilletInteracting.py
+  TestHighload.py
+  TestIntersectionChangeEdge.py
+  TestIntersectionWithCircle.py
+  TestIntersectionWithLine.py
+  TestIntersectionWithSpline.py
+  TestMirror.py
+  TestMultiRotation.py
+  TestMultiRotation01.py
+  TestMultiRotation02.py
+  TestMultiRotation03.py
+  TestMultiRotation04.py
+  TestMultiRotation05.py
+  TestMultiRotationWithParameter.py
+  TestMultiTranslation.py
+  TestOffset1.py
+  TestOffset2.py
+  TestPresentation.py
+  TestProjection.py
+  TestProjectionBSpline.py
+  TestProjectionBSplinePeriodic.py
+  TestProjectionBSplinePeriodicError.py
+  TestProjectionEllipse.py
+  TestProjectionEllipticArc.py
+  TestProjectionIntoResult.py
+  TestProjectionUpdate.py
+  TestProjectionWithoutReference.py
+  TestRectangle.py
+  TestRemainingDoF.py
+  TestRemoveBSpline.py
+  TestRemoveBSplinePeriodic.py
+  TestRemoveEllipse.py
+  TestRemoveEllipticArc.py
+  TestRemoveSketch.py
+  TestSignedDistancePointLine.py
+  TestSignedDistancePointPoint.py
+  TestSketchCopy01.py
+  TestSketchCopy02.py
+  TestSketchCopy03.py
+  TestSketchCopy04.py
+  TestSketchCopy05.py
+  TestSketchCopy06.py
+  TestSketchCopy07.py
+  TestSketchCopy08.py
+  TestSketchCopy09.py
+  TestSketchCopy10.py
+  TestSketchCopy11.py
+  TestSketchCopy12.py
+  TestSketchCopy13.py
+  TestSketchCopy14.py
+  TestSketchDrawer.py
+  TestSketchPointLine.py
+  TestSnowflake.py
+  TestSplit.py
+  TestSplitEllipse.py
+  TestSplitLine.py
+  TestSplitPreview.py
+  TestTrimArc01.py
+  TestTrimArc02.py
+  TestTrimArc03.py
+  TestTrimArc04.py
+  TestTrimArc05.py
+  TestTrimArc06.py
+  TestTrimArc07.py
+  TestTrimArc08.py
+  TestTrimCircle01.py
+  TestTrimCircle02.py
+  TestTrimCircle03.py
+  TestTrimCircle04.py
+  TestTrimCircle05.py
+  TestTrimCircleAndArc01.py
+  TestTrimEllipse.py
+  TestTrimLine01.py
+  TestTrimLine02.py
+  TestTrimLine03.py
+  TestTrimPreview.py
+  TestUpdateSketch.py
+)

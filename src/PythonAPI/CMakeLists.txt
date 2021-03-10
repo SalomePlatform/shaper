@@ -25,37 +25,23 @@ INSTALL(FILES initConfig.py DESTINATION ${SHAPER_INSTALL_PYTHON_API})
 # --------- Unit tests -----------
 INCLUDE(UnitTest)
 
-ADD_UNIT_TESTS(
-  TestPythonAPI.py
-  TestModel.py
+include(tests.set)
 
-  TestSketcherAddPoint.py
-  TestSketcherAddLine.py
-  TestSketcherAddArc.py
-  TestSketcherAddCircle.py
-  TestSketcherAddMirror.py
-  TestSketcherSetCoincident.py
-  TestSketcherSetTangent.py
-  TestSketcherSetParallel.py
-  TestSketcherSetPerpendicular.py
-  TestSketcherSetHorizontal.py
-  TestSketcherSetVertical.py
-  TestSketcherSetFixed.py
-  TestSketcherSetLength.py
-  TestSketcherSetRadius.py
-  TestSketcherSetAngle.py
-  TestSketcherSetEqual.py
-  TestSketcherSetFillet.py
+ADD_UNIT_TESTS(${TEST_NAMES})
 
-  TestFeatures.py
-  TestFeaturesExtrusion.py
-  TestFeaturesRevolution.py
-
-  TestPrimitivesBox.py
-
-  TestMakeBrick1.py
-  TestMakeBrick2.py
-  TestPlatine.py
-
-  Test2044.py
-  )
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/PythonAPI")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

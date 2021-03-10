@@ -41,7 +41,6 @@ foreach(eachFilePath IN LISTS hdfFilesCur hdfFilesRestr)
   endif()
 endforeach()
 
-SET(COMPONENT_NAME SHAPER)
 SET(TIMEOUT 600)
 
 SET(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/HDFs")

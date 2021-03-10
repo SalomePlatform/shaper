@@ -1,0 +1,74 @@
+# Copyright (C) 2021  CEA/DEN, EDF R&D
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+SET(TEST_NAMES
+               TestVertex.py
+               TestVertex_ErrorMsg.py
+               TestVertex_WholeSketch_1.py
+               TestVertex_WholeSketch_2.py
+               TestEdge.py
+               TestEdge_ByPoints.py
+               TestEdge_ErrorMsg.py
+               TestEdge_WholeSketch_1.py
+               TestEdge_WholeSketch_2.py
+               TestEdge_WholeSketch_3.py
+               TestEdge_WholeSketch_4.py
+               TestWire.py
+               TestWire_ErrorMsg.py
+               TestWire_WholeSketch_1.py
+               TestWire_WholeSketch_2.py
+               TestWire_WholeSketch_3.py
+               TestWire_WholeSketch_4.py
+               TestWire_WholeSketch_5.py
+               TestWire_WholeSketch_6.py
+               TestPolyline.py
+               TestInterpolation.py
+               TestFace.py
+               TestFace_ErrorMsg.py
+               TestFace_WholeSketch_1.py
+               TestFace_WholeSketch_2.py
+               TestShell.py
+               TestShell_WholeSketch_1.py
+               TestShell_WholeSketch_2.py
+               TestSolid.py
+               TestSolid_ErrorMsg.py
+               TestCompSolid.py
+               TestCompound.py
+               TestCompound_ErrorMsg.py
+               TestCompound_History.py
+               TestSubShapes.py
+               TestSubShapes_ErrorMsg.py
+               TestFilling.py
+               TestFilling_ByEdges.py
+               TestFilling_ByWires.py
+               TestFilling_Mixed.py
+               TestFilling_ErrorMsg.py
+               Test1920.py
+               Test2398.py
+               Test2409.py
+               Test2415.py
+               Test2439.py
+               Test2454.py
+               Test3125.py
+               Test3271.py
+               Test19056.py
+               Test20469.py
+               Test20513_1.py
+               Test20513_2.py
+)

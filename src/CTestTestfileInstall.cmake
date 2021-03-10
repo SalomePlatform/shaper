@@ -20,8 +20,31 @@
 SET(SALOME_TEST_DRIVER "$ENV{KERNEL_ROOT_DIR}/bin/salome/appliskel/salome_test_driver.py")
 
 SET(COMPONENT_NAME SHAPER)
+set(SALOME_TEST_LABEL_ADV SHAPR_ADV)
 
 # Add all test subdirs
 SUBDIRS(ConnectorAPI
         HDFs
+        FeaturesPlugin
+        ConstructionPlugin
+        SketchPlugin
+        ModelAPI
+        FiltersPlugin
+        CollectionPlugin
+        BuildPlugin
+        ExchangePlugin
+        PythonAPI
+        GeomAPI
+        ModelHighAPI
+        ParametersPlugin
+        PythonAddons
+        SketchAPI
+        ConstructionAPI
+        PartSetAPI
+        GeomDataAPI
+        Config
+        ExchangeAPI
+        ModelGeomAlgo
+        Locale
+        test_API
 )

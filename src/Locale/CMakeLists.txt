@@ -43,6 +43,23 @@ TARGET_LINK_LIBRARIES(Locale ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS Locale DESTINATION ${SHAPER_INSTALL_BIN})
 
-ADD_UNIT_TESTS(
-  TestUTF8.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/Locale")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

@@ -165,107 +165,23 @@ INSTALL(TARGETS _ModelAPI DESTINATION ${SHAPER_INSTALL_SWIG})
 INSTALL(TARGETS ModelAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 
-ADD_UNIT_TESTS(TestConstants.py
-               TestUndoRedo.py
-               TestDocument.py
-               Test1064.py
-               TestResults.py
-               TestIntArray.py
-               Test1512.py
-               Test1562.py
-               TestDoubleArray.py
-               Test1757.py
-               Test1998.py
-               Test1995.py
-               Test2170.py
-               TestExternalConstruction.py
-               Test2228.py
-               Test2241.py
-               Test2252.py
-               Test2276.py
-               Test2389.py
-               Test2391.py
-               TestCustomName_BooleanCut.py
-               TestCustomName_CommonCompSolid.py
-               TestCustomName_CutCompSolid.py
-               TestCustomName_CutGroup.py
-               TestCustomName_DefaultName.py
-               TestCustomName_ExtrudeFace.py
-               TestCustomName_ExtrusionCut.py
-               TestCustomName_ExtrusionCutFace.py
-               TestCustomName_MultiTranslation.py
-               TestCustomName_Partition.py
-               TestCustomName_Placement.py
-               TestCustomName_Recover.py
-               TestCustomName_Rename.py
-               TestCustomName_RotateGroup.py
-               TestCustomName_Translation.py
-               TestFolder_Create.py
-               TestFolder_Update.py
-               TestFolder_Remove.py
-               TestFolder_Stability.py
-               TestFolder_CustomName.py
-               TestFolder_Empty.py
-               TestFolder_Sketch.py
-               Test2358_1.py
-               Test2358_2.py
-               Test2396.py
-               Test2401.py
-               Test2413.py
-               Test2496.py
-               Test2510.py
-               TestFeatureSelection_1.py
-               TestFeatureSelection_2.py
-               Test2607.py
-               TestBlockRecalculation.py
-               TestSelectionScope.py
-               TestSelectorShell.py
-               TestWeakNaming2125.py
-               TestWeakNaming2222.py
-               TestWeakNaming2245.py
-               TestWeakNaming2247.py
-               TestWeakNaming2248.py
-               TestWeakNaming2261.py
-               TestWeakNaming2291.py
-               TestWeakNaming2335.py
-               TestWeakNaming2375.py
-               TestWeakNaming2437.py
-               TestWeakNaming2445.py
-               TestWeakNaming2446.py
-               TestWeakNaming2452.py
-               TestWeakNamingSortOrder.py
-               Test2685.py
-               TestGeomNamingPlacement.py
-               TestGeomNamingRevolution.py
-               TestGeomNamingEdgeByFilter.py
-               TestGeomNamingSketchPlane.py
-               TestGeomNamingBoxWithFillet.py
-               TestContainerSelector.py
-               TestSaveOpen1.py
-               TestSaveOpen2.py
-               TestSelectionInitialization.py
-               TestSelectionCircleCenter.py
-               TestSelectionInPart.py
-               Test2828.py
-               TestSelectionRestore.py
-               Test2491.py
-               Test2493.py
-               Test2627.py
-               Test2859.py
-               Test2873.py
-               Test2901.py
-               Test2903.py
-               Test3020.py
-               Test3116.py
-               Test19019_1.py
-               Test19019_2.py
-               Test19031.py
-               Test19058.py
-               Test19217.py
-               Test19707.py
-               Test19726.py
-               Test19912.py
-               Test19932.py
-               Test19989.py
-               Test20170.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/ModelAPI")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

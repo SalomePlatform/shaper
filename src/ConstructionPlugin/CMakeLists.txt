@@ -77,26 +77,23 @@ INCLUDE_DIRECTORIES(
   ../GeomDataAPI
 )
 
+include(tests.set)
 
-ADD_UNIT_TESTS(TestAxisCreation.py
-               TestAxis_ErrorMsg.py
-               UnitTestAxis.py
-               TestPoint_XYZ.py
-               TestPoint_IntersectLines.py
-               TestPoint_IntersectLineAndPlane.py
-               TestPoint_IntersectPlanes.py
-               TestPoint_Edge.py
-               TestPoint_ProjectOnEdge.py
-               TestPoint_ProjectOnFace.py
-               TestPoint_GeometricalPropertyCenterOfGravity.py
-               TestPoint_GeometricalPropertyCenterOfCircle.py
-               TestPoint_VertexSelection.py
-               TestPointName.py
-               TestPoint_ErrorMsg.py
-               TestPoint_FiniteValidator.py
-               TestPlane.py
-               TestPlane_ErrorMsg.py
-               TestPlane_FaceValidator.py
-               Test19207.py
-               Test19471.py
-)
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/ConstructionPlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

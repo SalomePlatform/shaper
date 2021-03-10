@@ -115,56 +115,23 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Collection)
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
-ADD_UNIT_TESTS(
-               TestGroup.py
-               TestGroup2.py
-               TestField.py
-               TestGroup1799.py
-               TestGroupMove01.py
-               TestGroupMove02.py
-               TestGroupMove03.py
-               TestGroupMove04.py
-               TestGroupMove05.py
-               TestGroupMove06.py
-               TestGroupMove07.py
-               TestGroupMove08.py
-               TestGroupMove09.py
-               TestGroupMove10.py
-               TestGroupMove11.py
-               TestGroupMove12.py
-               TestGroupMove13.py
-               TestGroupMove14.py
-               TestGroupMove15.py
-               TestGroupMove16.py
-               TestGroupMove17.py
-               TestGroupMove18.py
-               TestGroupMove19.py
-               TestGroupMove20.py
-               TestGroupMove21.py
-               TestGroupMove22.py
-               TestGroupMove23.py
-               TestGroupMove24.py
-               TestGroupMove25.py
-               TestGroupMove26.py
-               TestGroupShareTopology.py
-               TestGroupAddition.py
-               TestGroupAddition_Error.py
-               TestGroupIntersection.py
-               TestGroupIntersection_Error.py
-               TestGroupSubstraction.py
-               TestGroupSubstraction2.py
-               TestGroupSubstraction_Error1.py
-               TestGroupSubstraction_Error2.py
-               Test2977.py
-               TestGroupWholeResult1.py
-               TestGroupWholeResult2.py
-               Test3031.py
-               TestGroupWholeFeature1.py
-               TestGroupWholeFeature2.py
-               TestGroupMoveAndSplit1.py
-               TestGroupMoveAndSplit2.py
-               TestGroupMoveAndSplit3.py
-               TestGroupMoveAndSplit4.py
-               Test3114.py
-               Test18739.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/CollectionPlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

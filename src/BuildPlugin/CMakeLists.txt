@@ -115,57 +115,23 @@ INSTALL(TARGETS BuildPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build)
 
-ADD_UNIT_TESTS(TestVertex.py
-               TestVertex_ErrorMsg.py
-               TestVertex_WholeSketch_1.py
-               TestVertex_WholeSketch_2.py
-               TestEdge.py
-               TestEdge_ByPoints.py
-               TestEdge_ErrorMsg.py
-               TestEdge_WholeSketch_1.py
-               TestEdge_WholeSketch_2.py
-               TestEdge_WholeSketch_3.py
-               TestEdge_WholeSketch_4.py
-               TestWire.py
-               TestWire_ErrorMsg.py
-               TestWire_WholeSketch_1.py
-               TestWire_WholeSketch_2.py
-               TestWire_WholeSketch_3.py
-               TestWire_WholeSketch_4.py
-               TestWire_WholeSketch_5.py
-               TestWire_WholeSketch_6.py
-               TestPolyline.py
-               TestInterpolation.py
-               TestFace.py
-               TestFace_ErrorMsg.py
-               TestFace_WholeSketch_1.py
-               TestFace_WholeSketch_2.py
-               TestShell.py
-               TestShell_WholeSketch_1.py
-               TestShell_WholeSketch_2.py
-               TestSolid.py
-               TestSolid_ErrorMsg.py
-               TestCompSolid.py
-               TestCompound.py
-               TestCompound_ErrorMsg.py
-               TestCompound_History.py
-               TestSubShapes.py
-               TestSubShapes_ErrorMsg.py
-               TestFilling.py
-               TestFilling_ByEdges.py
-               TestFilling_ByWires.py
-               TestFilling_Mixed.py
-               TestFilling_ErrorMsg.py
-               Test1920.py
-               Test2398.py
-               Test2409.py
-               Test2415.py
-               Test2439.py
-               Test2454.py
-               Test3125.py
-               Test3271.py
-               Test19056.py
-               Test20469.py
-               Test20513_1.py
-               Test20513_2.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/BuildPlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

@@ -108,43 +108,23 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Exchange)
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
-ADD_UNIT_TESTS(
-  TestImport.py
-  TestExport.py
-  Test2290.py
-  Test2459.py
-  Test18710.py
-  TestExportToXAOWithFields.py
-  TestExportToXAOWithGroupNotUpdated.py
-  TestExport_FiniteValidator.py
-  TestExportPart_Failure_1.py
-  TestExportPart_Failure_2.py
-  TestExportPart_Failure_3.py
-  TestExportPart_FullPartSet.py
-  TestExportPart_FullPart_1.py
-  TestExportPart_FullPart_2.py
-  TestExportPart_PartSet.py
-  TestExportPart_Results_1.py
-  TestExportPart_Results_2.py
-  TestExportPart_Results_3.py
-  TestExportPart_Results_4.py
-  TestExportPart_Results_5.py
-  TestExportPart_Results_6.py
-  TestExportPart_Results_7.py
-  TestExportPart_Results_8.py
-  TestImportPart_AfterCurrent_1.py
-  TestImportPart_AfterCurrent_2.py
-  TestImportPart_AfterLast_1.py
-  TestImportPart_AfterLast_2.py
-  TestImportPart_AfterLast_3.py
-  TestImportPart_AfterLast_4.py
-  TestImportPart_AfterLast_5.py
-  TestImportPart_AfterLast_6.py
-  TestImportPart_Construction_1.py
-  TestImportPart_Construction_2.py
-  TestImportPart_Construction_3.py
-  TestImportPart_Construction_4.py
-  TestImportPart_Multiple.py
-  TestImportPart_ToEmptyPart.py
-  TestImportPart_ToEmptyPartSet.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/ExchangePlugin")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

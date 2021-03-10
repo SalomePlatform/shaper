@@ -19,34 +19,18 @@
 
 INCLUDE(UnitTest)
 
-ADD_UNIT_TESTS_API(
-  Primitives/TestBox.py
-  Primitives/TestCone.py
-  Primitives/TestCylinder.py
-  Primitives/TestSphere.py
-  Primitives/TestTorus.py
-  Primitives/TestAPI_Box.py
-  Primitives/TestAPI_Cone.py
-  Primitives/TestAPI_Cylinder.py
-  Primitives/TestAPI_Sphere.py
-  Primitives/TestAPI_Torus.py
-  #GDML/TestConeSegment.py
-  #GDML/TestAPI_ConeSegment.py
-  Transformations/TestAPI_MultiRotation.py
-  Transformations/TestAPI_MultiTranslation.py
-  Transformations/TestAPI_Rotation.py
-  Transformations/TestAPI_Scale.py
-  Transformations/TestAPI_Symmetry.py
-  Transformations/TestAPI_Translation.py
-  Transformations/TestMultiRotation.py
-  Transformations/TestMultiTranslation.py
-  Transformations/TestRotation.py
-  Transformations/TestScale.py
-  Transformations/TestSymmetry.py
-  Transformations/TestTranslation_1.py
-  Transformations/TestTranslation_2.py
-  Transformations/TestTranslation_3.py
-  Transformations/TestTranslation_4.py
-  Transformations/TestTranslation_5.py
-  Transformations/TestTranslation.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/test_API")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  message(${TEST_NAMES})
+  install(FILES ${TEST_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

@@ -116,17 +116,23 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ModelHighAPI.py DESTINATION ${SHAPER_I
 
 INCLUDE(UnitTest)
 
-ADD_UNIT_TESTS(
-  TestDouble.py
-  TestInteger.py
-  TestRefAttr.py
-  TestReference.py
-  TestDeflectionDump.py
-  TestUndoRedo.py
-  Test2488.py
-  Test18451.py
-  Test19031.py
-  Test19990_1.py
-  Test19990_2.py
-  Test20167.py
-)
+include(tests.set)
+
+ADD_UNIT_TESTS(${TEST_NAMES})
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/ModelHighAPI")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+  
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${TEST_NAMES})
+  
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})
