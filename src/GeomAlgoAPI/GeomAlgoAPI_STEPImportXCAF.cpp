@@ -94,8 +94,7 @@ std::shared_ptr<GeomAPI_Shape> readAttributes(STEPCAFControl_Reader &theReader,
   STEPControl_Reader aReader = theReader.ChangeReader();
 
   // BEGIN: reading materials of sub-shapes from file
-  if ( theIsMaterials )
-  {
+  if (theIsMaterials) {
     TopTools_IndexedMapOfShape anIndices;
     TopExp::MapShapes(ageom->impl<TopoDS_Shape>(), anIndices);
 
@@ -163,8 +162,7 @@ std::shared_ptr<GeomAPI_Shape> setgeom(const Handle(XCAFDoc_ShapeTool) &theShape
 
     TopoDS_Shape aShape = aCompound;
     // Check if any BRep entity has been read, there must be at least a vertex
-    if ( !TopExp_Explorer( aShape, TopAbs_VERTEX ).More() )
-    {
+    if (!TopExp_Explorer( aShape, TopAbs_VERTEX ).More()) {
       theError = "No geometrical data in the imported file.";
       std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl(new TopoDS_Shape());
@@ -215,7 +213,7 @@ void setShapeAttributes(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
     TopoDS_Shape aShape = theShapeTool->GetShape(theLabel);
 
     std::shared_ptr<GeomAPI_Shape> aShapeGeom(new GeomAPI_Shape);
-    if (!theLoc.IsIdentity()){
+    if (!theLoc.IsIdentity()) {
         aShape.Move(theLoc);
     }
     aShapeGeom->setImpl(new TopoDS_Shape(aShape));
@@ -254,17 +252,17 @@ void setShapeAttributes(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
       std::vector<int> aColRGB = {int(r*255),int(g*255),int(b*255)};
       theResultBody->addShapeColor(aShapeName, aColRGB);
     } else if (theColorTool->GetColor(theLabel, XCAFDoc_ColorCurv, aCol)) {
-     double aR = aCol.Red(), aG = aCol.Green(), aB = aCol.Blue();
-     std::vector<int> aColRGB = {int(aR*255),int(aG*255),int(aB*255)};
+      double aR = aCol.Red(), aG = aCol.Green(), aB = aCol.Blue();
+      std::vector<int> aColRGB = {int(aR*255),int(aG*255),int(aB*255)};
       theResultBody->addShapeColor(aShapeName, aColRGB);
     }
     // check explicit coloring of boundary entities
     if (aDim == 3) {
       TopExp_Explorer aXp2(aShape, TopAbs_FACE);
-      while(aXp2.More()) {
+      while (aXp2.More()) {
         if (theColorTool->GetColor(aXp2.Current(), XCAFDoc_ColorGen, aCol) ||
-           theColorTool->GetColor(aXp2.Current(), XCAFDoc_ColorSurf, aCol) ||
-           theColorTool->GetColor(aXp2.Current(), XCAFDoc_ColorCurv, aCol)) {
+          theColorTool->GetColor(aXp2.Current(), XCAFDoc_ColorSurf, aCol) ||
+          theColorTool->GetColor(aXp2.Current(), XCAFDoc_ColorCurv, aCol)) {
           double aR = aCol.Red(), aG = aCol.Green(), aB = aCol.Blue();
           TopoDS_Face aFace = TopoDS::Face(aXp2.Current());
           std::vector<int> aColRGB = {int(aR*255),int(aG*255),int(aB*255)};
@@ -278,23 +276,6 @@ void setShapeAttributes(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
           theResultBody->addShapeName(aShapeGeom , aNameFace.str()), aColRGB);
         }
         aXp2.Next();
-      }
-    }
-    if (aDim == 2) {
-      TopExp_Explorer aXp1(aShape, TopAbs_EDGE);
-      while(aXp1.More()) {
-        if (theColorTool->GetColor(aXp1.Current(), XCAFDoc_ColorGen, aCol) ||
-           theColorTool->GetColor(aXp1.Current(), XCAFDoc_ColorSurf, aCol) ||
-           theColorTool->GetColor(aXp1.Current(), XCAFDoc_ColorCurv, aCol)) {
-           double aR = aCol.Red(), aG = aCol.Green(), aB = aCol.Blue();
-           std::vector<int> aColRGB = {int(aR*255),int(aG*255),int(aB*255)};
-           std::wstringstream aNameEdge;
-           aNameEdge << L"Edge_"<< aShapeName;
-           aShapeGeom->setImpl(new TopoDS_Shape(aXp1.Current() ));
-           theResultBody->addShapeColor(
-           theResultBody->addShapeName(aShapeGeom , aNameEdge.str()), aColRGB);
-        }
-        aXp1.Next();
       }
     }
   } else {
