@@ -42,6 +42,6 @@ if(${HAVE_SALOME})
   foreach(tfile ${TEST_NAMES})
     list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
   endforeach(tfile ${TEST_NAMES})
-  
+  list(APPEND TMP_TESTS_NAMES "Test/TestSketcher.py")
   install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
 endif(${HAVE_SALOME})
