@@ -1017,7 +1017,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
   aMessageBox.setDefaultButton(QMessageBox::No);
 
-  QString aText;
+  QString aText, aDetailedText;
   if (!thePrefixInfo.empty())
     aText = thePrefixInfo.c_str();
   QString aSep = ", ";
@@ -1028,16 +1028,22 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   if (!aNotActivatedDocWrn.isEmpty())
     aText += aNotActivatedDocWrn;
   if (!anOtherFeatureNames.empty()) {
-    const char* aMsg = "Features are used in the following features: %1.\nThese "
-                       "features will be deleted.\n";
-    aText += QString(QObject::tr(aMsg))
+    const char* aMsg = "The selected features are used in some\n"
+                       "other features, which will also be deleted.\n";
+    const char* aMsgDetails = "The selected features are used"
+                              " in the following features: %1.\n";
+    aText += QString(QObject::tr(aMsg));
+    aDetailedText += QString(QObject::tr(aMsgDetails))
                      .arg(anOtherFeatureNames.join(aSep));
   }
   if (!aParamFeatureNames.empty()) {
-    const char* aMsg = "Parameters are used directly and through a sequence "
-                       "of dependencies in the following features: %1.\nThese features will "
-                       "be deleted.\nOr parameters could be replaced by their values.\n";
-    aText += QString(QObject::tr(aMsg))
+    const char* aMsg = "The selected parameters are used directly or through\n"
+                       "a sequence of dependencies in some features.\n"
+                       "These features will be deleted.\n"
+                       "Or parameters could be replaced by their values.\n";
+    const char* aMsgDetails = "Parameters are used in the following features: %1.\n";
+    aText += QString(QObject::tr(aMsg));
+    aDetailedText += QString(QObject::tr(aMsgDetails))
                      .arg(aParamFeatureNames.join(aSep));
 #ifdef _DEBUG
     QPushButton *aReplaceButton =
@@ -1046,8 +1052,10 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   }
 
   if (!aText.isEmpty()) {
-    aText += "Would you like to continue?";
     aMessageBox.setText(aText);
+    aMessageBox.setInformativeText(QObject::tr("Would you like to continue?"));
+    if (!aDetailedText.isEmpty())
+      aMessageBox.setDetailedText(aDetailedText);
     aMessageBox.exec();
     QMessageBox::ButtonRole aButtonRole = aMessageBox.buttonRole(aMessageBox.clickedButton());
 
