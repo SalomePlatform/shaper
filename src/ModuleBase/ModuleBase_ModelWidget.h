@@ -441,9 +441,6 @@ protected:
   /// A feature ID
   std::string myFeatureId;
 
-  /// Flag which shows that current operation is in editing mode
-  bool myIsEditing;
-
   /// Flag which shows whether current widget is obligatory
   /// The non-obligatory widgets should not accept the focus in the property panel
   bool myIsObligatory;
@@ -455,6 +452,9 @@ protected:
   ValueState myState;
 
 private:
+  /// Flag which shows that current operation is in editing mode
+  bool myIsEditing;
+
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
   bool myIsComputedDefault;
 

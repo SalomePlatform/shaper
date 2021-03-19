@@ -53,8 +53,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   const Config_WidgetAPI* theData)
   : QWidget(theParent),
   myWidgetValidator(0),
-  myIsEditing(false),
   myState(Stored),
+  myIsEditing(false),
   myIsValueStateBlocked(false),
   myFlushUpdateBlocked(false)
 {

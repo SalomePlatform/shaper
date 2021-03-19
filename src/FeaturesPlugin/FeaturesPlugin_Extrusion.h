@@ -56,22 +56,22 @@ public:
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_SIZES()
   {
-    static const std::string MY_CREATION_METHOD_ID("BySizes");
-    return MY_CREATION_METHOD_ID;
+    static const std::string MY_CREATION_METHOD_BY_SIZES("BySizes");
+    return MY_CREATION_METHOD_BY_SIZES;
   }
 
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_PLANES()
   {
-    static const std::string MY_CREATION_METHOD_ID("ByPlanesAndOffsets");
-    return MY_CREATION_METHOD_ID;
+    static const std::string MY_CREATION_METHOD_BY_PLANES("ByPlanesAndOffsets");
+    return MY_CREATION_METHOD_BY_PLANES;
   }
 
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_THROUGH_ALL()
   {
-    static const std::string MY_CREATION_METHOD_ID("ThroughAll");
-    return MY_CREATION_METHOD_ID;
+    static const std::string MY_CREATION_METHOD_THROUGH_ALL("ThroughAll");
+    return MY_CREATION_METHOD_THROUGH_ALL;
   }
 
   /// Attribute name of an object to which the extrusion grows.

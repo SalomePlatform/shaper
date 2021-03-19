@@ -220,7 +220,7 @@ void FeaturesPlugin_Extrusion::getSizes(double& theToSize, double& theFromSize)
   if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_SIZES()) {
     theToSize = real(TO_SIZE_ID())->value();
     theFromSize = real(FROM_SIZE_ID())->value();
-  } if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
+  } else if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
     theToSize = real(TO_OFFSET_ID())->value();
     theFromSize = real(FROM_OFFSET_ID())->value();
   } else {
