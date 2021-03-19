@@ -103,11 +103,7 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aCaseId;
   if (aStringAttr->isInitialized()) {
-    if (myIsEditing)
-      aCaseId = QString::fromStdString(aStringAttr->value());
-    else {
-      aCaseId = QString::fromStdString(aDefVal.empty() ? aStringAttr->value() : aDefVal);
-    }
+    aCaseId = QString::fromStdString(aStringAttr->value());
     int idx = myCaseIds.indexOf(aCaseId);
     if (idx == -1)
       idx = currentPageIndex();
