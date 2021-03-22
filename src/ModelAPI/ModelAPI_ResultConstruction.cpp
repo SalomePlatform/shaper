@@ -24,7 +24,3 @@ std::string ModelAPI_ResultConstruction::groupName()
 {
   return group();
 }
-
-ModelAPI_ResultConstruction::ModelAPI_ResultConstruction(){
-  setColor(DEFAULT_COLOR(), DEFAULT_COLOR_CONFIG_NAME());
-}

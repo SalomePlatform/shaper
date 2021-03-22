@@ -52,17 +52,8 @@
  *         Some feature's methods implemented here as dummy to
  *         Base class for all constraints.
  */
-class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomAPI_IPresentable,
-                                    public GeomAPI_ICustomPrs
+class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomAPI_IPresentable
 {
- public:
-  /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
-  {
-    return theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
-  }
-
  protected:
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintBase()

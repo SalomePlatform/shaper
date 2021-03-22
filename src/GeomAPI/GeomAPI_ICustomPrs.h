@@ -40,8 +40,7 @@ public:
 
   /// Modifies the given presentation in the custom way.
   virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
-                                     AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs) = 0;
+                                     AISObjectPtr thePrs) = 0;
 };
 
 typedef std::shared_ptr<GeomAPI_ICustomPrs> GeomCustomPrsPtr;

@@ -196,26 +196,14 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   setDefaultConstraintShown();
 
-  //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
-  //                                 Config_Prop::Color, "225,225,225");
-
   Config_PropManager::registerProp("Visualization", "result_body_color", "Result color",
     Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
 
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
     Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization",
-                                   ModelAPI_ResultConstruction::DEFAULT_COLOR_CONFIG_NAME(),
-                                   "Construction color",  Config_Prop::Color,
-                                   ModelAPI_ResultConstruction::DEFAULT_COLOR());
-
-  Config_PropManager::registerProp(
-        "Visualization",
-        ModelAPI_ResultConstruction::ModelApi_PointColor::COLOR_CONFIG_NAME(),
-        "Construction point color", Config_Prop::Color,
-        ModelAPI_ResultConstruction::ModelApi_PointColor::DEFAULT_COLOR());
-
+  Config_PropManager::registerProp("Visualization", ModelAPI_ResultConstruction::RESULT_COLOR_NAME(),
+    "Construction color", Config_Prop::Color, ModelAPI_ResultConstruction::DEFAULT_COLOR());
 
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
     Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
@@ -1396,14 +1384,6 @@ AISObjectPtr PartSet_Module::createPresentation(const ObjectPtr& theObject)
 }
 
 //******************************************************
-void getResultColor(const ResultPtr& theResult, std::vector<int>& theColor)
-{
-  ModelAPI_Tools::getColor(theResult, theColor);
-  if (theColor.empty())
-    PartSet_Tools::getDefaultColor(theResult, false, theColor);
-}
-
-//******************************************************
 double getResultDeflection(const ResultPtr& theResult)
 {
   double aDeflection = ModelAPI_Tools::getDeflection(theResult);
@@ -1467,33 +1447,45 @@ void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
   }
   else {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aResult.get()) {
       std::vector<int> aColor;
-      getResultColor(aResult, aColor);
-
-      SessionPtr aMgr = ModelAPI_Session::get();
-      if (aMgr->activeDocument() != aResult->document()) {
+      bool isSameDoc = (ModelAPI_Session::get()->activeDocument() == aResult->document());
+      // Get user defined color for the object
+      ModelAPI_Tools::getColor(aResult, aColor);
+      if (isSameDoc) {
+        bool isCustomized = false;
+        if (aColor.empty() && aFeature.get()) {
+          GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+          if (aCustPrs.get()) {
+            isCustomized = aCustPrs->customisePresentation(aResult, thePrs);
+          }
+        }
+        if (!isCustomized) {
+          if (aColor.empty()) {
+            PartSet_Tools::getDefaultColor(aResult, false, aColor);
+          }
+          thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+        }
+      }
+      else {
+        if (aColor.empty()) {
+          PartSet_Tools::getDefaultColor(aResult, false, aColor);
+        }
         QColor aQColor(aColor[0], aColor[1], aColor[2]);
         QColor aNewColor =
           QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF() / 3., aQColor.valueF());
-        aColor[0] = aNewColor.red();
-        aColor[1] = aNewColor.green();
-        aColor[2] = aNewColor.blue();
+        thePrs->setColor(aNewColor.red(), aNewColor.green(), aNewColor.blue());
       }
-      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-
       thePrs->setDeflection(getResultDeflection(aResult));
-
       thePrs->setTransparency(getResultTransparency(aResult));
 
       /// set texture  parameters
-      if(aResult->hasTextureFile()){
+      if(aResult->hasTextureFile()) {
         setTexture(aResult->getTextureFile(), thePrs);
       }
     }
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get()) {
-      if (aFeature->getKind() == SketchPlugin_Sketch::ID())
+    if (aFeature.get() && (aFeature->getKind() == SketchPlugin_Sketch::ID())) {
         thePrs->setWidth(2);
     }
   }

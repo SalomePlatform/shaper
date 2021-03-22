@@ -390,11 +390,9 @@ void ConstructionPlugin_Axis::execute()
   }
 }
 
-bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-  std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs)
 {
-  bool isCustomized = theDefaultPrs.get() != NULL &&
-                      theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  bool isCustomized = false;
 
   isCustomized = thePrs->setLineStyle(3) || isCustomized;
   isCustomized = thePrs->setWidth(2) || isCustomized;

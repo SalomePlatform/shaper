@@ -35,10 +35,6 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeSelection.h>
 
-#include <BuildPlugin_Face.h>
-#include <BuildPlugin_Wire.h>
-#include <BuildPlugin_Solid.h>
-
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -483,61 +479,6 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetValidated::getFilteredSelected()
     ModuleBase_ISelection::appendSelected(anOBSelected, aSelected);
 
   filterCompSolids(aSelected);
-
-  if (myFeatureId == BuildPlugin_Face::ID() || myFeatureId == BuildPlugin_Wire::ID() ||
-      myFeatureId == BuildPlugin_Solid::ID())
-  {
-    /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
-    /// - Face builder: edges, faces and wires selected
-    ///                 --> remove edges and wires
-    /// Wire builder: wires and edges selected
-    ///               --> remove egdes
-    /// Solid builder: faces and shapes shells or solids seleted
-    ///                --> remove faces
-
-    std::set<GeomAPI_Shape::ShapeType> shapeTypes;
-    for (auto aSelection: aSelected){
-      auto aShape = aSelection->shape();
-      if (aShape)
-        shapeTypes.insert(aShape->shapeType());
-    }
-
-    std::vector<ModuleBase_ViewerPrsPtr> aRemove;
-
-    if (myFeatureId == BuildPlugin_Face::ID() && shapeTypes.find(GeomAPI_Shape::FACE)
-        != shapeTypes.end())
-    {
-      for(auto aSelection: aSelected){
-        auto aType = aSelection->shape()->shapeType();
-        if (aType == GeomAPI_Shape::WIRE || aType == GeomAPI_Shape::EDGE)
-          aRemove.push_back(aSelection);
-      }
-    }
-    else if (myFeatureId == BuildPlugin_Wire::ID() && shapeTypes.find(GeomAPI_Shape::WIRE)
-             != shapeTypes.end())
-    {
-      for(auto aSelection: aSelected){
-        auto aType = aSelection->shape()->shapeType();
-        if (aType == GeomAPI_Shape::EDGE)
-          aRemove.push_back(aSelection);
-      }
-    }
-    else if (myFeatureId == BuildPlugin_Solid::ID() &&
-             (shapeTypes.find(GeomAPI_Shape::SHAPE) != shapeTypes.end() ||
-              shapeTypes.find(GeomAPI_Shape::SOLID) != shapeTypes.end() ||
-              shapeTypes.find(GeomAPI_Shape::SHELL) != shapeTypes.end()) )
-    {
-      for(auto aSelection: aSelected){
-        auto aType = aSelection->shape()->shapeType();
-        if( aType == GeomAPI_Shape::FACE)
-          aRemove.push_back(aSelection);
-      }
-    }
-
-    for(auto aSelection: aRemove){
-      aSelected.removeOne(aSelection);
-    }
-  }
 
   return aSelected;
 }

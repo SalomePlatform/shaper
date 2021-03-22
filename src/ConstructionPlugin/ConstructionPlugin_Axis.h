@@ -250,8 +250,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   ConstructionPlugin_Axis();
 
   /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs);
 
  protected:
   /// Creates a new axis by two defined points

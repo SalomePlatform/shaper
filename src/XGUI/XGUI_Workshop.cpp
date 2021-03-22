@@ -2459,22 +2459,17 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
       ModelAPI_Tools::getColor(aResult, aColor);
-      if (aColor.empty())
+      if (aColor.empty()) {
+        AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+        if (anAISObj.get()) {
+          aColor.resize(3);
+          anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+        }
+      }
+      if (aColor.empty()) {
         getDefaultColor(aResult, false, aColor);
-    }
-    else {
-      // TODO: remove the obtaining a color from the AIS object
-      // this does not happen never because:
-      // 1. The color can be changed only on results
-      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
-      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-      if (anAISObj.get()) {
-        aColor.resize(3);
-        anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
       }
     }
-    if (!aColor.empty())
-      break;
   }
   if (aColor.size() != 3)
     return;

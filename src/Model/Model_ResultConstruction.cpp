@@ -100,8 +100,8 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
                                        std::string& theDefault)
 {
   theSection = "Visualization";
-  theName =  getColorConfigName();
-  theDefault = getColor();
+  theName = RESULT_COLOR_NAME();
+  theDefault = DEFAULT_COLOR();
 }
 
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
