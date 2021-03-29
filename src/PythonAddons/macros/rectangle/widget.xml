@@ -3,16 +3,42 @@
     <group id="Linear geometry">
 
       <!-- SketchRectangle (python feature) -->
-      <feature
-        id="SketchRectangle"
-        title="Rectangle"
-        tooltip="Create rectangle"
-        icon="icons/Addons/rectangle.png"
-        helpfile="rectangleFeature.html">
-        <sketch-2dpoint_selector id="RectStartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="RectEndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
-                                 enable_value="enable_by_preferences"/>
+      <feature id="SketchRectangle"
+               title="Rectangle"
+               tooltip="Create rectangle"
+               icon="icons/Addons/rectangle.png"
+               helpfile="rectangleFeature.html">
+        <toolbox id="RectangleType">
+          <box id="RectangleTypeByCorners"
+               icon="icons/Addons/rectangle_start_end.png"
+               title="Rectangle by corners">
+            <sketch-2dpoint_selector id="RectStartPoint"
+                                     accept_expressions="0"
+                                     title="Start point"
+                                     tooltip="Start point coordinates"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="RectEndPoint"
+                                     accept_expressions="0"
+                                     title="End point"
+                                     tooltip="End point coordinates"
+                                     enable_value="enable_by_preferences"/>
+          </box>
+          <box id="RectangleTypeCentered"
+               icon="icons/Addons/rectangle_center_end.png"
+               title="Rectangle by center and corner">
+            <sketch-2dpoint_selector id="RectCenterPoint"
+                                     reference_attribute="RectCenterPointRef"
+                                     accept_expressions="0"
+                                     title="Center"
+                                     tooltip="Center point coordinates"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="RectCornerPoint"
+                                     accept_expressions="0"
+                                     title="Corner"
+                                     tooltip="Rectangle's corner coordinates"
+                                     enable_value="enable_by_preferences"/>
+          </box>
+        </toolbox>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="RectStartPoint,RectEndPoint"/>
       </feature>

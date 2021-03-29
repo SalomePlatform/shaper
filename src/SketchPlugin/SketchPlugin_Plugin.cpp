@@ -23,7 +23,6 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Circle.h>
-#include <SketchPlugin_Rectangle.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_BSplinePeriodic.h>
@@ -50,7 +49,6 @@
 #include <SketchPlugin_MacroArc.h>
 #include <SketchPlugin_MacroBSpline.h>
 #include <SketchPlugin_MacroCircle.h>
-#include <SketchPlugin_MacroRectangle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Offset.h>
@@ -289,12 +287,7 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_SketchCopy);
   } else if (theFeatureID == SketchPlugin_Offset::ID()) {
     return FeaturePtr(new SketchPlugin_Offset);
-  }else if (theFeatureID == SketchPlugin_MacroRectangle::ID()) {
-    return FeaturePtr(new SketchPlugin_MacroRectangle);
-  }else if (theFeatureID == SketchPlugin_Rectangle::ID()) {
-    return FeaturePtr(new SketchPlugin_Rectangle);
   }
-
   // feature of such kind is not found
   return FeaturePtr();
 }
@@ -373,10 +366,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_CurveFitting::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Offset::ID(), aHasSketchPlane);
-      aMsg->setState(SketchPlugin_MacroRectangle::ID(), aHasSketchPlane);
-      aMsg->setState(SketchPlugin_Rectangle::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
-      //aMsg->setState("SketchRectangle", aHasSketchPlane);
+      aMsg->setState("SketchRectangle", aHasSketchPlane);
     }
   }
   return aMsg;

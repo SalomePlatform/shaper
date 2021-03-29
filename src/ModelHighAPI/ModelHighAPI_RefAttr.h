@@ -72,6 +72,9 @@ public:
   MODELHIGHAPI_EXPORT
   void fillMessage(const std::shared_ptr<ModelAPI_ObjectMovedMessage>& theMessage) const;
 
+  std::shared_ptr<ModelAPI_Attribute> attr() const { return myAttribute; }
+  std::shared_ptr<ModelAPI_Object> object() const { return myObject; }
+
 private:
   enum VariantType { VT_ATTRIBUTE, VT_OBJECT } myVariantType;
   std::shared_ptr<ModelAPI_Attribute> myAttribute;

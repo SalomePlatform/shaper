@@ -7,7 +7,7 @@
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchEllipse SketchMacroEllipse SketchEllipticArc SketchMacroEllipticArc
                 SketchBSpline SketchMacroBSpline SketchMacroBSplinePeriodic SketchBSplinePeriodic
-                SketchRectangle SketchMacroRectangle
+                SketchRectangle
                 SketchProjection
                 SketchCurveFitting
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -51,82 +51,6 @@
                      tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
-      </feature>
-      <!-- SketchRectangle is a hidden feature. It is created inside SketchMacroRectangle. -->
-      <feature
-        id="SketchRectangle"
-        title="Rectangle"
-        tooltip="Create rectangle"
-        icon="icons/Addons/rectangle.png"
-        helpfile="rectangleFeature.html"
-        internal="1">
-        <sketch-2dpoint_selector id="rectangle_start_point"
-                                 accept_expressions="0"
-                                 title="Rectangle start point"
-                                 tooltip="Start point coordinates"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="rectangle_end_point"
-                                 accept_expressions="0"
-                                 title="Rectangle end point"
-                                 tooltip="End point coordinates"
-                                 enable_value="enable_by_preferences"/>
-        <validator id="GeomValidators_Different" parameters="rectangle_start_point,rectangle_end_point"/>
-        <boolvalue id="Auxiliary"
-                   label="Auxiliary"
-                   default="false"
-                   tooltip="Construction element"
-                   obligatory="0"
-                   change_visual_attributes="true"/>
-      </feature>
-      <!-- SketchMacroRectangle -->
-      <feature
-        id="SketchMacroRectangle"
-        title="Rectangle"
-        tooltip="Create rectangle"
-        icon="icons/Addons/rectangle.png"
-        helpfile="rectangleFeature.html">
-        <toolbox id="rectangle_type" modified_in_edit="edit_rectangle_type">
-          <box id="rectangle_type_by_start_and_end_points"
-               icon="icons/Sketch/rectangle_start_end.png"
-               title="Start and end points">
-            <sketch-2dpoint_selector id="rectangle_start_point1"
-                                     reference_attribute="rectangle_start_point1_ref"
-                                     accept_expressions="0"
-                                     title="Rectangle start point"
-                                     tooltip="Start point coordinates"
-                                     enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="rectangle_end_point1"
-                                     accept_expressions="0"
-                                     reference_attribute="rectangle_end_point1_ref"
-                                     title="Rectangle end point"
-                                     tooltip="End point coordinates"
-                                     enable_value="enable_by_preferences"/>
-            <validator id="GeomValidators_Different" parameters="rectangle_start_point1_ref,rectangle_end_point1_ref"/>
-         </box>
-         <box id="rectangle_type_by_center_and_end_points"
-              icon="icons/Sketch/rectangle_center_end.png"
-              title="Center and end points">
-           <sketch-2dpoint_selector id="rectangle_center_point"
-                                    accept_expressions="0"
-                                    reference_attribute="rectangle_center_point_ref"
-                                    title="Rectangle center point"
-                                    tooltip="Center point coordinates"
-                                    enable_value="enable_by_preferences"/>
-           <sketch-2dpoint_selector id="rectangle_end_point2"
-                                    accept_expressions="0"
-                                    reference_attribute="rectangle_end_point2_ref"
-                                    title="Rectangle end point"
-                                    tooltip="End point coordinates"
-                                    enable_value="enable_by_preferences"/>
-           <validator id="GeomValidators_Different" parameters="rectangle_end_point2_ref,rectangle_center_point_ref"/>
-        </box>
-       </toolbox>
-       <boolvalue id="Auxiliary"
-                  label="Auxiliary"
-                  default="false"
-                  tooltip="Construction element"
-                  obligatory="0"
-                  change_visual_attributes="true"/>
       </feature>
     </group>
     <group id="Conical geometry">

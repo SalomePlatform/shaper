@@ -77,7 +77,6 @@
 %shared_ptr(SketchAPI_Point)
 %shared_ptr(SketchAPI_Projection)
 %shared_ptr(SketchAPI_Rectangle)
-%shared_ptr(SketchAPI_MacroRectangle)
 %shared_ptr(SketchAPI_Rotation)
 %shared_ptr(SketchAPI_Translation)
 
@@ -584,7 +583,6 @@
 %include "SketchAPI_Offset.h"
 %include "SketchAPI_Translation.h"
 %include "SketchAPI_Rectangle.h"
-%include "SketchAPI_MacroRectangle.h"
 %include "SketchAPI_Rotation.h"
 %include "SketchAPI_Sketch.h"
 %include "SketchAPI_Constraint.h"

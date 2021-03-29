@@ -181,22 +181,10 @@ public:
       const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
   /// Add rectangle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
-      double theX1, double theY1, double theX2, double theY2, bool isFirstPointCenter);
-  /// Add rectangle
-  SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
-      const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,  bool isFirstPointCenter);
-  /// Add rectangle
-  SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
-      double theX1, double theY1, double theX2, double theY2);
-  /// Add rectangle
-  SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
-      const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner);
+
   /// Add circle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(

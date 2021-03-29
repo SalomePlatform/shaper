@@ -24,7 +24,6 @@
 #include "SketchAPI.h"
 
 #include "SketchAPI_SketchEntity.h"
-#include "SketchPlugin_Rectangle.h"
 
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
@@ -42,45 +41,45 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      double theX1, double theY1, double theX2, double theY2,
-                      bool isFirstPointCenter = false);
+                      double theX1, double theY1, double theX2, double theY2);
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                       const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint,
-                      bool isFirstPointCenter = false);
+                      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rectangle();
 
-  INTERFACE_4(SketchPlugin_Rectangle::ID(),
-              startPoint, SketchPlugin_Rectangle::START_ID(), GeomDataAPI_Point2D,
+  INTERFACE_7("SketchRectangle",
+              type, "RectangleType", ModelAPI_AttributeString,
+              /** Creation type of rectangle */,
+              startPoint, "RectStartPoint", GeomDataAPI_Point2D,
               /** Start point */,
-              endPoint, SketchPlugin_Rectangle::END_ID(), GeomDataAPI_Point2D,
+              endPoint, "RectEndPoint", GeomDataAPI_Point2D,
               /** End point */,
-              centerPoint, SketchPlugin_Rectangle::CENTER_ID(), GeomDataAPI_Point2D,
+              centerPoint, "RectCenterPoint", GeomDataAPI_Point2D,
               /** Center point */,
-              linesList, SketchPlugin_Rectangle::LINES_LIST_ID(), ModelAPI_AttributeRefList,
+              centerPointRef, "RectCenterPointRef", ModelAPI_AttributeRefAttr,
+              /** Reference to center point */,
+              cornerPoint, "RectCornerPoint", GeomDataAPI_Point2D,
+              /** Corner point */,
+              linesList, "RectangleList", ModelAPI_AttributeRefList,
               /** Lines list */
   )
 
   /// Set by coordinates
   SKETCHAPI_EXPORT
-  void setByCoordinates(double theX1, double theY1, double theX2, double theY2,
-                        bool isFirstPointCenter);
+  void setByCoordinates(double theX1, double theY1, double theX2, double theY2);
 
   /// Set by points
   SKETCHAPI_EXPORT
   void setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                   const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint, bool isFirstPointCenter);
+                   const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint);
 
   /// List of lines composing rectangle
   SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;
-
-  SKETCHAPI_EXPORT
-  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
-  };
+};
 
 //! Pointer on Rectangle object
 typedef std::shared_ptr<SketchAPI_Rectangle> RectanglePtr;
