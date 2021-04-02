@@ -24,9 +24,11 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
-
 #include <map>
 #include <set>
+#ifdef WIN32
+ #include<array>
+#endif WIN32
 
 class GeomAPI_Ax1;
 class GeomAPI_Edge;
@@ -68,6 +70,9 @@ public:
   /// \brief Calculate minimal distance between shapes
   GEOMALGOAPI_EXPORT static double minimalDistance(const GeomShapePtr& theShape1,
                                                    const GeomShapePtr& theShape2);
+  GEOMALGOAPI_EXPORT static double minimalDistance(const GeomShapePtr& theShape1,
+                                                   const GeomShapePtr& theShape2,
+                                                   std::array<double, 3> & fromShape1To2);
 
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.

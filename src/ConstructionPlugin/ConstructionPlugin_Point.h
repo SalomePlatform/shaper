@@ -39,6 +39,21 @@ public:
   /// Returns the kind of a feature.
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind();
 
+  /// Default color for a point.
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string POINT_COLOR("85,85,0");
+    return POINT_COLOR;
+  }
+
+  /// Default color property name.
+  inline static const std::string& COLOR_NAME()
+  {
+    static const std::string POINT_COLOR_NAME("construction_point_color");
+    return POINT_COLOR_NAME;
+  }
+
+
   /// Point kind.
   inline static const std::string& ID()
   {
@@ -328,8 +343,7 @@ public:
   ConstructionPlugin_Point();
 
   /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs);
 
 private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();

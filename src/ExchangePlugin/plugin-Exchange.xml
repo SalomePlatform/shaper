@@ -5,9 +5,9 @@
                helpfile="importFeature.html"
                internal="1">
       <switch id="ImportType">
-        <case id="Regular" title="BREP, XAO, IGES">
+        <case id="Regular" title="BREP, XAO, IGES, STL">
           <file_selector id="file_path" title="Import file" path="">
-              <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO" />
+              <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO,STL:STL" />
           </file_selector>
         <choice id="target_part"
                 string_list_attribute="target_parts_list"
@@ -37,13 +37,24 @@
             </groupbox>
           </case>
         </switch>
+</feature>
+      <feature id="ImportImageMacro" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
+               helpfile="importFeature.html"
+               internal="1">
+        <file_selector id="file_path" title="Import image file" path="">
+          <validator id="ExchangePlugin_ImportFormat" parameters="GIF|TIFF|PNG|JPG|JPEG|BMP|PPM|JPE:Image" />
+        </file_selector>
+        <choice id="target_part"
+                string_list_attribute="target_parts_list"
+                label="Import to"
+                tooltip="Select the image to import the document" />
       </feature>
       <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
                helpfile="importFeature.html" internal="1">
         <switch id="ImportType">
-          <case id="Regular" title="BREP, XAO, IGES">
+          <case id="Regular" title="BREP, XAO, IGES, STL">
             <file_selector id="file_path" title="Import file" path="">
-                <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO" />
+                <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,IGES|IGS:IGES,XAO:XAO,STL:STL" />
             </file_selector>
           </case>
           <case id="STEP" title="STEP">
@@ -65,6 +76,13 @@
             </groupbox>
           </case>
         </switch>
+      </feature>
+      <feature id="ImportImage" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png"
+               helpfile="importFeature.html"
+               internal="1">
+        <file_selector id="file_path" title="Import image file" path="">
+          <validator id="ExchangePlugin_ImportFormat" parameters="GIF|TIFF|PNG|JPG|JPEG|BMP|PPM|JPE:Image" />
+        </file_selector>
       </feature>
       <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png"
                helpfile="exportFeature.html" internal="1">

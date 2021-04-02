@@ -125,6 +125,15 @@ void FeaturesPlugin_Measurement::computeLength()
 
   std::ostringstream anOutput;
   anOutput << "Length = " << std::setprecision(10) << anEdge->length();
+  if(anEdge->isLine())
+  {
+    auto point1 = anEdge->firstPoint();
+    auto point2 = anEdge->lastPoint();
+
+    anOutput <<"\n|dx| = " <<  std::setprecision(10) << std::abs(point2->x() - point1->x())
+        <<"\n|dy| = " <<  std::setprecision(10) << std::abs(point2->y() - point1->y())
+        <<"\n|dz| = " <<  std::setprecision(10) << std::abs(point2->z() - point1->z());
+  }
   string(RESULT_ID())->setValue(anOutput.str());
 
   AttributeDoubleArrayPtr aValues =
@@ -156,10 +165,14 @@ void FeaturesPlugin_Measurement::computeDistance()
     return;
   }
 
-  double aDistance = GeomAlgoAPI_ShapeTools::minimalDistance(aShape1, aShape2);
+  std::array<double, 3> fromShape1To2;
+  double aDistance = GeomAlgoAPI_ShapeTools::minimalDistance(aShape1, aShape2, fromShape1To2);
 
   std::ostringstream anOutput;
-  anOutput << "Distance = " << std::setprecision(10) << aDistance;
+  anOutput << "Distance = " << std::setprecision(10) << aDistance
+           <<"\n|dx| = " <<  std::setprecision(10) << std::abs(fromShape1To2[0])
+      <<"\n|dy| = " <<  std::setprecision(10) << std::abs(fromShape1To2[1])
+      <<"\n|dz| = " <<  std::setprecision(10) << std::abs(fromShape1To2[2]);
   string(RESULT_ID())->setValue(anOutput.str());
 
   AttributeDoubleArrayPtr aValues =

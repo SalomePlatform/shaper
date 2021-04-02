@@ -41,6 +41,7 @@
 // shared pointers
 %shared_ptr(ExchangeAPI_Export)
 %shared_ptr(ExchangeAPI_Import)
+%shared_ptr(ExchangeAPI_Import_Image)
 
 // all supported interfaces
 %include "ExchangeAPI_Export.h"

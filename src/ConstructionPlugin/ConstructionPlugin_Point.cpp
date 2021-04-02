@@ -21,6 +21,7 @@
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -36,6 +37,8 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeIterator.h>
+
+#include <Config_PropManager.h>
 
 //==================================================================================================
 ConstructionPlugin_Point::ConstructionPlugin_Point()
@@ -150,11 +153,25 @@ void ConstructionPlugin_Point::execute()
 
 //==================================================================================================
 bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
-                                                     AISObjectPtr thePrs,
-                                                std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+                                                     AISObjectPtr thePrs)
 {
-  bool isCustomized = theDefaultPrs.get() != NULL &&
-                      theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  std::vector<int> aColor;
+  // get color from the attribute of the result
+  if (theResult.get() != NULL &&
+    theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
+    AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    if (aColorAttr.get() && aColorAttr->size()) {
+      aColor.push_back(aColorAttr->value(0));
+      aColor.push_back(aColorAttr->value(1));
+      aColor.push_back(aColorAttr->value(2));
+    }
+  }
+  if (aColor.empty())
+    aColor = Config_PropManager::color("Visualization", COLOR_NAME());
+
+  bool isCustomized = false;
+  if (aColor.size() == 3)
+    isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
   //thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
   return isCustomized;
 }

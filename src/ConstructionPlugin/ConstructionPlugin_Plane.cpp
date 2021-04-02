@@ -142,8 +142,7 @@ void ConstructionPlugin_Plane::execute()
 }
 
 //==================================================================================================
-bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                                std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs)
 {
   std::vector<int> aColor;
   // get color from the attribute of the result
@@ -157,7 +156,7 @@ bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObj
     }
   }
   if (aColor.empty())
-    aColor = Config_PropManager::color("Visualization", "construction_plane_color");
+    aColor = Config_PropManager::color("Visualization", COLOR_NAME());
 
   bool isCustomized = false;
   if (aColor.size() == 3)

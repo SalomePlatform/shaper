@@ -425,6 +425,49 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theStartPoint, theEndPoint));
 }
 
+static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & thePoint)
+{
+  if (thePoint.first)
+    return thePoint.first;
+
+  AttributePtr anAttr = thePoint.second.attr();
+  if (thePoint.second.object()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(thePoint.second.object());
+    if (aFeature)
+      anAttr = aFeature->attribute(SketchPlugin_Point::COORD_ID());
+  }
+
+  std::shared_ptr<GeomDataAPI_Point2D> aPntAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+  if (aPntAttr)
+    return aPntAttr->pnt();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  RectanglePtr aRect(new SketchAPI_Rectangle(aFeature));
+  fillAttribute("RectangleTypeCentered", aRect->type());
+  if (!theCenter.second.isEmpty())
+    fillAttribute(theCenter.second, aRect->centerPointRef());
+  fillAttribute(pointCoordinates(theCenter), aRect->centerPoint());
+  fillAttribute(pointCoordinates(theCorner), aRect->cornerPoint());
+  aRect->execute();
+
+  if (!theCorner.second.isEmpty() && aRect->linesList()->size() > 1) {
+    // get start point of the last line in rectangle and apply coindidence constraint
+    FeaturePtr aLine = ModelAPI_Feature::feature(aRect->linesList()->object(3));
+    AttributePtr aEndPnt = aLine->attribute(SketchPlugin_Line::START_ID());
+    setCoincident(ModelHighAPI_RefAttr(aEndPnt), theCorner.second);
+  }
+  return aRect;
+}
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,
@@ -1587,6 +1630,34 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
   if (isCustomFacesOrder(aCompFeat)) {
     std::list<std::list<ResultPtr> > aFaces;
     edgesOfSketchFaces(aCompFeat, aFaces);
+
+    /// remove faces that must not be dumped
+    std::vector< std::list<std::list<ResultPtr>>::iterator> aFacesToRemove;
+    for(auto itFaces = aFaces.begin(); itFaces != aFaces.end(); ++itFaces)
+    {
+      auto & facesGroup = *itFaces;
+      std::vector<std::list<ResultPtr>::iterator> subFacestoRemove;
+      for(auto itGroup = facesGroup.begin(); itGroup != facesGroup.end(); ++itGroup)
+      {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*itGroup);
+        if(theDumper.isDumped(aFeature)){
+          subFacestoRemove.push_back(itGroup);
+        }
+      }
+      for(auto itGroup :subFacestoRemove){
+        facesGroup.erase(itGroup);
+      }
+
+      if(!facesGroup.size()){
+        aFacesToRemove.push_back(itFaces);
+      }
+    }
+    for(auto itFaces :aFacesToRemove){
+      aFaces.erase(itFaces);
+    }
+
+    if(!aFaces.size())
+      return;
 
     const std::string& aSketchName = theDumper.name(aBase);
     std::string aMethodName(".changeFacesOrder");

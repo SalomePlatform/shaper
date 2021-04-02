@@ -24,4 +24,3 @@ std::string ModelAPI_ResultConstruction::groupName()
 {
   return group();
 }
-

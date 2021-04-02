@@ -46,6 +46,13 @@ public:
     return CONSTRUCTION_PLANE_COLOR;
   }
 
+  /// Default color property name.
+  inline static const std::string& COLOR_NAME()
+  {
+    static const std::string PLANE_COLOR_NAME("construction_plane_color");
+    return PLANE_COLOR_NAME;
+  }
+
   /// Plane kind.
   inline static const std::string& ID()
   {
@@ -255,8 +262,7 @@ public:
   ConstructionPlugin_Plane();
 
   /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs);
 
 protected:
   /// Creates a new plane by general equation.

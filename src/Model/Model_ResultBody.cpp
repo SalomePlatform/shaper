@@ -408,6 +408,16 @@ void Model_ResultBody::updateSubs(
   myHistoryCash.Clear();
 }
 
+void  Model_ResultBody::setTextureFile(const std::string & theTextureFile)
+{
+  ModelAPI_Result::setTextureFile(theTextureFile);
+  for( auto sub : mySubs){
+    sub->setTextureFile(theTextureFile);
+  }
+  for(auto map : mySubsMap){
+    map.first->setTextureFile(theTextureFile);
+  }
+}
 
 bool Model_ResultBody::isConnectedTopology()
 {

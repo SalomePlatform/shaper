@@ -859,12 +859,10 @@ void PartSet_Tools::getDefaultColor(ObjectPtr theObject, const bool isEmptyColor
 {
   theColor.clear();
   // get default color from the preferences manager for the given result
-  if (theColor.empty()) {
-    std::string aSection, aName, aDefault;
-    theObject->colorConfigInfo(aSection, aName, aDefault);
-    if (!aSection.empty() && !aName.empty()) {
-      theColor = Config_PropManager::color(aSection, aName);
-    }
+  std::string aSection, aName, aDefault;
+  theObject->colorConfigInfo(aSection, aName, aDefault);
+  if (!aSection.empty() && !aName.empty()) {
+    theColor = Config_PropManager::color(aSection, aName);
   }
   if (!isEmptyColorValid && theColor.empty()) {
     // all AIS objects, where the color is not set, are in black.

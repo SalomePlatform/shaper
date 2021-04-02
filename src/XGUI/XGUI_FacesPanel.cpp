@@ -44,6 +44,10 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationFeature.h>
+#include <XGUI_OperationMgr.h>
+
 #include <QAction>
 #include <QCheckBox>
 #include <QFocusEvent>
@@ -207,8 +211,10 @@ void XGUI_FacesPanel::setActivePanel(const bool theIsActive)
     // the selection is cleared by activating selection control
     myWorkshop->selector()->clearSelection();
   }
-  else
+  else{
     emit deactivated();
+    myUndoList.clear();
+  }
 }
 
 //********************************************************************
@@ -413,6 +419,8 @@ void XGUI_FacesPanel::processSelection()
 
     myItems.insert(myLastItemIndex, aPrs);
     myListView->addItem(aItemName, myLastItemIndex);
+    // add in undo list
+    myUndoList.push_back(myLastItemIndex);
     myLastItemIndex++;
     isModified = true;
   }
@@ -462,7 +470,7 @@ void XGUI_FacesPanel::processSelection()
 bool XGUI_FacesPanel::processDelete()
 {
   //appendFirstSelectionInHistory();
-  QModelIndexList anIndices = myListView->getControl()->selectionModel()->selectedIndexes();
+  //QModelIndexList anIndices = myListView->getControl()->selectionModel()->selectedIndexes();
 
   std::set<int> aSelectedIds;
   myListView->getSelectedIndices(aSelectedIds);
@@ -602,6 +610,18 @@ void XGUI_FacesPanel::onClosed()
 {
   setActivePanel(false);
   reset(true);
+}
+
+//********************************************************************
+
+void XGUI_FacesPanel::processUndo()
+{
+ if(!myUndoList.size())
+   return;
+
+ myListView->selectIndices({myUndoList.back()});
+ processDelete();
+ myUndoList.pop_back();
 }
 
 //********************************************************************

@@ -166,8 +166,9 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
 
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   // Parameters of rotation.
@@ -224,6 +225,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Rotated");
+    aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }
 

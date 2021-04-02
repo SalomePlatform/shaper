@@ -207,6 +207,13 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   std::list<GeomShapePtr> aShapes;
   for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
     AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
+
+    /// do not export pictures
+    ResultPtr aBodyContext =
+      std::dynamic_pointer_cast<ModelAPI_Result>(anAttrSelection->context());
+    if(aBodyContext->hasTextureFile())
+      continue;
+
     std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
     if (aCurShape.get() == NULL)
       aCurShape = anAttrSelection->context()->shape();
@@ -405,6 +412,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   std::list<DocumentPtr> aDocuments; /// documents of Parts selected and used in export
   std::map<DocumentPtr, GeomTrsfPtr> aDocTrsf; /// translation of the part
 
+  bool anExCludedIsImage = false;
   AttributeSelectionListPtr aSelection = selectionList(XAO_SELECTION_LIST_ID());
   bool aIsSelection = aSelection->isInitialized() && aSelection->size() > 0;
   if (aIsSelection) { // a mode for export to geom result by result
@@ -413,6 +421,11 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       ResultPtr aBodyContext =
         std::dynamic_pointer_cast<ModelAPI_Result>(anAttr->context());
       if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()) {
+          /// do not export pictures
+          if(aBodyContext->hasTextureFile()){
+            anExCludedIsImage = true;
+            continue;
+          }
         aResults.push_back(aBodyContext);
         GeomShapePtr aShape = anAttr->value();
         if (!aShape.get())
@@ -445,7 +458,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     }
   }
   if (aShapes.empty()) {
-    setError("No shapes to export");
+    if(!anExCludedIsImage)
+      setError("No shapes to export");
     return;
   }
 

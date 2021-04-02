@@ -121,6 +121,9 @@ public:
   /// \return whether the delete action is processed
   bool processDelete();
 
+  /// Delete last(s) item(s) added since the recent activation of the faces panel
+  void processUndo();
+
   /// Processing focus in/out for the faces control
   /// \param theObject source object of event
   /// \param theEvent an event
@@ -200,6 +203,7 @@ private:
 
   bool myIsActive; ///< current state about the panel is active
   int myLastItemIndex; ///< last index to be used in the map of items for the next added item
+  std::vector<int> myUndoList; ///< indexes of items for undo
 
   QMap<int, ModuleBase_ViewerPrsPtr> myItems; ///< selected face items
   std::set<ObjectPtr > myItemObjects; ///< cached objects of myItems

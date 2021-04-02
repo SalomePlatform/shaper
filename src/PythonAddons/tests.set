@@ -19,6 +19,7 @@
 
 SET(TEST_NAMES
   TestRectangle.py
+  TestRectangleCentered.py
   TestcompoundVertices.py
   TestimportParameters.py
 )

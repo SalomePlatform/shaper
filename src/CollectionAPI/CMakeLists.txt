@@ -23,6 +23,7 @@ SET(PROJECT_HEADERS
   CollectionAPI.h
   CollectionAPI_Group.h
   CollectionAPI_GroupAddition.h
+  CollectionAPI_GroupShape.h
   CollectionAPI_GroupIntersection.h
   CollectionAPI_GroupSubstraction.h
   CollectionAPI_Field.h
@@ -31,6 +32,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
   CollectionAPI_Group.cpp
   CollectionAPI_GroupAddition.cpp
+  CollectionAPI_GroupShape.cpp
   CollectionAPI_GroupIntersection.cpp
   CollectionAPI_GroupSubstraction.cpp
   CollectionAPI_Field.cpp

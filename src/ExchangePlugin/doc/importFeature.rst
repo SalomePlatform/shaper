@@ -57,7 +57,7 @@ The import will be performed within the active part. If no part is active, the p
 Import from CAD formats
 -----------------------
 
-It is possible to import files in the following CAD-neutral formats: BREP, STEP, IGES, XAO.
+It is possible to import files in the following CAD-neutral formats: BREP, STEP, IGES, XAO, STL.
 To import a file into active part select in the Main Menu *File -> Import -> From CAD format...* item.
 
 The following property panel will be opened:
@@ -68,7 +68,6 @@ The following property panel will be opened:
    **Import property panel**
 
 The first combobox provides the list of formats avalables (BREP, XAO, IGES or STEP).
-
 The **Import to** combobox provides the list of destinations (one of existing Parts or a new Part).
 
 In this panel it is possible to enter a file name directly or press **'...'** button and browse it with help of import file dialog box:
@@ -77,11 +76,10 @@ In this panel it is possible to enter a file name directly or press **'...'** bu
    :align: center
 
    **Dialog box to import CAD-neutral format**
-
 Import BREP, XAO, IGES
 """"""""""""""""""""""
 In case of first choice the format of imported file will be defined according to file extension.
-
+  
 **Apply** button imports the file.
   
 **Cancel** button cancels the operation.
@@ -146,3 +144,20 @@ The Result of the operation depends on the imported file content.
    Import of STEP file.
 
 **See Also** a sample TUI Script of :ref:`tui_import_file_step` operation.
+
+
+Import pictures
+"""""""""""""""
+
+It is possible to import pictures in the following image formats: GIF, TIFF, PNG, JPG, JPEG, BMP, PPM, JPE.
+To import a file into active part select in the Main Menu *File -> Import -> Picture...* item.
+
+Result
+""""""
+
+.. figure:: images/imageImported.png
+   :align: center
+
+   Import of PNG image file.
+
+**See Also** a sample TUI Script of :ref:`tui_import_file` operation.

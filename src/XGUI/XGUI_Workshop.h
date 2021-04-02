@@ -410,6 +410,9 @@ signals:
   /// Import shape from a file
   void onImportShape();
 
+  /// Import  image from a file
+  void onImportImage();
+
   /// Export features to a file
   void onExportPart();
 

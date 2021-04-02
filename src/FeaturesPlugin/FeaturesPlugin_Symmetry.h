@@ -137,7 +137,7 @@ private:
   void buildResult(const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
                    const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
                    std::shared_ptr<GeomAPI_Shape> theTargetShape,
-                   int& theResultIndex);
+                   int& theResultIndex, std::string &theTextureFile);
 
   /// Create new result for the given part and transformation
   void buildResult(std::shared_ptr<ModelAPI_ResultPart> theOriginal,

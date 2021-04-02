@@ -53,6 +53,13 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
     return RESULT_CONSTRUCTION_COLOR;
   }
 
+  /// default color for a result construction
+  inline static const std::string& RESULT_COLOR_NAME()
+  {
+    static const std::string COLOR_NAME("result_construction_color");
+    return COLOR_NAME;
+  }
+
   /// default deflection for a result construction
   inline static const std::string DEFAULT_DEFLECTION()
   {

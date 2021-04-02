@@ -31,6 +31,7 @@
         <source path="group_addition_widget.xml"/>
       </feature>
 
+
       <feature id="GroupIntersection"
         title="Group Intersection"
         tooltip="Get elements existing in all groups"
@@ -46,6 +47,15 @@
         helpfile="groupSubstractionFeature.html">
         <source path="group_substraction_widget.xml"/>
       </feature>
+
+      <feature id="GroupShape"
+        title="Group Shape"
+        tooltip="Join several groups to single shape"
+        icon="icons/Collection/group_shape.png"
+        helpfile="groupShapeFeature.html">
+        <source path="group_addition_widget.xml"/>
+      </feature>
+
     </group>
   </workbench>
 </plugin>

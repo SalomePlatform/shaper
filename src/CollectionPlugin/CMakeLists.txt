@@ -32,6 +32,8 @@ SET(PROJECT_HEADERS
     CollectionPlugin_Plugin.h
     CollectionPlugin_Group.h
     CollectionPlugin_GroupAddition.h
+    CollectionPlugin_GroupMerge.h
+    CollectionPlugin_GroupShape.h
     CollectionPlugin_GroupIntersection.h
     CollectionPlugin_GroupOperation.h
     CollectionPlugin_GroupSubstraction.h
@@ -49,6 +51,8 @@ SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
     CollectionPlugin_GroupAddition.cpp
+    CollectionPlugin_GroupMerge.cpp
+    CollectionPlugin_GroupShape.cpp
     CollectionPlugin_GroupIntersection.cpp
     CollectionPlugin_GroupOperation.cpp
     CollectionPlugin_GroupSubstraction.cpp

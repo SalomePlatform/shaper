@@ -409,6 +409,27 @@
       <translation>Le nom du fichier est vide.</translation>
     </message>
   </context>
+  <context>
+    <name>ImportImageMacro</name>
+    <message>
+      <source>Import</source>
+      <translation>Importer</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportImageMacro:file_path</name>
+    <message>
+      <source>Import image file</source>
+      <translation>Fichier de l'image à importer</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportImageMacro:target_part</name>
+    <message>
+      <source>Import to</source>
+      <translation>Importer vers</translation>
+    </message>
+  </context>
 
   <!-- Export part -->
   <context>

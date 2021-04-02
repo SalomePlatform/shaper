@@ -197,9 +197,10 @@ void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
+  std::string theTextureFile;
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts))
+       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
     return;
 
   std::string anError;
@@ -240,6 +241,7 @@ void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Translated");
+    aResultBody->setTextureFile(theTextureFile);
     setResult(aResultBody, aResultIndex++);
   }
 

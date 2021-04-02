@@ -22,12 +22,13 @@
 
 #include "CollectionPlugin.h"
 #include "CollectionPlugin_GroupOperation.h"
+#include "CollectionPlugin_GroupMerge.h"
 
 /**\class CollectionPlugin_GroupAddition
  * \ingroup Plugins
  * \brief Merge several groups of same shape type into single group.
  */
-class CollectionPlugin_GroupAddition : public CollectionPlugin_GroupOperation
+class CollectionPlugin_GroupAddition : public CollectionPlugin_GroupMerge
 {
 public:
   /// Extrusion kind
@@ -35,12 +36,6 @@ public:
   {
     static const std::string MY_GROUP_ID("GroupAddition");
     return MY_GROUP_ID;
-  }
-  /// attribute name of selected entities list
-  inline static const std::string& LIST_ID()
-  {
-    static const std::string MY_GROUP_LIST_ID("group_list");
-    return MY_GROUP_LIST_ID;
   }
 
   /// Returns the kind of a feature
@@ -51,13 +46,10 @@ public:
   }
 
   /// Creates a new group result if needed
-  COLLECTIONPLUGIN_EXPORT virtual void execute();
-
-  /// Request for initialization of data model of the feature: adding all attributes
-  COLLECTIONPLUGIN_EXPORT virtual void initAttributes();
+  COLLECTIONPLUGIN_EXPORT void execute();
 
   /// Use plugin manager for features creation
-  CollectionPlugin_GroupAddition();
+  CollectionPlugin_GroupAddition() = default;
 
 };
 

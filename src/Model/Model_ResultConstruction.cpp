@@ -100,7 +100,7 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
                                        std::string& theDefault)
 {
   theSection = "Visualization";
-  theName = "result_construction_color";
+  theName = RESULT_COLOR_NAME();
   theDefault = DEFAULT_COLOR();
 }
 

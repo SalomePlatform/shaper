@@ -490,6 +490,12 @@ void XGUI_Workshop::initMenu()
     QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportShape()));
 
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_IMAGE_CMD", tr("Picture..."),
+    tr("Import a picture from an image file"),
+    QIcon(),
+    QKeySequence(), false, "MEN_DESK_FILE", tr("Import"), 10, 10);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportImage()));
+
   // Export sub-menu
   aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Part set..."),
                                              tr("Export the current document into a native file"),
@@ -1212,6 +1218,15 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
     if (anActiveWidget->processAction(theActionType, aParam))
       return;
   }
+  else
+  {
+    XGUI_FacesPanel *  anFacePannel = facesPanel();
+    if(ActionUndo == theActionType && anFacePannel->isActivePanel())
+    {
+      anFacePannel->processUndo();
+      return;
+    }
+  }
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked
@@ -1324,6 +1339,19 @@ void XGUI_Workshop::onImportShape()
   if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_Import::ID()));
+    anImportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
+      "importFeature.html");
+    myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
+    operationMgr()->startOperation(anImportOp);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onImportImage()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anImportOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_Import_Image::ID()));
     anImportOp->setHelpFileName(QString("ExchangePlugin") + QDir::separator() +
       "importFeature.html");
     myPropertyPanel->updateApplyPlusButton(anImportOp->feature());
@@ -2431,22 +2459,17 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
       ModelAPI_Tools::getColor(aResult, aColor);
-      if (aColor.empty())
+      if (aColor.empty()) {
+        AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+        if (anAISObj.get()) {
+          aColor.resize(3);
+          anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+        }
+      }
+      if (aColor.empty()) {
         getDefaultColor(aResult, false, aColor);
-    }
-    else {
-      // TODO: remove the obtaining a color from the AIS object
-      // this does not happen never because:
-      // 1. The color can be changed only on results
-      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
-      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-      if (anAISObj.get()) {
-        aColor.resize(3);
-        anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
       }
     }
-    if (!aColor.empty())
-      break;
   }
   if (aColor.size() != 3)
     return;

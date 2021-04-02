@@ -56,6 +56,7 @@ class SketchAPI_Projection;
 class SketchAPI_Rectangle;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
+
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> PointOrReference;
 //--------------------------------------------------------------------------------------
@@ -178,6 +179,11 @@ public:
   std::shared_ptr<SketchAPI_Rectangle> addRectangle(
       const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
       const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
+  /// Add rectangle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner);
 
   /// Add circle
   SKETCHAPI_EXPORT

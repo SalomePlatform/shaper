@@ -68,6 +68,9 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
           for aResIndex in range(self.Part.size(aResultType)):
             anObject = self.Part.object(aResultType, aResIndex)
             aResult = model.objectToResult(anObject)
+            # do nt export picture
+            if aResult.hasTextureFile() is True:
+              continue
             if not aResult is None:
               if (not aResult.shape() or aResult.shape().isNull()) and isPart:
                 aPart = model.modelAPI_ResultPart(aResult)

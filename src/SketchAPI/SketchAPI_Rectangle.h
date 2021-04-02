@@ -24,6 +24,7 @@
 #include "SketchAPI.h"
 
 #include "SketchAPI_SketchEntity.h"
+
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
@@ -44,16 +45,27 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
+                      const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
                       const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rectangle();
 
-  INTERFACE_3("SketchRectangle",
-              startPoint, "RectStartPoint", GeomDataAPI_Point2D, /** Start point */,
-              endPoint, "RectEndPoint", GeomDataAPI_Point2D, /** End point */,
-              linesList, "RectangleList", ModelAPI_AttributeRefList, /** Lines list */
+  INTERFACE_7("SketchRectangle",
+              type, "RectangleType", ModelAPI_AttributeString,
+              /** Creation type of rectangle */,
+              startPoint, "RectStartPoint", GeomDataAPI_Point2D,
+              /** Start point */,
+              endPoint, "RectEndPoint", GeomDataAPI_Point2D,
+              /** End point */,
+              centerPoint, "RectCenterPoint", GeomDataAPI_Point2D,
+              /** Center point */,
+              centerPointRef, "RectCenterPointRef", ModelAPI_AttributeRefAttr,
+              /** Reference to center point */,
+              cornerPoint, "RectCornerPoint", GeomDataAPI_Point2D,
+              /** Corner point */,
+              linesList, "RectangleList", ModelAPI_AttributeRefList,
+              /** Lines list */
   )
 
   /// Set by coordinates
@@ -62,8 +74,8 @@ public:
 
   /// Set by points
   SKETCHAPI_EXPORT
-  void setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
-                   const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
+  void setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
+                   const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint);
 
   /// List of lines composing rectangle
   SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;

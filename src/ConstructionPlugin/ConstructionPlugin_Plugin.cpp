@@ -75,9 +75,11 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 
   // register construction properties
-  Config_PropManager::registerProp("Visualization", "construction_plane_color",
-                                   "Construction plane color",
-                                   Config_Prop::Color, ConstructionPlugin_Plane::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", ConstructionPlugin_Plane::COLOR_NAME(),
+    "Construction plane color", Config_Prop::Color, ConstructionPlugin_Plane::DEFAULT_COLOR());
+
+  Config_PropManager::registerProp("Visualization", ConstructionPlugin_Point::COLOR_NAME(),
+    "Construction point color", Config_Prop::Color, ConstructionPlugin_Point::DEFAULT_COLOR());
 }
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(std::string theFeatureID)

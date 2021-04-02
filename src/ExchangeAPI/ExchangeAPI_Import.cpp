@@ -205,3 +205,51 @@ void importPart(const std::shared_ptr<ModelAPI_Document> & thePart,
   if (aCurrentFeature)
     thePart->setCurrentFeature(aCurrentFeature, THE_VISIBLE_FEATURE);
 }
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+ExchangeAPI_Import_Image::ExchangeAPI_Import_Image(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature)
+: ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+}
+
+ExchangeAPI_Import_Image::ExchangeAPI_Import_Image(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    const std::string & theFilePath)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+    setFilePath(theFilePath);
+}
+
+void ExchangeAPI_Import_Image::setFilePath(const std::string & theFilePath)
+{
+  fillAttribute(theFilePath, myfilePath);
+  execute();
+}
+
+ImportImagePtr addImportImage(
+    const std::shared_ptr<ModelAPI_Document> & thePart,
+    const std::string & theFilePath)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import_Image::ID());
+  return ImportImagePtr(new ExchangeAPI_Import_Image(aFeature, theFilePath));
+}
+
+void ExchangeAPI_Import_Image::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  std::string aFilePath =
+      aBase->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID())->value();
+
+  theDumper << aBase << " = model.addImportImage(" << aPartName << ", \""
+            << aFilePath << "\")" << std::endl;
+
+  // to make import have results
+  theDumper << "model.do()" << std::endl;
+}

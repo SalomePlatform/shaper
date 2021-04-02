@@ -119,4 +119,47 @@ EXCHANGEAPI_EXPORT void importPart(
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
+/**\class ExchangeAPI_Import_Image
+ * \ingroup CPPHighAPI
+ * \brief Interface for Import feature
+ */
+class ExchangeAPI_Import_Image : public ModelHighAPI_Interface
+{
+public:
+  /// Constructor without values
+  EXCHANGEAPI_EXPORT
+  explicit ExchangeAPI_Import_Image(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  /// Constructor with values
+  EXCHANGEAPI_EXPORT
+  ExchangeAPI_Import_Image(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+                     const std::string & theFilePath);
+
+  /// Destructor
+  EXCHANGEAPI_EXPORT
+  virtual ~ExchangeAPI_Import_Image() = default;
+
+  INTERFACE_1(ExchangePlugin_Import_ImageFeature::ID(),
+              filePath, ExchangePlugin_Import_ImageFeature::FILE_PATH_ID(),
+              ModelAPI_AttributeString, /** File path */
+  )
+
+  /// Set point values
+  EXCHANGEAPI_EXPORT
+  void setFilePath(const std::string & theFilePath);
+
+  /// Dump wrapped feature
+  EXCHANGEAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+};
+
+//! Pointer on Import object
+typedef std::shared_ptr<ExchangeAPI_Import_Image> ImportImagePtr;
+
+
+EXCHANGEAPI_EXPORT
+ImportImagePtr addImportImage(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    const std::string & theFilePath);
+
+//--------------------------------------------------------------------------------------
 #endif /* SRC_EXCHANGEAPI_EXCHANGEAPI_IMPORT_H_ */
