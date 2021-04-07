@@ -476,7 +476,19 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
       bool isValid = aSession->filters()->isValid(myFeature, aBody, aSubShape);
       if (isValid) {
         aBuilder.Add(aComp, aTShape);
-        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aSubShape));
+        // bos #24043: Naming on a compsolid works wrong.
+        // Find a simple sub-result for the ViewerPrs context:
+        ObjectPtr aSubResultObj = aObj;
+        for (int aSubIndex = 0; aSubIndex < aBody->numberOfSubs(); aSubIndex++) {
+          ResultBodyPtr aSubResult = aBody->subResult(aSubIndex);
+          GeomShapePtr aSubResultShape = aSubResult->shape();
+          if (aSubResultShape->isSubShape(aSubShape)) {
+            aSubResultObj = aSubResult;
+            break;
+          }
+        }
+        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aSubResultObj, aSubShape));
+        //ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aSubShape));
         myValues.append(aValue);
       }
     }
