@@ -72,4 +72,25 @@ model.end()
 
 checkRectangle(lines_3, SketchAPI_Line(lines_1[0]).startPoint().pnt(), SketchAPI_Line(lines_2[0]).endPoint().pnt())
 
+# move center of rectangle
+SHIFT = 1.0
+center = SketchAPI_Line(lines_1[0]).startPoint().pnt()
+for i in range(0, 20):
+  center.setX(center.x() + SHIFT)
+  center.setY(center.y() + SHIFT)
+  model.begin()
+  sketch.move(SketchAPI_Line(lines_1[0]).startPoint(), center)
+  model.end()
+  checkRectangle(lines_3, center, SketchAPI_Line(lines_2[0]).endPoint().pnt())
+
+# move corner of rectangle
+corner = SketchAPI_Line(lines_2[0]).endPoint().pnt()
+for i in range(0, 20):
+  corner.setX(corner.x() + SHIFT)
+  corner.setY(corner.y() + SHIFT)
+  model.begin()
+  sketch.move(SketchAPI_Line(lines_2[0]).endPoint(), corner)
+  model.end()
+  checkRectangle(lines_3, SketchAPI_Line(lines_1[0]).startPoint().pnt(), corner)
+
 assert(model.checkPythonDump())
