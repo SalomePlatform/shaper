@@ -478,16 +478,22 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
         aBuilder.Add(aComp, aTShape);
         // bos #24043: Naming on a compsolid works wrong.
         // Find a simple sub-result for the ViewerPrs context:
-        ObjectPtr aSubResultObj = aObj;
-        for (int aSubIndex = 0; aSubIndex < aBody->numberOfSubs(); aSubIndex++) {
-          ResultBodyPtr aSubResult = aBody->subResult(aSubIndex);
-          GeomShapePtr aSubResultShape = aSubResult->shape();
-          if (aSubResultShape->isSubShape(aSubShape)) {
-            aSubResultObj = aSubResult;
-            break;
+        ResultBodyPtr aContext = aBody;
+        bool isComposite = aContext->numberOfSubs() > 0;
+        while (isComposite) {
+          isComposite = false;
+          int nbSubs = aContext->numberOfSubs();
+          for (int aSubIndex = 0; aSubIndex < nbSubs; aSubIndex++) {
+            ResultBodyPtr aSubResult = aContext->subResult(aSubIndex);
+            GeomShapePtr aSubResultShape = aSubResult->shape();
+            if (aSubResultShape->isSubShape(aSubShape)) {
+              aContext = aSubResult;
+              isComposite = aContext->numberOfSubs() > 0;
+              break;
+            }
           }
         }
-        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aSubResultObj, aSubShape));
+        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aContext, aSubShape));
         //ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aSubShape));
         myValues.append(aValue);
       }
