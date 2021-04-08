@@ -1631,34 +1631,6 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
     std::list<std::list<ResultPtr> > aFaces;
     edgesOfSketchFaces(aCompFeat, aFaces);
 
-    /// remove faces that must not be dumped
-    std::vector< std::list<std::list<ResultPtr>>::iterator> aFacesToRemove;
-    for(auto itFaces = aFaces.begin(); itFaces != aFaces.end(); ++itFaces)
-    {
-      auto & facesGroup = *itFaces;
-      std::vector<std::list<ResultPtr>::iterator> subFacestoRemove;
-      for(auto itGroup = facesGroup.begin(); itGroup != facesGroup.end(); ++itGroup)
-      {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(*itGroup);
-        if(theDumper.isDumped(aFeature)){
-          subFacestoRemove.push_back(itGroup);
-        }
-      }
-      for(auto itGroup :subFacestoRemove){
-        facesGroup.erase(itGroup);
-      }
-
-      if(!facesGroup.size()){
-        aFacesToRemove.push_back(itFaces);
-      }
-    }
-    for(auto itFaces :aFacesToRemove){
-      aFaces.erase(itFaces);
-    }
-
-    if(!aFaces.size())
-      return;
-
     const std::string& aSketchName = theDumper.name(aBase);
     std::string aMethodName(".changeFacesOrder");
     std::string aSpaceShift(aSketchName.size() + aMethodName.size(), ' ');
