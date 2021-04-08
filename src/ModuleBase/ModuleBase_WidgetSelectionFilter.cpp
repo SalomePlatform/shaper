@@ -34,7 +34,9 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_FiltersFactory.h>
 #include <ModelAPI_ResultBody.h>
+
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Edge.h>
 
 #include <Events_Loop.h>
 #include <Config_ValidatorReader.h>
@@ -472,8 +474,15 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
       TopoDS_Shape aTShape = aSubShape->impl<TopoDS_Shape>();
       if (!alreadyThere.Add(aTShape))
         continue;
+
+      // degenerated edge is not valid selection
+      if ((GeomAPI_Shape::ShapeType)mySelectionType == GeomAPI_Shape::EDGE)
+        if (aSubShape->edge()->isDegenerated())
+          continue;
+
       static SessionPtr aSession = ModelAPI_Session::get();
       bool isValid = aSession->filters()->isValid(myFeature, aBody, aSubShape);
+
       if (isValid) {
         aBuilder.Add(aComp, aTShape);
         // bos #24043: Naming on a compsolid works wrong.
