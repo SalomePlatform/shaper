@@ -70,6 +70,7 @@ aSession.finishOperation()
 #=========================================================================
 aSession.startOperation()
 aRectangle = aSketchFeature.addFeature("SketchRectangle")
+aRectangle.string("RectangleType").setValue("RectangleTypeByCorners")
 aStartCorner = geomDataAPI_Point2D(aRectangle.attribute("RectStartPoint"))
 aEndCorner = geomDataAPI_Point2D(aRectangle.attribute("RectEndPoint"))
 aStartCorner.setValue(10., 10.)
