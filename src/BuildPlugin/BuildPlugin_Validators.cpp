@@ -18,6 +18,9 @@
 //
 
 #include "BuildPlugin_Validators.h"
+#include "BuildPlugin_Solid.h"
+#include "BuildPlugin_Face.h"
+#include "BuildPlugin_Wire.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -126,37 +129,38 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
     return false;
   }
 
-  /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
+  if (theFeature->getKind() == BuildPlugin_Wire::ID()) {
+    /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
   /// Wire builder: wires and edges selected
-  std::set<GeomAPI_Shape::ShapeType> shapeTypes;
-  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if (aShape.get())
-      shapeTypes.insert(aShape->shapeType());
-  }
-
-  std::set<int> aRemove;
-  if (shapeTypes.find(GeomAPI_Shape::WIRE) != shapeTypes.end())
-  {
+    std::set<GeomAPI_Shape::ShapeType> shapeTypes;
     for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
       AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
       GeomShapePtr aShape = aSelection->value();
-      if (aShape.get()) {
-        auto aType = aShape->shapeType();
-        if (aType == GeomAPI_Shape::EDGE)
+      if (aShape.get())
+        shapeTypes.insert(aShape->shapeType());
+    }
+
+    std::set<int> aRemove;
+    if (shapeTypes.find(GeomAPI_Shape::WIRE) != shapeTypes.end())
+    {
+      for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+        AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+        GeomShapePtr aShape = aSelection->value();
+        if (aShape.get()) {
+          auto aType = aShape->shapeType();
+          if (aType == GeomAPI_Shape::EDGE)
+            aRemove.insert(anIndex);
+        }
+        else
           aRemove.insert(anIndex);
       }
-      else
-        aRemove.insert(anIndex);
     }
+
+    if (aRemove.size() > 0)
+      aSelectionList->remove(aRemove);
   }
 
-  if (aRemove.size() > 0)
-    aSelectionList->remove(aRemove);
-
   GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::shapeTypeByStr(theArguments.back());
-
   // Collect base shapes.
   ListOfShape aListOfShapes;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
@@ -226,35 +230,36 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     return false;
   }
 
-  /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
-  /// - Face builder: edges, faces and wires selected
-  ///                 --> remove edges and wires
-  std::set<GeomAPI_Shape::ShapeType> shapeTypes;
-  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if (aShape.get())
-      shapeTypes.insert(aShape->shapeType());
-  }
-
-  std::set<int> aRemove;
-  if (shapeTypes.find(GeomAPI_Shape::FACE) != shapeTypes.end())
-  {
+  if (theFeature->getKind() == BuildPlugin_Face::ID()) {
+    /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
+    /// - Face builder: edges, faces and wires selected
+    ///                 --> remove edges and wires
+    std::set<GeomAPI_Shape::ShapeType> shapeTypes;
     for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
       AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
       GeomShapePtr aShape = aSelection->value();
-      if (aShape.get()) {
-        auto aType = aShape->shapeType();
-        if (aType == GeomAPI_Shape::WIRE || aType == GeomAPI_Shape::EDGE)
+      if (aShape.get())
+        shapeTypes.insert(aShape->shapeType());
+    }
+
+    std::set<int> aRemove;
+    if (shapeTypes.find(GeomAPI_Shape::FACE) != shapeTypes.end())
+    {
+      for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+        AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+        GeomShapePtr aShape = aSelection->value();
+        if (aShape.get()) {
+          auto aType = aShape->shapeType();
+          if (aType == GeomAPI_Shape::WIRE || aType == GeomAPI_Shape::EDGE)
+            aRemove.insert(anIndex);
+        }
+        else
           aRemove.insert(anIndex);
       }
-      else
-        aRemove.insert(anIndex);
     }
+    if (aRemove.size() > 0)
+      aSelectionList->remove(aRemove);
   }
-  if (aRemove.size() > 0)
-    aSelectionList->remove(aRemove);
-
   bool hasEdgesOrWires = false;
   bool hasFaces = false;
 
@@ -351,38 +356,40 @@ bool BuildPlugin_ValidatorBaseForSolids::isValid(
     return false;
   }
 
-  /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
-  /// Solid builder: faces and shapes shells or solids seleted
-  ///                --> remove faces
+  if (theFeature->getKind() == BuildPlugin_Solid::ID()) {
+    /// remove objects of sub-type if ojects of correct type is in List,  in some cases :
+    /// Solid builder: faces and shapes shells or solids seleted
+    ///                --> remove faces
 
-  std::set<GeomAPI_Shape::ShapeType> shapeTypes;
-  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if (aShape.get())
-      shapeTypes.insert(aShape->shapeType());
-  }
-
-  std::set<int> aRemove;
-  if (shapeTypes.find(GeomAPI_Shape::SHAPE) != shapeTypes.end() ||
-      shapeTypes.find(GeomAPI_Shape::SOLID) != shapeTypes.end() ||
-      shapeTypes.find(GeomAPI_Shape::SHELL) != shapeTypes.end())
-  {
+    std::set<GeomAPI_Shape::ShapeType> shapeTypes;
     for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
       AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
       GeomShapePtr aShape = aSelection->value();
-      if (aShape.get()) {
-        auto aType = aShape->shapeType();
-        if (aType == GeomAPI_Shape::FACE)
+      if (aShape.get())
+        shapeTypes.insert(aShape->shapeType());
+    }
+
+    std::set<int> aRemove;
+    if (shapeTypes.find(GeomAPI_Shape::SHAPE) != shapeTypes.end() ||
+      shapeTypes.find(GeomAPI_Shape::SOLID) != shapeTypes.end() ||
+      shapeTypes.find(GeomAPI_Shape::SHELL) != shapeTypes.end())
+    {
+      for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+        AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+        GeomShapePtr aShape = aSelection->value();
+        if (aShape.get()) {
+          auto aType = aShape->shapeType();
+          if (aType == GeomAPI_Shape::FACE)
+            aRemove.insert(anIndex);
+        }
+        else
           aRemove.insert(anIndex);
       }
-      else
-        aRemove.insert(anIndex);
     }
-  }
 
-  if (aRemove.size() > 0)
-    aSelectionList->remove(aRemove);
+    if (aRemove.size() > 0)
+      aSelectionList->remove(aRemove);
+  }
 
   // Collect base shapes.
   ListOfShape anOriginalShapes;
