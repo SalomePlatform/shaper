@@ -119,9 +119,11 @@ MAYBE_UNUSED static const char * EVENT_DOF_OBJECTS = "DoFObjects";
 /// Event ID that requests updates visual attributes for presentations
 MAYBE_UNUSED static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttributes";
 
-
 /// Event ID that 1D-fillet failed (comes with ModelAPI_ShapesFailedMessage)
 MAYBE_UNUSED static const char * EVENT_OPERATION_SHAPES_FAILED = "OperationShapesFailed";
+
+/// Event ID that license of specified features is checked and valid
+MAYBE_UNUSED static const char * EVENT_FEATURE_LICENSE_VALID = "FeaturesLicenseValid";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
@@ -654,6 +656,30 @@ public:
 
 private:
   std::list< std::shared_ptr<GeomAPI_Shape> > myShapes;
+};
+
+/// Message that sends the features which license is checked and valid
+class ModelAPI_FeaturesLicenseValidMessage : public Events_Message
+{
+public:
+  /// Creates an message
+  MODELAPI_EXPORT
+  ModelAPI_FeaturesLicenseValidMessage(const Events_ID theID, const void* theSender = 0);
+  /// Default destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_FeaturesLicenseValidMessage();
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID eventId()
+  {
+    return Events_Loop::eventByName(EVENT_FEATURE_LICENSE_VALID);
+  }
+
+  /// Sets list of features with valid license
+  MODELAPI_EXPORT void setFeatures(const std::set<std::string>& theFeatures);
+  /// Returns list of features with valid license
+  MODELAPI_EXPORT const std::set<std::string>& features() const;
+
+private:
+  std::set<std::string> myFeatures;
 };
 
 #endif

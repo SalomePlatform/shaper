@@ -62,6 +62,16 @@ const std::map<std::string, std::string>& Config_ModuleReader::featuresInFiles()
   return myFeaturesInFiles;
 }
 
+const std::map<std::string, std::string>& Config_ModuleReader::proprietaryFeatures() const
+{
+  return myProprietaryFeatures;
+}
+
+const std::set<std::string>& Config_ModuleReader::proprietaryPlugins() const
+{
+  return myProprietaryPlugins;
+}
+
 const std::set<std::string>& Config_ModuleReader::modulePluginFiles() const
 {
   return myPluginFiles;
@@ -81,6 +91,10 @@ std::string Config_ModuleReader::getModuleName()
 void Config_ModuleReader::addFeature(const std::string& theFeatureName,
                                      const std::string& thePluginConfig)
 {
+  if (myProprietaryFeatures.count(theFeatureName)) {
+    myProprietaryFeatures.erase(theFeatureName);
+  }
+
   if (myFeaturesInFiles.count(theFeatureName)) {
     std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
       " There is a feature with the same ID.";
@@ -90,6 +104,21 @@ void Config_ModuleReader::addFeature(const std::string& theFeatureName,
   }
 
   myFeaturesInFiles[theFeatureName] = thePluginConfig;
+}
+
+void Config_ModuleReader::addFeatureRequireLicense(const std::string& theFeatureName,
+                                                   const std::string& thePluginConfig)
+{
+  if (myFeaturesInFiles.count(theFeatureName) ||
+      myProprietaryFeatures.count(theFeatureName)) {
+    std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
+      " There is a feature with the same ID.";
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg)
+      .arg(theFeatureName).arg(thePluginConfig).send();
+    return;
+  }
+
+  myProprietaryFeatures[theFeatureName] = thePluginConfig;
 }
 
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
@@ -112,10 +141,19 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
       Events_Loop::loop()->send(aMess);
     }
 
+    std::string aLicense = getProperty(theNode, PLUGIN_LICENSE);
+    std::transform(aLicense.begin(), aLicense.end(), aLicense.begin(), ::tolower);
+    bool isLicensed = aLicense == "true";
+    if (isLicensed)
+      myProprietaryPlugins.insert(aPluginName);
+
     std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf, aPluginDocSection);
     std::list<std::string>::iterator it = aFeatures.begin();
     for (; it != aFeatures.end(); it++) {
-      addFeature(*it, aPluginConf);
+      if (isLicensed)
+        addFeatureRequireLicense(*it, aPluginConf);
+      else
+        addFeature(*it, aPluginConf);
     }
   }
 }

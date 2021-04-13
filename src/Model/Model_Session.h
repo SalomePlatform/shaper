@@ -127,6 +127,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// the plugin manager on call of the feature)
   MODEL_EXPORT virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
+  /// Verifies the license for the plugin is valid
+  MODEL_EXPORT virtual bool checkLicense(const std::string& thePluginName);
+
   /// Processes the configuration file reading
   MODEL_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
