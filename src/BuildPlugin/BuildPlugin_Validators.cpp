@@ -23,6 +23,7 @@
 #include "BuildPlugin_Wire.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_PlanarEdges.h>
@@ -41,6 +42,8 @@
 
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
+
+#include <BuildPlugin_Interpolation.h>
 
 #include <SketchPlugin_Sketch.h>
 
