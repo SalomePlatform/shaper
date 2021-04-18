@@ -75,7 +75,6 @@
 #include <OSD_Protection.hxx>
 
 #ifdef TINSPECTOR
-#include <CDF_Session.hxx>
 #include <CDF_Directory.hxx>
 #endif
 
@@ -117,7 +116,7 @@ Model_Document::Model_Document(const int theID, const std::string theKind)
       myIsSetCurrentFeature(false)
 {
 #ifdef TINSPECTOR
-  CDF_Session::CurrentSession()->Directory()->Add(myDoc);
+  ModelAPI_Session::get()->application()->NewDocument("BinOcaf", myDoc);
 #endif
   myObjs = new Model_Objects(myDoc->Main());
   myDoc->SetUndoLimit(UNDO_LIMIT);

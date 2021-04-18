@@ -25,6 +25,11 @@
 #include <list>
 #include <memory>
 
+#ifdef TINSPECTOR
+#include <Standard_Handle.hxx>
+#include <TDocStd_Application.hxx>
+#endif
+
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
 class ModelAPI_Document;
@@ -137,6 +142,10 @@ class MODELAPI_EXPORT ModelAPI_Session
 
   /// Set state of the auto-update of features result in the application
   virtual void blockAutoUpdate(const bool theBlock) = 0;
+
+#ifdef TINSPECTOR
+  virtual Handle(TDocStd_Application) application() = 0;
+#endif
 
  protected:
   /// Sets the session interface implementation (once per application launch)

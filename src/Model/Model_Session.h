@@ -27,6 +27,10 @@
 #include <Events_Listener.h>
 #include <map>
 
+#ifdef TINSPECTOR
+#include "Model_Application.h"
+#endif
+
 class Model_Document;
 
 /**\class Model_Session
@@ -154,6 +158,12 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   /// Set state of the auto-update of features result in the application
   MODEL_EXPORT virtual void blockAutoUpdate(const bool theBlock);
+
+#ifdef TINSPECTOR
+  MODEL_EXPORT virtual Handle(TDocStd_Application) application() {
+    return Model_Application::getApplication();
+  }
+#endif
 
  protected:
   /// Loads (if not done yet) the information about the features and plugins
