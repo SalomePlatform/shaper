@@ -18,19 +18,29 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-"""importParameters
-Author: Nathalie Gore
+"""Obtention des surfaces médianes à partir d'une CAO contenue dans un fichier
+
+On sait traiter les faces :
+  . planes
+  . cylindriques
+  . sphériques
+  . toriques
+  . coniques
+
+Author: Gérald NICOLAS
 """
+__revision__ = "V02.01"
+
 import os
 
 from salome.shaper import model
 
 import ModelAPI
-import ParametersAPI
 
-class importParameters(model.Feature):
-    """Import of Construction points
-    """
+from macros.fibreNeutre.surfaceMediane import SurfaceMediane
+
+class fibreNeutre(model.Feature):
+    """Création des fibres neutres"""
 
 # Feature initializations
 
@@ -41,7 +51,7 @@ class importParameters(model.Feature):
     @staticmethod
     def ID():
         """Return Id of the Feature."""
-        return "importParameters"
+        return "fibreNeutre"
 
     @staticmethod
     def FILE_ID():
@@ -50,7 +60,7 @@ class importParameters(model.Feature):
 
     def getKind(self):
         """Override Feature.getKind()"""
-        return importParameters.ID()
+        return fibreNeutre.ID()
 
 
 # Initialization of the dialog panel
@@ -61,42 +71,26 @@ class importParameters(model.Feature):
         self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
 
 
-# Get existing parameters names
-
-    def existingParameters(self):
-        """ Returns list of already existing parameters names"""
-        aDoc = model.activeDocument()
-        aNbFeatures = aDoc.numInternalFeatures()
-        aNames = list()
-        for i in range(aNbFeatures):
-            aParamFeature = aDoc.internalFeature(i)
-            if aParamFeature is not None:
-                if aParamFeature.getKind() == ParametersAPI.ParametersAPI_Parameter.ID():
-                    aNames.append(aParamFeature.name())
-        return aNames
-
-
-# Execution of the Import
+# Execution
 
     def execute(self):
         """F.execute() -- execute the Feature"""
-        # Retrieving the user input
         apath    = self.string(self.FILE_ID())
         filepath = apath.value()
         #print("filepath : '{}'".format(filepath))
         if filepath != "" :
             if os.path.isfile(filepath):
-                # Creating the parameters in the current document
-                part = model.activeDocument()
-                aNames = self.existingParameters()
-                with open(filepath) as fic:
-                    for line in fic:
-                        defParameters = line.replace("\n","").split(' ')
-                        if len(defParameters) == 2 :
-                            if defParameters[0] not in aNames:
-                                model.addParameter(part, defParameters[0], defParameters[1])
-                                aNames.append(defParameters[0])
-                    fic.close()
+                # Lancement du script de création des fibres neutres
+                l_options = list()
+                #l_options.append("-v")
+                #l_options.append("-vmax")
+                l_options.append("-retour_shaper")
+                #print("l_options : '{}'".format(l_options))
+                s_med = SurfaceMediane(l_options)
+                erreur, message = s_med.surf_fic_cao (filepath)
+                del s_med
+                if erreur:
+                    self.setError(message)
             else:
                 self.setError("The file '{}' does not exist".format(filepath))
 
@@ -106,7 +100,7 @@ class importParameters(model.Feature):
         """Override Feature.initAttributes().
         F.isMacro() -> True
 
-        importParameters feature is macro: removes itself on the creation transaction
+        fibreNeutre feature is macro: removes itself on the creation transaction
         finish.
         """
-        return True
+        return False
