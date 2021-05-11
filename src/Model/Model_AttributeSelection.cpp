@@ -604,6 +604,8 @@ bool Model_AttributeSelection::update()
     aResult = aSelector.restore(aContextShape);
     bool aWasInvalid = aSelLab.IsAttribute(kINVALID_SELECTION);
     setInvalidIfFalse(aSelLab, aResult);
+    if (!aResult)
+      aWasInvalid = false;
 
     TopoDS_Shape aNewShape;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))

@@ -894,7 +894,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
           bool isObligatory = !aFactory->isNotObligatory(
             theFeature->getKind(), theFeature->data()->id(aSel)) &&
             aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-          if (isObligatory)
+          if (isObligatory ||
+            // #24260 : sketch plane was selected, but selection becomes wrong, make it invalid
+            (theFeature->getKind() == "Sketch" && aSel->id() == "External"))
             aState = ModelAPI_StateInvalidArgument;
         }
       }
