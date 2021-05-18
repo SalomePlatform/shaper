@@ -83,12 +83,28 @@ void GeomData_Dir::reinit()
   }
 }
 
+void GeomData_Dir::reset()
+{
+  if (myLab.FindAttribute(TDataStd_RealArray::GetID(), myCoords)) {
+    // invalidate values of the direction
+    myCoords->SetValue(0, 0.0);
+    myCoords->SetValue(1, 0.0);
+    myCoords->SetValue(2, 0.0);
+  }
+  GeomDataAPI_Dir::reset();
+}
+
 bool GeomData_Dir::isInitialized()
 {
   // Check once again the direction is initialized.
   // Use case (bos #18905): draw a sketch, click "Change sketch plane", then abort it.
   //                        myIsInitialized value is dropped to false, thus recheck.
-  if (!myIsInitialized)
-    myIsInitialized = myLab.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
+  // Additionally verify the values are valid.
+  // Use case (bos #24206): start a sketch, highlight a coordinate plane, then click anywhere
+  //                        in empty space. Sketch features in menu appears and can be selected.
+  if (!myIsInitialized) {
+    myIsInitialized = myLab.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True
+        && myCoords->Value(0) != 0.0 && myCoords->Value(1) != 0.0 && myCoords->Value(2) != 0.0;
+  }
   return ModelAPI_Attribute::isInitialized();
 }

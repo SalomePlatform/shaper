@@ -57,6 +57,9 @@ class GeomData_Dir : public GeomDataAPI_Dir
   /// Returns \c ture if the direction is initialized
   GEOMDATA_EXPORT virtual bool isInitialized();
 
+  /// Resets attribute to default state.
+  GEOMDATA_EXPORT virtual void reset();
+
  protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Dir(TDF_Label& theLabel);
