@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021  CEA/DEN, EDF R&D
+# Copyright (C) 2021  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,13 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-  TestExportToGEOM
-  TestExportToGEOMAllGroupsAndFields
-  TestExportToGEOMPartSet
-  TestExportToGEOMWholeResult
-  TestExportToGEOMWholeFeature
-  Test2882
-  Test17917
-  Test18887
-  Test3195
-  TestExportSTL
-  TestImportSTL
-  TestImportSTEP
-)
+include(tests.set)
+include(tests_gui.set)
+
+set(TEST_NAMES ${TEST_NAMES} ${TEST_WITH_GUI_NAMES})
+
+foreach(tfile ${TEST_NAMES})
+  set(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  add_test(${TEST_NAME} python ${tfile})
+  set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${SALOME_TEST_LABEL_ADV}")
+endforeach()

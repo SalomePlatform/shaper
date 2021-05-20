@@ -69,4 +69,5 @@ SET(TEST_NAMES
                TestGroupMoveAndSplit4.py
                Test3114.py
                Test18739.py
+               TestCreateShapesFromGroups.py
 )
