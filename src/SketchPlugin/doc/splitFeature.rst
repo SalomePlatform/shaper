@@ -14,7 +14,7 @@ To create a Split in the active Sketch:
 
 Property panel:
 
-.. figure:: images/Split_panel.png
+.. figure:: images/Split_panel_Sketch.png
    :align: center
 
    Split
