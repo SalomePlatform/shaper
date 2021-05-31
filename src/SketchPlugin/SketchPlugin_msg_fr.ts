@@ -150,6 +150,11 @@
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un plan pour l&apos;esquisse</translation>
     </message>
+    <name>Sketch</name>
+    <message>
+      <source>The sketch base plane is invalid, please push &apos;Change sketch plane&apos; button to reselect it.</source>
+      <translation>Le plan de base de l&apos;esquisse n&apos;est pas valide, veuillez appuyer sur le bouton &apos;Changer le plan de&apos;esquisse&apos; pour le resélectionner.</translation>
+    </message>
   </context>
   <context>
     <name>Sketch:DirX</name>

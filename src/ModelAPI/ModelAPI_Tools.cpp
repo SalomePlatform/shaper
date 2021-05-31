@@ -41,6 +41,7 @@
 #include <Events_Loop.h>
 #include <Locale_Convert.h>
 #include <ModelAPI_Events.h>
+#include <Config_Translator.h>
 
 #include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -153,12 +154,21 @@ std::string getFeatureError(const FeaturePtr& theFeature)
         CompositeFeaturePtr aComposite =
                     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
         if (aComposite) {
+          bool aHasSubError = false;
           for (int i = 0, aSize = aComposite->numberOfSubs(); i < aSize; i++) {
             FeaturePtr aSubFeature = aComposite->subFeature(i);
             std::string aSubFeatureError = getFeatureError(aSubFeature);
             if (!aSubFeatureError.empty()) {
               anError = anError + " in " + aSubFeature->getKind() + ".\n" + aSubFeatureError;
+              aHasSubError = true;
               break;
+            }
+          }
+          if (!aHasSubError) { // #24260: error not in the sub-features, but in the argument
+            if (aComposite->getKind() == "Sketch" &&
+                aComposite->selection("External")->isInvalid()) {
+              anError = Config_Translator::translate(aComposite->getKind(), "The sketch base plane \
+is invalid, please push 'Change sketch plane' button to reselect it.");
             }
           }
         }
