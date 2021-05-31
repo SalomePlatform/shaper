@@ -167,8 +167,9 @@ std::string getFeatureError(const FeaturePtr& theFeature)
           if (!aHasSubError) { // #24260: error not in the sub-features, but in the argument
             if (aComposite->getKind() == "Sketch" &&
                 aComposite->selection("External")->isInvalid()) {
-              anError = Config_Translator::translate(aComposite->getKind(), "The sketch base plane \
-is invalid, please push 'Change sketch plane' button to reselect it.");
+              std::string aMsg = "The sketch base plane is invalid, ";
+              aMsg += "please push 'Change sketch plane' button to reselect it.";
+              anError = Config_Translator::translate(aComposite->getKind(), aMsg);
             }
           }
         }
