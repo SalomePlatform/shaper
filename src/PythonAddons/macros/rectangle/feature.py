@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2014-2021  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -35,9 +34,6 @@ class SketchPlugin_Rectangle(model.Feature):
     """
 
 # Initializations
-
-    __sketch = None
-    __isHV = list()
 
     def __init__(self):
         """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
@@ -135,7 +131,6 @@ class SketchPlugin_Rectangle(model.Feature):
 # Edition of the rectangle
 
     def execute(self):
-        """F.execute() -- execute the Feature"""
         # Retrieving list of already created lines
         aLinesList = self.reflist(self.LINES_LIST_ID())
         aNbLines = aLinesList.size()
@@ -161,7 +156,7 @@ class SketchPlugin_Rectangle(model.Feature):
                 aRefAttrA.setAttr(aPrevLine.attribute("EndPoint"))
                 aRefAttrB.setAttr(aLine.attribute("StartPoint"))
                 aStartPoints.append(aLine.attribute("StartPoint"))
-            # Flags which show horizontal or vertical constraint is build for corresponding line
+            # Flags which show horizontal or vertical constraint is build for correponding line
             self.__isHV = [False, False, False, False]
             # Update coordinates of created lines
             self.updateLines()
@@ -208,12 +203,12 @@ class SketchPlugin_Rectangle(model.Feature):
             self.__isHV[i] = True
 
     def attributeChanged(self, theID):
-        """attributeChanged"""
         if theID == self.START_ID() or theID == self.END_ID() or theID == self.CENTER_ID() or theID == self.CENTER_REF_ID() or theID == self.CORNER_ID():
             # Search the sketch containing this rectangle
-            aRefs = self.data().refsToMe()
-            for itera in aRefs:
-                aFeature = ModelAPI.objectToFeature(itera.owner())
+            self.__sketch = None
+            aRefs = self.data().refsToMe();
+            for iter in aRefs:
+                aFeature = ModelAPI.objectToFeature(iter.owner())
                 if aFeature.getKind() == "Sketch":
                     self.__sketch = ModelAPI.featureToCompositeFeature(aFeature)
                     break
@@ -231,9 +226,9 @@ class SketchPlugin_Rectangle(model.Feature):
             aCenter = self.getPointByRef(self.attribute(self.CENTER_ID()), self.refattr(self.CENTER_REF_ID()))
             aCorner = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.CORNER_ID()))
             if (aStartPoint.isInitialized() and aEndPoint.isInitialized()) or (aCenter is not None and aCorner.isInitialized()):
-                self.updateLines()
+              self.updateLines()
             else:
-                self.updateStartPoint()
+              self.updateStartPoint()
         if theID == self.AUXILIARY_ID():
             anAuxiliary = self.data().boolean(self.AUXILIARY_ID()).value()
             aLinesList = self.reflist(self.LINES_LIST_ID())
@@ -244,7 +239,6 @@ class SketchPlugin_Rectangle(model.Feature):
                 aLine.data().boolean("Auxiliary").setValue(anAuxiliary)
 
     def getReferencePoint(self, theRef):
-        """getReferencePoint"""
         if theRef.isObject() and theRef.object() is not None:
             feature = ModelAPI.ModelAPI_Feature.feature(theRef.object())
             if feature.getKind() == "SketchPoint":
@@ -254,7 +248,6 @@ class SketchPlugin_Rectangle(model.Feature):
         return None
 
     def getPointByRef(self, thePoint, theRef):
-        """getPointByRef"""
         attr = thePoint
         if theRef.isInitialized():
             refPnt = self.getReferencePoint(theRef)
@@ -265,7 +258,6 @@ class SketchPlugin_Rectangle(model.Feature):
         return GeomDataAPI.geomDataAPI_Point2D(attr).pnt()
 
     def updateLines(self):
-        """updateLines"""
         # Retrieving list of already created lines
         aLinesList = self.reflist(self.LINES_LIST_ID())
         aNbLines = min(aLinesList.size(), 4)
@@ -312,7 +304,6 @@ class SketchPlugin_Rectangle(model.Feature):
             aLinesList.object(i).data().blockSendAttributeUpdated(wasBlocked[i], True)
 
     def updateStartPoint(self):
-        """updateStartPoint"""
         # Retrieving list of already created lines
         aLinesList = self.reflist(self.LINES_LIST_ID())
         aNbLines = aLinesList.size()

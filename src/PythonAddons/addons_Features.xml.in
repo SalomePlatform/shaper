@@ -2,5 +2,4 @@
   <source path="@ADDONS_FOLDER_PATH@/macros/rectangle/widget.xml"/>
   <source path="@ADDONS_FOLDER_PATH@/macros/compoundVertices/widget.xml"/>
   <source path="@ADDONS_FOLDER_PATH@/macros/importParameters/widget.xml"/>
-  <source path="@ADDONS_FOLDER_PATH@/macros/fibreNeutre/widget.xml"/>
 </plugin>

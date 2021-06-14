@@ -1,3 +1,4 @@
+
 Python addons
 =============
 
@@ -9,7 +10,7 @@ A feature description includes 4 files:
 
 - widget.xml with a description of the property panel,
 -  __init__.py,
-- feature.py with python commands,
+- feature.py with python commands, 
 - icon.png with image of button in the toolbar (the file is located at sub-folder /icons).
 
 Some examples of already created custom features are:
@@ -18,7 +19,6 @@ Some examples of already created custom features are:
    :titlesonly:
    :maxdepth: 1
 
+   rectangleFeature.rst
    compoundVerticesFeature.rst
    importParametersFeature.rst
-   fibreNeutreFeature.rst
-   rectangleFeature.rst
