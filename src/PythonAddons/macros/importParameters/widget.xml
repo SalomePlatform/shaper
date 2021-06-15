@@ -2,11 +2,11 @@
   <workbench id="Macros" document="Part">
     <group id="Samples">
       <feature id="importParameters"
-        title="List of Parameters"
+        title="Import Parameters"
         tooltip="Import a set of parameters"
         icon="icons/Addons/parameters.png"
         helpfile="importParametersFeature.html">
-        <file_selector id="file_path" title="Import file" path="">
+        <file_selector id="file_path" title="Import file" tooltip="Select file" path="">
         </file_selector>
       </feature>
     </group>

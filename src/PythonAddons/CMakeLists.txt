@@ -19,6 +19,7 @@
 
 SET(TEXT_RESOURCES
 	PythonAddons_msg_en.ts
+	PythonAddons_msg_fr.ts
 )
 
 # configuration
@@ -42,6 +43,7 @@ INSTALL(DIRECTORY macros DESTINATION ${SHAPER_INSTALL_ADDONS})
 INSTALL(DIRECTORY macros/rectangle/icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Addons)
 INSTALL(DIRECTORY macros/compoundVertices/icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Addons)
 INSTALL(DIRECTORY macros/importParameters/icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Addons)
+INSTALL(DIRECTORY macros/pipeNetwork/icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Addons)
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 INCLUDE(UnitTest)
@@ -53,16 +55,16 @@ ADD_UNIT_TESTS(${TEST_NAMES})
 if(${HAVE_SALOME})
   enable_testing()
   set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/PythonAddons")
-  
+
   install(FILES CTestTestfileInstall.cmake
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)
   install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-  
+
   set(TMP_TESTS_NAMES)
   foreach(tfile ${TEST_NAMES})
     list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
   endforeach(tfile ${TEST_NAMES})
-  
+
   install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
 endif(${HAVE_SALOME})

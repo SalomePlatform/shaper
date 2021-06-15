@@ -5,11 +5,11 @@
         id="compoundVertices"
         title="Points set"
         tooltip="Import a set of construction points"
-        icon="icons/Addons/import.png"
+        icon="icons/Addons/compound.png"
         helpfile="compoundVerticesFeature.html">
-        <file_selector id="file_path" title="Import txt file (X Y Z)" path="">
+        <file_selector id="file_path" title="Import file" tooltip="Select file" path="">
         </file_selector>
-        <stringvalue id="separator"  label="Separator (optional): ">
+        <stringvalue id="separator" label="Separator (optional):" tooltip="Select separator">
         </stringvalue>
       </feature>
     </group>

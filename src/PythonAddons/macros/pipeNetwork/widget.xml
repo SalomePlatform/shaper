@@ -1,0 +1,20 @@
+<source>
+  <workbench id="Macros" document="Part">
+    <group id="Samples">
+      <feature
+        id="pipeNetwork"
+        title="Pipe Network"
+        tooltip="Create"
+        icon="icons/Addons/pipeNetwork.png"
+        helpfile="pipeNetworkFeature.html">
+<!--        <boolvalue id="blocking"
+                   label="Hexa"
+                   default="false"
+                   tooltip="Partition"
+                   obligatory="0"/>-->
+        <file_selector id="file_path" title="Import file" path="">
+        </file_selector>
+      </feature>
+    </group>
+  </workbench>
+</source>

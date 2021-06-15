@@ -1,0 +1,43 @@
+# Positions des noeuds :
+nodes section
+# Le tuyau principal
+id_noeud1 - 0 0 0
+id_noeud2 - 10 -10 0
+id_noeud3 - 15 -15 0
+id_noeud4 - 20 -20 0
+id_noeud5 - 21 -21 10
+id_noeud6 - 30 -21 10
+id_noeud7 - 30 -10 10
+id_noeud8 - 30 -5 10
+id_noeud9 - 30 0 10
+# Les deux piquages
+id_noeudA id_noeud2 -5 -5 10
+id_noeudB id_noeudA 0 5 10
+id_noeudC - 30 -10 20
+id_noeudD id_noeudC 5 5 5
+id_noeudE id_noeudD 5 5 5
+
+# Connectivité :
+connectivity section
+# Choix entre 2 méthodes=soit 2par2 soit par_ligne
+method=2par2
+id_noeud1 id_noeud2
+id_noeud2 id_noeud3
+id_noeud3 id_noeud4
+id_noeud4 id_noeud5
+id_noeud5 id_noeud6
+id_noeud6 id_noeud7
+id_noeud7 id_noeud8
+id_noeud8 id_noeud9
+id_noeudA id_noeud2
+id_noeudB id_noeudA
+id_noeud7 id_noeudC
+id_noeudC id_noeudD
+id_noeudD id_noeudE
+
+# Congés de raccordement :
+fillets section
+id_noeud2 angular_connection
+id_noeud4 radius=1
+id_noeud5 angular_connection
+id_noeud6 radius=2

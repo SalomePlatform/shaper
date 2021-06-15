@@ -16,32 +16,36 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+"""Test de la création du réseau de tuyaux - Description des lignes par paquets de 2 noeuds"""
 
-from salome.shaper import model
-from salome.shaper import geom
-from ModelAPI import *
+__revision__ = "V02.01"
 
 import os
+
+from ModelAPI import *
 
 aSession = ModelAPI_Session.get()
 
 def getFilePath(fileName):
-    path = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "macros", "importParameters")
+    """Le fichier décrivant le réseau"""
+    path = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "macros", "pipeNetwork")
     return os.path.join(path, fileName)
 
-theFile = getFilePath("importParameters.txt")
+theFile = getFilePath("pipeNetwork_2par2.txt")
 
-aSession.startOperation("Create part for import")
+aSession.startOperation("Create part for pipe network")
 aPartFeature = aSession.moduleDocument().addFeature("Part")
 aSession.finishOperation()
 aPart = aSession.activeDocument()
 
 aSession.startOperation("Import file")
-aFeatureKind = "importParameters"
+aFeatureKind = "pipeNetwork"
 anImportFeature = aPart.addFeature(aFeatureKind)
 aFieldName = "file_path"
-file = anImportFeature.string(aFieldName)
-file.setValue(theFile)
+aFile = anImportFeature.string(aFieldName)
+aFile.setValue(theFile)
 aSession.finishOperation()
 
-assert(model.checkPythonDump())
+assert(aPart.size("Construction") == 42), "Right number of construction: {}".format(aPart.size("Construction"))
+
+assert(aPart.size("Folders") == 1), "Right number of folders: {}".format(aPart.size("Folders"))
