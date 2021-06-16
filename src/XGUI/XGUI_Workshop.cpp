@@ -51,7 +51,10 @@
 #include <XGUI_InspectionPanel.h>
 #include <XGUI_CompressFiles.h>
 
-#ifndef HAVE_SALOME
+#ifdef HAVE_SALOME
+#include <SUIT_Application.h>
+#include <SUIT_Session.h>
+#else
 #include <AppElements_Button.h>
 #include <AppElements_Command.h>
 #include <AppElements_MainMenu.h>
@@ -677,8 +680,13 @@ void XGUI_Workshop::showHelpPage(const QString& thePage) const
 #endif
     QString aFileName = aDocDir + aSep + thePage;
     if (QFile::exists(aFileName)) {
-      QUrl aUrl = QUrl::fromLocalFile(aFileName);
-      QDesktopServices::openUrl(aUrl);
+      SUIT_Application* app = SUIT_Session::session()->activeApplication();
+      if (app)
+        app->onHelpContextModule("SHAPER", aFileName);
+      else {
+        QUrl aUrl = QUrl::fromLocalFile(aFileName);
+        QDesktopServices::openUrl(aUrl);
+      }
     }
   }
 }
