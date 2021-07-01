@@ -29,6 +29,8 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Wire.h>
 
+#include <Approx_CurvilinearParameter.hxx>
+
 #include <Bnd_Box.hxx>
 
 #include <BRep_Tool.hxx>
@@ -59,10 +61,13 @@
 #include <Geom2d_Curve.hxx>
 #include <Geom2d_Curve.hxx>
 
+#include <Geom_BSplineCurve.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+
+#include <GeomAdaptor_HCurve.hxx>
 
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ShapeIterator.h>
@@ -1190,6 +1195,22 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
       aWire = fixParametricGaps(aWire);
       aWire = BRepAlgo::ConcatenateWire(aWire, GeomAbs_G1); // join smooth parts of wire
       aNewEdge = BRepAlgo::ConcatenateWireC0(aWire); // join C0 parts of wire
+
+      // Reapproximate the result edge to have the parameter equal to curvilinear abscissa.
+      static const int THE_MAX_DEGREE = 14;
+      static const int THE_MAX_INTERVALS = 32;
+      double aFirst, aLast;
+      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aNewEdge, aFirst, aLast);
+      Handle(GeomAdaptor_HCurve) aHCurve = new GeomAdaptor_HCurve(aCurve);
+      Approx_CurvilinearParameter anApprox(aHCurve, Precision::Confusion(), aCurve->Continuity(),
+                                           THE_MAX_DEGREE, THE_MAX_INTERVALS);
+      if (anApprox.HasResult()) {
+        Handle(Geom_BSplineCurve) aNewCurve = anApprox.Curve3d();
+        TColStd_Array1OfReal aKnots = aNewCurve->Knots();
+        BSplCLib::Reparametrize(aFirst, aLast, aKnots);
+        aNewCurve->SetKnots(aKnots);
+        BRep_Builder().UpdateEdge(aNewEdge, aNewCurve, BRep_Tool::Tolerance(aNewEdge));
+      }
     }
     anEdge = GeomEdgePtr(new GeomAPI_Edge);
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));
