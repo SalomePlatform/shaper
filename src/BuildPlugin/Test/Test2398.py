@@ -94,7 +94,7 @@ from GeomAPI import *
 REF_DATA = [(Filling_1, 719.149788883378505488508380949),
             (Filling_2, 910.894525282186464210099074990),
             (Filling_3, 719.149788883378505488508380949),
-            (Filling_4, 910.894525282186464210099074990)]
+            (Filling_4, 911.056740330659408755309414119)]
 for ref in REF_DATA:
     model.testNbResults(ref[0], 1)
     model.testNbSubResults(ref[0], [0])
