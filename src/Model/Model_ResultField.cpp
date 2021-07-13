@@ -90,7 +90,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultField::shape()
         for(int a = aList->size() - 1; a >= 0; a--) {
           std::shared_ptr<GeomAPI_Shape> aSelection = aList->value(a)->value();
           if (aSelection && !aSelection->isNull()) {
-            aSubs.push_back(aSelection);
+            aSubs.push_front(aSelection);
           }
         }
       }
