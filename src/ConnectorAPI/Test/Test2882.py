@@ -21,6 +21,10 @@ from SketchAPI import *
 
 from salome.shaper import model
 
+import salome
+salome.standalone()
+salome.salome_init(1)
+
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
@@ -92,7 +96,6 @@ from salome.geom import geomBuilder
 import os
 import tempfile
 
-salome.salome_init(1)
 aComp = salome.myStudy.FindComponent("GEOM")
 iterator = salome.myStudy.NewChildIterator(aComp)
 aComponents = []

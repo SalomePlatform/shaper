@@ -41,6 +41,7 @@ from GeomAlgoAPI import *
 
 __updated__ = "2015-05-22"
 
+salome.standalone()
 salome.salome_init(1)
 
 #=========================================================================

@@ -26,6 +26,7 @@
 #=========================================================================
 
 import salome
+salome.standalone()
 
 import os
 import math

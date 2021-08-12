@@ -17,6 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+import salome
+salome.standalone()
+salome.salome_init(1)
+
 from SketchAPI import *
 from salome.shaper import model
 from ModelAPI import *
@@ -44,13 +48,11 @@ model.exportToGEOM(partSet)
 model.end()
 
 # check what is exported to GEOM
-import salome
 from salome.geom import geomBuilder
 
 import os
 import tempfile
 
-salome.salome_init(1)
 aComp = salome.myStudy.FindComponent("GEOM")
 iterator = salome.myStudy.NewChildIterator(aComp)
 aComponents = []

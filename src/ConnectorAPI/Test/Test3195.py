@@ -19,6 +19,7 @@
 import sys
 import salome
 
+salome.standalone()
 salome.salome_init()
 ###
 ### SHAPER component

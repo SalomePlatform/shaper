@@ -23,6 +23,7 @@ import tempfile
 import sys
 import salome
 
+salome.standalone()
 salome.salome_init()
 theStudy = salome.myStudy
 

@@ -21,11 +21,12 @@ import salome
 from SketchAPI import *
 from salome.shaper import model
 
-from salome.geom import geomBuilder
 
 import os
 import tempfile
 
+salome.standalone()
+from salome.geom import geomBuilder
 salome.salome_init(1)
 geompy = geomBuilder.New()
 
