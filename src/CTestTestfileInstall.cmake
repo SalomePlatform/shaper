@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(SALOME_TEST_DRIVER "$ENV{KERNEL_ROOT_DIR}/bin/salome/appliskel/salome_test_driver.py")
-
 SET(COMPONENT_NAME SHAPER)
 set(SALOME_TEST_LABEL_ADV SHAPR_ADV)
 

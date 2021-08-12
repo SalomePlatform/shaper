@@ -19,9 +19,6 @@
 
 include(tests.set)
 
-#SET(SALOME_TEST_DRIVER "$ENV{KERNEL_ROOT_DIR}/bin/salome/appliskel/salome_test_driver.py")
-#SET(TIMEOUT        300)
-
 foreach(tfile ${TEST_NAMES})
   set(TEST_NAME ${COMPONENT_NAME}_${tfile})
   add_test(${TEST_NAME} python ${tfile})
