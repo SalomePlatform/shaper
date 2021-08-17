@@ -21,7 +21,7 @@
 
 #include <Config_PropManager.h>
 
-#include <FeaturesPlugin_CreateBoundingBox.h>
+#include <FeaturesPlugin_BoundingBox.h>
 
 #include <GeomAlgoAPI_BoundingBox.h>
 
@@ -174,15 +174,15 @@ void FeaturesPlugin_InspectBoundingBox::createBox()
   DocumentPtr aDoc =  aSession->activeDocument();
 
   if (aDoc.get()) {
-    myCreateFeature = aDoc->addFeature(FeaturesPlugin_CreateBoundingBox::ID());
+    myCreateFeature = aDoc->addFeature(FeaturesPlugin_BoundingBox::ID());
   }
 }
 
 //=================================================================================================
 void FeaturesPlugin_InspectBoundingBox::updateBox()
 {
-  myCreateFeature->boolean(FeaturesPlugin_CreateBoundingBox::COMPUTE_ID())->setValue(false);
-  myCreateFeature->selection(FeaturesPlugin_CreateBoundingBox::OBJECT_ID())
+  myCreateFeature->boolean(FeaturesPlugin_BoundingBox::COMPUTE_ID())->setValue(false);
+  myCreateFeature->selection(FeaturesPlugin_BoundingBox::OBJECT_ID())
                         ->setValue(selection(OBJECT_ID())->context(),
                                    selection(OBJECT_ID())->value());
 
@@ -195,5 +195,5 @@ void FeaturesPlugin_InspectBoundingBox::updateBox()
     aValuesFeatures->setValue(anI,aValues->value(anI));
 
   myCreateFeature->execute();
-  myCreateFeature->boolean(FeaturesPlugin_CreateBoundingBox::COMPUTE_ID())->setValue(true);
+  myCreateFeature->boolean(FeaturesPlugin_BoundingBox::COMPUTE_ID())->setValue(true);
 }
