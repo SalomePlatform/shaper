@@ -32,8 +32,7 @@ class TestHDF(unittest.TestCase):
   reffile = ""
 
   def setUp(self):
-    salome.salome_close()
-
+    salome.standalone()
     salome.salome_init(self.testfile, embedded=1)
     myStudyName = salome.myStudy._get_Name()
     self.session = salome.naming_service.Resolve('/Kernel/Session')
@@ -75,19 +74,13 @@ if __name__ == "__main__":
   if len(sys.argv) > 2:
     TestHDF.reffile = sys.argv[2]
   if len(sys.argv) > 3:
-    salomePortFile = sys.argv[3]
-  if len(sys.argv) > 4:
-    errFile = open(sys.argv[4], 'w')
+    errFile = open(sys.argv[3], 'w')
 
   aTest = unittest.TestLoader().loadTestsFromTestCase(TestHDF)
   unittest.TextTestRunner(stream=errFile).run(aTest)
   errFile.close()
-
-  # close Salome GUI
-  port = salome_utils.getPortNumber()
-  proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])
-
-  try:
-    os.remove(salomePortFile)
-  except:
-    print("Cannot remove file", file=f)
+  #import qtsalome
+  #qtsalome.qApp.closeAllWindows()
+  import signal
+  os.kill(os.getpid(),signal.SIGKILL)
+  
