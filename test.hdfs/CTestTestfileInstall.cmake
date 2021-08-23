@@ -20,7 +20,7 @@
 INCLUDE(tests.set)
 
 SET(COMPONENT_NAME     SHAPER)
-SET(PYTHON_TEST_DRIVER "$ENV{KERNEL_ROOT_DIR}/bin/salome/appliskel/python_test_driver.py")
+SET(PYTHON_TEST_DRIVER "testme.py")
 SET(TIMEOUT            600)
 
 FOREACH(tfile ${PUBLIC_TESTS})
