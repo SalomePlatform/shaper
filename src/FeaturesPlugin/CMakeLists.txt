@@ -70,8 +70,8 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_PointCoordinates.h
     FeaturesPlugin_GeometryCalculation.h
     FeaturesPlugin_BoundingBox.h
-    FeaturesPlugin_CommonBoundingBox.h
-    FeaturesPlugin_CreateBoundingBox.h
+    FeaturesPlugin_BoundingBoxBase.h
+    FeaturesPlugin_InspectBoundingBox.h
 )
 
 SET(PROJECT_SOURCES
@@ -122,8 +122,8 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_PointCoordinates.cpp
     FeaturesPlugin_GeometryCalculation.cpp
     FeaturesPlugin_BoundingBox.cpp
-    FeaturesPlugin_CommonBoundingBox.cpp
-    FeaturesPlugin_CreateBoundingBox.cpp
+    FeaturesPlugin_BoundingBoxBase.cpp
+    FeaturesPlugin_InspectBoundingBox.cpp
 )
 
 SET(XML_RESOURCES

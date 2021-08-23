@@ -17,22 +17,22 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef FeaturesPlugin_CreateBoundingBox_H_
-#define FeaturesPlugin_CreateBoundingBox_H_
+#ifndef FeaturesPlugin_InspectBoundingBox_H_
+#define FeaturesPlugin_InspectBoundingBox_H_
 
-#include <FeaturesPlugin_CommonBoundingBox.h>
+#include <FeaturesPlugin_BoundingBoxBase.h>
 
-/// \class FeaturesPlugin_BoundingBox
+/// \class FeaturesPlugin_InspectBoundingBox
 /// \ingroup Plugins
 /// \brief Feature to view the Bounding Box.
 
-class FeaturesPlugin_CreateBoundingBox : public FeaturesPlugin_CommonBoundingBox
+class FeaturesPlugin_InspectBoundingBox : public FeaturesPlugin_BoundingBoxBase
 {
 public:
-  /// Bounding box kind.
+  /// Bounding box macro kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_ID("BoundingBox");
+    static const std::string MY_ID("BoundingBoxMacro");
     return MY_ID;
   }
 
@@ -85,18 +85,18 @@ public:
     return MY_Z_MAX_COORD_ID;
   }
 
+  /// Attribute name for checkbox create box.
+  inline static const std::string& CREATEBOX_ID()
+  {
+    static const std::string MY_CREATEBOX_ID("createbox");
+    return MY_CREATEBOX_ID;
+  }
+
   /// Attribute name for values of result.
   inline static const std::string& RESULT_VALUES_ID()
   {
     static const std::string MY_RESULT_VALUES_ID("result_values");
     return MY_RESULT_VALUES_ID;
-  }
-
-  /// Attribute name for indicate to compute the bounding box.
-  inline static const std::string& COMPUTE_ID()
-  {
-    static const std::string MY_COMPUTE_ID("compute");
-    return MY_COMPUTE_ID;
   }
 
   /// \return the kind of a feature.
@@ -115,15 +115,25 @@ public:
   /// \param theID identifier of changed attribute
   FEATURESPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
-  /// Return Attribut values of result.
-  FEATURESPLUGIN_EXPORT virtual AttributePtr attributResultValues();
+  /// Reimplemented from ModelAPI_Feature::isMacro(). Returns true.
+  FEATURESPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
   /// Use plugin manager for features creation
-  FeaturesPlugin_CreateBoundingBox();
+  FeaturesPlugin_InspectBoundingBox();
 
 private:
+  /// Return Attribut values of result.
+  virtual AttributePtr attributResultValues();
+
   /// Update values displayed.
   bool updateValues();
+  /// Create Box
+  void createBox();
+  /// Update Box
+  void updateBox();
+
+  /// Feature to create box
+  FeaturePtr myCreateFeature;
 
 };
 

@@ -19,19 +19,19 @@
 
 #include "FeaturesPlugin_BoundingBox.h"
 
-#include <Config_PropManager.h>
-
-#include <FeaturesPlugin_CreateBoundingBox.h>
-
-#include <GeomAlgoAPI_BoundingBox.h>
-
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeDoubleArray.h>
-#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeBoolean.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+
+#include <GeomAlgoAPI_BoundingBox.h>
+
+#include <Config_PropManager.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <iomanip>
 #include <sstream>
@@ -54,7 +54,7 @@ void FeaturesPlugin_BoundingBox::initAttributes()
   data()->addAttribute(X_MAX_COORD_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(Y_MAX_COORD_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(Z_MAX_COORD_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(CREATEBOX_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(COMPUTE_ID(), ModelAPI_AttributeBoolean::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), X_MIN_COORD_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), Y_MIN_COORD_ID());
@@ -62,13 +62,12 @@ void FeaturesPlugin_BoundingBox::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), X_MAX_COORD_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), Y_MAX_COORD_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), Z_MAX_COORD_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CREATEBOX_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), RESULT_VALUES_ID());
-
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), COMPUTE_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_ID());
   data()->addAttribute(RESULT_VALUES_ID(), ModelAPI_AttributeDoubleArray::typeId());
 
   data()->realArray(RESULT_VALUES_ID())->setSize(6);
-
+  data()->boolean(COMPUTE_ID())->setValue(true);
 }
 
 //=================================================================================================
@@ -78,44 +77,21 @@ void FeaturesPlugin_BoundingBox::execute()
     return;
 
   createBoxByTwoPoints();
-
-  if (boolean(CREATEBOX_ID())->value()) {
-    if (!myCreateFeature.get())
-      createBox();
-    updateBox();
-  } else {
-    if (myCreateFeature.get()) {
-      myCreateFeature->eraseResults();
-      SessionPtr aSession = ModelAPI_Session::get();
-      DocumentPtr aDoc =  aSession->activeDocument();
-      aDoc->removeFeature(myCreateFeature);
-      myCreateFeature.reset();
-    }
-  }
 }
 
 //=================================================================================================
-void FeaturesPlugin_BoundingBox::attributeChanged(const std::string& theID)
+void FeaturesPlugin_BoundingBox::attributeChanged(const std::string&)
 {
-  if (theID == OBJECT_ID()) {
-    if (myCreateFeature.get())
-      updateBox();
-  }
-}
-
-//=================================================================================================
-AttributePtr FeaturesPlugin_BoundingBox::attributResultValues()
-{
-   return attribute(RESULT_VALUES_ID());
 }
 
 //=================================================================================================
 bool FeaturesPlugin_BoundingBox::updateValues()
 {
   AttributeSelectionPtr aSelection = selection(OBJECT_ID());
-  if (aSelection->isInitialized()) {
-    AttributeDoubleArrayPtr aValues =
+  AttributeDoubleArrayPtr aValues =
       std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attribute(RESULT_VALUES_ID()));
+
+  if (aSelection->isInitialized()) {
     std::stringstream streamxmin;
     std::stringstream streamymin;
     std::stringstream streamzmin;
@@ -130,6 +106,12 @@ bool FeaturesPlugin_BoundingBox::updateValues()
         aShape = aSelection->context()->shape();
     }
 
+    AttributeBooleanPtr anIsCompute = boolean(COMPUTE_ID());
+    if (!anIsCompute->value()) {
+      myShape = aShape;
+      anIsCompute->setValue(true);
+    }
+
     if (aShape && !aShape->isEqual(myShape)) {
       double aXmin, aXmax, aYmin, aYmax, aZmin, aZmax;
       std::string anError;
@@ -141,7 +123,6 @@ bool FeaturesPlugin_BoundingBox::updateValues()
         setError("Error in bounding box calculation :" +  anError);
         return false;
       }
-
       myShape = aShape;
       streamxmin << std::setprecision(14) << aXmin;
       aValues->setValue(0, aXmin);
@@ -155,45 +136,27 @@ bool FeaturesPlugin_BoundingBox::updateValues()
       aValues->setValue(4, aZmin);
       streamzmax << std::setprecision(14) << aZmax;
       aValues->setValue(5, aZmax);
-      string(X_MIN_COORD_ID() )->setValue( "X = " +  streamxmin.str() );
-      string(Y_MIN_COORD_ID() )->setValue( "Y = " +  streamymin.str() );
-      string(Z_MIN_COORD_ID() )->setValue( "Z = " +  streamzmin.str() );
-      string(X_MAX_COORD_ID() )->setValue( "X = " +  streamxmax.str() );
-      string(Y_MAX_COORD_ID() )->setValue( "Y = " +  streamymax.str() );
-      string(Z_MAX_COORD_ID() )->setValue( "Z = " +  streamzmax.str() );
+    } else {
+      streamxmin << std::setprecision(14) << aValues->value(0);
+      streamxmax << std::setprecision(14) << aValues->value(1);
+      streamymin << std::setprecision(14) << aValues->value(2);
+      streamymax << std::setprecision(14) << aValues->value(3);
+      streamzmin << std::setprecision(14) << aValues->value(4);
+      streamzmax << std::setprecision(14) << aValues->value(5);
     }
+
+    string(X_MIN_COORD_ID() )->setValue( "X = " +  streamxmin.str() );
+    string(Y_MIN_COORD_ID() )->setValue( "Y = " +  streamymin.str() );
+    string(Z_MIN_COORD_ID() )->setValue( "Z = " +  streamzmin.str() );
+    string(X_MAX_COORD_ID() )->setValue( "X = " +  streamxmax.str() );
+    string(Y_MAX_COORD_ID() )->setValue( "Y = " +  streamymax.str() );
+    string(Z_MAX_COORD_ID() )->setValue( "Z = " +  streamzmax.str() );
   }
   return true;
 }
 
 //=================================================================================================
-void FeaturesPlugin_BoundingBox::createBox()
+AttributePtr FeaturesPlugin_BoundingBox::attributResultValues()
 {
-  SessionPtr aSession = ModelAPI_Session::get();
-
-  DocumentPtr aDoc =  aSession->activeDocument();
-
-  if (aDoc.get()) {
-    myCreateFeature = aDoc->addFeature(FeaturesPlugin_CreateBoundingBox::ID());
-  }
-}
-
-//=================================================================================================
-void FeaturesPlugin_BoundingBox::updateBox()
-{
-  myCreateFeature->boolean(FeaturesPlugin_CreateBoundingBox::COMPUTE_ID())->setValue(false);
-  myCreateFeature->selection(FeaturesPlugin_CreateBoundingBox::OBJECT_ID())
-                        ->setValue(selection(OBJECT_ID())->context(),
-                                   selection(OBJECT_ID())->value());
-
-  AttributeDoubleArrayPtr aValuesFeatures =
-    std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>
-                              (myCreateFeature->attribute(RESULT_VALUES_ID()));
-  AttributeDoubleArrayPtr aValues =
-    std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attribute(RESULT_VALUES_ID()));
-  for (int anI=0; anI < 6; anI++)
-    aValuesFeatures->setValue(anI,aValues->value(anI));
-
-  myCreateFeature->execute();
-  myCreateFeature->boolean(FeaturesPlugin_CreateBoundingBox::COMPUTE_ID())->setValue(true);
+   return attribute(RESULT_VALUES_ID());
 }

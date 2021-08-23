@@ -19,7 +19,7 @@
 
 #include "FeaturesAPI_BoundingBox.h"
 
-#include <FeaturesPlugin_CreateBoundingBox.h>
+#include <FeaturesPlugin_BoundingBox.h>
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
@@ -60,7 +60,7 @@ void FeaturesAPI_BoundingBox::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aDocName = theDumper.name(aBase->document());
 
   AttributeSelectionPtr anAttrObject;
-    anAttrObject = aBase->selection(FeaturesPlugin_CreateBoundingBox::OBJECT_ID());
+    anAttrObject = aBase->selection(FeaturesPlugin_BoundingBox::OBJECT_ID());
 
   theDumper << aBase << " = model.getBoundingBox(" << aDocName << ", " << anAttrObject;
 
@@ -73,7 +73,7 @@ BoundingBoxPtr getBoundingBox(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
 
   FeaturePtr aFeature =
-      thePart->addFeature(FeaturesPlugin_CreateBoundingBox::ID());
+      thePart->addFeature(FeaturesPlugin_BoundingBox::ID());
 
   BoundingBoxPtr aBoundingBox;
 

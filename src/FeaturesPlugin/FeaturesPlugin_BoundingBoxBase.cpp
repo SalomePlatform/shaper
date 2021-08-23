@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "FeaturesPlugin_CommonBoundingBox.h"
+#include "FeaturesPlugin_BoundingBoxBase.h"
 
 #include <ModelAPI_AttributeDoubleArray.h>
 
@@ -39,7 +39,7 @@
 
 
 //=================================================================================================
-void FeaturesPlugin_CommonBoundingBox::createBoxByTwoPoints()
+void FeaturesPlugin_BoundingBoxBase::createBoxByTwoPoints()
 {
   AttributeDoubleArrayPtr aValues =
       std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attributResultValues());
@@ -95,7 +95,7 @@ void FeaturesPlugin_CommonBoundingBox::createBoxByTwoPoints()
 }
 
 //=================================================================================================
-void FeaturesPlugin_CommonBoundingBox::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxAlgo,
+void FeaturesPlugin_BoundingBoxBase::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxAlgo,
                                         std::shared_ptr<ModelAPI_ResultBody> theResultBox)
 {
   // Load the result

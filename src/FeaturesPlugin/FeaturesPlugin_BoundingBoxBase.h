@@ -17,8 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef FeaturesPlugin_CommonBoundingBox_H_
-#define FeaturesPlugin_CommonBoundingBox_H_
+#ifndef FeaturesPlugin_BoundingBoxBase_H_
+#define FeaturesPlugin_BoundingBoxBase_H_
 
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
@@ -30,11 +30,11 @@
 
 #include <ModelAPI_Attribute.h>
 
-/// \class FeaturesPlugin_CommonBoundingBox
+/// \class FeaturesPlugin_BoundingBoxBase
 /// \ingroup Plugins
-/// \brief Feature to view the Bounding Box.
-
-class FeaturesPlugin_CommonBoundingBox : public ModelAPI_Feature
+/// \brief Base feature to inspect properties of bounding box
+///        and create that box for the selected shape.
+class FeaturesPlugin_BoundingBoxBase : public ModelAPI_Feature
 {
 public:
   /// Performs the algorithm and stores results it in the data structure.
@@ -44,7 +44,7 @@ public:
   virtual AttributePtr attributResultValues() = 0;
 
 protected:
-  FeaturesPlugin_CommonBoundingBox() {}
+  FeaturesPlugin_BoundingBoxBase() {}
 
   /// Create box with two points
   void createBoxByTwoPoints();
