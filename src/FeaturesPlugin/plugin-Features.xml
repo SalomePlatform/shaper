@@ -196,15 +196,5 @@
         <source path="measurement_widget.xml"/>
       </feature>
     </group>
-    <group id="Face">
-      <feature id="NormalMacro" title="Normal to a face" tooltip="Calculate the normal to a face" auto_preview="true"
-               icon="icons/Features/normale.png" helpfile="normalToFaceFeature.html">
-        <source path="normal_to_face_widget.xml"/>
-      </feature>
-      <feature id="Normal" title="Normal to a face" tooltip="Calculate the normal to a face" auto_preview="true"
-               icon="icons/Features/axis.png" helpfile="normalToFaceFeature.html" internal="1">
-        <source path="create_normal_to_face_widget.xml"/>
-      </feature>
-    </group>
   </workbench>
 </plugin>

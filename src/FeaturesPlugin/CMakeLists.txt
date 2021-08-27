@@ -72,8 +72,6 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_BoundingBox.h
     FeaturesPlugin_BoundingBoxBase.h
     FeaturesPlugin_InspectBoundingBox.h
-    FeaturesPlugin_NormalToFace.h
-    FeaturesPlugin_InspectNormalToFace.h
 )
 
 SET(PROJECT_SOURCES
@@ -126,8 +124,6 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_BoundingBox.cpp
     FeaturesPlugin_BoundingBoxBase.cpp
     FeaturesPlugin_InspectBoundingBox.cpp
-    FeaturesPlugin_NormalToFace.cpp
-    FeaturesPlugin_InspectNormalToFace.cpp
 )
 
 SET(XML_RESOURCES
@@ -168,8 +164,6 @@ SET(XML_RESOURCES
   geometry_calculation_widget.xml
   bounding_box_widget.xml
   create_bounding_box_widget.xml
-  normal_to_face_widget.xml
-  create_normal_to_face_widget.xml
 )
 
 SET(TEXT_RESOURCES

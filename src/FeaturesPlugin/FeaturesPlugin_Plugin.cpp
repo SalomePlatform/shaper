@@ -34,13 +34,11 @@
 #include <FeaturesPlugin_Fillet1D.h>
 #include <FeaturesPlugin_GeometryCalculation.h>
 #include <FeaturesPlugin_InspectBoundingBox.h>
-#include <FeaturesPlugin_InspectNormalToFace.h>
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Measurement.h>
 #include <FeaturesPlugin_PointCoordinates.h>
 #include <FeaturesPlugin_MultiRotation.h>
 #include <FeaturesPlugin_MultiTranslation.h>
-#include <FeaturesPlugin_NormalToFace.h>
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Pipe.h>
 #include <FeaturesPlugin_Placement.h>
@@ -211,10 +209,6 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_InspectBoundingBox);
   } else if (theFeatureID == FeaturesPlugin_BoundingBox::ID()) {
     return FeaturePtr(new FeaturesPlugin_BoundingBox);
-  } else if (theFeatureID == FeaturesPlugin_InspectNormalToFace::ID()) {
-    return FeaturePtr(new FeaturesPlugin_InspectNormalToFace);
-  } else if (theFeatureID == FeaturesPlugin_NormalToFace::ID()) {
-    return FeaturePtr(new FeaturesPlugin_NormalToFace);
   }
 
 

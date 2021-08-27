@@ -31,7 +31,6 @@ from FeaturesAPI import addFillet, addChamfer
 from FeaturesAPI import addFusionFaces
 from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAngle
 from FeaturesAPI import getPointCoordinates, getGeometryCalculation, getBoundingBox
-from FeaturesAPI import getNormal
 from FeaturesAPI import addRemoveResults
 from FeaturesAPI import addCopy, addImportResult
 from FeaturesAPI import addDefeaturing

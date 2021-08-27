@@ -35,7 +35,6 @@
   #include "FeaturesAPI_Fillet.h"
   #include "FeaturesAPI_Intersection.h"
   #include "FeaturesAPI_Measurement.h"
-  #include "FeaturesAPI_NormalToFace.h"
   #include "FeaturesAPI_MultiRotation.h"
   #include "FeaturesAPI_MultiTranslation.h"
   #include "FeaturesAPI_Partition.h"
