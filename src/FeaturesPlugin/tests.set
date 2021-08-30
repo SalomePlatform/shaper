@@ -521,4 +521,5 @@ SET(TEST_NAMES
                TestGeometryCalculation.py
                TestBoundingBox.py
                Test23885.py
+               TestNormalToFace.py
 )

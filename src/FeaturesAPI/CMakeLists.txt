@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Fillet.h
   FeaturesAPI_Intersection.h
   FeaturesAPI_Measurement.h
+  FeaturesAPI_NormalToFace.h
   FeaturesAPI_MultiRotation.h
   FeaturesAPI_MultiTranslation.h
   FeaturesAPI_Partition.h
@@ -68,6 +69,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Fillet.cpp
   FeaturesAPI_Intersection.cpp
   FeaturesAPI_Measurement.cpp
+  FeaturesAPI_NormalToFace.cpp
   FeaturesAPI_MultiRotation.cpp
   FeaturesAPI_MultiTranslation.cpp
   FeaturesAPI_Partition.cpp
