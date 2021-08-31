@@ -70,12 +70,6 @@ def dumpShaper(fileName):
   model.end()
   pass
 
-def getTmpFileName(ext):
-  tempdir = tempfile.gettempdir()
-  tmp_file = tempfile.NamedTemporaryFile(suffix=".%s"%ext, prefix='shaper_', dir=tempdir, delete=False)
-  tmp_filename = tmp_file.name
-  return tmp_filename
-
 def testGroupsAndFieldsExportToGEOM():
   model.begin()
   partSet = model.moduleDocument()
@@ -184,26 +178,23 @@ def checkResultInGEOM():
 
 def checkDump():
   # Dump the salome study (only CORBA modules, SHAPER dump is not in it)
-  tempdir = tempfile.gettempdir()
-  dumpFileGeomBase = "dump_test_geom"
-  dumpFileGeom = os.path.join(tempdir, "%s.py"%dumpFileGeomBase)
-  salome.myStudy.DumpStudy(tempdir, dumpFileGeomBase, True, False)
+  with tempfile.TemporaryDirectory() as tempdir:
+    dumpFileGeomBase = "dump_test_geom"
+    dumpFileGeom = os.path.join(tempdir, "%s.py"%dumpFileGeomBase)
+    salome.myStudy.DumpStudy(tempdir, dumpFileGeomBase, True, False)
 
-  # Dump SHAPER
-  dumpFileShaper = os.path.join(tempdir, "dump_test_shaper.py")
-  dumpShaper(dumpFileShaper)
+    # Dump SHAPER
+    dumpFileShaper = os.path.join(tempdir, "dump_test_shaper.py")
+    dumpShaper(dumpFileShaper)
 
-  # Load SHAPER dump
-  exec(compile(open(dumpFileShaper).read(), dumpFileShaper, 'exec'))
+    # Load SHAPER dump
+    exec(compile(open(dumpFileShaper).read(), dumpFileShaper, 'exec'))
 
-  # Load GEOM dump
-  exec(compile(open(dumpFileGeom).read(), dumpFileGeom, 'exec'))
+    # Load GEOM dump
+    exec(compile(open(dumpFileGeom).read(), dumpFileGeom, 'exec'))
 
-  # Clean files
-  files = [dumpFileGeom, dumpFileShaper]
-  for f in files:
-    os.remove(f)
-
+    # Clean files
+    files = [dumpFileGeom, dumpFileShaper]
   pass
 
 if __name__ == '__main__':

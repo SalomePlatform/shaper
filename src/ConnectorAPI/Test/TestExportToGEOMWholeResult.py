@@ -102,27 +102,25 @@ def testExportToGEOM():
   # Check that the group has 6+6 faces
   geomGroup_2 = getSubObject(geomObject_1, 2)
   assert geompy.NumberOfFaces(geomGroup_2) == 12
+  
+  with tempfile.TemporaryDirectory() as tempdir:
+    # Dump the salome study (only CORBA modules, SHAPER dump is not in it)
+    dumpFileGeomBase = "dump_test_geom"
+    dumpFileGeom = os.path.join(tempdir, "%s.py"%dumpFileGeomBase)
+    salome.myStudy.DumpStudy(tempdir, dumpFileGeomBase, True, False)
 
-  # Dump the salome study (only CORBA modules, SHAPER dump is not in it)
-  tempdir = tempfile.gettempdir()
-  dumpFileGeomBase = "dump_test_geom"
-  dumpFileGeom = os.path.join(tempdir, "%s.py"%dumpFileGeomBase)
-  salome.myStudy.DumpStudy(tempdir, dumpFileGeomBase, True, False)
+    # Dump SHAPER
+    dumpFileShaper = os.path.join(tempdir, "dump_test_shaper.py")
+    dumpShaper(dumpFileShaper)
 
-  # Dump SHAPER
-  dumpFileShaper = os.path.join(tempdir, "dump_test_shaper.py")
-  dumpShaper(dumpFileShaper)
+    # Load SHAPER dump
+    exec(compile(open(dumpFileShaper).read(), dumpFileShaper, 'exec'))
 
-  # Load SHAPER dump
-  exec(compile(open(dumpFileShaper).read(), dumpFileShaper, 'exec'))
+    # Load GEOM dump
+    exec(compile(open(dumpFileGeom).read(), dumpFileGeom, 'exec'))
 
-  # Load GEOM dump
-  exec(compile(open(dumpFileGeom).read(), dumpFileGeom, 'exec'))
-
-  # Clean files
-  files = [dumpFileGeom, dumpFileShaper]
-  for f in files:
-    os.remove(f)
+    # Clean files
+    files = [dumpFileGeom, dumpFileShaper]
 
   pass
 
