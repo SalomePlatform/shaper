@@ -119,6 +119,87 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 }
 
 //=================================================================================================
+bool FeaturesPlugin_CompositeBoolean::cutRecursiveCompound(const GeomShapePtr theCompound,
+                                                           const ListOfShape& theTools,
+                                 std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
+                                                           GeomShapePtr& theResult)
+{
+  // I. If theCompound is among the selected objects,
+  //    cut it by all tools and return result through theResult.
+  // It can be a SOLID, ?COMPOUND?, ?COMPSOLID?
+  AttributeSelectionListPtr anObjectsSelList = myFeature->selectionList(OBJECTS_ID());
+  for (int anObjIndex = 0; anObjIndex < anObjectsSelList->size(); anObjIndex++) {
+    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjIndex);
+    GeomShapePtr anObject = anObjectAttr->value();
+    if (theCompound->isEqual(anObject)) {
+      // Cut theCompound itself
+      ListOfShape aListWithObject;
+      aListWithObject.push_back(anObject);
+      std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo
+        (new GeomAlgoAPI_Boolean(aListWithObject, theTools, GeomAlgoAPI_Tools::BOOL_CUT));
+
+      // Checking that the algorithm worked properly.
+      if (!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
+        myFeature->setError("Error: Boolean algorithm failed.");
+        return false;
+      }
+
+      if (GeomAlgoAPI_ShapeTools::area(aBoolAlgo->shape()) > 1.e-27) {
+        theMakeShapeList->appendAlgo(aBoolAlgo);
+        theResult = aBoolAlgo->shape();
+        return true;
+      }
+      return false;
+    }
+  }
+
+  // II. Iterate the COMPOUND or COMPSOLID
+  //     to find and cut Objects among its sub-shapes
+  if (theCompound->shapeType() == GeomAPI_Shape::COMPOUND ||
+      theCompound->shapeType() == GeomAPI_Shape::COMPSOLID) {
+
+    bool hasCut = false;
+    ListOfShape aShapesToAdd;
+    for (GeomAPI_ShapeIterator it (theCompound); it.more(); it.next()) {
+      GeomShapePtr aSubShape = it.current();
+      GeomShapePtr aResult;
+      if (cutRecursiveCompound(aSubShape, theTools, theMakeShapeList, aResult)) {
+        hasCut = true;
+        aShapesToAdd.push_back(aResult);
+      }
+      else {
+        aShapesToAdd.push_back(aSubShape);
+      }
+    }
+
+    if (hasCut) {
+      if (theCompound->shapeType() == GeomAPI_Shape::COMPSOLID) {
+        // Build COMPSOLID
+        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo
+          (new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+        if (!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
+          myFeature->setError("Error: PaveFiller algorithm failed.");
+          return false;
+        }
+        theResult = aFillerAlgo->shape();
+        theMakeShapeList->appendAlgo(aFillerAlgo);
+      }
+      else {
+        // Build COMPOUND
+        theResult = GeomAlgoAPI_CompoundBuilder::compound(aShapesToAdd);
+        std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aCompMkr (new GeomAlgoAPI_MakeShapeCustom);
+        aCompMkr->setResult(theResult);
+        aCompMkr->addModified(theCompound, theResult); // ??
+        theMakeShapeList->appendAlgo(aCompMkr);
+      }
+      return true;
+    }
+  }
+
+  return false; // no cuts
+}
+
+//=================================================================================================
 bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
                                                   ListOfShape& theObjects,
                                                   ListOfMakeShape& theMakeShapes)
@@ -127,7 +208,26 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
   ListOfShape anObjects, anEdgesAndFaces, aCompSolids;
   std::map<GeomShapePtr, ListOfShape> aCompSolidsObjects;
   bool aCompoundsOnly = true;// if there are only compounds, do not use filler restoring compsolids
+
   AttributeSelectionListPtr anObjectsSelList = myFeature->selectionList(OBJECTS_ID());
+
+  // collect recursive (complex) compounds, if any
+  ListOfShape aCompounds; // recursive compounds
+  GeomAPI_DataMapOfShapeShape aCompoundsMap; // recursive compounds map
+  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    ResultPtr aContext = anObjectAttr->context();
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
+    if (aResCompSolidPtr.get()) {
+      // Root body owner (true)
+      ResultBodyPtr aResRootPtr = ModelAPI_Tools::bodyOwner(aContext, true);
+      if (!aResRootPtr->isSame(aResCompSolidPtr)) {
+        aCompoundsMap.bind(aResRootPtr->shape(), aResRootPtr->shape());
+        aCompounds.push_back(aResRootPtr->shape());
+      }
+    }
+  }
+
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
     AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
     GeomShapePtr anObject = anObjectAttr->value();
@@ -138,19 +238,25 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
     ResultPtr aContext = anObjectAttr->context();
     ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if(aResCompSolidPtr.get()) {
-      GeomShapePtr aContextShape = aResCompSolidPtr->shape();
-      std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
-      for(; anIt != aCompSolidsObjects.end(); anIt++) {
-        if(anIt->first->isEqual(aContextShape)) {
-          aCompSolidsObjects[anIt->first].push_back(anObject);
-          break;
+      ResultBodyPtr aResRootPtr = ModelAPI_Tools::bodyOwner(aContext, true);
+      if (!aCompoundsMap.isBound(aResRootPtr->shape()) || myOperationType != BOOL_CUT) {
+        // Compsolid or a simple (one-level) compound
+        // Or not CUT
+        // TODO: correct FUSE for complex compounds?
+        GeomShapePtr aContextShape = aResCompSolidPtr->shape();
+        std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+        for(; anIt != aCompSolidsObjects.end(); anIt++) {
+          if(anIt->first->isEqual(aContextShape)) {
+            aCompSolidsObjects[anIt->first].push_back(anObject);
+            break;
+          }
         }
-      }
-      if(anIt == aCompSolidsObjects.end()) {
-        aCompSolidsObjects[aContextShape].push_back(anObject);
-        aCompSolids.push_back(aContextShape);
-        if (aContextShape->shapeType() != GeomAPI_Shape::COMPOUND)
-          aCompoundsOnly = false;
+        if(anIt == aCompSolidsObjects.end()) {
+          aCompSolidsObjects[aContextShape].push_back(anObject);
+          aCompSolids.push_back(aContextShape);
+          if (aContextShape->shapeType() != GeomAPI_Shape::COMPOUND)
+            aCompoundsOnly = false;
+        }
       }
     } else {
       if(anObject->shapeType() == GeomAPI_Shape::EDGE ||
@@ -164,7 +270,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
   switch(myOperationType) {
     case BOOL_CUT: {
-      if((anObjects.empty() && aCompSolidsObjects.empty()) || theTools.empty()) {
+      if((anObjects.empty() && aCompSolidsObjects.empty()
+          && aCompoundsMap.size() < 1) || theTools.empty()) {
         myFeature->setError("Error: Not enough objects for boolean operation.");
         return false;
       }
@@ -260,6 +367,18 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           theMakeShapes.push_back(aMakeShapeList);
         }
       }
+
+      // Complex (recursive) compounds handling
+      for(ListOfShape::const_iterator anIt = aCompounds.cbegin();
+          anIt != aCompounds.cend(); ++anIt) {
+        GeomShapePtr aCompound = (*anIt);
+        GeomShapePtr aRes;
+        std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList (new GeomAlgoAPI_MakeShapeList());
+        cutRecursiveCompound(aCompound, theTools, aMakeShapeList, aRes);
+        theObjects.push_back(aCompound);
+        theMakeShapes.push_back(aMakeShapeList);
+      }
+
       break;
     }
     case BOOL_FUSE: {

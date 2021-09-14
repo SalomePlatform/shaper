@@ -25,6 +25,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 
 /// \class FeaturesPlugin_CompositeBoolean
 /// \ingroup Plugins
@@ -72,7 +73,7 @@ protected:
   /// \param[in] theTools list of tools.
   /// \param[out] theObjects list of objects.
   /// \param[out] theMakeShapes list of according algos.
-  /// \return false in failed.
+  /// \return false if failed.
   bool makeBoolean(const ListOfShape& theTools,
                    ListOfShape& theObjects,
                    ListOfMakeShape& theMakeShapes);
@@ -92,6 +93,18 @@ protected:
   void storeDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
                           const ListOfShape& theTools,
                           const GeomShapePtr theResultShapesCompound);
+
+private:
+  /// Makes cut operation recursively. Called from makeBoolean().
+  /// \param[in] theCompound the shape to be cut.
+  /// \param[in] theTools list of tools.
+  /// \param[out] theMakeShapeList list of according algos.
+  /// \param[out] theResult result of cut.
+  /// \return false if failed or no cuts done (this is normal case).
+  bool cutRecursiveCompound (const GeomShapePtr theCompound,
+                             const ListOfShape& theTools,
+                             std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
+                             GeomShapePtr& theResult);
 
 protected:
   ModelAPI_Feature* myFeature;
