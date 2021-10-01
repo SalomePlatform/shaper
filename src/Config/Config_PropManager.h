@@ -36,7 +36,7 @@ class Config_PropManager
 {
  public:
 
-  /** 
+  /**
    * Registers property parameters
    * \param theSection - name of section (domain of using) of the property.
    * \param theName - name (title) of the value.
@@ -89,7 +89,17 @@ class Config_PropManager
   //! \return double result or zero
   CONFIG_EXPORT static double stringToDouble(const std::string& theDouble);
 
+  //! Returns Auto-color status as a Boolean
+  CONFIG_EXPORT static bool getAutoColorStatus();
+
+  //! Set Auto-color boolean value
+  //! \param theValue a value to use
+  CONFIG_EXPORT static void setAutoColorStatus(const bool theValue);
+
  private:
+
+  CONFIG_EXPORT static bool autoColorStatus; // Auto-color status
+
   CONFIG_EXPORT static Config_Properties& props(); ///< List of all stored properties
 };
 

@@ -114,7 +114,8 @@ void XGUI_ContextMenuMgr::createActions()
   anAction = ModuleBase_Tools::createAction(QIcon(":pictures/color.png"), tr("Color..."), aDesktop);
   addAction("COLOR_CMD", anAction);
 
-  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/autocolor.png"), tr("Auto color"), aDesktop);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/autocolor.png"),
+                                                  tr("Auto color"), aDesktop);
   addAction("AUTOCOLOR_CMD", anAction);
 
   anAction = ModuleBase_Tools::createAction(QIcon(""), tr("Deflection..."), aDesktop);
@@ -124,22 +125,24 @@ void XGUI_ContextMenuMgr::createActions()
                                            tr("Transparency..."), aDesktop);
   addAction("TRANSPARENCY_CMD", anAction);
 
-  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), aDesktop);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"),
+                                                  tr("Show"), aDesktop);
   addAction("SHOW_CMD", anAction);
 
-  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"),
-                                           aDesktop);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"),
+                                            tr("Show only"), aDesktop);
   addAction("SHOW_ONLY_CMD", anAction);
 
   anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"),
                                            aDesktop);
   addAction("HIDE_CMD", anAction);
 
-  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"),
-                                           aDesktop);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"),
+                                            tr("Hide all"), aDesktop);
   addAction("HIDEALL_CMD", anAction);
 
-  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/shading.png"), tr("Shading"), aDesktop);
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/shading.png"),
+                                            tr("Shading"), aDesktop);
   addAction("SHADING_CMD", anAction);
 
   anAction = ModuleBase_Tools::createAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"),

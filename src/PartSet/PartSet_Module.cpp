@@ -202,9 +202,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
     Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization", "result_group_auto_color", "Auto color",
-    Config_Prop::Boolean, "false");
-
   Config_PropManager::registerProp("Visualization", "result_construction_color",
     "Construction color",
     Config_Prop::Color,

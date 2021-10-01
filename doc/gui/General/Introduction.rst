@@ -8,11 +8,11 @@ SHAPER module of SALOME is destined for:
 
 - import and export of geometrical models in IGES, BREP, STEP and XAO formats;
 - parametric construction of geometrical objects using a wide range of functions:
-    
+
   - creation of complex 2D sections using :ref:`sketchPlugin` with consequent extrusion or revolution (see :ref:`featuresPlugin`);
   - construction of model using primitives defined in :ref:`primitivesPlugin`;
   - usage of Boolean operations (see :ref:`featuresPlugin`);
-  
+
 - viewing geometrical objects in the OCC viewer;
 - transformation of geometrical objects using various algorithms.
 
@@ -28,16 +28,16 @@ SHAPER module works with one study containing several documents:
 - one or several parts.
 
 Only one document can be active. In complicated models partset consists of several parts. Parts in partset may be copied, positioned relatively to each other, or simply translated.
-  
+
 A new study contains only a partset with 7 default constructions, which cannot be deleted:
-  
+
 - one point **Origin** coinciding with the origin of the coordinate system;
 - three axes **OX**, **OY**, **OZ**  coinciding with coordinate axes;
-- three planes **YOZ**, **XOZ**, **XOY**  coinciding with coordinate planes.    
+- three planes **YOZ**, **XOZ**, **XOY**  coinciding with coordinate planes.
 
 Only  points, axis, planes (see  :ref:`constructionPlugin`) and sketches (see  :ref:`sketchPlugin`) can be added into Partset to be used in any part later.
 :ref:`parameter_usage` can be used both in Partset and any Part.
-    
+
 A new Part can be created as described in :ref:`partPlugin`.
 
 Double click or pop-up menu can be used to activate existing document.
@@ -50,17 +50,17 @@ The main window of the application consists of the following components:
 - :ref:`main_menu`;
 - :ref:`doc_windows`;
 - :ref:`viewer`;
-- :ref:`toolbar`;    
-- status bar.    
+- :ref:`toolbar`;
+- status bar.
 
 .. figure:: /images/main_window.png
    :align: center
 
    Main window of SHAPER module
-  
+
 .. _main_menu:
 
-Main menu 
+Main menu
 ---------
 
 Main menu provides access to all commands of the application.
@@ -78,7 +78,7 @@ Main menu includes standard Salome items:
 - Tools;
 - Window;
 - Help;
-    
+
 and items specific for SHAPER module:
 
 - Part (see :ref:`partPlugin`);
@@ -86,8 +86,8 @@ and items specific for SHAPER module:
 - Construction (see :ref:`constructionPlugin`);
 - Build (see :ref:`buildPlugin`);
 - Primitives (see :ref:`primitivesPlugin`);
-- Features (see :ref:`featuresPlugin`);  
-- Macros. 
+- Features (see :ref:`featuresPlugin`);
+- Macros.
 
  .. _toolbar:
 
@@ -130,7 +130,7 @@ Visibility of SHAPER toolbar sections is managed using *View -> Toolbar* :ref:`m
 Dock windows
 ------------
 
-Standard dock windows are: 
+Standard dock windows are:
 
 - :ref:`object_browser`
 - :ref:`inspection_panel`
@@ -139,9 +139,9 @@ Standard dock windows are:
 - :ref:`property_panel`
 
 Dock windows can be placed in three dock areas using drag-and-drop:
-  
-- left, 
-- right, 
+
+- left,
+- right,
 - bottom.
 
 By default Object browser window is placed at the left dock area, Inspection panel at the right dock area and Python console at the bottom dock area of the main window.
@@ -159,12 +159,12 @@ Each dock window can be closed using **Cross** window button and opened again us
 
    Pop-up menu for visibility of windows and toolbars
 
-.. _object_browser: 
+.. _object_browser:
 
 Object browser
 ^^^^^^^^^^^^^^
 
-Object browser contains all documents created in the current study. 
+Object browser contains all documents created in the current study.
 
 Each document includes standard branches where created objects are placed.
 
@@ -179,7 +179,7 @@ Partset includes three branches:
 
 - Parameters;
 - Constructions;
-- Features    
+- Features
 
 Part includes the following branches:
 
@@ -187,11 +187,11 @@ Part includes the following branches:
 - Constructions;
 - Results;
 - Fields;
-- Groups;   
-- Features.    
+- Groups;
+- Features.
 
 New part contains only 3 empty branches:
- 
+
 - Parameters;
 - Constructions;
 - Results.
@@ -199,7 +199,7 @@ New part contains only 3 empty branches:
 Features are placed one after another in the active document with default names and their results are placed into the corresponding branch.
 
 Examples of default names assigned automatically for :ref:`box_feature` are:
- 
+
 * **Box_1**, **Box_2**, ... for Feature;
 * **Box_1_1**, **Box_2_1**, ... for Result.
 
@@ -225,6 +225,11 @@ Each feature, result, construction, group, field, parameter can be renamed using
    :align: center
 
    **Construction** pop-up menu
+
+.. figure:: /images/popup_menu_object_browser_group.png
+   :align: center
+
+   **Group** pop-up menu
 
 The order of features can be changed using *Move to the end* and *Move to the end and split* pop-up menu commands. They work only for Group features. The selected group or several groups will be moved to the end of features list. The *Move to the end and split* also splits the resulting group in several groups: one group per one selection.
 
@@ -264,7 +269,7 @@ Note that all features using the removed feature and their results will be remov
    :align: center
 
    **Delete feature** dialog box
-   
+
 .. _property_panel:
 
 Property panel
@@ -278,21 +283,21 @@ Property panel consists of two parts:
 
 - controls a container for input of parameters for the current operation;
 - buttons panel containing standard buttons:
- 
+
    | |ok_btn| **Ok/Apply** executes operation with defined parameters,
-   | |cancel_btn| **Cancel/Close** calls **Abort operation** dialog box to confirm  operation abort, 
+   | |cancel_btn| **Cancel/Close** calls **Abort operation** dialog box to confirm  operation abort,
    | |help_btn| **Help** calls User's guide opened on page describing the current operation.
 
    .. figure:: /images/abort_operation.png
       :align: center
-     
+
       **Abort operation** dialog box
 
 |ok_btn| **OK/Apply**  button is disabled if not all input parameters are defined or some errors are found. Error is shown as tooltip and in status bar.
 
-.. _inspection_panel: 
+.. _inspection_panel:
 
-Inspection panel 
+Inspection panel
 ^^^^^^^^^^^^^^^^
 
 Inspection panel provides the list of types and quantities of all topological entities, composing the selected result, construction or feature.
@@ -305,20 +310,20 @@ Inspection panel provides the list of types and quantities of all topological en
 **Object** displays name of the selected result, construction  or feature.
 
 **Type** characterizes the whole shape.
-   
+
 The information about Point, Axis or Edge  additionally shows coordinates of point / end points.
 
 .. figure:: /images/inspection_panel_line.png
    :align: center
 
    **Inspection panel** for Axis
-   
+
 The information about  Plane, Face additionally shows coordinates of center point and direction of normal.
 
 .. figure:: /images/inspection_panel_face.png
    :align: center
 
-   **Inspection panel** for Face 
+   **Inspection panel** for Face
 
 .. _hidefaces_panel:
 
@@ -333,7 +338,7 @@ Hide Faces panel
    **Hide Faces** panel
 
 - If this panel is activated it "listens" user selection.
-- If a face is selected then its name will be shown in the panel's list and hidden in the viewer. 
+- If a face is selected then its name will be shown in the panel's list and hidden in the viewer.
 - If user selects a group of faces (or at least a one face of this group) then whole group will be hidden and also all faces from all objects referenced by this group.
 - If user will display the hidden group again (by a show operation) then the group will be removed from Hide Faces list and visibility of all referenced faces will be restored.
 
@@ -357,8 +362,8 @@ Pop-up menu gives the possibility to:
 - Paste the text from clipboard to Python console ;
 - Clear Python console;
 - Dump commands from console into the specified file;
-- Start/Stop writing log into the specified file.    
- 
+- Start/Stop writing log into the specified file.
+
 .. figure:: /images/python_console_popup.png
    :align: center
 
@@ -386,7 +391,7 @@ The description of OCC 3D Viewer architecture and functionality is provided in G
 
 .. _parameter_usage:
 
-Parameters 
+Parameters
 ----------
 
 Model parametrization can be done using parameters.
@@ -405,14 +410,14 @@ The list of features using parameters is given in **Parameters** dialog box:
    :align: center
 
    Parameters dialog box
-  
+
 If a parameter value is changed, then all features where it is used are rebuilt.
 
 A parameter name should be unique in the active document.
 
 However, partset and part can have parameters with the same name. If parameter names in Partset and Part are identical, then Part parameter has a higher priority and its value will be used in the features of this part.
 
-In contrast to features (see :ref:`object_browser`), there is an additional option when parameters are deleted.   
+In contrast to features (see :ref:`object_browser`), there is an additional option when parameters are deleted.
 
 .. figure:: /images/delete_parameter.png
    :align: center
@@ -456,7 +461,7 @@ SHAPER preferences contains the following tabs:
 Visualization tab is activated by default when **Preferences** dialog box is opened in the active SHAPER module.
 
 Other tabs are activated by click on tab header.
-  
+
 .. _visualization_preferences:
 
 Visualization tab
@@ -475,7 +480,7 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 - **Result color** selects default shading color for objects from **Results** branch;
 - **Group color** selects default color for objects from **Groups** branch;
 - **Construction color** selects default color for objects from **Constructions** branch;
-- **Part color** selects default color for parts shown in Partset;  
+- **Part color** selects default color for parts shown in Partset;
 - **Field color** selects default color for objects from **Fields** branch;
 - **Body deflection coefficient** defines default deflection coefficient for objects from **Results** branch. A smaller coefficient provides better quality of a shape in the viewer;
 - **Construction deflection coefficient** defines default deflection coefficient for objects from **Constructions** branch. A smaller coefficient provides better quality of a shape in the viewer;
@@ -485,11 +490,11 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 - **Color of removed feature in operation** selects default color used for visualization of sketch entities to be removed during **Trim/Split** operations;
 - **Color of sketch plane** selects default shading color for sketch plane;
 - **Hidden faces transparency** defines default transparency value for hidden faces;
-- **Dimension arrow size**  defines default size of arrows for extension line showing dimensional constraint;  
+- **Dimension arrow size**  defines default size of arrows for extension line showing dimensional constraint;
 - **Dimension font** defines font used for value of dimensional constraint;
 - **Dimension value size**  defines default size of value for dimensional constraint;
-- **Sketch dimension color**  defines default color of dimensional constraint; 
-- **Construction plane color** selects default color for Construction planes;  
+- **Sketch dimension color**  defines default color of dimensional constraint;
+- **Construction plane color** selects default color for Construction planes;
 - **Sketch entity color** selects default color for sketch objects;
 - **Sketch external entity color** selects default color for external objects selected as reference during sketch creation/edition;
 - **Sketch auxiliary entity color** selects default color for sketch auxiliary objects;
@@ -497,18 +502,18 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 - **Sketch fully constraint color** selects default color for a sketch with zero degrees of freedom.
 - **Zoom trihedron arrows** if this control is checked then arrows of a view trihedron will be scaled according to current view scale
 - **Axis arrow size** relative size of trihedron arrows. It has effect only in case if **Zoom trihedron arrows** is On.
-  
+
 To redefine any color click on the corresponding line to access **Select color** dialog box
 
 .. figure:: /images/select_color.png
    :align: center
 
    **Preferences**: **Select color** dialog box
-   
+
 Preferences for sketch are applicable  during sketch creation/edition operation.
-   
+
 .. _plugins_preferences:
-   
+
 Plugins tab
 ^^^^^^^^^^^
 Plugins tab defines folders where plugins and resources are located.
@@ -533,10 +538,10 @@ Plugins tab defines folders where plugins and resources are located.
    :align: center
 
    **Find directory** dialog box
-    
-   
+
+
 .. _shortcuts_preferences:
-   
+
 Shortcuts tab
 ^^^^^^^^^^^^^
 
@@ -546,9 +551,9 @@ Shortcuts tab defines shortcut keys for different operations.
    :align: center
 
    **Preferences**: Shortcuts tab
-   
+
 - **Add parameter in parameters manager dialog** defines shortcut keys for adding parameter in parameters manager dialog box.
-   
+
 .. _windows_preferences:
 
 Windows tab
@@ -578,24 +583,24 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 **Input fields**:
 
 - **Size** defines size of coordinate planes;
-- **Thickness**  defines thickness of coordinate plane borders; 
-- **Rotate to plane when selected** check-box turns on/off automatic switch the viewer to the top view for the selected sketch plane.  
+- **Thickness**  defines thickness of coordinate plane borders;
+- **Rotate to plane when selected** check-box turns on/off automatic switch the viewer to the top view for the selected sketch plane.
 - **Angular tolerance** defines defines an angular tolerance for automatic creation of horizontal and vertical constraints;
 - **Default spline weight** defines default weight for B-spline nodes during creation. The default value can be changed by editing of the spline;
 - **Cursor for sketch operation** defines a cursor which indicates a launched sketcher sub-operation.
 - **Create sketch entities by dragging** defines a style of sketch etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects have to be defined by mouse press - mouse move - mouse release. Otherwise every point of an object has to be defined by mouse click;
-   
+
 .. _viewer_preferences:
-   
+
 Viewer tab
 ^^^^^^^^^^
 
-Viewer tab defines selection in OCC 3D viewer properties. 
+Viewer tab defines selection in OCC 3D viewer properties.
 
 .. figure:: /images/viewer_preferences.png
    :align: center
 
-   **Preferences**: Viewer tab   
+   **Preferences**: Viewer tab
 
 **Input fields**:
 
@@ -607,8 +612,8 @@ Viewer tab defines selection in OCC 3D viewer properties.
 
 - **Selection sensitivity** defines size of area around object in pixels, in which  mouse click selects object inside this area:
 
-  - **Vertex** defines selection  sensitivity for vertices; 
-  - **Edge**  defines selection  sensitivity for edges.  
+  - **Vertex** defines selection  sensitivity for vertices;
+  - **Edge**  defines selection  sensitivity for edges.
 
 .. _toolbars_management:
 
@@ -619,7 +624,7 @@ Toolbars management
 
 **Toolbars** dialog box
 ^^^^^^^^^^^^^^^^^^^^^^^
-To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item. 
+To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item.
 The following dialog box with existing toolbars appears:
 
 .. figure:: /images/Toolbars.png
@@ -641,7 +646,7 @@ The following dialog box with existing toolbars appears:
    :align: center
 
    Warning dialog box
-   
+
 .. _create_toolbar:
 
 **Create toolbar** dialog box
@@ -677,7 +682,7 @@ The following dialog box with existing toolbars appears:
 
 - **Toolbar name** non-editable field displays  name of modified tool bar;
 - **Out of toolbars** window contains list of commands which are not included into any tool bar and separator definition "------";
-- **In the toolbar** window contains list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar; 
+- **In the toolbar** window contains list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar;
 - **Right arrow** button transfers currently selected item from  **Out of toolbars** window to **In the toolbar** window and puts new item before the selected item in **In the toolbar** window.
     If there is no selected item in **In the toolbar**  window then new item will be added at the end of items list. In order to clear current selection it is necessary to click in empty space of the window.
 - **Left arrow** button transfers currently selected item from **In the toolbar** window into **Out of toolbars** window;

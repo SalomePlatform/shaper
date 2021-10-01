@@ -2547,14 +2547,9 @@ void XGUI_Workshop::changeAutoColor(const QObjectPtrList& theObjects)
   QString aDescription = contextMenuMgr()->action("AUTOCOLOR_CMD")->text();
   aMgr->startOperation(aDescription.toStdString());
 
-  Config_Prop* aProp = Config_PropManager::findProp("Visualization", "result_group_auto_color");
-
-  if (aProp) {
-    bool anIsAutoColor = Config_PropManager::boolean("Visualization", "result_group_auto_color");
-
-    if (anIsAutoColor) {
+    if (Config_PropManager::getAutoColorStatus()) {
       contextMenuMgr()->action("AUTOCOLOR_CMD")->setText(tr("Auto color"));
-      aProp->setValue("false");
+      Config_PropManager::setAutoColorStatus(false);
       ModelAPI_Tools::findRandomColor(aColor, true);
     } else {
       // set the value to all results
@@ -2585,9 +2580,8 @@ void XGUI_Workshop::changeAutoColor(const QObjectPtrList& theObjects)
       updateCommandStatus();
       myViewerProxy->update();
       contextMenuMgr()->action("AUTOCOLOR_CMD")->setText(tr("Disable auto color"));
-      aProp->setValue("true");
+      Config_PropManager::setAutoColorStatus(true);
     }
-  }
 }
 
 //**************************************************************
