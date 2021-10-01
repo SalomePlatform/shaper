@@ -680,6 +680,7 @@ void XGUI_Workshop::showHelpPage(const QString& thePage) const
 #endif
     QString aFileName = aDocDir + aSep + thePage;
     if (QFile::exists(aFileName)) {
+#ifdef HAVE_SALOME
       SUIT_Application* app = SUIT_Session::session()->activeApplication();
       if (app)
         app->onHelpContextModule("SHAPER", aFileName);
@@ -687,6 +688,10 @@ void XGUI_Workshop::showHelpPage(const QString& thePage) const
         QUrl aUrl = QUrl::fromLocalFile(aFileName);
         QDesktopServices::openUrl(aUrl);
       }
+#else
+      QUrl aUrl = QUrl::fromLocalFile(aFileName);
+      QDesktopServices::openUrl(aUrl);
+#endif
     }
   }
 }

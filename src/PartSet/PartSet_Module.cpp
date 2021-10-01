@@ -146,8 +146,10 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <Graphic3d_Texture2Dmanual.hxx>
-#include <OCCViewer_Utilities.h>
 
+#ifdef HAVE_SALOME
+#include <OCCViewer_Utilities.h>
+#endif
 
 #define FEATURE_ITEM_COLOR "0,0,225"
 
@@ -1405,6 +1407,7 @@ double getResultTransparency(const ResultPtr& theResult)
 //******************************************************
 void PartSet_Module::setTexture(const std::string & theTextureFile, const AISObjectPtr& thePrs)
 {
+#ifdef HAVE_SALOME
   Handle(AIS_InteractiveObject) anAIS = thePrs->impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull())
   {
@@ -1437,6 +1440,7 @@ void PartSet_Module::setTexture(const std::string & theTextureFile, const AISObj
       anAISShape->SetDisplayMode(AIS_Shaded);
     }
   }
+#endif
 }
 
 //******************************************************
