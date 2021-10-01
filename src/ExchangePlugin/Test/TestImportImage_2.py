@@ -17,13 +17,13 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import os
+import os, inspect
 from salome.shaper import model
 
 import salome
 salome.salome_init(1)
 
-data_dir = os.path.join(os.path.dirname(sys.argv[0]), "data")
+data_dir = os.path.join(os.path.dirname(inspect.getfile(lambda: None)), "data")
 
 from tempfile import TemporaryDirectory
 tmp_dir = TemporaryDirectory()
