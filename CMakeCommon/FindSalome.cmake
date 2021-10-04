@@ -17,13 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL directory")
-SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI directory")
-SET(HAVE_SALOME NO)
-IF(EXISTS ${GUI_ROOT_DIR})
-	MESSAGE("-- SALOME found at " ${GUI_ROOT_DIR})
-	SET(HAVE_SALOME YES)
-
+IF(${HAVE_SALOME})
   	FIND_LIBRARY(caf caf ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CAM CAM ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CASCatch CASCatch ${GUI_ROOT_DIR}/lib/salome)
@@ -65,9 +59,4 @@ IF(EXISTS ${GUI_ROOT_DIR})
 	FIND_LIBRARY(vtkTools vtkTools ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(SalomeGuiHelpers SalomeGuiHelpers ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(SalomeTreeData SalomeTreeData ${GUI_ROOT_DIR}/lib/salome)
-
-	SET(SALOME_GUI_INCLUDE ${GUI_ROOT_DIR}/include/salome)
-	SET(SALOME_KERNEL_INCLUDE ${KERNEL_ROOT_DIR}/include/salome)
-        SET(SALOME_KERNEL_LIBDIR ${KERNEL_ROOT_DIR}/lib/salome)
-	ADD_DEFINITIONS( -DHAVE_SALOME )
-ENDIF(EXISTS ${GUI_ROOT_DIR})
+ENDIF()

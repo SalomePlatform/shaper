@@ -19,71 +19,84 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 
-PROJECT (SHAPER)
-SET(${PROJECT_NAME}_MAJOR_VERSION 9)
-SET(${PROJECT_NAME}_MINOR_VERSION 7)
-SET(${PROJECT_NAME}_PATCH_VERSION 0)
-SET(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
-SET(COMPONENT_NAME SHAPER)
+# Project name
+# ============
+PROJECT(SHAPER)
 
-# Ensure a proper linker behavior:
+# Ensure a proper linker behavior
+# ===============================
 CMAKE_POLICY(SET CMP0003 NEW)
 IF(WIN32)
   CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib
 ENDIF(WIN32)
 
+# Append path to common macros
+# ===========================
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
+# Detect SALOME mode; append path to SALOME macros
+# ================================================
+SET(HAVE_SALOME NO)
+SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+  SET(HAVE_SALOME YES)
+  MESSAGE(STATUS "SALOME found; building with SALOME!")
+  SET(CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake" ${CMAKE_MODULE_PATH})
+  INCLUDE(SalomeMacros)
+ELSE()
+  MESSAGE(STATUS "SALOME is not found; building without it!")
+  INCLUDE(SalomeMacros)
+ENDIF()
+
+# Versioning
+# ===========
+SALOME_SETUP_VERSION(9.7.0 DEVELOPMENT)
+MESSAGE(STATUS "Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION} from \"${${PROJECT_NAME}_GIT_SHA1}\"")
+SET(COMPONENT_NAME SHAPER)
+
+# Options
+# =======
 IF (NOT CADBUILDER_BUILD_DOC)
   OPTION(SHAPER_BUILD_DOC "Generate SHAPER documentation" ON)
 ENDIF(NOT CADBUILDER_BUILD_DOC)
 
 INCLUDE(FindEclipse)
 INCLUDE(Common)
-INCLUDE(FindSalome)
-INCLUDE(FindSUIT)
 INCLUDE(FindTInspector)
+INCLUDE(FindSalomeQt5)
 
 IF(HAVE_SALOME)
-  SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
-  IF(EXISTS ${CONFIGURATION_ROOT_DIR})
-    SET(CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake" ${CMAKE_MODULE_PATH})
-    INCLUDE(SalomeMacros)
-    INCLUDE(FindSalomeQt5)
-  ELSE()
-    MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
-  ENDIF()
+  INCLUDE(SalomeSetupPlatform) # From CONFIGURATION
+
+  ADD_DEFINITIONS(-DHAVE_SALOME)
+
   SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
   IF(EXISTS ${KERNEL_ROOT_DIR})
     FIND_PACKAGE(SalomeKERNEL REQUIRED)
     ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
     INCLUDE_DIRECTORIES(${KERNEL_INCLUDE_DIRS})
+    SET(SALOME_KERNEL_LIBDIR ${KERNEL_ROOT_DIR}/lib/salome)
   ELSE(EXISTS ${KERNEL_ROOT_DIR})
     MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
   ENDIF(EXISTS ${KERNEL_ROOT_DIR})
+
   SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI")
   IF(EXISTS ${GUI_ROOT_DIR})
     FIND_PACKAGE(SalomeGUI REQUIRED)
   ELSE(EXISTS ${GUI_ROOT_DIR})
     MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR")
   ENDIF(EXISTS ${GUI_ROOT_DIR})
-  INCLUDE(SalomeSetupPlatform)   # From CONFIGURATION
 
   FIND_PACKAGE(SalomePythonInterp REQUIRED)
   FIND_PACKAGE(SalomePythonLibs REQUIRED)
-
   FIND_PACKAGE(SalomeOpenCASCADE REQUIRED)
-
+  INCLUDE(FindSalome)
 ELSE()
-  INCLUDE(SalomeMacros)
-  INCLUDE(FindSalomeQt5)
   INCLUDE(FindPython)
   INCLUDE(FindSalomeOpenCASCADE)
 ENDIF()
 
-# Common CMake macros
-# ===================
-
+INCLUDE(FindSUIT)
 
 # Find LibXml2
 IF(DEFINED ENV{LIBXML2_ROOT_DIR})

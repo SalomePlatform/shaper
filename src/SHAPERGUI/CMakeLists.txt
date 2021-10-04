@@ -105,14 +105,9 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/Config
                     ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
-                    ${SALOME_GUI_INCLUDE}
-                    ${SALOME_KERNEL_INCLUDE}
+                    ${SUIT_INCLUDE}
                     ${OpenCASCADE_INCLUDE_DIR}
 )
-
-IF(${HAVE_SALOME})
-  INCLUDE_DIRECTORIES(${SALOME_KERNEL_INCLUDE})
-ENDIF(${HAVE_SALOME})
 
 ADD_LIBRARY(SHAPER SHARED
     ${PROJECT_SOURCES}
