@@ -1025,3 +1025,80 @@ MACRO(SWIG_CHECK_GENERATION swig_module)
      ENDIF()
   ENDIF()
 ENDMACRO(SWIG_CHECK_GENERATION)
+
+#########################################################################
+# SALOME_SETUP_VERSION()
+#
+# USAGE: SALOME_SETUP_VERSION(version [DEVELOPMENT])
+#
+# ARGUMENTS:
+#   version   [in] Version decriptor (string).
+#
+# OPTIONS:
+#   DEVELOPMENT    Forces setting development flag.
+#
+# The macro sets the following variables:
+# - PROJECTNAME_MAJOR_VERSION - major version number
+# - PROJECTNAME_MINOR_VERSION - minor version number
+# - PROJECTNAME_PATCH_VERSION - release version number
+# - PROJECTNAME_VERSION       - full qualified version
+# - PROJECTNAME_VERSION_DEV   - development flag (0 value for released version)
+# - PROJECTNAME_XVERSION      - hexadecimal representation of version
+# - PROJECTNAME_GIT_SHA1      - git commit's sha1
+#
+FUNCTION(SALOME_SETUP_VERSION version)
+  # parse arguments
+  PARSE_ARGUMENTS(SALOME_SETUP_VERSION "" "DEVELOPMENT" ${ARGN})
+  # project name in upper case (if not set in master CMakeLists.txt)
+  STRING(TOUPPER ${PROJECT_NAME} _pkg_uc)
+  # parse version component
+  STRING(REGEX MATCHALL "[^.]" _components "${version}")
+  LIST(LENGTH _components _length)
+  IF(${_length} GREATER 0)
+    LIST(GET _components 0 _major)
+    LIST(REMOVE_AT _components 0)
+  ELSE()
+    SET(_major 0)
+  ENDIF()
+  LIST(LENGTH _components _length)
+  IF(${_length} GREATER 0)
+    LIST(GET _components 0 _minor)
+    LIST(REMOVE_AT _components 0)
+  ELSE()
+    SET(_minor 0)
+  ENDIF()
+  LIST(LENGTH _components _length)
+  IF(${_length} GREATER 0)
+    LIST(GET _components 0 _patch)
+    LIST(REMOVE_AT _components 0)
+  ELSE()
+    SET(_patch 0)
+  ENDIF()
+  # set project version: 'major', 'minor' and 'patch' components
+  SET(${_pkg_uc}_MAJOR_VERSION ${_major} PARENT_SCOPE)
+  SET(${_pkg_uc}_MINOR_VERSION ${_minor} PARENT_SCOPE)
+  SET(${_pkg_uc}_PATCH_VERSION ${_patch} PARENT_SCOPE)
+  SET(${_pkg_uc}_VERSION       ${_major}.${_minor}.${_patch} PARENT_SCOPE)
+  # set 'development' flag
+  IF(SALOME_SETUP_VERSION_DEVELOPMENT)
+    SET(${_pkg_uc}_VERSION_DEV 1 PARENT_SCOPE)
+  ELSE()
+    SET(${_pkg_uc}_VERSION_DEV 0 PARENT_SCOPE)
+  ENDIF()
+  # set hexa representation of version
+  SALOME_TOHEXA(${_major} _major_h)
+  SALOME_TOHEXA(${_minor} _minor_h)
+  SALOME_TOHEXA(${_patch} _patch_h)
+  SET(${_pkg_uc}_XVERSION "0x${_major_h}${_minor_h}${_patch_h}" PARENT_SCOPE)
+  # detect git sha1
+  EXECUTE_PROCESS(COMMAND git describe --dirty --tags --match=V* --always
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    OUTPUT_VARIABLE _git_version
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  IF(_git_version)
+    SET(${_pkg_uc}_GIT_SHA1 "${_git_version}" PARENT_SCOPE)
+  ELSE(_)
+    SET(${_pkg_uc}_GIT_SHA1 "unknown" PARENT_SCOPE)
+  ENDIF()
+ENDFUNCTION()
