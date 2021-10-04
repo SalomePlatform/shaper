@@ -21,7 +21,7 @@ INCLUDE(UnitTest)
 
 include(tests.set)
 
-ADD_UNIT_TESTS(${TEST_NAMES})
+ADD_UNIT_TESTS_API(${TEST_NAMES})
 
 if(${HAVE_SALOME})
   enable_testing()
@@ -31,6 +31,5 @@ if(${HAVE_SALOME})
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)
   install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-  message(${TEST_NAMES})
   install(FILES ${TEST_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
 endif(${HAVE_SALOME})
