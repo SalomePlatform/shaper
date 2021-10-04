@@ -327,6 +327,14 @@
         <translation>Segment de ligne</translation>
     </message>
     <message>
+        <source>Arc of circle</source>
+        <translation>Arc de cercle</translation>
+    </message>
+    <message>
+        <source>Circle</source>
+        <translation>Cercle</translation>
+    </message>
+    <message>
         <source>Center</source>
         <translation>Centre</translation>
     </message>
@@ -341,6 +349,10 @@
     <message>
         <source>Radius</source>
         <translation>Rayon</translation>
+    </message>
+    <message>
+        <source>Arc of ellipse</source>
+        <translation>Arc d'ellipse</translation>
     </message>
     <message>
         <source>Major radius</source>
