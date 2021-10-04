@@ -21,7 +21,7 @@ INCLUDE(UnitTest)
 
 include(tests.set)
 
-ADD_UNIT_TESTS_API(${TEST_NAMES})
+ADD_UNIT_TESTS(${TEST_NAMES})
 
 if(${HAVE_SALOME})
   enable_testing()

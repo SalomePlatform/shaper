@@ -55,6 +55,9 @@ function(GENERATE_TESTS PATH testdir TESTS)
 
     # Full path to the python test file beeing executed
     SET(aTestFileName "${testdir}/${eachFileName}")
+    IF(NOT EXISTS ${aTestFileName})
+      SET(aTestFileName "${testdir}/Test/${eachFileName}")
+    ENDIF(NOT EXISTS ${aTestFileName})
     IF(EXISTS ${aTestFileName})
       ADD_TEST(NAME ${aTestName}
                COMMAND ${PYTHON_EXECUTABLE} ${aTestFileName})
@@ -64,13 +67,15 @@ function(GENERATE_TESTS PATH testdir TESTS)
       # Debug output...
       #MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFileName}")
     ELSE(EXISTS ${aTestFileName})
-      MESSAGE(WARNING "Can not find the test file: ${aTestFileName}")
+      MESSAGE(WARNING "Can not find the test file: ${eachFileName}")
+      MESSAGE(STATUS "Search paths are: ${testdir}")
+      MESSAGE(STATUS "                  ${testdir}/Test")
     ENDIF(EXISTS ${aTestFileName})
   endforeach(eachFileName ${ARGN})
 endfunction(GENERATE_TESTS)
 
 function(ADD_UNIT_TESTS)
-  GENERATE_TESTS(PATH "${CMAKE_CURRENT_SOURCE_DIR}/Test" TESTS ${ARGN})
+  GENERATE_TESTS(PATH "${CMAKE_CURRENT_SOURCE_DIR}" TESTS ${ARGN})
 endfunction(ADD_UNIT_TESTS)
 
 function(ADD_UNIT_TESTS_API)
