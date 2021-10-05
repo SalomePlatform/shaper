@@ -404,9 +404,9 @@ void XGUI_InspectionPanel::fillEdge(const GeomEdgePtr& theEdge)
     if (aCircle) {
       addStartEndPoints = aStartPnt->distance(aEndPnt) >= Precision::Confusion();
       if (addStartEndPoints)
-        myTypeLbl->setText("Arc of circle");
+        myTypeLbl->setText(tr("Arc of circle"));
       else
-        myTypeLbl->setText("Circle");
+        myTypeLbl->setText(tr("Circle"));
 
       appendPointToParameters(tr("Center"), aCircle->center(), aParams);
       appendDirToParameters(tr("Normal"), aCircle->normal(), aParams);
@@ -418,9 +418,9 @@ void XGUI_InspectionPanel::fillEdge(const GeomEdgePtr& theEdge)
       if (anEllipse) {
         addStartEndPoints = aStartPnt->distance(aEndPnt) >= Precision::Confusion();
         if (addStartEndPoints)
-          myTypeLbl->setText("Arc of ellipse");
+          myTypeLbl->setText(tr("Arc of ellipse"));
         else
-          myTypeLbl->setText("Ellipse");
+          myTypeLbl->setText(tr("Ellipse"));
 
         appendPointToParameters(tr("Center"), anEllipse->center(), aParams);
         appendDirToParameters(tr("Normal"), anEllipse->normal(), aParams);
