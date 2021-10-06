@@ -478,6 +478,7 @@ void XGUI_InspectionPanel::fillFace(const GeomFacePtr& theFace)
       if (anEdge->isCircle() || anEdge->isEllipse()) {
         fillEdge(anEdge);
         isCommonCase = false;
+        myTypeLbl->setText(tr("Disk"));
       }
     }
     else {

@@ -335,6 +335,10 @@
         <translation>Cercle</translation>
     </message>
     <message>
+        <source>Disk</source>
+        <translation>Disque</translation>
+    </message>
+    <message>
         <source>Center</source>
         <translation>Centre</translation>
     </message>
