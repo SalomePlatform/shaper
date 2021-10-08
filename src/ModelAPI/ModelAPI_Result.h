@@ -39,7 +39,7 @@ class ModelAPI_Result : public ModelAPI_Object
  public:
 
   /// Reference to the color of the result.
-  /// The integer array is used. It contains tree values for red green and blue values.
+  /// The integer array is used. It contains three values for red, green and blue values.
   /// The values are in [0, 255] range
   inline static const std::string& COLOR_ID()
   {

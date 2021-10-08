@@ -38,6 +38,12 @@ public:
     static const std::string MY_DUMP_ID("Dump");
     return MY_DUMP_ID;
   }
+  /// attribute name of true dumping directory
+  inline static const std::string& DUMP_DIR_ID()
+  {
+    static const std::string MY_DUMP_DIR_ID("dump_dir");
+    return MY_DUMP_DIR_ID;
+  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {

@@ -32,6 +32,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 static const std::string SCALE_VERSION_1("v9.5");
 
@@ -92,10 +93,10 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
+  ResultPtr aTextureSource;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   // Getting the center point
@@ -143,7 +144,8 @@ void FeaturesPlugin_Scale::performScaleByFactor()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Scaled");
-    aResultBody->setTextureFile(theTextureFile);
+    // Copy image data, if any
+    ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
   }
 
@@ -159,10 +161,10 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
+  ResultPtr aTextureSource;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   // Getting the center point
@@ -215,7 +217,8 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Scaled");
-    aResultBody->setTextureFile(theTextureFile);
+    // Copy image data, if any
+    ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
   }
 

@@ -93,7 +93,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)
             aRes = model.objectToResult(aResObject)
             #do not export images
-            if aRes.hasTextureFile() is True:
+            if aRes.hasTexture() is True:
               continue
             aResFeatureId = str(aPartDoc.feature(aRes).data().featureId())
             if aResFeatureId in aFeaturesIndices:

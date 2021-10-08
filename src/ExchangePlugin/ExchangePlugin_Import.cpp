@@ -156,7 +156,7 @@ void ExchangePlugin_Import::execute()
 
 void ExchangePlugin_Import_Image::execute()
 {
- AttributeStringPtr aFilePathAttr = string(ExchangePlugin_ImportBase::FILE_PATH_ID());
+  AttributeStringPtr aFilePathAttr = string(ExchangePlugin_ImportBase::FILE_PATH_ID());
   std::string aFilePath = aFilePathAttr->value();
   if (aFilePath.empty()) {
     setError("File path is empty.");

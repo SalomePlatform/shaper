@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2020  CEA/DEN, EDF R&D
+// Copyright (C) 2014-2021  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,19 +15,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
-#ifndef GEOMALGOAPI_IMAGEIMPORT_H_
-#define GEOMALGOAPI_IMAGEIMPORT_H_
+#include <ModelAPI_AttributeImage.h>
 
-#include <GeomAlgoAPI.h>
-#include <GeomAPI_Shape.h>
 
-#include <string>
+std::string ModelAPI_AttributeImage::attributeType()
+{
+  return typeId();
+}
 
-/// Implementation of the import STL files algorithms
-GEOMALGOAPI_EXPORT
-std::shared_ptr<GeomAPI_Shape> ImageImport(const int theWidth,
-                                           const int theHeight,
-                                           std::string& theError);
+/// To virtually destroy the fields of successors
+ModelAPI_AttributeImage::~ModelAPI_AttributeImage()
+{
+}
 
-#endif /* GEOMALGOAPI_IMAGEIMPORT_H_ */
+ModelAPI_AttributeImage::ModelAPI_AttributeImage()
+{
+}

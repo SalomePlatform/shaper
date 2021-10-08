@@ -26,6 +26,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
@@ -197,10 +198,10 @@ void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
+  ResultPtr aTextureSource;
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
-  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList
+      (anObjectsSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   std::string anError;
@@ -241,7 +242,8 @@ void FeaturesPlugin_Translation::performTranslation(const GeomTrsfPtr& theTrsf)
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Translated");
-    aResultBody->setTextureFile(theTextureFile);
+    // Copy image data, if any
+    ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
   }
 

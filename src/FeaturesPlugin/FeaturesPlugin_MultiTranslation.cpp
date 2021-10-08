@@ -37,6 +37,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <math.h>
 
@@ -91,9 +92,9 @@ void FeaturesPlugin_MultiTranslation::execute()
 
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
-  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+  ResultPtr aTextureSource;
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList
+      (anObjectsSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   std::shared_ptr<GeomAPI_Dir> aFirstDir, aSecondDir;
@@ -171,7 +172,8 @@ void FeaturesPlugin_MultiTranslation::execute()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Translated");
-    aResultBody->setTextureFile(theTextureFile);
+    // Copy image data, if any
+    ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
   }
 

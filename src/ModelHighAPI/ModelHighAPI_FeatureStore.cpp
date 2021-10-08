@@ -241,7 +241,12 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   } else if (aType == ModelAPI_AttributeString::typeId()) {
     AttributeStringPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttr);
     // do not dump solver DOF for sketch as it may be changed unexpectedly
-    if(anAttr->id() == "SolverDOF") {
+    if (anAttr->id() == "SolverDOF") {
+      return "";
+    }
+    // do not dump file path for Image as it is changed after DumpPython
+    if (aFeatOwner->getKind() == "ImportImage" &&
+        anAttr->id() == "file_path") {
       return "";
     }
     aResult<<anAttr->value();

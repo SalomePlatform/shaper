@@ -45,7 +45,6 @@ class ModelAPI_Object: public ModelAPI_Entity
 {
   std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
-  std::string textureFile = "";
  public:
 #ifdef DEBUG_NAMES
   std::wstring myName; // name of this object
@@ -101,19 +100,9 @@ class ModelAPI_Object: public ModelAPI_Entity
   /// signal.
   MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
-  MODELAPI_EXPORT bool hasTextureFile()
+  MODELAPI_EXPORT virtual bool hasTexture()
   {
-    return (textureFile != "");
-  }
-
-  MODELAPI_EXPORT virtual void setTextureFile(const std::string & theTextureFile)
-  {
-    textureFile = theTextureFile;
-  }
-
-  MODELAPI_EXPORT const std::string & getTextureFile()
-  {
-    return  textureFile;
+    return false;
   }
 
  protected:

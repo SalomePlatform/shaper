@@ -58,6 +58,13 @@ protected:
 public:
   MODELAPI_EXPORT virtual ~ModelAPI_ResultBody();
 
+  /// Reference to the image attribute of the result body.
+  inline static const std::string& IMAGE_ID()
+  {
+    static const std::string MY_IMAGE_ID("Image");
+    return MY_IMAGE_ID;
+  }
+
   /// Returns the group identifier of this result
   MODELAPI_EXPORT virtual std::string groupName();
 

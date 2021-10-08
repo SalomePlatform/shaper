@@ -63,6 +63,10 @@ public:
    * Returns a name of theFileName
    */
   GEOMALGOAPI_EXPORT static std::string name(const std::string& theFileName);
+  /**
+   * Returns a directory path of theFileName
+   */
+  GEOMALGOAPI_EXPORT static std::string path(const std::string& theFileName);
 };
 
 /** \class AlgoError

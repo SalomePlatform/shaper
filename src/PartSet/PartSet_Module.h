@@ -400,7 +400,7 @@ public:
   virtual void createFeatures();
 
   /// add texture
-  static void setTexture(const std::string &theTextureFile, const AISObjectPtr& thePrs);
+  static void setTexture(const AISObjectPtr& thePrs, const ResultPtr& theResult);
 
 public slots:
   /// Slolt called on object display

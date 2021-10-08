@@ -171,9 +171,8 @@ bool PartSet_CustomPrs::displayPresentation(
       isModified = true;
     }
     else {
-      if (myFeature->firstResult().get() && myFeature->firstResult()->hasTextureFile())
-      {
-        PartSet_Module::setTexture( myFeature->firstResult()->getTextureFile(), aPresentation);
+      if (myFeature->firstResult().get()) {
+        PartSet_Module::setTexture(aPresentation, myFeature->firstResult());
       }
       anOperationPrs->Redisplay();
       isModified = true;

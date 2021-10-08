@@ -61,6 +61,14 @@ std::string File_Tools::name(const std::string& theFileName)
   return aPath.Name().ToCString();
 }
 
+std::string File_Tools::path(const std::string& theFileName)
+{
+  OSD_Path aPath (theFileName.c_str());
+  Standard_Integer aTrekLen =
+    theFileName.size() - aPath.Extension().Length() - aPath.Name().Length();
+  return theFileName.substr(0, aTrekLen);
+}
+
 bool AlgoError::isAlgorithmFailed(const GeomMakeShapePtr& theAlgorithm,
                                   const std::string& theFeature,
                                   std::string& theError)

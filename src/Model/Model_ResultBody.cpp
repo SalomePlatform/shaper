@@ -26,6 +26,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeImage.h>
 #include <Model_Data.h>
 #include <Events_Loop.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -54,6 +55,13 @@ Model_ResultBody::~Model_ResultBody()
 {
   updateSubs(std::shared_ptr<GeomAPI_Shape>()); // erase sub-results
   delete myBuilder;
+}
+
+void Model_ResultBody::initAttributes()
+{
+  ModelAPI_Result::initAttributes();
+  // append the image attribute. It is empty, the attribute will be filled by a request
+  data()->addAttribute(IMAGE_ID(), ModelAPI_AttributeImage::typeId())->setIsArgument(false);
 }
 
 bool Model_ResultBody::generated(const GeomShapePtr& theNewShape,
@@ -408,17 +416,6 @@ void Model_ResultBody::updateSubs(
   myHistoryCash.Clear();
 }
 
-void  Model_ResultBody::setTextureFile(const std::string & theTextureFile)
-{
-  ModelAPI_Result::setTextureFile(theTextureFile);
-  for( auto sub : mySubs){
-    sub->setTextureFile(theTextureFile);
-  }
-  for(auto map : mySubsMap){
-    map.first->setTextureFile(theTextureFile);
-  }
-}
-
 bool Model_ResultBody::isConnectedTopology()
 {
   TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
@@ -446,6 +443,16 @@ void Model_ResultBody::cleanCash()
     const ResultBodyPtr& aSub = *aSubIter;
     aSub->cleanCash();
   }
+}
+
+bool Model_ResultBody::hasTexture()
+{
+  AttributeImagePtr anImageAttr =
+    data()->image(ModelAPI_ResultBody::IMAGE_ID());
+  if (anImageAttr.get()) {
+    return anImageAttr->hasTexture();
+  }
+  return false;
 }
 
 // adds to the theSubSubs map all sub-shapes of theSub if it is compound of compsolid

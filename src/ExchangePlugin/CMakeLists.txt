@@ -19,6 +19,7 @@
 
 INCLUDE(Common)
 INCLUDE(UnitTest)
+INCLUDE(UseQtExt)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/Config
@@ -32,7 +33,11 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ConstructionPlugin
                     ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
                     ${OpenCASCADE_INCLUDE_DIR}
+                    ${QT_INCLUDES}
 )
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
     ExchangePlugin.h
@@ -82,6 +87,7 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
     GeomValidators
     XAOShaper
+    ${QT_LIBRARIES}
 )
 
 # default dump approaches (will be set if not initialized)

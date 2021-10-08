@@ -20,6 +20,7 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeImage.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -1021,6 +1022,30 @@ void copyVisualizationAttrs(
     AttributeDoublePtr aDestTransp = theDest->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
     if (aDestTransp.get()) {
       aDestTransp->setValue(aSourceTransp->value());
+    }
+  }
+}
+
+
+void copyImageAttribute (std::shared_ptr<ModelAPI_Result> theSource,
+                         std::shared_ptr<ModelAPI_Result> theDest)
+{
+  if (!theSource.get() || !theDest.get())
+    return;
+
+  // images allowed only for ResultBody
+  ResultBodyPtr aSourceBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSource);
+  ResultBodyPtr aDestBody   = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theDest);
+  if (!aSourceBody.get() || !aDestBody.get())
+    return;
+
+  AttributeImagePtr aSourceImage =
+    theSource->data()->image(ModelAPI_ResultBody::IMAGE_ID());
+  if (aSourceImage.get() && aSourceImage->hasTexture()) {
+    AttributeImagePtr aDestImage =
+      theDest->data()->image(ModelAPI_ResultBody::IMAGE_ID());
+    if (aDestImage.get()) {
+      aSourceImage->copyTo(aDestImage);
     }
   }
 }
