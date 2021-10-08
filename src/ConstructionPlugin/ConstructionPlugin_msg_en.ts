@@ -300,6 +300,13 @@
       <translation>Select the third point.</translation>
     </message>
   </context>
+  <context>
+    <name>Plane:nb_copies</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select the number of copies.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Point:edge</name>

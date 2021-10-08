@@ -42,6 +42,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -99,46 +100,63 @@ void ConstructionPlugin_Plane::initAttributes()
   // By two parallel planes.
   data()->addAttribute(PLANE1(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PLANE2(), ModelAPI_AttributeSelection::typeId());
+
+  // By other plane.
+  AttributeIntegerPtr aNbCopies = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(
+    data()->addAttribute(NB_COPIES(), ModelAPI_AttributeInteger::typeId()));
+
+  if (!aNbCopies->isInitialized())
+    aNbCopies->setValue(1);
 }
 
 //==================================================================================================
 void ConstructionPlugin_Plane::execute()
 {
-  GeomShapePtr aShape;
+  ListOfShape aShapes;
 
   std::string aCreationMethod = string(CREATION_METHOD())->value();
   if(aCreationMethod == CREATION_METHOD_BY_GENERAL_EQUATION() ||
       aCreationMethod == "PlaneByGeneralEquation") {
-    aShape = createByGeneralEquation();
+    aShapes.push_back(createByGeneralEquation());
   } else if(aCreationMethod == CREATION_METHOD_BY_THREE_POINTS()) {
-    aShape = createByThreePoints();
+    aShapes.push_back(createByThreePoints());
   } else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_POINT()) {
-    aShape = createByLineAndPoint();
+    aShapes.push_back(createByLineAndPoint());
   } else if(aCreationMethod == CREATION_METHOD_BY_OTHER_PLANE()) {
     std::string aCreationMethodOption = string(CREATION_METHOD_BY_OTHER_PLANE_OPTION())->value();
     if(aCreationMethodOption == CREATION_METHOD_BY_DISTANCE_FROM_OTHER()) {
-      aShape = createByDistanceFromOther();
+      createByDistanceFromOther(aShapes);
     } else if(aCreationMethodOption == CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
-      aShape = createByCoincidentPoint();
+      aShapes.push_back(createByCoincidentPoint());
     } else if(aCreationMethodOption == CREATION_METHOD_BY_ROTATION()) {
-      aShape = createByRotation();
+      createByRotation(aShapes);
     }
   } else if(aCreationMethod == CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
-    aShape = createByTwoParallelPlanes();
+    aShapes.push_back(createByTwoParallelPlanes());
   } else {
     setError("Error: Plane creation method \"" + aCreationMethod + "\" not supported.");
     return;
   }
 
-  if(!aShape.get()) {
+  if(aShapes.size() == 0) {
     setError("Error: Could not create a plane.");
     return;
   }
 
-  ResultConstructionPtr aConstr = document()->createConstruction(data());
-  aConstr->setInfinite(true);
-  aConstr->setShape(aShape);
-  setResult(aConstr);
+  int anIndex = 0;
+  for (auto aShapeIter = aShapes.begin(); aShapeIter != aShapes.end(); ++aShapeIter, ++anIndex)
+  {
+    if (!aShapeIter->get())
+    {
+      setError("Error: Could not create a plane.");
+      continue;
+    }
+    ResultConstructionPtr aConstr = document()->createConstruction(data(), anIndex);
+    aConstr->setInfinite(true);
+    aConstr->setShape(*aShapeIter);
+    setResult(aConstr, anIndex);
+  }
+  removeResults(anIndex);
 }
 
 //==================================================================================================
@@ -191,7 +209,6 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByGeneralEquation
   }
   return aPlaneFace;
 }
-
 //==================================================================================================
 std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByThreePoints()
 {
@@ -275,17 +292,18 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOther()
+void ConstructionPlugin_Plane::createByDistanceFromOther(ListOfShape& theShapes)
 {
   AttributeSelectionPtr aFaceAttr = data()->selection(ConstructionPlugin_Plane::PLANE());
   AttributeDoublePtr aDistAttr = data()->real(ConstructionPlugin_Plane::DISTANCE());
-  std::shared_ptr<GeomAPI_Shape> aPlane;
+  AttributeIntegerPtr aNbCopyAttr = data()->integer(ConstructionPlugin_Plane::NB_COPIES());
   if ((aFaceAttr.get() != NULL) &&
-      (aDistAttr.get() != NULL) &&
+      (aDistAttr.get() != NULL) && (aNbCopyAttr.get() != NULL) &&
       aFaceAttr->isInitialized() && aDistAttr->isInitialized()) {
 
     double aDist = aDistAttr->value();
     bool anIsReverse = boolean(REVERSE())->value();
+    int aNumOfCopies = aNbCopyAttr->value();
     if(anIsReverse) aDist = -aDist;
     GeomShapePtr aShape = aFaceAttr->value();
     if (!aShape.get() && aFaceAttr->context()) {
@@ -293,7 +311,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
     }
 
     if(!aShape.get()) {
-      return aPlane;
+      return;
     }
 
     std::shared_ptr<GeomAPI_Face> aFace;
@@ -305,18 +323,22 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
       aFace = anIt.current()->face();
     }
     if (!aFace)
-      return GeomShapePtr();
+      return;
 
     std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
     std::shared_ptr<GeomAPI_Dir> aDir = aPln->direction();
 
-    aOrig->translate(aDir, aDist);
-    std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aOrig, aDir));
+    for (int aNbCopy = 0; aNbCopy < aNumOfCopies; ++aNbCopy)
+    {
+      std::shared_ptr<GeomAPI_Shape> aPlane;
+      aOrig->translate(aDir, aDist);
+      std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aOrig, aDir));
 
-    aPlane = makeRectangularFace(aFace, aNewPln);
+      aPlane = makeRectangularFace(aFace, aNewPln);
+      theShapes.push_back(aPlane);
+    }
   }
-  return aPlane;
 }
 
 //==================================================================================================
@@ -357,7 +379,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByCoincidentPoint
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
+void ConstructionPlugin_Plane::createByRotation(ListOfShape& theShapes)
 {
   // Get face.
   AttributeSelectionPtr aFaceSelection = selection(PLANE());
@@ -374,7 +396,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
     aFace = anIt.current()->face();
   }
   if (!aFace)
-    return GeomShapePtr();
+    return;
   aFace = makeRectangularFace(aFace, aFace->getPlane());
 
   // Get axis.
@@ -392,7 +414,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
     anEdge = anIt.current()->edge();
   }
   if (!anEdge)
-    return GeomShapePtr();
+    return;
+
+  AttributeIntegerPtr aNbCopyAttr = data()->integer(ConstructionPlugin_Plane::NB_COPIES());
+  int aNBCopy;
+  if (!aNbCopyAttr.get())
+    return;
+
+  aNBCopy = aNbCopyAttr->value();
 
   std::shared_ptr<GeomAPI_Ax1> anAxis =
     std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
@@ -401,17 +430,20 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   // Getting angle.
   double anAngle = real(ANGLE())->value();
 
-  std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(
-      new GeomAlgoAPI_Rotation(aFace, anAxis, anAngle));
-  // Checking that the algorithm worked properly.
-  std::string anError;
-  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
-    setError("Error: Failed to rotate plane");
-    return GeomShapePtr();
-  }
+  for (int anIndex = 1; anIndex <= aNBCopy; ++anIndex)
+  {
+    std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(
+      new GeomAlgoAPI_Rotation(aFace, anAxis, anAngle * anIndex));
+    // Checking that the algorithm worked properly.
+    std::string anError;
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
+      setError("Error: Failed to rotate plane");
+      return;
+    }
 
-  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo->shape()));
-  return aRes;
+    std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo->shape()));
+    theShapes.push_back(aRes);
+  }
 }
 
 //==================================================================================================

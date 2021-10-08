@@ -26,6 +26,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Integer.h>
 
 class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
@@ -45,7 +46,8 @@ public:
   ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& theFace,
                         const ModelHighAPI_Double& theDistance,
-                        const bool theIsReverse);
+                        const bool theIsReverse,
+                        const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
   /// Constructor with values
   CONSTRUCTIONAPI_EXPORT
@@ -80,13 +82,14 @@ public:
   ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& thePlane,
                         const ModelHighAPI_Selection& theAxis,
-                        const ModelHighAPI_Double& theAngle);
+                        const ModelHighAPI_Double& theAngle,
+                        const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
   /// Destructor
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Plane();
 
-  INTERFACE_20(ConstructionPlugin_Plane::ID(),
+  INTERFACE_21(ConstructionPlugin_Plane::ID(),
                creationMethod, ConstructionPlugin_Plane::CREATION_METHOD(),
                ModelAPI_AttributeString, /** Creation method */,
                A, ConstructionPlugin_Plane::A(),
@@ -127,13 +130,16 @@ public:
                plane1, ConstructionPlugin_Plane::PLANE1(),
                ModelAPI_AttributeSelection, /** Plane 1 */,
                plane2, ConstructionPlugin_Plane::PLANE2(),
-               ModelAPI_AttributeSelection, /** Plane 2 */)
+               ModelAPI_AttributeSelection, /** Plane 2 */,
+               nbcopy, ConstructionPlugin_Plane::NB_COPIES(),
+               ModelAPI_AttributeInteger, /** Number of copies */)
 
   /// Set face and distance
   CONSTRUCTIONAPI_EXPORT
   void setByFaceAndDistance(const ModelHighAPI_Selection& theFace,
                             const ModelHighAPI_Double& theDistance,
-                            const bool theIsReverse);
+                            const bool theIsReverse,
+                            const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
   /// Set GeneralEquation parameters of the feature
   CONSTRUCTIONAPI_EXPORT
@@ -168,7 +174,8 @@ public:
   CONSTRUCTIONAPI_EXPORT
   void setByRotation(const ModelHighAPI_Selection& thePlane,
                      const ModelHighAPI_Selection& theAxis,
-                     const ModelHighAPI_Double& theAngle);
+                     const ModelHighAPI_Double& theAngle,
+                     const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
   /// Dump wrapped feature
   CONSTRUCTIONAPI_EXPORT
@@ -184,7 +191,8 @@ CONSTRUCTIONAPI_EXPORT
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& theFace,
                   const ModelHighAPI_Double& theDistance,
-                  const bool theIsReverse);
+                  const bool theIsReverse,
+                  const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
 /// \ingroup CPPHighAPI
 /// \brief Create Plane feature
@@ -224,6 +232,7 @@ CONSTRUCTIONAPI_EXPORT
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& thePlane,
                   const ModelHighAPI_Selection& theAxis,
-                  const ModelHighAPI_Double& theAngle);
+                  const ModelHighAPI_Double& theAngle,
+                  const ModelHighAPI_Integer& theNbCopy = ModelHighAPI_Integer(1));
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_PLANE_H_ */
