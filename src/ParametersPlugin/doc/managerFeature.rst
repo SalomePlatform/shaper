@@ -20,6 +20,8 @@ The following dialog box with parameter table appears:
 .. |param_up| image:: images/parameters_up.png
 .. |param_down| image:: images/parameters_down.png
 
+To edit a parameter, double-click on parameter in object browser.
+
 **Input fields**:
 
 - **Name** defines parameter name. Name follows the naming rules of the python language for variables;
@@ -29,9 +31,23 @@ The following dialog box with parameter table appears:
 - **Add** button adds a new empty string in the end of table. Default  **Name** is *<NoName>*, **Expression** is   *<NoValue>* 
 - **Insert** button adds a new empty string before the selected parameter;
 - **Delete** button removes the selected parameter from the table;   
+- **Import** button import parameters from .txt files. Parameters must be written in file in separate lines like example: **Name** **Expression** #**Comment**
+Sample.txt:
+''Longueur 36. # Longueur de la pièce''
+''Largeur 24 #Largeur de la pièce''
+''Hauteur Longueur * Largeur''
 - **Modify parameter position** button moves the selected parameter
   
     | |param_up| one string higher in the table,
     | |param_down| one string lower in the table.
 
+**TUI Command**:
+
+.. py:function:: model.importParameters(Part_doc, filename)
+
+    :param part: The current part object
+    :param filename: The txt file with parameters
+    :return: Created objects.
+
+**See Also** a sample TUI Script of a :ref:`tui_parameterFeature` operation.
 **See Also** :ref:`parameter` operation.

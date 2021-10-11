@@ -22,15 +22,23 @@ from salome.shaper import model
 model.begin()
 partSet = model.moduleDocument()
 # check error on empty name
-Param1 = model.addParameter(partSet, "", "100")
-assert(Param1.feature().error() != "")
+try:
+    Param1 = model.addParameter(partSet, "", "100")
+except SyntaxError as anError:
+    assert(str(anError).find("Attribute \"variable\" value is empty.") != -1)
 # check error on empty value
-Param2 = model.addParameter(partSet, "L", "")
-assert(Param2.feature().error() != "")
+try:
+    Param2 = model.addParameter(partSet, "L", "")
+except SyntaxError as anError:
+    assert(str(anError).find("Expression is empty.") != -1)
 # check error if name is not variable
-Param3 = model.addParameter(partSet, "100", "100")
-assert(Param3.feature().error() != "")
+try:
+    Param3 = model.addParameter(partSet, "100", "100")
+except SyntaxError as anError:
+    assert(str(anError).find("Incorrect variable name.") != -1)
 # check error on wrong value expression
-Param4 = model.addParameter(partSet, "N", "+-.so&@")
-assert(Param4.feature().error() != "")
+try:
+    Param4 = model.addParameter(partSet, "N", "+-.so&@")
+except SyntaxError as anError:
+    assert(str(anError).find("invalid syntax") != -1)
 model.end()

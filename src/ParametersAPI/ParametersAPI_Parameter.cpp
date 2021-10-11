@@ -35,7 +35,7 @@ ParametersAPI_Parameter::ParametersAPI_Parameter(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const std::string & theName,
     const std::string & theExpression,
-    const std::string & theComment)
+    const std::wstring & theComment)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
@@ -87,10 +87,18 @@ void ParametersAPI_Parameter::dump(ModelHighAPI_Dumper& theDumper) const
 ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
                           const std::string & theName,
                           const std::string & theExpression,
-                          const std::string & theComment)
+                          const std::wstring & theComment)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ParametersAPI_Parameter::ID());
-  return ParameterPtr(new ParametersAPI_Parameter(aFeature, theName, theExpression, theComment));
+  ParameterPtr aParam(new ParametersAPI_Parameter(aFeature, theName, theExpression, theComment));
+
+  if (!aParam->feature()->error().empty())
+  {
+    std::string anError("Error with parameter \"");
+    anError += theName + "\": " + aParam->feature()->error();
+    throw anError;
+  }
+  return aParam;
 }
 
 //--------------------------------------------------------------------------------------

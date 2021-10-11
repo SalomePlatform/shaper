@@ -41,6 +41,11 @@ The property panel checks validity of the expression. For an invalid expression 
     :param string: The parameter comment
     :return: Created object.
 
+Write error in Python console if:
+- parameter name is empty.
+- parameter don't have unique name.
+- parameter expression is empty or incorrect.
+
 **See Also** a sample TUI Script of a :ref:`tui_parameterFeature` operation.
 
 Result

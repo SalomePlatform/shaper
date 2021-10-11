@@ -109,6 +109,9 @@ private slots:
   /// Slot for reaction on remove parameter
   void onRemove();
 
+  /// Slot for reaction on import parameter
+  void onImport();
+
   /// Slot for reaction on shift up
   void onUp();
 
@@ -148,7 +151,7 @@ private:
   bool isValid();
 
   /// Returns true if parameter with the given name already exists
-  bool hasName(const QString& theName) const;
+  bool hasName(const QString& theName, int theIndex) const;
 
   /// Enable or disable buttons for parameters managemnt
   void enableButtons(bool theEnable);
@@ -173,6 +176,7 @@ private:
   QPushButton* myAddBtn;
   QPushButton* myInsertBtn;
   QPushButton* myRemoveBtn;
+  QPushButton* myImportBtn;
   QToolButton* myUpBtn;
   QToolButton* myDownBtn;
 

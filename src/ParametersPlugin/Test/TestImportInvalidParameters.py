@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2021  CEA/DEN, EDF R&D
+# Copyright (C) 2014-2021  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,21 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-"""Package for Parameter plugin for the Parametric Geometry API of the Modeler.
-"""
 
-from ParametersAPI import addParameter, removeParameter
+from salome.shaper import model
+import inspect, os
 
-from .import_parameter import *
+data_dir = os.path.join(os.path.dirname(inspect.getfile(lambda: None)), "data")
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+
+nameFile = "invalid_parameters.txt"
+
+aDir = os.path.join(data_dir, nameFile)
+
+aListOfParameters = model.importParameters(Part_1_doc, aDir)
+
+assert(len(aListOfParameters) == 0)

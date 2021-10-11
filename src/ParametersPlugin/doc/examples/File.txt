@@ -1,0 +1,3 @@
+Width 10.0 #Width of square
+Height 15.0 # Height of square
+Area Width*Height # Area of square

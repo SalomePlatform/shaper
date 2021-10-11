@@ -188,6 +188,27 @@ const std::string& ModelAPI_ParameterEvalMessage::error() const
   return myError;
 }
 
+/// Creates an empty message
+ModelAPI_ImportParametersMessage::ModelAPI_ImportParametersMessage(const Events_ID theID, const void* theSender)
+  :Events_Message(theID, theSender)
+{
+
+}
+
+ModelAPI_ImportParametersMessage::~ModelAPI_ImportParametersMessage()
+{
+}
+
+std::string ModelAPI_ImportParametersMessage::filename() const
+{
+  return myFilename;
+}
+
+void ModelAPI_ImportParametersMessage::setFilename(std::string theFilename)
+{
+  myFilename = theFilename;
+}
+
 ModelAPI_BuildEvalMessage::ModelAPI_BuildEvalMessage(
   const Events_ID theID, const void* theSender)
   : Events_Message(theID, theSender), myIsProcessed(false)
