@@ -454,10 +454,11 @@ bool Model_AttributeSelection::isInitialized()
 
 Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
 : myRef(theLabel),
+  myTmpCenterType(NOT_CENTER),
+  myParent(NULL),
   myIsGeometricalSelection(false)
 {
   myIsInitialized = myRef.isInitialized();
-  myParent = NULL;
 }
 
 void Model_AttributeSelection::setID(const std::string theID)
