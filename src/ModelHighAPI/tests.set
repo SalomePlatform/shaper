@@ -30,4 +30,5 @@ SET(TEST_NAMES
   Test19990_1.py
   Test19990_2.py
   Test20167.py
+  TestSetColors.py
 )

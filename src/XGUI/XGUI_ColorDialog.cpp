@@ -28,6 +28,42 @@
 #include <QGridLayout>
 #include <QRadioButton>
 #include <QDialogButtonBox>
+#include <QMouseEvent>
+#include <QApplication>
+
+namespace
+{
+  class RadioButton: public QRadioButton
+  {
+    QWidget* myBuddy;
+  public:
+    RadioButton(const QString& text, QWidget* buddy = nullptr, QWidget* parent = nullptr):
+      QRadioButton(text, parent), myBuddy(buddy)
+    {
+      if (buddy != nullptr)
+      {
+        buddy->setEnabled(isEnabled());
+        buddy->installEventFilter(this);
+      }
+    }
+    RadioButton(QWidget* buddy = nullptr, QWidget* parent = nullptr):
+      RadioButton(QString(), buddy, parent) {}
+
+    bool eventFilter(QObject* sender, QEvent* event)
+    {
+      if (myBuddy != nullptr && sender == myBuddy && event->type() == QEvent::MouseButtonPress)
+        setChecked(true);
+      return QRadioButton::eventFilter(sender, event);
+    }
+
+    void changeEvent(QEvent* event)
+    {
+      if (myBuddy != nullptr && event->type() == QEvent::EnabledChange)
+        myBuddy->setEnabled(isEnabled());
+      QRadioButton::changeEvent(event);
+    }
+  };
+}
 
 XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
   : QDialog(theParent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint)
@@ -35,8 +71,13 @@ XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
   setWindowTitle(tr("Color"));
   QGridLayout* aLay = new QGridLayout(this);
 
-  QRadioButton* aRandomChoiceBtn = new QRadioButton(this);
-  QRadioButton* aColorChoiceBtn = new QRadioButton(this);
+  myColorButton = new QtxColorButton(this);
+  myColorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  QLabel* aRandomLabel = new QLabel(tr("Random"), this);
+
+  QRadioButton* aColorChoiceBtn = new RadioButton(myColorButton, this);
+  QRadioButton* aRandomChoiceBtn = new RadioButton(aRandomLabel, this);
   aColorChoiceBtn->setChecked(true);
   myButtonGroup = new QButtonGroup(this);
   myButtonGroup->setExclusive(true);
@@ -44,13 +85,8 @@ XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
   myButtonGroup->addButton(aRandomChoiceBtn, 1);
 
   aLay->addWidget(aColorChoiceBtn, 0, 0);
-  aLay->addWidget(aRandomChoiceBtn, 1, 0);
-
-  myColorButton = new QtxColorButton(this);
-  myColorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   aLay->addWidget(myColorButton, 0, 1);
-
-  QLabel* aRandomLabel = new QLabel(tr("Random"), this);
+  aLay->addWidget(aRandomChoiceBtn, 1, 0);
   aLay->addWidget(aRandomLabel, 1, 1);
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,

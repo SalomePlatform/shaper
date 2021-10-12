@@ -25,7 +25,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
-
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Pnt.h>
 //--------------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ std::wstring ModelHighAPI_Selection::name() const
   return std::wstring();
 }
 
-void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
+void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue, bool random)
 {
   if (myVariantType != VT_ResultSubShapePair || !myResultSubShapePair.first.get())
     return;
@@ -217,9 +217,20 @@ void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
   AttributeIntArrayPtr aColor =
       myResultSubShapePair.first->data()->intArray(ModelAPI_Result::COLOR_ID());
   aColor->setSize(3);
-  aColor->setValue(0, theRed);
-  aColor->setValue(1, theGreen);
-  aColor->setValue(2, theBlue);
+
+  if (random)
+  {
+    std::vector<int> aValues;
+    ModelAPI_Tools::findRandomColor(aValues);
+    for (int anIndex = 0; anIndex < 3; ++anIndex)
+      aColor->setValue(anIndex, aValues[anIndex]);
+  }
+  else
+  {
+    aColor->setValue(0, theRed);
+    aColor->setValue(1, theGreen);
+    aColor->setValue(2, theBlue);
+  }
 }
 
 void ModelHighAPI_Selection::setDeflection(double theValue)
