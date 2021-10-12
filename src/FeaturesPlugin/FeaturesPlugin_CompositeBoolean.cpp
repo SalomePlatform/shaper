@@ -200,6 +200,32 @@ bool FeaturesPlugin_CompositeBoolean::cutRecursiveCompound(const GeomShapePtr th
 }
 
 //=================================================================================================
+void FeaturesPlugin_CompositeBoolean::addSubShapes (const GeomShapePtr theCompound,
+                                                    const ListOfShape& theSubShapesToAvoid,
+                                                    ListOfShape& theSubShapesToAdd) {
+  for (GeomAPI_ShapeIterator aCompoundIt (theCompound);
+       aCompoundIt.more();
+       aCompoundIt.next()) {
+    GeomShapePtr aCompoundSS = aCompoundIt.current();
+    ListOfShape::const_iterator aUseIt = theSubShapesToAvoid.cbegin();
+    for (; aUseIt != theSubShapesToAvoid.cend(); aUseIt++) {
+      if (aCompoundSS->isEqual(*aUseIt)) {
+        break;
+      }
+    }
+    if (aUseIt == theSubShapesToAvoid.cend()) {
+      if (aCompoundSS->shapeType() == GeomAPI_Shape::COMPSOLID ||
+          aCompoundSS->shapeType() == GeomAPI_Shape::COMPOUND) {
+        addSubShapes(aCompoundSS, theSubShapesToAvoid, theSubShapesToAdd);
+      }
+      else {
+        theSubShapesToAdd.push_back(aCompoundSS);
+      }
+    }
+  }
+}
+
+//=================================================================================================
 bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
                                                   ListOfShape& theObjects,
                                                   ListOfMakeShape& theMakeShapes)
@@ -239,10 +265,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
     ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if(aResCompSolidPtr.get()) {
       ResultBodyPtr aResRootPtr = ModelAPI_Tools::bodyOwner(aContext, true);
-      if (!aCompoundsMap.isBound(aResRootPtr->shape()) || myOperationType != BOOL_CUT) {
+      if (!aCompoundsMap.isBound(aResRootPtr->shape())) {
         // Compsolid or a simple (one-level) compound
-        // Or not CUT
-        // TODO: correct FUSE for complex compounds?
         GeomShapePtr aContextShape = aResCompSolidPtr->shape();
         std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
         for(; anIt != aCompSolidsObjects.end(); anIt++) {
@@ -386,6 +410,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       theObjects.insert(theObjects.end(), anEdgesAndFaces.begin(), anEdgesAndFaces.end());
       theObjects.insert(theObjects.end(), anObjects.begin(), anObjects.end());
       theObjects.insert(theObjects.end(), aCompSolids.begin(), aCompSolids.end());
+      theObjects.insert(theObjects.end(), aCompounds.begin(), aCompounds.end());
 
       // Filter edges and faces in tools.
       ListOfShape aTools;
@@ -398,7 +423,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         }
       }
 
-      if((anObjects.size() + aTools.size() +
+      if((anObjects.size() + aTools.size() + aCompounds.size() +
           aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
         myFeature->setError("Error: Not enough objects for boolean operation.");
         return false;
@@ -409,31 +434,23 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
       aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
 
-      // Collecting solids from compsolids which will not be
+      // Collecting solids and compsolids from compounds which will not be
       // modified in boolean operation and will be added to result.
       ListOfShape aShapesToAdd;
-      for(std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
-          anIt != aCompSolidsObjects.end(); anIt++) {
+      for (ListOfShape::iterator anIt = aCompounds.begin();
+           anIt != aCompounds.end(); anIt++) {
+        GeomShapePtr aCompound = (*anIt);
+        addSubShapes(aCompound, anObjects, aShapesToAdd);
+      }
+
+      // Collecting solids from compsolids which will not be
+      // modified in boolean operation and will be added to result.
+      for (std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+           anIt != aCompSolidsObjects.end(); anIt++) {
         GeomShapePtr aCompSolid = anIt->first;
         ListOfShape& aUsedShapes = anIt->second;
-        aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedShapes.begin(), aUsedShapes.end());
-
-        // Collect solids from compsolid which will not be modified in boolean operation.
-        for (GeomAPI_ShapeIterator aCompSolidIt(aCompSolid);
-             aCompSolidIt.more();
-             aCompSolidIt.next())
-        {
-          GeomShapePtr aSolidInCompSolid = aCompSolidIt.current();
-          ListOfShape::iterator aUseIt = aUsedShapes.begin();
-          for(; aUseIt != aUsedShapes.end(); aUseIt++) {
-            if(aSolidInCompSolid->isEqual(*aUseIt)) {
-              break;
-            }
-          }
-          if(aUseIt == aUsedShapes.end()) {
-            aShapesToAdd.push_back(aSolidInCompSolid);
-          }
-        }
+        aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedShapes.begin(), aUsedShapes.end()); //???
+        addSubShapes(aCompSolid, aUsedShapes, aShapesToAdd);
       }
 
       // Cut edges and faces(if we have any) with solids.

@@ -95,7 +95,8 @@ protected:
                           const GeomShapePtr theResultShapesCompound);
 
 private:
-  /// Makes cut operation recursively. Called from makeBoolean().
+  /// Makes cut operation recursively.
+  /// Called from makeBoolean().
   /// \param[in] theCompound the shape to be cut.
   /// \param[in] theTools list of tools.
   /// \param[out] theMakeShapeList list of according algos.
@@ -105,6 +106,16 @@ private:
                              const ListOfShape& theTools,
                              std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
                              GeomShapePtr& theResult);
+
+  /// Add subshapes of \a theCompound to \a theSubShapesToAdd list,
+  /// except ones from \a theSubShapesToAvoid.
+  /// Called from makeBoolean().
+  /// \param[in] theCompound the shape to collect sub-shapes of.
+  /// \param[in] theSubShapesToAvoid list of shapes that should not be added to the result.
+  /// \param[out] theSubShapesToAdd list of found sub-shapes.
+  void addSubShapes (const GeomShapePtr theCompound,
+                     const ListOfShape& theSubShapesToAvoid,
+                     ListOfShape& theSubShapesToAdd);
 
 protected:
   ModelAPI_Feature* myFeature;
