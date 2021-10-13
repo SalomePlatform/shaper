@@ -19,6 +19,8 @@
 
 #include "Config_PropManager.h"
 
+bool Config_PropManager::autoColorStatus = false;
+
 std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
 bool stringToBoolean(const std::string& theInt);
@@ -28,6 +30,15 @@ Config_Properties& Config_PropManager::props() {
   return *confProps;
 }
 
+bool Config_PropManager::getAutoColorStatus()
+{
+    return Config_PropManager::autoColorStatus;
+}
+
+void Config_PropManager::setAutoColorStatus(const bool theValue)
+{
+    Config_PropManager::autoColorStatus = theValue;
+}
 
 Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
                                               const std::string& theName,
