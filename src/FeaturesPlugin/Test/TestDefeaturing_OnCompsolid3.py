@@ -77,9 +77,9 @@ from GeomAPI import *
 model.testNbResults(Defeaturing_1, 1)
 model.testNbSubResults(Defeaturing_1, [2])
 model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.SOLID, [2])
-model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.FACE, [14])
-model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.EDGE, [60])
-model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.VERTEX, [120])
+model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.FACE, [12])
+model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.EDGE, [48])
+model.testNbSubShapes(Defeaturing_1, GeomAPI_Shape.VERTEX, [96])
 model.testResultsVolumes(Defeaturing_1, [4000])
 
 assert(model.checkPythonDump())
