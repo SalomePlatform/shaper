@@ -47,6 +47,8 @@
 #include <list>
 #include <map>
 #include <sstream>
+#include <vector>
+#include <array>
 
 #define RECURSE_TOP_LEVEL 50
 
