@@ -278,13 +278,61 @@
         <source>Replace</source>
         <translation>Remplacer</translation>
     </message>
-  <message>
-    <source>Trihedron arrows constant size</source>
-    <translation>Flèche trièdre de taille constante</translation>
-  </message>
+    <message>
+        <source>Trihedron arrows constant size</source>
+        <translation>Flèche trièdre de taille constante</translation>
+    </message>
     <message>
         <source>Keep trihedron arrows view size constant</source>
         <translation>Maintenir la taille de la vue des flèches trièdres constante</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Général</translation>
+    </message>
+    <message>
+        <source>Opening a study</source>
+        <translation>Ouverture d&apos;une étude</translation>
+    </message>
+    <message>
+        <source>Launching a python script</source>
+        <translation>Lancement d&apos;un script python</translation>
+    </message>
+    <message>
+        <source>Activate</source>
+        <translation>Activation</translation>
+    </message>
+    <message>
+        <source>Display</source>
+        <translation>Visualisation</translation>
+    </message>
+    <message>
+        <source>Last part</source>
+        <translation>Dernière pièce</translation>
+    </message>
+    <message>
+        <source>All parts</source>
+        <translation>Toutes les pièces</translation>
+    </message>
+    <message>
+        <source>No activation</source>
+        <translation>Aucune</translation>
+    </message>
+    <message>
+        <source>As stored in HDF</source>
+        <translation>Comme dans le HDF</translation>
+    </message>
+    <message>
+        <source>Last item in each folder</source>
+        <translation>Le dernier élément de chaque dossier</translation>
+    </message>
+    <message>
+        <source>All items</source>
+        <translation>Tous les éléments</translation>
+    </message>
+    <message>
+        <source>No visualization</source>
+        <translation>Aucune visualisation</translation>
     </message>
 </context>
 </TS>

@@ -47,6 +47,9 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
    /// Name of preferences of menu section
   static const QString MENU_SECTION;
 
+  /// Name of preferences of general section
+  static const QString GENERAL_SECTION;
+
   /// Shows a dialog box to edit preferences
   /// \param theModified a list of modified preferences
   static bool editPreferences(ModuleBase_Prefs& theModified);
@@ -82,6 +85,9 @@ private:
 
   /// Set default values to the Config_PropManager properties
   static void resetConfig();
+
+  /// Creates a content for General tab, which defines behavior of loading parts and displaying shapes
+  static void createGeneralTab(ModuleBase_IPrefMgr* thePref, int thePageId);
 
   /// Creates content of preferences editing widget
   static void createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId);

@@ -451,6 +451,7 @@ To call **Preferences** dialog box:
 
 SHAPER preferences contains the following tabs:
 
+- :ref:`general_preferences`;
 - :ref:`visualization_preferences`;
 - :ref:`plugins_preferences`;
 - :ref:`shortcuts_preferences`;
@@ -458,9 +459,42 @@ SHAPER preferences contains the following tabs:
 - :ref:`sketch_preferences`.
 - :ref:`viewer_preferences`.
 
-Visualization tab is activated by default when **Preferences** dialog box is opened in the active SHAPER module.
+General tab is activated by default when **Preferences** dialog box is opened in the active SHAPER module.
 
 Other tabs are activated by click on tab header.
+
+.. _general_preferences:
+
+General tab
+^^^^^^^^^^^
+
+This tab defines what parts to be activated and what elements to be visible after opening a study or a script.
+
+.. figure:: /images/general_preferences.png
+   :align: center
+
+   **Preferences**: General tab
+
+**Input fields**:
+
+- **Activate** relates to activation of part when opening a HDF document. Its could be one of the following:
+
+  - "Last part" - activate last part in the document (**default value**);
+  - "All parts" - activate all parts within the document;
+  - "No activation" - do not activate any part.
+
+- **Display** in "Opening a study". It specifies the shapes, which should be visualized when activating a part. It could be one of the following:
+
+  - "As stored in HDF" - display only the shapes visible before the document is saved (**default value**);
+  - "Last item in each folder" - show only the last result in each folder of the part: Constructions, Results, Groups, Fields;
+  - "All items" - show all shapes from each folder;
+  - "No visualization" - do not display any shape.
+
+- **Display** in "Launching a python script". It specifies the shapes, which should be visualized when loading a script using "File -> Load Script..." menu. It could be one of the following:
+
+  - "Last item in each folder" - show only the last result in each folder of the part: Constructions, Results, Groups, Fields;
+  - "All items" - show all shapes from each folder(**default value**);
+  - "No visualization" - do not display any shape.
 
 .. _visualization_preferences:
 

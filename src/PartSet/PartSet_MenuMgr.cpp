@@ -46,6 +46,7 @@
 #include <XGUI_DataModel.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_Tools.h>
 #include <XGUI_ViewerProxy.h>
 
 #include <Events_Loop.h>
@@ -495,15 +496,20 @@ void PartSet_MenuMgr::onActivatePart(bool)
 void PartSet_MenuMgr::activatePart(ResultPartPtr thePart) const
 {
   bool isFirstLoad = !thePart->partDoc().get();
+  ModuleBase_Tools::blockUpdateViewer(true);
   thePart->activate();
   if (isFirstLoad) {
     XGUI_Workshop* aWorkshop = myModule->getWorkshop();
     XGUI_ObjectsBrowser* aObjBrowser = aWorkshop->objectBrowser();
+    ModuleBase_Tools::setDisplaying(thePart);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    aObjBrowser->onSelectionChanged();
     DocumentPtr aDoc = thePart->partDoc();
     std::list<bool> aStates;
     aDoc->restoreNodesState(aStates);
     aObjBrowser->setStateForDoc(aDoc, aStates);
   }
+  ModuleBase_Tools::blockUpdateViewer(false);
 }
 
 void PartSet_MenuMgr::onActivateAllParts()

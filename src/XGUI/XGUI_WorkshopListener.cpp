@@ -50,6 +50,11 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetSelector.h>
 
+#ifdef HAVE_SALOME
+#include <SUIT_Application.h>
+#include <SUIT_Session.h>
+#endif
+
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ErrorMgr.h"
@@ -57,7 +62,6 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_PropertyPanel.h"
-
 #include "XGUI_QtEvents.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_SelectionMgr.h"
@@ -373,6 +377,7 @@ void XGUI_WorkshopListener::
       }
     }
   }
+
   // this processing should be moved in another place in order to do not cause problems in
   // flush messages chain
   //if (aHiddenObjects.size() > 0)
@@ -392,6 +397,10 @@ void XGUI_WorkshopListener::
 void XGUI_WorkshopListener::
   onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
+  SUIT_Application * app = SUIT_Session::session()->activeApplication();
+
+  QVariant aVar = app->property("IsLoadedScript");
+
   std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
 #ifdef DEBUG_FEATURE_CREATED
@@ -406,46 +415,32 @@ void XGUI_WorkshopListener::
 
   //bool aHasPart = false;
   bool aDisplayed = false;
-  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
-    ObjectPtr anObject = *aIt;
+  if (aVar.isNull() || !aVar.toBool()) {
+    for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
+      ObjectPtr anObject = *aIt;
 
 #ifdef DEBUG_RESULT_COMPSOLID
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-    if (aRes.get()) {
-      ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
-      if (aCompSolidRes.get()) {
-          qDebug(QString("COMPSOLID, numberOfSubs = %1")
-            .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
-      }
-      if (ModelAPI_Tools::compSolidOwner(aRes))
-        qDebug("COMPSOLID sub-object");
-    }
-#endif
-    // the validity of the data should be checked here in order to avoid display of the objects,
-    // which were created, then deleted, but flush for the creation event happens after that
-    // we should not display disabled objects
-    bool aHide = !anObject->data()->isValid() ||
-                 anObject->isDisabled() ||
-                 !anObject->isDisplayed();
-    if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-      aHide = aRes && aRes->isConcealed();
-      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
-      // be changed to the object becomes visible when the shape becomes not empty
-      if (!aHide && aRes.get())
-        aHide = !aRes->shape().get() || aRes->shape()->isNull();
-    }
-    if (!aHide) {
-      // setDisplayed has to be called in order to synchronize internal state of the object
-      // with list of displayed objects
-      if (myWorkshop->module()->canDisplayObject(anObject)) {
-        anObject->setDisplayed(true);
-        aDisplayed = displayObject(anObject);
-      } else
-        anObject->setDisplayed(false);
+      if (aRes.get()) {
+        ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+        if (aCompSolidRes.get()) {
+            qDebug(QString("COMPSOLID, numberOfSubs = %1")
+              .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
+        }
+        if (ModelAPI_Tools::compSolidOwner(aRes))
+          qDebug("COMPSOLID sub-object");
+      }
+#endif
+
+      ResultBodyPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
+
+      if (aRes.get() && aRes->numberOfSubs() > 0)
+        for (int anIndex = 0; anIndex < aRes->numberOfSubs(); ++anIndex)
+          setDisplayed(aRes->subResult(anIndex), aDisplayed);
+      else
+        setDisplayed(anObject, aDisplayed);
     }
   }
-
   MAYBE_UNUSED bool isCustomized = customizeFeature(anObjects, aDisplayed);
 
   //if (myObjectBrowser)
@@ -557,4 +552,33 @@ bool XGUI_WorkshopListener::customizeFeature(const std::set<ObjectPtr>& theObjec
 XGUI_Workshop* XGUI_WorkshopListener::workshop() const
 {
   return myWorkshop;
+}
+
+
+void XGUI_WorkshopListener::setDisplayed(ObjectPtr theObject, bool& theDisplayed)
+{
+  // the validity of the data should be checked here in order to avoid display of the objects,
+  // which were created, then deleted, but flush for the creation event happens after that
+  // we should not display disabled objects
+  bool aHide = !theObject->data()->isValid() ||
+                theObject->isDisabled() ||
+               !theObject->isDisplayed();
+  if (!aHide) { // check that this is not hidden result
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    aHide = aRes && aRes->isConcealed();
+    // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+    // be changed to the object becomes visible when the shape becomes not empty
+    if (!aHide && aRes.get())
+      aHide = !aRes->shape().get() || aRes->shape()->isNull();
+  }
+  if (!aHide) {
+    // setDisplayed has to be called in order to synchronize internal state of the object
+    // with list of displayed objects
+    if (myWorkshop->module()->canDisplayObject(theObject)) {
+      theObject->setDisplayed(true);
+      theDisplayed = displayObject(theObject);
+    }
+    else
+      theObject->setDisplayed(false);
+  }
 }

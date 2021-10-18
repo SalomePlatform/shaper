@@ -35,6 +35,7 @@
 
 const QString ModuleBase_Preferences::VIEWER_SECTION = "Viewer";
 const QString ModuleBase_Preferences::MENU_SECTION = "Menu";
+const QString ModuleBase_Preferences::GENERAL_SECTION = "General";
 
 SUIT_ResourceMgr* ModuleBase_Preferences::myResourceMgr = 0;
 
@@ -115,6 +116,7 @@ void ModuleBase_Preferences::loadCustomProps()
 void ModuleBase_Preferences::createEditContent(ModuleBase_IPrefMgr* thePref, int thePage)
 {
   thePref->prefMgr()->setItemIcon(thePage, QIcon(":pictures/module.png"));
+  createGeneralTab(thePref, thePage);
   createCustomPage(thePref, thePage);
 }
 
@@ -148,6 +150,64 @@ void ModuleBase_Preferences::resetConfigPropPreferences(SUIT_PreferenceMgr* theP
     if (anItem)
       anItem->retrieve();
   }
+}
+
+void ModuleBase_Preferences::createGeneralTab(ModuleBase_IPrefMgr* thePref, int thePageId)
+{
+  int generalTab = thePref->addPreference(QObject::tr("General"), thePageId,
+                                          SUIT_PreferenceMgr::Auto, QString(), QString());
+  thePref->setItemProperty("columns", 2, generalTab);
+
+  QStringList actItemList;
+  actItemList << QObject::tr("Last part")
+              << QObject::tr("All parts")
+              << QObject::tr("No activation");
+
+  QList<QVariant> actIdList;
+  actIdList << 0 << 1 << 2;
+
+  // Group related to opening a study
+  int group = thePref->addPreference(QObject::tr("Opening a study"), generalTab,
+                                     SUIT_PreferenceMgr::Auto, QString(), QString());
+
+  int actId = thePref->addPreference(QObject::tr("Activate"), group, SUIT_PreferenceMgr::Selector,
+                                     ModuleBase_Preferences::GENERAL_SECTION,
+                                     "part_activation_study");
+  thePref->setItemProperty("strings", actItemList, actId);
+  thePref->setItemProperty("indexes", actIdList, actId);
+
+  QStringList visuItemList;
+  visuItemList << QObject::tr("As stored in HDF")
+               << QObject::tr("Last item in each folder")
+               << QObject::tr("All items")
+               << QObject::tr("No visualization");
+
+  QList<QVariant> visuIdList;
+  visuIdList << 0 << 1 << 2 << 3;
+
+  int visuId = thePref->addPreference(QObject::tr("Display"), group, SUIT_PreferenceMgr::Selector,
+                                      ModuleBase_Preferences::GENERAL_SECTION,
+                                      "part_visualization_study");
+  thePref->setItemProperty("strings", visuItemList, visuId);
+  thePref->setItemProperty("indexes", visuIdList, visuId);
+
+  // Group related to running a python script
+  group = thePref->addPreference(QObject::tr("Launching a python script"), generalTab,
+                                 SUIT_PreferenceMgr::Auto, QString(), QString());
+
+  visuItemList.clear();
+  visuItemList << QObject::tr("Last item in each folder")
+               << QObject::tr("All items")
+               << QObject::tr("No visualization");
+
+  visuIdList.clear();
+  visuIdList << 0 << 1 << 2;
+
+  visuId = thePref->addPreference(QObject::tr("Display"), group, SUIT_PreferenceMgr::Selector,
+                                  ModuleBase_Preferences::GENERAL_SECTION,
+                                  "part_visualization_script");
+  thePref->setItemProperty("strings", visuItemList, visuId);
+  thePref->setItemProperty("indexes", visuIdList, visuId);
 }
 
 void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId)

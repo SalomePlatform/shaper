@@ -103,6 +103,9 @@ protected:
   XGUI_Workshop* workshop() const;
 
 private:
+
+  void setDisplayed(ObjectPtr theObject, bool& theDisplayed);
+
   XGUI_Workshop* myWorkshop; // the current workshop
 
   bool myUpdatePrefs;
