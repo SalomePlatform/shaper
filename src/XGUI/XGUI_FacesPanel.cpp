@@ -92,7 +92,7 @@ void updateHiddenShapes(Handle(ModuleBase_ResultPrs) thePrs, const TopoDS_ListOf
 
 //********************************************************************
 XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, XGUI_Workshop* theWorkshop)
-  : QDockWidget(theParent), myWorkshop(theWorkshop), myIsActive(false)
+  : QDockWidget(theParent), myWorkshop(theWorkshop), myIsActive(false), myLastItemIndex(0)
 {
   setWindowTitle(tr("Hide Faces"));
   setObjectName("Hide Faces");
