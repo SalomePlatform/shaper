@@ -41,6 +41,11 @@ ModelHighAPI_Reference::ModelHighAPI_Reference(
   if (!myObject) {
     theValue->execute(true);
     myObject = std::shared_ptr<ModelAPI_Object>(theValue->defaultResult());
+    if (!myObject) {
+      // [bos #26534] EDF 24265 - Problem of recover in TUI
+      // Feature can have no results, store the feature itself
+      myObject = std::shared_ptr<ModelAPI_Object>(theValue->feature());
+    }
   }
 }
 

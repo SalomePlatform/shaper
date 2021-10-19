@@ -37,12 +37,12 @@ FeaturesAPI_Recover::FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>
   const bool theRecoverCompound)
 : ModelHighAPI_Interface(theFeature)
 {
-  if(initialize()) {
+  if (initialize()) {
     std::string aMethod = theRecoverCompound ? FeaturesPlugin_Recover::METHOD_COMPOUND()
                                              : FeaturesPlugin_Recover::METHOD_DEFAULT();
     fillAttribute(aMethod, theFeature->string(FeaturesPlugin_Recover::METHOD()));
 
-    setBaseFeature(theBaseFeature);
+    fillAttribute(theBaseFeature.feature(), mybaseFeature);
     setRecoveredList(theRecoveredList);
   }
 }
