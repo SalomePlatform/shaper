@@ -152,17 +152,18 @@ bool Selector_Modify::select(NCollection_List<Handle(TNaming_NamedShape)>& theMo
   const TopoDS_Shape theContext, const TopoDS_Shape theValue)
 {
   if (theModifList.Extent() > 1) { // searching for the best modification result: by context
+    bool isFound = false;
     Handle(TNaming_NamedShape) aCandidate;
     NCollection_List<Handle(TNaming_NamedShape)>::Iterator aModIter(theModifList);
-    for (; !theModifList.IsEmpty() && aModIter.More(); aModIter.Next()) {
+    for (; aModIter.More() && !isFound; aModIter.Next()) {
       aCandidate = aModIter.Value();
       TDF_Label aFatherLab = aCandidate->Label().Father();
       Handle(TNaming_NamedShape) aFatherNS;
       if (aFatherLab.FindAttribute(TNaming_NamedShape::GetID(), aFatherNS)) {
-        for (TNaming_Iterator anIter(aFatherNS); anIter.More(); anIter.Next()) {
+        for (TNaming_Iterator anIter(aFatherNS);
+             anIter.More() && !isFound; anIter.Next()) {
           if (theContext.IsSame(anIter.NewShape())) { // found the best modification
-            theModifList.Clear();
-            break;
+            isFound = true;
           }
         }
       }
