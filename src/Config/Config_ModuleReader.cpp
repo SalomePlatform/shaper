@@ -31,6 +31,7 @@
 
 // Have to be included before std headers
 #include <Python.h>
+#include <structmember.h>
 
 //Necessary for cerr
 #include <iostream>
@@ -196,6 +197,135 @@ void Config_ModuleReader::loadPlugin(const std::string& thePluginName)
   }
 }
 
+namespace
+{
+  // Handle Python exception
+  // Reuse code from KERNEL module
+  
+  typedef struct
+  {
+    PyObject_HEAD
+    int softspace;
+    std::string *out;
+  } PyStdOut;
+
+  static void
+  PyStdOut_dealloc(PyStdOut *self)
+  {
+    PyObject_Del(self);
+  }
+
+  static PyObject*
+  PyStdOut_write(PyStdOut* self, PyObject* args)
+  {
+    char *c;
+    if (!PyArg_ParseTuple(args, "s", &c))
+      return NULL;
+
+    *(self->out) = *(self->out) + c;
+
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+
+  static PyMethodDef PyStdOut_methods[] =
+  {
+    {"write",  (PyCFunction)PyStdOut_write,  METH_VARARGS,
+      PyDoc_STR("write(string) -> None")},
+    {0, 0, 0, 0}  /* sentinel */
+  };
+
+  static PyMemberDef PyStdOut_memberlist[] =
+  {
+    {(char*)"softspace", T_INT, offsetof(PyStdOut, softspace), 0,
+     (char*)"flag indicating that a space needs to be printed; used by print"},
+    {0, 0, 0, 0, 0}   /* sentinel */
+  };
+
+  static PyTypeObject PyStdOut_Type =
+  {
+    /* The ob_type field must be initialized in the module init function
+     * to be portable to Windows without using C++. */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    /* 0, */                      /*ob_size*/
+    "PyOut",                      /*tp_name*/
+    sizeof(PyStdOut),             /*tp_basicsize*/
+    0,                            /*tp_itemsize*/
+    /* methods */
+    (destructor)PyStdOut_dealloc, /*tp_dealloc*/
+    0,                            /*tp_print*/
+    0,                            /*tp_getattr*/
+    0,                            /*tp_setattr*/
+    0,                            /*tp_compare*/
+    0,                            /*tp_repr*/
+    0,                            /*tp_as_number*/
+    0,                            /*tp_as_sequence*/
+    0,                            /*tp_as_mapping*/
+    0,                            /*tp_hash*/
+    0,                            /*tp_call*/
+    0,                            /*tp_str*/
+    PyObject_GenericGetAttr,      /*tp_getattro*/
+    /* softspace is writable:  we must supply tp_setattro */
+    PyObject_GenericSetAttr,      /* tp_setattro */
+    0,                            /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,           /*tp_flags*/
+    0,                            /*tp_doc*/
+    0,                            /*tp_traverse*/
+    0,                            /*tp_clear*/
+    0,                            /*tp_richcompare*/
+    0,                            /*tp_weaklistoffset*/
+    0,                            /*tp_iter*/
+    0,                            /*tp_iternext*/
+    PyStdOut_methods,             /*tp_methods*/
+    PyStdOut_memberlist,          /*tp_members*/
+    0,                            /*tp_getset*/
+    0,                            /*tp_base*/
+    0,                            /*tp_dict*/
+    0,                            /*tp_descr_get*/
+    0,                            /*tp_descr_set*/
+    0,                            /*tp_dictoffset*/
+    0,                            /*tp_init*/
+    0,                            /*tp_alloc*/
+    0,                            /*tp_new*/
+    0,                            /*tp_free*/
+    0,                            /*tp_is_gc*/
+    0,                            /*tp_bases*/
+    0,                            /*tp_mro*/
+    0,                            /*tp_cache*/
+    0,                            /*tp_subclasses*/
+    0,                            /*tp_weaklist*/
+    0,                            /*tp_del*/
+    0,                            /*tp_version_tag*/
+    0,                            /*tp_finalize*/
+  };
+
+  PyObject* newPyStdOut(std::string& out)
+  {
+    PyStdOut* self = PyObject_New(PyStdOut, &PyStdOut_Type);
+    if (self) {
+      self->softspace = 0;
+      self->out=&out;
+    }
+    return (PyObject*)self;
+  }
+
+  std::string parseException()
+  {
+    std::string error;
+    if (PyErr_Occurred())
+    {
+      PyObject* new_stderr = newPyStdOut(error);
+      PyObject* old_stderr = PySys_GetObject((char*)"stderr");
+      Py_INCREF(old_stderr);
+      PySys_SetObject((char*)"stderr", new_stderr);
+      PyErr_Print();
+      PySys_SetObject((char*)"stderr", old_stderr);
+      Py_DECREF(new_stderr);
+    }
+    return error;
+  }
+}
+
 void Config_ModuleReader::loadScript(const std::string& theFileName, bool theSendErr)
 {
   /* acquire python thread */
@@ -204,20 +334,11 @@ void Config_ModuleReader::loadScript(const std::string& theFileName, bool theSen
   PyObject* module = PyImport_ImportModule(theFileName.c_str());
   if (!module) {
     std::string anErrorMsg = "An error occurred while importing " + theFileName;
-    //Get detailed error message:
+    // Get detailed error message (including traceback)
     if (PyErr_Occurred()) {
-      PyObject *pstr, *ptype, *pvalue, *ptraceback;
-      PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-      PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
-      pstr = PyObject_Str(pvalue);
-      std::string aPyError = std::string(PyUnicode_AsUTF8(pstr));
-      if (!aPyError.empty()) {
+      std::string aPyError = parseException();
+      if (!aPyError.empty())
         anErrorMsg += ":\n" + aPyError;
-      }
-      Py_XDECREF(pstr);
-      Py_XDECREF(ptype);
-      Py_XDECREF(pvalue);
-      Py_XDECREF(ptraceback);
     }
     if (theSendErr)
       Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
