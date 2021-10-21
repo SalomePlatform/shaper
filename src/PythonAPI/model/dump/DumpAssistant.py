@@ -50,8 +50,11 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
     def collectFeatures(self):
         self.myFeatures = {}
         self.myWrapperNames = {}
-        for aModule in sys.modules:
-            for aName, anObj in inspect.getmembers(sys.modules[aModule], inspect.isclass):
+        # Fixing [bos #26531] [CEA] Shaper tests fail with SEGFAULT
+        # Use copy of sys.modules to avoid exception "dictionary changed size during iteration"
+        sys_modules = sys.modules.copy()
+        for aModule in sys_modules:
+            for aName, anObj in inspect.getmembers(sys_modules[aModule], inspect.isclass):
                 if issubclass(anObj, ModelHighAPI.ModelHighAPI_Interface) and hasattr(anObj, "ID") and anObj.dump != ModelHighAPI.ModelHighAPI_Interface.dump:
                     self.myFeatures[anObj.ID()] = anObj
                     self.myWrapperNames[anObj.ID()] = aName
