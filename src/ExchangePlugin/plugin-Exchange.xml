@@ -100,12 +100,12 @@
         <!--<boolvalue id="topological_naming"
              label="Topological naming selection"
              tooltip="To use standard topological naming selection identifier, used for parametric model"
-             default="true"/>
+             default="true"/>-->
         <boolvalue id="geometric_selection"
-             label="Geometric selection"
+             label="Dump by coordinates"
              tooltip="To use geometrical point coordinates to identify selected shapes"
-             default="true"/>
-        <boolvalue id="weak_naming"
+             default="false"/>
+        <!--<boolvalue id="weak_naming"
              label="Weak naming selection"
              tooltip="To use geometrical order for identification of selected shapes"
              default="false"/> -->

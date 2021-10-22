@@ -86,7 +86,7 @@ SET(PROJECT_LIBRARIES
 
 # default dump approaches (will be set if not initialized)
 SET(PYTHONDUMP_NAMING ON  CACHE BOOL "Dump named references to shapes")
-SET(PYTHONDUMP_GEO    ON  CACHE BOOL "Dump references to shapes by the geometric properties")
+SET(PYTHONDUMP_GEO    OFF CACHE BOOL "Dump references to shapes by the geometric properties")
 SET(PYTHONDUMP_WEAK   OFF CACHE BOOL "Dump weak named references to shapes")
 
 ADD_DEFINITIONS(-DEXCHANGEPLUGIN_EXPORTS)
