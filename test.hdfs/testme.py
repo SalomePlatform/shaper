@@ -35,8 +35,9 @@ if __name__ == '__main__':
     hdffile = sys.argv[1]
     testdatafile = sys.argv[2]
 
-  tempdir = tempfile.gettempdir()
-  testlogfile = tempdir + "/test.log"
+  tempfile = tempfile.NamedTemporaryFile()
+  testlogfile = tempfile.name
+  tempfile.close()
 
   isOk = True
   error = ""
