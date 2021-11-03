@@ -52,6 +52,9 @@
 // directors
 %feature("director") ModelHighAPI_Dumper;
 
+// functions with named parameters
+%feature("kwargs") setColor;
+
 // renamed methods
 %rename(__print__) ModelHighAPI_Dumper::operator<<;
 

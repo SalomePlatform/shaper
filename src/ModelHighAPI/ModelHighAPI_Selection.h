@@ -134,7 +134,7 @@ public:
 
   /// Change result's color
   MODELHIGHAPI_EXPORT
-  void setColor(int theRed, int theGreen, int theBlue);
+  void setColor(int theRed = 0, int theGreen = 0, int theBlue = 0, bool random = false);
 
   /// Change result's deflection
   MODELHIGHAPI_EXPORT
