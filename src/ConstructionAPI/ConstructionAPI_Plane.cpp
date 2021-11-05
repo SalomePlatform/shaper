@@ -33,11 +33,12 @@ ConstructionAPI_Plane::ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feat
 ConstructionAPI_Plane::ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const ModelHighAPI_Selection& theFace,
                                              const ModelHighAPI_Double& theDistance,
-                                             const bool theIsReverse)
+                                             const bool theIsReverse,
+                                             const ModelHighAPI_Integer& theNbCopy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setByFaceAndDistance(theFace, theDistance, theIsReverse);
+    setByFaceAndDistance(theFace, theDistance, theIsReverse, theNbCopy);
   }
 }
 
@@ -99,11 +100,12 @@ ConstructionAPI_Plane::ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feat
 ConstructionAPI_Plane::ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const ModelHighAPI_Selection& thePlane,
                                              const ModelHighAPI_Selection& theAxis,
-                                             const ModelHighAPI_Double& theAngle)
+                                             const ModelHighAPI_Double& theAngle,
+                                             const ModelHighAPI_Integer& theNbCopy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setByRotation(thePlane, theAxis, theAngle);
+    setByRotation(thePlane, theAxis, theAngle, theNbCopy);
   }
 }
 
@@ -115,7 +117,8 @@ ConstructionAPI_Plane::~ConstructionAPI_Plane()
 //==================================================================================================
 void ConstructionAPI_Plane::setByFaceAndDistance(const ModelHighAPI_Selection& theFace,
                                                  const ModelHighAPI_Double& theDistance,
-                                                 const bool theIsReverse)
+                                                 const bool theIsReverse,
+                                                 const ModelHighAPI_Integer& theNbCopy)
 {
   fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE(), mycreationMethod);
   fillAttribute(theFace, myplane);
@@ -123,6 +126,7 @@ void ConstructionAPI_Plane::setByFaceAndDistance(const ModelHighAPI_Selection& t
                 mycreationMethodByOtherPlane);
   fillAttribute(theDistance, mydistance);
   fillAttribute(theIsReverse, myreverse);
+  fillAttribute(theNbCopy, mynbcopy);
 
   execute();
 }
@@ -196,7 +200,8 @@ void ConstructionAPI_Plane::setByCoincidentToPoint(const ModelHighAPI_Selection&
 //==================================================================================================
 void ConstructionAPI_Plane::setByRotation(const ModelHighAPI_Selection& thePlane,
                                           const ModelHighAPI_Selection& theAxis,
-                                          const ModelHighAPI_Double& theAngle)
+                                          const ModelHighAPI_Double& theAngle,
+                                          const ModelHighAPI_Integer& theNbCopy)
 {
   fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE(), mycreationMethod);
   fillAttribute(thePlane, myplane);
@@ -204,6 +209,7 @@ void ConstructionAPI_Plane::setByRotation(const ModelHighAPI_Selection& thePlane
                 mycreationMethodByOtherPlane);
   fillAttribute(theAxis, myaxis);
   fillAttribute(theAngle, myangle);
+  fillAttribute(theNbCopy, mynbcopy);
 
   execute();
 }
@@ -248,8 +254,11 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
        ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER()) {
       AttributeDoublePtr anAttrDistance = aBase->real(ConstructionPlugin_Plane::DISTANCE());
       AttributeBooleanPtr anAttrReverse = aBase->boolean(ConstructionPlugin_Plane::REVERSE());
+      AttributeIntegerPtr anAttrNbCopy = aBase->integer(ConstructionPlugin_Plane::NB_COPIES());
 
       theDumper << ", " << anAttrPlane << ", " << anAttrDistance << ", " << anAttrReverse;
+      if(anAttrNbCopy.get() && anAttrNbCopy->value() > 1)
+        theDumper << ", " << anAttrNbCopy;
     } else if(aCreationMethodOption ==
               ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
       AttributeSelectionPtr anAttrPoint =
@@ -259,8 +268,11 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
     } else if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_ROTATION()) {
       AttributeSelectionPtr anAttrAxis = aBase->selection(ConstructionPlugin_Plane::AXIS());
       AttributeDoublePtr anAttrAngle = aBase->real(ConstructionPlugin_Plane::ANGLE());
+      AttributeIntegerPtr anAttrNbCopy = aBase->integer(ConstructionPlugin_Plane::NB_COPIES());
 
       theDumper << ", " << anAttrPlane << ", " << anAttrAxis << ", " << anAttrAngle;
+      if (anAttrNbCopy.get() && anAttrNbCopy->value() > 1)
+         theDumper << ", " << anAttrNbCopy;
     }
   } else if(aCreationMethod ==
             ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
@@ -277,11 +289,12 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& theFace,
                   const ModelHighAPI_Double& theDistance,
-                  const bool theIsReverse)
+                  const bool theIsReverse,
+                  const ModelHighAPI_Integer& theNbCopies)
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Plane::ID());
-  return PlanePtr(new ConstructionAPI_Plane(aFeature, theFace, theDistance, theIsReverse));
+  return PlanePtr(new ConstructionAPI_Plane(aFeature, theFace, theDistance, theIsReverse, theNbCopies));
 }
 
 //==================================================================================================
@@ -332,9 +345,10 @@ PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& thePlane,
                   const ModelHighAPI_Selection& theAxis,
-                  const ModelHighAPI_Double& theAngle)
+                  const ModelHighAPI_Double& theAngle,
+                  const ModelHighAPI_Integer& theNbCopies)
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Plane::ID());
-  return PlanePtr(new ConstructionAPI_Plane(aFeature, thePlane, theAxis, theAngle));
+  return PlanePtr(new ConstructionAPI_Plane(aFeature, thePlane, theAxis, theAngle, theNbCopies));
 }

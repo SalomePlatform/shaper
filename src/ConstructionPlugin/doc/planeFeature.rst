@@ -28,7 +28,7 @@ There are 4 algorithms for creation of a Plane:
    :align: left
    :height: 24px
 
-**By other plane** creates a plane parallel to another plane.
+**By other plane** creates a plane or planes(if the number of copies is more than one) parallel to another plane.
 
 .. figure:: images/plane_by_two_parallel_planes_32x32.png
    :align: left
@@ -134,18 +134,19 @@ By rotation around an edge by a specified angle.
 
 **TUI Commands**:
 
-.. py:function:: model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Front"), 10, False)
+.. py:function:: model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Front"), 10, False, 1)
 
     :param part: The current part object.
     :param object: A plane.
     :param real: An offset.
     :param boolean: Is reverse.
+    :param integer: Number of copies
     :return: Result object.
 
 Result
 """"""
 
-The Result of the operation will be a plane parallel to already existing one:
+The Result of the operation will be a plane (or planes at equal distance from each other, if the number of copies is more than one) parallel to already existing one:
 
 .. figure:: images/CreatedPlane3.png
    :align: center

@@ -37,6 +37,7 @@ SET(TEST_NAMES
     TestPlane.py
     TestPlane_ErrorMsg.py
     TestPlane_FaceValidator.py
+    TestPlane_Copies.py
     Test19207.py
     Test19471.py
 )

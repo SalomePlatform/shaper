@@ -25,6 +25,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <GeomAPI_ICustomPrs.h>
+#include <GeomAPI_Shape.h>
 
 /// \class ConstructionPlugin_Plane
 /// \ingroup Plugins
@@ -226,6 +227,11 @@ public:
     return ATTR_ID;
   }
 
+  inline static const std::string& NB_COPIES()
+  {
+    static const std::string ATTR_ID("nb_copies");
+    return ATTR_ID;
+  }
 
   /// Attribute name for a parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& A()
@@ -270,11 +276,11 @@ protected:
   std::shared_ptr<GeomAPI_Shape> createByThreePoints();
   std::shared_ptr<GeomAPI_Shape> createByLineAndPoint();
   std::shared_ptr<GeomAPI_Shape> createByCoincidentPoint();
-  std::shared_ptr<GeomAPI_Shape> createByRotation();
+  void createByRotation(ListOfShape& theShapes);
   std::shared_ptr<GeomAPI_Shape> createByTwoParallelPlanes();
   /// Creates a new plane by copy of face plane with translation along the normal
   /// to the specified distance.
-  std::shared_ptr<GeomAPI_Shape> createByDistanceFromOther();
+  void createByDistanceFromOther(ListOfShape& theShapes);
 };
 
 #endif

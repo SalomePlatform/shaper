@@ -1905,10 +1905,12 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
           }
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           ResultConstructionPtr aConstr = createConstruction(theFeature->data(), aResIndex);
-          if (!aConstr->updateShape())
-            theFeature->execute(); // not stored shape in the data structure, execute to have it
-          else
-            theFeature->setResult(aConstr, aResIndex); // result is ready without execution
+          if (!aConstr->data()->isDeleted()) {
+            if (!aConstr->updateShape())
+              theFeature->execute(); // not stored shape in the data structure, execute to have it
+            else
+              theFeature->setResult(aConstr, aResIndex); // result is ready without execution
+          }
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {
