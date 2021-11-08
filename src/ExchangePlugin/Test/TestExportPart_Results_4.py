@@ -63,8 +63,8 @@ model.end()
 
 import os
 
-filename = 'check_export.shaperpart'
-model.removeFile(filename)
+filename = model.getTmpFileName('check_export', '.shaperpart')
+model.removeTmpFile(filename)
 
 featureToExport = Extrusion_1
 

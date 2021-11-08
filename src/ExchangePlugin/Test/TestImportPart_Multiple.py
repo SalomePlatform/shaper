@@ -36,8 +36,8 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), mod
 model.do()
 model.end()
 
-filename = 'check_export.shaperpart'
-model.removeFile(filename)
+filename = model.getTmpFileName('check_export', '.shaperpart')
+model.removeTmpFile(filename)
 
 # export all features from Part_1
 model.begin()
