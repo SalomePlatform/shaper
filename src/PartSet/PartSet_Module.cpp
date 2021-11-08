@@ -83,6 +83,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -1738,6 +1739,25 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     if (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID())) {
       aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+    }
+    if (aObj.get())
+    {
+      if (!aPart.get() && aObj->groupName() == ModelAPI_ResultParameter::group())
+      {
+        QObjectPtrList aObjects = aWorkshop->objectBrowser()->selectedObjects();
+        FeaturePtr aFeature;
+        ResultParameterPtr aParam;
+        foreach(ObjectPtr aObj, aObjects) {
+          aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObj);
+          if (aParam.get())
+            break;
+        }
+        if (aParam.get())
+          aFeature = ModelAPI_Feature::feature(aParam);
+
+        if (aFeature.get())
+          editFeature(aFeature);
+      }
     }
   }
   if (aPart.get()) { // if this is a part

@@ -45,7 +45,7 @@ public:
   explicit ParametersAPI_Parameter(const  std::shared_ptr<ModelAPI_Feature> & theFeature,
                                    const std::string & theName,
                                    const std::string & theExpression,
-                                   const std::string & theComment = std::string());
+                                   const std::wstring & theComment = std::wstring());
   /// Destructor
   PARAMETERSAPI_EXPORT
   virtual ~ParametersAPI_Parameter();
@@ -80,7 +80,7 @@ PARAMETERSAPI_EXPORT
 ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
                           const std::string & theName,
                           const std::string & theExpression,
-                          const std::string & theComment = std::string());
+                          const std::wstring & theComment = std::wstring());
 
 /**\ingroup CPPHighAPI
  * \brief Remove Parameter feature and substitute it by the value in referred features

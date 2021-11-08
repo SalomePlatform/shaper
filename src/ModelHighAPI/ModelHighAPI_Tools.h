@@ -136,6 +136,11 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::string & theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::wstring & theValue,
+  const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);
+
 MODELHIGHAPI_EXPORT
 void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);

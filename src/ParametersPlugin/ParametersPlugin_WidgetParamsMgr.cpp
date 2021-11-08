@@ -54,6 +54,7 @@
 #include <QKeyEvent>
 #include <QDialogButtonBox>
 #include <QShortcut>
+#include <QFileDialog>
 
 enum ColumnType {
   Col_Name,
@@ -252,6 +253,10 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   myInsertBtn = new QPushButton(translate("Insert"), this);
   connect(myInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
   aBtnLayout->addWidget(myInsertBtn);
+
+  myImportBtn = new QPushButton(translate("Import file"), this);
+  connect(myImportBtn, SIGNAL(clicked(bool)), SLOT(onImport()));
+  aBtnLayout->addWidget(myImportBtn);
 
   myRemoveBtn = new QPushButton(translate("Remove"), this);
   connect(myRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemove()));
@@ -484,6 +489,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   FeaturePtr aFeature = myParametersList.at(myDelegate->editIndex().row());
   QTreeWidgetItem* aItem = myParameters->child(myDelegate->editIndex().row());
   int aColumn = myDelegate->editIndex().column();
+  int aRow = myDelegate->editIndex().row();
   QString aText = aItem->text(aColumn);
   bool isModified = false;
 
@@ -495,7 +501,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
         while (aText.indexOf(" ") != -1) {
           aText.replace(" ", "");
         }
-        if (hasName(aText)) {
+        if (hasName(aText, aRow)) {
           myMessage = translate("Name '%1' already exists.").arg(aText);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
           return;
@@ -521,7 +527,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   case Col_Comment:
     {
       AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::COMMENT_ID());
-      aStringAttr->setValue(aText.toStdString());
+      aStringAttr->setValue(aText.toStdWString());
       isModified = true;
     }
     break;
@@ -691,6 +697,27 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
   }
 }
 
+void ParametersPlugin_WidgetParamsMgr::onImport()
+{
+  std::string aWinText("Select txt file");
+  std::string aFileType("Text files (*.txt);;All files (*.*)");
+  QString aQPath = QFileDialog::getOpenFileName(nullptr,
+                                                aWinText.c_str(), "",
+                                                aFileType.c_str());
+  if (aQPath.size() == 0)
+    return;
+
+  std::string aPath(aQPath.toStdString());
+  std::shared_ptr<ModelAPI_ImportParametersMessage> aMessage =
+    std::shared_ptr<ModelAPI_ImportParametersMessage>(
+      new ModelAPI_ImportParametersMessage(ModelAPI_ImportParametersMessage::eventId()));
+  aMessage->setFilename(aPath);
+  Events_Loop::loop()->send(aMessage);
+
+  updateParametersFeatures();
+  updateParametersPart();
+}
+
 void ParametersPlugin_WidgetParamsMgr::onUp()
 {
   QTreeWidgetItem* aCurrentItem = selectedItem();
@@ -764,12 +791,11 @@ void ParametersPlugin_WidgetParamsMgr::onDown()
 }
 
 
-bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
+bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName, int theIndex) const
 {
-  int aCurrent = myDelegate->editIndex().row();
   int i = 0;
   foreach(FeaturePtr aFeature, myParametersList) {
-    if ((i != aCurrent) && (aFeature->data()->name() == theName.toStdWString()))
+    if ((i != theIndex) && (aFeature->data()->name() == theName.toStdWString()))
       return true;
     i++;
   }
@@ -800,11 +826,13 @@ void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
     //myRemoveBtn->setEnabled(isParameter);
     myUpBtn->setEnabled(isParameter);
     myDownBtn->setEnabled(isParameter);
+    myImportBtn->setEnabled(true);
   } else {
     myInsertBtn->setEnabled(false);
     //myRemoveBtn->setEnabled(false);
     myUpBtn->setEnabled(false);
     myDownBtn->setEnabled(false);
+    myImportBtn->setEnabled(false);
   }
   myRemoveBtn->setEnabled(!aItemsList.isEmpty());
 }
@@ -819,6 +847,7 @@ void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
     //myRemoveBtn->setEnabled(theEnable);
     myUpBtn->setEnabled(theEnable);
     myDownBtn->setEnabled(theEnable);
+    myImportBtn->setEnabled(theEnable);
   }
   myOkCancelBtn->button(QDialogButtonBox::Ok)->setEnabled(theEnable);
 }
@@ -830,7 +859,8 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
     aItem = myParameters->child(i);
     if ((aItem->text(Col_Name) == NoName) ||
         (aItem->text(Col_Equation) == translate(NoValue)) ||
-        (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
+        (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ||
+        (hasName(aItem->text(Col_Name), i)) ) {
       return false;
     }
   }

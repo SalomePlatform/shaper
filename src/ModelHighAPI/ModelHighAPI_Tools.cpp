@@ -225,6 +225,13 @@ void fillAttribute(const std::string & theValue,
 }
 
 //--------------------------------------------------------------------------------------
+void fillAttribute(const std::wstring & theValue,
+  const std::shared_ptr<ModelAPI_AttributeString> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
+//--------------------------------------------------------------------------------------
 void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute)
 {

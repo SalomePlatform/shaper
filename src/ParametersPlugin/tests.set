@@ -28,4 +28,6 @@ SET(TEST_NAMES
                Test2392.py
                Test2474.py
                Test19036.py
+               TestImportParameters.py
+               TestImportInvalidParameters.py
 )

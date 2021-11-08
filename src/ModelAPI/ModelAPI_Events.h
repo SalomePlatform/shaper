@@ -352,6 +352,44 @@ class ModelAPI_ParameterEvalMessage : public Events_Message
   MODELAPI_EXPORT const std::string& error() const;
 };
 
+class ModelAPI_ImportParametersMessage : public Events_Message
+{
+  std::string myFilename; ///< filename where where parameters are stored
+  std::string myError; ///< error of processing, empty if there is no error
+
+public:
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID& eventId()
+  {
+    static const char* MY_PARAMETER_EVALUATION_EVENT_ID("ImportParametersMessage");
+    static Events_ID anId = Events_Loop::eventByName(MY_PARAMETER_EVALUATION_EVENT_ID);
+    return anId;
+  }
+
+  /// Useful method that creates and sends the event.
+  /// Returns the message, processed, with the resulting fields filled.
+  MODELAPI_EXPORT static std::shared_ptr<ModelAPI_ImportParametersMessage>
+    send(std::string theParameter, const void* theSender)
+  {
+    std::shared_ptr<ModelAPI_ImportParametersMessage> aMessage =
+      std::shared_ptr<ModelAPI_ImportParametersMessage>(
+        new ModelAPI_ImportParametersMessage(eventId(), theSender));
+    aMessage->setFilename(theParameter);
+    Events_Loop::loop()->send(aMessage);
+    return aMessage;
+  }
+
+  /// Creates an empty message
+  MODELAPI_EXPORT ModelAPI_ImportParametersMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_ImportParametersMessage();
+
+  /// Returns a filename stored in the message
+  MODELAPI_EXPORT std::string filename() const;
+  /// Sets a filename to the message
+  MODELAPI_EXPORT void setFilename(std::string theFilename);
+};
+
 class ModelAPI_BuildEvalMessage : public Events_Message
 {
   FeaturePtr myParam; ///< parameters that should be evaluated
