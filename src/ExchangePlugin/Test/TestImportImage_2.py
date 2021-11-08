@@ -105,6 +105,7 @@ assert(abs(dz-0) <= tol)
 
 # Close SALOME GUI
 import salome_utils
-import subprocess
+import killSalomeWithPort
+
 port = salome_utils.getPortNumber()
-proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])
+killSalomeWithPort.killMyPort(port)
