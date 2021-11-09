@@ -102,9 +102,8 @@
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
-//#include <AIS_DimensionSelectionMode.hxx>
 #include <AIS_Shape.hxx>
-#include <AIS_Dimension.hxx>
+#include <PrsDim_Dimension.hxx>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
@@ -1707,7 +1706,7 @@ bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* t
             anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
 
             if (!anAISIO.IsNull()) {
-              Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
+              Handle(PrsDim_Dimension) aDim = Handle(PrsDim_Dimension)::DownCast(anAISIO);
               if (!aDim.IsNull()) {
                 gp_Pnt aPosition = aDim->GetTextPosition();
 

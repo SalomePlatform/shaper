@@ -32,16 +32,16 @@
 #include <Quantity_NameOfColor.hxx>
 #include <BRepBndLib.hxx>
 
-#include <AIS_Dimension.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_LengthDimension.hxx>
-#include <AIS_ParallelRelation.hxx>
-#include <AIS_PerpendicularRelation.hxx>
-#include <AIS_RadiusDimension.hxx>
 #include <AIS_Shape.hxx>
-#include <AIS_FixRelation.hxx>
 #include <Prs3d_PointAspect.hxx>
+#include <PrsDim_Dimension.hxx>
+#include <PrsDim_LengthDimension.hxx>
+#include <PrsDim_ParallelRelation.hxx>
+#include <PrsDim_PerpendicularRelation.hxx>
+#include <PrsDim_RadiusDimension.hxx>
+#include <PrsDim_FixRelation.hxx>
 
 #include <Graphic3d_AspectLine3d.hxx>
 
@@ -140,9 +140,10 @@ void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoin
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull()) {
-    Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension(theStartPoint->impl<gp_Pnt>(),
-                                                                  theEndPoint->impl<gp_Pnt>(),
-                                                                  thePlane->impl<gp_Pln>());
+    Handle(PrsDim_LengthDimension) aDimAIS =
+        new PrsDim_LengthDimension(theStartPoint->impl<gp_Pnt>(),
+                                   theEndPoint->impl<gp_Pnt>(),
+                                   thePlane->impl<gp_Pln>());
     aDimAIS->SetCustomValue(theDistance);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
@@ -159,7 +160,7 @@ void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoin
     setImpl(new Handle(AIS_InteractiveObject)(aDimAIS));
   } else {
     // update presentation
-    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
+    Handle(PrsDim_LengthDimension) aDimAIS = Handle(PrsDim_LengthDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
       aDimAIS->SetMeasuredGeometry(theStartPoint->impl<gp_Pnt>(), theEndPoint->impl<gp_Pnt>(),
                                    thePlane->impl<gp_Pln>());
@@ -177,7 +178,7 @@ bool GeomAPI_AISObject::isEmptyDistanceGeometry()
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
-    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
+    Handle(PrsDim_LengthDimension) aDimAIS = Handle(PrsDim_LengthDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
       anEmpty = !aDimAIS->IsValid();
     }
@@ -209,8 +210,8 @@ void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull()) {
-    Handle(AIS_RadiusDimension) aDimAIS = new AIS_RadiusDimension(theCircle->impl<gp_Circ>(),
-                                                                  anAnchor->impl<gp_Pnt>());
+    Handle(PrsDim_RadiusDimension) aDimAIS = new PrsDim_RadiusDimension(theCircle->impl<gp_Circ>(),
+                                                                        anAnchor->impl<gp_Pnt>());
     aDimAIS->SetCustomValue(theRadius);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
@@ -226,7 +227,7 @@ void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
     setImpl(new Handle(AIS_InteractiveObject)(aDimAIS));
   } else {
     // update presentation
-    Handle(AIS_RadiusDimension) aDimAIS = Handle(AIS_RadiusDimension)::DownCast(anAIS);
+    Handle(PrsDim_RadiusDimension) aDimAIS = Handle(PrsDim_RadiusDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
       aDimAIS->SetMeasuredGeometry(theCircle->impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
       aDimAIS->SetCustomValue(theRadius);
@@ -243,14 +244,14 @@ void GeomAPI_AISObject::createParallel(std::shared_ptr<GeomAPI_Shape> theLine1,
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull()) {
-    Handle(AIS_ParallelRelation) aParallel = new AIS_ParallelRelation(
+    Handle(PrsDim_ParallelRelation) aParallel = new PrsDim_ParallelRelation(
         theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
     if (theFlyoutPoint)
       aParallel->SetPosition(theFlyoutPoint->impl<gp_Pnt>());
 
     setImpl(new Handle(AIS_InteractiveObject)(aParallel));
   } else {
-    Handle(AIS_ParallelRelation) aParallel = Handle(AIS_ParallelRelation)::DownCast(anAIS);
+    Handle(PrsDim_ParallelRelation) aParallel = Handle(PrsDim_ParallelRelation)::DownCast(anAIS);
     if (!aParallel.IsNull()) {
       aParallel->SetFirstShape(theLine1->impl<TopoDS_Shape>());
       aParallel->SetSecondShape(theLine2->impl<TopoDS_Shape>());
@@ -269,12 +270,12 @@ void GeomAPI_AISObject::createPerpendicular(std::shared_ptr<GeomAPI_Shape> theLi
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull()) {
-    Handle(AIS_PerpendicularRelation) aPerpendicular = new AIS_PerpendicularRelation(
+    Handle(PrsDim_PerpendicularRelation) aPerpendicular = new PrsDim_PerpendicularRelation(
         theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
 
     setImpl(new Handle(AIS_InteractiveObject)(aPerpendicular));
   } else {
-    Handle(AIS_PerpendicularRelation) aPerpendicular = Handle(AIS_PerpendicularRelation)::DownCast(
+    Handle(PrsDim_PerpendicularRelation) aPerpendicular = Handle(PrsDim_PerpendicularRelation)::DownCast(
         anAIS);
     if (!aPerpendicular.IsNull()) {
       aPerpendicular->SetFirstShape(theLine1->impl<TopoDS_Shape>());
@@ -292,13 +293,13 @@ void GeomAPI_AISObject::createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  Handle(AIS_FixRelation) aFixPrs;
+  Handle(PrsDim_FixRelation) aFixPrs;
   if (anAIS.IsNull()) {
-    aFixPrs = new AIS_FixRelation(aShape, aPlane);
+    aFixPrs = new PrsDim_FixRelation(aShape, aPlane);
 
     setImpl(new Handle(AIS_InteractiveObject)(aFixPrs));
   } else {
-    aFixPrs = Handle(AIS_FixRelation)::DownCast(anAIS);
+    aFixPrs = Handle(PrsDim_FixRelation)::DownCast(anAIS);
     if (!aFixPrs.IsNull()) {
       aFixPrs->SetFirstShape(aShape);
       aFixPrs->SetPlane(aPlane);
@@ -325,7 +326,7 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   if (anAIS.IsNull())
     return;
   Quantity_Color aColor((Quantity_NameOfColor) theColor);
-  Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
+  Handle(PrsDim_Dimension) aDimAIS = Handle(PrsDim_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
   }
@@ -371,7 +372,7 @@ bool GeomAPI_AISObject::setColor(int theR, int theG, int theB)
     return false;
 
   Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-  Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
+  Handle(PrsDim_Dimension) aDimAIS = Handle(PrsDim_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
     if (!aContext.IsNull())

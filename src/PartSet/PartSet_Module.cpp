@@ -124,8 +124,8 @@
 #include <Config_PropManager.h>
 #include <Config_Keywords.h>
 
-#include <AIS_Dimension.hxx>
 #include <AIS_InteractiveObject.hxx>
+#include <PrsDim_Dimension.hxx>
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
@@ -1174,7 +1174,7 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     foreach(AISObjectPtr aAIS, aPrsList) {
       Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
 #endif
-      Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
+      Handle(PrsDim_Dimension) aDim = Handle(PrsDim_Dimension)::DownCast(aAisObj);
       if (!aDim.IsNull()) {
         aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
         aContext->Redisplay(aDim, false);

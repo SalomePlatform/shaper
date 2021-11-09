@@ -24,18 +24,18 @@
 #include <ModelAPI_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
-#include <AIS_AngleDimension.hxx>
+#include <PrsDim_AngleDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
 #include <SketcherPrs_DimensionStyle.h>
 
-DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
+DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, PrsDim_AngleDimension)
 
 /**
 * \ingroup GUI
 * A class for representation of angle constraint
 */
-class SketcherPrs_Angle : public AIS_AngleDimension
+class SketcherPrs_Angle : public PrsDim_AngleDimension
 {
 public:
   /// Constructor
@@ -47,7 +47,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_Angle();
 
-  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Angle, PrsDim_AngleDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

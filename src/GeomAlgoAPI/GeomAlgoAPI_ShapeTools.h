@@ -28,8 +28,8 @@
 #include <map>
 #include <set>
 #ifdef WIN32
- #include<array>
-#endif WIN32
+#include<array>
+#endif
 
 class GeomAPI_Ax1;
 class GeomAPI_Edge;
