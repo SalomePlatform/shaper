@@ -766,45 +766,80 @@
   </context>
   
   <context>
-    <name>SketchRectangle:GeomValidators_Different</name>
+    <name>SketchRectangle</name>
     <message>
-      <source>Attributes RectStartPoint and RectEndPoint are equal.</source>
-      <translation>Start point and end point must be different</translation>
+      <source>Create rectangle</source>
+      <translation>Create rectangle</translation>
+    </message>
+    <message>
+      <source>Rectangle</source>
+      <translation>Rectangle</translation>
     </message>
   </context>
   <context>
-    <name>SketchRectangle:RectEndPoint</name>
+    <name>SketchRectangle:Auxiliary</name>
     <message>
-      <source>Attribute "%1" is locked by modification value in the viewer.</source>
-      <translation>Select an end point of the rectangle.</translation>
+      <source>Auxiliary</source>
+      <translation>Auxiliary</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>Construction element</translation>
     </message>
   </context>
   <context>
-    <name>SketchRectangle:RectStartPoint</name>
+    <name>SketchRectangle:RectCenterPoint</name>
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a point.</translation>
     </message>
+    <message>
+      <source>Center</source>
+      <translation>Center</translation>
+    </message>
   </context>
   <context>
-    <name>SketchRectangle:Model_FeatureValidator</name>
+    <name>SketchRectangle:RectCornerPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point.</translation>
+    </message>
+    <message>
+      <source>Corner</source>
+      <translation>Corner</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectEndPoint</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Select a point.</translation>
     </message>
-  </context>
-  <context>
-    <name>SketchRectangle:RectEndPoint</name>
     <message>
-      <source>Attribute "%1" is locked by modification value in the viewer.</source>
-      <translation>Select a point.</translation>
+      <source>End point</source>
+      <translation>End point</translation>
     </message>
   </context>
   <context>
     <name>SketchRectangle:RectStartPoint</name>
     <message>
-      <source>Attribute "%1" is locked by modification value in the viewer.</source>
-      <translation>Select an point.</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>Start point</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectangleType</name>
+    <message>
+      <source>Rectangle by center and corner</source>
+      <translation>Rectangle by center and corner</translation>
+    </message>
+    <message>
+      <source>Rectangle by corners</source>
+      <translation>Rectangle by corners</translation>
     </message>
   </context>
 
