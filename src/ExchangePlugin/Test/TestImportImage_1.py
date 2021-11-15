@@ -101,5 +101,6 @@ assert(abs(dz-0) <= tol)
 import salome_utils
 import killSalomeWithPort
 
-port = salome_utils.getPortNumber()
-killSalomeWithPort.killMyPort(port)
+port = salome_utils.getPortNumber(False)
+if port:
+  killSalomeWithPort.killMyPort(port)
