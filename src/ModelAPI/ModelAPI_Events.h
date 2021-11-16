@@ -380,7 +380,8 @@ public:
   }
 
   /// Creates an empty message
-  MODELAPI_EXPORT ModelAPI_ImportParametersMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT ModelAPI_ImportParametersMessage(const Events_ID theID,
+                                                   const void* theSender = 0);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_ImportParametersMessage();
 

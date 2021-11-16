@@ -189,7 +189,8 @@ const std::string& ModelAPI_ParameterEvalMessage::error() const
 }
 
 /// Creates an empty message
-ModelAPI_ImportParametersMessage::ModelAPI_ImportParametersMessage(const Events_ID theID, const void* theSender)
+ModelAPI_ImportParametersMessage::ModelAPI_ImportParametersMessage(const Events_ID theID,
+                                                                   const void* theSender)
   :Events_Message(theID, theSender)
 {
 

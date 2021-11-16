@@ -201,7 +201,6 @@ namespace
 {
   // Handle Python exception
   // Reuse code from KERNEL module
-  
   typedef struct
   {
     PyObject_HEAD

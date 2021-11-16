@@ -294,7 +294,8 @@ PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Plane::ID());
-  return PlanePtr(new ConstructionAPI_Plane(aFeature, theFace, theDistance, theIsReverse, theNbCopies));
+  return PlanePtr(new ConstructionAPI_Plane(aFeature, theFace, theDistance,
+                                            theIsReverse, theNbCopies));
 }
 
 //==================================================================================================
