@@ -19,7 +19,6 @@
 
 #include <GeomAlgoAPI_ImageImport.h>
 
-#include <QPixmap>
 #include <BRep_Builder.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
@@ -36,18 +35,13 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Wire.hxx>
 
-std::shared_ptr<GeomAPI_Shape> ImageImport(const std::string& theFileName,
-                                         std::string& theError)
+std::shared_ptr<GeomAPI_Shape> ImageImport(const int width,
+                                           const int height,
+                                           std::string& theError)
 {
   TopoDS_Shape aResShape;
   try
   {
-    QPixmap* pixmap = new QPixmap(theFileName.c_str());
-    int height            =  pixmap->height();
-    int width             =  pixmap->width();
-
-    delete pixmap;
-
     TopoDS_Vertex aTriVertexes[4];
     gp_Pnt aPnt1( -0.5*width, -0.5*height, 0);
     gp_Pnt aPnt2( 0.5*width, -0.5*height, 0);

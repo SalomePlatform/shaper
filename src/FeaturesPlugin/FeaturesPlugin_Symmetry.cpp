@@ -41,6 +41,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <FeaturesPlugin_Tools.h>
 
@@ -204,13 +205,14 @@ void FeaturesPlugin_Symmetry::buildResult(
     const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
     std::shared_ptr<GeomAPI_Shape> theTargetShape, int& theResultIndex,
-    std::string & theTextureFile)
+    const ResultPtr& theTextureSource)
 {
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
   FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
                                            theAlgo, theTargetShape, "Symmetried");
-  aResultBody->setTextureFile(theTextureFile);
+  // Copy image data, if any
+  ModelAPI_Tools::copyImageAttribute(theTextureSource, aResultBody);
   setResult(aResultBody, theResultIndex++);
 }
 
@@ -281,10 +283,10 @@ void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
+  ResultPtr aTextureSource;
   AttributeSelectionListPtr anObjSelList = selectionList(OBJECTS_LIST_ID());
   if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+       anObjSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   std::string anError;
@@ -312,7 +314,7 @@ void FeaturesPlugin_Symmetry::performSymmetry(GeomTrsfPtr theTrsf)
   ListOfShape aTopLevel;
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt)
-    buildResult(aMakeShapeList, anOriginalShapes, *anIt, aResultIndex, theTextureFile);
+    buildResult(aMakeShapeList, anOriginalShapes, *anIt, aResultIndex, aTextureSource);
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);

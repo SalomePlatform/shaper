@@ -211,7 +211,7 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
     /// do not export pictures
     ResultPtr aBodyContext =
       std::dynamic_pointer_cast<ModelAPI_Result>(anAttrSelection->context());
-    if(aBodyContext->hasTextureFile())
+    if (aBodyContext->hasTexture())
       continue;
 
     std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
@@ -416,13 +416,13 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   AttributeSelectionListPtr aSelection = selectionList(XAO_SELECTION_LIST_ID());
   bool aIsSelection = aSelection->isInitialized() && aSelection->size() > 0;
   if (aIsSelection) { // a mode for export to geom result by result
-    for(int a = 0; a < aSelection->size(); a++) {
+    for (int a = 0; a < aSelection->size(); a++) {
       AttributeSelectionPtr anAttr = aSelection->value(a);
       ResultPtr aBodyContext =
         std::dynamic_pointer_cast<ModelAPI_Result>(anAttr->context());
       if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()) {
           /// do not export pictures
-          if(aBodyContext->hasTextureFile()){
+          if (aBodyContext->hasTexture()){
             anExCludedIsImage = true;
             continue;
           }

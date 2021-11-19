@@ -20,4 +20,5 @@
 SET(TEST_WITH_GUI_NAMES
   TestImportImage_1.py
   TestImportImage_2.py
+  TestImportImage_3.py
 )

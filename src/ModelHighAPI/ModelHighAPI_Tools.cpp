@@ -29,6 +29,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
 //--------------------------------------------------------------------------------------
+#include <GeomAlgoAPI_Tools.h>
+//--------------------------------------------------------------------------------------
 #include <Locale_Convert.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeBoolean.h>
@@ -529,6 +531,8 @@ static bool dumpToPython(SessionPtr theSession,
   if (aDump.get()) {
     aDump->string("file_path")->setValue(theFilename);
     aDump->string("file_format")->setValue("py");
+    std::string aTrek = GeomAlgoAPI_Tools::File_Tools::path(theFilename);
+    aDump->string("dump_dir")->setValue(aTrek);
     aDump->boolean("topological_naming")->setValue((theSelectionType & CHECK_NAMING) != 0);
     aDump->boolean("geometric_selection")->setValue((theSelectionType & CHECK_GEOMETRICAL) != 0);
     aDump->boolean("weak_naming")->setValue((theSelectionType & CHECK_WEAK) != 0);

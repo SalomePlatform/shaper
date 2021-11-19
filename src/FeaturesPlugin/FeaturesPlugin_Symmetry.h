@@ -23,6 +23,7 @@
 #include <FeaturesPlugin.h>
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 class GeomAPI_Trsf;
 class GeomAlgoAPI_MakeShapeList;
@@ -137,7 +138,8 @@ private:
   void buildResult(const std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theAlgo,
                    const std::list<std::shared_ptr<GeomAPI_Shape> >& theOriginalShapes,
                    std::shared_ptr<GeomAPI_Shape> theTargetShape,
-                   int& theResultIndex, std::string &theTextureFile);
+                   int& theResultIndex,
+                   const ResultPtr& theTextureSource);
 
   /// Create new result for the given part and transformation
   void buildResult(std::shared_ptr<ModelAPI_ResultPart> theOriginal,

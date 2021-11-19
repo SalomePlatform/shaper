@@ -71,10 +71,10 @@ void FeaturesPlugin_Placement::execute()
   // Getting objects.
   GeomAPI_ShapeHierarchy anObjects;
   std::list<ResultPtr> aParts;
-  std::string theTextureFile;
+  ResultPtr aTextureSource;
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
-  if (!FeaturesPlugin_Tools::shapesFromSelectionList(
-       anObjectsSelList, isKeepSubShapes, anObjects, aParts, theTextureFile))
+  if (!FeaturesPlugin_Tools::shapesFromSelectionList
+      (anObjectsSelList, isKeepSubShapes, anObjects, aParts, aTextureSource))
     return;
 
   // Verify the start shape
@@ -181,7 +181,8 @@ void FeaturesPlugin_Placement::execute()
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
                                              aMakeShapeList, *anIt, "Placed");
-    aResultBody->setTextureFile(theTextureFile);
+    // Copy image data, if any
+    ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
   }
 

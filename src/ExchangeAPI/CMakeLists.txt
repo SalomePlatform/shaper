@@ -18,6 +18,7 @@
 #
 
 INCLUDE(Common)
+INCLUDE(UseQtExt)
 
 SET(PROJECT_HEADERS
   ExchangeAPI.h
@@ -34,6 +35,7 @@ SET(PROJECT_LIBRARIES
   ModelAPI
   ModelHighAPI
   GeomAlgoAPI
+  ${QT_LIBRARIES}
 )
 
 INCLUDE_DIRECTORIES(
@@ -41,6 +43,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
   ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+  ${QT_INCLUDES}
 )
 
 # Plugin headers dependency
@@ -50,6 +53,9 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
 )
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 #TODO(spo): is ${OpenCASCADE_DEFINITIONS} necessary?
 ADD_DEFINITIONS(-DEXCHANGEAPI_EXPORTS ${OpenCASCADE_DEFINITIONS})

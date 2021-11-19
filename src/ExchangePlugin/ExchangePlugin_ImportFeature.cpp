@@ -45,6 +45,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeImage.h>
 #include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -66,6 +67,7 @@
 
 #include <ExchangePlugin_Tools.h>
 
+#include <QPixmap>
 
 /*
  * Request for initialization of data model of the feature: adding all attributes
@@ -635,35 +637,50 @@ void ExchangePlugin_ImportFeatureBase::loadNamingDS(
 
 void ExchangePlugin_Import_ImageFeature::importFile(const std::string& theFileName)
 {
-
   std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFileName);
-  std::string theTextureFileName = "";
-  // Perform the import
   std::string anError;
-  std::shared_ptr<GeomAPI_Shape> aGeomShape;
-   if (anExtension == "PNG" || anExtension == "GIF" ||
-             anExtension == "TIFF" || anExtension == "JPE" ||
-             anExtension == "JPG" || anExtension == "JPEG" ||
-             anExtension == "BMP"|| anExtension == "PPM"
-             ) {
-     aGeomShape = ImageImport(theFileName, anError);
-     if(anError == "")
-       theTextureFileName = theFileName;
-    } else {
+
+  if (anExtension == "PNG"  || anExtension == "GIF" ||
+      anExtension == "TIFF" || anExtension == "JPE" ||
+      anExtension == "JPEG" || anExtension == "JPG" ||
+      anExtension == "BMP"  || anExtension == "PPM"
+      ) {
+    // Perform the import
+    QPixmap px (theFileName.c_str());
+    int aWidth  = px.width();
+    int aHeight = px.height();
+    if (aWidth < 1 || aHeight < 1) {
+      setError("An error occurred while importing " + theFileName + ": invalid image");
+      return;
+    }
+
+    std::shared_ptr<GeomAPI_Shape> aGeomShape = ImageImport(aWidth, aHeight, anError);
+
+    // Check if shape is valid
+    if (!anError.empty()) {
+      setError("An error occurred while importing " + theFileName + ": " + anError);
+      return;
+    }
+
+    // Pass the results into the model
+    std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
+    data()->setName(Locale::Convert::toWString(anObjectName));
+
+    auto resultBody = createResultBody(aGeomShape);
+
+    // Store image in result body attribute
+    AttributeImagePtr anImageAttr = resultBody->data()->image(ModelAPI_ResultBody::IMAGE_ID());
+    if (anImageAttr.get() != NULL) {
+      QImage aQImage = px.toImage();
+      const uchar* aImageBytes = aQImage.bits();
+      std::list<unsigned char> aByteArray (aImageBytes, aImageBytes + aQImage.sizeInBytes());
+      anImageAttr->setTexture(aWidth, aHeight, aByteArray, anExtension);
+    }
+
+    setResult(resultBody);
+  }
+  else {
     anError = "Unsupported format: " + anExtension;
-  }
-
-  // Check if shape is valid
-  if (!anError.empty()) {
     setError("An error occurred while importing " + theFileName + ": " + anError);
-    return;
   }
-
-  // Pass the results into the model
-  std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
-  data()->setName(Locale::Convert::toWString(anObjectName));
-
-  auto resultBody = createResultBody(aGeomShape);
-  resultBody->setTextureFile(theTextureFileName);
-  setResult(resultBody);
 }

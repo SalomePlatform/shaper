@@ -184,6 +184,14 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
   ModelAPI_Session::get()->startOperation(ExchangePlugin_Dump::ID());
   FeaturePtr aFeature = aDoc->addFeature(ExchangePlugin_Dump::ID());
   if (aFeature.get()) {
+    // keep path to the true dumping directory for external files dumping
+    AttributeStringPtr aAttr = aFeature->string(ExchangePlugin_Dump::DUMP_DIR_ID());
+    if (aAttr.get()) {
+      QString aDirPath = QFileInfo(thePath).path();
+      aAttr->setValue(aDirPath.toStdString());
+    }
+
+    // tmp path to write the script
     std::string aTmpDir = aStudy->GetTmpDir(thePath.toStdString().c_str(), isMultiFile);
     std::string aFileName = aTmpDir + DUMP_NAME;
 
@@ -191,7 +199,7 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
       QFile::remove(aFileName.c_str());
     }
 
-    AttributeStringPtr aAttr = aFeature->string(ExchangePlugin_Dump::FILE_PATH_ID());
+    aAttr = aFeature->string(ExchangePlugin_Dump::FILE_PATH_ID());
     if (aAttr.get())
       aAttr->setValue(aFileName);
 
@@ -206,7 +214,7 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     ModelAPI_Session::get()->finishOperation();
 
     if (QFile::exists(aFileName.c_str())) {
-        QFile aInFile(aFileName.c_str());
+      QFile aInFile(aFileName.c_str());
       if (!aInFile.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
       QTextStream aText(&aInFile);

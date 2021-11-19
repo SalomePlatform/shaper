@@ -58,6 +58,9 @@ public:
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
 
+  /// Request for initialization of data model of the result body: adding all attributes
+  virtual void initAttributes();
+
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
   MODEL_EXPORT virtual bool generated(const GeomShapePtr& theNewShape,
@@ -114,7 +117,7 @@ public:
   MODEL_EXPORT virtual void cleanCash() override;
 
   /// sets the texture file
-  MODEL_EXPORT virtual void  setTextureFile(const std::string & theTextureFile) override;
+  MODEL_EXPORT virtual bool hasTexture() override;
 
 
 protected:

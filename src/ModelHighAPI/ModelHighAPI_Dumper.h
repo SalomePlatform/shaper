@@ -169,6 +169,14 @@ public:
   MODELHIGHAPI_EXPORT
   bool process(const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theFileName);
 
+  /// Keep path to the true dumping directory.
+  /// It is used to store image files or any other external files
+  /// \param theDumpDir path to the true dumping directory
+  MODELHIGHAPI_EXPORT
+  void setDumpDir(const std::string& theDumpDir) { myDumpDir = theDumpDir; }
+  /// Return path to the true dumping directory
+  MODELHIGHAPI_EXPORT std::string getDumpDir() const { return myDumpDir; }
+
   /// Add module to list of imported modules
   /// \param theModuleName  name of the module to be imported
   MODELHIGHAPI_EXPORT
@@ -454,6 +462,8 @@ private:
 
   std::list<EntityPtr> myPostponed; ///< list of postponed entities (sketch constraints or folders)
   bool myDumpPostponedInProgress; ///< processing postponed is in progress
+
+  std::string myDumpDir;
 
 protected:
   /// list of entities, used by other features but not dumped yet

@@ -24,10 +24,13 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Validator.h>
 
 #include <ModelHighAPI_Dumper.h>
 
 #include <Config_ModuleReader.h>
+
+#include <GeomAlgoAPI_Tools.h>
 
 #ifdef EXCHANGEPLUGIN_DUMP_NAMING
 static const bool THE_DUMP_NAMING = true;
@@ -67,11 +70,15 @@ void ExchangePlugin_Dump::initAttributes()
 
   data()->addAttribute(EXPORT_VARIABLES_ID(), ModelAPI_AttributeBoolean::typeId());
 
+  data()->addAttribute(DUMP_DIR_ID(), ModelAPI_AttributeString::typeId());
+
   // default values
   boolean(TOPOLOGICAL_NAMING_DUMP_ID())->setValue(THE_DUMP_NAMING);
   boolean(GEOMETRIC_DUMP_ID())->setValue(THE_DUMP_GEO);
   boolean(WEAK_NAMING_DUMP_ID())->setValue(THE_DUMP_WEAK);
   boolean(EXPORT_VARIABLES_ID())->setValue(false);
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), DUMP_DIR_ID());
 }
 
 void ExchangePlugin_Dump::execute()
@@ -161,6 +168,14 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
       aWeakNamingStorage->setFilenameSuffix("_weak");
     aDumper->addCustomStorage(aWeakNamingStorage);
   }
+
+  // pass dump directory to the dumper
+  AttributeStringPtr aDumpDirAttr =
+    this->string(ExchangePlugin_Dump::DUMP_DIR_ID());
+  std::string aDumpDir;
+  if (aDumpDirAttr.get() && !aDumpDirAttr->isInitialized())
+    aDumpDir = GeomAlgoAPI_Tools::File_Tools::path(theFileName);
+  aDumper->setDumpDir(aDumpDir);
 
   if (!aDumper->process(aDoc, theFileName)) {
     setError("An error occurred while dumping to " + theFileName);

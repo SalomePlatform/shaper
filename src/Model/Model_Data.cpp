@@ -32,6 +32,7 @@
 #include <Model_AttributeSelection.h>
 #include <Model_AttributeSelectionList.h>
 #include <Model_AttributeIntArray.h>
+#include <Model_AttributeImage.h>
 #include <Model_AttributeTables.h>
 #include <Model_Events.h>
 #include <Model_Expression.h>
@@ -218,6 +219,8 @@ AttributePtr Model_Data::addAttribute(
     anAttr = new Model_AttributeDoubleArray(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeTables::typeId()) {
     anAttr = new Model_AttributeTables(anAttrLab);
+  } else if (theAttrType == ModelAPI_AttributeImage::typeId()) {
+    anAttr = new Model_AttributeImage(anAttrLab);
   }
   // create also GeomData attributes here because only here the OCAF structure is known
   else if (theAttrType == GeomData_Point::typeId()) {
@@ -375,6 +378,7 @@ GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttrList, refattrlist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeIntArray, intArray);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDoubleArray, realArray);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeTables, tables);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeImage, image);
 
 std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {

@@ -26,11 +26,17 @@
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeStringArray.h>
+#include <ModelAPI_AttributeImage.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 #include <GeomAlgoAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <algorithm>
+//--------------------------------------------------------------------------------------
+#include <QPixmap>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 
 ExchangeAPI_Import::ExchangeAPI_Import(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -245,7 +251,44 @@ void ExchangeAPI_Import_Image::dump(ModelHighAPI_Dumper& theDumper) const
   std::string aPartName = theDumper.name(aBase->document());
 
   std::string aFilePath =
-      aBase->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID())->value();
+    aBase->string(ExchangePlugin_Import_ImageFeature::FILE_PATH_ID())->value();
+
+  // store image into a new file near the dumped python script
+  ResultPtr aResult = aBase->firstResult();
+  std::string aNewImageDir = theDumper.getDumpDir();
+  if (aResult.get() && aResult->hasTexture()) {
+    // get image data
+    int aWidth, aHeight;
+    std::string aFormat;
+    std::list<unsigned char> aByteList;
+    AttributeImagePtr anImageAttr =
+      aResult->data()->image(ModelAPI_ResultBody::IMAGE_ID());
+    anImageAttr->texture(aWidth, aHeight, aByteList, aFormat);
+
+    // convert image data to QPixmap
+    uchar* arr = new uchar[aByteList.size()];
+    std::copy(aByteList.begin(), aByteList.end(), arr);
+    QImage image (arr, aWidth, aHeight, QImage::Format_ARGB32);
+    QPixmap pixmap = QPixmap::fromImage( image );
+
+    // get new file name
+    std::wstring aName = aBase->name();
+    std::string anImageName (aName.begin(), aName.end());
+    std::string aNewImageFile = anImageName + "." + aFormat;
+    QFileInfo aNewFileInfo (QDir(aNewImageDir.c_str()), aNewImageFile.c_str());
+    for (int ii = 1; QFile::exists(aNewFileInfo.absoluteFilePath()); ii++) {
+      // construct the new file name by adding the unique number
+      aNewImageFile = anImageName + "_" + std::to_string(ii) + "." + aFormat;
+      aNewFileInfo.setFile(QDir(aNewImageDir.c_str()), aNewImageFile.c_str());
+    }
+
+    // write image to a new file
+    if (pixmap.save(aNewFileInfo.absoluteFilePath())) {
+      // to dump new file name
+      aFilePath = aNewFileInfo.absoluteFilePath().toStdString();
+    }
+    delete [] arr;
+  }
 
   theDumper << aBase << " = model.addImportImage(" << aPartName << ", \""
             << aFilePath << "\")" << std::endl;

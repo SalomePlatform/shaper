@@ -48,6 +48,7 @@ class ModelAPI_Feature;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeIntArray;
+class ModelAPI_AttributeImage;
 class ModelAPI_AttributeTables;
 class ModelAPI_Object;
 class GeomAPI_Shape;
@@ -113,6 +114,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual std::shared_ptr<ModelAPI_AttributeIntArray> intArray(const std::string& theID) = 0;
   /// Returns the attribute that contains string values array
   virtual std::shared_ptr<ModelAPI_AttributeStringArray> stringArray(const std::string& theID) = 0;
+  /// Returns the attribute that contains image
+  virtual std::shared_ptr<ModelAPI_AttributeImage> image(const std::string& theID) = 0;
   /// Returns the attribute that contains tables
   virtual std::shared_ptr<ModelAPI_AttributeTables> tables(const std::string& theID) = 0;
 
