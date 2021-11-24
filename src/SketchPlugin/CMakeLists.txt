@@ -65,6 +65,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Offset.h
+    SketchPlugin_OverConstraintsResolver.h
     SketchPlugin_Plugin.h
     SketchPlugin_Point.h
     SketchPlugin_Projection.h
@@ -120,6 +121,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Offset.cpp
+    SketchPlugin_OverConstraintsResolver.cpp
     SketchPlugin_Plugin.cpp
     SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp

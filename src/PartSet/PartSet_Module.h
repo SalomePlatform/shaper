@@ -417,7 +417,8 @@ public slots:
   /// \param theTrsfType type of tranformation
   virtual void onViewTransformed(int theTrsfType = 2);
 
-  void onConflictingConstraints();
+  /// Called on remove conflicting constraints
+  void onRemoveConflictingConstraints();
 
 protected slots:
   /// Called when previous operation is finished

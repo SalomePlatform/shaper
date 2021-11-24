@@ -79,6 +79,9 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   /// Retrieve preferences of config prop to default state
   static void resetConfigPropPreferences(SUIT_PreferenceMgr* thePref);
 
+  /// Updates content of preferences for sketch tab
+  static void updateSketchTab(ModuleBase_IPrefMgr* thePref, int thePageId);
+
 private:
   /// Updates SUIT_ResourceMgr values by Config_PropManager properties
   static void updateResourcesByConfig();

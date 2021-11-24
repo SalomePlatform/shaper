@@ -69,6 +69,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_Preferences.h>
 
 #include <ModelAPI_ResultField.h>
 #include <ModelAPI_Object.h>
@@ -149,6 +150,7 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <Graphic3d_Texture2Dmanual.hxx>
 
+#include <SUIT_ResourceMgr.h>
 
 #define FEATURE_ITEM_COLOR "0,0,225"
 
@@ -1983,28 +1985,54 @@ void PartSet_Module::enableCustomModes() {
 }
 
 //******************************************************
-void PartSet_Module::onConflictingConstraints()
+void PartSet_Module::onRemoveConflictingConstraints()
 {
-  const std::set<ObjectPtr>& aConstraints = myOverconstraintListener->conflictingObjects();
-  QObjectPtrList aObjectsList;
-  std::set<ObjectPtr>::const_iterator aIt;
-  for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); aIt++) {
-    if (mySketchReentrantMgr->isLastAutoConstraint(*aIt))
-      aObjectsList.append(*aIt);
+  const std::set<ObjectPtr>& aConstraints = myOverconstraintListener->objectsToRemove();
+  std::set<ObjectPtr>::const_iterator anIt;
+
+  XGUI_Workshop* aWorkshop = getWorkshop();
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+
+  bool isAllowToNotify = ModuleBase_Preferences::resourceMgr()->booleanValue(SKETCH_TAB_NAME,
+    "notify_change_constraint");
+
+  if (isAllowToNotify) {
+    anIt = aConstraints.begin();
+    std::string aText("Conflict in constraints: \n");
+
+    for (; anIt != aConstraints.end(); anIt++)
+    {
+      ObjectPtr anObject = *anIt;
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      TCollection_AsciiString aStr(aFeature->name().c_str());
+      std::string aName(aStr.ToCString());
+      aText += aName + "\n";
+    }
+
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+    ModuleBase_Tools::warningAboutConflict(aConnector->desktop(),
+      aText);
   }
-  if (aObjectsList.size() > 0) {
-    XGUI_Workshop* aWorkshop = getWorkshop();
+
+  ModuleBase_Operation* anOp = anOpMgr->currentOperation();
+  if (sketchMgr()->isNestedSketchOperation(anOp)) {
+    std::set<FeaturePtr> aFeatures;
+    for (anIt = aConstraints.cbegin(); anIt != aConstraints.cend(); anIt++)
+      aFeatures.insert(ModelAPI_Feature::feature(*anIt));
+
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
+  }
+  else {
+    QObjectPtrList anObjectsList;
+    for (anIt = aConstraints.cbegin(); anIt != aConstraints.cend(); anIt++)
+      anObjectsList.append(*anIt);
+
     QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
     ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription);
-    XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-
-    ModuleBase_Operation* anOp = anOpMgr->currentOperation();
-    if (sketchMgr()->isNestedSketchOperation(anOp))
-      anOp->abort();
 
     anOpMgr->startOperation(anOpAction);
-    aWorkshop->deleteFeatures(aObjectsList);
+    aWorkshop->deleteFeatures(anObjectsList);
     anOpMgr->commitOperation();
-    ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
   }
+  ModuleBase_Tools::flushUpdated(sketchMgr()->activeSketch());
 }

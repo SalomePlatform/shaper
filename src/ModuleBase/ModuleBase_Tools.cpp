@@ -92,6 +92,7 @@
 #include <QTextCodec>
 #include <QWindow>
 #include <QScreen>
+#include <QCheckBox>
 
 #include <sstream>
 #include <string>
@@ -1128,6 +1129,33 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
       theReferencesToDelete.insert(aFeaturesRefsToParameterOnly.begin(),
                                    aFeaturesRefsToParameterOnly.end());
   }
+  return true;
+}
+
+//**************************************************************
+bool warningAboutConflict(QWidget* theParent, const std::string& theWarningText)
+{
+  QMessageBox aMessageBox(theParent);
+  aMessageBox.setWindowTitle(QObject::tr("Conflicts in constraint"));
+  aMessageBox.setIcon(QMessageBox::Warning);
+  aMessageBox.setText((theWarningText + "\nConstraints will be removed or substituted").c_str());
+
+  QCheckBox* aCheckBox = new QCheckBox;
+
+  aCheckBox->setTristate(false);
+  aCheckBox->setText("switch off the notifications.");
+
+  aMessageBox.setCheckBox(aCheckBox);
+  aMessageBox.setStandardButtons(QMessageBox::Ok);
+
+  aMessageBox.exec();
+
+  if (aCheckBox->isChecked())
+  {
+    ModuleBase_Preferences::resourceMgr()->setValue(SKETCH_TAB_NAME,
+                                                    "notify_change_constraint", false);
+  }
+
   return true;
 }
 

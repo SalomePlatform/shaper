@@ -122,6 +122,10 @@ MAYBE_UNUSED static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttribut
 /// Event ID that 1D-fillet failed (comes with ModelAPI_ShapesFailedMessage)
 MAYBE_UNUSED static const char * EVENT_OPERATION_SHAPES_FAILED = "OperationShapesFailed";
 
+MAYBE_UNUSED static const char * EVENT_CHECK_CONSTRAINTS = "CheckConstrains";
+
+MAYBE_UNUSED static const char * EVENT_REMOVE_CONSTRAINTS = "RemoveConstrains";
+
 /// Event ID that license of specified features is checked and valid
 MAYBE_UNUSED static const char * EVENT_FEATURE_LICENSE_VALID = "FeaturesLicenseValid";
 
@@ -658,6 +662,26 @@ public:
 private:
   std::list< std::shared_ptr<GeomAPI_Shape> > myShapes;
 };
+
+///Message that sends the constraints to check or remove
+class ModelAPI_CheckConstraintsMessage : public Events_Message
+{
+public:
+  /// Creates an empty message
+  MODELAPI_EXPORT ModelAPI_CheckConstraintsMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_CheckConstraintsMessage();
+
+  ///Get list of constrains
+  MODELAPI_EXPORT const std::set<ObjectPtr>& constraints() const;
+
+  ///Set list of constrains
+  MODELAPI_EXPORT void setConstraints(const std::set<ObjectPtr>& theConstraints);
+
+private:
+  std::set<ObjectPtr> myConstraints;
+};
+
 
 /// Message that sends the features which license is checked and valid
 class ModelAPI_FeaturesLicenseValidMessage : public Events_Message

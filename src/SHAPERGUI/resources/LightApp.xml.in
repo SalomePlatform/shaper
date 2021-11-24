@@ -28,6 +28,11 @@
     <parameter name="part_visualization_study" value="0"/>
     <parameter name="part_visualization_script" value="1"/>
   </section>
+  <section name="Sketch">
+    <!-- Sketch preferences -->
+    <parameter name="allow_change_constraint" value="true"/>
+    <parameter name="notify_change_constraint" value="true"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="face-selection" value="true" />
