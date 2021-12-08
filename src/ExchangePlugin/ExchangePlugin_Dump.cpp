@@ -173,7 +173,9 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
   AttributeStringPtr aDumpDirAttr =
     this->string(ExchangePlugin_Dump::DUMP_DIR_ID());
   std::string aDumpDir;
-  if (aDumpDirAttr.get() && !aDumpDirAttr->isInitialized())
+  if (aDumpDirAttr.get() && aDumpDirAttr->isInitialized())
+    aDumpDir = aDumpDirAttr->value();
+  else
     aDumpDir = GeomAlgoAPI_Tools::File_Tools::path(theFileName);
   aDumper->setDumpDir(aDumpDir);
 
