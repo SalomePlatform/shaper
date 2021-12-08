@@ -211,7 +211,7 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
     /// do not export pictures
     ResultPtr aBodyContext =
       std::dynamic_pointer_cast<ModelAPI_Result>(anAttrSelection->context());
-    if (aBodyContext->hasTexture())
+    if (aBodyContext.get() && aBodyContext->hasTexture())
       continue;
 
     std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
