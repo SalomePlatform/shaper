@@ -235,7 +235,7 @@ void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue, boo
 
 void ModelHighAPI_Selection::setDeflection(double theValue)
 {
-  if (myVariantType != VT_ResultSubShapePair)
+  if (myVariantType != VT_ResultSubShapePair || !myResultSubShapePair.first.get())
     return;
 
   AttributeDoublePtr aDeflectionAttr =
@@ -247,7 +247,7 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
 // LCOV_EXCL_START
 void ModelHighAPI_Selection::setTransparency(double theValue)
 {
-  if (myVariantType != VT_ResultSubShapePair)
+  if (myVariantType != VT_ResultSubShapePair || !myResultSubShapePair.first.get())
     return;
 
   AttributeDoublePtr aTransparencyAttr =
