@@ -42,6 +42,7 @@
 
 #include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <algorithm>
 #include <iostream>
@@ -229,6 +230,95 @@ bool findVariable(FeaturePtr theSearcher, const std::wstring& theName, double& o
   if (aDocument != aRootDocument) {
     // any parameters in PartSet is okindependently on the Part position (issu #1504)
     if (findVariable(aRootDocument, FeaturePtr(), theName, outValue, theParam))
+      return true;
+  }
+  return false;
+}
+
+static void cacheSubresults(const ResultBodyPtr& theTopLevelResult,
+                            std::set<ResultPtr>& theCashedResults)
+{
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allSubs(theTopLevelResult, aResults, false);
+  for (std::list<ResultPtr>::iterator aR = aResults.begin(); aR != aResults.end(); ++aR) {
+    theCashedResults.insert(*aR);
+  }
+}
+
+bool isInResults(AttributeSelectionListPtr theSelection,
+                 const std::list<ResultPtr>& theResults,
+                 std::set<ResultPtr>& theCashedResults)
+{
+  // collect all results into a cashed set
+  if (theCashedResults.empty()) {
+    std::list<ResultPtr>::const_iterator aRes = theResults.cbegin();
+    for(; aRes != theResults.cend(); aRes++) {
+      if (theCashedResults.count(*aRes))
+        continue;
+      else
+        theCashedResults.insert(*aRes);
+
+      if ((*aRes)->groupName() == ModelAPI_ResultBody::group()) {
+        ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRes);
+        cacheSubresults(aResBody, theCashedResults);
+      } else if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) { // all results of the part
+        ResultPartPtr aResPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes);
+        DocumentPtr aPartDoc = aResPart->partDoc();
+        if (!aPartDoc.get() || !aPartDoc->isOpened()) { // document is not accessible
+          return false;
+        }
+        int aBodyCount = aPartDoc->size(ModelAPI_ResultBody::group());
+        for (int aBodyIndex = 0; aBodyIndex < aBodyCount; ++aBodyIndex) {
+          ResultBodyPtr aResBody =
+            std::dynamic_pointer_cast<ModelAPI_ResultBody>(
+              aPartDoc->object(ModelAPI_ResultBody::group(), aBodyIndex));
+          if (aResBody.get()) {
+            theCashedResults.insert(aResBody);
+            cacheSubresults(aResBody, theCashedResults);
+          }
+        }
+      }
+    }
+  }
+  // if context is in results, return true
+  for(int a = 0; a < theSelection->size(); a++) {
+    AttributeSelectionPtr anAttr = theSelection->value(a);
+    ResultPtr aContext = anAttr->context();
+    // check is it group selected for groups BOP
+    if (aContext.get() && aContext->groupName() == ModelAPI_ResultGroup::group()) {
+      // it is impossible by used results check which result is used in this group result,
+      // so check the results shapes is it in results of this document or not
+      FeaturePtr aSelFeature =
+        std::dynamic_pointer_cast<ModelAPI_Feature>(theSelection->owner());
+      if (!aSelFeature.get() || aSelFeature->results().empty())
+        continue;
+      GeomShapePtr aGroupResShape = aSelFeature->firstResult()->shape();
+
+      std::set<ResultPtr>::iterator allResultsIter = theCashedResults.begin();
+      for(; allResultsIter != theCashedResults.end(); allResultsIter++) {
+        GeomShapePtr aResultShape = (*allResultsIter)->shape();
+
+        GeomAPI_Shape::ShapeType aType =
+          GeomAPI_Shape::shapeTypeByStr(theSelection->selectionType());
+        GeomAPI_ShapeExplorer aGroupResExp(aGroupResShape, aType);
+        for(; aGroupResExp.more(); aGroupResExp.next()) {
+          if (aResultShape->isSubShape(aGroupResExp.current(), false))
+            return true; // at least one shape of the group is in the used results
+        }
+      }
+    }
+    ResultBodyPtr aSelected = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
+    if (!aSelected.get()) { // try to get selected feature and all its results
+      FeaturePtr aContextFeature = anAttr->contextFeature();
+      if (aContextFeature.get() && !aContextFeature->results().empty()) {
+        const std::list<ResultPtr>& allResluts = aContextFeature->results();
+        std::list<ResultPtr>::const_iterator aResIter = allResluts.cbegin();
+        for(; aResIter != allResluts.cend(); aResIter++) {
+          if (aResIter->get() && theCashedResults.count(*aResIter))
+            return true;
+        }
+      }
+    } else if (aSelected.get() && theCashedResults.count(aSelected))
       return true;
   }
   return false;

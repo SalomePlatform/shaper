@@ -158,6 +158,17 @@ Qt::ItemFlags PartSet_ObjectNode::flags(int theColumn) const
   } else {
     DocumentPtr aDoc = myObject->document();
     SessionPtr aSession = ModelAPI_Session::get();
+
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myObject);
+    if (aFeature.get() && aFeature->getKind() == "Group")
+    {
+      std::shared_ptr<ModelAPI_CompositeFeature> anOwner =
+        ModelAPI_Tools::compositeOwner (aFeature);
+
+      if (anOwner.get() && anOwner->getKind() == "ImportResult")
+        return aDefaultFlag;
+    }
+
     if (aSession->activeDocument() == aDoc)
       return aEditingFlag;
   }
