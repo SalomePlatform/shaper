@@ -41,10 +41,10 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Shape.hxx>
-#include <AIS_Dimension.hxx>
-#include <AIS_LengthDimension.hxx>
-#include <AIS_RadiusDimension.hxx>
-#include <AIS_AngleDimension.hxx>
+#include <PrsDim_Dimension.hxx>
+#include <PrsDim_LengthDimension.hxx>
+#include <PrsDim_RadiusDimension.hxx>
+#include <PrsDim_AngleDimension.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 
 #include <iomanip>
@@ -394,13 +394,13 @@ AISObjectPtr FeaturesPlugin_Measurement::lengthDimension(AISObjectPtr thePreviou
         aPlane = gp_Pln(aPnt1, aPlane.XAxis().Direction());
       }
 
-      Handle(AIS_LengthDimension) aDim;
+      Handle(PrsDim_LengthDimension) aDim;
       if (thePrevious.get()) {
         aAISObj = thePrevious;
         Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-        aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
+        aDim = Handle(PrsDim_LengthDimension)::DownCast(aAIS);
         if (aDim.IsNull()) {
-          aDim = new AIS_LengthDimension(aTEdge, aPlane);
+          aDim = new PrsDim_LengthDimension(aTEdge, aPlane);
           aAISObj = AISObjectPtr(new GeomAPI_AISObject());
           aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
         }
@@ -409,7 +409,7 @@ AISObjectPtr FeaturesPlugin_Measurement::lengthDimension(AISObjectPtr thePreviou
         }
       }
       else {
-        aDim = new AIS_LengthDimension(aTEdge, aPlane);
+        aDim = new PrsDim_LengthDimension(aTEdge, aPlane);
         aAISObj = AISObjectPtr(new GeomAPI_AISObject());
         aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
       }
@@ -457,13 +457,13 @@ AISObjectPtr FeaturesPlugin_Measurement::distanceDimension(AISObjectPtr thePrevi
             aPlane = gp_Pln(aPnt1, aPlane.XAxis().Direction());
           }
 
-          Handle(AIS_LengthDimension) aDim;
+          Handle(PrsDim_LengthDimension) aDim;
           if (thePrevious.get()) {
             aAISObj = thePrevious;
             Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-            aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
+            aDim = Handle(PrsDim_LengthDimension)::DownCast(aAIS);
             if (aDim.IsNull()) {
-              aDim = new AIS_LengthDimension(aPnt1, aPnt2, aPlane);
+              aDim = new PrsDim_LengthDimension(aPnt1, aPnt2, aPlane);
               aAISObj = AISObjectPtr(new GeomAPI_AISObject());
               aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
             }
@@ -474,7 +474,7 @@ AISObjectPtr FeaturesPlugin_Measurement::distanceDimension(AISObjectPtr thePrevi
           }
           else {
             aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-            aDim = new AIS_LengthDimension(aPnt1, aPnt2, aPlane);
+            aDim = new PrsDim_LengthDimension(aPnt1, aPnt2, aPlane);
             aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
           }
           aDim->SetFlyout(aDistance / 3.);
@@ -501,16 +501,16 @@ AISObjectPtr FeaturesPlugin_Measurement::radiusDimension(AISObjectPtr thePreviou
     if (thePrevious.get()) {
       aAISObj = thePrevious;
       Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      Handle(AIS_RadiusDimension) aDim = Handle(AIS_RadiusDimension)::DownCast(aAIS);
+      Handle(PrsDim_RadiusDimension) aDim = Handle(PrsDim_RadiusDimension)::DownCast(aAIS);
       if (aDim.IsNull()) {
-        aDim = new AIS_RadiusDimension(aShp);
+        aDim = new PrsDim_RadiusDimension(aShp);
         aAISObj = AISObjectPtr(new GeomAPI_AISObject());
         aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
       } else
         aDim->SetMeasuredGeometry(aShp);
     } else {
       aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(AIS_RadiusDimension) aDim = new AIS_RadiusDimension(aShp);
+      Handle(PrsDim_RadiusDimension) aDim = new PrsDim_RadiusDimension(aShp);
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
     }
   }
@@ -546,20 +546,20 @@ AISObjectPtr FeaturesPlugin_Measurement::angleDimension(AISObjectPtr thePrevious
     TopoDS_Edge aTEdge1 = TopoDS::Edge(anEdge1->impl<TopoDS_Shape>());
     TopoDS_Edge aTEdge2 = TopoDS::Edge(anEdge2->impl<TopoDS_Shape>());
 
-    Handle(AIS_AngleDimension) aDim;
+    Handle(PrsDim_AngleDimension) aDim;
     if (thePrevious.get()) {
       aAISObj = thePrevious;
       Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      aDim = Handle(AIS_AngleDimension)::DownCast(aAIS);
+      aDim = Handle(PrsDim_AngleDimension)::DownCast(aAIS);
       if (aDim.IsNull()) {
-        aDim = new AIS_AngleDimension(aTEdge1, aTEdge2);
+        aDim = new PrsDim_AngleDimension(aTEdge1, aTEdge2);
         aAISObj = AISObjectPtr(new GeomAPI_AISObject());
         aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
       } else
         aDim->SetMeasuredGeometry(aTEdge1, aTEdge2);
     } else {
       aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      aDim = new AIS_AngleDimension(aTEdge1, aTEdge2);
+      aDim = new PrsDim_AngleDimension(aTEdge1, aTEdge2);
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
     }
   }
@@ -589,15 +589,15 @@ AISObjectPtr FeaturesPlugin_Measurement::angleByPointsDimension(AISObjectPtr the
     if (thePrevious.get()) {
       aAISObj = thePrevious;
       Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      Handle(AIS_AngleDimension) aDim = Handle(AIS_AngleDimension)::DownCast(aAIS);
+      Handle(PrsDim_AngleDimension) aDim = Handle(PrsDim_AngleDimension)::DownCast(aAIS);
       if (aDim.IsNull()) {
-        aDim = new AIS_AngleDimension(aPnt1, aPnt2, aPnt3);
+        aDim = new PrsDim_AngleDimension(aPnt1, aPnt2, aPnt3);
         aAISObj = AISObjectPtr(new GeomAPI_AISObject());
         aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
       } else
         aDim->SetMeasuredGeometry(aPnt1, aPnt2, aPnt3);
     } else {
-      Handle(AIS_AngleDimension) aDim = new AIS_AngleDimension(aPnt1, aPnt2, aPnt3);
+      Handle(PrsDim_AngleDimension) aDim = new PrsDim_AngleDimension(aPnt1, aPnt2, aPnt3);
       aAISObj = AISObjectPtr(new GeomAPI_AISObject());
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
     }
@@ -610,7 +610,7 @@ void FeaturesPlugin_Measurement::setupDimension(AISObjectPtr theDim)
 {
   if (theDim.get()) {
     Handle(AIS_InteractiveObject) aAIS = theDim->impl<Handle(AIS_InteractiveObject)>();
-    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAIS);
+    Handle(PrsDim_Dimension) aDim = Handle(PrsDim_Dimension)::DownCast(aAIS);
     int aSize = Config_PropManager::integer("Visualization", "dimension_arrow_size");
     int aTextSize = Config_PropManager::integer("Visualization", "dimension_value_size");
     std::string aFont = Config_PropManager::string("Visualization", "dimension_font");

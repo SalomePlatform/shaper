@@ -57,7 +57,6 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_Shape.hxx>
-#include <AIS_Dimension.hxx>
 #include <AIS_Trihedron.hxx>
 #ifdef BEFORE_TRIHEDRON_PATCH
 #include <AIS_Axis.hxx>
@@ -67,6 +66,7 @@
 #include <AIS_Selection.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
+#include <PrsDim_Dimension.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_SelectionManager.hxx>

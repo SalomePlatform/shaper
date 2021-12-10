@@ -52,7 +52,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   /// Returns shape used for the presentation creation (can be NULL)
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Shape> getShape() const;
 
-  /** \brief Creates AIS_LengthDimension object
+  /** \brief Creates PrsDim_LengthDimension object
    *  \param[in] theStartPoint  first point for dimension
    *  \param[in] theEndPoint    second point for dimension
    *  \param[in] theFlyoutPoint the flyout of dimension relative to the measured line
@@ -73,7 +73,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT
   bool isEmptyDistanceGeometry();
 
-  /** \brief Creates AIS_RadiusDimension object
+  /** \brief Creates PrsDim_RadiusDimension object
    *  \param[in] theCircle      the radius is created for this circle
    *  \param[in] theFlyoutPoint the flyout of dimension
    *  \param[in] theRadius      value of the radius to be shown
@@ -82,7 +82,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   void createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
                     std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint, double theRadius);
 
-  /** \brief Creates AIS_ParallelRelation object for two lines
+  /** \brief Creates PrsDim_ParallelRelation object for two lines
    *  \param[in] theLine1       first parallel line
    *  \param[in] theLine2       second parallel line
    *  \param[in] theFlyoutPoint the flyout point for relation
@@ -94,7 +94,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
                       std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
                       std::shared_ptr<GeomAPI_Pln> thePlane);
 
-  /** \brief Creates AIS_PerpendicularRelation object for two lines
+  /** \brief Creates PrsDim_PerpendicularRelation object for two lines
    *  \param[in] theLine1       first parallel line
    *  \param[in] theLine2       second parallel line
    *  \param[in] thePlane       the plane which contains the lines
@@ -104,7 +104,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
                            std::shared_ptr<GeomAPI_Shape> theLine2,
                            std::shared_ptr<GeomAPI_Pln> thePlane);
 
-  /** \brief Creates AIS_FixedRelation object for an object
+  /** \brief Creates PrsDim_FixedRelation object for an object
    *  \param[in] theShape       the object
    *  \param[in] thePlane       the plane which contains the lines
    */

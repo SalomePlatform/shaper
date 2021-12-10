@@ -65,8 +65,8 @@ model.do()
 
 model.end()
 
-filename = 'check_export.shaperpart'
-model.removeFile(filename)
+filename = model.getTmpFileName('check_export', '.shaperpart')
+model.removeTmpFile(filename)
 
 # store the reference data
 features = [Box_1.feature(), Translation_1.feature()]

@@ -105,11 +105,11 @@ static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 
-IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
+IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, PrsDim_LengthDimension);
 
 SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketcher)
-: AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
+: PrsDim_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
   myConstraint(theConstraint),
   mySketcher(theSketcher),
   myFirstPoint(MyDefStart),
@@ -227,7 +227,7 @@ void SketcherPrs_LengthDimension::Compute(
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);
 
-  AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
+  PrsDim_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
@@ -336,7 +336,7 @@ void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Select
   }
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
-  AIS_LengthDimension::ComputeSelection(aSelection, aMode);
+  PrsDim_LengthDimension::ComputeSelection(aSelection, aMode);
 }
 
 void SketcherPrs_LengthDimension::setDirection(ModelAPI_Feature* theConstraint,

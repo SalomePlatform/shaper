@@ -49,11 +49,11 @@ extern void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 
-IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
+IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, PrsDim_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketcher)
-: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcher(theSketcher),
+: PrsDim_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcher(theSketcher),
   myCircle(MyDefCirc),
   myAnchorPoint(gp_Pnt(0, 0, 2)),
   myValue(1, false, "")
@@ -172,7 +172,7 @@ void SketcherPrs_Radius::Compute(
     (SketcherPrs_Tools::LocationType)(aLocAttr->value()) : SketcherPrs_Tools::LOCATION_AUTOMATIC;
   updateArrows(DimensionAspect(), GetValue(), aTextSize, aLocationType);
 
-  AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
+  PrsDim_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
@@ -204,5 +204,5 @@ void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSe
   }
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
-  AIS_RadiusDimension::ComputeSelection(aSelection, aMode);
+  PrsDim_RadiusDimension::ComputeSelection(aSelection, aMode);
 }

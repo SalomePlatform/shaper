@@ -47,7 +47,7 @@
 #include <BRep_Tool.hxx>
 #include <Precision.hxx>
 
-#include <AIS_Dimension.hxx>
+#include <PrsDim_Dimension.hxx>
 
 namespace SketcherPrs_Tools {
 

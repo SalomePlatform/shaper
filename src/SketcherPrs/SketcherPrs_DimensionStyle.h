@@ -23,7 +23,7 @@
 //#include <Events_Listener.h>
 
 #include <ModelAPI_AttributeDouble.h>
-#include <AIS_Dimension.hxx>
+#include <PrsDim_Dimension.hxx>
 
 #include "SketcherPrs_Tools.h"
 
@@ -63,7 +63,7 @@ public:
   /// Visualizes the dimension text or dimension value depending on the has parameters state
   /// \param theDimension a modified dimension
   /// \param theDimensionValue container filled by the model double attribute
-  Standard_EXPORT void updateDimensions(AIS_Dimension* theDimension,
+  Standard_EXPORT void updateDimensions(PrsDim_Dimension* theDimension,
                                         const DimensionValue& theDimensionValue);
 
 private:
@@ -72,7 +72,7 @@ private:
   /// \param theHasParameters if true, the text is shown, else digit
   /// \param theTextValue a dimension text value
   /// \param theDoubleValue a dimension digit value
-  void updateDimensions(AIS_Dimension* theDimension,
+  void updateDimensions(PrsDim_Dimension* theDimension,
                         const bool theHasParameters,
                         const std::string& theTextValue,
                         const double theDoubleValue);

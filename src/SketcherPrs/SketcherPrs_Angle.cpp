@@ -57,11 +57,11 @@ extern void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 //  #define COMPILATION_CORRECTION
 //#endif
 
-IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
+IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, PrsDim_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
                                      SketchPlugin_Sketch* theSketcher)
-: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)),
+: PrsDim_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)),
   myConstraint(theConstraint),
   mySketcher(theSketcher),
   myFirstPoint(gp_Pnt(0,0,0)),
@@ -263,7 +263,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   updateArrows(myAspect, anAngleCircleLength, aTextSize, aLocationType);
 
-  AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
+  PrsDim_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
@@ -294,7 +294,7 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
   }
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
-  AIS_AngleDimension::ComputeSelection(aSelection, aMode);
+  PrsDim_AngleDimension::ComputeSelection(aSelection, aMode);
 }
 
 bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()

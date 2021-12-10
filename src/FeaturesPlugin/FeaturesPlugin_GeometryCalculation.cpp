@@ -81,7 +81,6 @@ void FeaturesPlugin_GeometryCalculation::attributeChanged(const std::string& the
     }
 
     if (aShape) {
-      double aTolerance = 0.0001;
       double aLength;
       double aSurfArea;
       double aVolume;

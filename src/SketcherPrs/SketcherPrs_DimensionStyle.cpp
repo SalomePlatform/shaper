@@ -25,7 +25,7 @@
 
 #include <Locale_Convert.h>
 
-#include <AIS_Dimension.hxx>
+#include <PrsDim_Dimension.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <Standard_Version.hxx>
 
@@ -63,7 +63,7 @@ SketcherPrs_DimensionStyle::~SketcherPrs_DimensionStyle()
 {
 }
 
-void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
+void SketcherPrs_DimensionStyle::updateDimensions(PrsDim_Dimension* theDimension,
           const SketcherPrs_DimensionStyle::DimensionValue& theDimensionValue)
 {
   if (!theDimension)
@@ -72,10 +72,10 @@ void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
                    theDimensionValue.myTextValue, theDimensionValue.myDoubleValue);
 }
 
-void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
-                                                          const bool theHasParameters,
-                                                          const std::string& theTextValue,
-                                                          const double theDoubleValue)
+void SketcherPrs_DimensionStyle::updateDimensions(PrsDim_Dimension* theDimension,
+                                                  const bool theHasParameters,
+                                                  const std::string& theTextValue,
+                                                  const double theDoubleValue)
 {
   if (!theDimension)
     return;

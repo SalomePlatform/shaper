@@ -111,7 +111,7 @@ static bool updateFaces(const AttributeSelectionListPtr& theList,
                         SetOfShapes& theFaces)
 {
   bool aNewCache = false;
-  if (theFaces.size() != theList->size()) {
+  if ((int)theFaces.size() != theList->size()) {
     aNewCache = true;
   } else {
     for (int i = 0; i < theList->size(); i++) {
@@ -165,7 +165,7 @@ bool FiltersPlugin_ContinuousFaces::isOk(const GeomShapePtr& theShape, const Res
   }
 
   if (myCachedShapes.empty()) {
-    for (size_t i = 0; i < aList->size(); i++)
+    for (int i = 0; i < aList->size(); i++)
     {
       ResultBodyPtr aBaseResult = ModelAPI_Tools::bodyOwner(aList->value(i)->context(), true);
       if (!aBaseResult.get()) {

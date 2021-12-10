@@ -106,6 +106,8 @@ assert(model.checkPythonDump())
 
 # Close SALOME GUI
 import salome_utils
-import subprocess
-port = salome_utils.getPortNumber()
-proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])
+import killSalomeWithPort
+
+port = salome_utils.getPortNumber(False)
+if port:
+  killSalomeWithPort.killMyPort(port)

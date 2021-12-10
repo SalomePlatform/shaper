@@ -24,18 +24,18 @@
 #include <ModelAPI_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
-#include <AIS_RadiusDimension.hxx>
+#include <PrsDim_RadiusDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
 #include <SketcherPrs_DimensionStyle.h>
 
-DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension)
+DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, PrsDim_RadiusDimension)
 
 /**
 * \ingroup GUI
 * A class for representation of radius constraint
 */
-class SketcherPrs_Radius : public AIS_RadiusDimension
+class SketcherPrs_Radius : public PrsDim_RadiusDimension
 {
 public:
   /// Constructor
@@ -47,7 +47,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_Radius();
 
-  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Radius, PrsDim_RadiusDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

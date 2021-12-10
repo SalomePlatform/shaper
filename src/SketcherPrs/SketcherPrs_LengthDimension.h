@@ -22,7 +22,7 @@
 
 #include <GeomAPI_Ax3.h>
 #include <ModelAPI_Feature.h>
-#include <AIS_LengthDimension.hxx>
+#include <PrsDim_LengthDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 #include <SketchPlugin_Sketch.h>
 
@@ -32,14 +32,14 @@
 
 #include <SketcherPrs_DimensionStyle.h>
 
-DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension)
+DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, PrsDim_LengthDimension)
 
 /**
 * \ingroup GUI
 * A class for representation of linear dimension constraint.
 * It supports SketchPlugin_ConstraintLength and SketchPlugin_ConstraintDistance features.
 */
-class SketcherPrs_LengthDimension : public AIS_LengthDimension
+class SketcherPrs_LengthDimension : public PrsDim_LengthDimension
 {
 public:
   /// Constructor
@@ -51,7 +51,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_LengthDimension();
 
-  DEFINE_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, PrsDim_LengthDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

@@ -1199,7 +1199,7 @@ std::array<std::vector<int>, 10> myColorTab = {
 
 void findRandomColor(std::vector<int>& theValues, bool theReset)
 {
-  static int i = 0;
+  static size_t i = 0;
   static std::vector<std::vector<int>> usedGeneratedColor;
 
   // True when disabling auto-color
