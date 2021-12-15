@@ -1067,6 +1067,37 @@ void XGUI_Workshop::openFile(const QString& theDirectory)
   }
 #endif
 
+  int anActivationId =
+    ModuleBase_Preferences::resourceMgr()->integerValue("General", "part_activation_study", -1);
+  int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+
+  if (anActivationId == 0 && aSize > 0) {
+    ObjectPtr anObject = aRootDoc->object(ModelAPI_ResultPart::group(), aSize - 1);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anObject);
+    if (aPart.get()) {
+      aPart->activate();
+      ModuleBase_Tools::setDisplaying(aPart);
+    }
+  }
+  else if (anActivationId == 1) {
+    for (int anIndex = 0; anIndex < aSize; ++anIndex) {
+      ObjectPtr anObject = aRootDoc->object(ModelAPI_ResultPart::group(), anIndex);
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anObject);
+      if (aPart.get()) {
+        aPart->activate();
+        ModuleBase_Tools::setDisplaying(aPart);
+
+        if (anIndex < aSize - 1) {
+          SessionPtr aMgr = ModelAPI_Session::get();
+          aMgr->startOperation("Activation");
+          aMgr->setActiveDocument(aMgr->moduleDocument());
+          aMgr->finishOperation();
+          updateCommandStatus();
+          viewer()->update();
+        }
+      }
+    }
+  }
   QApplication::restoreOverrideCursor();
 }
 

@@ -406,6 +406,11 @@ std::wstring MODULEBASE_EXPORT generateName(const AttributePtr& theAttribute,
 
 /// Returns pixel ratio of a screen where main window is displayed
 qreal MODULEBASE_EXPORT currentPixelRatio();
+
+/// Set displaying status for elements from part depending on the settings
+/// \param thePart a pointer of part
+void MODULEBASE_EXPORT setDisplaying(std::shared_ptr<ModelAPI_ResultPart> thePart,
+                                     bool theDisplayFromScript = false);
 }
 
 #endif

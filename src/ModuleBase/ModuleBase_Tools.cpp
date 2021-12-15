@@ -21,6 +21,7 @@
 
 #include <ModuleBase_ParamIntSpinBox.h>
 #include <ModuleBase_ParamSpinBox.h>
+#include <ModuleBase_Preferences.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
@@ -36,6 +37,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeString.h>
@@ -52,6 +54,12 @@
 #include <ModelAPI_Folder.h>
 
 #include <ModelGeomAlgo_Point2D.h>
+
+#ifdef HAVE_SALOME
+#include <SUIT_Application.h>
+#include <SUIT_ResourceMgr.h>
+#include <SUIT_Session.h>
+#endif
 
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -107,6 +115,51 @@ const double DEFAULT_DEVIATION_COEFFICIENT = 1.e-4;
 namespace ModuleBase_Tools {
 
 //******************************************************************
+
+  //! Waits for REDISPLAY message and set the Visible flag to the entities
+  //! according to Preferences choice.
+  class ModuleBase_RedisplayListener : public Events_Listener
+  {
+  public:
+    static std::shared_ptr<ModuleBase_RedisplayListener> instance()
+    {
+      static std::shared_ptr<ModuleBase_RedisplayListener>
+          anInstance(new ModuleBase_RedisplayListener);
+      return anInstance;
+    }
+
+    void processEvent(const std::shared_ptr<Events_Message>& theMessage)
+    {
+      if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY))
+      {
+#if HAVE_SALOME
+        // If the python script is being loaded now, the preferences should be used
+        // to display the required object
+        SUIT_Application * app = SUIT_Session::session()->activeApplication();
+        QVariant aVar = app->property("IsLoadedScript");
+        if (!aVar.isNull() && aVar.toBool()) {
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+          int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+          if (aSize > 0) {
+            ObjectPtr anPartObject = aRootDoc->object(ModelAPI_ResultPart::group(), aSize - 1);
+            ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anPartObject);
+            ModuleBase_Tools::setDisplaying(aPart, true);
+          }
+        }
+#endif
+      }
+    }
+
+  private:
+    ModuleBase_RedisplayListener()
+    {
+      Events_Loop::loop()->registerListener(this,
+          Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    }
+  };
+
+  static std::shared_ptr<ModuleBase_RedisplayListener>
+      RL = ModuleBase_RedisplayListener::instance();
 
 //******************************************************************
 
@@ -1341,6 +1394,46 @@ qreal currentPixelRatio()
   return qApp->primaryScreen()->devicePixelRatio();
 }
 
+
+// Set displaying status to every element on group
+static void setDisplayingByLoop(DocumentPtr theDoc, int theSize,
+  std::string theGroup, bool theDisplayFromScript)
+{
+  int aDisplayingId = -1;
+  if (theDisplayFromScript) {
+    aDisplayingId = ModuleBase_Preferences::resourceMgr()->integerValue("General",
+      "part_visualization_script", -1);
+    // Increase ID to prevert using "As stored in HDF"
+    ++aDisplayingId;
+  }
+  else {
+    aDisplayingId = ModuleBase_Preferences::resourceMgr()->integerValue("General",
+      "part_visualization_study", -1);
+
+    // if chosen "As stored in HDF" then don't change displaying
+    if (aDisplayingId == 0)
+      return;
+  }
+
+  for (int anIndex = theSize - 1; anIndex >= 0; --anIndex) {
+    ObjectPtr anObject = theDoc->object(theGroup, anIndex);
+    anObject->setDisplayed((aDisplayingId == 1 && anIndex == theSize - 1) || aDisplayingId == 2);
+  }
+}
+
+void setDisplaying(ResultPartPtr thePart, bool theDisplayFromScript)
+{
+  DocumentPtr aDoc = thePart->partDoc();
+  int aConstructionSize = aDoc->size(ModelAPI_ResultConstruction::group());
+  int aGroupSize = aDoc->size(ModelAPI_ResultGroup::group());
+  int aFieldSize = aDoc->size(ModelAPI_ResultField::group());
+  int aResultSize = aDoc->size(ModelAPI_ResultBody::group());
+  setDisplayingByLoop(aDoc, aConstructionSize,
+    ModelAPI_ResultConstruction::group(), theDisplayFromScript);
+  setDisplayingByLoop(aDoc, aGroupSize, ModelAPI_ResultGroup::group(), theDisplayFromScript);
+  setDisplayingByLoop(aDoc, aFieldSize, ModelAPI_ResultField::group(), theDisplayFromScript);
+  setDisplayingByLoop(aDoc, aResultSize, ModelAPI_ResultBody::group(), theDisplayFromScript);
+}
 
 } // namespace ModuleBase_Tools
 

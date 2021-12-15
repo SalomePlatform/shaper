@@ -4,6 +4,12 @@
     <parameter name="language"    value="en"/>
     <parameter name="locale"      value="true"/>
   </section>
+  <section name="General">
+    <!-- Common settings of part's activation and visualization -->
+    <parameter name="part_activation_study" value="0"/>
+    <parameter name="part_visualization_study" value="0"/>
+    <parameter name="part_visualization_script" value="1"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />

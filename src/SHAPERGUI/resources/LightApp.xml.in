@@ -22,6 +22,12 @@
     <parameter name="PartSet" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
     <parameter name="XGUI" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
   </section>
+  <section name="General">
+    <!-- Common settings of part's activation and visualization -->
+    <parameter name="part_activation_study" value="0"/>
+    <parameter name="part_visualization_study" value="0"/>
+    <parameter name="part_visualization_script" value="1"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="face-selection" value="true" />
