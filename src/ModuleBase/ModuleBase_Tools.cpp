@@ -135,8 +135,13 @@ namespace ModuleBase_Tools {
 #if HAVE_SALOME
         // If the python script is being loaded now, the preferences should be used
         // to display the required object
-        SUIT_Application * app = SUIT_Session::session()->activeApplication();
-        QVariant aVar = app->property("IsLoadedScript");
+        SUIT_Session* aSession = SUIT_Session::session();
+        if (!aSession)
+          return;
+        SUIT_Application * anApp = aSession->activeApplication();
+        if (!anApp)
+          return;
+        QVariant aVar = anApp->property("IsLoadedScript");
         if (!aVar.isNull() && aVar.toBool()) {
           DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
