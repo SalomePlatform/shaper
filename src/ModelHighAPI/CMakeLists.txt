@@ -58,7 +58,6 @@ SET(PROJECT_LIBRARIES
   Locale
   ModelAPI
   ModelGeomAlgo
-  ModuleBase
 )
 
 ADD_DEFINITIONS(-DMODELHIGHAPI_EXPORTS -DWNT)
@@ -88,7 +87,6 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Locale
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelGeomAlgo
-  ${PROJECT_SOURCE_DIR}/src/ModuleBase
   ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
   ${OpenCASCADE_INCLUDE_DIR}
 )
