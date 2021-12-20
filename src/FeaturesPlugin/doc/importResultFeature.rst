@@ -8,6 +8,9 @@ changed, the part and part result that contains the copy-results will be updated
 copy-shape, so, even the document was opened and the source-part was not activated (loaded), the part with copy-feature works well
 with this result-shape.
 
+If the source-part contains one or several groups, which refer to sub-shapes of source results, then these groups are mutually imported
+as a sub-features of the Import Result feature. The copied groups contain only the elements referring to the imported results.
+
 It may be necessary for the user to load the other parts before using this feature otherwise the content of the **Results** folders will be empty.
 
 To create a Copy in the active part:
@@ -42,7 +45,7 @@ current Part where the import is done. Only results from the **Results** folder 
 Result
 """"""
 
-The Result of the operation will be copy of one or several results selected in another part located in the same place:
+The Result of the operation will be copy of one or several results selected and groups referring to these results in another part located in the same place:
 
 .. figure:: images/CreatedImportResult.png
    :align: center

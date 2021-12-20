@@ -21,6 +21,7 @@
 #define ModelAPI_Tools_HeaderFile
 
 #include "ModelAPI.h"
+#include <ModelAPI_AttributeSelectionList.h>
 
 class ModelAPI_CompositeFeature;
 class ModelAPI_Document;
@@ -310,6 +311,12 @@ MODELAPI_EXPORT std::list<std::shared_ptr<ModelAPI_Feature> > referencedFeatures
   std::shared_ptr<ModelAPI_Result> theTarget, const std::string& theFeatureKind,
   const bool theSortResults);
 
+/*!
+ * Returns true if something in selection is presented in the results list
+ */
+MODELAPI_EXPORT bool isInResults(AttributeSelectionListPtr theSelection,
+                                 const std::list<ResultPtr>& theResults,
+                                 std::set<ResultPtr>& theCashedResults);
 
 /*! Returns a container with the current color value.
 *   These are tree int values for RGB definition.

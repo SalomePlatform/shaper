@@ -1610,11 +1610,29 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 
       } else if (aObject->document() == aMgr->activeDocument()) {
         if (hasParameter || hasFeature) {
-          myMenuMgr->action("EDIT_CMD")->setEnabled(true);
-          theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
-          if (aCurrentOp && aFeature.get()) {
-            if (aCurrentOp->id().toStdString() == aFeature->getKind())
+
+          // disable Edit menu for groups under ImportResult feature
+          bool isEnabled = true;
+          if (aFeature.get() && aFeature->getKind() == "Group")
+          {
+            std::shared_ptr<ModelAPI_CompositeFeature> anOwner =
+              ModelAPI_Tools::compositeOwner (aFeature);
+
+            if (anOwner.get() && anOwner->getKind() == "ImportResult")
+            {
               myMenuMgr->action("EDIT_CMD")->setEnabled(false);
+              isEnabled = false;
+            }
+          }
+
+          if (isEnabled)
+          {
+            myMenuMgr->action("EDIT_CMD")->setEnabled(true);
+            theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
+            if (aCurrentOp && aFeature.get()) {
+              if (aCurrentOp->id().toStdString() == aFeature->getKind())
+                myMenuMgr->action("EDIT_CMD")->setEnabled(false);
+            }
           }
         }
       }

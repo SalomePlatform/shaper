@@ -22,7 +22,7 @@
 
 #include "FeaturesPlugin.h"
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_AttributeValidator.h>
 
 /// \class FeaturesPlugin_ImportResult
@@ -30,7 +30,7 @@
 /// \brief The Import Result feature allows the user to import one or several results
 ///        from another Part.
 
-class FeaturesPlugin_ImportResult : public ModelAPI_Feature
+class FeaturesPlugin_ImportResult : public ModelAPI_CompositeFeature
 {
 public:
   /// Feature kind.
@@ -38,6 +38,12 @@ public:
   {
     static const std::string MY_ID("ImportResult");
     return MY_ID;
+  }
+  /// All features (list of references)
+  inline static const std::string& FEATURES_ID()
+  {
+    static const std::string MY_FEATURES_ID("Features");
+    return MY_FEATURES_ID;
   }
 
   /// \return the kind of a feature.
@@ -59,6 +65,26 @@ public:
 
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Appends a feature
+  FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+
+  /// \return the number of sub-elements.
+  FEATURESPLUGIN_EXPORT virtual int numberOfSubs(bool forTree = false) const;
+
+  /// \return the sub-feature by zero-base index.
+  FEATURESPLUGIN_EXPORT virtual
+    std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false);
+
+  /// \return the sub-feature unique identifier in this composite feature by zero-base index.
+  FEATURESPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;
+
+  /// \return true if feature or result belong to this composite feature as subs.
+  FEATURESPLUGIN_EXPORT virtual bool isSub(ObjectPtr theObject) const;
+
+  /// This method to inform that sub-feature is removed and must be removed from the internal data
+  /// structures of the owner (the remove from the document will be done outside just after).
+  FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_ImportResult() {}

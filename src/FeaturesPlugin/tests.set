@@ -393,6 +393,9 @@ SET(TEST_NAMES
                TestCopySubShapes.py
                TestCopyWholeFeature.py
                TestImportResult.py
+               TestImportResultWithGroups1.py
+               TestImportResultWithGroups2.py
+               TestImportResultWithGroups3.py
                TestDefeaturing_ErrorMsg.py
                TestDefeaturing_OnSolid1.py
                TestDefeaturing_OnSolid2.py

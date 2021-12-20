@@ -57,6 +57,14 @@ void FeaturesAPI_ImportResult::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anObjects =
     aBase->selectionList(FeaturesPlugin_ImportResult::OBJECTS());
 
+  CompositeFeaturePtr aCompositeFeature =
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
+  int aNbOfSubs = aCompositeFeature->numberOfSubs();
+  for (int anIndex = 0; anIndex < aNbOfSubs; anIndex++) {
+    FeaturePtr aSubFeature = aCompositeFeature->subFeature(anIndex);
+    theDumper.name(aSubFeature, false, false, true); //mark as not to dump
+  }
+
   theDumper << aBase << " = model.addImportResult("
             << aDocName << ", " << anObjects << ")" << std::endl;
 }
