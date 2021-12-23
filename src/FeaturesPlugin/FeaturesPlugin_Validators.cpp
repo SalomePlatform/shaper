@@ -2019,6 +2019,14 @@ bool FeaturesPlugin_ValidatorDefeaturingSelection::isValid(
       theError = "Error: Not all selected shapes are sub-shapes of solids.";
       return false;
     }
+
+    ResultBodyPtr aResRootPtr = ModelAPI_Tools::bodyOwner(aContext, true);
+    if (aResRootPtr.get() && aResRootPtr->shape().get()) {
+      if (!aResRootPtr->shape()->isCollectionOfSolids()) {
+        theError = "Error: The main shape should be a collection of solids";
+        return false;
+      }
+    }
   }
 
   return true;

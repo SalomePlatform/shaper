@@ -55,6 +55,7 @@
 
 #include <BOPAlgo_CheckerSI.hxx>
 #include <BOPDS_DS.hxx>
+#include <BOPTools_AlgoTools.hxx>
 
 #include <sstream>
 #include <algorithm> // for std::transform
@@ -146,6 +147,32 @@ bool GeomAPI_Shape::isCompound() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_COMPOUND;
+}
+
+bool GeomAPI_Shape::isCollectionOfSolids() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return false;
+
+  if (aShape.ShapeType() == TopAbs_SOLID ||
+      aShape.ShapeType() == TopAbs_COMPSOLID)
+    return true;
+
+  if (aShape.ShapeType() != TopAbs_COMPOUND)
+    return false;
+
+  TopTools_ListOfShape aLS;
+  TopTools_MapOfShape aMFence;
+  BOPTools_AlgoTools::TreatCompound(aShape, aLS, &aMFence);
+  TopTools_ListOfShape::Iterator it(aLS);
+  for (; it.More(); it.Next()) {
+    const TopoDS_Shape& aSx = it.Value();
+    if (aSx.ShapeType() != TopAbs_SOLID &&
+        aSx.ShapeType() != TopAbs_COMPSOLID)
+      return false;
+  }
+  return true;
 }
 
 bool GeomAPI_Shape::isCompoundOfSolids() const

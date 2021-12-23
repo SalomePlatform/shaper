@@ -110,6 +110,11 @@ public:
   GEOMAPI_EXPORT
   virtual bool isCompoundOfSolids() const;
 
+  /// Returns true, if the shape contains only solids, compsolids
+  /// and compounds of solids and compsolids of any nesting depth
+  GEOMAPI_EXPORT
+  virtual bool isCollectionOfSolids() const;
+
   /// Returns whether the shape is a compound where all elements are topologically connected
   GEOMAPI_EXPORT
   virtual bool isConnectedTopology() const;
