@@ -18,6 +18,7 @@
 #
 
 from salome.shaper import model
+from tempfile import TemporaryDirectory
 from ModelAPI import *
 
 model.begin()
@@ -33,36 +34,37 @@ Translation_1 = model.addTranslation(partSet, [model.selection("COMPOUND", "Part
 model.end()
 
 # check save document in a current folder
-aSession = ModelAPI_Session.get()
-aFiles = StringList()
-aSession.save(".", aFiles)
-assert(len(aFiles) == 3)
+with TemporaryDirectory() as tmp_dir:
+  aSession = ModelAPI_Session.get()
+  aFiles = StringList()
+  aSession.save(tmp_dir, aFiles)
+  assert(len(aFiles) == 3)
 
-# check open of the same document
-assert(aSession.load(".") == False) # error because this document is already opened
+  # check open of the same document
+  assert(aSession.load(tmp_dir) == False) # error because this document is already opened
 
-# close the current document
-aSession.closeAll()
+  # close the current document
+  aSession.closeAll()
 
-# open again: it must be correct now
-assert(aSession.load("."))
+  # open again: it must be correct now
+  assert(aSession.load(tmp_dir))
 
-# activate the Part of session
-model.begin()
-partSet = model.moduleDocument()
-assert(partSet.size("Features") == 2)
-aPart = objectToFeature(partSet.object("Features", 0))
-aPartResult = modelAPI_ResultPart(aPart.results()[0])
-aPartResult.activate()
-aPartDoc = aPartResult.partDoc()
-aSession.setActiveDocument(aPartDoc, True)
-model.do()
-# check the field result data
-aFieldFeature = aPartDoc.objectByName("Features", "Field_1")
-aFieldResult = modelAPI_ResultField(objectToFeature(aFieldFeature).results()[0])
-assert(aFieldResult.textLine(0) == "5")
-aSession.setActiveDocument(partSet, True)
-model.do()
-aTranslation = objectToFeature(partSet.objectByName("Features", "Translation_1"))
-partSet.setCurrentFeature(aTranslation, True)
-model.end()
+  # activate the Part of session
+  model.begin()
+  partSet = model.moduleDocument()
+  assert(partSet.size("Features") == 2)
+  aPart = objectToFeature(partSet.object("Features", 0))
+  aPartResult = modelAPI_ResultPart(aPart.results()[0])
+  aPartResult.activate()
+  aPartDoc = aPartResult.partDoc()
+  aSession.setActiveDocument(aPartDoc, True)
+  model.do()
+  # check the field result data
+  aFieldFeature = aPartDoc.objectByName("Features", "Field_1")
+  aFieldResult = modelAPI_ResultField(objectToFeature(aFieldFeature).results()[0])
+  assert(aFieldResult.textLine(0) == "5")
+  aSession.setActiveDocument(partSet, True)
+  model.do()
+  aTranslation = objectToFeature(partSet.objectByName("Features", "Translation_1"))
+  partSet.setCurrentFeature(aTranslation, True)
+  model.end()

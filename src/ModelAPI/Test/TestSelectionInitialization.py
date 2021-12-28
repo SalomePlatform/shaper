@@ -18,6 +18,7 @@
 #
 
 from salome.shaper import model
+from tempfile import TemporaryDirectory
 from ModelAPI import *
 
 model.begin()
@@ -29,25 +30,26 @@ Sphere_1 = model.addSphere(Part_1_doc, model.selection("VERTEX", "Point_1"), 10)
 model.end()
 
 # save document in a current folder
-aSession = ModelAPI_Session.get()
-aFiles = StringList()
-aSession.save(".", aFiles)
-# close the current document
-aSession.closeAll()
-# open the saved document
-assert(aSession.load("."))
+with TemporaryDirectory() as tmp_dir:
+  aSession = ModelAPI_Session.get()
+  aFiles = StringList()
+  aSession.save(tmp_dir, aFiles)
+  # close the current document
+  aSession.closeAll()
+  # open the saved document
+  assert(aSession.load(tmp_dir))
 
-# activate the Part of session
-model.begin()
-partSet = model.moduleDocument()
-assert(partSet.size("Features") == 1)
-aPart = objectToFeature(partSet.object("Features", 0))
-aPartResult = modelAPI_ResultPart(aPart.results()[0])
-aPartResult.activate()
-aPartDoc = aPartResult.partDoc()
-aSession.setActiveDocument(aPartDoc, True)
-model.end()
+  # activate the Part of session
+  model.begin()
+  partSet = model.moduleDocument()
+  assert(partSet.size("Features") == 1)
+  aPart = objectToFeature(partSet.object("Features", 0))
+  aPartResult = modelAPI_ResultPart(aPart.results()[0])
+  aPartResult.activate()
+  aPartDoc = aPartResult.partDoc()
+  aSession.setActiveDocument(aPartDoc, True)
+  model.end()
 
-# check the sphere location (it should not be "Origin" - default one)
-aSphere = objectToFeature(aPartDoc.objectByName("Features", "Sphere_1"))
-assert(aSphere.selection("center_point").namingName() == "Point_1")
+  # check the sphere location (it should not be "Origin" - default one)
+  aSphere = objectToFeature(aPartDoc.objectByName("Features", "Sphere_1"))
+  assert(aSphere.selection("center_point").namingName() == "Point_1")
