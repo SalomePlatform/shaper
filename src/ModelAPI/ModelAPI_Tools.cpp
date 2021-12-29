@@ -40,6 +40,7 @@
 #include <Events_Loop.h>
 #include <Locale_Convert.h>
 
+#include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAPI_ShapeHierarchy.h>
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -197,6 +198,125 @@ ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGro
   }
   // not found
   return ObjectPtr();
+}
+
+//==================================================================================================
+void loadModifiedShapes(ResultBodyPtr theResultBody,
+                        const ListOfShape& theBaseShapes,
+                        const ListOfShape& theTools,
+                        const GeomMakeShapePtr& theMakeShape,
+                        const GeomShapePtr theResultShape,
+                        const std::string& theNamePrefix)
+{
+  theResultBody->storeModified(theBaseShapes, theResultShape, theMakeShape);
+
+  ListOfShape aShapes = theBaseShapes;
+  ListOfShape::const_iterator aToolIter = theTools.cbegin();
+  for (; aToolIter != theTools.cend(); aToolIter++)
+    aShapes.push_back(*aToolIter);
+
+  for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); ++anIter)
+  {
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX, theNamePrefix);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE, theNamePrefix);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE, theNamePrefix);
+  }
+}
+
+//==================================================================================================
+void loadModifiedShapes(ResultBodyPtr theResultBody,
+                        const GeomShapePtr& theBaseShape,
+                        const GeomMakeShapePtr& theMakeShape,
+                        const std::string theName)
+{
+  switch (theBaseShape->shapeType()) {
+  case GeomAPI_Shape::COMPOUND: {
+    for (GeomAPI_ShapeIterator anIt(theBaseShape); anIt.more(); anIt.next())
+    {
+      loadModifiedShapes(theResultBody,
+        anIt.current(),
+        theMakeShape,
+        theName);
+    }
+    break;
+  }
+  case GeomAPI_Shape::COMPSOLID:
+  case GeomAPI_Shape::SOLID:
+  case GeomAPI_Shape::SHELL: {
+    theResultBody->loadModifiedShapes(theMakeShape,
+      theBaseShape,
+      GeomAPI_Shape::FACE,
+      theName);
+  }
+  case GeomAPI_Shape::FACE:
+  case GeomAPI_Shape::WIRE: {
+    theResultBody->loadModifiedShapes(theMakeShape,
+      theBaseShape,
+      GeomAPI_Shape::EDGE,
+      theName);
+  }
+  case GeomAPI_Shape::EDGE: {
+    theResultBody->loadModifiedShapes(theMakeShape,
+      theBaseShape,
+      GeomAPI_Shape::VERTEX,
+      theName);
+  }
+  default: // [to avoid compilation warning]
+    break;
+  }
+}
+
+//==================================================================================================
+void loadDeletedShapes(ResultBodyPtr theResultBody,
+                      const GeomShapePtr theBaseShape,
+                      const ListOfShape& theTools,
+                      const GeomMakeShapePtr& theMakeShape,
+                      const GeomShapePtr theResultShapesCompound)
+{
+  ListOfShape aShapes = theTools;
+  if (theBaseShape.get())
+    aShapes.push_front(theBaseShape);
+
+  for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); anIter++)
+  {
+    theResultBody->loadDeletedShapes(theMakeShape,
+      *anIter,
+      GeomAPI_Shape::VERTEX,
+      theResultShapesCompound);
+    theResultBody->loadDeletedShapes(theMakeShape,
+      *anIter,
+      GeomAPI_Shape::EDGE,
+      theResultShapesCompound);
+    theResultBody->loadDeletedShapes(theMakeShape,
+      *anIter,
+      GeomAPI_Shape::FACE,
+      theResultShapesCompound);
+    // store information about deleted solids because of unittest TestBooleanCommon_SolidsHistory
+    // on OCCT 7.4.0 : common produces modified compsolid, so, move to the end for removed solids
+    // starts to produce whole compsolid
+    theResultBody->loadDeletedShapes(theMakeShape,
+      *anIter,
+      GeomAPI_Shape::SOLID,
+      theResultShapesCompound);
+  }
+}
+
+//==================================================================================================
+void loadDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+                        const ListOfShape& theTools,
+                        const GeomShapePtr theResultShapesCompound)
+{
+  for (std::vector<ResultBaseAlgo>::iterator anIt = theResultBaseAlgoList.begin();
+    anIt != theResultBaseAlgoList.end();
+    ++anIt)
+  {
+    ResultBaseAlgo& aRCA = *anIt;
+    loadDeletedShapes(aRCA.resultBody,
+      aRCA.baseShape,
+      theTools,
+      aRCA.makeShape,
+      theResultShapesCompound);
+  }
 }
 
 bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,

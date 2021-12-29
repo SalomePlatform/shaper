@@ -18,7 +18,6 @@
 //
 
 #include "FeaturesPlugin_BooleanFill.h"
-#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -78,7 +77,7 @@ void FeaturesPlugin_BooleanFill::execute()
     return;
   }
 
-  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  std::vector<ModelAPI_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
@@ -122,7 +121,7 @@ void FeaturesPlugin_BooleanFill::execute()
   // result shape has been deleted, but in another it was modified or stayed.
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
+  ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
                                           aTools.objects(),
                                           aResultCompound);
 

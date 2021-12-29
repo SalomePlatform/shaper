@@ -136,7 +136,7 @@ In this case, the following property panel will be opened:
    **Dialog box to export in STL format**
 
 
-The file name and path can be defined in **Export file**  field by direct input or browsing with ‘…’ button, which opens Export file dialog box.
+The file name and path can be defined in **Export file**  field by direct input or browsing with '...' button, which opens Export file dialog box.
 
 **Object** field contains an exported object which can be selected in a viewer or object browser.
 

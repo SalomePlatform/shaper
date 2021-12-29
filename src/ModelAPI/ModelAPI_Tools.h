@@ -30,6 +30,7 @@ class ModelAPI_Result;
 class ModelAPI_ResultParameter;
 class ModelAPI_ResultBody;
 
+class GeomAlgoAPI_MakeShape;
 class GeomAPI_Shape;
 class GeomAPI_ShapeHierarchy;
 
@@ -49,6 +50,35 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(
  * \return error value or empty string
  */
 MODELAPI_EXPORT std::string getFeatureError(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+MODELAPI_EXPORT struct ResultBaseAlgo {
+  std::shared_ptr<ModelAPI_ResultBody> resultBody;
+  std::shared_ptr<GeomAPI_Shape> baseShape;
+  std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape;
+};
+
+MODELAPI_EXPORT void loadModifiedShapes(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  const std::list<std::shared_ptr<GeomAPI_Shape>>& theBaseShapes,
+  const std::list<std::shared_ptr<GeomAPI_Shape>>& theTools,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
+  const std::shared_ptr<GeomAPI_Shape> theResultShape,
+  const std::string& theNamePrefix = "");
+
+MODELAPI_EXPORT void loadModifiedShapes(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
+  const std::string theName);
+/// Stores deleted shapes.
+MODELAPI_EXPORT void loadDeletedShapes(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+  const std::list<std::shared_ptr<GeomAPI_Shape>>& theTools,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
+  const std::shared_ptr<GeomAPI_Shape> theResultShapesCompound);
+
+/// Stores deleted shapes.
+MODELAPI_EXPORT void loadDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+  const std::list<std::shared_ptr<GeomAPI_Shape>>& theTools,
+  const std::shared_ptr<GeomAPI_Shape> theResultShapesCompound);
 
 /*!
  * Searches for variable with name \param theName in \param theDocument.

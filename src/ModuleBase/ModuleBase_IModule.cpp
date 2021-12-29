@@ -34,6 +34,7 @@
 #include "ModuleBase_Dialog.h"
 #include "ModuleBase_IErrorMgr.h"
 
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
 
@@ -219,6 +220,33 @@ void ModuleBase_IModule::createFeatures()
   Config_ModuleReader aXMLReader = Config_ModuleReader();
   aXMLReader.readAll();
   myFeaturesInFiles = aXMLReader.featuresInFiles();
+  myProprietaryFeatures = aXMLReader.proprietaryFeatures();
+  myProprietaryPlugins = aXMLReader.proprietaryPlugins();
+}
+
+void ModuleBase_IModule::processProprietaryFeatures()
+{
+  std::set<std::string>::iterator it = myFeaturesValidLicense.begin();
+  while (it != myFeaturesValidLicense.end()) {
+    std::map<std::string, std::string>::iterator aFound = myProprietaryFeatures.find(*it);
+    if (aFound == myProprietaryFeatures.end())
+      ++it;
+    else {
+      myFeaturesInFiles[aFound->first] = aFound->second;
+      myProprietaryFeatures.erase(aFound);
+      std::set<std::string>::iterator aRemoveIt = it++;
+      myFeaturesValidLicense.erase(aRemoveIt);
+    }
+  }
+}
+
+void ModuleBase_IModule::loadProprietaryPlugins()
+{
+  for (std::set<std::string>::const_iterator itP = myProprietaryPlugins.begin();
+       itP != myProprietaryPlugins.end(); ++itP) {
+    if (!ModelAPI_Session::get()->checkLicense(*itP))
+      Events_InfoMessage(*itP, "License of %1 plugin is not valid or not exist!").arg(*itP).send();
+  }
 }
 
 

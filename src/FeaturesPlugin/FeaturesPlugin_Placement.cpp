@@ -179,8 +179,8 @@ void FeaturesPlugin_Placement::execute()
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     //LoadNamingDS
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Placed");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Placed");
     // Copy image data, if any
     ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);

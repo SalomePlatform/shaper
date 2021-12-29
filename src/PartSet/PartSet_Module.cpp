@@ -186,6 +186,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LICENSE_VALID));
 
   registerSelectionFilter(SF_GlobalFilter, new PartSet_GlobalFilter(myWorkshop));
   registerSelectionFilter(SF_FilterInfinite, new PartSet_FilterInfinite(myWorkshop));
@@ -285,6 +286,7 @@ void PartSet_Module::createFeatures()
   ModuleBase_IModule::createFeatures();
   myRoot = new PartSet_RootNode();
   myRoot->setWorkshop(workshop());
+  ModuleBase_IModule::loadProprietaryPlugins();
 }
 
 
@@ -1766,6 +1768,12 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         mySketchMgr->previewSketchPlane()->isDisplayed())
         mySketchMgr->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
     }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LICENSE_VALID)) {
+    std::shared_ptr<ModelAPI_FeaturesLicenseValidMessage> aMsg =
+      std::dynamic_pointer_cast<ModelAPI_FeaturesLicenseValidMessage>(theMessage);
+    myFeaturesValidLicense.insert(aMsg->features().begin(), aMsg->features().end());
+    processProprietaryFeatures();
   }
 }
 

@@ -170,8 +170,8 @@ void FeaturesPlugin_MultiTranslation::execute()
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Translated");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Translated");
     // Copy image data, if any
     ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);

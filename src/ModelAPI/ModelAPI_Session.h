@@ -97,6 +97,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// the plugin manager on call of the feature)
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
 
+  /// Verifies the license for the plugin is valid
+  virtual bool checkLicense(const std::string& thePluginName) = 0;
+
   /// Returns the root document of the application (that may contains sub-documents)
   virtual std::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
 

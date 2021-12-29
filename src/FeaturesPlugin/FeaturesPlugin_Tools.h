@@ -28,36 +28,6 @@
 
 class FeaturesPlugin_Tools {
 public:
-  struct ResultBaseAlgo {
-    ResultBodyPtr resultBody;
-    GeomShapePtr baseShape;
-    GeomMakeShapePtr makeShape;
-  };
-
-public:
-  static void loadModifiedShapes(ResultBodyPtr theResultBody,
-                                 const ListOfShape& theBaseShapes,
-                                 const ListOfShape& theTools,
-                                 const GeomMakeShapePtr& theMakeShape,
-                                 const GeomShapePtr theResultShape,
-                                 const std::string& theNamePrefix = "");
-
-  static void loadModifiedShapes(ResultBodyPtr theResultBody,
-                                 const GeomShapePtr& theBaseShape,
-                                 const GeomMakeShapePtr& theMakeShape,
-                                 const std::string theName);
-  /// Stores deleted shapes.
-  static void loadDeletedShapes(ResultBodyPtr theResultBody,
-                                const GeomShapePtr theBaseShape,
-                                const ListOfShape& theTools,
-                                const GeomMakeShapePtr& theMakeShape,
-                                const GeomShapePtr theResultShapesCompound);
-
-  /// Stores deleted shapes.
-  static void loadDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
-                                const ListOfShape& theTools,
-                                const GeomShapePtr theResultShapesCompound);
-
   /// Obtain shapes from the selection list attribute.
   static bool getShape(const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
                        const bool theShareTopology,

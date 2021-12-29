@@ -24,6 +24,7 @@
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Intersection.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
@@ -84,19 +85,19 @@ void FeaturesPlugin_Intersection::execute()
   }
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                           anObjects,
-                                           ListOfShape(),
-                                           aMakeShapeList,
-                                           aResShape);
+  ModelAPI_Tools::loadModifiedShapes(aResultBody,
+                                     anObjects,
+                                     ListOfShape(),
+                                     aMakeShapeList,
+                                     aResShape);
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
-                                          GeomShapePtr(),
-                                          anObjects,
-                                          aMakeShapeList,
-                                          aResShape);
+  ModelAPI_Tools::loadDeletedShapes(aResultBody,
+                                    GeomShapePtr(),
+                                    anObjects,
+                                    aMakeShapeList,
+                                    aResShape);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

@@ -62,6 +62,16 @@ const std::map<std::string, std::string>& Config_ModuleReader::featuresInFiles()
   return myFeaturesInFiles;
 }
 
+const std::map<std::string, std::string>& Config_ModuleReader::proprietaryFeatures() const
+{
+  return myProprietaryFeatures;
+}
+
+const std::set<std::string>& Config_ModuleReader::proprietaryPlugins() const
+{
+  return myProprietaryPlugins;
+}
+
 const std::set<std::string>& Config_ModuleReader::modulePluginFiles() const
 {
   return myPluginFiles;
@@ -81,6 +91,10 @@ std::string Config_ModuleReader::getModuleName()
 void Config_ModuleReader::addFeature(const std::string& theFeatureName,
                                      const std::string& thePluginConfig)
 {
+  if (myProprietaryFeatures.count(theFeatureName)) {
+    myProprietaryFeatures.erase(theFeatureName);
+  }
+
   if (myFeaturesInFiles.count(theFeatureName)) {
     std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
       " There is a feature with the same ID.";
@@ -90,6 +104,21 @@ void Config_ModuleReader::addFeature(const std::string& theFeatureName,
   }
 
   myFeaturesInFiles[theFeatureName] = thePluginConfig;
+}
+
+void Config_ModuleReader::addFeatureRequireLicense(const std::string& theFeatureName,
+                                                   const std::string& thePluginConfig)
+{
+  if (myFeaturesInFiles.count(theFeatureName) ||
+      myProprietaryFeatures.count(theFeatureName)) {
+    std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
+      " There is a feature with the same ID.";
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg)
+      .arg(theFeatureName).arg(thePluginConfig).send();
+    return;
+  }
+
+  myProprietaryFeatures[theFeatureName] = thePluginConfig;
 }
 
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
@@ -103,6 +132,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
+    std::string aPluginDocSection = getProperty(theNode, PLUGIN_DOCSECTION);
     std::string aUsesPlugin = getProperty(theNode, PLUGIN_USES);
     if (!aUsesPlugin.empty()) { // send information about the plugin dependencies
       std::shared_ptr<Config_PluginMessage> aMess(new Config_PluginMessage(
@@ -111,10 +141,19 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
       Events_Loop::loop()->send(aMess);
     }
 
-    std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf);
+    std::string aLicense = getProperty(theNode, PLUGIN_LICENSE);
+    std::transform(aLicense.begin(), aLicense.end(), aLicense.begin(), ::tolower);
+    bool isLicensed = aLicense == "true";
+    if (isLicensed)
+      myProprietaryPlugins.insert(aPluginName);
+
+    std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf, aPluginDocSection);
     std::list<std::string>::iterator it = aFeatures.begin();
     for (; it != aFeatures.end(); it++) {
-      addFeature(*it, aPluginConf);
+      if (isLicensed)
+        addFeatureRequireLicense(*it, aPluginConf);
+      else
+        addFeature(*it, aPluginConf);
     }
   }
 }
@@ -137,7 +176,8 @@ bool Config_ModuleReader::hasRequiredModules(xmlNodePtr theNode) const
 }
 
 std::list<std::string> Config_ModuleReader::importPlugin(const std::string& thePluginLibrary,
-                                                         const std::string& thePluginXmlConf)
+                                                         const std::string& thePluginXmlConf,
+                                                         const std::string& thePluginDocSection)
 {
   if (thePluginXmlConf.empty()) {  //probably a third party library
     loadLibrary(thePluginLibrary);
@@ -146,6 +186,7 @@ std::list<std::string> Config_ModuleReader::importPlugin(const std::string& theP
 
   Config_FeatureReader aReader = Config_FeatureReader(thePluginXmlConf,
                                                       thePluginLibrary,
+                                                      thePluginDocSection,
                                                       myEventGenerated);
   aReader.readAll();
   return aReader.features();

@@ -49,6 +49,12 @@ class Config_ModuleReader : public Config_XMLReader
   /// Returns map that describes which file contains a feature
   /// (the feature is key, the file is value)
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
+  /// Returns map containing features, which have licensed.
+  /// The valid license should be confirmed first
+  /// (the feature is key, the file is value)
+  CONFIG_EXPORT const std::map<std::string, std::string>& proprietaryFeatures() const;
+  /// Returns proprietary plugins
+  CONFIG_EXPORT const std::set<std::string>& proprietaryPlugins() const;
   /// Returns list of module's xml files
   CONFIG_EXPORT const std::set<std::string>& modulePluginFiles() const;
   /// Returns module name: an xml attribute from the root of the plugins.xml:
@@ -77,7 +83,8 @@ class Config_ModuleReader : public Config_XMLReader
   bool hasRequiredModules(xmlNodePtr aNode) const;
   /// reads info about plugin's features from plugin xml description
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
-                                      const std::string& thePluginFile);
+                                      const std::string& thePluginFile,
+                                      const std::string& thePluginDocSection);
   /// stores information about plugin in the internal cache
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,
@@ -85,14 +92,22 @@ class Config_ModuleReader : public Config_XMLReader
   /// Save feature in myFeaturesInFiles.
   /// Generates an error if the feature name is already registered.
   void addFeature(const std::string& theFeatureName, const std::string& thePluginConfig);
+  /// Save feature in myFeaturesRequireLicense.
+  /// Generates an error if the feature name is already registered.
+  void addFeatureRequireLicense(const std::string& theFeatureName,
+                                const std::string& thePluginConfig);
 
  private:
   std::map<std::string, std::string> myFeaturesInFiles; ///< a feature name is key, a file is value
+  /// list of features, which need a license, and their config files
+  std::map<std::string, std::string> myProprietaryFeatures;
   std::set<std::string> myPluginFiles; ///< a feature name is key, a file is value
   /// a plugin name is key, a plugin type is value
   static std::map<std::string, PluginType> myPluginTypes;
   static std::set<std::string> myDependencyModules; ///< set of loaded modules
   const char* myEventGenerated; ///< gives ability to send Feature_Messages to various listeners
+
+  std::set<std::string> myProprietaryPlugins; ///< list of plugins protected by license
 };
 
 #endif /* CONFIG_XMLMODULEREADER_H_ */

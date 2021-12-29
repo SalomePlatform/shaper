@@ -443,12 +443,24 @@ protected:
   /// Returns new instance of operation object (used in createOperation for customization)
   virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 
+  /// Load plugins required license
+  void loadProprietaryPlugins();
+
+  /// Collect features, which have valid license
+  void processProprietaryFeatures();
+
 protected:
   /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
 
   /// Map of features in XML
   std::map<std::string, std::string> myFeaturesInFiles;
+  /// Map of features in XML, which require license but not confirmed yet
+  std::map<std::string, std::string> myProprietaryFeatures;
+  /// Proprietary plugins
+  std::set<std::string> myProprietaryPlugins;
+  /// Features, which have valid license
+  std::set<std::string> myFeaturesValidLicense;
 
   std::map<ModuleBase_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
 

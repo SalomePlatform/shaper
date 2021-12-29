@@ -18,13 +18,13 @@
 //
 
 #include "FeaturesPlugin_Extrusion.h"
-#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Tools.h>
@@ -173,8 +173,8 @@ void FeaturesPlugin_Extrusion::storeResultWithBoundaries(
   ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
 
   // Store modified shapes.
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theBoundaryShapes, ListOfShape(),
-                                           theMakeShape, theMakeShape->shape());
+  ModelAPI_Tools::loadModifiedShapes(aResultBody, theBoundaryShapes, ListOfShape(),
+                                     theMakeShape, theMakeShape->shape());
 
   // Store generated edges/faces.
   storeGenerationHistory(aResultBody, theBaseShape, theMakeShape);

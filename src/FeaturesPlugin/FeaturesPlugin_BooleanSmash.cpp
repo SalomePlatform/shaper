@@ -19,8 +19,6 @@
 
 #include "FeaturesPlugin_BooleanSmash.h"
 
-#include "FeaturesPlugin_Tools.h"
-
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -175,20 +173,20 @@ void FeaturesPlugin_BooleanSmash::execute()
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
 
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                           anOriginalShapes,
-                                           anOriginalShapes,
-                                           aMakeShapeList,
-                                           aShape);
+  ModelAPI_Tools::loadModifiedShapes(aResultBody,
+                                     anOriginalShapes,
+                                     anOriginalShapes,
+                                     aMakeShapeList,
+                                     aShape);
 
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
-  FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
-                                          GeomShapePtr(),
-                                          anOriginalShapes,
-                                          aMakeShapeList,
-                                          aShape);
+  ModelAPI_Tools::loadDeletedShapes(aResultBody,
+                                    GeomShapePtr(),
+                                    anOriginalShapes,
+                                    aMakeShapeList,
+                                    aShape);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

@@ -31,6 +31,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Validator.h>
 
 
 static const std::wstring THE_NEW_PART_STR(L"New Part");
@@ -88,6 +89,23 @@ void ExchangePlugin_Import::initAttributes()
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_COLORS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_SCALE_INTER_UNITS_ID(), ModelAPI_AttributeBoolean::typeId());
+
+#ifndef HAVE_SALOME
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::IMPORT_TYPE_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_FILE_PATH_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_TARGET_PART_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_TARGET_PARTS_LIST_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_MATERIALS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_COLORS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), ExchangePlugin_Import::STEP_SCALE_INTER_UNITS_ID());
+#endif
 }
 
 /*

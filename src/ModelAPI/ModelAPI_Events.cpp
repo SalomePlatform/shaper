@@ -470,3 +470,23 @@ const ListOfShape& ModelAPI_ShapesFailedMessage::shapes() const
 {
   return myShapes;
 }
+
+
+// =====   ModelAPI_FeaturesLicenseValidMessage   =====
+ModelAPI_FeaturesLicenseValidMessage::ModelAPI_FeaturesLicenseValidMessage(
+    const Events_ID theID, const void* theSender)
+  : Events_Message(theID, theSender)
+{}
+
+ModelAPI_FeaturesLicenseValidMessage::~ModelAPI_FeaturesLicenseValidMessage()
+{}
+
+void ModelAPI_FeaturesLicenseValidMessage::setFeatures(const std::set<std::string>& theFeatures)
+{
+  myFeatures = theFeatures;
+}
+
+const std::set<std::string>& ModelAPI_FeaturesLicenseValidMessage::features() const
+{
+  return myFeatures;
+}

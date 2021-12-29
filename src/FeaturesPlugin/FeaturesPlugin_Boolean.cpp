@@ -111,7 +111,7 @@ void FeaturesPlugin_Boolean::storeResult(
     const GeomShapePtr theResultShape,
     int& theResultIndex,
     std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
-    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList)
+    std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList)
 {
   if (!theResultShape)
     return;
@@ -119,7 +119,7 @@ void FeaturesPlugin_Boolean::storeResult(
   std::shared_ptr<ModelAPI_ResultBody> aResultBody =
       document()->createBody(data(), theResultIndex);
 
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+  ModelAPI_Tools::loadModifiedShapes(aResultBody,
                                            theObjects,
                                            theTools,
                                            theMakeShapeList,
@@ -127,10 +127,10 @@ void FeaturesPlugin_Boolean::storeResult(
   setResult(aResultBody, theResultIndex++);
 
   // merge algorithms
-  FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+  ModelAPI_Tools::ResultBaseAlgo aRBA;
   aRBA.resultBody = aResultBody;
   aRBA.baseShape = theObjects.front();
-  for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+  for (std::vector<ModelAPI_Tools::ResultBaseAlgo>::iterator
        aRBAIt = theResultBaseAlgoList.begin();
        aRBAIt != theResultBaseAlgoList.end(); ++aRBAIt) {
     theMakeShapeList->appendAlgo(aRBAIt->makeShape);

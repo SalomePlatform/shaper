@@ -179,6 +179,11 @@ std::list<std::string> Model_Session::redoList()
   return ROOT_DOC->redoList();
 }
 
+bool Model_Session::checkLicense(const std::string& thePluginName)
+{
+  return getPlugin(thePluginName);
+}
+
 ModelAPI_Plugin* Model_Session::getPlugin(const std::string& thePluginName)
 {
   if (myPluginObjs.find(thePluginName) == myPluginObjs.end()) {

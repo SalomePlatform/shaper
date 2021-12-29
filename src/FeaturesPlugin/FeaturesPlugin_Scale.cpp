@@ -142,8 +142,8 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Scaled");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Scaled");
     // Copy image data, if any
     ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);
@@ -215,8 +215,8 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   anObjects.topLevelObjects(aTopLevel);
   for (ListOfShape::iterator anIt = aTopLevel.begin(); anIt != aTopLevel.end(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
-                                             aMakeShapeList, *anIt, "Scaled");
+    ModelAPI_Tools::loadModifiedShapes(aResultBody, anOriginalShapes, ListOfShape(),
+                                       aMakeShapeList, *anIt, "Scaled");
     // Copy image data, if any
     ModelAPI_Tools::copyImageAttribute(aTextureSource, aResultBody);
     setResult(aResultBody, aResultIndex++);

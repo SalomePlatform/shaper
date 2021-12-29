@@ -75,7 +75,7 @@ protected:
                    const GeomShapePtr theResultShape,
                    int& theResultIndex,
                    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
-                   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList);
+                   std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList);
 
 private:
   OperationType myOperationType;

@@ -62,7 +62,7 @@ void FeaturesPlugin_Union::execute()
 
   std::string anError;
   int aResultIndex = 0;
-  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  std::vector<ModelAPI_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
 
   GeomShapePtr aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(ListOfShape());
@@ -93,7 +93,7 @@ void FeaturesPlugin_Union::execute()
   }
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
-  for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+  for (std::vector<ModelAPI_Tools::ResultBaseAlgo>::iterator
        aRBAIt = aResultBaseAlgoList.begin();
        aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
     aMakeShapeList->appendAlgo(aRBAIt->makeShape);

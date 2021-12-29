@@ -209,8 +209,8 @@ void FeaturesPlugin_Symmetry::buildResult(
 {
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
-                                           theAlgo, theTargetShape, "Symmetried");
+  ModelAPI_Tools::loadModifiedShapes(aResultBody, theOriginalShapes, ListOfShape(),
+                                     theAlgo, theTargetShape, "Symmetried");
   // Copy image data, if any
   ModelAPI_Tools::copyImageAttribute(theTextureSource, aResultBody);
   setResult(aResultBody, theResultIndex++);
