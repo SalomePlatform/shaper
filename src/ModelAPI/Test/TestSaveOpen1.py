@@ -18,6 +18,7 @@
 #
 
 from salome.shaper import model
+from tempfile import TemporaryDirectory
 from ModelAPI import *
 
 model.begin()
@@ -27,21 +28,22 @@ Point_name = Point_2.name()
 model.end()
 
 # check save document in a current folder
-aSession = ModelAPI_Session.get()
-aFiles = StringList()
-aSession.save(".", aFiles)
-assert(len(aFiles) == 1)
+with TemporaryDirectory() as tmp_dir:
+  aSession = ModelAPI_Session.get()
+  aFiles = StringList()
+  aSession.save(tmp_dir, aFiles)
+  assert(len(aFiles) == 1)
 
 # check open of the same document
-assert(aSession.load(".") == False) # error because this document is already opened
+  assert(aSession.load(tmp_dir) == False) # error because this document is already opened
 
 # close the current document
-aSession.closeAll()
+  aSession.closeAll()
 
 # open again: it must be correct now
-assert(aSession.load("."))
+  assert(aSession.load(tmp_dir))
 
 # check the created point is opened
-partSet = model.moduleDocument()
-assert(partSet.size("Features") == 1)
-assert(partSet.object("Features", 0).data().name() == Point_name)
+  partSet = model.moduleDocument()
+  assert(partSet.size("Features") == 1)
+  assert(partSet.object("Features", 0).data().name() == Point_name)
