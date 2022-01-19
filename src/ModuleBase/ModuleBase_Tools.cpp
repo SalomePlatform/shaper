@@ -1402,8 +1402,28 @@ qreal currentPixelRatio()
 
 // Set displaying status to every element on group
 static void setDisplayingByLoop(DocumentPtr theDoc, int theSize,
-  std::string theGroup, bool theDisplayFromScript)
+  std::string theGroup, bool theDisplayFromScript, int theDisplayingId)
 {
+  for (int anIndex = theSize - 1; anIndex >= 0; --anIndex) {
+    ObjectPtr anObject = theDoc->object(theGroup, anIndex);
+    anObject->setDisplayed((theDisplayingId == 1 && anIndex == theSize - 1) || theDisplayingId == 2);
+  }
+}
+
+void setDisplaying(ResultPartPtr thePart, bool theDisplayFromScript)
+{
+  static bool isDoingDisplay = false;
+
+  if (isDoingDisplay)
+    return;
+
+  isDoingDisplay = true;
+  DocumentPtr aDoc = thePart->partDoc();
+  int aConstructionSize = aDoc->size(ModelAPI_ResultConstruction::group());
+  int aGroupSize = aDoc->size(ModelAPI_ResultGroup::group());
+  int aFieldSize = aDoc->size(ModelAPI_ResultField::group());
+  int aResultSize = aDoc->size(ModelAPI_ResultBody::group());
+
   int aDisplayingId = -1;
   if (theDisplayFromScript) {
     aDisplayingId = ModuleBase_Preferences::resourceMgr()->integerValue("General",
@@ -1420,24 +1440,12 @@ static void setDisplayingByLoop(DocumentPtr theDoc, int theSize,
       return;
   }
 
-  for (int anIndex = theSize - 1; anIndex >= 0; --anIndex) {
-    ObjectPtr anObject = theDoc->object(theGroup, anIndex);
-    anObject->setDisplayed((aDisplayingId == 1 && anIndex == theSize - 1) || aDisplayingId == 2);
-  }
-}
-
-void setDisplaying(ResultPartPtr thePart, bool theDisplayFromScript)
-{
-  DocumentPtr aDoc = thePart->partDoc();
-  int aConstructionSize = aDoc->size(ModelAPI_ResultConstruction::group());
-  int aGroupSize = aDoc->size(ModelAPI_ResultGroup::group());
-  int aFieldSize = aDoc->size(ModelAPI_ResultField::group());
-  int aResultSize = aDoc->size(ModelAPI_ResultBody::group());
   setDisplayingByLoop(aDoc, aConstructionSize,
-    ModelAPI_ResultConstruction::group(), theDisplayFromScript);
-  setDisplayingByLoop(aDoc, aGroupSize, ModelAPI_ResultGroup::group(), theDisplayFromScript);
-  setDisplayingByLoop(aDoc, aFieldSize, ModelAPI_ResultField::group(), theDisplayFromScript);
-  setDisplayingByLoop(aDoc, aResultSize, ModelAPI_ResultBody::group(), theDisplayFromScript);
+    ModelAPI_ResultConstruction::group(), theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aGroupSize, ModelAPI_ResultGroup::group(), theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aFieldSize, ModelAPI_ResultField::group(), theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aResultSize, ModelAPI_ResultBody::group(), theDisplayFromScript, aDisplayingId);
+  isDoingDisplay = false;
 }
 
 } // namespace ModuleBase_Tools
