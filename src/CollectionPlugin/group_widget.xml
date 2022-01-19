@@ -6,11 +6,13 @@
   <multi_selector id="group_list"
     tooltip="Select a set of objects"
     shape_types="Vertices Edges Faces Solids"
+    allow_objects="Group"
     use_choice="true"
     use_filters="FiltersSelection"
     clear_in_neutral_point="false"
     filter_points="false"
     same_topology="true">
     <validator id="GeomValidators_BodyShapes"/>
-  </multi_selector>
+    <validator id="CollectionPlugin_GroupSelectionValidator"/>
+    </multi_selector>
 </source>

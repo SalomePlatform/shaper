@@ -51,6 +51,8 @@ CollectionPlugin_Plugin::CollectionPlugin_Plugin()
     new CollectionPlugin_FieldValidator);
   aFactory->registerValidator("CollectionPlugin_OperationAttribute",
     new CollectionPlugin_GroupOperationAttributeValidator);
+  aFactory->registerValidator("CollectionPlugin_GroupSelectionValidator",
+    new CollectionPlugin_GroupSelectionValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
