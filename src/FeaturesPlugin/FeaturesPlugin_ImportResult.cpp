@@ -112,8 +112,8 @@ void FeaturesPlugin_ImportResult::execute()
       for (int aGroupIndex = 0; aGroupIndex < aGroupCount; ++aGroupIndex)
       {
         ResultGroupPtr aResultGroup =
-            std::dynamic_pointer_cast<ModelAPI_ResultGroup>((*aDoc)->object(ModelAPI_ResultGroup::group(),
-                                                                            aGroupIndex));
+            std::dynamic_pointer_cast<ModelAPI_ResultGroup>(
+            (*aDoc)->object(ModelAPI_ResultGroup::group(), aGroupIndex));
 
         if (!aResultGroup.get() || !aResultGroup->shape().get())
           continue;

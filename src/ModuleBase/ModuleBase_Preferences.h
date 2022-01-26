@@ -86,7 +86,8 @@ private:
   /// Set default values to the Config_PropManager properties
   static void resetConfig();
 
-  /// Creates a content for General tab, which defines behavior of loading parts and displaying shapes
+  /// Creates a content for General tab, which defines the behavior of loading parts
+  /// and displaying shapes
   static void createGeneralTab(ModuleBase_IPrefMgr* thePref, int thePageId);
 
   /// Creates content of preferences editing widget
