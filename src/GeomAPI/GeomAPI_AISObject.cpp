@@ -275,8 +275,8 @@ void GeomAPI_AISObject::createPerpendicular(std::shared_ptr<GeomAPI_Shape> theLi
 
     setImpl(new Handle(AIS_InteractiveObject)(aPerpendicular));
   } else {
-    Handle(PrsDim_PerpendicularRelation) aPerpendicular = Handle(PrsDim_PerpendicularRelation)::DownCast(
-        anAIS);
+    Handle(PrsDim_PerpendicularRelation) aPerpendicular =
+        Handle(PrsDim_PerpendicularRelation)::DownCast(anAIS);
     if (!aPerpendicular.IsNull()) {
       aPerpendicular->SetFirstShape(theLine1->impl<TopoDS_Shape>());
       aPerpendicular->SetSecondShape(theLine2->impl<TopoDS_Shape>());

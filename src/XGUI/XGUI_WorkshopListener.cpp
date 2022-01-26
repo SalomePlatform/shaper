@@ -422,7 +422,8 @@ void XGUI_WorkshopListener::
 #ifdef DEBUG_RESULT_COMPSOLID
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aRes.get()) {
-        ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+        ResultCompSolidPtr aCompSolidRes =
+            std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
         if (aCompSolidRes.get()) {
             qDebug(QString("COMPSOLID, numberOfSubs = %1")
               .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());

@@ -112,7 +112,8 @@ void FeaturesPlugin_ImportResult::execute()
       for (int aGroupIndex = 0; aGroupIndex < aGroupCount; ++aGroupIndex)
       {
         ResultGroupPtr aResultGroup =
-          std::dynamic_pointer_cast<ModelAPI_ResultGroup>((*aDoc)->object(ModelAPI_ResultGroup::group(), aGroupIndex));
+            std::dynamic_pointer_cast<ModelAPI_ResultGroup>((*aDoc)->object(ModelAPI_ResultGroup::group(),
+                                                                            aGroupIndex));
 
         if (!aResultGroup.get() || !aResultGroup->shape().get())
           continue;
@@ -161,7 +162,8 @@ void FeaturesPlugin_ImportResult::execute()
 
     AttributeSelectionListPtr aNewSelectionList = aNewGroupFeature->selectionList("group_list");
     aNewSelectionList->setSelectionType (aSelectionList->selectionType());
-    GeomAPI_Shape::ShapeType aTypeOfShape = GeomAPI_Shape::shapeTypeByStr (aSelectionList->selectionType());
+    GeomAPI_Shape::ShapeType aTypeOfShape =
+        GeomAPI_Shape::shapeTypeByStr(aSelectionList->selectionType());
 
     for (int aLocalSelIndex = 0; aLocalSelIndex < aSelectionList->size(); aLocalSelIndex++) {
 

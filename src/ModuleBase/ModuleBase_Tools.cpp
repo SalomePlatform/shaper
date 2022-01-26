@@ -1406,7 +1406,8 @@ static void setDisplayingByLoop(DocumentPtr theDoc, int theSize,
 {
   for (int anIndex = theSize - 1; anIndex >= 0; --anIndex) {
     ObjectPtr anObject = theDoc->object(theGroup, anIndex);
-    anObject->setDisplayed((theDisplayingId == 1 && anIndex == theSize - 1) || theDisplayingId == 2);
+    anObject->setDisplayed((theDisplayingId == 1 && anIndex == theSize - 1) ||
+                           theDisplayingId == 2);
   }
 }
 
@@ -1440,11 +1441,14 @@ void setDisplaying(ResultPartPtr thePart, bool theDisplayFromScript)
       return;
   }
 
-  setDisplayingByLoop(aDoc, aConstructionSize,
-    ModelAPI_ResultConstruction::group(), theDisplayFromScript, aDisplayingId);
-  setDisplayingByLoop(aDoc, aGroupSize, ModelAPI_ResultGroup::group(), theDisplayFromScript, aDisplayingId);
-  setDisplayingByLoop(aDoc, aFieldSize, ModelAPI_ResultField::group(), theDisplayFromScript, aDisplayingId);
-  setDisplayingByLoop(aDoc, aResultSize, ModelAPI_ResultBody::group(), theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aConstructionSize, ModelAPI_ResultConstruction::group(),
+                      theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aGroupSize, ModelAPI_ResultGroup::group(),
+                      theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aFieldSize, ModelAPI_ResultField::group(),
+                      theDisplayFromScript, aDisplayingId);
+  setDisplayingByLoop(aDoc, aResultSize, ModelAPI_ResultBody::group(),
+                      theDisplayFromScript, aDisplayingId);
   isDoingDisplay = false;
 }
 
