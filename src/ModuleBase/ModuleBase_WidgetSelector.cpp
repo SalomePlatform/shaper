@@ -35,10 +35,15 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
 
 #include <Config_WidgetAPI.h>
 
 #include <TopoDS_Iterator.hxx>
+
+// Get object from group
+// Return true if find object
+static bool getObjectFromGroup(ObjectPtr& theObject, GeomShapePtr& theShape);
 
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
@@ -66,6 +71,15 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& 
   if (!theObject.get())
     theObject = thePrs->object();
   theShape = aSelection->getShape(thePrs);
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  while (aFeature && aFeature->lastResult()->groupName() == ModelAPI_ResultGroup::group()) {
+    if (!getObjectFromGroup(theObject, theShape))
+      break;
+    aFeature = ModelAPI_Feature::feature(theObject);
+
+    thePrs->setObject(theObject);
+  }
 }
 
 //********************************************************************
@@ -264,6 +278,23 @@ bool ModuleBase_WidgetSelector::isWholeResultAllowed() const
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     if (aSelAttr.get())
       return aSelAttr->isWholeResultAllowed();
+  }
+  return false;
+}
+
+bool getObjectFromGroup(ObjectPtr& theObject, GeomShapePtr& theShape)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+
+  AttributeSelectionListPtr anAttrList = aFeature->selectionList("group_list");
+
+  for (int anIndex = 0; anIndex < anAttrList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelect = anAttrList->value(anIndex);
+    if (aSelect->context()->shape()->isSubShape(theShape) ||
+        aSelect->context()->shape()->isEqual(theShape)) {
+      theObject = aSelect->contextObject();
+      return true;
+    }
   }
   return false;
 }

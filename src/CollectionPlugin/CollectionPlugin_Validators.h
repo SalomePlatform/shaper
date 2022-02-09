@@ -55,4 +55,19 @@ class CollectionPlugin_GroupOperationAttributeValidator : public ModelAPI_Attrib
                        Events_InfoMessage& theError) const;
 };
 
+/**\class CollectionPlugin_GroupSelectionValidator
+* \ingroup Validators
+* \brief Validator for prevent adding whole group in other group.
+*/
+class CollectionPlugin_GroupSelectionValidator : public ModelAPI_AttributeValidator
+{
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute (not used).
+  //! \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const;
+};
+
 #endif

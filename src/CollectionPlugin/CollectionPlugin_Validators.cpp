@@ -100,3 +100,27 @@ bool CollectionPlugin_GroupOperationAttributeValidator::isValid(
   }
   return true;
 }
+
+bool CollectionPlugin_GroupSelectionValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& /*theArguments*/,
+    Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr aSelList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelList) {
+    theError = "Error: This validator can only work with selection list of attributes";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < aSelList->size(); ++anIndex) {
+    AttributeSelectionPtr aCurSelection = aSelList->value(anIndex);
+    ResultPtr aGroupResult = aCurSelection->context();
+    if (!aGroupResult.get() || aGroupResult->groupName() == ModelAPI_ResultGroup::group()) {
+      theError = "Error: Whole group mustn't be selected.";
+      return false;
+    }
+  }
+
+  return true;
+}
