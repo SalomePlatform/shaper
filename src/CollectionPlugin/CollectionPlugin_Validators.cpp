@@ -115,7 +115,9 @@ bool CollectionPlugin_GroupSelectionValidator::isValid(
 
   for (int anIndex = 0; anIndex < aSelList->size(); ++anIndex) {
     AttributeSelectionPtr aCurSelection = aSelList->value(anIndex);
-    ResultPtr aGroupResult = aCurSelection->context();
+    FeaturePtr aCurFeature = aCurSelection->contextFeature();
+    ResultPtr aGroupResult = aCurFeature.get() ? aCurFeature->lastResult()
+                                               : aCurSelection->context();
     if (!aGroupResult.get() || aGroupResult->groupName() == ModelAPI_ResultGroup::group()) {
       theError = "Error: Whole group mustn't be selected.";
       return false;
