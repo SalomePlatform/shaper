@@ -44,6 +44,12 @@ public:
   /// Return filters feature
   FILTERSAPI_EXPORT
   FiltersFeaturePtr feature() const;
+
+  /// Return selected entities
+  FILTERSAPI_EXPORT
+  std::list<ModelHighAPI_Selection> select(const std::string theShapeType) const;
+  FILTERSAPI_EXPORT
+  std::list<ModelHighAPI_Selection> select(const GeomAPI_Shape::ShapeType theShapeType) const;
 };
 
 /// Create list of filters

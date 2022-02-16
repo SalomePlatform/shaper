@@ -27,6 +27,7 @@ SET(TEST_NAMES
   TestFilters_FilterName.py
   TestFilters_IsReversed.py
   TestFilters_Remove.py
+  TestFilters_Select.py
   TestFilter_BelongsTo.py
   TestFilter_BelongsTo_Exclude.py
   TestFilter_OnPlane.py

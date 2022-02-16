@@ -454,60 +454,24 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
 
   clearCurrentSelection();
 
+  FiltersFeaturePtr aFiltersFeature =
+    std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
+  static SessionPtr aSession = ModelAPI_Session::get();
+  std::list< std::pair<ResultPtr, GeomShapePtr> > aResList =
+    aSession->filters()->select(aFiltersFeature, (GeomAPI_Shape::ShapeType)mySelectionType);
+
   BRep_Builder aBuilder;
   TopoDS_Compound aComp;
   aBuilder.MakeCompound(aComp);
 
-  DocumentPtr aDoc = myFeature->document();
-  int aNb = aDoc->size(ModelAPI_ResultBody::group());
-  ObjectPtr aObj;
-  ResultBodyPtr aBody;
-  for (int i = 0; i < aNb; i++) {
-    aObj = aDoc->object(ModelAPI_ResultBody::group(), i);
-    aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
-    GeomShapePtr aShape = aBody->shape();
-    std::list<GeomShapePtr> aSubShapes =
-      aShape->subShapes((GeomAPI_Shape::ShapeType)mySelectionType);
-    TopTools_MapOfShape alreadyThere;
-    std::list<GeomShapePtr>::const_iterator aShapesIt;
-    for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
-      GeomShapePtr aSubShape = (*aShapesIt);
-      TopoDS_Shape aTShape = aSubShape->impl<TopoDS_Shape>();
-      if (!alreadyThere.Add(aTShape))
-        continue;
-
-      // degenerated edge is not valid selection
-      if ((GeomAPI_Shape::ShapeType)mySelectionType == GeomAPI_Shape::EDGE)
-        if (aSubShape->edge()->isDegenerated())
-          continue;
-
-      static SessionPtr aSession = ModelAPI_Session::get();
-      bool isValid = aSession->filters()->isValid(myFeature, aBody, aSubShape);
-
-      if (isValid) {
-        aBuilder.Add(aComp, aTShape);
-        // bos #24043: Naming on a compsolid works wrong.
-        // Find a simple sub-result for the ViewerPrs context:
-        ResultBodyPtr aContext = aBody;
-        bool isComposite = aContext->numberOfSubs() > 0;
-        while (isComposite) {
-          isComposite = false;
-          int nbSubs = aContext->numberOfSubs();
-          for (int aSubIndex = 0; aSubIndex < nbSubs; aSubIndex++) {
-            ResultBodyPtr aSubResult = aContext->subResult(aSubIndex);
-            GeomShapePtr aSubResultShape = aSubResult->shape();
-            if (aSubResultShape->isSubShape(aSubShape)) {
-              aContext = aSubResult;
-              isComposite = aContext->numberOfSubs() > 0;
-              break;
-            }
-          }
-        }
-        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aContext, aSubShape));
-        //ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aSubShape));
-        myValues.append(aValue);
-      }
-    }
+  std::list< std::pair<ResultPtr, GeomShapePtr> >::const_iterator itSelected = aResList.cbegin();
+  for (; itSelected != aResList.cend(); itSelected++) {
+    ResultPtr aCurRes = (*itSelected).first;
+    GeomShapePtr aSubShape = (*itSelected).second;
+    TopoDS_Shape aTShape = aSubShape->impl<TopoDS_Shape>();
+    aBuilder.Add(aComp, aTShape);
+    ModuleBase_ViewerPrsPtr aValue (new ModuleBase_ViewerPrs(aCurRes, aSubShape));
+    myValues.append(aValue);
   }
 
   if (myValues.size() > 0)
