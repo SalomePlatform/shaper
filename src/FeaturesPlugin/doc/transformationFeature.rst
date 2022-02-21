@@ -38,7 +38,7 @@ Scale by one common factor scales the entire object without modification the geo
 
 Input fields:
 
-- **Main objects** panel contains shapes to be scaled. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be scaled. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Center point** defines the point relatively to which the object is scaled. Point is selected in 3D OCC viewer or object browser;
 - **Scale factor** defines the multiplier of axial dimensions. If Scale Factor is negative, the object is mirrored through the Central Point. 
 
@@ -76,7 +76,7 @@ Scale by different factors along axes is a general transformation, which can mod
 
 Input fields:
 
-- **Main objects** panel contains shapes to be scaled. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be scaled. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Center point** defines the point relatively to which the object is scaled. Point is selected in 3D OCC viewer or object browser;
 - **Scale factor in X**, **Scale factor in Y**, **Scale factor in Z** define the the multipliers of axial dimensions.  If Scale Factor is negative, the object is mirrored through the Central Point. 
 

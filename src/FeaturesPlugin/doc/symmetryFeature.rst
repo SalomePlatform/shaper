@@ -42,7 +42,7 @@ Symmetry through a Point of symmetry
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Point**  defines a point of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 
@@ -78,7 +78,7 @@ Symmetry through an Axis of symmetry
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Axis**  defines an axis of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 
@@ -114,7 +114,7 @@ Symmetry through a Plane of symmetry
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Plane**  defines a plane of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 

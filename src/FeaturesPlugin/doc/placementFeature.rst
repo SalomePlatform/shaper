@@ -17,7 +17,7 @@ The following property panel will be opened:
 
 In this property panel, it is necessary to:
 
--  Select objects which will be moved;
+-  Select objects which will be moved; :ref:`transformation_subshapes`
 
 -  Select a face, edge or vertex as a start for moving;
 

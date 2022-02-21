@@ -44,7 +44,7 @@ Translation by axis and distance
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Axis**  defines a vector along which the object will be translated. The vector is an edge or axis selected in 3D OCC viewer or object browser;
 - **Distance** defines the distance along the **Vector of translation**.
 
@@ -80,7 +80,7 @@ Translation by vector
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **DX**, **DY**, **DZ**  define vector using coordinates along the axis.
 
 **TUI Command**:
@@ -117,7 +117,7 @@ Translation by two points
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Start point**  defines start vector point as point or vertex selected in 3D OCC viewer or object browser;
 - **End point**  defines end vector point as point or vertex selected in 3D OCC viewer or object browser;
   
@@ -142,4 +142,13 @@ The result of operation is a shifted initial shape.
    Translation by two points
 
 **See Also** a sample TUI Script of :ref:`tui_translation_2points` operation.
-  
+
+
+  .. _transformation_subshapes:
+
+Transformation of COMPSOLID subshapes is prohibited. Read more about transformation of COMPOUND subshapes.
+======================
+
+If you select one or more subshapes of COMPOUND as transformation **Main objects**, all other subshapes will be also included in result at their original locations.
+
+Transformation of COMPSOLID subshapes is prohibited, because we cannot guarantee the result still be a COMPSOLID after moving/duplicating some parts of it.

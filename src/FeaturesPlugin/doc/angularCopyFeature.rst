@@ -20,7 +20,7 @@ The following property panel appears.
 
 Input fields:
 
-- **Main objects** panel contains shapes to be rotated. The shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be rotated. The shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Vector of rotation**  defines the axis of rotation. The vector of rotation is an edge, axis selected in 3D OCC viewer or object browser;
 - **Angular Step** check-box turns on/off definition of the angle by which the object is rotated. By default (if the checkbox is not checked), **Angular Step** = 2 * PI / NbTimes;
 - **Nb. Copies** defines the number of rotated shape copies in the resulting compound. If **Nb. Copies** = 1, the result contains only the initial shape.

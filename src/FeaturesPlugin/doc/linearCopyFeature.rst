@@ -19,7 +19,7 @@ The following property panel appears.
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **First direction** defines translation in the first direction:
 
   - **Vector of translation**  defines vector along which the object will be translated. Vector is edge, axis selected in 3D OCC viewer or object browser;

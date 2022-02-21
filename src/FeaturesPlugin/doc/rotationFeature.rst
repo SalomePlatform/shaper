@@ -37,7 +37,7 @@ Rotation by axis and angle
 
 Input fields:
 
-- **Main objects** panel contains shapes to be rotated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be rotated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Axis** defines the axis of rotation. The vector is an edge or axis selected in 3D OCC viewer or object browser;
 - **Angle** defines the angle by which the object is rotated. 
 
@@ -73,7 +73,7 @@ Rotation by center and points
 
 Input fields:
 
-- **Main objects** panel contains shapes to be rotated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be rotated. Shapes are selected in 3D OCC viewer or object browser; :ref:`transformation_subshapes`
 - **Center point**, **Start point**, **End point** define 3 points or vertices selected in 3D OCC viewer or object browser. Rotation axis will pass through the **Center point** and will be orthogonal to a plane defined by three points. Rotation Angle is the angle between two vectors directed from the **Center point** to **Start point** and **End point**.  
 
 **TUI Command**:
