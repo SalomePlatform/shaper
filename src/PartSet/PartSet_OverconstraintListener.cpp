@@ -20,6 +20,10 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
 
+// Attention: keep the next include here,
+// otherwise it causes compilation errors at least on Debian 8
+#include <ModuleBase_Preferences.h>
+
 #include "PartSet_OverconstraintListener.h"
 #include <PartSet_Module.h>
 #include <PartSet_SketcherMgr.h>
@@ -37,6 +41,8 @@
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_ConstraintHorizontal.h"
 #include "SketchPlugin_ConstraintVertical.h"
+
+#include <SUIT_ResourceMgr.h>
 
 #include "Events_Loop.h"
 
@@ -62,6 +68,7 @@ PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorks
 
   aLoop->registerListener(this, ModelAPI_EventReentrantMessage::eventId());
   aLoop->registerListener(this, SketchPlugin_MacroArcReentrantMessage::eventId());
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_REMOVE_CONSTRAINTS));
 }
 
 void PartSet_OverconstraintListener::setActive(const bool& theActive)
@@ -225,7 +232,34 @@ void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_M
       }
     }
   }
+  else if (anEventID == Events_Loop::eventByName(EVENT_REMOVE_CONSTRAINTS)) {
+    std::shared_ptr<ModelAPI_CheckConstraintsMessage> aConstraintsMsg =
+      std::dynamic_pointer_cast<ModelAPI_CheckConstraintsMessage>(theMessage);
+    if (aConstraintsMsg.get()) {
+      myObjectsToRemove = aConstraintsMsg->constraints();
 
+      std::set<ObjectPtr>::const_iterator
+        anIt = myObjectsToRemove.begin(), aLast = myObjectsToRemove.end();
+
+      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+
+      for (; anIt != aLast; anIt++)
+      {
+        ObjectPtr anObject = *anIt;
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+        std::string aType = aFeature->getKind();
+        if ((aType == SketchPlugin_ConstraintHorizontal::ID() ||
+             aType == SketchPlugin_ConstraintVertical::ID()) &&
+             !aModule->sketchReentranceMgr()->isLastAutoConstraint(*anIt))
+          myObjectsToRemove.erase(*anIt);
+      }
+
+      if (myObjectsToRemove.empty())
+        return;
+
+      QTimer::singleShot(5, aModule, SLOT(onRemoveConflictingConstraints()));
+    }
+  }
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
   aCurrentInfoStr = getObjectsInfo(myConflictingObjects);
   qDebug(QString("RESULT: current objects count = %1:%2\n")
@@ -236,40 +270,43 @@ void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_M
 bool PartSet_OverconstraintListener::appendConflictingObjects(
                                                const std::set<ObjectPtr>& theConflictingObjects)
 {
-  std::set<ObjectPtr> aModifiedObjects;
+  bool isAllowToChange = ModuleBase_Preferences::resourceMgr()->booleanValue(SKETCH_TAB_NAME,
+                                        "allow_change_constraint");
+  if (isAllowToChange) {
+    std::set<ObjectPtr> aModifiedObjects;
 
-  // set error state for new objects and append them in the internal map of objects
-  std::set<ObjectPtr>::const_iterator
-    anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
-  FeaturePtr aFeature;
-  bool isHVConstraint = false;
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = *anIt;
-    if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
-      aModifiedObjects.insert(anObject);
-      myConflictingObjects.insert(anObject);
-    }
-    if (!isHVConstraint) {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-      if (aFeature) {
-        std::string aType = aFeature->getKind();
-        isHVConstraint = (aType == SketchPlugin_ConstraintHorizontal::ID()) ||
-          (aType == SketchPlugin_ConstraintVertical::ID());
+    // set error state for new objects and append them in the internal map of objects
+    std::set<ObjectPtr>::const_iterator
+      anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
+
+    int aCountOfSimilarConstraints = 0;
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr anObject = *anIt;
+      if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
+        aModifiedObjects.insert(anObject);
+        myConflictingObjects.insert(anObject);
       }
+      else
+        ++aCountOfSimilarConstraints;
     }
-  }
-  bool isUpdated = !aModifiedObjects.empty();
-  if (isUpdated)
-    redisplayObjects(aModifiedObjects);
 
-  // If the conflicting object is an automatic constraint caused the conflict
-  // then it has to be deleted
-  if (isHVConstraint) {
-    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-    QTimer::singleShot(5, aModule, SLOT(onConflictingConstraints()));
-  }
+    if (theConflictingObjects.size() == aCountOfSimilarConstraints)
+      return false;
 
-  return isUpdated;
+    std::shared_ptr<ModelAPI_CheckConstraintsMessage> aMessage =
+      std::shared_ptr<ModelAPI_CheckConstraintsMessage>(
+        new ModelAPI_CheckConstraintsMessage(
+          Events_Loop::eventByName(EVENT_CHECK_CONSTRAINTS)));
+    aMessage->setConstraints(theConflictingObjects);
+    Events_Loop::loop()->send(aMessage);
+
+    bool isUpdated = !aModifiedObjects.empty();
+    if (isUpdated)
+      redisplayObjects(aModifiedObjects);
+    return isUpdated;
+  }
+  else
+    return false;
 }
 
 bool PartSet_OverconstraintListener::repairConflictingObjects(

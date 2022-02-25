@@ -339,6 +339,11 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
                                    std::set<FeaturePtr>& theReferencesToDelete,
                                    const std::string& thePrefixInfo = "");
 
+/// Shows a message box about conflicting constraints.
+/// \param theParent a parent widget for the message box
+/// \param theWarningText text describing the cause of the conflict
+bool MODULEBASE_EXPORT warningAboutConflict(QWidget* theParent, const std::string& theWarningText);
+
 /// Converts a list of objects to set of corresponded features. If object is result, it is ignored
 /// because the feature only might be removed. But if result is in a parameter group, the feature
 /// of this parameter is to be removed

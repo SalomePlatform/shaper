@@ -69,6 +69,11 @@ public:
     return myConflictingObjects;
   }
 
+  const std::set<ObjectPtr>& objectsToRemove() const
+  {
+    return myObjectsToRemove;
+  }
+
   bool isFullyConstrained() const { return myIsFullyConstrained; }
 
 protected:
@@ -101,6 +106,7 @@ private:
   ModuleBase_IWorkshop* myWorkshop;
   bool myIsActive; /// state if sketch is active
   std::set<ObjectPtr> myConflictingObjects;
+  std::set<ObjectPtr> myObjectsToRemove;
   bool myIsFullyConstrained; /// state if Solver is fully constrained, DOF = 0
 };
 

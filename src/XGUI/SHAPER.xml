@@ -10,6 +10,11 @@
     <parameter name="part_visualization_study" value="0"/>
     <parameter name="part_visualization_script" value="1"/>
   </section>
+  <section name="Sketch">
+    <!-- Sketch preferences -->
+    <parameter name="allow_change_constraint" value="true"/>
+    <parameter name="notify_change_constraint" value="true"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
@@ -42,5 +47,4 @@
     <parameter name="winapplication"       value="C:\Program Files\Internet Explorer\iexplore.exe" />
     <parameter name="application"          value="/usr/bin/mozilla" />
   </section>
-
 </document>

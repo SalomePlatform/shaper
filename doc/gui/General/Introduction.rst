@@ -618,11 +618,16 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 
 - **Size** defines size of coordinate planes;
 - **Thickness**  defines thickness of coordinate plane borders;
-- **Rotate to plane when selected** check-box turns on/off automatic switch the viewer to the top view for the selected sketch plane.
+- **Rotate to plane when selected** check-box turns on/off automatic switch the viewer to the top view for the selected sketch plane;
 - **Angular tolerance** defines defines an angular tolerance for automatic creation of horizontal and vertical constraints;
 - **Default spline weight** defines default weight for B-spline nodes during creation. The default value can be changed by editing of the spline;
-- **Cursor for sketch operation** defines a cursor which indicates a launched sketcher sub-operation.
+- **Cursor for sketch operation** defines a cursor which indicates a launched sketcher sub-operation;
 - **Create sketch entities by dragging** defines a style of sketch etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects have to be defined by mouse press - mouse move - mouse release. Otherwise every point of an object has to be defined by mouse click;
+- **Allow automatic constraint substitution/remove** allows automatic resolving of conflicting constraints.
+  The following conflicts could be processed:
+    - Horizontal/Vertical automatic constraints (this last constraint will be removed);
+    - Pair of arcs connected smoothly, which centers are coincident (Tangency between arcs will be removed);
+- **Notify automatic constraint substitution/remove** defines a message box to be shown to the user, if the conflicting constraints situation is automatically resolved.
 
 .. _viewer_preferences:
 

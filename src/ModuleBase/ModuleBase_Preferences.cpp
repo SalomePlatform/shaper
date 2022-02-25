@@ -118,6 +118,7 @@ void ModuleBase_Preferences::createEditContent(ModuleBase_IPrefMgr* thePref, int
   thePref->prefMgr()->setItemIcon(thePage, QIcon(":pictures/module.png"));
   createGeneralTab(thePref, thePage);
   createCustomPage(thePref, thePage);
+  updateSketchTab(thePref, thePage);
 }
 
 void ModuleBase_Preferences::resetResourcePreferences(SUIT_PreferenceMgr* thePref)
@@ -208,6 +209,18 @@ void ModuleBase_Preferences::createGeneralTab(ModuleBase_IPrefMgr* thePref, int 
                                   "part_visualization_script");
   thePref->setItemProperty("strings", visuItemList, visuId);
   thePref->setItemProperty("indexes", visuIdList, visuId);
+}
+
+void ModuleBase_Preferences::updateSketchTab(ModuleBase_IPrefMgr* thePref, int thePageId)
+{
+  int sketchTab   = thePref->addPreference(QObject::tr("Sketch"), thePageId,
+                             SUIT_PreferenceMgr::Auto, QString(), QString());
+  int allowChange = thePref->addPreference(
+                           QObject::tr("Allow automatic constraint substitution/remove"),
+                           sketchTab, SUIT_PreferenceMgr::GroupBox,
+                           "Sketch", "allow_change_constraint");
+  thePref->addPreference(QObject::tr("Notify automatic constraint substitution/remove"),
+           allowChange, SUIT_PreferenceMgr::Bool, "Sketch", "notify_change_constraint");
 }
 
 void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId)

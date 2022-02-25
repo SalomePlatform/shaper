@@ -471,6 +471,26 @@ const ListOfShape& ModelAPI_ShapesFailedMessage::shapes() const
   return myShapes;
 }
 
+/// Creates an empty message
+ModelAPI_CheckConstraintsMessage::ModelAPI_CheckConstraintsMessage(const Events_ID theID, const void* theSender)
+  :Events_Message(theID, theSender)
+{
+}
+
+ModelAPI_CheckConstraintsMessage::~ModelAPI_CheckConstraintsMessage()
+{
+}
+
+const std::set<ObjectPtr>& ModelAPI_CheckConstraintsMessage::constraints() const
+{
+  return myConstraints;
+}
+
+void ModelAPI_CheckConstraintsMessage::setConstraints(const std::set<ObjectPtr>& theConstraints)
+{
+  myConstraints = theConstraints;
+}
+
 
 // =====   ModelAPI_FeaturesLicenseValidMessage   =====
 ModelAPI_FeaturesLicenseValidMessage::ModelAPI_FeaturesLicenseValidMessage(
