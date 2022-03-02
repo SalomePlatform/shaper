@@ -419,21 +419,25 @@ std::shared_ptr<GeomAPI_Solid> GeomAPI_Shape::solid() const
 }
 
 std::list<std::shared_ptr<GeomAPI_Shape> >
-GeomAPI_Shape::subShapes(ShapeType theSubShapeType) const
+GeomAPI_Shape::subShapes(const ShapeType theSubShapeType, const bool theOnlyUnique) const
 {
   ListOfShape aSubs;
   const TopoDS_Shape& aShape = impl<TopoDS_Shape>();
   if (aShape.IsNull())
     return aSubs;
 
+  TopTools_MapOfShape alreadyThere;
+
   // process multi-level compounds
   if (shapeType() == COMPOUND && theSubShapeType == COMPOUND) {
     for (TopoDS_Iterator anIt(aShape); anIt.More(); anIt.Next()) {
       const TopoDS_Shape& aCurrent = anIt.Value();
       if (aCurrent.ShapeType() == TopAbs_COMPOUND) {
-        GeomShapePtr aSub(new GeomAPI_Shape);
-        aSub->setImpl(new TopoDS_Shape(aCurrent));
-        aSubs.push_back(aSub);
+        if (!theOnlyUnique || alreadyThere.Add(aCurrent)) {
+          GeomShapePtr aSub(new GeomAPI_Shape);
+          aSub->setImpl(new TopoDS_Shape(aCurrent));
+          aSubs.push_back(aSub);
+        }
       }
     }
     // add self
@@ -444,9 +448,11 @@ GeomAPI_Shape::subShapes(ShapeType theSubShapeType) const
   else {
     for (TopExp_Explorer anExp(aShape, (TopAbs_ShapeEnum)theSubShapeType);
          anExp.More(); anExp.Next()) {
-      GeomShapePtr aSub(new GeomAPI_Shape);
-      aSub->setImpl(new TopoDS_Shape(anExp.Current()));
-      aSubs.push_back(aSub);
+      if (!theOnlyUnique || alreadyThere.Add(anExp.Current())) {
+        GeomShapePtr aSub(new GeomAPI_Shape);
+        aSub->setImpl(new TopoDS_Shape(anExp.Current()));
+        aSubs.push_back(aSub);
+      }
     }
   }
   return aSubs;

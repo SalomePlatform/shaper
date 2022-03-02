@@ -156,8 +156,12 @@ public:
   std::shared_ptr<GeomAPI_Solid> solid() const;
 
   /// Returns list of sub-shapes of the given type
+  /// \param theSubShapeType type of sub-shapes to search.
+  /// \param theOnlyUnique set it to \c true to omit subsequent
+  ///        inclusions of the same sub-shape. By default it is \c false.
   GEOMAPI_EXPORT
-  std::list<std::shared_ptr<GeomAPI_Shape> > subShapes(ShapeType theSubShapeType) const;
+  std::list< std::shared_ptr<GeomAPI_Shape> > subShapes(const ShapeType theSubShapeType,
+                                                        const bool theOnlyUnique = false) const;
 
   /// Returns the shape type
   GEOMAPI_EXPORT

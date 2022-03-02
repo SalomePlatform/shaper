@@ -23,6 +23,7 @@
 #include "ModelAPI_AttributeSelectionList.h"
 #include <Events_InfoMessage.h>
 
+#include "GeomAPI_Edge.h"
 
 void Model_FiltersFactory::registerFilter(const std::string& theID, ModelAPI_Filter* theFilter)
 {
@@ -110,6 +111,59 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature,
   }
   // all filters are passed
   return true;
+}
+
+std::list< std::pair<ResultPtr, GeomShapePtr> > Model_FiltersFactory::select
+(const FiltersFeaturePtr& theFilterFeature,
+ const GeomAPI_Shape::ShapeType theShapeType)
+{
+  std::list< std::pair<ResultPtr, GeomShapePtr> > aResList;
+
+  DocumentPtr aDoc = theFilterFeature->document();
+  int aNb = aDoc->size(ModelAPI_ResultBody::group());
+  ObjectPtr aObj;
+  ResultBodyPtr aBody;
+  for (int i = 0; i < aNb; i++) {
+    aObj = aDoc->object(ModelAPI_ResultBody::group(), i);
+    aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
+    GeomShapePtr aShape = aBody->shape();
+    std::list<GeomShapePtr> aSubShapes = aShape->subShapes(theShapeType, true);
+    std::list<GeomShapePtr>::const_iterator aShapesIt;
+    for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
+      GeomShapePtr aSubShape = (*aShapesIt);
+
+      // degenerated edge is not valid selection
+      if (theShapeType == GeomAPI_Shape::EDGE)
+        if (aSubShape->edge()->isDegenerated())
+          continue;
+
+      bool isValid = this->isValid(theFilterFeature, aBody, aSubShape);
+
+      if (isValid) {
+        // bos #24043: Naming on a compsolid works wrong.
+        // Find a simple sub-result for the ViewerPrs context:
+        ResultBodyPtr aContext = aBody;
+        bool isComposite = aContext->numberOfSubs() > 0;
+        while (isComposite) {
+          isComposite = false;
+          int nbSubs = aContext->numberOfSubs();
+          for (int aSubIndex = 0; aSubIndex < nbSubs; aSubIndex++) {
+            ResultBodyPtr aSubResult = aContext->subResult(aSubIndex);
+            GeomShapePtr aSubResultShape = aSubResult->shape();
+            if (aSubResultShape->isSubShape(aSubShape)) {
+              aContext = aSubResult;
+              isComposite = aContext->numberOfSubs() > 0;
+              break;
+            }
+          }
+        }
+        std::pair<ResultPtr, GeomShapePtr> aPair (aContext, aSubShape);
+        aResList.push_back(aPair);
+      }
+    }
+  }
+
+  return aResList;
 }
 
 /// Returns list of filters for the given shape type

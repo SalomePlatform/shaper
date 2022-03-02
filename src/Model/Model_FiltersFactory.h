@@ -47,6 +47,14 @@ public:
                        ResultPtr theResult,
                        GeomShapePtr theShape);
 
+  /// Returns list of all shapes and subshapes in the study, satisfying
+  ///         criteria of all filters of \a theFilterFeature.
+  /// \param theFiltersFeature feature that contains all information about the filters
+  /// \param theShapeType the type of sub-shapes to find
+  virtual std::list< std::pair<ResultPtr, GeomShapePtr> > select
+    (const FiltersFeaturePtr& theFilterFeature,
+     const GeomAPI_Shape::ShapeType theShapeType);
+
   /// Returns the filters that support the given shape type
   virtual std::list<FilterPtr> filters(GeomAPI_Shape::ShapeType theType);
 
