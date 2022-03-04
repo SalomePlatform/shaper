@@ -110,6 +110,7 @@ SET(TEST_NAMES
                TestRemoveSubShapes5.py
                TestRemoveSubShapes6.py
                TestPipe.py
+               TestPipe_DoNotMovePath.py
                TestPipe_Edge.py
                TestPipe_Wire.py
                TestPipe_Compound.py

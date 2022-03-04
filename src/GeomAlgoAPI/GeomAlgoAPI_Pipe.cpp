@@ -455,6 +455,8 @@ gp_Trsf getPathToBaseTranslation(const TopoDS_Shape& theBase, const TopoDS_Shape
           aPntPath = aStart;
         else if (aDeltaEnd < THE_THRESHOLD * aDeltaStart)
           aPntPath = anEnd;
+        else
+          aPntPath = aPntBase; // no translation
       }
     }
     aTranslation.SetTranslation(aPntPath, aPntBase);
