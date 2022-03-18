@@ -92,6 +92,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Defeaturing.h
     GeomAlgoAPI_BoundingBox.h
     GeomAlgoAPI_NormalToFace.h
+    GeomAlgoAPI_Tube.h
 )
 
 SET(PROJECT_SOURCES
@@ -163,6 +164,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Defeaturing.cpp
     GeomAlgoAPI_BoundingBox.cpp
     GeomAlgoAPI_NormalToFace.cpp
+    GeomAlgoAPI_Tube.cpp
 )
 
 SET(PROJECT_LIBRARIES

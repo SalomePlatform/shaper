@@ -41,6 +41,9 @@ Sphere_6 = model.addSphere(Part_1_doc, model.selection("VERTEX", "PartSet/Origin
 Sphere_7 = model.addSphere(Part_1_doc, 10)
 Sphere_7.setCenterPoint(Point_1)
 
+Sphere_8 = model.addSphere(Part_1_doc,10,40,0,180,0,180)
+Sphere_9 = model.addSphere(Part_1_doc,40,10,0,180,0,180)
+
 model.do()
 model.end()
 
@@ -71,6 +74,12 @@ model.testNbSubShapes(Sphere_7, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Sphere_7, GeomAPI_Shape.FACE, [1])
 model.testHaveNamingFaces(Sphere_7, model, Part_1_doc)
 
+model.testNbResults(Sphere_8, 1)
+model.testNbSubResults(Sphere_8, [0])
+model.testNbSubShapes(Sphere_8, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Sphere_8, GeomAPI_Shape.FACE, [4])
+model.testHaveNamingFaces(Sphere_8, model, Part_1_doc)
+
 model.testNbResults(Sphere_2, 0)
 assert(Sphere_2.feature().error() == "Sphere builder :: radius is negative or null.")
 
@@ -79,3 +88,6 @@ assert(Sphere_3.feature().error() == "Sphere builder :: radius is negative or nu
 
 model.testNbResults(Sphere_5, 0)
 assert(Sphere_5.feature().error() == "Attribute \"center_point\" is not initialized.")
+
+model.testNbResults(Sphere_9, 0)
+assert(Sphere_9.feature().error() == "Sphere builder :: RMin is larger than RMax.")

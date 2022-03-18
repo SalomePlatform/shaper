@@ -1,8 +1,8 @@
 
   .. _tui_create_cylinder:
 
-Create cylinder
-================
+Create Cylinder
+===============
 
 .. literalinclude:: examples/cylinder1.py
     :linenos:

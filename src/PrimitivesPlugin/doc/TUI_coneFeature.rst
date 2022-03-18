@@ -1,8 +1,8 @@
 
   .. _tui_create_cone:
 
-Create / Cone
-=============
+Create Cone
+===========
 
 .. literalinclude:: examples/cone.py
     :linenos:

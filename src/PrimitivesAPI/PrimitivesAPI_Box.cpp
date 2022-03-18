@@ -51,6 +51,29 @@ PrimitivesAPI_Box::PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& th
 }
 
 //==================================================================================================
+PrimitivesAPI_Box::PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                     const ModelHighAPI_Double& theOx,
+                                     const ModelHighAPI_Double& theOy,
+                                     const ModelHighAPI_Double& theOz,
+                                     const ModelHighAPI_Double& theHalfX,
+                                     const ModelHighAPI_Double& theHalfY,
+                                     const ModelHighAPI_Double& theHalfZ)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+  {
+    fillAttribute(PrimitivesPlugin_Box::CREATION_METHOD_BY_ONE_POINT_AND_DIMS(), creationMethod());
+    fillAttribute(theOx, ox());
+    fillAttribute(theOy, oy());
+    fillAttribute(theOz, oz());
+    fillAttribute(theHalfX, halfdx());
+    fillAttribute(theHalfY, halfdy());
+    fillAttribute(theHalfZ, halfdz());
+    execute();
+  }
+}
+
+//==================================================================================================
 PrimitivesAPI_Box::~PrimitivesAPI_Box()
 {
 
@@ -81,6 +104,30 @@ void PrimitivesAPI_Box::setPoints(const ModelHighAPI_Selection& theFirstPoint,
 }
 
 //==================================================================================================
+void PrimitivesAPI_Box::setOrigin(const ModelHighAPI_Double& theOx,
+                                  const ModelHighAPI_Double& theOy,
+                                  const ModelHighAPI_Double& theOz)
+{
+  fillAttribute(theOx, ox());
+  fillAttribute(theOy, oy());
+  fillAttribute(theOz, oz());
+
+  execute();
+}
+
+//==================================================================================================
+void PrimitivesAPI_Box::setHalfLengths(const ModelHighAPI_Double& theHalfLengthX,
+                                       const ModelHighAPI_Double& theHalfLengthY,
+                                       const ModelHighAPI_Double& theHalfLengthZ)
+{
+  fillAttribute(theHalfLengthX, halfdx());
+  fillAttribute(theHalfLengthY, halfdy());
+  fillAttribute(theHalfLengthZ, halfdz());
+
+  execute();
+}
+
+//==================================================================================================
 void PrimitivesAPI_Box::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -101,6 +148,16 @@ void PrimitivesAPI_Box::dump(ModelHighAPI_Dumper& theDumper) const
     AttributeSelectionPtr anAttrSecondPnt =
       aBase->selection(PrimitivesPlugin_Box::POINT_SECOND_ID());
     theDumper << ", " << anAttrFirstPnt << ", " << anAttrSecondPnt;
+  } else if (aCreationMethod == PrimitivesPlugin_Box::CREATION_METHOD_BY_ONE_POINT_AND_DIMS()) {
+    AttributeDoublePtr anAttrOx = aBase->real(PrimitivesPlugin_Box::OX_ID());
+    AttributeDoublePtr anAttrOy = aBase->real(PrimitivesPlugin_Box::OY_ID());
+    AttributeDoublePtr anAttrOz = aBase->real(PrimitivesPlugin_Box::OZ_ID());
+    AttributeDoublePtr anAttrHalfLengthX = aBase->real(PrimitivesPlugin_Box::HALF_DX_ID());
+    AttributeDoublePtr anAttrHalfLengthY = aBase->real(PrimitivesPlugin_Box::HALF_DY_ID());
+    AttributeDoublePtr anAttrHalfLengthZ = aBase->real(PrimitivesPlugin_Box::HALF_DZ_ID());
+    theDumper << ", " << anAttrOx << ", " << anAttrOy << ", " << anAttrOz;
+    theDumper << ", " << anAttrHalfLengthX << ", " << anAttrHalfLengthY;
+    theDumper << ", " << anAttrHalfLengthZ;
   }
 
   theDumper << ")" << std::endl;
@@ -123,4 +180,18 @@ BoxPtr addBox(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Box::ID());
   return BoxPtr(new PrimitivesAPI_Box(aFeature, theFirstPoint, theSecondPoint));
+}
+
+//==================================================================================================
+BoxPtr addBox(const std::shared_ptr<ModelAPI_Document>& thePart,
+              const ModelHighAPI_Double& theOx,
+              const ModelHighAPI_Double& theOy,
+              const ModelHighAPI_Double& theOz,
+              const ModelHighAPI_Double& theHalfLengthX,
+              const ModelHighAPI_Double& theHalfLengthY,
+              const ModelHighAPI_Double& theHalfLengthZ)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Box::ID());
+  return BoxPtr(new PrimitivesAPI_Box(aFeature, theOx, theOy, theOz, theHalfLengthX,
+                                      theHalfLengthY, theHalfLengthZ));
 }

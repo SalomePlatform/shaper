@@ -1,15 +1,65 @@
 <source>
-  <shape_selector id="center_point"
-                  label="Center point"
-                  icon="icons/Primitives/point.png"
-                  tooltip="Select a center point"
-                  shape_types="vertex">
-  </shape_selector>
-  <doublevalue id="radius"
-               label="Radius"
-               icon="icons/Primitives/radius.png"
-               tooltip="Enter a radius"
-               step="1."
-               default="10.">
-  </doublevalue>
+  <toolbox id="CreationMethod">
+    <box id="SphereByPointRadius" title="By point and radius" icon="icons/Primitives/sphere_32x32.png">
+      <shape_selector id="center_point"
+                      label="Center point"
+                      icon="icons/Primitives/point.png"
+                      tooltip="Select a center point"
+                      shape_types="vertex">
+      </shape_selector>
+      <doublevalue id="radius"
+                   label="Radius"
+                   icon="icons/Primitives/radius.png"
+                   tooltip="Enter a radius"
+                   step="1."
+                   default="10.">
+      </doublevalue>
+    </box>
+    <box id="SphereByDimensions" title="By dimensions" icon="icons/Primitives/sphere_part_32x32.png">
+      <groupbox title="Dimensions">
+        <doublevalue id="rmin"
+                     label="Rmin"
+                     step="1."
+                     default="0."
+                     tooltip="Enter the inner radius">
+        </doublevalue>
+        <doublevalue id="rmax"
+                     label="Rmax"
+                     step="1."
+                     default="10."
+                     tooltip="Enter the outer radius">
+        </doublevalue>
+      </groupbox>
+      <label title=""/>
+      <groupbox title="Phi/theta range">
+        <doublevalue id="phimin"
+                     label="Phi min"
+                     step="1."
+                     default="0."
+                     tooltip="Enter the azimuthal starting angle">
+        </doublevalue>
+        <doublevalue id="phimax"
+                     label="Phi max"
+                     step="1."
+                     default="360."
+                     max="360.0"
+                     tooltip="Enter the azimuthal revolution angle">
+        </doublevalue>
+        <doublevalue id="thetamin"
+                     label="Theta min"
+                     step="1."
+                     default="0."
+                     max="180.0"
+                     tooltip="Enter the polar starting angle">
+        </doublevalue>
+        <doublevalue id="thetamax"
+                     label="Theta max"
+                     step="1."
+                     default="180."
+                     max="180.0"
+                     tooltip="Enter the polar revolution angle">
+        </doublevalue>
+      </groupbox>
+    </box>
+  </toolbox>
 </source>

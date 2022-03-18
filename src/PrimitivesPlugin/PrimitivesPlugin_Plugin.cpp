@@ -24,6 +24,7 @@
 #include <PrimitivesPlugin_Cylinder.h>
 #include <PrimitivesPlugin_Sphere.h>
 #include <PrimitivesPlugin_Torus.h>
+#include <PrimitivesPlugin_Tube.h>
 
 #include <ModelAPI_Session.h>
 
@@ -52,6 +53,8 @@ FeaturePtr PrimitivesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new PrimitivesPlugin_Sphere);
   } else if (theFeatureID == PrimitivesPlugin_Torus::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Torus);
+  } else if (theFeatureID == PrimitivesPlugin_Tube::ID()) {
+    return FeaturePtr(new PrimitivesPlugin_Tube);
   }
   // feature of such kind is not found
   return FeaturePtr();

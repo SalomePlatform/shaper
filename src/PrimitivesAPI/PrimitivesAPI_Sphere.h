@@ -50,15 +50,39 @@ public:
                                 const ModelHighAPI_Selection& theCenterPoint,
                                 const ModelHighAPI_Double& theRadius);
 
+  /// Constructor with values.
+  PRIMITIVESAPI_EXPORT
+  explicit PrimitivesAPI_Sphere(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                const ModelHighAPI_Double& theRMin,
+                                const ModelHighAPI_Double& theRMax,
+                                const ModelHighAPI_Double& thePhiMin,
+                                const ModelHighAPI_Double& thePhiMax,
+                                const ModelHighAPI_Double& theThetaMin,
+                                const ModelHighAPI_Double& theThetaMax);
+
   /// Destructor.
   PRIMITIVESAPI_EXPORT
   virtual ~PrimitivesAPI_Sphere();
 
-  INTERFACE_2(PrimitivesPlugin_Sphere::ID(),
+  INTERFACE_9(PrimitivesPlugin_Sphere::ID(),
+             creationMethod, PrimitivesPlugin_Sphere::CREATION_METHOD(),
+             ModelAPI_AttributeString, /** Creation method */,
              centerPoint, PrimitivesPlugin_Sphere::CENTER_POINT_ID(),
              ModelAPI_AttributeSelection, /** Center point */,
              radius, PrimitivesPlugin_Sphere::RADIUS_ID(),
-             ModelAPI_AttributeDouble, /** Radius */)
+             ModelAPI_AttributeDouble, /** Radius */,
+             rmin, PrimitivesPlugin_Sphere::RMIN_ID(),
+             ModelAPI_AttributeDouble, /** The minimum radius*/,
+             rmax, PrimitivesPlugin_Sphere::RMAX_ID(),
+             ModelAPI_AttributeDouble, /** The maximum radius*/,
+             phimin, PrimitivesPlugin_Sphere::PHIMIN_ID(),
+             ModelAPI_AttributeDouble, /** The minimum phi*/,
+             phimax, PrimitivesPlugin_Sphere::PHIMAX_ID(),
+             ModelAPI_AttributeDouble, /** The maximum phi*/,
+             thetamin, PrimitivesPlugin_Sphere::THETAMIN_ID(),
+             ModelAPI_AttributeDouble, /** The minimum theta*/,
+             thetamax,PrimitivesPlugin_Sphere::THETAMAX_ID(),
+             ModelAPI_AttributeDouble, /** The maximum theta*/)
 
   /// Set center point
   PRIMITIVESAPI_EXPORT
@@ -67,6 +91,18 @@ public:
   /// Set radius
   PRIMITIVESAPI_EXPORT
   void setRadius(const ModelHighAPI_Double& theRadius);
+
+  /// Set minimum and maximum radius
+  PRIMITIVESAPI_EXPORT
+  void setRadius(const ModelHighAPI_Double& theRMin, const ModelHighAPI_Double& theRMax);
+
+  /// Set minimum and maximum phi
+  PRIMITIVESAPI_EXPORT
+  void setPhi(const ModelHighAPI_Double& thePhiMin, const ModelHighAPI_Double& thePhiMax);
+
+  /// Set minimum and maximum theta
+  PRIMITIVESAPI_EXPORT
+  void setTheta(const ModelHighAPI_Double& theThetaMin, const ModelHighAPI_Double& theThetaMax);
 
   /// Dump wrapped feature
   PRIMITIVESAPI_EXPORT
@@ -88,5 +124,16 @@ SpherePtr addSphere(const std::shared_ptr<ModelAPI_Document>& thePart,
 PRIMITIVESAPI_EXPORT
 SpherePtr addSphere(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const ModelHighAPI_Double& theRadius);
+
+/// \ingroup CPPHighAPI
+/// \brief Create primitive Sphere feature.
+PRIMITIVESAPI_EXPORT
+SpherePtr addSphere(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const ModelHighAPI_Double& theRMin,
+                    const ModelHighAPI_Double& theRMax,
+                    const ModelHighAPI_Double& thePhiMin,
+                    const ModelHighAPI_Double& thePhiMax,
+                    const ModelHighAPI_Double& theThetaMin,
+                    const ModelHighAPI_Double& theThetaMax);
 
 #endif // PRIMITIVESAPI_SPHERE_H_

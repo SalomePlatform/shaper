@@ -1,0 +1,26 @@
+<source>
+  <doublevalue
+    id="rmin"
+    label="rmin"
+    step="1."
+    default="3."
+    min = "0."
+    tooltip="Enter the inner radius">
+  </doublevalue>
+  <doublevalue
+    id="rmax"
+    label = "rmax"
+    step="1."
+    default="5."
+    min="0."
+    tooltip="Enter the outer radius">
+  </doublevalue>
+  <doublevalue
+    id="height"
+    label="height"
+    step="1."
+    default="12."
+    min="0."
+    tooltip="Enter the height">
+  </doublevalue>
+</source>

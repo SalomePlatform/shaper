@@ -40,5 +40,56 @@
         shape_types="vertex">
       </shape_selector>
     </box>
+    <box id="BoxByOnePointAndDims" title="By one point and dimensions" icon="icons/Primitives/box_pt_dxyz_32x32.png">
+      <groupbox title="Origin">
+        <doublevalue
+          id="ox"
+          label="OX"
+          step="1."
+          default="0."
+          tooltip="Enter the coordinate X for the center">
+        </doublevalue>
+        <doublevalue
+          id="oy"
+          label="OY"
+          step="1."
+          default="0."
+          tooltip="Enter the coordinate Y for the center">
+        </doublevalue>
+        <doublevalue
+          id="oz"
+          label="OZ"
+          step="1."
+          default="0."
+          tooltip="Enter the coordinate Z for the center">
+        </doublevalue>
+      </groupbox>
+      <groupbox title="Half-lengths">
+        <doublevalue
+          id="half_dx"
+          label="DX"
+          step="1."
+          default="20."
+          tooltip="Enter the half length in X">
+          <validator id="GeomValidators_Positive" parameters="0"/>
+        </doublevalue>
+        <doublevalue
+          id="half_dy"
+          label="DY"
+          step="1."
+          default="20."
+          tooltip="Enter the half length in Y">
+          <validator id="GeomValidators_Positive" parameters="0"/>
+        </doublevalue>
+        <doublevalue
+          id="half_dz"
+          label="DZ"
+          step="1."
+          default="20."
+          tooltip="Enter the half length in Z">
+          <validator id="GeomValidators_Positive" parameters="0"/>
+        </doublevalue>
+      </groupbox>
+    </box>
   </toolbox>
 </source>

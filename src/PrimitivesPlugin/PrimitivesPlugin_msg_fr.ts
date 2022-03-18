@@ -28,6 +28,10 @@
       <source>Torus</source>
       <translation>Tore</translation>
     </message>
+    <message>
+      <source>Tube</source>
+      <translation>Tube</translation>
+    </message>
   </context>
 
   <context>
@@ -50,6 +54,10 @@
     <message>
       <source>By two points</source>
       <translation>Par deux points</translation>
+    </message>
+    <message>
+      <source>By one point and dimensions</source>
+      <translation>Par un point et des dimensions</translation>
     </message>
   </context>
   <context>
@@ -119,6 +127,72 @@
     <message>
       <source>Dimension in Z</source>
       <translation>Dimension en Z</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:ox</name>
+    <message>
+      <source>OX</source>
+      <translation>OX</translation>
+    </message>
+    <message>
+      <source>Enter the coordinate X for the center</source>
+      <translation>Entrez la coodonnée en X du centre</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:oy</name>
+    <message>
+      <source>OY</source>
+      <translation>OY</translation>
+    </message>
+    <message>
+      <source>Enter the coordinate Y for the center</source>
+      <translation>Entrez la coodonnée en Y du centre</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:oz</name>
+    <message>
+      <source>OZ</source>
+      <translation>OZ</translation>
+    </message>
+    <message>
+      <source>Enter the coordinate Z for the center</source>
+      <translation>Entrez la coodonnée en Z du centre</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:half_dx</name>
+    <message>
+      <source>DX</source>
+      <translation>DX</translation>
+    </message>
+    <message>
+      <source>Enter the half length in X</source>
+      <translation>Entrez la demi-longueur en X</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:half_dy</name>
+    <message>
+      <source>DY</source>
+      <translation>DY</translation>
+    </message>
+    <message>
+      <source>Enter the half length in Y</source>
+      <translation>Entrez la demi-longueur en Y</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:half_dz</name>
+    <message>
+      <source>DZ</source>
+      <translation>DZ</translation>
+    </message>
+    <message>
+      <source>Enter the half length in Z</source>
+      <translation>Entrez la demi-longueur en Z</translation>
     </message>
   </context>
 
@@ -313,6 +387,25 @@
       <source>Sphere</source>
       <translation>Sphère</translation>
     </message>
+    <message>
+      <source>Dimensions</source>
+      <translation>Dimensions</translation>
+    </message>
+    <message>
+      <source>Phi/theta range</source>
+      <translation>Intervalles pour Phi/Theta</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:CreationMethod</name>
+    <message>
+      <source>By point and radius</source>
+      <translation>Par un centre et un rayon</translation>
+    </message>
+    <message>
+      <source>By dimensions</source>
+      <translation>Par dimensions</translation>
+    </message>
   </context>
   <context>
     <name>Sphere:center_point</name>
@@ -338,6 +431,72 @@
     <message>
       <source>Radius</source>
       <translation>Rayon</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:rmin</name>
+    <message>
+      <source>Enter the inner radius</source>
+      <translation>Entrez le rayon interne</translation>
+    </message>
+    <message>
+      <source>rmin</source>
+      <translation>Rmin</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:rmax</name>
+    <message>
+      <source>Enter the outer radius</source>
+      <translation>Entrez le rayon externe</translation>
+    </message>
+    <message>
+      <source>rmax</source>
+      <translation>Rmax</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:phimin</name>
+    <message>
+      <source>Enter the azimuthal starting angle</source>
+      <translation>Entrez l&apos;angle azimutal de départ</translation>
+    </message>
+    <message>
+      <source>phimin</source>
+      <translation>Phi min</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:phimax</name>
+    <message>
+      <source>Enter the azimuthal revolution angle</source>
+      <translation>Entrez l&apos;angle azimutal de révolution</translation>
+    </message>
+    <message>
+      <source>phimax</source>
+      <translation>Phi max</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:thetamin</name>
+    <message>
+      <source>Enter the polar starting angle</source>
+      <translation>Entrez l&apos;angle polaire de départ</translation>
+    </message>
+    <message>
+      <source>thetamin</source>
+      <translation>Theta min</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sphere:thetamax</name>
+    <message>
+      <source>Enter the polar revolution angle</source>
+      <translation>Entrez l&apos;angle polaire de révolution</translation>
+    </message>
+    <message>
+      <source>thetamax</source>
+      <translation>Theta max</translation>
     </message>
   </context>
 
@@ -402,6 +561,48 @@
     <message>
       <source>Ring radius</source>
       <translation>Rayon de l&apos;anneau</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Tube</name>
+    <message>
+      <source>Create a Tube
+      </source>
+      <translation>Créer un tube</translation>
+    </message>
+  </context>
+  <context>
+    <name>Tube:rmin</name>
+    <message>
+      <source>Enter the inner radius</source>
+      <translation>Entrez le rayon interne</translation>
+    </message>
+    <message>
+      <source>rmin</source>
+      <translation>rmin</translation>
+    </message>
+  </context>
+  <context>
+    <name>Tube:rmax</name>
+    <message>
+      <source>Enter the outer radius</source>
+      <translation>Entrez le rayon externe</translation>
+    </message>
+    <message>
+      <source>rmax</source>
+      <translation>rmax</translation>
+    </message>
+  </context>
+  <context>
+    <name>Tube:height</name>
+    <message>
+      <source>Enter the height</source>
+      <translation>Entrez la hauteur</translation>
+    </message>
+    <message>
+      <source>height</source>
+      <translation>height</translation>
     </message>
   </context>
 

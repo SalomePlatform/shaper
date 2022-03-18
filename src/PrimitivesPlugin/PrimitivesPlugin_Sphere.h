@@ -30,9 +30,10 @@
 
 /**\class PrimitivesPlugin_Sphere
  * \ingroup Plugins
- * \brief Feature for creation of a sphere.
+ * \brief Feature for creation of a sphere primitive using various methods.
  *
- * Creates a sphere from a radius and a center point defaulting to the origin
+ * It can be built via two methods : using a radius and a center point defaulting to the origin,
+ * or radii (inner and outer) and angle limits (theta and phi).
  */
 class PrimitivesPlugin_Sphere : public ModelAPI_Feature
 {
@@ -42,6 +43,27 @@ class PrimitivesPlugin_Sphere : public ModelAPI_Feature
   {
     static const std::string MY_SPHERE_ID("Sphere");
     return MY_SPHERE_ID;
+  }
+
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD_BY_PT_RADIUS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("SphereByPointRadius");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("SphereByDimensions");
+    return MY_CREATION_METHOD_ID;
   }
 
   /// Attribute name of the base point
@@ -56,6 +78,48 @@ class PrimitivesPlugin_Sphere : public ModelAPI_Feature
   {
     static const std::string MY_RADIUS_ID("radius");
     return MY_RADIUS_ID;
+  }
+
+  /// attribute name of the inner radius
+  inline static const std::string& RMIN_ID()
+  {
+    static const std::string MY_RMIN_ID("rmin");
+    return MY_RMIN_ID;
+  }
+
+  /// attribute name of the outer radius
+  inline static const std::string& RMAX_ID()
+  {
+    static const std::string MY_RMAX_ID("rmax");
+    return MY_RMAX_ID;
+  }
+
+  /// attribute name of the lower phi limit
+  inline static const std::string& PHIMIN_ID()
+  {
+    static const std::string MY_PHIMIN_ID("phimin");
+    return MY_PHIMIN_ID;
+  }
+
+  /// attribute name of the higher phi limit
+  inline static const std::string& PHIMAX_ID()
+  {
+    static const std::string MY_PHIMAX_ID("phimax");
+    return MY_PHIMAX_ID;
+  }
+
+  /// attribute name of the lower theta limit
+  inline static const std::string& THETAMIN_ID()
+  {
+    static const std::string MY_THETAMIN_ID("thetamin");
+    return MY_THETAMIN_ID;
+  }
+
+  /// attribute name of the higher theta limit
+  inline static const std::string& THETAMAX_ID()
+  {
+    static const std::string MY_THETAMAX_ID("thetamax");
+    return MY_THETAMAX_ID;
   }
 
   /// Returns the kind of a feature
@@ -78,6 +142,13 @@ class PrimitivesPlugin_Sphere : public ModelAPI_Feature
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(std::shared_ptr<GeomAlgoAPI_Sphere> theSphereAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultSphere);
+
+  /// Perform the creation of the sphere using a point and a radius
+  void createSphereByPtRadius();
+
+  /// Perform the creation of the sphere using radii (inner and outer) and angle limits
+  /// (theta and phi)
+  void createShereByDimensions();
 
 };
 
