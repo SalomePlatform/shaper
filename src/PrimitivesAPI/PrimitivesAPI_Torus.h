@@ -36,7 +36,7 @@ class ModelHighAPI_Selection;
 
 /// \class PrimitivesAPI_Torus
 /// \ingroup CPPHighAPI
-/// \brief Interface for primitive Cone feature.
+/// \brief Interface for primitive Torus feature.
 class PrimitivesAPI_Torus: public ModelHighAPI_Interface
 {
 public:
@@ -76,11 +76,11 @@ public:
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
-/// Pointer on primitive Cone object
+/// Pointer on primitive Torus object
 typedef std::shared_ptr<PrimitivesAPI_Torus> TorusPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Cone feature.
+/// \brief Create primitive Torus feature.
 PRIMITIVESAPI_EXPORT
 TorusPtr addTorus(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Selection& theBasePoint,
@@ -89,7 +89,7 @@ TorusPtr addTorus(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Double& theRingRadius);
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Cone feature.
+/// \brief Create primitive Torus feature.
 PRIMITIVESAPI_EXPORT
 TorusPtr addTorus(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Double& theRadius,

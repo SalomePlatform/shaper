@@ -53,11 +53,21 @@ public:
                              const ModelHighAPI_Selection& theFirstPoint,
                              const ModelHighAPI_Selection& theSecondPoint);
 
+  /// Constructor with values.
+  PRIMITIVESAPI_EXPORT
+  explicit PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                             const ModelHighAPI_Double& theOx,
+                             const ModelHighAPI_Double& theOy,
+                             const ModelHighAPI_Double& theOz,
+                             const ModelHighAPI_Double& theHalfX,
+                             const ModelHighAPI_Double& theHalfY,
+                             const ModelHighAPI_Double& theHalfZ);
+
   /// Destructor.
   PRIMITIVESAPI_EXPORT
   virtual ~PrimitivesAPI_Box();
 
-  INTERFACE_6(PrimitivesPlugin_Box::ID(),
+  INTERFACE_12(PrimitivesPlugin_Box::ID(),
              creationMethod, PrimitivesPlugin_Box::CREATION_METHOD(),
              ModelAPI_AttributeString, /** Creation method */,
              dx, PrimitivesPlugin_Box::DX_ID(),
@@ -69,7 +79,19 @@ public:
              firstPoint, PrimitivesPlugin_Box::POINT_FIRST_ID(),
              ModelAPI_AttributeSelection, /** First point */,
              secondPoint, PrimitivesPlugin_Box::POINT_SECOND_ID(),
-             ModelAPI_AttributeSelection, /** Second point */)
+             ModelAPI_AttributeSelection, /** Second point */,
+             ox, PrimitivesPlugin_Box::OX_ID(),
+             ModelAPI_AttributeDouble, /** X coordinate for origin*/,
+             oy, PrimitivesPlugin_Box::OY_ID(),
+             ModelAPI_AttributeDouble, /** Y coordinate for origin*/,
+             oz, PrimitivesPlugin_Box::OZ_ID(),
+             ModelAPI_AttributeDouble, /** Z coordinate for origin*/,
+             halfdx, PrimitivesPlugin_Box::HALF_DX_ID(),
+             ModelAPI_AttributeDouble, /** Half length in X*/,
+             halfdy, PrimitivesPlugin_Box::HALF_DY_ID(),
+             ModelAPI_AttributeDouble, /** Half length in Y*/,
+             halfdz, PrimitivesPlugin_Box::HALF_DZ_ID(),
+             ModelAPI_AttributeDouble, /** Half length in Z*/)
 
   /// Set dimensions
   PRIMITIVESAPI_EXPORT
@@ -81,6 +103,18 @@ public:
   PRIMITIVESAPI_EXPORT
   void setPoints(const ModelHighAPI_Selection& theFirstPoint,
                  const ModelHighAPI_Selection& theSecondPoint);
+
+  /// Set origin point
+  PRIMITIVESAPI_EXPORT
+  void setOrigin(const ModelHighAPI_Double& theOx,
+                 const ModelHighAPI_Double& theOy,
+                 const ModelHighAPI_Double& theOz);
+
+  /// Set half lengths
+  PRIMITIVESAPI_EXPORT
+  void setHalfLengths(const ModelHighAPI_Double& theHalfLengthX,
+                      const ModelHighAPI_Double& theHalfLengthY,
+                      const ModelHighAPI_Double& theHalfLengthZ);
 
   /// Dump wrapped feature
   PRIMITIVESAPI_EXPORT
@@ -104,5 +138,16 @@ PRIMITIVESAPI_EXPORT
 BoxPtr addBox(const std::shared_ptr<ModelAPI_Document>& thePart,
               const ModelHighAPI_Selection& theFirstPoint,
               const ModelHighAPI_Selection& theSecondPoint);
+
+/// \ingroup CPPHighAPI
+/// \brief Create primitive Box feature.
+PRIMITIVESAPI_EXPORT
+BoxPtr addBox(const std::shared_ptr<ModelAPI_Document>& thePart,
+              const ModelHighAPI_Double& theOx,
+              const ModelHighAPI_Double& theOy,
+              const ModelHighAPI_Double& theOz,
+              const ModelHighAPI_Double& theHalfLengthX,
+              const ModelHighAPI_Double& theHalfLengthY,
+              const ModelHighAPI_Double& theHalfLengthZ);
 
 #endif // PRIMITIVESAPI_BOX_H_

@@ -43,6 +43,7 @@
 %shared_ptr(PrimitivesAPI_Cylinder)
 %shared_ptr(PrimitivesAPI_Sphere)
 %shared_ptr(PrimitivesAPI_Torus)
+%shared_ptr(PrimitivesAPI_Tube)
 
 // all supported interfaces
 %include "PrimitivesAPI_Box.h"
@@ -50,3 +51,4 @@
 %include "PrimitivesAPI_Cylinder.h"
 %include "PrimitivesAPI_Sphere.h"
 %include "PrimitivesAPI_Torus.h"
+%include "PrimitivesAPI_Tube.h"

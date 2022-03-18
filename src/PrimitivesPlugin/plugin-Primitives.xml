@@ -30,5 +30,11 @@
         <source path="cone_widget.xml"/>
       </feature>
     </group>
+    <group id="Primitives">
+      <feature id="Tube" title="Tube" tooltip="Create a Tube" icon="icons/Primitives/tube.png"
+               helpfile="tubeFeature.html">
+        <source path="tube_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
 </plugin>

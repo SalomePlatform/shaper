@@ -28,5 +28,6 @@
   #include "PrimitivesAPI_Cylinder.h"
   #include "PrimitivesAPI_Sphere.h"
   #include "PrimitivesAPI_Torus.h"
+  #include "PrimitivesAPI_Tube.h"
 
 #endif // PRIMITIVESAPI_SWIG_H_

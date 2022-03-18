@@ -31,8 +31,9 @@ class ModelAPI_ResultBody;
  * \ingroup Plugins
  * \brief Feature for creation of a box primitive using various methods.
  *
- * Box creates a cuboid - Parallelepiped with 6 rectangular faces. It can be built via two
- * methods : using two points that define a diagonal, or using 3 lengths that define the 
+ * Box creates a cuboid - Parallelepiped with 6 rectangular faces. It can be built via three
+ * methods : using two points that define a diagonal, a point that define a center and 3 lengths
+ * that define the half-lengths on X, Y and Z-axes, or using 3 lengths that define the 
  * rectangular dimensions.
  */
 class PrimitivesPlugin_Box : public ModelAPI_Feature
@@ -63,6 +64,13 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
   inline static const std::string& CREATION_METHOD_BY_TWO_POINTS()
   {
     static const std::string MY_CREATION_METHOD_ID("BoxByTwoPoints");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD_BY_ONE_POINT_AND_DIMS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("BoxByOnePointAndDims");
     return MY_CREATION_METHOD_ID;
   }
 
@@ -101,6 +109,48 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
     return MY_DZ_ID;
   }
 
+  /// Attribute name of the first coordinate of the center
+  inline static const std::string& OX_ID()
+  {
+    static const std::string MY_OX_ID("ox");
+    return MY_OX_ID;
+  }
+
+  /// Attribute name of the second coordinate of the center
+  inline static const std::string& OY_ID()
+  {
+    static const std::string MY_OY_ID("oy");
+    return MY_OY_ID;
+  }
+
+  /// Attribute name of the third coordinate of the center
+  inline static const std::string& OZ_ID()
+  {
+    static const std::string MY_OZ_ID("oz");
+    return MY_OZ_ID;
+  }
+
+  /// Attribute name of the half-length on X axis
+  inline static const std::string& HALF_DX_ID()
+  {
+    static const std::string MY_HALF_DX_ID("half_dx");
+    return MY_HALF_DX_ID;
+  }
+
+  /// Attribute name of the half-length on Y axis
+  inline static const std::string& HALF_DY_ID()
+  {
+    static const std::string MY_HALF_DY_ID("half_dy");
+    return MY_HALF_DY_ID;
+  }
+
+  /// Attribute name of the half-length on Z axis
+  inline static const std::string& HALF_DZ_ID()
+  {
+    static const std::string MY_HALF_DZ_ID("half_dz");
+    return MY_HALF_DZ_ID;
+  }
+
   /// Returns the kind of a feature
   PRIMITIVESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -127,6 +177,9 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
 
   ///Perform the creation of the box using three cordinates
   void createBoxByDimensions();
+
+  ///Perform the creation of the box using a center and three half-lenths
+  void createBoxByOnePointAndDims();
 
 };
 

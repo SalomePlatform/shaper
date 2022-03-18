@@ -1,7 +1,7 @@
 
   .. _tui_create_cylportion:
 
-Create portion of cylinder
+Create Portion of cylinder
 ==========================
 
 .. literalinclude:: examples/cylinder2.py

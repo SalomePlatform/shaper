@@ -34,6 +34,7 @@ GeomAlgoAPI_Box::GeomAlgoAPI_Box(const double theDx, const double theDy, const d
   myDy = theDy;
   myDz = theDz;
   myMethodType = MethodType::BOX_DIM;
+  headError = "Box builder with dimensions";
 }
 
 //=================================================================================================
@@ -43,33 +44,48 @@ GeomAlgoAPI_Box::GeomAlgoAPI_Box(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
   myFirstPoint = theFirstPoint;
   mySecondPoint = theSecondPoint;
   myMethodType = MethodType::BOX_POINTS;
+  headError = "Box builder with two points";
+}
+
+//=================================================================================================
+GeomAlgoAPI_Box::GeomAlgoAPI_Box(const double theOx, const double theOy, const double theOz,
+                                 const double theDx, const double theDy, const double theDz)
+{
+  myOx = theOx;
+  myOy = theOy;
+  myOz = theOz;
+  myDx = theDx;
+  myDy = theDy;
+  myDz = theDz;
+  myMethodType = MethodType::BOX_POINT_DIMS;
+  headError = "Box builder with coordinates and dimensions";
 }
 
 //=================================================================================================
 bool GeomAlgoAPI_Box::check()
 {
-  if (myMethodType == MethodType::BOX_DIM) {
+  if (myMethodType == MethodType::BOX_DIM || myMethodType == MethodType::BOX_POINT_DIMS) {
     if (myDx < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dx is null or negative.";
+      myError = headError + " :: Dx is null or negative.";
       return false;
     } else if (myDy < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dy is null or negative.";
+      myError = headError + " :: Dy is null or negative.";
       return false;
     } else if (myDz < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dz is null or negative.";
+      myError = headError + " :: Dz is null or negative.";
       return false;
     }
   } else if (myMethodType == MethodType::BOX_POINTS) {
     if (!myFirstPoint.get()) {
-      myError = "Box builder with points :: the first point is not valid.";
+      myError = headError + " :: the first point is not valid.";
       return false;
     }
     if (!mySecondPoint.get()) {
-      myError = "Box builder with points :: the second point is not valid.";
+      myError = headError + " :: the second point is not valid.";
       return false;
     }
     if (myFirstPoint->distance(mySecondPoint) < Precision::Confusion()) {
-      myError = "Box builder with points :: the distance between the two points is null.";
+      myError = headError + " :: the distance between the two points is null.";
       return false;
     }
     double aDiffX = myFirstPoint->x() - mySecondPoint->x();
@@ -79,7 +95,7 @@ bool GeomAlgoAPI_Box::check()
         fabs(aDiffY)  < Precision::Confusion() ||
         fabs(aDiffZ)  < Precision::Confusion()) {
       myError =
-        "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.";
+        headError + " :: the points belong both to one of the OXY, OYZ or OZX planes.";
       return false;
     }
   } else {
@@ -96,6 +112,8 @@ void GeomAlgoAPI_Box::build()
     buildWithDimensions();
   } else if (myMethodType == MethodType::BOX_POINTS) {
     buildWithPoints();
+  } else if (myMethodType == MethodType::BOX_POINT_DIMS) {
+    buildWithPointAndDims();
   } else {
     myError = "Box builder :: Method not implemented.";
     return;
@@ -113,7 +131,7 @@ void GeomAlgoAPI_Box::buildWithDimensions()
 
   // Test the algorithm
   if (!aBoxMaker->IsDone()) {
-    myError = "Box builder with dimensions  :: algorithm failed.";
+    myError = headError + " :: algorithm failed.";
     return;
   }
 
@@ -124,7 +142,7 @@ void GeomAlgoAPI_Box::buildWithDimensions()
 
   // Test on the shapes
   if (!aShape.get() || aShape->isNull()) {
-    myError = "Box builder with dimensions  :: resulting shape is null.";
+    myError = headError + " :: resulting shape is null.";
     return;
   }
 
@@ -147,7 +165,7 @@ void GeomAlgoAPI_Box::buildWithPoints()
 
   // Test the algorithm
   if(!aBoxMaker->IsDone()) {
-    myError = "Box builder with two points  :: algorithm failed.";
+    myError = headError + " :: algorithm failed.";
     return;
   }
 
@@ -159,13 +177,25 @@ void GeomAlgoAPI_Box::buildWithPoints()
 
   // Tests on the shape
   if (!aShape.get() || aShape->isNull()) {
-    myError = "Box builder with two points  :: resulting shape is null.";
+    myError = headError + " :: resulting shape is null.";
     return;
   }
 
   setImpl(aBoxMaker);
 
   setDone(true);
+}
+
+//=================================================================================================
+void GeomAlgoAPI_Box::buildWithPointAndDims()
+{
+  // Construct points from cordinates and dimensions to use the method with two points
+  myFirstPoint =
+    std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(myOx - myDx, myOy - myDy, myOz - myDz));
+  mySecondPoint =
+    std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(myOx + myDx, myOy + myDy, myOz + myDz));
+
+  buildWithPoints();
 }
 
 //=================================================================================================

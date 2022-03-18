@@ -26,6 +26,7 @@ SET(PROJECT_HEADERS
   PrimitivesAPI_Cylinder.h
   PrimitivesAPI_Sphere.h
   PrimitivesAPI_Torus.h
+  PrimitivesAPI_Tube.h
 )
 
 SET(PROJECT_SOURCES
@@ -34,6 +35,7 @@ SET(PROJECT_SOURCES
   PrimitivesAPI_Cylinder.cpp
   PrimitivesAPI_Sphere.cpp
   PrimitivesAPI_Torus.cpp
+  PrimitivesAPI_Tube.cpp
 )
 
 SET(PROJECT_LIBRARIES

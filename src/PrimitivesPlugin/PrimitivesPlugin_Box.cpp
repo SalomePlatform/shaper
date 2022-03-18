@@ -40,14 +40,24 @@ void PrimitivesPlugin_Box::initAttributes()
 {
   data()->addAttribute(PrimitivesPlugin_Box::CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
+  // Data for the first mode
   data()->addAttribute(PrimitivesPlugin_Box::DX_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::DY_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::DZ_ID(), ModelAPI_AttributeDouble::typeId());
 
+  // Data for the second mode
   data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND_ID(),
                        ModelAPI_AttributeSelection::typeId());
+
+  // Data for the third mode
+  data()->addAttribute(PrimitivesPlugin_Box::OX_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::OY_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::OZ_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::HALF_DX_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::HALF_DY_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::HALF_DZ_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 //=================================================================================================
@@ -61,6 +71,9 @@ void PrimitivesPlugin_Box::execute()
 
   if (aMethodType == CREATION_METHOD_BY_TWO_POINTS())
     createBoxByTwoPoints();
+
+  if (aMethodType == CREATION_METHOD_BY_ONE_POINT_AND_DIMS())
+    createBoxByOnePointAndDims();
 }
 
 //=================================================================================================
@@ -137,6 +150,50 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
     return;
   }
   if(!aBoxAlgo->checkValid("Box builder with two points")) {
+    // The error is not displayed in a popup window. It must be in the message console.
+    setError(aBoxAlgo->getError());
+    return;
+  }
+
+  int aResultIndex = 0;
+  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex);
+  loadNamingDS(aBoxAlgo, aResultBox);
+  setResult(aResultBox, aResultIndex);
+}
+
+//=================================================================================================
+void PrimitivesPlugin_Box::createBoxByOnePointAndDims()
+{
+  // Getting dx, dy and dz
+  double aDx = real(PrimitivesPlugin_Box::HALF_DX_ID())->value();
+  double aDy = real(PrimitivesPlugin_Box::HALF_DY_ID())->value();
+  double aDz = real(PrimitivesPlugin_Box::HALF_DZ_ID())->value();
+
+  // Getting point coordinates
+  double x = real(PrimitivesPlugin_Box::OX_ID())->value();
+  double y = real(PrimitivesPlugin_Box::OY_ID())->value();
+  double z = real(PrimitivesPlugin_Box::OZ_ID())->value();
+
+  std::shared_ptr<GeomAlgoAPI_Box> aBoxAlgo;
+  aBoxAlgo = std::shared_ptr<GeomAlgoAPI_Box>(new GeomAlgoAPI_Box(x,y,z,aDx,aDy,aDz));
+
+  // These checks should be made to the GUI for the feature but
+  // the corresponding validator does not exist yet.
+  if (!aBoxAlgo->check()) {
+    setError(aBoxAlgo->getError());
+    return;
+  }
+
+  // Build the box
+  aBoxAlgo->build();
+
+  // Check if the creation of the box
+  if(!aBoxAlgo->isDone()) {
+    // The error is not displayed in a popup window. It must be in the message console.
+    setError(aBoxAlgo->getError());
+    return;
+  }
+  if(!aBoxAlgo->checkValid("Box builder with one point and dimensions")) {
     // The error is not displayed in a popup window. It must be in the message console.
     setError(aBoxAlgo->getError());
     return;

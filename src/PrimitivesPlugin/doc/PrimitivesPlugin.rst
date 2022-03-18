@@ -15,3 +15,4 @@ The Primitives plug-in contains features for creation of geometrical primitives.
    cylinderFeature.rst
    sphereFeature.rst
    torusFeature.rst
+   tubeFeature.rst

@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
     PrimitivesPlugin_Cylinder.h
     PrimitivesPlugin_Sphere.h
     PrimitivesPlugin_Torus.h
+    PrimitivesPlugin_Tube.h
 )
 
 SET(PROJECT_SOURCES
@@ -34,6 +35,7 @@ SET(PROJECT_SOURCES
     PrimitivesPlugin_Cylinder.cpp
     PrimitivesPlugin_Sphere.cpp
     PrimitivesPlugin_Torus.cpp
+    PrimitivesPlugin_Tube.cpp
 )
 
 SET(XML_RESOURCES
@@ -43,6 +45,7 @@ SET(XML_RESOURCES
   cylinder_widget.xml
   sphere_widget.xml
   torus_widget.xml
+  tube_widget.xml
 )
 
 SET(TEXT_RESOURCES

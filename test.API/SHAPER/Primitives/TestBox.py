@@ -84,6 +84,7 @@ Box_15 = model.addBox(Part_1_doc, model.selection("VERTEX", "Sketch_1/SketchLine
 Box_16 = model.addBox(Part_1_doc, model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]"), model.selection("VERTEX", "[Extrusion_2_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_2_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_2_1/To_Face]"))
 Box_17 = model.addBox(Part_1_doc, model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
 Box_18 = model.addBox(Part_1_doc, "dx", "dy", "dz")
+Box_19 = model.addBox(Part_1_doc, 0, 0, 0, 20, 20 ,20)
 model.do()
 model.end()
 
@@ -126,6 +127,12 @@ model.testNbSubShapes(Box_18, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Box_18, GeomAPI_Shape.FACE, [6])
 model.testHaveNamingFaces(Box_18, model, Part_1_doc)
 
+model.testNbResults(Box_19, 1)
+model.testNbSubResults(Box_19, [0])
+model.testNbSubShapes(Box_19, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_19, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_19, model, Part_1_doc)
+
 model.testNbResults(Box_2, 0)
 assert(Box_2.feature().error() == "Box builder with dimensions :: Dx is null or negative.")
 
@@ -145,16 +152,16 @@ model.testNbResults(Box_7, 0)
 assert(Box_7.feature().error() == "Box builder with dimensions :: Dz is null or negative.")
 
 model.testNbResults(Box_9, 0)
-assert(Box_9.feature().error() == "Box builder with points :: the distance between the two points is null.")
+assert(Box_9.feature().error() == "Box builder with two points :: the distance between the two points is null.")
 
 model.testNbResults(Box_10, 0)
-assert(Box_10.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+assert(Box_10.feature().error() == "Box builder with two points :: the points belong both to one of the OXY, OYZ or OZX planes.")
 
 model.testNbResults(Box_11, 0)
-assert(Box_11.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+assert(Box_11.feature().error() == "Box builder with two points :: the points belong both to one of the OXY, OYZ or OZX planes.")
 
 model.testNbResults(Box_12, 0)
-assert(Box_12.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+assert(Box_12.feature().error() == "Box builder with two points :: the points belong both to one of the OXY, OYZ or OZX planes.")
 
 model.testNbResults(Box_13, 0)
 assert(Box_13.feature().error() == "Attribute \"FirstPoint\" is not initialized.")

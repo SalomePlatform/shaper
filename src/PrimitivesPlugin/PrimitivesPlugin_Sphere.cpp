@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        PrimitivesPlugin_Sphere.h
+// File:        PrimitivesPlugin_Sphere.cpp
 // Created:     15 Mar 2017
 // Author:      Clarisse Genrault (CEA)
 
@@ -29,6 +29,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
@@ -43,6 +44,10 @@ PrimitivesPlugin_Sphere::PrimitivesPlugin_Sphere()
 //=================================================================================================
 void PrimitivesPlugin_Sphere::initAttributes()
 {
+  data()->addAttribute(PrimitivesPlugin_Sphere::CREATION_METHOD(),
+                       ModelAPI_AttributeString::typeId());
+
+  // data for the first mode : by a point and a radius
   data()->addAttribute(PrimitivesPlugin_Sphere::CENTER_POINT_ID(),
                        ModelAPI_AttributeSelection::typeId());
 
@@ -60,10 +65,32 @@ void PrimitivesPlugin_Sphere::initAttributes()
       aCenterPoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());
     }
   }
+
+  // data for the second mode : by dimensions
+  data()->addAttribute(PrimitivesPlugin_Sphere::RMIN_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Sphere::RMAX_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Sphere::PHIMIN_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Sphere::PHIMAX_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Sphere::THETAMIN_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Sphere::THETAMAX_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 //=================================================================================================
 void PrimitivesPlugin_Sphere::execute()
+{
+  AttributeStringPtr aMethodTypeAttr = string(PrimitivesPlugin_Sphere::CREATION_METHOD());
+  std::string aMethodType = aMethodTypeAttr->value();
+
+  if (aMethodType == CREATION_METHOD_BY_PT_RADIUS())
+    createSphereByPtRadius();
+
+  if (aMethodType == CREATION_METHOD_BY_DIMENSIONS())
+    createShereByDimensions();
+}
+
+
+//=================================================================================================
+void PrimitivesPlugin_Sphere::createSphereByPtRadius()
 {
   // Getting point.
   std::shared_ptr<GeomAPI_Pnt> aCenterPoint;
@@ -95,12 +122,54 @@ void PrimitivesPlugin_Sphere::execute()
   // Build the sphere
   aSphereAlgo->build();
 
-  // Check if the creation of the cylinder
+  // Check if the creation of the sphere is OK
   if(!aSphereAlgo->isDone()) {
     setError(aSphereAlgo->getError());
     return;
   }
   if(!aSphereAlgo->checkValid("Sphere builder")) {
+    setError(aSphereAlgo->getError());
+    return;
+  }
+
+  int aResultIndex = 0;
+  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex);
+  loadNamingDS(aSphereAlgo, aResultBox);
+  setResult(aResultBox, aResultIndex);
+}
+
+//=================================================================================================
+void PrimitivesPlugin_Sphere::createShereByDimensions()
+{
+  // Getting rmin, rmax, phimin, phimax, thetamin et thetamax
+  double aRMin = real(PrimitivesPlugin_Sphere::RMIN_ID())->value();
+  double aRMax = real(PrimitivesPlugin_Sphere::RMAX_ID())->value();
+  double aPhiMin = real(PrimitivesPlugin_Sphere::PHIMIN_ID())->value();
+  double aPhiMax = real(PrimitivesPlugin_Sphere::PHIMAX_ID())->value();
+  double aThetaMin = real(PrimitivesPlugin_Sphere::THETAMIN_ID())->value();
+  double aThetaMax = real(PrimitivesPlugin_Sphere::THETAMAX_ID())->value();
+
+  std::shared_ptr<GeomAlgoAPI_Sphere> aSphereAlgo = std::shared_ptr<GeomAlgoAPI_Sphere>(
+      new GeomAlgoAPI_Sphere(aRMin, aRMax, aPhiMin, aPhiMax, aThetaMin, aThetaMax));
+
+  // These checks should be made to the GUI for the feature but
+  // the corresponding validator does not exist yet.
+  if (!aSphereAlgo->check()) {
+    setError(aSphereAlgo->getError());
+    return;
+  }
+
+  // Build the sphere
+  aSphereAlgo->build();
+
+  // Check if the creation of the sphere is OK
+  if(!aSphereAlgo->isDone()) {
+    // The error is not displayed in a popup window. It must be in the message console.
+    setError(aSphereAlgo->getError());
+    return;
+  }
+  if(!aSphereAlgo->checkValid("Sphere Builder")) {
+    // The error is not displayed in a popup window. It must be in the message console.
     setError(aSphereAlgo->getError());
     return;
   }
