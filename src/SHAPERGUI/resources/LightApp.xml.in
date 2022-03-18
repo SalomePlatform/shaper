@@ -32,6 +32,7 @@
     <!-- Sketch preferences -->
     <parameter name="allow_change_constraint" value="true"/>
     <parameter name="notify_change_constraint" value="true"/>
+    <parameter name="operation_cursor" value="1"/>
   </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
