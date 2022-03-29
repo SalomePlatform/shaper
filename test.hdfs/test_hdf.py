@@ -33,7 +33,7 @@ class TestHDF(unittest.TestCase):
 
   def setUp(self):
     salome.standalone()
-    salome.salome_init(self.testfile, embedded=1)
+    salome.salome_init(self.testfile, embedded=1, forced=True)
     myStudyName = salome.myStudy._get_Name()
     self.session = salome.naming_service.Resolve('/Kernel/Session')
     self.session.emitMessage("connect_to_study")
@@ -83,4 +83,3 @@ if __name__ == "__main__":
   #qtsalome.qApp.closeAllWindows()
   import signal
   os.kill(os.getpid(),signal.SIGKILL)
-  
