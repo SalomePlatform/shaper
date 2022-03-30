@@ -33,6 +33,10 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 const QString ModuleBase_Preferences::VIEWER_SECTION = "Viewer";
 const QString ModuleBase_Preferences::MENU_SECTION = "Menu";
 const QString ModuleBase_Preferences::GENERAL_SECTION = "General";

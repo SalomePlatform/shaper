@@ -95,7 +95,7 @@ bool readUnits(STEPControl_Reader& aReader,
   else {
     //cout<<"need re-scale a model"<<endl;
     // set UnitFlag to 'meter'
-    Interface_Static::SetCVal("xstep.cascade.unit","M");
+    Interface_Static::SetCVal("xstep.cascade.unit", "M");
   }
   return true;
 }
@@ -103,7 +103,7 @@ bool readUnits(STEPControl_Reader& aReader,
 
 //==================================================================================================
 std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
-                                          const std::string& theFormatName,
+                                          const std::string& /*theFormatName*/,
                                           const bool theScalInterUnits,
                                           std::string& theError)
 {
@@ -116,7 +116,7 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
   STEPControl_Reader aReader;
 
   //VSR: 16/09/09: Convert to METERS
-  Interface_Static::SetCVal("xstep.cascade.unit","M");
+  Interface_Static::SetCVal("xstep.cascade.unit", "M");
   Interface_Static::SetIVal("read.step.ideas", 1);
   Interface_Static::SetIVal("read.step.nonmanifold", 1);
 
@@ -131,7 +131,7 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
 
     if (status == IFSelect_RetDone) {
       // Regard or not the model units
-      if( !readUnits(aReader,theScalInterUnits,theError)) {
+      if( !readUnits(aReader, theScalInterUnits, theError)) {
         std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
         aGeomShape->setImpl(new TopoDS_Shape());
         return aGeomShape;
@@ -188,7 +188,7 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
         aResShape = compound;
 
       // Check if any BRep entity has been read, there must be at least a vertex
-      if ( !TopExp_Explorer( aResShape, TopAbs_VERTEX ).More() )
+      if (!TopExp_Explorer(aResShape, TopAbs_VERTEX).More())
       {
         theError = "No geometrical data in the imported file.";
         std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
@@ -215,7 +215,7 @@ GeomShapePtr STEPImportAttributs(const std::string& theFileName,
                                  std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                  const bool theScalInterUnits,
                                  const bool theMaterials,
-                                 const bool theColor,
+                                 const bool /*theColor*/,
                                  std::map< std::wstring,
                                  std::list<std::wstring>>& theMaterialShape,
                                  std::string& theError)
@@ -225,7 +225,7 @@ GeomShapePtr STEPImportAttributs(const std::string& theFileName,
     STEPControl_Reader aReader;
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
 
-    Interface_Static::SetCVal("xstep.cascade.unit","M");
+    Interface_Static::SetCVal("xstep.cascade.unit", "M");
     Interface_Static::SetIVal("read.step.ideas", 1);
     Interface_Static::SetIVal("read.step.nonmanifold", 1);
 
@@ -236,7 +236,7 @@ GeomShapePtr STEPImportAttributs(const std::string& theFileName,
 
       if (status == IFSelect_RetDone) {
         // Regard or not the model units
-        if( !readUnits(aReader,theScalInterUnits,theError)) {
+        if( !readUnits(aReader, theScalInterUnits, theError)) {
           aGeomShape->setImpl(new TopoDS_Shape());
           return aGeomShape;
         }
@@ -254,7 +254,6 @@ GeomShapePtr STEPImportAttributs(const std::string& theFileName,
 
     if (aCafreader.ReadFile(theFileName.c_str()) != IFSelect_RetDone) {
       theError = "Wrong format of the imported file. Can't import file.";
-      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl(new TopoDS_Shape());
       return aGeomShape;
     }
@@ -264,8 +263,8 @@ GeomShapePtr STEPImportAttributs(const std::string& theFileName,
                           theMaterials,
                           theMaterialShape,
                           theError);
-  } catch (OSD_Exception& e) {
+  } catch (OSD_Exception&) {
     //Try to load STEP file without colors...
-    return STEPImport(theFileName,"",theScalInterUnits,theError);
+    return STEPImport(theFileName, "", theScalInterUnits, theError);
   }
 }

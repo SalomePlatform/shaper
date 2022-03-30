@@ -56,6 +56,10 @@
 
 #include <set>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 #define DEBUG_DELIVERY
 
 XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)

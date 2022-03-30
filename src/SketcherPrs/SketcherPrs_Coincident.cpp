@@ -38,7 +38,6 @@
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Prs3d_PointAspect.hxx>
-#include <Prs3d_Root.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Selection.hxx>
 #include <Select3D_SensitivePoint.hxx>
@@ -153,7 +152,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA->SetScale(2. * aRatio);
   aPtA->SetColor(aExternalColor);
 
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
+  Handle(Graphic3d_Group) aGroup = thePresentation->CurrentGroup();
   aGroup->SetPrimitivesAspect(aPtA);
   Handle(Graphic3d_ArrayOfPoints) aPntArray = new Graphic3d_ArrayOfPoints(1);
   aPntArray->AddVertex (myPoint.X(), myPoint.Y(), myPoint.Z());

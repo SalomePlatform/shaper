@@ -24,8 +24,6 @@
 #include <SketchPlugin_Constraint.h>
 
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Prs3d_Root.hxx>
-
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Parallel, SketcherPrs_SymbolPrs);
@@ -78,7 +76,7 @@ bool SketcherPrs_Parallel::updateIfReadyToDisplay(double theStep, bool withColor
 void SketcherPrs_Parallel::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
+  Handle(Graphic3d_Group) aGroup = thePrs->CurrentGroup();
 
   Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);

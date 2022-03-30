@@ -120,7 +120,7 @@ std::shared_ptr<GeomAPI_Shape> readAttributes(STEPCAFControl_Reader &theReader,
 
 //=============================================================================
 std::shared_ptr<GeomAPI_Shape> setgeom(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
-                                       const TDF_Label &theLabel,
+                                       const TDF_Label& /*theLabel*/,
                                        std::string& theError)
 {
   BRep_Builder aB;
@@ -164,7 +164,6 @@ std::shared_ptr<GeomAPI_Shape> setgeom(const Handle(XCAFDoc_ShapeTool) &theShape
     // Check if any BRep entity has been read, there must be at least a vertex
     if (!TopExp_Explorer( aShape, TopAbs_VERTEX ).More()) {
       theError = "No geometrical data in the imported file.";
-      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl(new TopoDS_Shape());
       return aGeomShape;
     }
@@ -302,7 +301,7 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
                     const Handle(Standard_Transient)        &theEnti,
                     const TopTools_IndexedMapOfShape        &theIndices,
                     const Handle(Transfer_TransientProcess) &theTP,
-                    const TDF_Label                         &theShapeLabel,
+                    const TDF_Label                         &/*theShapeLabel*/,
                     std::map< std::wstring, std::list<std::wstring>> &theMaterialShape )
 {
   // Treat Product Definition Shape only.

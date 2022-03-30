@@ -39,9 +39,12 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_Tools.h>
 
-
 #include <QAction>
 #include <QMainWindow>
+
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
 
 #ifdef _DEBUG
 #include <iostream>

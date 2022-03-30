@@ -146,9 +146,10 @@ The result of operation is a shifted initial shape.
 
   .. _transformation_subshapes:
 
-Transformation of COMPSOLID subshapes is prohibited. Read more about transformation of COMPOUND subshapes.
-======================
+Transformation of COMPSOLID subshapes is prohibited.
+===========
 
-If you select one or more subshapes of COMPOUND as transformation **Main objects**, all other subshapes will be also included in result at their original locations.
+If you select one or more subshapes of COMPOUND as transformation (translation or other operation that changes the shape position or orientation) **Main objects**,
+all other subshapes will be also included in result at their original locations.
 
 Transformation of COMPSOLID subshapes is prohibited, because we cannot guarantee the result still be a COMPSOLID after moving/duplicating some parts of it.

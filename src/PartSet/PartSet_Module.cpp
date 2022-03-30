@@ -1144,10 +1144,9 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   Handle(V3d_Viewer) aV3dViewer = aContext->CurrentViewer();
   Handle(V3d_View) aView;
   double aScale = 0;
-  for (aV3dViewer->InitDefinedViews();
-       aV3dViewer->MoreDefinedViews();
-       aV3dViewer->NextDefinedViews()) {
-    Handle(V3d_View) aV = aV3dViewer->DefinedView();
+  V3d_ListOfView::Iterator aDefinedViews(aV3dViewer->DefinedViews());
+  for (; aDefinedViews.More(); aDefinedViews.Next()) {
+    Handle(V3d_View) aV = aDefinedViews.Value();
     double aS = aV->Scale();
     if (aS > aScale) {
       aScale = aS;
@@ -1810,11 +1809,11 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     {
       if (!aPart.get() && aObj->groupName() == ModelAPI_ResultParameter::group())
       {
-        QObjectPtrList aObjects = aWorkshop->objectBrowser()->selectedObjects();
+        QObjectPtrList aSelectedObjects = aWorkshop->objectBrowser()->selectedObjects();
         FeaturePtr aFeature;
         ResultParameterPtr aParam;
-        foreach(ObjectPtr aObj, aObjects) {
-          aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObj);
+        foreach(ObjectPtr aSelected, aSelectedObjects) {
+          aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aSelected);
           if (aParam.get())
             break;
         }

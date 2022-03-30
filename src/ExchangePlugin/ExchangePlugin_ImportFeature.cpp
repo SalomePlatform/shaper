@@ -341,10 +341,10 @@ void ExchangePlugin_ImportFeature::setMaterielGroup(
         if (aRes->get() && ((*aRes)->data()->name() == (*aResMat)))
         {
           if (aShape->isCompound() || aShape->isCompSolid()) {
-            GeomAPI_ShapeIterator anIt(aShape);
-            for (; anIt.more(); anIt.next()) {
-              aSelectionList->setSelectionType(anIt.current()->shapeTypeStr());
-              aSelectionList->append(theResultBody,anIt.current());
+            GeomAPI_ShapeIterator aShapeIt(aShape);
+            for (; aShapeIt.more(); aShapeIt.next()) {
+              aSelectionList->setSelectionType(aShapeIt.current()->shapeTypeStr());
+              aSelectionList->append(theResultBody, aShapeIt.current());
             }
           } else {
             aSelectionList->setSelectionType(aShape->shapeTypeStr());

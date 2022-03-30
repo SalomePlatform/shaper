@@ -37,7 +37,6 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopExp_Explorer.hxx>
-#include <Prs3d_Root.hxx>
 #include <Graphic3d_Text.hxx>
 
 
@@ -217,7 +216,7 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     QStringList aValues = strings();
     AttributeSelectionListPtr aSelList =
       aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
-    Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
+    Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
     for (int i = 0; i < aSelList->size(); i++) {
       AttributeSelectionPtr aSelection = aSelList->value(i);
       GeomShapePtr aShapePtr = aSelection->value();

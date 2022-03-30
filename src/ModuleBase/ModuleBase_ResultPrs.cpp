@@ -444,7 +444,7 @@ bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selectio
     /// visualizes it in Ring style) OCCT version is 7.0.0 with path for SHAPER module.
     Handle(StdSelect_BRepOwner) aOwner = new StdSelect_BRepOwner(aShape, aPriority, Standard_True);
     StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
-                                                  aDeflection, myDrawer->HLRAngle(), 9, 500);
+                                                  aDeflection, myDrawer->DeviationAngle(), 9, 500);
 
 
     NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> anEntities = aSelection->Entities();

@@ -57,6 +57,10 @@
 #include <QCheckBox>
 #include <QDir>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 FeaturePtr ModuleBase_WidgetSelectionFilter::SelectorFeature;
 std::string ModuleBase_WidgetSelectionFilter::AttributeId;
 

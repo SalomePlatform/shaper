@@ -69,6 +69,10 @@
 #include <QMessageBox>
 #include <QMainWindow>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 #define DEBUG_UNDO_INVALID_SKETCH
 
 

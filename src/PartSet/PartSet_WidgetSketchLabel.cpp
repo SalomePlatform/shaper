@@ -80,6 +80,10 @@
 #include <QDialog>
 #include <QTimer>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308
 #endif

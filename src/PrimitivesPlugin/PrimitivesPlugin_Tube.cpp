@@ -66,7 +66,6 @@ void PrimitivesPlugin_Tube::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Tube> theTu
   theTubeAlgo->prepareNamingFaces();
 
   // Insert to faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theTubeAlgo->getCreatedFaces();
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();

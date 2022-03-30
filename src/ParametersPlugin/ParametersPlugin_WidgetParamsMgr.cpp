@@ -56,6 +56,10 @@
 #include <QShortcut>
 #include <QFileDialog>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 enum ColumnType {
   Col_Name,
   Col_Equation,

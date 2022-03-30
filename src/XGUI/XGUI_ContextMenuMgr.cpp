@@ -66,6 +66,10 @@
 #include <QMainWindow>
 #include <QModelIndex>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent),

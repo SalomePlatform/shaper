@@ -50,10 +50,8 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetSelector.h>
 
-#ifdef HAVE_SALOME
 #include <SUIT_Application.h>
 #include <SUIT_Session.h>
-#endif
 
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_Displayer.h"
@@ -75,6 +73,10 @@
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
+#endif
+
+#ifdef WIN32
+#pragma warning(disable : 4189) // for declaration of unused variables (MAYBE_UNUSED)
 #endif
 
 //#define DEBUG_FEATURE_CREATED
@@ -397,9 +399,13 @@ void XGUI_WorkshopListener::
 void XGUI_WorkshopListener::
   onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
-  SUIT_Application * app = SUIT_Session::session()->activeApplication();
-
-  QVariant aVar = app->property("IsLoadedScript");
+  bool isLoadedScript = false;
+  SUIT_Session* aSession = SUIT_Session::session();
+  if (aSession)
+  {
+    QVariant aVar = aSession->activeApplication()->property("IsLoadedScript");
+    isLoadedScript = !aVar.isNull() && aVar.toBool();
+  }
 
   std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -415,7 +421,7 @@ void XGUI_WorkshopListener::
 
   //bool aHasPart = false;
   bool aDisplayed = false;
-  if (aVar.isNull() || !aVar.toBool()) {
+  if (!isLoadedScript) {
     for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
       ObjectPtr anObject = *aIt;
 

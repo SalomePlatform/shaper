@@ -56,6 +56,10 @@
 #include <inspector/VInspectorAPI_CallBack.hxx>
 #endif
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 #define OPTIMIZATION_LEVEL 50
 
 

@@ -54,10 +54,10 @@
 #include <ModelAPI_Folder.h>
 
 #include <ModelGeomAlgo_Point2D.h>
+#include <SUIT_ResourceMgr.h>
 
 #ifdef HAVE_SALOME
 #include <SUIT_Application.h>
-#include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 #endif
 

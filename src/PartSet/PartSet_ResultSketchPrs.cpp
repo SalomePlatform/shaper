@@ -232,7 +232,7 @@ void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Select
                                       theShape,
                                       theTypeOfSelection,
                                       aDeflection,
-                                      myDrawer->HLRAngle(),
+                                      myDrawer->DeviationAngle(),
                                       myDrawer->IsAutoTriangulation());
   } catch ( Standard_Failure ) {
   }

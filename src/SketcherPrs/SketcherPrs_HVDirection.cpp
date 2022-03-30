@@ -24,7 +24,6 @@
 #include <SketchPlugin_Constraint.h>
 
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Prs3d_Root.hxx>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
@@ -67,7 +66,7 @@ bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep, bool withCo
 void SketcherPrs_HVDirection::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                         Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
+  Handle(Graphic3d_Group) aGroup = thePrs->CurrentGroup();
 
   // Draw constrained object
   Handle(Graphic3d_AspectLine3d) aLineAspect =

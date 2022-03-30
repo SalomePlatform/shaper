@@ -44,6 +44,10 @@
 #include <XGUI_SelectionActivate.h>
 #include <XGUI_SelectionMgr.h>
 
+#ifdef WIN32
+#pragma warning(disable : 4456) // for nested foreach
+#endif
+
 PartSet_ExternalPointsMgr::PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWorkshop,
                                                      const CompositeFeaturePtr& theSketch)
   : QObject(theWorkshop), myWorkshop(theWorkshop), mySketch(theSketch)

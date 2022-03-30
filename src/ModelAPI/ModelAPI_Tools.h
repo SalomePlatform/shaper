@@ -51,7 +51,7 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(
  */
 MODELAPI_EXPORT std::string getFeatureError(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
-MODELAPI_EXPORT struct ResultBaseAlgo {
+struct ResultBaseAlgo {
   std::shared_ptr<ModelAPI_ResultBody> resultBody;
   std::shared_ptr<GeomAPI_Shape> baseShape;
   std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape;

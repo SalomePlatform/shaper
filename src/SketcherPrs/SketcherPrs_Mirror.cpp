@@ -24,9 +24,7 @@
 #include <SketchPlugin_Constraint.h>
 
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_LineAspect.hxx>
-
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Mirror, SketcherPrs_SymbolPrs);
@@ -134,7 +132,7 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   if (aNb != anAttrC->size())
     return;
 
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
+  Handle(Graphic3d_Group) aGroup = thePrs->CurrentGroup();
 
   // drawListOfShapes uses myDrawer for attributes definition
   Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);

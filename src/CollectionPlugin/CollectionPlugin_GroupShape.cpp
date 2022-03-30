@@ -35,9 +35,8 @@ void CollectionPlugin_GroupShape::execute()
     /// unique shape, remove compound on type
 
     TopoDS_Iterator anIt(aShape);
-    TopoDS_Shape aShape = anIt.Value();
     std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-    aRes->setImpl(new TopoDS_Shape(aShape));
+    aRes->setImpl(new TopoDS_Shape(anIt.Value()));
     aGroup->store(GeomShapePtr());
     aGroup->store(aRes);
     aCompound = aGroup->shape();

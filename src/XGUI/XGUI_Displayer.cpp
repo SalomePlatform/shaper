@@ -1194,11 +1194,7 @@ GeomPlanePtr XGUI_Displayer::getScreenPlane() const
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     Handle(V3d_Viewer) aViewer = aContext->CurrentViewer();
-    Handle(V3d_View) aView;
-    for (aViewer->InitActiveViews(); aViewer->MoreActiveViews(); aViewer->NextActiveViews()) {
-      aView = aViewer->ActiveView();
-      break;
-    }
+    Handle(V3d_View) aView = aViewer->ActiveViews().First();
     if (!aView.IsNull()) {
       double aEyeX, aEyeY, aEyeZ;
       aView->Eye(aEyeX, aEyeY, aEyeZ);
@@ -1220,11 +1216,7 @@ double XGUI_Displayer::getViewScale() const
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     Handle(V3d_Viewer) aViewer = aContext->CurrentViewer();
-    Handle(V3d_View) aView;
-    for (aViewer->InitActiveViews(); aViewer->MoreActiveViews(); aViewer->NextActiveViews()) {
-      aView = aViewer->ActiveView();
-      break;
-    }
+    Handle(V3d_View) aView = aViewer->ActiveViews().First();
     return aView->Camera()->Scale();
   }
   return 1;

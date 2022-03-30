@@ -41,7 +41,7 @@ void Model_AttributeImage::setTexture(const int theWidth,
   if (theWidth > 0 && theHeight > 0 && theByteArray.size() > 0) { // set new data
     // Find or create attributes
     Handle_TDataStd_ByteArray aByteArray =
-      TDataStd_ByteArray::Set(myLab, 0, theByteArray.size() - 1);
+      TDataStd_ByteArray::Set(myLab, 0, int(theByteArray.size()) - 1);
     Handle_TDataStd_IntegerArray aDimensions =
       TDataStd_IntegerArray::Set(myLab, 0, 1);
     Handle_TDataStd_Comment aFormat = TDataStd_Comment::Set(myLab, theFormat.c_str());
@@ -52,7 +52,7 @@ void Model_AttributeImage::setTexture(const int theWidth,
 
     // Texture
     Handle(TColStd_HArray1OfByte) aNewArray =
-      new TColStd_HArray1OfByte(0, theByteArray.size() - 1);
+      new TColStd_HArray1OfByte(0, int(theByteArray.size()) - 1);
     std::list<unsigned char>::const_iterator itBA = theByteArray.begin();
     for (int j = 0; itBA != theByteArray.end(); ++itBA, ++j) {
       aNewArray->SetValue(j, (Standard_Byte)(*itBA));

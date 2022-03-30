@@ -56,6 +56,10 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#ifdef WIN32
+#pragma warning(disable : 4189) // for skipping MAYBE_UNUSED on Win
+#endif
+
 static const int LayoutMargin = 3;
 
 //********************************************************************

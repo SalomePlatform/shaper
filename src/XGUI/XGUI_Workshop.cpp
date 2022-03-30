@@ -172,6 +172,8 @@ static Handle(VInspector_CallBack) MyVCallBack;
 
 #ifdef WIN32
 #include <windows.h>
+#pragma warning(disable : 4456) // for nested foreach
+#pragma warning(disable : 4189) // for declaration of unused variables (MAYBE_UNUSED)
 #else
 #include <dlfcn.h>
 #endif

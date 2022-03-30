@@ -55,7 +55,7 @@ void FeaturesPlugin_NormalToFace::initAttributes()
 }
 
 //=================================================================================================
-void FeaturesPlugin_NormalToFace::attributeChanged(const std::string& theID)
+void FeaturesPlugin_NormalToFace::attributeChanged(const std::string& /*theID*/)
 {
 }
 

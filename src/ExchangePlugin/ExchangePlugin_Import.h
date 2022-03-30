@@ -85,7 +85,7 @@ class ExchangePlugin_ImportBase : public ModelAPI_Feature
                                          AttributeIntegerPtr& aTargetAttr);
 };
 
-EXCHANGEPLUGIN_EXPORT class ExchangePlugin_Import : public ExchangePlugin_ImportBase
+class ExchangePlugin_Import : public ExchangePlugin_ImportBase
 {
  public:
   /// Feature kind
@@ -158,7 +158,7 @@ EXCHANGEPLUGIN_EXPORT class ExchangePlugin_Import : public ExchangePlugin_Import
 
 };
 
-EXCHANGEPLUGIN_EXPORT class ExchangePlugin_Import_Image : public ExchangePlugin_ImportBase
+class ExchangePlugin_Import_Image : public ExchangePlugin_ImportBase
 {
  public:
   /// Feature kind

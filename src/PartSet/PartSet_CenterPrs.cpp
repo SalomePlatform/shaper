@@ -27,7 +27,6 @@
 #include <Geom_CartesianPoint.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
-#include <Prs3d_Root.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <AIS_InteractiveContext.hxx>
 
@@ -59,7 +58,7 @@ void PartSet_CenterPrs::drawPoint(const Handle(Prs3d_Presentation)& thePrs,
   PtA->SetColor(theColor);
 
   Handle(Geom_Point) aPnt = Component();
-  Handle(Graphic3d_Group) TheGroup = Prs3d_Root::CurrentGroup(thePrs);
+  Handle(Graphic3d_Group) TheGroup = thePrs->CurrentGroup();
   TheGroup->SetPrimitivesAspect(PtA);
 
   Handle(Graphic3d_ArrayOfPoints) aPoint = new Graphic3d_ArrayOfPoints (1);
