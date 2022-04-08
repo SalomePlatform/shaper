@@ -33,6 +33,7 @@
 
 #include <Events_Message.h>
 #include <Events_InfoMessage.h>
+#include <Events_MessageBool.h>
 
 #include <memory>
 
@@ -40,14 +41,17 @@
 static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE =
     new InitializationPlugin_Plugin();
 
-InitializationPlugin_Plugin::InitializationPlugin_Plugin()
+InitializationPlugin_Plugin::InitializationPlugin_Plugin() :
+  myCreatePartOnStart(false) // by default in TUI mode part is not created on start of PartSet
 {
   char* isUnitTest = getenv("SHAPER_UNIT_TEST_IN_PROGRESS");
   myInitDataModel = (!isUnitTest || isUnitTest[0] != '1');
 
   Events_Loop* aLoop = Events_Loop::loop();
-  const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
+  static const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
   aLoop->registerListener(this, kDocCreatedEvent, NULL, true);
+  static const Events_ID kCreatePartEvent = Events_Loop::eventByName(EVENT_CREATE_PART_ON_START);
+  aLoop->registerListener(this, kCreatePartEvent, NULL, true);
 
   myEvalListener =
     std::shared_ptr<InitializationPlugin_EvalListener>(new InitializationPlugin_EvalListener());
@@ -55,7 +59,8 @@ InitializationPlugin_Plugin::InitializationPlugin_Plugin()
 
 void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
+  static const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
+  static const Events_ID kCreatePartEvent = Events_Loop::eventByName(EVENT_CREATE_PART_ON_START);
   if (theMessage->eventID() == kDocCreatedEvent) {
     std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::dynamic_pointer_cast<
         ModelAPI_DocumentCreatedMessage>(theMessage);
@@ -63,13 +68,15 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
 
     /// Issue 431: for the current moment create planes only in the module document,
     /// Later if it is needed we may create special initial planes in Parts (may be different)
-    if (aDoc != ModelAPI_Session::get()->moduleDocument())
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aDoc != aMgr->moduleDocument() || aMgr->isLoading())
       return;
 
     if (myInitDataModel)
       myEvalListener->initDataModel();
 
     std::list<FeaturePtr> aFeatures;
+    aMgr->startOperation("Initialization");
 
     // the viewer update should be blocked in order to avoid the features blinking before they are
     // hidden
@@ -85,6 +92,8 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     aFeatures.push_back(createPlane(aDoc, 1., 0., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., -1., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., 0., 1.));
+    if (myCreatePartOnStart)
+      createPart(aDoc);
     // for PartSet it is done outside of the transaction, so explicitly flush this creation
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 
@@ -100,12 +109,20 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
       }
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-    // the viewer update should be unblocked in order to avoid the features blinking before they are
-    // hidden
+
+    aMgr->finishOperation(); // before last message flush to update the title, make it not-modified
+    aMgr->clearUndoRedo(); // to forbid undo of auxiliary elements and initial part
+
+    // the viewer update should be unblocked to avoid the features blinking before they are hidden
     aMsg = std::shared_ptr<Events_Message>(
                   new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
 
     Events_Loop::loop()->send(aMsg);
+  }
+  else if (theMessage->eventID() == kCreatePartEvent)
+  {
+    std::shared_ptr<Events_MessageBool> aMsg = std::dynamic_pointer_cast<Events_MessageBool>(theMessage);
+    myCreatePartOnStart = aMsg->value();
   }
 }
 
@@ -188,4 +205,11 @@ FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePt
   aAxis->firstResult()->data()->execState(ModelAPI_StateDone);
 
   return aAxis;
+}
+
+void InitializationPlugin_Plugin::createPart(DocumentPtr thePartSet)
+{
+  std::shared_ptr<ModelAPI_Feature> aPart = thePartSet->addFeature("Part");
+  if (aPart.get())
+    aPart->execute(); // to initialize and activate this part document
 }

@@ -193,10 +193,14 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       if (aWidgetSelector)
         workshop()->selector()->setSelected(aWidgetSelector->getAttributeSelection());
     }
-  } else if (theMessage->eventID() == Events_Loop::eventByName("FinishOperation")/* ||
-             theMessage->eventID() == Events_Loop::eventByName("AbortOperation")*/)
-    workshop()->facesPanel()->reset(false); // do not flush redisplay, it is flushed after event
-
+  }
+  else if (theMessage->eventID() == Events_Loop::eventByName("FinishOperation")/* ||
+          theMessage->eventID() == Events_Loop::eventByName("AbortOperation")*/)
+  {
+    XGUI_FacesPanel* aFacesPanel = workshop()->facesPanel();
+    if (aFacesPanel)
+      aFacesPanel->reset(false); // do not flush redisplay, it is flushed after event
+  }
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {

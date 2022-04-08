@@ -25,6 +25,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <cmath>
 #include <sstream>
@@ -108,7 +109,33 @@ void begin()
   }
   std::ostringstream aTransactionName;
   aTransactionName << "Operation_" << aTransactionID;
-  ModelAPI_Session::get()->startOperation(aTransactionName.str());
+	
+  // check the first transaction and part, automatically created on start of PartSet
+  std::shared_ptr<ModelAPI_Session> aSession = ModelAPI_Session::get();
+  if (aSession->undoList().empty() && aSession->redoList().empty() && // no undo/redo available
+      aSession->moduleDocument()->size(ModelAPI_ResultPart::group()) == 1 && // only one part
+      aSession->moduleDocument()->size(ModelAPI_Feature::group()) == 1) // only part feature
+  {
+    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>
+      (aSession->moduleDocument()->object(ModelAPI_ResultPart::group(), 0));
+    if (aPartRes.get() && aPartRes->isActivated())
+    {
+      DocumentPtr aPartDoc = aPartRes->partDoc();
+      if (aPartDoc.get() && aPartDoc->size(ModelAPI_Feature::group()) == 0) // no features in part
+      {
+        // remove the automtically created part
+        aSession->startOperation("Delete automatic part");
+        FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+          aSession->moduleDocument()->object(ModelAPI_Feature::group(), 0));
+        aSession->setActiveDocument(aSession->moduleDocument());
+        aSession->moduleDocument()->removeFeature(aPartFeature);
+        aSession->finishOperation();
+        aSession->clearUndoRedo();
+      }
+    }
+  }
+
+  aSession->startOperation(aTransactionName.str());
 }
 
 void end()

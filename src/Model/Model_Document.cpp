@@ -1129,6 +1129,21 @@ void Model_Document::redo()
   // update the current features status
   setCurrentFeature(currentFeature(false), false);
 }
+
+void Model_Document::clearUndoRedo()
+{
+  myNestedNum.clear();
+  myTransactions.clear();
+  myRedos.clear();
+  myTransactionSave = 0;
+  myDoc->ClearUndos();
+  myDoc->ClearRedos();
+  // clear for all subs
+  const std::set<int> aSubs = subDocuments();
+  for (std::set<int>::iterator aSubIter = aSubs.begin(); aSubIter != aSubs.end(); aSubIter++)
+    subDoc(*aSubIter)->clearUndoRedo();
+}
+
 // this is used for creation of undo/redo1-list by GUI
 // LCOV_EXCL_START
 std::list<std::string> Model_Document::undoList() const

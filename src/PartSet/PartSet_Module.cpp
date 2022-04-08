@@ -123,6 +123,7 @@
 #include <SketcherPrs_Tools.h>
 
 #include <Events_Loop.h>
+#include <Events_MessageBool.h>
 #include <Config_PropManager.h>
 #include <Config_Keywords.h>
 
@@ -286,6 +287,13 @@ PartSet_Module::~PartSet_Module()
 void PartSet_Module::createFeatures()
 {
   ModuleBase_IModule::createFeatures();
+
+  // send signal to initialization plugin about the state of the preferences: to create part or not
+  bool aCreate = ModuleBase_Preferences::resourceMgr()->booleanValue(
+    ModuleBase_Preferences::GENERAL_SECTION, "create_init_part", true);
+  Events_MessageBool aCreateMsg(Events_Loop::eventByName(EVENT_CREATE_PART_ON_START), aCreate);
+  aCreateMsg.send();
+
   myRoot = new PartSet_RootNode();
   myRoot->setWorkshop(workshop());
   ModuleBase_IModule::loadProprietaryPlugins();

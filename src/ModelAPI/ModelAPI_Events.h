@@ -129,6 +129,10 @@ MAYBE_UNUSED static const char * EVENT_REMOVE_CONSTRAINTS = "RemoveConstrains";
 /// Event ID that license of specified features is checked and valid
 MAYBE_UNUSED static const char * EVENT_FEATURE_LICENSE_VALID = "FeaturesLicenseValid";
 
+/// To send preferences information: create part on init or not
+MAYBE_UNUSED static const char * EVENT_CREATE_PART_ON_START = "CreatePartOnStart";
+
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {

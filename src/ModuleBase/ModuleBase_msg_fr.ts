@@ -291,6 +291,14 @@
         <translation>Général</translation>
     </message>
     <message>
+        <source>Creation a study</source>
+        <translation>Création d&apos;une étude</translation>
+    </message>
+    <message>
+        <source>Create new part</source>
+        <translation>Création d&apos;une nouvelle pièce</translation>
+    </message>
+    <message>
         <source>Opening a study</source>
         <translation>Ouverture d&apos;une étude</translation>
     </message>

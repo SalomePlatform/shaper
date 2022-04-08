@@ -70,9 +70,13 @@ class InitializationPlugin_Plugin : public Events_Listener
   FeaturePtr createAxis(DocumentPtr theDoc, FeaturePtr theOrigin,
                         double theX, double theY, double theZ);
 
+  /// Creates and activates a new part in PartSet document.
+  void createPart(DocumentPtr thePartSet);
+
  private:
   std::shared_ptr<InitializationPlugin_EvalListener> myEvalListener;
   bool myInitDataModel;
+  bool myCreatePartOnStart;
 };
 
 #endif

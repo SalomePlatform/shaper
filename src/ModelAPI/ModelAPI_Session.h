@@ -40,6 +40,9 @@ class ModelAPI_FiltersFactory;
 
 class MODELAPI_EXPORT ModelAPI_Session
 {
+protected:
+  bool myIsLoading; ///< keeps the state of the loading of the document
+
  public:
   /// Returns the real implementation (the alone instance per application) of the plugin manager
   static std::shared_ptr<ModelAPI_Session> get();
@@ -48,6 +51,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   //! \param theFileName full name of the file to load
   //! \returns true if file was loaded successfully
   virtual bool load(const char* theFileName) = 0;
+
+  //! Returns true if a loading process is performed (so, no need to react on a new part creation)
+  virtual bool isLoading() { return myIsLoading; };
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store
@@ -86,6 +92,8 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual std::list<std::string> undoList() = 0;
   //! Returns stack of rolled back operations (from last rolled back to first)
   virtual std::list<std::string> redoList() = 0;
+  //! Clears undo and redo lists of all documents in the session
+  virtual void clearUndoRedo() = 0;
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by

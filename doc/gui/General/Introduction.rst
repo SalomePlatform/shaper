@@ -475,7 +475,7 @@ Other tabs are activated by click on tab header.
 General tab
 ^^^^^^^^^^^
 
-This tab defines what parts to be activated and what elements to be visible after opening a study or a script.
+This tab defines behavior of Parts and displayed objects on creation or opening of a study, or loading python scripts.
 
 .. figure:: /images/general_preferences.png
    :align: center
@@ -483,6 +483,8 @@ This tab defines what parts to be activated and what elements to be visible afte
    **Preferences**: General tab
 
 **Input fields**:
+
+- **Create new part** flag. If it is enabled, an empty part is created on a study creation.
 
 - **Activate** relates to activation of part when opening a HDF document. Its could be one of the following:
 

@@ -59,7 +59,9 @@ static Model_Session* myImpl = new Model_Session();
 
 bool Model_Session::load(const char* theFileName)
 {
+  myIsLoading = true;
   bool aRes = ROOT_DOC->load(theFileName, "root", ROOT_DOC);
+  myIsLoading = false;
   return aRes;
 }
 
@@ -176,6 +178,11 @@ std::list<std::string> Model_Session::undoList()
 std::list<std::string> Model_Session::redoList()
 {
   return ROOT_DOC->redoList();
+}
+
+void Model_Session::clearUndoRedo()
+{
+  return ROOT_DOC->clearUndoRedo();
 }
 
 bool Model_Session::checkLicense(const std::string& thePluginName)
@@ -447,6 +454,7 @@ Model_Session::Model_Session()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
+  myIsLoading = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
