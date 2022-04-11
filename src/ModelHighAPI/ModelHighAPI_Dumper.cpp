@@ -1275,12 +1275,24 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeString>& theAttrStr)
 {
-  // escaping the quote sign in the string under dumping
+  // escaping the quote signs in the string under dumping
   std::string aStr = theAttrStr->value();
+  /*
   size_t aPos = aStr.find("\"");
   while (aPos != std::string::npos) {
     aStr.insert(aPos, "\\");
     aPos = aStr.find("\"", aPos + 2);
+  }
+  aPos = aStr.find("\'");
+  while (aPos != std::string::npos) {
+    aStr.insert(aPos, "\\");
+    aPos = aStr.find("\'", aPos + 2);
+  }
+  */
+  size_t aPos = aStr.find_first_of("\"\'");
+  while (aPos != std::string::npos) {
+    aStr.insert(aPos, "\\");
+    aPos = aStr.find_first_of("\"\'", aPos + 2);
   }
   *myDumpStorage << "'" << aStr << "'";
   return *this;

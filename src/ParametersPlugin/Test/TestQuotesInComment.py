@@ -1,4 +1,4 @@
-# Copyright (C) 2021  CEA/DEN, EDF R&D
+# Copyright (C) 2014-2021  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,18 +17,20 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-               TestParameterCreation.py
-               TestParameterRename.py
-               TestParameterChangeValue.py
-               TestParameterDelete.py
-               TestParameterErrorMsg.py
-               TestParametersMgr.py
-               Test1806.py
-               Test2392.py
-               Test2474.py
-               Test19036.py
-               TestImportParameters.py
-               TestImportInvalidParameters.py
-               TestQuotesInComment.py
-)
+from salome.shaper import model
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+
+model.addParameter(Part_1_doc, "a", '10', 'longueur de l\'aile')
+model.addParameter(Part_1_doc, "b", '12', 'trou à l\"origine')
+model.addParameter(Part_1_doc, "c", '14', 'l\'opposé de l\"origine')
+
+Box_1 = model.addBox(Part_1_doc, "a", "b", "c")
+
+model.end()
+
+assert(len(Box_1.feature().error()) == 0)
+assert(model.checkPythonDump())
