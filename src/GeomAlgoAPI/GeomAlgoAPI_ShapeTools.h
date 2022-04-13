@@ -235,6 +235,11 @@ public:
                                                    const ListOfShape& theBaseShapes,
                                                    const std::shared_ptr<GeomAPI_Dir> theDir,
                                                    double& theToSize, double& theFromSize);
+
+  /// \brief Get shared faces of a shape
+  /// \param[in] theShape shape that should be exploded
+  /// \return list of shared faces
+  GEOMALGOAPI_EXPORT static ListOfShape getSharedFaces(const GeomShapePtr& theShape);
 };
 
 #endif

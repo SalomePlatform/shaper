@@ -1781,3 +1781,20 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
     }
   }
 }
+
+ListOfShape GeomAlgoAPI_ShapeTools::getSharedFaces(const GeomShapePtr& theShape)
+{
+  ListOfShape aSharedFaces;
+  TopTools_IndexedDataMapOfShapeListOfShape aMapFS;
+  TopExp::MapShapesAndUniqueAncestors(theShape->impl<TopoDS_Shape>(),
+                                      TopAbs_FACE, TopAbs_SOLID, aMapFS);
+  for (Standard_Integer i = 1; i <= aMapFS.Extent(); i++) {
+    const TopTools_ListOfShape& ancestors = aMapFS.FindFromIndex(i);
+    if (ancestors.Size() > 1) {
+      GeomShapePtr aFace(new GeomAPI_Shape);
+      aFace->setImpl<TopoDS_Shape>(new TopoDS_Shape(aMapFS.FindKey(i)));
+      aSharedFaces.push_back(aFace);
+    }
+  }
+  return aSharedFaces;
+}

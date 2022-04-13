@@ -163,51 +163,54 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
     # If theFields is true, the same is performed for Fields.
     def processGroups(self, theRes, theEngine, thePartFeatureId, theStudyShape, theFields):
       allGroupsProcessed = []
+      allRefGroups = []
       if theFields:
-        aRefGroups = ModelAPI.referencedFeatures(theRes, "Field", True)
+        allRefGroups.append(ModelAPI.referencedFeatures(theRes, "Field", True))
       else:
-        aRefGroups = ModelAPI.referencedFeatures(theRes, "Group", True)
-      for aRef in aRefGroups:
-        aGroupIndices = []
-        aGroupHasIndex = {}
-        aResShape = theRes.shape()
-        if theFields:
-          aSelList = aRef.selectionList("selected")
-        else:
-          aSelList = aRef.selectionList("group_list")
-        aSelType = GeomAPI_Shape.shapeTypeByStr(aSelList.selectionType())
-        for aGroupRes in aRef.results():
-          aShape = aGroupRes.shape()
-          anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
-          while anExplorer.more():
-            anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, anExplorer.current())
-            if anId > 0 and not anId in aGroupHasIndex:
-              aGroupIndices.append(anId)
-              aGroupHasIndex[anId] = 0
-            anExplorer.next()
-        if len(aGroupIndices): # create group
-          aGroupFeatureId = aRef.data().featureId()
+        allRefGroups.append(ModelAPI.referencedFeatures(theRes, "Group", True))
+        allRefGroups.append(ModelAPI.referencedFeatures(theRes, "Shared_faces", True))
+      for aRefGroups in allRefGroups:
+        for aRef in aRefGroups:
+          aGroupIndices = []
+          aGroupHasIndex = {}
+          aResShape = theRes.shape()
           if theFields:
-            aFieldOp = theEngine.GetIFieldOperations()
-            aGroupEntry = "field" + str(thePartFeatureId) + ":" + str(aGroupFeatureId)
-            aGroup = aFieldOp.FindField(theStudyShape, aGroupEntry)
+            aSelList = aRef.selectionList("selected")
           else:
-            aGroupOp = theEngine.GetIGroupOperations()
-            aGroupEntry = "group" + str(thePartFeatureId) + ":" + str(aGroupFeatureId)
-            aGroup = aGroupOp.FindGroup(theStudyShape, aGroupEntry)
-          if not aGroup: # create a new
+            aSelList = aRef.selectionList("group_list")
+          aSelType = GeomAPI_Shape.shapeTypeByStr(aSelList.selectionType())
+          for aGroupRes in aRef.results():
+            aShape = aGroupRes.shape()
+            anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
+            while anExplorer.more():
+              anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, anExplorer.current())
+              if anId > 0 and not anId in aGroupHasIndex:
+                aGroupIndices.append(anId)
+                aGroupHasIndex[anId] = 0
+              anExplorer.next()
+          if len(aGroupIndices): # create group
+            aGroupFeatureId = aRef.data().featureId()
             if theFields:
-              aGroup = aFieldOp.CreateFieldByType(theStudyShape, aSelType)
+              aFieldOp = theEngine.GetIFieldOperations()
+              aGroupEntry = "field" + str(thePartFeatureId) + ":" + str(aGroupFeatureId)
+              aGroup = aFieldOp.FindField(theStudyShape, aGroupEntry)
             else:
-              aGroup = aGroupOp.CreateGroup(theStudyShape, aSelType)
-            aGroup.SetEntry(aGroupEntry)
-            theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape)
-          aGroup.SetSelection(aGroupIndices)
-          if theFields:
-            self.fillField(aGroup, aRef, theEngine, aGroupIndices)
-          # a group takes shape from the main result
-          #aGroup.SetShapeByStream(aRef.firstResult().shape().getShapeStream(False)) # group shape
-          allGroupsProcessed.append(aGroupEntry)
+              aGroupOp = theEngine.GetIGroupOperations()
+              aGroupEntry = "group" + str(thePartFeatureId) + ":" + str(aGroupFeatureId)
+              aGroup = aGroupOp.FindGroup(theStudyShape, aGroupEntry)
+            if not aGroup: # create a new
+              if theFields:
+                aGroup = aFieldOp.CreateFieldByType(theStudyShape, aSelType)
+              else:
+                aGroup = aGroupOp.CreateGroup(theStudyShape, aSelType)
+              aGroup.SetEntry(aGroupEntry)
+              theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape)
+            aGroup.SetSelection(aGroupIndices)
+            if theFields:
+              self.fillField(aGroup, aRef, theEngine, aGroupIndices)
+            # a group takes shape from the main result
+            #aGroup.SetShapeByStream(aRef.firstResult().shape().getShapeStream(False)) # group shape
+            allGroupsProcessed.append(aGroupEntry)
       # check all existing groups: if some does not processed, remove it from the tree
       aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(theStudyShape.GetSO())
       while aSOIter.More():

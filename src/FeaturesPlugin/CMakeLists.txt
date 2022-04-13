@@ -79,6 +79,9 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_InspectNormalToFace.h
     FeaturesPlugin_GlueFaces.h
     FeaturesPlugin_LimitTolerance.h
+    FeaturesPlugin_CommonSharedFaces.h
+    FeaturesPlugin_GroupSharedFaces.h
+    FeaturesPlugin_SharedFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -138,6 +141,9 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_InspectNormalToFace.cpp
     FeaturesPlugin_GlueFaces.cpp
     FeaturesPlugin_LimitTolerance.cpp
+    FeaturesPlugin_CommonSharedFaces.cpp
+    FeaturesPlugin_GroupSharedFaces.cpp
+    FeaturesPlugin_SharedFaces.cpp
 )
 
 SET(XML_RESOURCES
@@ -184,6 +190,8 @@ SET(XML_RESOURCES
   normal_to_face_widget.xml
   create_normal_to_face_widget.xml
   limit_tolerance_widget.xml
+  shared_faces_macro_widget.xml
+  shared_faces_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -204,6 +212,7 @@ INCLUDE_DIRECTORIES(
   ../ModuleBase
   ../Events
   ../Config
+  ../Locale
   ${OpenCASCADE_INCLUDE_DIR}
 )
 
