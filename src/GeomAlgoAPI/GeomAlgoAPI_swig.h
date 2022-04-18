@@ -63,6 +63,7 @@
   #include "GeomAlgoAPI_Copy.h"
   #include "GeomAlgoAPI_Symmetry.h"
   #include "GeomAlgoAPI_MapShapesAndAncestors.h"
+  #include "GeomAlgoAPI_ShapeInfo.h"
 
   #include <memory>
   #include <string>
@@ -76,3 +77,6 @@
   #endif
 
 #endif /* SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_ */
+
+// fix for SWIG v2.0.4
+#define SWIGPY_SLICE_ARG(obj) ((PyObject*)(obj))

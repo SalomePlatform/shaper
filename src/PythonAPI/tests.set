@@ -49,5 +49,7 @@ SET(TEST_NAMES
   TestMakeBrick2.py
   TestPlatine.py
 
+  TestShapeInfo.py
+
   Test2044.py
 )

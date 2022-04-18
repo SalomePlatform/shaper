@@ -103,6 +103,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/ModuleBase
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${PROJECT_SOURCE_DIR}/src/Config
                     ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
                     ${SUIT_INCLUDE}

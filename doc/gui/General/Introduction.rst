@@ -325,6 +325,13 @@ The information about  Plane, Face additionally shows coordinates of center poin
 
    **Inspection panel** for Face
 
+The shapes information, equal to the provided Inspection panel information on the shape is accessible inpython API by usage of **shapeInfo** command:
+
+ | *from salome.shaper import geom*
+ | *geom.shapeInfo(vertex)*
+ | *==> ('Vertex', 0.0, 0.0, 10.0)*
+
+
 .. _hidefaces_panel:
 
 Hide Faces panel
