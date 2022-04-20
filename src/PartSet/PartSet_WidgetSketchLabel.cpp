@@ -166,8 +166,17 @@ myIsSelection(false)
   myViewInverted = new QCheckBox(tr("Reversed"), aViewBox);
   aViewLayout->addWidget(myViewInverted, 0, 0);
 
+  // Sketch plane visibility
   myViewVisible = new QCheckBox(tr("Visible"), aViewBox);
-  myViewVisible->setChecked(true);
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  PartSet_PreviewSketchPlane* aPreviewPlane = aModule->sketchMgr()->previewSketchPlane();
+  if (aPreviewPlane->isPlaneCreated())
+    // init with current state
+    myViewVisible->setChecked(aPreviewPlane->isDisplayed());
+  else
+    // true by default (at start of sketch creation)
+    myViewVisible->setChecked(true);
+
   aViewLayout->addWidget(myViewVisible, 0, 1, Qt::AlignRight);
   connect(myViewVisible, SIGNAL(toggled(bool)), this, SLOT(onShowViewPlane(bool)));
 

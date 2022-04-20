@@ -53,12 +53,9 @@ void PartSet_PreviewSketchPlane::eraseSketchPlane(ModuleBase_IWorkshop* theWorks
   if (myPreviewIsDisplayed) {
     XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
     aDisp->eraseAIS(myPlane, false);
-    if (isClearPlane) {
-      myPlane = std::shared_ptr<GeomAPI_AISObject>();
-      myShape = std::shared_ptr<GeomAPI_Shape>();
-    }
     myPreviewIsDisplayed = false;
   }
+  if (isClearPlane) clearPlanePreview();
 }
 
 void PartSet_PreviewSketchPlane::displaySketchPlane(ModuleBase_IWorkshop* theWorkshop)
