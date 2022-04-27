@@ -1169,6 +1169,31 @@ bool isShownIsoLines(std::shared_ptr<ModelAPI_Result> theResult)
   return false;
 }
 
+//******************************************************
+void showEdgesDirection(std::shared_ptr<ModelAPI_Result> theResult, bool theShow)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::SHOW_EDGES_DIRECTION_ID());
+  if (aAttr.get() != NULL) {
+    aAttr->setValue(theShow);
+  }
+}
+
+//******************************************************
+bool isShowEdgesDirection(std::shared_ptr<ModelAPI_Result> theResult)
+{
+  if (!theResult.get())
+    return false;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::SHOW_EDGES_DIRECTION_ID());
+  if (aAttr.get() != NULL) {
+    return aAttr->value();
+  }
+  return false;
+}
+
 //**************************************************************
 void setTransparency(ResultPtr theResult, double theTransparency)
 {

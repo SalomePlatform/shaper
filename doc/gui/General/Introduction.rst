@@ -394,6 +394,13 @@ This point of view can be modified using viewer commands: **Panning**, **Zooming
 
    Two view windows
 
+The viewer is able to show direction of edges of objects.
+
+.. figure:: /images/edges_directions.png
+   :align: center
+
+   Showing the edges direction
+
 The description of OCC 3D Viewer architecture and functionality is provided in GUI module user's guide in chapter **OCC 3D Viewer**.
 
 .. _parameter_usage:

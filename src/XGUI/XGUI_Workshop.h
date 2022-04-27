@@ -236,6 +236,9 @@ Q_OBJECT
   /// \param theMode a mode to set (see \ref XGUI_Displayer)
   void setDisplayMode(const QObjectPtrList& theList, int theMode);
 
+  /// Toggle visualisation of edges direction
+  void toggleEdgesDirection(const QObjectPtrList& theList);
+
   /// Set selection mode in viewer. If theMode=-1 then activate default mode
   /// \param theMode the selection mode (according to TopAbs_ShapeEnum)
   void setViewerSelectionMode(int theMode);

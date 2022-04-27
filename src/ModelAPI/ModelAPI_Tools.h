@@ -304,6 +304,14 @@ MODELAPI_EXPORT void showIsoLines(std::shared_ptr<ModelAPI_Result> theResult, bo
 
 MODELAPI_EXPORT bool isShownIsoLines(std::shared_ptr<ModelAPI_Result> theResult);
 
+/*! Set visibility of edges direction
+* \param[in] theResult a result object
+* \param[in] theShow is a visibility flag
+*/
+MODELAPI_EXPORT void showEdgesDirection(std::shared_ptr<ModelAPI_Result> theResult, bool theShow);
+
+MODELAPI_EXPORT bool isShowEdgesDirection(std::shared_ptr<ModelAPI_Result> theResult);
+
 /*! Returns current transparency in the given result
 * \param theResult a result object
 * \return a transparency value or -1 if it was not defined
