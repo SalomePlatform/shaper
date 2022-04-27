@@ -188,6 +188,9 @@ Q_OBJECT
   /// Move selected features to be after the current feature
   void moveObjects(const bool theSplit);
 
+  /// Start a "Recover" feature on the selected one
+  void recoverFeature();
+
   /// Returns true if the object can be shaded. If the object is a compsolid result, the method
   /// checks subobjects of the result
   /// \return boolean value

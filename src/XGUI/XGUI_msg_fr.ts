@@ -212,6 +212,10 @@
         <source>Show Isos</source>
         <translation>Show Isos</translation>
     </message>
+    <message>
+      <source>Recover</source>
+      <translation>Récupérer</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>
