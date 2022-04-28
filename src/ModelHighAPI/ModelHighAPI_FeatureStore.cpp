@@ -44,15 +44,15 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_Pnt.h>
 
 #include <Locale_Convert.h>
 
-#include <TopoDS_Shape.hxx>
-#include <TopExp_Explorer.hxx>
-
 #include <ios>
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 #define PRECISION 6
 #define TOLERANCE (1.e-7)
@@ -403,19 +403,17 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
 }
 
 std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>& theShape) {
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  if (aShape.IsNull()) {
+  if (theShape->isNull()) {
     return "null";
   }
   std::ostringstream aResult;
   // output the number of shapes of different types
-  TopAbs_ShapeEnum aType = TopAbs_COMPOUND;
-  for(; aType <= TopAbs_VERTEX; aType = TopAbs_ShapeEnum((int)aType + 1)) {
-    TopExp_Explorer anExp(aShape, aType);
+  GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::COMPOUND;
+  for (; aType <= GeomAPI_Shape::VERTEX; aType = GeomAPI_Shape::ShapeType((int)aType + 1)) {
+    GeomAPI_ShapeExplorer anExp(theShape, aType);
     int aCount = 0;
-    for(; anExp.More(); anExp.Next()) aCount++;
-    TopAbs::Print(aType, aResult);
-    aResult<<": "<<aCount<<std::endl;
+    for (; anExp.more(); anExp.next()) aCount++;
+    aResult << anExp.current()->shapeTypeStr().c_str() <<  ": " << aCount << std::endl;
   }
   // output the main characteristics
   double aVolume = GeomAlgoAPI_ShapeTools::volume(theShape);

@@ -74,10 +74,6 @@
 #include <OSD_Path.hxx>
 #include <OSD_Protection.hxx>
 
-#ifdef TINSPECTOR
-#include <CDF_Directory.hxx>
-#endif
-
 #include <UTL.hxx>
 
 #include <climits>
@@ -111,13 +107,10 @@ static const Standard_GUID kEXTERNAL_SHAPE_REF("9aa5dd14-6d34-4a8d-8786-05842fd7
 Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID),
       myKind(theKind),
-      myDoc(new TDocStd_Document("BinOcaf")),  // binary OCAF format
       myIsActive(false),
       myIsSetCurrentFeature(false)
 {
-#ifdef TINSPECTOR
-  ModelAPI_Session::get()->application()->NewDocument("BinOcaf", myDoc);
-#endif
+  Model_Application::getApplication()->NewDocument("BinOcaf", myDoc);
   myObjs = new Model_Objects(myDoc->Main());
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionSave = 0;

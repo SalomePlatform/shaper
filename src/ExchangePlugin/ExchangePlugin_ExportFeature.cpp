@@ -27,7 +27,6 @@
 #include <ostream>
 #endif
 
-
 #include <Config_Common.h>
 #include <Config_PropManager.h>
 
@@ -153,7 +152,6 @@ void ExchangePlugin_ExportFeature::attributeChanged(const std::string& theID)
     string(ExchangePlugin_ExportFeature::FILE_PATH_ID())->setValue(
       string(ExchangePlugin_ExportFeature::STL_FILE_PATH_ID())->value());
   }
-
 }
 
 /*
@@ -205,6 +203,7 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   AttributeSelectionListPtr aSelectionListAttr =
       this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   std::list<GeomShapePtr> aShapes;
+  std::list<ResultPtr> aContexts;
   for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
     AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
 
@@ -218,7 +217,10 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
     if (aCurShape.get() == NULL)
       aCurShape = anAttrSelection->context()->shape();
     if (aCurShape.get() != NULL)
+    {
       aShapes.push_back(aCurShape);
+      aContexts.push_back(anAttrSelection->context());
+    }
   }
 
   // Store compound if we have more than one shape.
@@ -231,7 +233,7 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   if (aFormatName == "BREP") {
     aResult = BREPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName == "STEP") {
-    aResult = STEPExport(theFileName, aFormatName, aShape, anError);
+    aResult = STEPExport(theFileName, aShapes, aContexts, anError);
   } else if (aFormatName.substr(0, 4) == "IGES") {
     aResult = IGESExport(theFileName, aFormatName, aShape, anError);
   } else {

@@ -26,8 +26,6 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
 
-#include <ModuleBase_Tools.h>
-
 #include <cmath>
 #include <sstream>
 
@@ -108,9 +106,8 @@ void begin()
     aNbTransactions = aNbUndo;
     ++aTransactionID;
   }
-  static std::string anOperationPrefix(ModuleBase_Tools::translate("", "Operation").toStdString());
   std::ostringstream aTransactionName;
-  aTransactionName << anOperationPrefix << "_" << aTransactionID;
+  aTransactionName << "Operation_" << aTransactionID;
   ModelAPI_Session::get()->startOperation(aTransactionName.str());
 }
 

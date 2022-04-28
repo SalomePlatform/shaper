@@ -22,7 +22,6 @@
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>
-#include <Standard_TypeDef.hxx>
 
 /// get the boundin box of theshape.
   /// \param theShape   the shape
@@ -36,9 +35,9 @@
   /// \param theError  error
 GEOMALGOAPI_EXPORT
 bool GetBoundingBox(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                    Standard_Real& theXmin,Standard_Real& theXmax,
-                    Standard_Real& theYmin,Standard_Real& theYmax,
-                    Standard_Real& theZmin,Standard_Real& theZmax,
+                    double& theXmin, double& theXmax,
+                    double& theYmin, double& theYmax,
+                    double& theZmin, double& theZmax,
                     std::string& theError);
 
 #endif

@@ -529,7 +529,7 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theOldShape,
   if (aNewShapeType == TopAbs_WIRE || aNewShapeType == TopAbs_SHELL) {
     // TODO: This is a workaround. New shape should be only vertex, edge or face.
     TopAbs_ShapeEnum aShapeTypeToExplore = aNewShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
-    aTag = TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
+    aTag = aNewShapeType == TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
     for (TopExp_Explorer anExp(aNewShape, aShapeTypeToExplore); anExp.More(); anExp.Next()) {
       builder(aTag)->Generated(anOldShape, anExp.Current());
     }
@@ -750,7 +750,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
         // TODO: This is a workaround. New shape should be only edge or face.
         TopAbs_ShapeEnum aShapeTypeToExplore = aNewShapeType == TopAbs_WIRE ? TopAbs_EDGE
                                                                             : TopAbs_FACE;
-        int aTag = TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
+        int aTag = aNewShapeType == TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
         for (TopExp_Explorer anExp(aNewShape_, aShapeTypeToExplore); anExp.More(); anExp.Next()) {
           builder(aTag)->Generated(anOldSubShape_, anExp.Current());
           // store information about the external document reference to restore old shape on open

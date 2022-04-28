@@ -22,45 +22,15 @@
 
 #include <GeomAlgoAPI.h>
 
-#include <XCAFDoc_ColorTool.hxx>
-#include <XCAFDoc_MaterialTool.hxx>
-
 #include <STEPCAFControl_Reader.hxx>
 
 #include <ModelAPI_ResultBody.h>
-#include <TopTools_IndexedMapOfShape.hxx>
 
- /// read Attributs of step file
- GEOMALGOAPI_EXPORT
- std::shared_ptr<GeomAPI_Shape>  readAttributes(STEPCAFControl_Reader &theReader,
-                                 std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+/// read Attributs of step file
+std::shared_ptr<GeomAPI_Shape>  readAttributes(STEPCAFControl_Reader &theReader,
+                                std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                  const bool  theMaterials,
                                  std::map< std::wstring,std::list<std::wstring>> &theMaterialShape,
                                  std::string& theError);
-/// read attributs for  label
- GEOMALGOAPI_EXPORT
- void setShapeAttributes(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
-                         const Handle(XCAFDoc_ColorTool) &theColorTool,
-                         const Handle(XCAFDoc_MaterialTool) &TheMaterialTool,
-                         const TDF_Label &theLabel,
-                         const TopLoc_Location &theLoc,
-                         std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                         std::map< std::wstring, std::list<std::wstring>> &theMaterialShape,
-                         bool theIsRef);
-
-// read geometry
-GEOMALGOAPI_EXPORT
-std::shared_ptr<GeomAPI_Shape> setgeom(const Handle(XCAFDoc_ShapeTool) &shapeTool,
-                                       const TDF_Label &theLabel,
-                                       std::string& theError);
-
-// store Materiel for theShapeLabel in the map theMaterialShape
-GEOMALGOAPI_EXPORT
-void storeMaterial(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                   const Handle(Standard_Transient) &theEnti,
-                   const TopTools_IndexedMapOfShape &theIndices,
-                   const Handle(Transfer_TransientProcess) &theTP,
-                   const TDF_Label &theShapeLabel,
-                   std::map< std::wstring, std::list<std::wstring>> &theMaterialShape);
 
 #endif /* GEOMALGOAPI_STEPIMPORTXCAF_H_ */

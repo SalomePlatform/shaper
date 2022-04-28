@@ -28,7 +28,7 @@
 #include <map>
 
 #ifdef TINSPECTOR
-#include "Model_Application.h"
+#include <TDocStd_Application.hxx>
 #endif
 
 class Model_Document;
@@ -163,9 +163,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void blockAutoUpdate(const bool theBlock);
 
 #ifdef TINSPECTOR
-  MODEL_EXPORT virtual Handle(TDocStd_Application) application() {
-    return Model_Application::getApplication();
-  }
+  MODEL_EXPORT virtual Handle(TDocStd_Application) application();
 #endif
 
  protected:

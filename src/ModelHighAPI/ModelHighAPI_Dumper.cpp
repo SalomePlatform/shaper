@@ -70,9 +70,10 @@
 
 #include <PartSetPlugin_Part.h>
 
-#include <OSD_OpenFile.hxx>
-
 #include <fstream>
+#include <iomanip>
+#include <cctype>
+#include <cmath>
 
 // ===========    Implementation of storage of dumped data    ===========
 static const int THE_DUMP_PRECISION = 16;
@@ -260,8 +261,7 @@ void ModelHighAPI_Dumper::DumpStorage::restoreReservedBuffer()
 bool ModelHighAPI_Dumper::DumpStorage::exportTo(const std::string& theFilename,
                                                 const ModulesSet& theUsedModules)
 {
-  std::ofstream aFile;
-  OSD_OpenStream(aFile, theFilename.c_str(), std::ofstream::out);
+  std::ofstream aFile(theFilename.c_str(), std::ofstream::out);
   if (!aFile.is_open())
     return false;
 

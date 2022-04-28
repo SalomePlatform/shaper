@@ -472,7 +472,8 @@ const ListOfShape& ModelAPI_ShapesFailedMessage::shapes() const
 }
 
 /// Creates an empty message
-ModelAPI_CheckConstraintsMessage::ModelAPI_CheckConstraintsMessage(const Events_ID theID, const void* theSender)
+ModelAPI_CheckConstraintsMessage::ModelAPI_CheckConstraintsMessage(
+  const Events_ID theID, const void* theSender)
   :Events_Message(theID, theSender)
 {
 }

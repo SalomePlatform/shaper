@@ -21,7 +21,6 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Plugin.h>
 #include <Model_Data.h>
-#include <Model_Document.h>
 #include <Model_Objects.h>
 #include <Model_Application.h>
 #include <Model_Events.h>
@@ -674,3 +673,10 @@ void Model_Session::blockAutoUpdate(const bool theBlock)
     }
   }
 }
+
+#ifdef TINSPECTOR
+Handle(TDocStd_Application) Model_Session::application()
+{
+  return Model_Application::getApplication();
+}
+#endif

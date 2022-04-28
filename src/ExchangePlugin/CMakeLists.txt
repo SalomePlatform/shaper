@@ -32,7 +32,6 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/XAO
                     ${PROJECT_SOURCE_DIR}/src/ConstructionPlugin
                     ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
-                    ${OpenCASCADE_INCLUDE_DIR}
                     ${QT_INCLUDES}
 )
 
