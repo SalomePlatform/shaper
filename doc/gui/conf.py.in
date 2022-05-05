@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SHAPER'
-copyright = u'2014-2021  CEA/DEN, EDF R&D'
+copyright = u'2014-2022  CEA/DEN, EDF R&D'
 
 # Copyright is shown via custom footer
 html_show_copyright = False

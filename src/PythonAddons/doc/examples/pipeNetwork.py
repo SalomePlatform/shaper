@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Exemple de création d'un objet SHAPER tuyauterie à partir d'une description dans un fichier txte
 
-Copyright 2021 EDF
+Copyright 2022 EDF
 """
 
 __revision__ = "V02.01"
