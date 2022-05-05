@@ -115,6 +115,8 @@ static std::string angleTypeToString(FeaturePtr theFeature)
       aType = THE_ANGLE_SUPPLEMENTARY;
     else if (aBackwardDiff < aDirectDiff && aBackwardDiff < aComplementaryDiff)
       aType = THE_ANGLE_BACKWARD;
+    else
+      aType = THE_ANGLE_DIRECT;
   }
   return aType;
 }
