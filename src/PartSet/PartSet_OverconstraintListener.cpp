@@ -238,12 +238,11 @@ void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_M
     if (aConstraintsMsg.get()) {
       myObjectsToRemove = aConstraintsMsg->constraints();
 
-      std::set<ObjectPtr>::const_iterator
-        anIt = myObjectsToRemove.begin(), aLast = myObjectsToRemove.end();
+      std::set<ObjectPtr>::const_iterator anIt = myObjectsToRemove.begin();
 
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
 
-      for (; anIt != aLast; anIt++)
+      for (; anIt != myObjectsToRemove.end(); )
       {
         ObjectPtr anObject = *anIt;
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
@@ -251,7 +250,9 @@ void PartSet_OverconstraintListener::processEvent(const std::shared_ptr<Events_M
         if ((aType == SketchPlugin_ConstraintHorizontal::ID() ||
              aType == SketchPlugin_ConstraintVertical::ID()) &&
              !aModule->sketchReentranceMgr()->isLastAutoConstraint(*anIt))
-          myObjectsToRemove.erase(*anIt);
+          anIt = myObjectsToRemove.erase(anIt);
+        else
+          anIt++;
       }
 
       if (myObjectsToRemove.empty())
