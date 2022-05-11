@@ -28,6 +28,8 @@
 #include <GeomAPI_Edge.h>
 
 class GeomAlgoAPI_MakeShape;
+class GeomAlgoAPI_Offset;
+class GeomAlgoAPI_WireBuilder;
 
 /**\class SketchPlugin_Offset
  * \ingroup Plugins
@@ -48,6 +50,34 @@ public:
   {
     static std::string MY_KIND = SketchPlugin_Offset::ID();
     return MY_KIND;
+  }
+
+  /// Type of joint
+  inline static const std::string& JOINT_ID()
+  {
+    static const std::string ID("offset_joint");
+    return ID;
+  }
+
+  /// Keep distance joint (add arcs where needed)
+  inline static const std::string& JOINT_KEEP_DISTANCE()
+  {
+    static const std::string ID("KeepDistance");
+    return ID;
+  }
+
+  /// Arcs joint (make fillets on all straight lines intersections)
+  inline static const std::string& JOINT_ARCS()
+  {
+    static const std::string ID("Arcs");
+    return ID;
+  }
+
+  /// Lines joint (do not add new arcs, prolongate and intersect adjacent lines)
+  inline static const std::string& JOINT_LINES()
+  {
+    static const std::string ID("Lines");
+    return ID;
   }
 
   /// list of offset edges
@@ -140,6 +170,11 @@ private:
                        std::set<FeaturePtr>& theProcessedEdgesSet,
                        std::list<FeaturePtr>& theChain,
                        const bool isPrepend = false);
+
+  void makeFillet (const double theValue,
+                   const std::shared_ptr<GeomAlgoAPI_WireBuilder>&,
+                   const std::shared_ptr<GeomAlgoAPI_Offset>&,
+                   std::list< std::shared_ptr<GeomAlgoAPI_MakeShape> >& theOffsetAlgos);
 };
 
 #endif

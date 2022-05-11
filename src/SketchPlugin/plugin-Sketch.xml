@@ -1020,6 +1020,17 @@
                tooltip="Offset a curve to a distance"
                icon="icons/Sketch/offset.png"
                helpfile="offsetFeature.html">
+        <toolbox id="offset_joint">
+           <box id="KeepDistance"
+               icon="icons/Sketch/offset_keep_distance_32x32.png"
+               title="Keep distance"/>
+           <box id="Arcs"
+               icon="icons/Sketch/offset_arcs_32x32.png"
+               title="Arcs"/>
+           <box id="Lines"
+               icon="icons/Sketch/offset_lines_32x32.png"
+               title="Lines"/>
+        </toolbox>
         <sketch_multi_selector id="segments"
                                label="Edges"
                                tooltip="Select edges to offset"

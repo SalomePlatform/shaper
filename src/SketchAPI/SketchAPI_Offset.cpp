@@ -34,13 +34,15 @@ SketchAPI_Offset::SketchAPI_Offset (const std::shared_ptr<ModelAPI_Feature> & th
 SketchAPI_Offset::SketchAPI_Offset (const std::shared_ptr<ModelAPI_Feature> & theFeature,
                                     const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
                                     const ModelHighAPI_Double & theOffsetValue,
-                                    bool theIsReversed)
+                                    const bool theIsReversed,
+                                    const std::string & theJointType)
   : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
     fillAttribute(theObjects, edgesList());
     fillAttribute(theOffsetValue, value());
     fillAttribute(theIsReversed, reversed());
+    fillAttribute(theJointType, joint());
 
     execute();
   }
@@ -72,6 +74,7 @@ void SketchAPI_Offset::dump (ModelHighAPI_Dumper& theDumper) const
   AttributeRefListPtr aOffsetObjects = edgesList();
   AttributeDoublePtr aValue = value();
   AttributeBooleanPtr aReversed = reversed();
+  AttributeStringPtr aJoint = joint();
 
   // Check all attributes are already dumped. If not, store the feature as postponed.
   if (!theDumper.isDumped(aOffsetObjects)) {
@@ -80,7 +83,7 @@ void SketchAPI_Offset::dump (ModelHighAPI_Dumper& theDumper) const
   }
 
   theDumper << aBase << " = " << aSketchName << ".addOffset(" << aOffsetObjects << ", "
-            << aValue << ", " << aReversed << ")" << std::endl;
+            << aValue << ", " << aReversed  << ", " << aJoint << ")" << std::endl;
 
   // Dump variables for a list of created features
   theDumper << "[";

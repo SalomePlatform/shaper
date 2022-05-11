@@ -34,8 +34,8 @@ class GeomAlgoAPI_Fillet1D : public GeomAlgoAPI_MakeShape
 
 public:
   /// Run fillet operation on a set of vertices with fixed radius.
-  /// \param theBaseWire        a changing Wire
-  /// \param theFilletVertices  list of edges the fillet is performed on
+  /// \param theBaseWire        a wire or a compound of wires
+  /// \param theFilletVertices  list of vertices the fillet is performed on
   /// \param theFilletRadius    radius of the fillet
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Fillet1D(const GeomShapePtr& theBaseWire,
                                           const ListOfShape&  theFilletVertices,
@@ -57,13 +57,21 @@ public:
   const ListOfShape& failedVertices() const { return myFailedVertices; }
 
 private:
-  /// Perform 1d-fillet on wire
-  /// \param theBaseWire        a changing wire
-  /// \param theFilletVertices  list of vertices of filler
+  /// Perform 1d-fillet on a wire or a compound of wires
+  /// \param theBaseShape       the base wire or a compound of wires for fillet
+  /// \param theFilletVertices  list of vertices of fillet
   /// \param theRadius          fillet radius
-  void build(const GeomShapePtr& theBaseWire,
+  void build(const GeomShapePtr& theBaseShape,
              const ListOfShape&  theFilletVertices,
              const double        theRadius);
+
+  /// Perform 1d-fillet on wire
+  /// \param theBaseWire        the base wire for fillet
+  /// \param theFilletVertices  list of vertices of fillet
+  /// \param theRadius          fillet radius
+  GeomShapePtr buildWire(const GeomShapePtr& theBaseWire,
+                         const ListOfShape&  theFilletVertices,
+                         const double        theRadius);
 
 private:
   MapModified myGenerated;

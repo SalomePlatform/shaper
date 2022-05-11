@@ -54,7 +54,8 @@ void Model_AttributeIntArray::setSize(const int theSize, bool sendUpdated)
   } else { // reset the old array
     if (theSize) {
       if (theSize != myArray->Length()) { // old data is not kept, a new array is created
-        Handle(TColStd_HArray1OfInteger) aNewArray = new TColStd_HArray1OfInteger(0, theSize - 1);
+        Handle(TColStd_HArray1OfInteger) aNewArray =
+          new TColStd_HArray1OfInteger(0, theSize - 1, 0);
         myArray->ChangeArray(aNewArray);
         if (sendUpdated)
           owner()->data()->sendAttributeUpdated(this);

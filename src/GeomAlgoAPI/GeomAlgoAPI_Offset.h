@@ -25,6 +25,16 @@
 
 class GeomAPI_Pln;
 
+/// \enum GeomAlgoAPI_OffsetJoint
+/// \brief Type of joint of straight edges in 2D offset
+/// \a KeepDistance Keep the distance from initial contour to the resulting one,
+///    creating contour from lines and arcs where it is needed
+/// \a Arcs On connection of straight edges, tangent arcs are created,
+///    except the case of too short edges. Radius of arcs equals to the offset value.
+/// \a Lines No arcs is created on the connection of the resulting lines,
+///    adjacent lines are prolonged to the point of their intersection.
+enum class GeomAlgoAPI_OffsetJoint { KeepDistance, Arcs, Lines };
+
 /// \class GeomAlgoAPI_Offset
 /// \ingroup DataAlgo
 /// \brief Perform 3D offset for the shape
@@ -39,9 +49,12 @@ public:
   /// \param[in] thePlane base plane for all offsets
   /// \param[in] theEdgesOrWire base shapes
   /// \param[in] theOffsetValue offset distance, it can be negative
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Offset(const std::shared_ptr<GeomAPI_Pln>& thePlane,
-                                        const GeomShapePtr& theEdgeOrWire,
-                                        const double theOffsetValue);
+  /// \param[in] theJointType type of joint of straight edges
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Offset
+    (const std::shared_ptr<GeomAPI_Pln>& thePlane,
+     const GeomShapePtr& theEdgeOrWire,
+     const double theOffsetValue,
+     const GeomAlgoAPI_OffsetJoint theJoint = GeomAlgoAPI_OffsetJoint::KeepDistance);
 
   /// \return the list of shapes generated from the shape \a theShape.
   /// \param[in] theOldShape base shape.

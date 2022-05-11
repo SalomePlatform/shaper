@@ -22,12 +22,14 @@
 #include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_MapShapesAndAncestors.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Wire.h>
 #include <GeomAPI_WireExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <GEOMImpl_Fillet1d.hxx>
 
@@ -66,14 +68,64 @@ GeomAlgoAPI_Fillet1D::GeomAlgoAPI_Fillet1D(const GeomShapePtr& theBaseWire,
   build(theBaseWire, theFilletVertices, theFilletRadius);
 }
 
-void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
+void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseShape,
                                  const ListOfShape&  theFilletVertices,
                                  const double        theRadius)
 {
-  if (!theBaseWire || theFilletVertices.empty() || theRadius < 0.)
+  if (!theBaseShape.get() || theFilletVertices.empty() || theRadius < 0.)
     return;
 
   myFailedVertices.clear();
+  GeomShapePtr aShape;
+
+  if (theBaseShape->isWire())
+    aShape = buildWire(theBaseShape, theFilletVertices, theRadius);
+  else if (theBaseShape->isCompound()) {
+    std::list<GeomShapePtr> aShapes;
+    for (GeomAPI_ShapeIterator it (theBaseShape); it.more(); it.next()) {
+      GeomShapePtr aSubShape = it.current();
+      if (aSubShape->isWire()) {
+        // get only fillet vertices of current wire
+        ListOfShape aFilletVertices;
+        std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aFilletVerticesSet
+          (theFilletVertices.begin(), theFilletVertices.end());
+        for (GeomAPI_WireExplorer anExp(aSubShape->wire()); anExp.more(); anExp.next()) {
+          if (aFilletVerticesSet.find(anExp.currentVertex()) != aFilletVerticesSet.end())
+            aFilletVertices.push_back(anExp.currentVertex());
+        }
+
+        GeomShapePtr aShape_i = buildWire(aSubShape, aFilletVertices, theRadius);
+        if (aShape_i.get() != NULL)
+          aShapes.push_back(aShape_i);
+        else
+          aShapes.push_back(aSubShape);
+      }
+      else {
+        setDone(false);
+        myError = "Input shape for fillet is neither a wire nor a compound of wires";
+        return;
+      }
+    }
+    aShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+    myModified[theBaseShape].push_back(aShape);
+  } else {
+    setDone(false);
+    myError = "Input shape for fillet is neither a wire nor a compound";
+    return;
+  }
+
+  setShape(aShape);
+  setDone(myFailedVertices.empty());
+}
+
+GeomShapePtr GeomAlgoAPI_Fillet1D::buildWire(const GeomShapePtr& theBaseWire,
+                                             const ListOfShape&  theFilletVertices,
+                                             const double        theRadius)
+{
+  std::shared_ptr<GeomAPI_Shape> aShape;
+  if (!theBaseWire.get() || theFilletVertices.empty() || theRadius < 0.)
+    return aShape;
+
   // store all edges of a base wire as modified, because they will be rebuild by ShapeFix
   for (GeomAPI_WireExplorer aWExp(theBaseWire->wire()); aWExp.more(); aWExp.next()) {
     GeomShapePtr aCurrent = aWExp.current();
@@ -103,7 +155,7 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
 
     GeomPlanePtr aPlane = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
     if (!aPlane)
-      return; // non-planar edges
+      return aShape; // non-planar edges
 
     TopoDS_Edge anEdge1 = TopoDS::Edge(anEdges.front()->impl<TopoDS_Shape>());
     TopoDS_Edge anEdge2 = TopoDS::Edge(anEdges.back()->impl<TopoDS_Shape>());
@@ -148,9 +200,10 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
       aNewEdges.push_back(aWExp.current());
     for (ListOfShape::iterator anIt = aNewEdges.begin(); anIt != aNewEdges.end(); ++anIt)
       aBuilder.Add(aNewWire, TopoDS::Edge((*anIt)->impl<TopoDS_Shape>()));
-  }
-  for (MapModified::iterator aGenIt = myGenerated.begin(); aGenIt != myGenerated.end(); ++aGenIt) {
-    for (ListOfShape::iterator anIt = aGenIt->second.begin(); anIt != aGenIt->second.end(); ++anIt)
+
+    ListOfShape aNewEdges1;
+    generated(aWExp.currentVertex(), aNewEdges1);
+    for (ListOfShape::iterator anIt = aNewEdges1.begin(); anIt != aNewEdges1.end(); ++anIt)
       aBuilder.Add(aNewWire, TopoDS::Edge((*anIt)->impl<TopoDS_Shape>()));
   }
   // fix the wire connectivity
@@ -161,7 +214,7 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
   aNewWire = aFixWire.WireAPIMake();
   if (aNewWire.IsNull()) {
     myFailedVertices = theFilletVertices;
-    return;
+    return aShape;
   }
 
   // update the map of modified shapes, because the edges are changed by ShapeFix
@@ -197,12 +250,10 @@ void GeomAlgoAPI_Fillet1D::build(const GeomShapePtr& theBaseWire,
     aNewWire = aReorderedWire;
   }
 
-  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-  aShape->setImpl(new TopoDS_Shape(aNewWire));
-  myModified[theBaseWire].push_back(aShape);
-
-  setShape(aShape);
-  setDone(myFailedVertices.empty());
+  std::shared_ptr<GeomAPI_Shape> aResShape(new GeomAPI_Shape);
+  aResShape->setImpl(new TopoDS_Shape(aNewWire));
+  myModified[theBaseWire].push_back(aResShape);
+  return aResShape;
 }
 
 void GeomAlgoAPI_Fillet1D::generated(const GeomShapePtr theOldShape,
