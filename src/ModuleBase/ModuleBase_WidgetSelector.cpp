@@ -73,7 +73,9 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& 
   theShape = aSelection->getShape(thePrs);
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  while (aFeature && aFeature->lastResult()->groupName() == ModelAPI_ResultGroup::group()) {
+  while (aFeature.get() &&
+         aFeature->lastResult().get() &&
+         aFeature->lastResult()->groupName() == ModelAPI_ResultGroup::group()) {
     if (!getObjectFromGroup(theObject, theShape))
       break;
     aFeature = ModelAPI_Feature::feature(theObject);
