@@ -670,6 +670,15 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  Events_InfoMessage& theError) const
 {
+  FeaturePtr anEdge1, anEdge2;
+  return isValidVertex(theAttribute, theError, anEdge1, anEdge2);
+}
+
+bool SketchPlugin_FilletVertexValidator::isValidVertex(const AttributePtr& theAttribute,
+                                                       Events_InfoMessage& theError,
+                                                       FeaturePtr&         theEdge1,
+                                                       FeaturePtr&         theEdge2)
+{
   AttributeRefAttrPtr aPointRefAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   if(!aPointRefAttr.get()) {
@@ -723,13 +732,13 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   // Get coincides from constraint.
   std::set<FeaturePtr> aCoinsides;
   SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                        aCoinsides,
-                                        true);
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                       aCoinsides,
+                                       true);
   SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                        aCoinsides,
-                                        true);
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                       aCoinsides,
+                                       true);
 
   // Remove points and external lines from set of coincides.
   std::set<FeaturePtr> aNewSetOfCoincides;
@@ -773,6 +782,11 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     theError = "Error: One of the selected points does not have two suitable edges for fillet.";
     return false;
   }
+
+  // output edges
+  std::set<FeaturePtr>::iterator aFIt = aCoinsides.begin();
+  theEdge1 = *aFIt;
+  theEdge2 = *(++aFIt);
 
   // Check that selected edges don't have tangent constraint.
   std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();

@@ -31,6 +31,7 @@
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_ConstraintRadius.h"
 #include "SketchPlugin_Tools.h"
+#include "SketchPlugin_Validators.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -53,6 +54,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <Events_Loop.h>
+#include <Events_InfoMessage.h>
 
 #include <math.h>
 
@@ -212,37 +214,15 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
   if (!aFilletPoint2D.get())
     return false;
 
-  std::set<AttributePoint2DPtr> aCoincidentPoints =
-      SketchPlugin_Tools::findPointsCoincidentToPoint(aFilletPoint2D);
-  std::set<FeaturePtr> aFilletFeatures;
-  for (std::set<AttributePoint2DPtr>::iterator aCPIt = aCoincidentPoints.begin();
-       aCPIt != aCoincidentPoints.end(); ++aCPIt) {
-    std::shared_ptr<SketchPlugin_Feature> anOwner =
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(
-        ModelAPI_Feature::feature((*aCPIt)->owner()));
-    if (anOwner && !anOwner->isExternal())
-      aFilletFeatures.insert(anOwner);
-  }
-  // remove auxilary entities from set of coincident features
-  if (aFilletFeatures.size() > 2) {
-    std::set<FeaturePtr>::iterator anIt = aFilletFeatures.begin();
-    while (anIt != aFilletFeatures.end()) {
-      if ((*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
-        std::set<FeaturePtr>::iterator aRemoveIt = anIt++;
-        aFilletFeatures.erase(aRemoveIt);
-      }
-      else
-        ++anIt;
-    }
-  }
-  if (aFilletFeatures.size() != 2) {
-    setError("Error: Selected point does not have two suitable edges for fillet.");
+  Events_InfoMessage anError;
+  FeaturePtr anEdge1, anEdge2;
+  if (!SketchPlugin_FilletVertexValidator::isValidVertex
+      (aPointRefAttr, anError, anEdge1, anEdge2)) {
+    setError(anError.messageString());
     return false;
   }
-
-  std::set<FeaturePtr>::iterator aFIt = aFilletFeatures.begin();
-  myBaseFeatures[0] = *aFIt;
-  myBaseFeatures[1] = *(++aFIt);
+  myBaseFeatures[0] = anEdge1;
+  myBaseFeatures[1] = anEdge2;
 
   std::shared_ptr<GeomAPI_Pnt2d> aFilletPnt2d = aFilletPoint2D->pnt();
   double aRadius = calculateFilletRadius(myBaseFeatures);

@@ -209,6 +209,16 @@ public:
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
+
+  //! returns true if attribute is a good point for fillet
+  //! \param theAttribute the checked point attribute
+  //! \param theError error message
+  //! \param theEdge1 adjacent edge feature
+  //! \param theEdge2 adjacent edge feature
+  static bool isValidVertex(const AttributePtr& theAttribute,
+                            Events_InfoMessage& theError,
+                            FeaturePtr&         theEdge1,
+                            FeaturePtr&         theEdge2);
 };
 
 
