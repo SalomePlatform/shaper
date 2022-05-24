@@ -696,7 +696,7 @@ Il est nommé conformément au noeud d'application. Cela n'a qu'un intérêt gra
             while True:
 
                 # B.1. Lecture du fichier
-                with open(filepath) as afile:
+                with open(filepath, encoding='utf-8') as afile:
                     summary = 0
                     method = self.parligne
                     for line in afile:
