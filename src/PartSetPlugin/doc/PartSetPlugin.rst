@@ -59,3 +59,18 @@ Result
 
 Selected part is removed together with all its objects.
 
+Move Part
+-----------
+The part feature may be moved in the Object Browser by mouse Drag-and-Drop. For this user should
+press mouse left button on a Part feature and move it up or down along the PartSet features, then release the mouse button
+to put a moved part between other PartSet features.
+
+The following conditions must be met:
+
+- PartSet document must be active.
+- No operation is started.
+- The moved part(s) do not break order of depended objects.
+
+Only enabled features could participate in the movement. If the history line arrow is located not in the end of the history
+of features and the user moves the Part much lower than this arrow, the Part feature will be dropped just after the arrow
+(the last active feature).

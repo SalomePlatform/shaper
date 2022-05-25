@@ -1441,4 +1441,127 @@ void findRandomColor(std::vector<int>& theValues, bool theReset)
 
 // LCOV_EXCL_STOP
 
+/// Returns name of the higher level feature (Part or feature of PartSet).
+static FeaturePtr topOwner(const FeaturePtr& theFeature)
+{
+  FeaturePtr anOwner = theFeature;
+  while (anOwner.get())
+  {
+    FeaturePtr aNextOwner = compositeOwner(anOwner);
+    if (aNextOwner.get())
+      anOwner = aNextOwner;
+    else
+      break;
+  }
+  if (anOwner->document() != ModelAPI_Session::get()->moduleDocument()) // the part-owner name
+    anOwner = findPartFeature(ModelAPI_Session::get()->moduleDocument(), anOwner->document());
+  return anOwner;
+}
+
+std::wstring validateMovement(const FeaturePtr& theAfter, const std::list<FeaturePtr> theMoved)
+{
+  std::wstring aResult;
+  if (theMoved.empty())
+    return aResult; // nothing to move, nothing to check, ok
+  DocumentPtr aDoc = theAfter.get() ? theAfter->document() : (*(theMoved.cbegin()))->document();
+  std::set<FeaturePtr> aMoved(theMoved.begin(), theMoved.end()); // fast access to moved
+  std::set<FeaturePtr> aPassed, aPassedMoved; // all features and all moved before the current one
+  std::set<FeaturePtr> aPassedAfter; // all passed features after theAfter
+  bool anAfterIsPassed = theAfter.get() == 0; // flag that iterator already passed theAfter
+  std::list<FeaturePtr> allFeat = aDoc->allFeatures();
+  for (std::list<FeaturePtr>::iterator aFeat = allFeat.begin(); aFeat != allFeat.end(); aFeat++)
+  {
+    if (!anAfterIsPassed)
+    {
+      if (aMoved.count(*aFeat))
+        aPassedMoved.insert(*aFeat);
+      else // check aPassedMoved are not referenced by the current feature
+        aPassed.insert(*aFeat);
+
+      anAfterIsPassed = *aFeat == theAfter;
+      if (anAfterIsPassed && !aPassedMoved.empty())
+      { // check dependencies of moved relatively to the passed
+        std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+        findAllReferences(aPassedMoved, aReferences);
+        std::map<FeaturePtr, std::set<FeaturePtr> >::iterator aRefIter = aReferences.begin();
+        for (; aRefIter != aReferences.end(); aRefIter++)
+        {
+          if (aPassed.count(aRefIter->first))
+          {
+            aResult += topOwner(aRefIter->first)->name() + L" -> ";
+            // iterate all passed moved to check is it referenced by described feature or not
+            std::set<FeaturePtr>::iterator aMovedIter = aPassedMoved.begin();
+            for (; aMovedIter != aPassedMoved.end(); aMovedIter++)
+            {
+              std::map<FeaturePtr, std::set<FeaturePtr> > aPassedRefs;
+              std::set<FeaturePtr> aMovedOne;
+              aMovedOne.insert(*aMovedIter);
+              findAllReferences(aMovedOne, aPassedRefs);
+              if (aPassedRefs.count(aRefIter->first))
+                aResult += topOwner(*aMovedIter)->name() + L" ";
+            }
+            aResult += L"\n";
+          }
+        }
+      }
+    }
+    else // iteration after theAfter
+    {
+      if (aMoved.count(*aFeat)) { // check dependencies of moved relatively to ones after theAfter
+        std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+        findAllReferences(aPassedAfter, aReferences);
+        bool aFoundRef = aReferences.find(*aFeat) != aReferences.end();
+        if (!aFoundRef && !(*aFeat)->results().empty()) // reference may be a feature in moved part
+        {
+          ResultPartPtr aFeatPart =
+            std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFeat)->firstResult());
+          if (aFeatPart.get() && aFeatPart->partDoc().get())
+          {
+            std::map<FeaturePtr, std::set<FeaturePtr> >::iterator aRef = aReferences.begin();
+            for (; aRef != aReferences.end() && !aFoundRef; aRef++)
+              aFoundRef = aRef->first->document() == aFeatPart->partDoc();
+          }
+        }
+
+        if (aFoundRef)
+        {
+          aResult += topOwner(*aFeat)->name() + L" -> ";
+          std::set<FeaturePtr> aReferencedCount; // to avoid duplicates in the displayed references
+          // iterate all passed after theAfter to check refers it described feature or not
+          FeaturePtr aFeatTop = topOwner(*aFeat);
+          std::set<FeaturePtr>::iterator aPassedIter = aPassedAfter.begin();
+          for (; aPassedIter != aPassedAfter.end(); aPassedIter++)
+          {
+            FeaturePtr aPassedTop = topOwner(*aPassedIter);
+            if (aReferencedCount.count(aPassedTop))
+              continue;
+            std::map<FeaturePtr, std::set<FeaturePtr> > aPassedRefs;
+            std::set<FeaturePtr> aPassedOne;
+            aPassedOne.insert(*aPassedIter);
+            findAllReferences(aPassedOne, aPassedRefs);
+            std::map<FeaturePtr, std::set<FeaturePtr> >::iterator aPRIter = aPassedRefs.begin();
+            for (; aPRIter != aPassedRefs.end(); aPRIter++)
+            {
+              FeaturePtr aPRTop = topOwner(aPRIter->first);
+              if (aPRIter->first == *aFeat || aPRIter->first == aFeatTop ||
+                  aPRTop == *aFeat || aPRTop == aFeatTop)
+              {
+                aResult += aPassedTop->name() + L" ";
+                aReferencedCount.insert(aPassedTop);
+                break;
+              }
+            }
+          }
+          aResult += L"\n";
+        }
+      }
+      else {
+        aPassedAfter.insert(*aFeat);
+      }
+    }
+
+  }
+  return aResult;
+}
+
 } // namespace ModelAPI_Tools

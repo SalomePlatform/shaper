@@ -121,7 +121,6 @@ void BuildPlugin_Interpolation::attributeChanged(const std::string& theID)
 //=================================================================================================
 void BuildPlugin_Interpolation::updateCoordinates()
 {
-    std::wstring exp;
     double aMint = real(MINT_ID())->value();
     double aMaxt = real(MAXT_ID())->value();
     int aNbrStep = integer(NUMSTEP_ID())->value();
