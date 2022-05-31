@@ -498,33 +498,42 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
 void SHAPERGUI::logShaperGUIEvent()
 {
   QAction* anAction = static_cast<QAction*>(sender());
+  if ( !anAction )
+    return;
   QString anId = anAction->data().toString();
-  QString anEventDescription ("SHAPER");
+  QStringList message = (QStringList() << moduleName());
   if (anId.contains("Sketch"))
-    anEventDescription += " sketcher";
-  anEventDescription += ": ";
-  anEventDescription += anAction->text();
-  anEventDescription += " has been started";
-  CAM_Application::logUserEvent(anEventDescription);
+    message << tr("sketcher");
+  message << tr("operation %1 has been activated").arg(anAction->text());
+  CAM_Application::logUserEvent(message.join(": "));
 }
 
 //******************************************************
 void SHAPERGUI::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
-  //QString anEventDescription ("SHAPER operation has been committed");
-  QString anEventDescription ("SHAPER operation ");
-  anEventDescription += theOperation->id();
-  anEventDescription += " has been committed";
-  CAM_Application::logUserEvent(anEventDescription);
+  QStringList message = (QStringList() << moduleName());
+  QString anId = theOperation->id();
+  if (anId.contains("Sketch"))
+  {
+    message << tr("sketcher");
+    anId.remove("Sketch");
+  }
+  message << tr("operation %1 has been committed").arg(anId);
+  CAM_Application::logUserEvent(message.join(": "));
 }
 
 //******************************************************
 void SHAPERGUI::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  QString anEventDescription ("SHAPER operation ");
-  anEventDescription += theOperation->id();
-  anEventDescription += " has been aborted";
-  CAM_Application::logUserEvent(anEventDescription);
+  QStringList message = (QStringList() << moduleName());
+  QString anId = theOperation->id();
+  if (anId.contains("Sketch"))
+  {
+    message << tr("sketcher");
+    anId.remove("Sketch");
+  }
+  message << tr("operation %1 has been aborted").arg(anId);
+  CAM_Application::logUserEvent(message.join(": "));
 }
 
 //******************************************************
