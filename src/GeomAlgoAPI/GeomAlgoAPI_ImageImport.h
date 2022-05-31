@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2020  CEA/DEN, EDF R&D
+// Copyright (C) 2014-2022  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,6 +15,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 #ifndef GEOMALGOAPI_IMAGEIMPORT_H_
 #define GEOMALGOAPI_IMAGEIMPORT_H_
