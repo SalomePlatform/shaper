@@ -61,6 +61,7 @@
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
 #include <QtxResourceMgr.h>
+#include <QtxInfoPanel.h>
 
 #include <Config_PropManager.h>
 #include <Config_ModuleReader.h>
@@ -243,6 +244,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
 void SHAPERGUI::windows(QMap<int, int>& theWndMap) const
 {
   theWndMap.insert(LightApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea);
+  theWndMap.insert(LightApp_Application::WT_InfoPanel, Qt::RightDockWidgetArea);
 }
 
 //******************************************************
@@ -390,7 +392,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
           this, SLOT(onSaveDocByShaper()));
   connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
           this, SLOT(onSaveAsDocByShaper()));
-
+  updateInfoPanel();
   return isDone;
 }
 
@@ -591,6 +593,11 @@ void SHAPERGUI::onSaveAsDocByShaper()
 void SHAPERGUI::onUpdateCommandStatus()
 {
   getApp()->updateActions();
+
+  LightApp_Application* aApp = dynamic_cast<LightApp_Application*>(application());
+  QtxInfoPanel* aInfoPanel = aApp->infoPanel();
+  if (aInfoPanel->isVisible())
+    updateInfoPanel();
 }
 
 //******************************************************
@@ -1311,4 +1318,91 @@ void SHAPERGUI::publishToStudy()
     aVMList << "OCCViewer" << "VTKViewer";
     getApp()->updatePresentations("SHAPERSTUDY", aVMList);
   }
+}
+
+void SHAPERGUI::fillPartSetInfoPanel(QtxInfoPanel* theInfoPanel)
+{
+  QIntList aShaperActions = shaperActions();
+  theInfoPanel->addLabel(tr("Current mode: Part set mode"));
+
+  addActionsToInfoGroup(theInfoPanel, tr("Parts management"),
+    { "Part", "Duplicate", "Remove" });
+  addActionsToInfoGroup(theInfoPanel, tr("Import operations"),
+    { "OPEN_CMD", "IMPORT_PART_CMD", "IMPORT_SHAPE_CMD" });
+  addActionsToInfoGroup(theInfoPanel, tr("Export operations"),
+    { "SAVEAS_CMD", "EXPORT_PART_CMD", "EXPORT_SHAPE_CMD" });
+  addActionsToInfoGroup(theInfoPanel, tr("Arrangement of parts"),
+    { "Placement", "Translation", "Rotation" });
+}
+
+void SHAPERGUI::fillPartInfoPanel(QtxInfoPanel* theInfoPanel)
+{
+  QIntList aShaperActions = shaperActions();
+  theInfoPanel->addLabel(tr("Current mode: Part mode"));
+
+  addActionsToInfoGroup(theInfoPanel, tr("Primitives"),
+    { "Box", "Cylinder", "Sphere" });
+  addActionsToInfoGroup(theInfoPanel, tr("Geometry"),
+    { "Vertex", "Edge", "Wire", "Face" });
+  addActionsToInfoGroup(theInfoPanel, tr("Features"),
+    { "Extrusion", "Revolution", "Cut", "Fuse", "Fillet" });
+}
+
+void SHAPERGUI::fillSketcherInfoPanel(QtxInfoPanel* theInfoPanel)
+{
+  QIntList aShaperActions = shaperActions();
+  theInfoPanel->addLabel(tr("Current mode: Sketcher mode"));
+
+  addActionsToInfoGroup(theInfoPanel, tr("Primitives"),
+    { "SketchPoint", "SketchLine", "SketchCircle", "SketchRectangle" });
+  addActionsToInfoGroup(theInfoPanel, tr("Dimensions"),
+    { "SketchConstraintLength", "SketchConstraintRadius", "SketchConstraintAngle" });
+  addActionsToInfoGroup(theInfoPanel, tr("Constraints"),
+    { "SketchConstraintParallel", "SketchConstraintPerpendicular",
+    "SketchConstraintEqual", "SketchConstraintCoincidence" });
+}
+
+void SHAPERGUI::addActionsToInfoGroup(QtxInfoPanel* theInfoPanel,
+  const QString& theGroup, const QSet<QString>& theActions)
+{
+  QIntList aShaperActions = shaperActions();
+
+  int aGroup = theInfoPanel->addGroup(theGroup);
+  int aCount = 0;
+  foreach(int aCmd, aShaperActions) {
+    QAction* aAction = action(aCmd);
+    if (theActions.contains(aAction->data().toString()))
+    {
+      theInfoPanel->addAction(aAction, aGroup);
+      aCount++;
+    }
+    if (aCount >= theActions.size())
+      break;
+  }
+}
+
+void SHAPERGUI::updateInfoPanel()
+{
+  LightApp_Application* aApp = dynamic_cast<LightApp_Application*>(application());
+  QtxInfoPanel* aInfoPanel = aApp->infoPanel();
+  aInfoPanel->clear();
+  aInfoPanel->setTitle(tr("Welcome to SHAPER"));
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QList<DocumentPtr> aDocs;
+  DocumentPtr aActiveDoc = aMgr->activeDocument();
+  DocumentPtr aModuleDoc = aMgr->moduleDocument();
+
+  XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
+  QStringList aOpList = aOpMgr->operationList();
+  bool isSketcher = false;
+  if (aOpList.size() > 0)
+    isSketcher = (aOpList.first() == "Sketch");
+
+  if (isSketcher) // Sketcher mode
+    fillSketcherInfoPanel(aInfoPanel);
+  else if (aActiveDoc == aModuleDoc) // Part set mode
+    fillPartSetInfoPanel(aInfoPanel);
+  else
+    fillPartInfoPanel(aInfoPanel);
 }
