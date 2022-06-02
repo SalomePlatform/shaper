@@ -1775,6 +1775,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     cleanHistory();
   else if (theId == "MOVE_CMD" || theId == "MOVE_SPLIT_CMD")
     moveObjects(theId == "MOVE_SPLIT_CMD");
+  else if (theId == "RECOVER_CMD")
+    recoverFeature();
   else if (theId == "COLOR_CMD")
     changeColor(anObjects);
   else if (theId == "AUTOCOLOR_CMD")
@@ -2287,6 +2289,15 @@ void XGUI_Workshop::moveObjects(const bool theSplit)
   aMgr->finishOperation();
   updateCommandStatus();
   myViewerProxy->update();
+}
+
+void XGUI_Workshop::recoverFeature()
+{
+  if (!abortAllOperations())
+    return;
+
+  static const QString RECOVER_OP_NAME = "Recover";
+  module()->launchOperation(RECOVER_OP_NAME, false);
 }
 
 //**************************************************************

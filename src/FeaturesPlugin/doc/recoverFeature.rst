@@ -8,7 +8,8 @@ Recover
 To recover in the active part:
 
 #. select in the Main Menu *Features - > Recover* item or
-#. click |recover.icon| **Recover** button in the toolbar
+#. click |recover.icon| **Recover** button in the toolbar or
+#. click |recover.icon| **Recover** command in the context menu if one feature is selected in the Object Browser
 
 The feature has the following options:
 

@@ -111,6 +111,10 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("MOVE_SPLIT_CMD", anAction);
 #endif
 
+  anAction = ModuleBase_Tools::createAction(QIcon(":pictures/recover.png"),
+    tr("Recover"), this);
+  addAction("RECOVER_CMD", anAction);
+
   anAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"),
                                            tr("Clean history"), aDesktop);
   addAction("CLEAN_HISTORY_CMD", anAction);
@@ -362,6 +366,18 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           action("MOVE_SPLIT_CMD")->setEnabled(true);
         }
 #endif
+        if (hasFeature && aObject->document() != aMgr->moduleDocument() &&
+            aObject->document() == aMgr->activeDocument())
+        {
+          XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+          if (!anOperationMgr->hasOperation()) {
+            FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+            std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+            ModelAPI_Tools::getConcealedResults(aFeature, aResults);
+            if (!aResults.empty()) // check the feature conceals at least one result
+              action("RECOVER_CMD")->setEnabled(true);
+          }
+        }
 
         if( aMgr->activeDocument() == aObject->document() )
         {
@@ -729,6 +745,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_RESULTS_CMD"));
   aList.append(action("MOVE_CMD"));
   aList.append(action("MOVE_SPLIT_CMD"));
+  aList.append(action("RECOVER_CMD"));
   aList.append(mySeparator1);
   aList.append(action("INSERT_FOLDER_CMD"));
   aList.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
