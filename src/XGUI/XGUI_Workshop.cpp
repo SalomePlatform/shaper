@@ -2897,7 +2897,7 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 void XGUI_Workshop::updateColorScaleVisibility()
 {
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  viewer()->setColorScaleShown(false);
+  myViewerProxy->setColorScaleShown(false);
   if (anObjects.size() == 1) {
     FieldStepPtr aStep =
       std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(anObjects.first());
@@ -2926,6 +2926,55 @@ void XGUI_Workshop::updateColorScaleVisibility()
       }
     }
   }
+}
+
+//**************************************************************
+void XGUI_Workshop::updateGroupsText()
+{
+  ModuleBase_IViewer::TextColor aText;
+
+  int aSize = 10;
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  if (aResMgr->booleanValue("Viewer", "group_names_display")) {
+    // the first item in the TextColor list is font name -> text color
+    QColor aTextColor = aResMgr->colorValue("Viewer", "group_names_color");
+    std::vector<int> aTextCV;
+    aTextCV.push_back(aTextColor.red());
+    aTextCV.push_back(aTextColor.green());
+    aTextCV.push_back(aTextColor.blue());
+    QString aFontName = aResMgr->stringValue("Viewer", "group_names_font");
+    aText.push_back(std::pair<std::wstring, std::vector<int> >(aFontName.toStdWString(), aTextCV));
+    aSize = aResMgr->integerValue("Viewer", "group_names_size");
+
+    DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
+    int aNbGroups = aDoc->size(ModelAPI_ResultGroup::group());
+    for (int aGIndex = 0; aGIndex < aNbGroups; aGIndex++)
+    {
+      ResultGroupPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(
+        aDoc->object(ModelAPI_ResultGroup::group(), aGIndex));
+      if (aGroup.get() && !aGroup->isDisabled() && aGroup->isDisplayed())
+      {
+        std::vector<int> aColor;
+        ModelAPI_Tools::getColor(aGroup, aColor);
+        if (aColor.empty())
+        { // default groups colors
+          std::string aSection, aName, aDefault;
+          aGroup->colorConfigInfo(aSection, aName, aDefault);
+          if (!aSection.empty() && !aName.empty()) {
+            aColor = Config_PropManager::color(aSection, aName);
+          }
+        }
+        if (aColor.empty())
+        {
+          aColor.push_back(150.);
+          aColor.push_back(150.);
+          aColor.push_back(150.);
+        }
+        aText.push_back(std::pair<std::wstring, std::vector<int> >(aGroup->data()->name(), aColor));
+      }
+    }
+  }
+  myViewerProxy->setText(aText, aSize);
 }
 
 

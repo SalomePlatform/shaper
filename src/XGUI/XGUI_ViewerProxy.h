@@ -166,6 +166,12 @@ Q_OBJECT
   //! Set color scale parameters according to user preferences and window size
   void setupColorScale();
 
+  //! Sets the text displayed in right-top corner of the 3D view
+  //! \param theText the text to display, or empty string to erase presentation;
+  //!        the first item is the font name and text color
+  //! \param theSize size of the text font
+  virtual void setText(const ModuleBase_IViewer::TextColor& theText, const int theSize);
+
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
 

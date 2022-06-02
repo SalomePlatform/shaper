@@ -463,32 +463,26 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_x_position");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 1, aItem);
-
   aItem = myPreferences->addItem(tr("Y position"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_y_position");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 1, aItem);
-
   aItem = myPreferences->addItem(tr("Width"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_width");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 1, aItem);
-
   aItem = myPreferences->addItem(tr("Height"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_height");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 1, aItem);
-
   aItem = myPreferences->addItem(tr("Intervals number"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_nb_intervals");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 100, aItem);
-
   aItem = myPreferences->addItem(tr("Text height"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_height");
   myPreferences->setItemProperty("min", 0, aItem);
   myPreferences->setItemProperty("max", 100, aItem);
-
   aItem = myPreferences->addItem(tr("Text color"), colorScaleGroup,
     SUIT_PreferenceMgr::Color, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_color");
 }

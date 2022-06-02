@@ -726,24 +726,13 @@ void XGUI_ViewerProxy::setupColorScale()
   setColorScaleIntervals(aN);
 }
 
-
-//***************************************
-//void XGUI_ViewerProxy::Zfitall()
-//{
-//#ifdef HAVE_SALOME
-//  myWorkshop->salomeConnector()->viewer()->Zfitall();
-//#else
-//  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-//  AppElements_ViewWindow* aView = aViewer->activeViewWindow();
-//  if (aView) {
-//    Handle(V3d_View) aView3d = aView->v3dView();
-//    aView3d->ZFitAll();
-//    if (aView3d->Depth() < 0.1)
-//      aView3d->DepthFitAll();
-//  }
-//#endif
-//}
-
+void XGUI_ViewerProxy::setText(
+  const ModuleBase_IViewer::TextColor& theText, const int theSize)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setText(theText, theSize);
+#endif
+}
 
 #ifdef HAVE_SALOME
 void XGUI_ViewerProxy::setFitter(OCCViewer_Fitter* theFitter)

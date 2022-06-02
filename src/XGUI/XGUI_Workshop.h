@@ -343,6 +343,9 @@ Q_OBJECT
   /// The method updates a Color Scale object in the viewer
   void updateColorScaleVisibility();
 
+  /// The method updates a Text of Group names in the viewer.
+  void updateGroupsText();
+
   void showHelpPage(const QString& thePage) const;
 
 signals:

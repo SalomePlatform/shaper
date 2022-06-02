@@ -36,7 +36,6 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultConstruction.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -224,6 +223,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     emit objectDisplayed(theObject, theAIS);
     selectionActivate()->activate(anAISIO, theUpdateViewer);
   }
+  myWorkshop->updateGroupsText();
   if (theUpdateViewer)
     updateViewer();
 
@@ -261,7 +261,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   qDebug(QString("erase object: %1").arg(aPtrStr.str().c_str()).toStdString().c_str());
   qDebug(getResult2AISObjectMapInfo().c_str());
 #endif
-
+  myWorkshop->updateGroupsText();
   if (theUpdateViewer)
     updateViewer();
 
@@ -352,6 +352,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
     #ifdef DEBUG_FEATURE_REDISPLAY
       qDebug("  Redisplay happens");
     #endif
+    myWorkshop->updateGroupsText();
     if (theUpdateViewer)
       updateViewer();
   }
@@ -533,6 +534,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
         aErased = true;
       }
     }
+    myWorkshop->updateGroupsText();
     if (theUpdateViewer)
       updateViewer();
   }
@@ -639,21 +641,9 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     myContextId = aContext.get();
     if (!myWorkshop->selectionActivate()->isTrihedronActive())
       selectionActivate()->deactivateTrihedron(true);
-    // Do not modify default drawer. The same is done in ModuleBase_ResultPrs
-    //aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
-    //aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
     // Commented out according to discussion in bug #2825
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
-    //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
-    //double aDeflection =
-    //  QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
-    //try {
-    //  aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
-    //} catch (...) {}
-
-    //ModuleBase_IViewer::DefaultHighlightDrawer->SetDeviationCoefficient(aDeflection);
-    //aSelStyle->SetDeviationCoefficient(aDeflection);
 
     Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
     if (!aTrihedron.IsNull())
@@ -916,39 +906,6 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 }
 
 //**************************************************************
-//bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
-//{
-//  AISObjectPtr anAISObj = getAISObject(theObject);
-//  // correct the result's color it it has the attribute
-//  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-//
-//  // Customization of presentation
-//  GeomCustomPrsPtr aCustomPrs;
-//  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-//  if (aFeature.get() != NULL) {
-//    GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-//    if (aCustPrs.get() != NULL)
-//      aCustomPrs = aCustPrs;
-//  }
-//  if (aCustomPrs.get() == NULL) {
-//    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-//    // we ignore presentable not customized objects
-//    if (aPrs.get() == NULL)
-//      aCustomPrs = myCustomPrs;
-//  }
-//  bool isCustomized = aCustomPrs.get() &&
-//                      aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
-//  isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
-//                 || isCustomized;
-//
-//  // update presentation state if faces panel is active
-//  if (anAISObj.get() && myWorkshop->facesPanel())
-//    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, anAISObj) || isCustomized;
-//
-//  return isCustomized;
-//}
-
-//**************************************************************
 QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
                                       const QColor& theColor,
                                       bool theUpdateViewer)
@@ -960,6 +917,7 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
   int aR, aG, aB;
   anAISObj->getColor(aR, aG, aB);
   anAISObj->setColor(theColor.red(), theColor.green(), theColor.blue());
+  myWorkshop->updateGroupsText();
   if (theUpdateViewer)
     updateViewer();
   return QColor(aR, aG, aB);

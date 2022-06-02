@@ -1104,10 +1104,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
     aText += QString(QObject::tr(aMsg));
     aDetailedText += QString(QObject::tr(aMsgDetails))
                      .arg(aParamFeatureNames.join(aSep));
-#ifdef _DEBUG
-    QPushButton *aReplaceButton =
-#endif
-      aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
+    aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
   }
 
   if (!aText.isEmpty()) {
