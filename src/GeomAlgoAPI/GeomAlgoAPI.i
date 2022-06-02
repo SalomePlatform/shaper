@@ -113,8 +113,10 @@
 %include "GeomAlgoAPI_Symmetry.h"
 %include "GeomAlgoAPI_Box.h"
 %include "GeomAlgoAPI_MapShapesAndAncestors.h"
+%include "GeomAlgoAPI_ShapeInfo.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
   $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );
 }
 %template(ShapeList) std::list<std::shared_ptr<GeomAPI_Shape> >;
+%template(ValuesList) std::list<GeomAlgoAPI_InfoValue>;
