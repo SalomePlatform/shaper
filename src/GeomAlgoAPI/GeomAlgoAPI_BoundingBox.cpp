@@ -342,9 +342,9 @@ Standard_Boolean PreciseBoundingBox(const TopoDS_Shape &theShape, Bnd_Box &theBo
 
 //=================================================================================================
 bool GetBoundingBox(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                    Standard_Real& theXmin,Standard_Real& theXmax,
-                    Standard_Real& theYmin,Standard_Real& theYmax,
-                    Standard_Real& theZmin,Standard_Real& theZmax,
+                    double& theXmin, double& theXmax,
+                    double& theYmin, double& theYmax,
+                    double& theZmin, double& theZmax,
                     std::string& theError)
 {
   #ifdef _DEBUG

@@ -23,14 +23,19 @@
 #include <GeomAlgoAPI.h>
 
 #include <string>
+#include <list>
+#include <memory>
 
-#include <GeomAPI_Shape.h>
+class GeomAPI_Shape;
+class ModelAPI_Result;
 
-/// Implementation of the export STEP files algorithms
+/// Implementation of the export STEP files algorithms.
+/// In order to supposrt names and colors experted, theShapes list corresponds to theResults
+/// list elements one by one.
 GEOMALGOAPI_EXPORT
 bool STEPExport(const std::string& theFileName,
-                const std::string& theFormatName,
-                const std::shared_ptr<GeomAPI_Shape>& theShape,
+                const std::list<std::shared_ptr<GeomAPI_Shape> >& theShapes,
+                const std::list<std::shared_ptr<ModelAPI_Result> >& theResults,
                 std::string& theError);
 
 #endif /* GEOMALGOAPI_STEPEXPORT_H_ */

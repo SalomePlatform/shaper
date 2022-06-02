@@ -158,6 +158,7 @@
 #include <iterator>
 
 #ifdef TINSPECTOR
+#include <Model_Session.h>
 #include <TDocStd_Application.hxx>
 #include <inspector/TInspector_Communicator.hxx>
 #include <inspector/VInspector_CallBack.hxx>
@@ -1860,7 +1861,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   }
 #ifdef TINSPECTOR
   else if (theId == "TINSPECTOR_VIEW") {
-    Handle(TDocStd_Application) anApplication = ModelAPI_Session::get()->application();
+    std::shared_ptr<Model_Session> aSession =
+      std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
+
+    Handle(TDocStd_Application) anApplication = aSession->application();
     if (!anApplication.IsNull())
     {
       if (!MyTCommunicator)

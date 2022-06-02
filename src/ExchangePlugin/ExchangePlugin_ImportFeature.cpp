@@ -168,19 +168,16 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   data()->setName(Locale::Convert::toWString(anObjectName));
 
   ResultBodyPtr aResult = document()->createBody(data());
-
-  bool anColorGroupSelected = boolean(ExchangePlugin_ImportFeature::STEP_COLORS_ID())->value();
-  bool anMaterialsGroupSelected =
-                        boolean(ExchangePlugin_ImportFeature::STEP_MATERIALS_ID())->value();
+  bool anColorGroupSelected = false, anMaterialsGroupSelected = false;
   if (anExtension == "BREP" || anExtension == "BRP") {
     aGeomShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
-    bool anScalInterUnits =
-            boolean(ExchangePlugin_ImportFeature::STEP_SCALE_INTER_UNITS_ID())->value();
+    bool anScalInterUnits = boolean(STEP_SCALE_INTER_UNITS_ID())->value();
+    anColorGroupSelected = boolean(STEP_COLORS_ID())->value();
+    anMaterialsGroupSelected = boolean(STEP_MATERIALS_ID())->value();
 
     // Process groups/fields
-    std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
+    AttributeRefListPtr aRefListOfGroups = reflist(FEATURES_ID());
 
     // Remove previous groups/fields stored in RefList
     std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();

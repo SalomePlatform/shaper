@@ -56,4 +56,6 @@ SET(TEST_NAMES
   TestImportPart_Multiple.py
   TestImportPart_ToEmptyPart.py
   TestImportPart_ToEmptyPartSet.py
+  TestStep1.py
+  TestStep2.py
 )

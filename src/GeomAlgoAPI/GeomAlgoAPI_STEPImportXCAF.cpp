@@ -40,6 +40,7 @@
 #include <TopoDS.hxx>
 #include <Transfer_TransientProcess.hxx>
 #include <TransferBRep.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
 
 #include <XCAFApp_Application.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
@@ -47,8 +48,33 @@
 #include <XCAFDoc_ShapeTool.hxx>
 #include <XSControl_TransferReader.hxx>
 #include <XSControl_WorkSession.hxx>
+#include <XCAFDoc_ColorTool.hxx>
+#include <XCAFDoc_MaterialTool.hxx>
 
 #include <Locale_Convert.h>
+
+// read geometry
+std::shared_ptr<GeomAPI_Shape> setGeom(const Handle(XCAFDoc_ShapeTool) &shapeTool,
+  const TDF_Label &theLabel,
+  std::string& theError);
+
+/// read attributs for  label
+void setShapeAttributes(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
+  const Handle(XCAFDoc_ColorTool) &theColorTool,
+  const Handle(XCAFDoc_MaterialTool) &TheMaterialTool,
+  const TDF_Label &theLabel,
+  const TopLoc_Location &theLoc,
+  std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  std::map< std::wstring, std::list<std::wstring>> &theMaterialShape,
+  bool theIsRef);
+
+// store Materiel for theShapeLabel in the map theMaterialShape
+void storeMaterial(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  const Handle(Standard_Transient) &theEnti,
+  const TopTools_IndexedMapOfShape &theIndices,
+  const Handle(Transfer_TransientProcess) &theTP,
+  const TDF_Label &theShapeLabel,
+  std::map< std::wstring, std::list<std::wstring>> &theMaterialShape);
 
 //=============================================================================
 TopoDS_Shape getShape(const Handle(Standard_Transient) &theEnti,
@@ -89,7 +115,7 @@ std::shared_ptr<GeomAPI_Shape> readAttributes(STEPCAFControl_Reader &theReader,
   setShapeAttributes(shapeTool, colorTool, materialTool, mainLabel,
                      TopLoc_Location(),theResultBody,theMaterialShape,false);
 
-  std::shared_ptr<GeomAPI_Shape> ageom =  setgeom(shapeTool,mainLabel,theError);
+  std::shared_ptr<GeomAPI_Shape> ageom =  setGeom(shapeTool,mainLabel,theError);
 
   STEPControl_Reader aReader = theReader.ChangeReader();
 
@@ -119,7 +145,7 @@ std::shared_ptr<GeomAPI_Shape> readAttributes(STEPCAFControl_Reader &theReader,
 }
 
 //=============================================================================
-std::shared_ptr<GeomAPI_Shape> setgeom(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
+std::shared_ptr<GeomAPI_Shape> setGeom(const Handle(XCAFDoc_ShapeTool) &theShapeTool,
                                        const TDF_Label& /*theLabel*/,
                                        std::string& theError)
 {
@@ -386,4 +412,3 @@ void storeMaterial( std::shared_ptr<ModelAPI_ResultBody>    theResultBody,
     }
   }
 }
-

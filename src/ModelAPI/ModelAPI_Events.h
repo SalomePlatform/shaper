@@ -668,7 +668,8 @@ class ModelAPI_CheckConstraintsMessage : public Events_Message
 {
 public:
   /// Creates an empty message
-  MODELAPI_EXPORT ModelAPI_CheckConstraintsMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT ModelAPI_CheckConstraintsMessage(
+    const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_CheckConstraintsMessage();
 
