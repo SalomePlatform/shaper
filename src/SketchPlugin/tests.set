@@ -171,6 +171,7 @@ SET(TEST_NAMES
   TestMultiTranslation.py
   TestOffset1.py
   TestOffset2.py
+  TestOffset3.py
   TestPresentation.py
   TestProjection.py
   TestProjectionBSpline.py

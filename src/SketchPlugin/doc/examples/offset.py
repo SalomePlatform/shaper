@@ -16,7 +16,18 @@ Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchLine_4.endPoint())
 Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_4.startPoint())
 
 SketchOffset_1_objects = [SketchLine_1.result(), SketchLine_2.result(), SketchLine_3.result(), SketchLine_4.result()]
+
+### KeepDistance (default) mode, not reversed (outside)
 SketchOffset_1 = Sketch_1.addOffset(SketchOffset_1_objects, 10.0, False)
+
+### KeepDistance mode, reversed (inside)
+SketchOffset_2 = Sketch_1.addOffset(SketchOffset_1_objects, 25.0, True, "KeepDistance")
+
+### Arcs mode, reversed (inside)
+SketchOffset_3 = Sketch_1.addOffset(SketchOffset_1_objects, 15.0, True, "Arcs")
+
+### Lines mode, not reversed (outside)
+SketchOffset_4 = Sketch_1.addOffset(SketchOffset_1_objects, 20.0, False, "Lines")
 
 model.do()
 model.end()

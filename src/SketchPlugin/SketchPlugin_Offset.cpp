@@ -40,15 +40,19 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_MapShapesAndAncestors.h>
 #include <GeomAlgoAPI_Offset.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
+#include <GeomAlgoAPI_Fillet1D.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_BSpline.h>
 #include <GeomAPI_Circ.h>
@@ -60,6 +64,8 @@
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
+
+#include <math.h>
 
 static const double tolerance = 1.e-7;
 
@@ -86,12 +92,31 @@ void SketchPlugin_Offset::initAttributes()
       registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
   ModelAPI_Session::get()->validators()->
       registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
+
+  AttributeStringPtr aJointAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>
+    (data()->addAttribute(JOINT_ID(), ModelAPI_AttributeString::typeId()));
+  if (!aJointAttr->isInitialized())
+    aJointAttr->setValue(JOINT_KEEP_DISTANCE());
 }
 
 void SketchPlugin_Offset::execute()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (!aSketch) return;
+
+  // 0. Joint type
+  AttributeStringPtr aJointAttr = string(JOINT_ID());
+  std::string aType = JOINT_KEEP_DISTANCE();
+  if (aJointAttr->isInitialized())
+    aType = aJointAttr->value();
+
+  GeomAlgoAPI_OffsetJoint aJoint;
+  if (aType == JOINT_ARCS())
+    aJoint = GeomAlgoAPI_OffsetJoint::Arcs;
+  else if (aType == JOINT_LINES())
+    aJoint = GeomAlgoAPI_OffsetJoint::Lines;
+  else // Default mode
+    aJoint = GeomAlgoAPI_OffsetJoint::KeepDistance;
 
   // 1. Sketch plane
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
@@ -189,14 +214,21 @@ void SketchPlugin_Offset::execute()
       }
 
       // 5.d. Make offset for the wire
-      std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape(
-          new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign));
+      std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape
+        (new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign, aJoint));
 
       if (anOffsetShape->isDone()) {
-        std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList(new GeomAlgoAPI_MakeShapeList);
-        aMakeList->appendAlgo(aWireBuilder);
-        aMakeList->appendAlgo(anOffsetShape);
-        anOffsetAlgos.push_back(aMakeList);
+        if (aJoint == GeomAlgoAPI_OffsetJoint::Arcs) {
+          // For Arcs joint make fillet at all straight edges intersections
+          // of the wire, resulting from GeomAlgoAPI_Offset algorithm
+          makeFillet(fabs(aValue), aWireBuilder, anOffsetShape, anOffsetAlgos);
+        }
+        else {
+          std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList (new GeomAlgoAPI_MakeShapeList);
+          aMakeList->appendAlgo(aWireBuilder);
+          aMakeList->appendAlgo(anOffsetShape);
+          anOffsetAlgos.push_back(aMakeList);
+        }
       }
       else {
         setError("Offset algorithm failed");
@@ -753,7 +785,6 @@ bool SketchPlugin_Offset::findWires()
       }
     }
   }
-  // TODO: hilight selection in the viewer
 
   data()->blockSendAttributeUpdated(aWasBlocked);
   return true;
@@ -768,4 +799,112 @@ AISObjectPtr SketchPlugin_Offset::getAISObject(AISObjectPtr thePrevious)
   AISObjectPtr anAIS = SketcherPrs_Factory::offsetObject(this, sketch(),
     thePrevious);
   return anAIS;
+}
+
+
+void SketchPlugin_Offset::makeFillet
+     (const double theValue,
+      const std::shared_ptr<GeomAlgoAPI_WireBuilder>& theWireBuilder,
+      const std::shared_ptr<GeomAlgoAPI_Offset>& theOffsetShape,
+      ListOfMakeShape& theOffsetAlgos)
+{
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList (new GeomAlgoAPI_MakeShapeList);
+  aMakeList->appendAlgo(theWireBuilder);
+  aMakeList->appendAlgo(theOffsetShape);
+
+  bool isOK = true;
+
+  GeomShapePtr aResWire = theOffsetShape->shape();
+  GeomAlgoAPI_MapShapesAndAncestors aMapVE
+    (aResWire, GeomAPI_Shape::VERTEX, GeomAPI_Shape::EDGE);
+  const MapShapeToShapes& aSubshapes = aMapVE.map();
+
+  // find vertices for fillet
+  std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aFilletVertices;
+  for (MapShapeToShapes::const_iterator anIt = aSubshapes.begin();
+       anIt != aSubshapes.end(); ++anIt) {
+    // vertex should have 2 adjacent edges
+    if (anIt->second.size() != 2)
+      continue;
+
+    // both edges should be linear
+    ListOfShape anEdges;
+    anEdges.insert(anEdges.end(), anIt->second.begin(), anIt->second.end());
+    GeomEdgePtr anEdge1 (new GeomAPI_Edge(anEdges.front()));
+    GeomEdgePtr anEdge2 (new GeomAPI_Edge(anEdges.back()));
+    if (!anEdge1->isLine() || !anEdge2->isLine())
+      continue;
+
+    // skip vertices, which smoothly connect adjacent edges
+    GeomVertexPtr aSharedVertex(new GeomAPI_Vertex(anIt->first));
+    if (GeomAlgoAPI_ShapeTools::isTangent(anEdge1, anEdge2, aSharedVertex))
+      continue;
+
+    aFilletVertices.insert(anIt->first);
+  }
+
+  if (!aFilletVertices.empty()) {
+    isOK = false; // the wire needs correction
+    ListOfShape aVerticesList (aFilletVertices.begin(), aFilletVertices.end());
+
+    // Fillet1D on all linear edges intersections
+    std::shared_ptr<GeomAlgoAPI_Fillet1D> aFilletBuilder
+      (new GeomAlgoAPI_Fillet1D(aResWire, aVerticesList, theValue));
+
+    std::string anError;
+    if (!GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed
+        (aFilletBuilder, getKind(), anError)) {
+      aMakeList->appendAlgo(aFilletBuilder);
+      isOK = true;
+    }
+    else {
+      ListOfShape aFailedVertices = aFilletBuilder->failedVertices();
+      if (aFailedVertices.size() != 0) {
+        // Exclude failed vertices and also vertices, joined
+        // with failed by one edge, and run algorithm once again
+        ListOfShape::iterator itVertices = aFailedVertices.begin();
+        for (; itVertices != aFailedVertices.end(); itVertices++) {
+          GeomShapePtr aFailedVertex = *itVertices;
+          aFilletVertices.erase(aFailedVertex);
+          // remove also neighbour vertices
+          MapShapeToShapes::const_iterator anIt = aSubshapes.find(aFailedVertex);
+          if (anIt != aSubshapes.end()) { // should be always true
+            ListOfShape anEdges;
+            anEdges.insert(anEdges.end(), anIt->second.begin(), anIt->second.end());
+            GeomEdgePtr anEdge1 (new GeomAPI_Edge(anEdges.front()));
+            GeomEdgePtr anEdge2 (new GeomAPI_Edge(anEdges.back()));
+            GeomVertexPtr V1, V2;
+            anEdge1->vertices(V1, V2);
+            if (V1->isEqual(aFailedVertex)) V1 = V2;
+            aFilletVertices.erase(V1);
+            anEdge2->vertices(V1, V2);
+            if (V1->isEqual(aFailedVertex)) V1 = V2;
+            aFilletVertices.erase(V1);
+          }
+        }
+        if (aFilletVertices.size() == 0) {
+          // there are no suitable vertices for fillet
+          isOK = true;
+        }
+        else {
+          // Fillet1D one more try
+          ListOfShape aVerticesList1 (aFilletVertices.begin(), aFilletVertices.end());
+
+          std::shared_ptr<GeomAlgoAPI_Fillet1D> aFilletBuilder1
+            (new GeomAlgoAPI_Fillet1D(aResWire, aVerticesList1, theValue));
+
+          if (!GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed
+              (aFilletBuilder1, getKind(), anError)) {
+            aMakeList->appendAlgo(aFilletBuilder1);
+            isOK = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (isOK)
+    theOffsetAlgos.push_back(aMakeList);
+  else
+    setError("Offset algorithm failed");
 }
