@@ -99,6 +99,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual std::list<std::string> undoList();
   //! Returns stack of rolled back operations
   MODEL_EXPORT virtual std::list<std::string> redoList();
+  //! Clears undo and redo lists of all documents in the session
+  MODEL_EXPORT virtual void clearUndoRedo();
 
   /// Returns the root document of the application (that may contains sub-documents)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> moduleDocument();

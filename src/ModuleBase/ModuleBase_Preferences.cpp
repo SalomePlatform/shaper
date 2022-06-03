@@ -160,57 +160,64 @@ void ModuleBase_Preferences::resetConfigPropPreferences(SUIT_PreferenceMgr* theP
 void ModuleBase_Preferences::createGeneralTab(ModuleBase_IPrefMgr* thePref, int thePageId)
 {
   int generalTab = thePref->addPreference(QObject::tr("General"), thePageId,
-                                          SUIT_PreferenceMgr::Auto, QString(), QString());
+    SUIT_PreferenceMgr::Auto, QString(), QString());
   thePref->setItemProperty("columns", 2, generalTab);
 
   QStringList actItemList;
   actItemList << QObject::tr("Last part")
-              << QObject::tr("All parts")
-              << QObject::tr("No activation");
+    << QObject::tr("All parts")
+    << QObject::tr("No activation");
 
   QList<QVariant> actIdList;
   actIdList << 0 << 1 << 2;
 
-  // Group related to opening a study
-  int group = thePref->addPreference(QObject::tr("Opening a study"), generalTab,
+  // Group related to creation of a study
+  int group = thePref->addPreference(QObject::tr("Creation a study"), generalTab,
                                      SUIT_PreferenceMgr::Auto, QString(), QString());
 
-  int actId = thePref->addPreference(QObject::tr("Activate"), group, SUIT_PreferenceMgr::Selector,
-                                     ModuleBase_Preferences::GENERAL_SECTION,
-                                     "part_activation_study");
-  thePref->setItemProperty("strings", actItemList, actId);
-  thePref->setItemProperty("indexes", actIdList, actId);
-
-  QStringList visuItemList;
-  visuItemList << QObject::tr("As stored in HDF")
-               << QObject::tr("Last item in each folder")
-               << QObject::tr("All items")
-               << QObject::tr("No visualization");
-
-  QList<QVariant> visuIdList;
-  visuIdList << 0 << 1 << 2 << 3;
-
-  int visuId = thePref->addPreference(QObject::tr("Display"), group, SUIT_PreferenceMgr::Selector,
-                                      ModuleBase_Preferences::GENERAL_SECTION,
-                                      "part_visualization_study");
-  thePref->setItemProperty("strings", visuItemList, visuId);
-  thePref->setItemProperty("indexes", visuIdList, visuId);
+  int actId = thePref->addPreference(QObject::tr("Create new part"), group, SUIT_PreferenceMgr::Bool,
+                                     ModuleBase_Preferences::GENERAL_SECTION, "create_init_part");
 
   // Group related to running a python script
   group = thePref->addPreference(QObject::tr("Launching a python script"), generalTab,
                                  SUIT_PreferenceMgr::Auto, QString(), QString());
 
-  visuItemList.clear();
+  QStringList visuItemList;
   visuItemList << QObject::tr("Last item in each folder")
                << QObject::tr("All items")
                << QObject::tr("No visualization");
 
-  visuIdList.clear();
+  QList<QVariant> visuIdList;
   visuIdList << 0 << 1 << 2;
+
+  int visuId = thePref->addPreference(QObject::tr("Display"), group, SUIT_PreferenceMgr::Selector,
+                                      ModuleBase_Preferences::GENERAL_SECTION,
+                                      "part_visualization_script");
+  thePref->setItemProperty("strings", visuItemList, visuId);
+  thePref->setItemProperty("indexes", visuIdList, visuId);
+
+  // Group related to opening a study
+  group = thePref->addPreference(QObject::tr("Opening a study"), generalTab,
+                                 SUIT_PreferenceMgr::Auto, QString(), QString());
+
+  actId = thePref->addPreference(QObject::tr("Activate"), group, SUIT_PreferenceMgr::Selector,
+                                 ModuleBase_Preferences::GENERAL_SECTION,
+                                 "part_activation_study");
+  thePref->setItemProperty("strings", actItemList, actId);
+  thePref->setItemProperty("indexes", actIdList, actId);
+
+  visuItemList.clear();
+  visuItemList << QObject::tr("As stored in HDF")
+               << QObject::tr("Last item in each folder")
+               << QObject::tr("All items")
+               << QObject::tr("No visualization");
+
+  visuIdList.clear();
+  visuIdList << 0 << 1 << 2 << 3;
 
   visuId = thePref->addPreference(QObject::tr("Display"), group, SUIT_PreferenceMgr::Selector,
                                   ModuleBase_Preferences::GENERAL_SECTION,
-                                  "part_visualization_script");
+                                  "part_visualization_study");
   thePref->setItemProperty("strings", visuItemList, visuId);
   thePref->setItemProperty("indexes", visuIdList, visuId);
 }

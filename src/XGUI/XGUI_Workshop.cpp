@@ -90,6 +90,7 @@
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
+#include <Events_MessageBool.h>
 
 #include <ExchangePlugin_ExportPart.h>
 #include <ExchangePlugin_ImportPart.h>
@@ -1160,6 +1161,12 @@ void XGUI_Workshop::onPreferences()
         myMainWindow->viewer()->updateFromResources();
       } else if (aSection == ModuleBase_Preferences::MENU_SECTION) {
         myMainWindow->menuObject()->updateFromResources();
+      }
+      else if (aSection == ModuleBase_Preferences::GENERAL_SECTION && aPref.second == "create_init_part") {
+        bool aCreate = ModuleBase_Preferences::resourceMgr()->booleanValue(
+          ModuleBase_Preferences::GENERAL_SECTION, "create_init_part", true);
+        Events_MessageBool aCreateMsg(Events_Loop::eventByName(EVENT_CREATE_PART_ON_START), aCreate);
+        aCreateMsg.send();
       }
     }
     std::vector<int> aColor;

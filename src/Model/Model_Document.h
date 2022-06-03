@@ -106,6 +106,8 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual bool canRedo();
   //! Redoes last operation
   MODEL_EXPORT virtual void redo();
+  //! Clears undo/redo lists
+  MODEL_EXPORT virtual void clearUndoRedo();
 
   //! Adds to the document the new feature of the given feature id
   //! \param theID creates feature and puts it in the document

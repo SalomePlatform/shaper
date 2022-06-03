@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
     Events_Loop.h
     Events_LongOp.h
     Events_InfoMessage.h
+    Events_MessageBool.h
 )
 
 SET(PROJECT_SOURCES
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
     Events_Loop.cpp
     Events_LongOp.cpp
     Events_InfoMessage.cpp
+    Events_MessageBool.cpp
 )
 
 SET(PROJECT_LIBRARIES

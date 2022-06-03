@@ -9,6 +9,7 @@
     <parameter name="part_activation_study" value="0"/>
     <parameter name="part_visualization_study" value="0"/>
     <parameter name="part_visualization_script" value="1"/>
+    <parameter name="create_init_part" value="true"/>
   </section>
   <section name="Sketch">
     <!-- Sketch preferences -->
