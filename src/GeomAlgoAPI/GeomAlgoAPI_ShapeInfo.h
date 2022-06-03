@@ -28,6 +28,8 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 
+#include <string>
+
 /// Keeps values of different possible types, used in python shapeInfo.
 class GeomAlgoAPI_InfoValue
 {
