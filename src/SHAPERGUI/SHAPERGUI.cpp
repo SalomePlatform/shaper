@@ -856,88 +856,94 @@ void SHAPERGUI::contextMenuPopup(const QString& theClient, QMenu* theMenu, QStri
 //******************************************************
 void SHAPERGUI::createPreferences()
 {
-  LightApp_Preferences* pref = preferences();
-  if (!pref)
+  LightApp_Preferences* aPref = preferences();
+  if (!aPref)
     return;
   ModuleBase_Preferences::updateConfigByResources();
   QString aModName = moduleName();
 
-  QtxPreferenceItem* item = pref->findItem(aModName, true );
+  QtxPreferenceItem* item = aPref->findItem(aModName, true );
   if ( item && (!item->isEmpty() )) {
     item->parentItem()->removeItem(item);
     delete item;
   }
 
-  int catId = pref->addPreference(aModName, -1 );
+  int catId = aPref->addPreference(aModName, -1 );
   if ( catId == -1 )
     return;
-  SHAPERGUI_PrefMgr aMgr(pref, aModName);
+  SHAPERGUI_PrefMgr aMgr(aPref, aModName);
   ModuleBase_Preferences::createEditContent(&aMgr, catId);
 
-  int viewTab = pref->addItem(tr("Viewer"), catId);
+  int viewTab = aPref->addItem(tr("Viewer"), catId);
   // Create other parameters group in viewer tab
-  int otherGroup = pref->addItem(tr("Default selection"), viewTab);
-  pref->setItemProperty("columns", 3, otherGroup);
-  pref->addItem(tr("Faces"), otherGroup,
+  int otherGroup = aPref->addItem(tr("Default selection"), viewTab);
+  aPref->setItemProperty("columns", 3, otherGroup);
+  aPref->addItem(tr("Faces"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
-  pref->addItem(tr("Edges"), otherGroup,
+  aPref->addItem(tr("Edges"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
-  pref->addItem(tr("Vertices"), otherGroup,
+  aPref->addItem(tr("Vertices"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
 
-  int sensitivityGroup = pref->addItem(tr("Selection sensitivity"), viewTab);
-  pref->setItemProperty("columns", 2, sensitivityGroup);
-  pref->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
+  int sensitivityGroup = aPref->addItem(tr("Selection sensitivity"), viewTab);
+  aPref->setItemProperty("columns", 2, sensitivityGroup);
+  aPref->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                 ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
-  pref->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
+  aPref->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                 ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
 
-  int highlightGroup = pref->addItem(tr("Additional highlighting"), viewTab);
-  pref->setItemProperty("columns", 2, highlightGroup);
-  pref->addItem(tr("In 3d mode"), highlightGroup,
+  int highlightGroup = aPref->addItem(tr("Additional highlighting"), viewTab);
+  aPref->setItemProperty("columns", 2, highlightGroup);
+  aPref->addItem(tr("In 3d mode"), highlightGroup,
     SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-3d");
-  pref->addItem(tr("In 2d mode"), highlightGroup,
+  aPref->addItem(tr("In 2d mode"), highlightGroup,
     SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-2d");
 
-  int colorScaleGroup = pref->addItem(tr("Color scale"), viewTab);
-  pref->setItemProperty("columns", 4, colorScaleGroup);
+  int colorScaleGroup = aPref->addItem(tr("Color scale"), viewTab);
+  aPref->setItemProperty("columns", 4, colorScaleGroup);
   int aItem = aMgr.addPreference(tr("X position"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_x_position");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 1, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 1, aItem);
   aItem = aMgr.addPreference(tr("Y position"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_y_position");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 1, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 1, aItem);
   aItem = aMgr.addPreference(tr("Width"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_width");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 1, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 1, aItem);
   aItem = aMgr.addPreference(tr("Height"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_height");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 1, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 1, aItem);
   aItem = aMgr.addPreference(tr("Intervals number"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_nb_intervals");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 100, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 100, aItem);
   aItem = aMgr.addPreference(tr("Text height"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_height");
-  pref->setItemProperty("min", 0, aItem);
-  pref->setItemProperty("max", 100, aItem);
-
+  aPref->setItemProperty("min", 0, aItem);
+  aPref->setItemProperty("max", 100, aItem);
   aItem = aMgr.addPreference(tr("Text color"), colorScaleGroup,
     SUIT_PreferenceMgr::Color, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_color");
 
-  pref->retrieve();
+  int aGroupNamesGroup = aMgr.addPreference(tr("Group names display"), viewTab,
+    SUIT_PreferenceMgr::GroupBox , ModuleBase_Preferences::VIEWER_SECTION, "group_names_display");
+  aPref->setItemProperty("columns", 3, aGroupNamesGroup);
+  aMgr.addPreference(tr("Text font"), aGroupNamesGroup,
+    SUIT_PreferenceMgr::String, ModuleBase_Preferences::VIEWER_SECTION, "group_names_font");
+  aItem = aMgr.addPreference(tr("Text size"), aGroupNamesGroup,
+    SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "group_names_size");
+  aPref->setItemProperty("min", 8, aItem);
+  aPref->setItemProperty("max", 100, aItem);
+  aItem = aMgr.addPreference(tr("Text color"), aGroupNamesGroup,
+    SUIT_PreferenceMgr::Color, ModuleBase_Preferences::VIEWER_SECTION, "group_names_color");
+
+  aPref->retrieve();
 }
 
 //******************************************************
@@ -954,9 +960,9 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
     aValue = aProp->defaultValue();
     aResMgr->setValue(theSection, theParam, QString(aValue.c_str()));
 
-    LightApp_Preferences* pref = preferences();
-    if (pref)
-      pref->retrieve();
+    LightApp_Preferences* aPref = preferences();
+    if (aPref)
+      aPref->retrieve();
   }
   aProp->setValue(aValue);
 
@@ -1000,7 +1006,12 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
     Events_MessageBool aCreateMsg(Events_Loop::eventByName(EVENT_CREATE_PART_ON_START), aCreate);
     aCreateMsg.send();
   }
-
+  else if (theSection == ModuleBase_Preferences::VIEWER_SECTION &&
+           theParam.startsWith("group_names_"))
+  { // one of the group names parameter changed, so, update the groups names vizualization
+    myWorkshop->updateGroupsText();
+    myWorkshop->displayer()->updateViewer();
+  }
   myWorkshop->displayer()->redisplayObjects();
 }
 

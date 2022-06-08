@@ -187,6 +187,16 @@ Q_OBJECT
   // \param theText is a title
   virtual void setColorScaleTitle(const QString& theText) = 0;
 
+  //! Type for mapping from text to color to display the names lines in different colors
+  typedef std::list<std::pair<std::wstring, std::vector<int> > > TextColor;
+
+  //! Sets the text displayed in right-top corner of the 3D view
+  //! \param theText the text to display, or empty string to erase presentation;
+  //!        the first item is the font name and text color
+  //! \param theSize size of the text font
+  virtual void setText(const TextColor& theText, const int theSize) = 0;
+
+
   /// Switches On additional highlight for objects preselection
   void showSelectionHighlight() {
     myShowHighlight = true;

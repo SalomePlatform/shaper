@@ -37,6 +37,7 @@ class QKeyEvent;
 class SHAPERGUI_OCCSelector;
 class OCCViewer_Viewer;
 class SUIT_ViewManager;
+class AIS_TextLabel;
 
 /**
 * \ingroup Salome
@@ -168,7 +169,6 @@ Q_OBJECT
   /// \param toActivate - activation flag
   void activateViewer(bool toActivate);
 
-
   // Methods for color scale management
 
   //! Returns True if ColorScale is visible
@@ -208,11 +208,14 @@ Q_OBJECT
   // \param theText is a title
   virtual void setColorScaleTitle(const QString& theText);
 
+  //! Sets the text displayed in right-top corner of the 3D view
+  //! \param theText the text to display, or empty string to erase presentation;
+  //!        the first item is the font name and text color
+  //! \param theSize size of the text font
+  virtual void setText(const ModuleBase_IViewer::TextColor& theText, const int theSize);
+
   virtual void setFitter(OCCViewer_Fitter* theFitter);
   virtual OCCViewer_Fitter* fitter() const;
-
-  // Fit all along Z (perpendicular to display)
-  //virtual void Zfitall();
 
  private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
@@ -242,6 +245,9 @@ Q_OBJECT
   SHAPERGUI_OCCSelector* mySelector;
   SHAPERGUI_SalomeView* myView;
   bool myIsSelectionChanged;
+  /// Presentation of names of all displayed SHAPER group results in 3D view,
+  /// a text in right-top corner of the view.
+  NCollection_List<Handle(AIS_TextLabel)> myText;
 };
 
 

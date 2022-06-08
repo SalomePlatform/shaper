@@ -63,4 +63,12 @@ Created Group appears in the view.
 
    Created group
 
+Information about the group, currently displayed in the viewer, is also visuzalised in the right-bottom corner of the viewer: the name of the group result and its color, indicated by background.
+This option may be switched in the SHAPER preferences, tab Viewer, section "Group names display". Also there the font parameters of this text may be changed.
+
+.. figure:: images/group_names.png
+   :align: center
+
+   Group names
+
 **See Also** a sample TUI Script of :ref:`tui_create_group` operation.

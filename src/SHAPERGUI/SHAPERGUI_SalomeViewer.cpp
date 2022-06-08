@@ -30,6 +30,8 @@
 
 #include <Standard_Version.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+#include <AIS_TextLabel.hxx>
+#include <Graphic3d_Vec2.hxx>
 
 #include <QMouseEvent>
 #include <QContextMenuEvent>
@@ -236,13 +238,13 @@ bool SHAPERGUI_SalomeViewer::canDragByMouse() const
 
 
 //**********************************************
-void SHAPERGUI_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onKeyPress(SUIT_ViewWindow* /*theView*/, QKeyEvent* theEvent)
 {
   emit keyPress(myView, theEvent);
 }
 
 //**********************************************
-void SHAPERGUI_SalomeViewer::onKeyRelease(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onKeyRelease(SUIT_ViewWindow* /*theView*/, QKeyEvent* theEvent)
 {
   emit keyRelease(myView, theEvent);
 }
@@ -588,6 +590,75 @@ void SHAPERGUI_SalomeViewer::setColorScaleTitle(const QString& theText)
   }
 }
 
+void SHAPERGUI_SalomeViewer::setText(
+  const ModuleBase_IViewer::TextColor& theText, const int theSize)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  NCollection_List<Handle(AIS_TextLabel)>::Iterator aPrsIter(myText);
+  if (!theText.empty())
+  {
+    Quantity_Color aTextColor;
+    std::string aTextFont;
+
+    double anOffset = -theSize - 1; // initial offset from the toolbar of the viewer
+    ModuleBase_IViewer::TextColor::const_iterator aLine = theText.cbegin();
+    for (; aLine != theText.cend(); aLine++)
+    {
+      Quantity_Color aColor(aLine->second.at(0) / 255.,
+        aLine->second.at(1) / 255., aLine->second.at(2) / 255., Quantity_TOC_RGB);
+      if (aLine == theText.cbegin())
+      {  // the first is the font name and text color
+        aTextColor = aColor;
+        aTextFont = std::string(aLine->first.begin(), aLine->first.end());
+        continue;
+      }
+
+      Handle(AIS_TextLabel) aPrs;
+      if (!aPrsIter.More())
+      { // new presentation is added to the list forever
+        aPrs = new AIS_TextLabel;
+        aPrs->SetZLayer(Graphic3d_ZLayerId_TopOSD);
+        aPrs->SetHJustification(Graphic3d_HTA_RIGHT);
+        aPrs->SetVJustification(Graphic3d_VTA_TOPFIRSTLINE);
+        aPrs->SetDisplayType(Aspect_TODT_SUBTITLE);
+        aPrs->SetTransparency(0.2);
+        static const Graphic3d_Vec2i aZOffset(0);
+        aPrs->SetTransformPersistence(new Graphic3d_TransformPers(
+          Graphic3d_TMF_2d, Aspect_TOTP_RIGHT_UPPER, aZOffset));
+      }
+      else
+      { // update the existing presentation
+        aPrs = aPrsIter.ChangeValue();
+        if (!aContext->IsDisplayed(aPrs))
+          aContext->Display(aPrs, Standard_False);
+      }
+      // common part of parameters for new and existing prs
+      aPrs->SetText(aLine->first.c_str());
+      aPrs->SetFont(aTextFont.c_str());
+      aPrs->SetHeight(theSize);
+      aPrs->SetPosition(gp_Pnt(0, anOffset, 0));
+      anOffset -= int(double(theSize) * 1.2 + 1); // to have a proportional gap between lines
+      aPrs->SetColor(aTextColor);
+      aPrs->SetColorSubTitle(aColor);
+      if (!aPrsIter.More())
+      { // for the new presentation
+        aContext->Display(aPrs, Standard_False);
+        myText.Append(aPrs);
+      }
+      else
+      { // update existing presentation
+        aContext->Redisplay(aPrs, Standard_False, Standard_False);
+        aPrsIter.Next();
+      }
+    }
+  }
+  // hide the left presentations, created previously, but unused for now
+  for (; aPrsIter.More(); aPrsIter.Next())
+    aContext->Erase(aPrsIter.ChangeValue(), Standard_False);
+}
+
 void SHAPERGUI_SalomeViewer::setFitter(OCCViewer_Fitter* theFitter)
 {
   if (mySelector)
@@ -600,23 +671,3 @@ OCCViewer_Fitter* SHAPERGUI_SalomeViewer::fitter() const
     return mySelector->viewer()->fitter();
   return 0;
 }
-
-
-//void SHAPERGUI_SalomeViewer::Zfitall()
-//{
-//  if (!mySelector || !mySelector->viewer())
-//    return;
-//  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
-//  /// WORKAROUND for issue #1798. SUIT_ViewManager::closeAllViews() should nullify myActiveView
-//  /// As a result, we need to check views count in manager
-//  if (aMgr->getViews().size() > 0) {
-//    OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
-//    if (aView) {
-//      OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-//      Handle(V3d_View) aView3d = aWnd->getViewPort()->getView();
-//      aView3d->ZFitAll();
-//      if (aView3d->Depth() < 0.1)
-//        aView3d->DepthFitAll();
-//    }
-//  }
-//}

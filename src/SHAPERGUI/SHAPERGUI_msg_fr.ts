@@ -107,6 +107,22 @@
         <source>MEN_DESK_EDIT</source>
         <translation>MEN_DESK_EDIT</translation>
     </message>
+    <message>
+        <source>Group names display</source>
+        <translation>Affichage des noms de groupe</translation>
+    </message>
+    <message>
+        <source>Text font</source>
+        <translation>Police de texte</translation>
+    </message>
+    <message>
+        <source>Text size</source>
+        <translation>Taille du texte</translation>
+    </message>
+    <message>
+        <source>Text color</source>
+        <translation>Couleur du texte</translation>
+    </message>
 </context>
 <context>
     <name>SHAPERGUI_ToolbarItemsDlg</name>

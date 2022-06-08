@@ -50,7 +50,8 @@ MAYBE_UNUSED const static char* INSPECTION_PANEL = "inspection_panel_dock";
 * \ingroup GUI
 * A class which represents an inspection panel: to show content of currently selected objects
 */
-class XGUI_EXPORT XGUI_InspectionPanel : public QDockWidget, public GeomAlgoAPI_ShapeInfo::Translator
+class XGUI_EXPORT XGUI_InspectionPanel :
+  public QDockWidget, public GeomAlgoAPI_ShapeInfo::Translator
 {
   Q_OBJECT
 public:
