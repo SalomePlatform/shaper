@@ -992,6 +992,21 @@ bool FeaturesPlugin_ValidatorFillet1DSelection::isValid(const AttributePtr& theA
     // LCOV_EXCL_STOP
   }
 
+  // Validate wires selection
+  if (!theArguments.empty() &&
+      theArguments.front() == "wire") {
+    for (int ind = 0; ind < anAttrSelectionList->size(); ++ind) {
+      AttributeSelectionPtr aCurSel = anAttrSelectionList->value(ind);
+      //GeomShapePtr aContext = aCurSel->context()->shape();
+      GeomShapePtr aWire = aCurSel->value();
+      if (aWire->shapeType() != GeomAPI_Shape::WIRE) {
+        theError = "Selected shape is not a wire";
+        return false;
+      }
+    }
+    return true;
+  }
+
   // check each selected vertex is a sharp corner between adjacent edges,
   // and these edges are in the same plane
   std::map<GeomShapePtr, MapShapeToShapes> aWireSubshapes;

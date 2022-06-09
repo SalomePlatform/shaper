@@ -87,7 +87,9 @@ bool FeaturesPlugin_Fillet1D::baseShapes(ListOfShape& theWires, MapShapeSubs& th
     int aNbSel = aSelList->size();
     for (int ind = 0; ind < aNbSel; ++ind) {
       AttributeSelectionPtr aCurSel = aSelList->value(ind);
-      GeomShapePtr aWire = aCurSel->context()->shape();
+      GeomShapePtr aWire = aCurSel->value();
+      if (!aWire.get() && aCurSel->context().get())
+        aWire = aCurSel->context()->shape();
       if (aProcessedWires.find(aWire) != aProcessedWires.end())
         continue;
 
@@ -123,7 +125,6 @@ bool FeaturesPlugin_Fillet1D::baseShapes(ListOfShape& theWires, MapShapeSubs& th
         setError("Wire has no vertices for fillet.");
         return false;
       }
-
 
       // keep the sequence of wires and fillet vertices stable
       theWires.push_back(aWire);

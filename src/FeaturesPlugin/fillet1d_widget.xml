@@ -12,6 +12,7 @@
                       use_choice="false"
                       concealment="true">
         <validator id="PartSet_DifferentObjects"/>
+        <validator id="FeaturesPlugin_ValidatorFillet1DSelection" parameters="wire"/>
       </multi_selector>
     </box>
     <box id="by_vertices"
