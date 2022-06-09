@@ -47,6 +47,18 @@
         <source>Part files (*.shaperpart);;All files (*.*)</source>
         <translation>Fichiers pièces (*.shaperpart);;Tous les fichiers (*.*)</translation>
     </message>
+    <message>
+        <source>Part(s) cannot be moved because of breaking dependencies.</source>
+        <translation>La ou les pièces ne peuvent pas être déplacées en raison de la rupture des dépendances.</translation>
+    </message>
+    <message>
+        <source>Move part</source>
+        <translation>Déplacer une partie</translation>
+    </message>
+    <message>
+        <source>Cannot move part(s) during another operation.</source>
+        <translation>Impossible de déplacer la pièce lors d'une autre opération.</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_ActionsMgr</name>

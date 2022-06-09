@@ -19,24 +19,28 @@
 
 #include "XGUI_DataModel.h"
 #include "XGUI_ObjectsBrowser.h"
+#include "XGUI_Workshop.h"
 
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_ITreeNode.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultField.h>
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <Config_FeatureMessage.h>
 
 #include <Events_Loop.h>
+
+#include <QMimeData>
+#include <QMessageBox>
 
 #include <cassert>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)
 #endif
-
-
 
 // Constructor *************************************************
 XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)//,
@@ -364,11 +368,161 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 {
   if (theIndex.isValid()) {
     ModuleBase_ITreeNode* aNode = (ModuleBase_ITreeNode*)theIndex.internalPointer();
-    return aNode->flags(theIndex.column());
+    Qt::ItemFlags aResultFlags = aNode->flags(theIndex.column());
+    // Drag and drop of Part features only if:
+    // - PartSet is active
+    // - active Part feature of PartSet is dragged
+    // - finally if it does not break dependencies between features (but here only drag possibility is checked)
+    SessionPtr aSession = ModelAPI_Session::get();
+    if (aSession->hasModuleDocument() && aSession->moduleDocument() == aSession->activeDocument()) {
+
+      ObjectPtr aNodeObj = aNode->object();
+      if (aNodeObj.get() && aNodeObj->groupName() == ModelAPI_Feature::group())
+      {
+        FeaturePtr aNodeFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aNodeObj);
+        if (aNodeFeature.get() && aNodeFeature->getKind() == "Part" && !aNodeFeature->isDisabled())
+          aResultFlags |= Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+      }
+    }
+    return aResultFlags;
   }
-  return Qt::ItemFlags();
+  return Qt::ItemIsDropEnabled | Qt::ItemFlags();
 }
 
+bool XGUI_DataModel::canDropMimeData(const QMimeData *theData, Qt::DropAction theAction,
+  int theRow, int theColumn, const QModelIndex &theParent) const
+{
+  if (theParent.isValid())
+    return false;
+  ModuleBase_ITreeNode* aSubNode = myRoot->subNode(theRow);
+  if ((aSubNode && aSubNode->object() && aSubNode->object()->groupName() == ModelAPI_Feature::group())
+      || theRow == myRoot->childrenCount()) // into the end of a list of features
+  {
+    return true;
+  }
+
+  return false; // in other cases drop is forbidden
+}
+
+QMimeData* XGUI_DataModel::mimeData(const QModelIndexList& theIndexes) const
+{
+  std::set<int> aRows; // to avoid duplication of rows and for sorting the indices
+  foreach (QModelIndex anIndex, theIndexes) {
+    if (anIndex.isValid() && anIndex.internalPointer())
+      aRows.insert(anIndex.row());
+  }
+  QByteArray anEncodedData;
+  QDataStream aStream(&anEncodedData, QIODevice::WriteOnly);
+  for(std::set<int>::iterator aRIter = aRows.begin(); aRIter != aRows.end(); aRIter++)
+    aStream << *aRIter;
+
+  QMimeData* aMimeData = new QMimeData();
+  aMimeData->setData("xgui/moved.rows", anEncodedData);
+  return aMimeData;
+}
+
+bool XGUI_DataModel::dropMimeData(const QMimeData *theData, Qt::DropAction theAction,
+  int theRow, int theColumn, const QModelIndex &theParent)
+{
+  FeaturePtr aDropAfter; // after this feature it is dropped, NULL if drop the the first place
+  if (theRow > 0)
+  {
+    ModuleBase_ITreeNode* aNode = myRoot->subNode(theRow - 1);
+    if (aNode && aNode->object() && aNode->object()->groupName() == ModelAPI_Feature::group())
+      aDropAfter = std::dynamic_pointer_cast<ModelAPI_Feature>(aNode->object());
+  }
+  SessionPtr aSession = ModelAPI_Session::get();
+  if (aDropAfter.get()) // move to the upper enabled feature
+  {
+    while (aDropAfter.get() && (aDropAfter->isDisabled() || !aDropAfter->isInHistory()))
+      aDropAfter = aDropAfter->document()->nextFeature(aDropAfter, true);
+  }
+  else { // move after invisible items, not the first (which is coordinate system by default)
+    std::list<FeaturePtr> allFeatures = aSession->get()->moduleDocument()->allFeatures();
+    std::list<FeaturePtr>::iterator aFeature = allFeatures.begin();
+    for(; aFeature != allFeatures.end(); aFeature++)
+    {
+      if ((*aFeature)->isInHistory())
+        break;
+      aDropAfter = *aFeature;
+    }
+  }
+  // move after the composite feature memebers, if they are invisible (sub elements of sketch)
+  CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDropAfter);
+  if (aComposite.get())
+  {
+    FeaturePtr aNext = aDropAfter->document()->nextFeature(aDropAfter);
+    while (aNext.get() && !aNext->isInHistory() && aComposite->isSub(aNext)) {
+      aDropAfter = aNext;
+      aNext = aDropAfter->document()->nextFeature(aNext);
+    }
+  }
+
+  QByteArray anEncodedData = theData->data("xgui/moved.rows");
+  if (anEncodedData.isEmpty())
+    return false; // dropped something alien, decline
+
+  QDataStream stream(&anEncodedData, QIODevice::ReadOnly);
+  std::list<FeaturePtr> aDropped;
+  while (!stream.atEnd()) {
+    int aRow;
+    stream >> aRow;
+    ModuleBase_ITreeNode* aNode = myRoot->subNode(aRow);
+    if (aNode)
+    {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aNode->object());
+      // feature moved after itself is not moved, add only Part feature, other skip
+      if (aFeature.get() && aFeature != aDropAfter && aFeature->getKind() == "Part")
+        aDropped.push_back(aFeature);
+    }
+  }
+  if (aDropped.empty()) // nothing to move
+    return false;
+
+  // check for the movement is valid due to existing dependencies
+  std::wstring anErrorStr = ModelAPI_Tools::validateMovement(aDropAfter, aDropped);
+  if (!anErrorStr.empty())
+  {
+    QMessageBox aMessageBox;
+    aMessageBox.setWindowTitle(QObject::tr("Move part"));
+    aMessageBox.setIcon(QMessageBox::Warning);
+    aMessageBox.setStandardButtons(QMessageBox::Ok);
+    aMessageBox.setDefaultButton(QMessageBox::Ok);
+    QString aMessageText(QObject::tr("Part(s) cannot be moved because of breaking dependencies."));
+    aMessageBox.setText(aMessageText);
+    aMessageBox.setDetailedText(QString::fromStdWString(anErrorStr));
+    aMessageBox.exec();
+    return false;
+  }
+
+  if (aSession->isOperation())
+  {
+    QMessageBox aMessageBox;
+    aMessageBox.setWindowTitle(QObject::tr("Move part"));
+    aMessageBox.setIcon(QMessageBox::Warning);
+    aMessageBox.setStandardButtons(QMessageBox::Ok);
+    aMessageBox.setDefaultButton(QMessageBox::Ok);
+    QString aMessageText(QObject::tr("Cannot move part(s) during another operation."));
+    aMessageBox.setText(aMessageText);
+    aMessageBox.exec();
+    return false;
+  }
+
+  aSession->startOperation("Move Part");
+  DocumentPtr aPartSet = aSession->moduleDocument();
+  for (std::list<FeaturePtr>::iterator aDrop = aDropped.begin(); aDrop != aDropped.end(); aDrop++)
+  {
+    aPartSet->moveFeature(*aDrop, aDropAfter);
+    aDropAfter = *aDrop;
+  }
+  aSession->finishOperation();
+
+  updateSubTree(myRoot);
+  myWorkshop->updateHistory();
+
+  // returns false in any case to avoid calling removeRows after it,
+  return false; // because number of rows stays the same
+}
 
 //******************************************************
 QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc, int theColumn) const

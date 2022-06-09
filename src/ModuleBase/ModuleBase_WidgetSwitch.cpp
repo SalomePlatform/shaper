@@ -57,10 +57,7 @@ int ModuleBase_WidgetSwitch::addPage(ModuleBase_PageBase* thePage, const QString
                                                                    const QPixmap& theIcon,
                                                                    const QString& theTooltip)
 {
-#ifdef _DEBUG
-  int aSuperCount =
-#endif
-    ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon, theTooltip);
+  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon, theTooltip);
   myCombo->addItem(translate(theName.toStdString()));
   int aResultCount = myCombo->count();
   if (aResultCount == 2)

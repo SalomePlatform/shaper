@@ -94,6 +94,13 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+  // drag and drop
+  setDragEnabled(true);
+  setAcceptDrops(true);
+  viewport()->setAcceptDrops(true);
+  setDropIndicatorShown(true);
+  setDragDropMode(QAbstractItemView::InternalMove);
+
   setItemDelegateForColumn(1, new XGUI_TreeViewItemDelegate(this));
 
   connect(this, SIGNAL(doubleClicked(const QModelIndex&)),

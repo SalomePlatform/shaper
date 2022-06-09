@@ -356,6 +356,16 @@ MODELAPI_EXPORT bool isInResults(AttributeSelectionListPtr theSelection,
 */
 MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues, bool theReset = false);
 
+/*!
+* Checks the movement of features possibility. The feature cannot appear before the feature
+* depended on it. Used in drag and drop part features.
+* \param theAfter feature after which the moved features are placed, or null for the first place
+* \param theMoved ordered list of the moved features
+* \returns string with error text, dependencies that do not allow make movement or empty string
+*/
+MODELAPI_EXPORT std::wstring validateMovement(
+  const FeaturePtr& theAfter, const std::list<FeaturePtr> theMoved);
+
 }
 
 #endif
