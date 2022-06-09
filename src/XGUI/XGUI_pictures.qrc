@@ -98,5 +98,6 @@
      <file>pictures/CrossCursor.png</file>
      <file>pictures/HandCursor.png</file>
      <file>pictures/iso_lines.png</file>
+     <file>pictures/edges_dir.png</file>
  </qresource>
  </RCC>

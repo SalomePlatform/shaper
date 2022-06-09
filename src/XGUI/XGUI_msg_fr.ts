@@ -228,6 +228,10 @@
       <source>Recover</source>
       <translation>Récupérer</translation>
     </message>
+    <message>
+        <source>Show edges direction</source>
+        <translation>Afficher la direction des bords</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>

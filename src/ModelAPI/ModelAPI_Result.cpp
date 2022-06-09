@@ -41,6 +41,8 @@ void ModelAPI_Result::initAttributes()
   aData->addAttribute(ISO_LINES_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
   aData->addAttribute(SHOW_ISO_LINES_ID(), ModelAPI_AttributeBoolean::typeId())->
     setIsArgument(false);
+  aData->addAttribute(SHOW_EDGES_DIRECTION_ID(), ModelAPI_AttributeBoolean::typeId())->
+    setIsArgument(false);
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
