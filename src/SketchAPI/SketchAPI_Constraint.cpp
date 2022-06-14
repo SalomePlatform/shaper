@@ -42,6 +42,8 @@
 
 #include <SketcherPrs_Tools.h>
 
+#include <limits>
+
 SketchAPI_Constraint::SketchAPI_Constraint(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -87,6 +89,13 @@ void SketchAPI_Constraint::setEntityD(const ModelHighAPI_RefAttr& theEntity)
 void SketchAPI_Constraint::setValue(const ModelHighAPI_Double& theValue)
 {
   fillAttribute(theValue, feature()->real(SketchPlugin_Constraint::VALUE()));
+}
+
+double SketchAPI_Constraint::value() const
+{
+  AttributeDoublePtr aValueAttr = feature()->real(SketchPlugin_Constraint::VALUE());
+  return aValueAttr->isInitialized() ? aValueAttr->value()
+                                     : std::numeric_limits<double>::quiet_NaN();
 }
 
 static const std::string& constraintTypeToSetter(const std::string& theType)

@@ -62,6 +62,8 @@ public:
 
   SKETCHAPI_EXPORT void setValue(const ModelHighAPI_Double& theValue);
 
+  SKETCHAPI_EXPORT double value() const;
+
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
