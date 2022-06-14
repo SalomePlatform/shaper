@@ -76,9 +76,18 @@ def checkMovement(theWhat, theTo, theError):
   aListCheck = theError.split('\n')
   aListGet = anError.split('\n')
   assert(len(aListCheck) == len(aListGet))
+  # sort the second part of received list strings by name to keep stability of tests
+  aListGetSort = []
+  for aLGet in aListGet:
+    if aLGet.find("-> ") > 0:
+      aRightPart = aLGet.split('-> ')[1].split(' ')
+      aRightPart.sort()
+      aListGetSort.append(aLGet.split('-> ')[0] + '-> ' + ' '.join(aRightPart))
+    else:
+      aListGetSort.append(aLGet)
   for anErr in aListCheck:
     #print("Looking for " + anErr + " in " + str(aListGet))
-    assert(aListGet.count(anErr) == 1)
+    assert(aListGetSort.count(anErr) == 1)
 
 # movement to very first location actually means movement after the first invisible objects, coordinate system hidden ones
 aLastHidden = None
@@ -97,7 +106,7 @@ checkMovement(Part_1, Part_3, 'Placement_1 -> Part_1')
 
 checkMovement(Part_2, None, 'Part_2 -> Origin Sketch_1 Sketch_2')
 checkMovement(Part_2, aLastHidden, 'Part_2 -> Sketch_1 Sketch_2')
-checkMovement(Part_2, Sketch_1, 'Part_2 -> Sketch_2 Sketch_1') # in GUI this is not the case, because it drops after invisible sketch components
+checkMovement(Part_2, Sketch_1, 'Part_2 -> Sketch_1 Sketch_2') # in GUI this is not the case, because it drops after invisible sketch components
 checkMovement(Part_2, Sketch_2, 'Part_2 -> Sketch_2') # in GUI this is not the case, because it drops after invisible sketch components
 checkMovement(Part_2, Part_1, '')
 checkMovement(Part_2, Placement_1, 'Placement_1 -> Part_2')
