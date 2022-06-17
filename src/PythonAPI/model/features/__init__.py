@@ -30,6 +30,7 @@ from FeaturesAPI import addRecover
 from FeaturesAPI import addFillet, addChamfer
 from FeaturesAPI import addFusionFaces
 from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAngle
+from FeaturesAPI import shapeProximity
 from FeaturesAPI import getPointCoordinates, getGeometryCalculation, getBoundingBox
 from FeaturesAPI import getNormal
 from FeaturesAPI import makeVertexInsideFace

@@ -139,3 +139,28 @@ double measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart,
 
   return aValue;
 }
+
+double shapeProximity(const std::shared_ptr<ModelAPI_Document>& thePart,
+                      const ModelHighAPI_Selection& theFrom,
+                      const ModelHighAPI_Selection& theTo)
+{
+  FeaturePtr aMeasure = thePart->addFeature(FeaturesPlugin_Measurement::ID());
+  fillAttribute(FeaturesPlugin_Measurement::MEASURE_PROXIMITY(),
+                aMeasure->string(FeaturesPlugin_Measurement::MEASURE_KIND()));
+  fillAttribute(theFrom,
+                aMeasure->selection(FeaturesPlugin_Measurement::DISTANCE_FROM_OBJECT_ID()));
+  fillAttribute(theTo,
+                aMeasure->selection(FeaturesPlugin_Measurement::DISTANCE_TO_OBJECT_ID()));
+  aMeasure->execute();
+
+  // obtain result
+  AttributeDoubleArrayPtr aResult = std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(
+      aMeasure->attribute(FeaturesPlugin_Measurement::RESULT_VALUES_ID()));
+  double aValue = aResult->size() ? aResult->value(0) : -1.0;
+
+  // perform removing macro feature Measurement
+  thePart->removeFeature(aMeasure);
+  apply();
+
+  return aValue;
+}
