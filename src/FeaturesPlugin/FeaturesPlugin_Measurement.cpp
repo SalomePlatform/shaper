@@ -93,12 +93,15 @@ void FeaturesPlugin_Measurement::attributeChanged(const std::string& theID)
     std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(
       attribute(RESULT_VALUES_ID()))->setSize(0);
   }
-  if (theID != RESULT_ID()) {
+  else if (theID != RESULT_ID() &&
+           theID != RESULT_VALUES_ID()) {
     std::string aKind = string(MEASURE_KIND())->value();
     if (aKind == MEASURE_LENGTH())
       computeLength();
     else if (aKind == MEASURE_DISTANCE())
       computeDistance();
+    else if (aKind == MEASURE_PROXIMITY())
+      computeProximity();
     else if (aKind == MEASURE_RADIUS())
       computeRadius();
     else if (aKind == MEASURE_ANGLE())
@@ -176,6 +179,41 @@ void FeaturesPlugin_Measurement::computeDistance()
            <<"\n|dx| = " <<  std::setprecision(10) << std::abs(fromShape1To2[0])
       <<"\n|dy| = " <<  std::setprecision(10) << std::abs(fromShape1To2[1])
       <<"\n|dz| = " <<  std::setprecision(10) << std::abs(fromShape1To2[2]);
+  string(RESULT_ID())->setValue(anOutput.str());
+
+  AttributeDoubleArrayPtr aValues =
+      std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attribute(RESULT_VALUES_ID()));
+  aValues->setSize(1);
+  aValues->setValue(0, aDistance);
+}
+
+void FeaturesPlugin_Measurement::computeProximity()
+{
+  AttributeSelectionPtr aFirstFeature = selection(DISTANCE_FROM_OBJECT_ID());
+  GeomShapePtr aShape1;
+  if (aFirstFeature && aFirstFeature->isInitialized()) {
+    aShape1 = aFirstFeature->value();
+    if (!aShape1 && aFirstFeature->context())
+      aShape1 = aFirstFeature->context()->shape();
+  }
+
+  AttributeSelectionPtr aSecondFeature = selection(DISTANCE_TO_OBJECT_ID());
+  GeomShapePtr aShape2;
+  if (aSecondFeature && aSecondFeature->isInitialized()) {
+    aShape2 = aSecondFeature->value();
+    if (!aShape2 && aSecondFeature->context())
+      aShape2 = aSecondFeature->context()->shape();
+  }
+
+  if (!aShape1 || !aShape2) {
+    string(RESULT_ID())->setValue("");
+    return;
+  }
+
+  double aDistance = GeomAlgoAPI_ShapeTools::shapeProximity(aShape1, aShape2);
+
+  std::ostringstream anOutput;
+  anOutput << "Proximity = " << std::setprecision(10) << aDistance;
   string(RESULT_ID())->setValue(anOutput.str());
 
   AttributeDoubleArrayPtr aValues =

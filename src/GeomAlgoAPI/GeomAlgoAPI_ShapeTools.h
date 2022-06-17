@@ -88,6 +88,11 @@ public:
                                                    const GeomShapePtr& theShape2,
                                                    std::array<double, 3> & fromShape1To2);
 
+  /// \brief Calculate maximal value of all possible distances between shapes.
+  ///        The shapes can be two edges or two faces only.
+  GEOMALGOAPI_EXPORT static double shapeProximity(const GeomShapePtr& theShape1,
+                                                  const GeomShapePtr& theShape2);
+
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.
   /// \param[in] theType type of combine.

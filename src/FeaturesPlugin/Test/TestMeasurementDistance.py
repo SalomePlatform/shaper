@@ -87,44 +87,59 @@ TOLERANCE = 1.e-6
 # reference data
 REF_DATA = [(model.selection("VERTEX", "PartSet/Origin"),
              model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"),
-             122.4744871),
+             122.4744871,
+             "NA"),
             (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"),
              model.selection("VERTEX", "Sketch_2/SketchArc_1"),
-             36.94403089),
+             36.94403089,
+             "NA"),
             (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
              model.selection("EDGE", "([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])"),
-             0),
+             0,
+             100.0),
             (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
              model.selection("EDGE", "[Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2][Extrusion_2_1/To_Face]"),
-             16.00781059),
+             16.00781059,
+             176.710217655),
             (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
              model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2"),
-             8.412291828),
+             8.412291828,
+             "NA"),
             (model.selection("VERTEX", "Sketch_1/SketchCircle_1_2__cc"),
              model.selection("FACE", "Plane_1"),
-             35.35533906),
+             35.35533906,
+             "NA"),
             (model.selection("FACE", "Extrusion_2_2/From_Face"),
              model.selection("FACE", "Extrusion_2_2/To_Face"),
+             100,
              100),
             (model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"),
              model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2"),
-             0),
-            (model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"),
-             model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5"),
-             27.63932023),
+             0,
+             165.799606),
+            (model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5"),
+             model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"),
+             27.63932023,
+             40.0),
             (model.selection("SOLID", "Extrusion_1_1"),
              model.selection("FACE", "Extrusion_2_1/To_Face"),
-             12.5),
+             12.5,
+             "NA"),
             (model.selection("SOLID", "Extrusion_1_1"),
              model.selection("SOLID", "Extrusion_2_1"),
-             0),
+             0,
+             "NA"),
             (model.selection("SOLID", "Extrusion_1_1"),
              model.selection("SOLID", "Extrusion_2_2"),
-             87.5)
+             87.5,
+             "NA")
            ]
 
 for ref in REF_DATA:
     dist = model.measureDistance(Part_1_doc, ref[0], ref[1])
     assert(math.fabs(dist - ref[2]) < TOLERANCE), "Distance {} differs from expected value {}".format(dist, ref[2])
+    if ref[3] != "NA":
+        prox = model.shapeProximity(Part_1_doc, ref[0], ref[1])
+        assert(math.fabs(prox - ref[3]) < TOLERANCE), "Proximity {} differs from expected value {}".format(prox, ref[3])
 
 model.end()

@@ -62,4 +62,11 @@ double measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const ModelHighAPI_Selection& thePoint2,
                     const ModelHighAPI_Selection& thePoint3);
 
+/// \ingroup CPPHighAPI
+/// \brief Calculate maximum of all distances between objects.
+FEATURESAPI_EXPORT
+double shapeProximity(const std::shared_ptr<ModelAPI_Document>& thePart,
+                      const ModelHighAPI_Selection& theFrom,
+                      const ModelHighAPI_Selection& theTo);
+
 #endif // FeaturesAPI_Measurement_H_
