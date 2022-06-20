@@ -119,6 +119,9 @@ public:
   /// sets the texture file
   MODEL_EXPORT virtual bool hasTexture() override;
 
+  /// Find the imported color by the construction name of a shape.
+  /// Returns empty vector if not found.
+  MODEL_EXPORT virtual const std::vector<int>& findShapeColor(const std::wstring& theShapeName);
 
 protected:
   /// Makes a body on the given feature
@@ -154,7 +157,7 @@ protected:
                               std::map< std::wstring,
                               std::vector<int>>& theColorsShape) override;
 
-  /// find the name of shapp read in step file
+  /// Find the name of shape read in step file
   std::wstring findShapeName(std::shared_ptr<GeomAPI_Shape> theShape) override;
 
   /// Clear the map of name and color read shape in step file
@@ -163,7 +166,7 @@ protected:
   /// map with the name read in step file and shape
   std::map< std::wstring, std::shared_ptr<GeomAPI_Shape> > myNamesShape;
 
-  /// map with the name contruct and color read
+  /// map from the construction name to the imported color
   std::map< std::wstring, std::vector<int>> myColorsShape;
 
 };

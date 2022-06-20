@@ -281,6 +281,15 @@ std::wstring Model_ResultBody::findShapeName(std::shared_ptr<GeomAPI_Shape> theS
   return  L"material not found" ;
 }
 
+const std::vector<int>& Model_ResultBody::findShapeColor(const std::wstring& theShapeName)
+{
+  std::map<std::wstring, std::vector<int> >::iterator aColor = myColorsShape.find(theShapeName);
+  if (aColor != myColorsShape.end())
+    return aColor->second;
+  static std::vector<int> anEmptyVector;
+  return anEmptyVector;
+}
+
 void Model_ResultBody::setShapeName(
                 std::map< std::wstring, std::shared_ptr<GeomAPI_Shape>>& theShapeName,
                 std::map< std::wstring, std::vector<int>>& theColorsShape)

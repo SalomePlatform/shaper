@@ -214,7 +214,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
     setColorGroups(aResult);
   }
 
-  // create Materiel group
+  // create Material group
   if (anMaterialsGroupSelected){
     setMaterielGroup(aResult,theMaterialShape);
   }
@@ -627,6 +627,15 @@ void ExchangePlugin_ImportFeatureBase::loadNamingDS(
 {
   //load result
   theResultBody->store(theGeomShape);
+
+  // to store color of higher-level shape
+  std::wstring aName = theResultBody->findShapeName(theGeomShape);
+  if (!aName.empty())
+  {
+    std::vector<int> aColor = theResultBody->findShapeColor(aName);
+    if (!aColor.empty())
+      ModelAPI_Tools::setColor(theResultBody, aColor);
+  }
 
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS);

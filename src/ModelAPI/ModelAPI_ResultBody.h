@@ -194,11 +194,11 @@ public:
 
   /// Add shape Name for read shape in step file
   MODELAPI_EXPORT virtual std::wstring addShapeName
-                              (std::shared_ptr<GeomAPI_Shape>,const std::wstring& theName) = 0;
+                              (std::shared_ptr<GeomAPI_Shape>, const std::wstring& theName) = 0;
 
   /// Add color for shape Name read shape in step file
   MODELAPI_EXPORT virtual void addShapeColor
-                              (const std::wstring& theName,std::vector<int>& theColor) = 0;
+                              (const std::wstring& theName, std::vector<int>& theColor) = 0;
 
   /// Set the map of name and color read shape in step file
   MODELAPI_EXPORT virtual void setShapeName
@@ -208,8 +208,13 @@ public:
   /// Clear the map of name and color read shape in step file
   MODELAPI_EXPORT virtual void clearShapeNameAndColor() = 0;
 
-  /// find the name of shapp read in step file
+  /// Find the name of shape read in step file
   MODELAPI_EXPORT virtual std::wstring findShapeName(std::shared_ptr<GeomAPI_Shape> theShape) = 0;
+
+  /// Find the imported color by the construction name of a shape.
+  /// Returns empty vector if not found.
+  MODELAPI_EXPORT virtual const std::vector<int>& findShapeColor(
+    const std::wstring& theShapeName) = 0;
 
 
 protected:
