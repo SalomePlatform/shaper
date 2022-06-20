@@ -52,4 +52,6 @@ SET(TEST_NAMES
   TestShapeInfo.py
 
   Test2044.py
+
+  TestCR.py
 )

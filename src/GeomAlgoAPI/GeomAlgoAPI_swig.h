@@ -64,6 +64,7 @@
   #include "GeomAlgoAPI_Symmetry.h"
   #include "GeomAlgoAPI_MapShapesAndAncestors.h"
   #include "GeomAlgoAPI_ShapeInfo.h"
+  #include "GeomAlgoAPI_CanonicalRecognition.h"
 
   #include <memory>
   #include <string>

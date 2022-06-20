@@ -39,3 +39,4 @@ from GeomAPI import GeomAPI_Shape  as Shape
 from GeomAlgoAPI import GeomAlgoAPI_Boolean   as Boolean
 
 from .ShapeInfo import *
+from .CanonicalRecognition import *
