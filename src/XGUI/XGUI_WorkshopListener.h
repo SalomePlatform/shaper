@@ -104,7 +104,7 @@ protected:
 
 private:
 
-  void setDisplayed(ObjectPtr theObject, bool& theDisplayed);
+  void setDisplayed(ObjectPtr theObject, const bool theIsLoadedScript, bool& theDisplayed);
 
   XGUI_Workshop* myWorkshop; // the current workshop
 

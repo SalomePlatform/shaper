@@ -431,33 +431,31 @@ void XGUI_WorkshopListener::
 
   //bool aHasPart = false;
   bool aDisplayed = false;
-  if (!isLoadedScript) {
-    for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
-      ObjectPtr anObject = *aIt;
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
+    ObjectPtr anObject = *aIt;
 
 #ifdef DEBUG_RESULT_COMPSOLID
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-      if (aRes.get()) {
-        ResultCompSolidPtr aCompSolidRes =
-            std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
-        if (aCompSolidRes.get()) {
-            qDebug(QString("COMPSOLID, numberOfSubs = %1")
-              .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
-        }
-        if (ModelAPI_Tools::compSolidOwner(aRes))
-          qDebug("COMPSOLID sub-object");
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    if (aRes.get()) {
+      ResultCompSolidPtr aCompSolidRes =
+        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+      if (aCompSolidRes.get()) {
+        qDebug(QString("COMPSOLID, numberOfSubs = %1")
+          .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
       }
+      if (ModelAPI_Tools::compSolidOwner(aRes))
+        qDebug("COMPSOLID sub-object");
+    }
 #endif
 
-      ResultBodyPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
-
-      if (aRes.get() && aRes->numberOfSubs() > 0)
-        for (int anIndex = 0; anIndex < aRes->numberOfSubs(); ++anIndex)
-          setDisplayed(aRes->subResult(anIndex), aDisplayed);
-      else
-        setDisplayed(anObject, aDisplayed);
-    }
+    ResultBodyPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
+    if (aRes.get() && aRes->numberOfSubs() > 0)
+      for (int anIndex = 0; anIndex < aRes->numberOfSubs(); ++anIndex)
+        setDisplayed(aRes->subResult(anIndex), isLoadedScript, aDisplayed);
+    else
+      setDisplayed(anObject, isLoadedScript, aDisplayed);
   }
+
   MAYBE_UNUSED bool isCustomized = customizeFeature(anObjects, aDisplayed);
 
   //if (myObjectBrowser)
@@ -572,8 +570,13 @@ XGUI_Workshop* XGUI_WorkshopListener::workshop() const
 }
 
 
-void XGUI_WorkshopListener::setDisplayed(ObjectPtr theObject, bool& theDisplayed)
+void XGUI_WorkshopListener::setDisplayed(
+  ObjectPtr theObject, const bool theIsLoadedScript, bool& theDisplayed)
 {
+  if (theIsLoadedScript) {
+    theObject->setDisplayed(theDisplayed);
+    return;
+  }
   // the validity of the data should be checked here in order to avoid display of the objects,
   // which were created, then deleted, but flush for the creation event happens after that
   // we should not display disabled objects
