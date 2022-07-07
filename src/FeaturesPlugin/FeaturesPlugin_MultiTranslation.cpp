@@ -21,7 +21,7 @@
 #include <FeaturesPlugin_Tools.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
-#include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_MakeShapeSet.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_Translation.h>
 
@@ -136,7 +136,7 @@ void FeaturesPlugin_MultiTranslation::execute()
   }
 
   // Collect transformations for each object in a part.
-  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+  std::shared_ptr<GeomAlgoAPI_MakeShapeSet> aMakeShapeList(new GeomAlgoAPI_MakeShapeSet);
   for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
        anObjectsIt != anObjects.end(); anObjectsIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;

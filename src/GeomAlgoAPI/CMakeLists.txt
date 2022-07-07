@@ -39,6 +39,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_MakeShapeCustom.h
     GeomAlgoAPI_MakeShapeList.h
+    GeomAlgoAPI_MakeShapeSet.h
     GeomAlgoAPI_MakeSweep.h
     GeomAlgoAPI_MakeVolume.h
     GeomAlgoAPI_DFLoader.h
@@ -112,6 +113,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_MakeShapeCustom.cpp
     GeomAlgoAPI_MakeShapeList.cpp
+    GeomAlgoAPI_MakeShapeSet.cpp
     GeomAlgoAPI_MakeSweep.cpp
     GeomAlgoAPI_MakeVolume.cpp
     GeomAlgoAPI_DFLoader.cpp
