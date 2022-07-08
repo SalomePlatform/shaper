@@ -195,6 +195,16 @@
                icon="icons/Features/measurement.png" helpfile="measurementFeature.html" abort_confirmation="false">
         <source path="measurement_widget.xml"/>
       </feature>
+      <feature id="Point_cloud" title="Cloud of points"
+               tooltip="Create points laying on the face"
+               icon="" internal="1">
+        <shape_selector id="face" label="Face"
+                        icon="" tooltip="Select objects"
+                        shape_types="face"/>
+        <integervalue id="number_of_points" label="Nb points"
+                      step="1" default="2"
+                      icon="" tooltip="Number of points"/>
+      </feature>
     </group>
     <group id="Face">
       <feature id="NormalMacro" title="Normal to a face" tooltip="Calculate the normal to a face" auto_preview="true"

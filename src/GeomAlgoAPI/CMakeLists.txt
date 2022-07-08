@@ -58,6 +58,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_ShapeTools.h
     GeomAlgoAPI_Partition.h
     GeomAlgoAPI_PaveFiller.h
+    GeomAlgoAPI_PointCloudOnFace.h
     GeomAlgoAPI_Intersection.h
     GeomAlgoAPI_Pipe.h
     GeomAlgoAPI_WireBuilder.h
@@ -132,6 +133,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_ShapeTools.cpp
     GeomAlgoAPI_Partition.cpp
     GeomAlgoAPI_PaveFiller.cpp
+    GeomAlgoAPI_PointCloudOnFace.cpp
     GeomAlgoAPI_Intersection.cpp
     GeomAlgoAPI_Pipe.cpp
     GeomAlgoAPI_WireBuilder.cpp

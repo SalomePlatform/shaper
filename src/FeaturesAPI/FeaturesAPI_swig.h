@@ -41,6 +41,7 @@
   #include "FeaturesAPI_Partition.h"
   #include "FeaturesAPI_Pipe.h"
   #include "FeaturesAPI_Placement.h"
+  #include "FeaturesAPI_PointCloudOnFace.h"
   #include "FeaturesAPI_Recover.h"
   #include "FeaturesAPI_RemoveSubShapes.h"
   #include "FeaturesAPI_Revolution.h"
