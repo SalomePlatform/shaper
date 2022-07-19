@@ -30,7 +30,8 @@ def importParameters(theDocument, theFileName):
     aResult = []
     try:
         aFile = codecs.open(theFileName, 'r', encoding = 'utf_8_sig')
-    except IOError:
+    except IOError as e:
+        print("Failed to read file: %s" % str(e))
         return aResult
 
     for aLine in aFile:
