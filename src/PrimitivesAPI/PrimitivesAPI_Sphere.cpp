@@ -125,12 +125,7 @@ void PrimitivesAPI_Sphere::dump(ModelHighAPI_Dumper& theDumper) const
 
   std::string aCreationMethod = aBase->string(PrimitivesPlugin_Sphere::CREATION_METHOD())->value();
 
-  if(aCreationMethod == PrimitivesPlugin_Sphere::CREATION_METHOD_BY_PT_RADIUS()) {
-    AttributeSelectionPtr anAttrCenterPoint =
-        aBase->selection(PrimitivesPlugin_Sphere::CENTER_POINT_ID());
-    AttributeDoublePtr anAttrRadius = aBase->real(PrimitivesPlugin_Sphere::RADIUS_ID());
-    theDumper << ", " << anAttrCenterPoint << ", " << anAttrRadius;
-  } else if(aCreationMethod == PrimitivesPlugin_Sphere::CREATION_METHOD_BY_DIMENSIONS()) {
+  if (aCreationMethod == PrimitivesPlugin_Sphere::CREATION_METHOD_BY_DIMENSIONS()) {
     AttributeDoublePtr anAttrRMin = aBase->real(PrimitivesPlugin_Sphere::RMIN_ID());
     AttributeDoublePtr anAttrRMax = aBase->real(PrimitivesPlugin_Sphere::RMAX_ID());
     AttributeDoublePtr anAttrPhiMin = aBase->real(PrimitivesPlugin_Sphere::PHIMIN_ID());
@@ -140,6 +135,13 @@ void PrimitivesAPI_Sphere::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrRMin << ", " << anAttrRMax;
     theDumper << ", " << anAttrPhiMin << ", " << anAttrPhiMax;
     theDumper << ", " << anAttrThetaMin << ", " << anAttrThetaMax;
+  } else { // CREATION_METHOD_BY_PT_RADIUS by default to support versions with undefined method
+    AttributeSelectionPtr anAttrCenterPoint =
+        aBase->selection(PrimitivesPlugin_Sphere::CENTER_POINT_ID());
+    AttributeDoublePtr anAttrRadius = aBase->real(PrimitivesPlugin_Sphere::RADIUS_ID());
+    // for old versions radius value was located in another place, so, use the default 10
+    double aRadValue = anAttrRadius->isInitialized() ? anAttrRadius->value() : 10;
+    theDumper << ", " << anAttrCenterPoint << ", " << aRadValue;
   }
 
   theDumper << ")" << std::endl;
