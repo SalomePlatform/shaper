@@ -139,9 +139,7 @@ void PrimitivesAPI_Sphere::dump(ModelHighAPI_Dumper& theDumper) const
     AttributeSelectionPtr anAttrCenterPoint =
         aBase->selection(PrimitivesPlugin_Sphere::CENTER_POINT_ID());
     AttributeDoublePtr anAttrRadius = aBase->real(PrimitivesPlugin_Sphere::RADIUS_ID());
-    // for old versions radius value was located in another place, so, use the default 10
-    double aRadValue = anAttrRadius->isInitialized() ? anAttrRadius->value() : 10;
-    theDumper << ", " << anAttrCenterPoint << ", " << aRadValue;
+    theDumper << ", " << anAttrCenterPoint << ", " << anAttrRadius;
   }
 
   theDumper << ")" << std::endl;

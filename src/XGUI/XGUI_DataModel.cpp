@@ -42,6 +42,20 @@
 #pragma warning(disable: 4100)
 #endif
 
+static bool isValidNode(const ModuleBase_ITreeNode* theNode)
+{
+  ModuleBase_ITreeNode* aParent = 0;
+  try {
+    aParent = theNode->parent();
+  }
+  catch (...) {
+    return false;
+  }
+  if (aParent)
+    return isValidNode(aParent);
+  return true;
+}
+
 // Constructor *************************************************
 XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)//,
   //myIsEventsProcessingBlocked(false)
@@ -367,7 +381,10 @@ bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& the
 Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 {
   if (theIndex.isValid()) {
-    ModuleBase_ITreeNode* aNode = (ModuleBase_ITreeNode*)theIndex.internalPointer();
+    ModuleBase_ITreeNode* aNode = static_cast<ModuleBase_ITreeNode*>(theIndex.internalPointer());
+    // Check that the pointer is Valid
+    if (!isValidNode(aNode))
+      return Qt::NoItemFlags;
     Qt::ItemFlags aResultFlags = aNode->flags(theIndex.column());
     // Drag and drop of Part features only if:
     // - PartSet is active
