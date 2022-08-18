@@ -40,6 +40,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Partition.h
     FeaturesPlugin_Pipe.h
     FeaturesPlugin_Placement.h
+    FeaturesPlugin_PointCloudOnFace.h
     FeaturesPlugin_CompositeBoolean.h
     FeaturesPlugin_CompositeSketch.h
     FeaturesPlugin_ExtrusionBoolean.h
@@ -94,6 +95,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Pipe.cpp
     FeaturesPlugin_Placement.cpp
+    FeaturesPlugin_PointCloudOnFace.cpp
     FeaturesPlugin_CompositeBoolean.cpp
     FeaturesPlugin_CompositeSketch.cpp
     FeaturesPlugin_ExtrusionBoolean.cpp

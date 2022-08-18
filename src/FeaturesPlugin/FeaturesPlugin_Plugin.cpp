@@ -44,6 +44,7 @@
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Pipe.h>
 #include <FeaturesPlugin_Placement.h>
+#include <FeaturesPlugin_PointCloudOnFace.h>
 #include <FeaturesPlugin_Recover.h>
 #include <FeaturesPlugin_RemoveSubShapes.h>
 #include <FeaturesPlugin_Revolution.h>
@@ -215,6 +216,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_InspectNormalToFace);
   } else if (theFeatureID == FeaturesPlugin_NormalToFace::ID()) {
     return FeaturePtr(new FeaturesPlugin_NormalToFace);
+  } else if (theFeatureID == FeaturesPlugin_PointCloudOnFace::ID()) {
+    return FeaturePtr(new FeaturesPlugin_PointCloudOnFace);
   }
 
 

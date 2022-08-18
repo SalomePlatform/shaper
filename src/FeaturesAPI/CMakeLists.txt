@@ -38,6 +38,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Partition.h
   FeaturesAPI_Pipe.h
   FeaturesAPI_Placement.h
+  FeaturesAPI_PointCloudOnFace.h
   FeaturesAPI_Recover.h
   FeaturesAPI_RemoveResults.h
   FeaturesAPI_RemoveSubShapes.h
@@ -75,6 +76,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Partition.cpp
   FeaturesAPI_Pipe.cpp
   FeaturesAPI_Placement.cpp
+  FeaturesAPI_PointCloudOnFace.cpp
   FeaturesAPI_Recover.cpp
   FeaturesAPI_RemoveResults.cpp
   FeaturesAPI_RemoveSubShapes.cpp
