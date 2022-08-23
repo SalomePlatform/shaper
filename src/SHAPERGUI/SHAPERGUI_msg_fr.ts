@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation type="vanished">Information</translation>
     </message>
     <message>
         <source>Show inspection window</source>
@@ -106,6 +106,58 @@
     <message>
         <source>MEN_DESK_EDIT</source>
         <translation>MEN_DESK_EDIT</translation>
+    </message>
+    <message>
+        <source>Parts management</source>
+        <translation>Gestion des pièces</translation>
+    </message>
+    <message>
+        <source>Import operations</source>
+        <translation>Opérations d&apos;importation</translation>
+    </message>
+    <message>
+        <source>Export operations</source>
+        <translation>Opérations d&apos;exportation</translation>
+    </message>
+    <message>
+        <source>Arrangement of parts</source>
+        <translation>Disposition des pièces</translation>
+    </message>
+    <message>
+        <source>Primitives</source>
+        <translation>Primitives</translation>
+    </message>
+    <message>
+        <source>Geometry</source>
+        <translation>Géométrie</translation>
+    </message>
+    <message>
+        <source>Features</source>
+        <translation>Fonctionnalités</translation>
+    </message>
+    <message>
+        <source>Dimensions</source>
+        <translation>Dimensions</translation>
+    </message>
+    <message>
+        <source>Constraints</source>
+        <translation>Contraintes</translation>
+    </message>
+    <message>
+        <source>Welcome to SHAPER</source>
+        <translation>Bienvenue à SHAPER</translation>
+    </message>
+    <message>
+        <source>Current mode: Part set mode</source>
+        <translation>Mode actuel : Mode de réglage des pièces</translation>
+    </message>
+    <message>
+        <source>Current mode: Part mode</source>
+        <translation>Mode actuel : Mode partiel</translation>
+    </message>
+    <message>
+        <source>Current mode: Sketcher mode</source>
+        <translation>Mode actuel : Mode esquisseur</translation>
     </message>
     <message>
         <source>Group names display</source>

@@ -35,6 +35,7 @@ class XGUI_Workshop;
 class SHAPERGUI_OCCSelector;
 class OCCViewer_Viewer;
 class CAM_Study;
+class QtxInfoPanel;
 
 /** 
  * \ingroup Salome
@@ -173,6 +174,8 @@ Q_OBJECT
 
   void publishToStudy();
 
+  virtual void updateInfoPanel();
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
@@ -241,6 +244,17 @@ private slots:
   void saveToolbarsConfig();
   void loadToolbarsConfig();
 
+  //! Fill Info Panel in Part set mode
+  void fillPartSetInfoPanel(QtxInfoPanel* theInfoPanel);
+
+  //! Fill Info Panel in Part mode
+  void fillPartInfoPanel(QtxInfoPanel* theInfoPanel);
+
+  //! Fill Info Panel in Sketcher mode
+  void fillSketcherInfoPanel(QtxInfoPanel* theInfoPanel);
+
+  //! Fill Info Panel in Sketcher mode
+  void addActionsToInfoGroup(QtxInfoPanel* theInfoPanel, const QString& theGroup, const QSet<QString>& theActions);
 
   void hideInternalWindows();
 
