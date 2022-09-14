@@ -335,14 +335,6 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
   myIsEditEnabled = getApp()->isEditEnabled();
   getApp()->setEditEnabled(false);
 
-  // this following row is caused by #187 bug.
-  // SALOME saves the dock widget positions before deactivateModule() and
-  // load it after the module activation. So, if the panel is visible before
-  // deactivate, it becomes visible after activate.
-  // In order to avoid the visible property panel, the widget position save is
-  // switch off in this module
-  aResMgr->setValue("Study", "store_positions", false);
-
   // Synchronize displayed objects
   Handle(AIS_InteractiveContext) aContext;
   if (mySelector && mySelector->viewer())
@@ -1058,6 +1050,16 @@ void SHAPERGUI::updateModuleVisibilityState()
 {
   LightApp_Module::updateModuleVisibilityState();
   onWhatIs(myIsInspectionVisible);
+
+  // the following code is caused by #187 bug.
+  // SALOME saves the dock widget positions before deactivateModule() and
+  // load it after the module activation. So, if the panel is visible before
+  // deactivate, it becomes visible after activate.
+  // In order to avoid the visible property panel, we hide it here
+  ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
+  if (!anOperation) {
+    myWorkshop->hidePanel(myWorkshop->propertyPanel());
+  }
 }
 
 void SHAPERGUI::onEditToolbars()

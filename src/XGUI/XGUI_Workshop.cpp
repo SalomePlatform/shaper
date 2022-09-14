@@ -1728,11 +1728,14 @@ void XGUI_Workshop::showPanel(QDockWidget* theDockWidget)
 //******************************************************
 void XGUI_Workshop::hidePanel(QDockWidget* theDockWidget)
 {
-  if (theDockWidget && theDockWidget == myPropertyPanel) {
+  if (!theDockWidget) return;
+
+  if (theDockWidget == myPropertyPanel) {
     QAction* aViewAct = theDockWidget->toggleViewAction();
     ///<! Do not allow to show empty property panel
     aViewAct->setEnabled(false);
   }
+
   theDockWidget->hide();
 
   // the property panel is active window of the desktop, when it is
