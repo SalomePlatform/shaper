@@ -931,11 +931,12 @@ std::shared_ptr<SketchAPI_Offset> SketchAPI_Sketch::addOffset(
     const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
     const ModelHighAPI_Double & theValue,
     const bool theReversed,
-    const std::string & theJointType)
+    const std::string & theJointType,
+    const bool theApprox)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Offset::ID());
-  return OffsetPtr(new SketchAPI_Offset(aFeature, theObjects, theValue, theReversed, theJointType));
+  return OffsetPtr(new SketchAPI_Offset(aFeature, theObjects, theValue, theReversed, theJointType, theApprox));
 }
 
 //--------------------------------------------------------------------------------------

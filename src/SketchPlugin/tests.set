@@ -170,6 +170,7 @@ SET(TEST_NAMES_PARA
   TestOffset1.py
   TestOffset2.py
   TestOffset3.py
+  TestOffset4.py
   TestPresentation.py
   TestProjection.py
   TestProjectionBSpline.py

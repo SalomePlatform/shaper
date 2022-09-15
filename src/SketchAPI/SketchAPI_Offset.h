@@ -51,12 +51,13 @@ public:
                    const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
                    const ModelHighAPI_Double & theOffsetValue,
                    const bool theIsReversed = false,
-                   const std::string & theJointType = SketchPlugin_Offset::JOINT_KEEP_DISTANCE());
+                   const std::string & theJointType = SketchPlugin_Offset::JOINT_KEEP_DISTANCE(),
+                   const bool theIsApprox = false);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Offset();
 
-  INTERFACE_4(SketchPlugin_Offset::ID(),
+  INTERFACE_5(SketchPlugin_Offset::ID(),
 
               edgesList, SketchPlugin_Offset::EDGES_ID(),
               ModelAPI_AttributeRefList, /** Offset edges list */,
@@ -68,7 +69,10 @@ public:
               ModelAPI_AttributeBoolean, /** Negative value */,
 
               joint, SketchPlugin_Offset::JOINT_ID(),
-              ModelAPI_AttributeString, /** Joint type */
+              ModelAPI_AttributeString, /** Joint type */,
+
+              approx, SketchPlugin_Offset::APPROX_ID(),
+              ModelAPI_AttributeBoolean, /** Negative value */
               )
 
   /// List of created objects

@@ -101,6 +101,13 @@ public:
     return ID;
   }
 
+  /// attribute to approx by segments and arcs
+  inline static const std::string& APPROX_ID()
+  {
+    static const std::string ID("approx");
+    return ID;
+  }
+
   /// name for add wire action
   inline static const std::string& ADD_WIRE_ACTION_ID()
   {

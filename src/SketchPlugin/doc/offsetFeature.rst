@@ -38,6 +38,7 @@ Property panel:
 Input fields:
 
 - Offset mode can be **Keep distance**, **Arcs** or **Lines**
+- **Approx by segments and arcs** converts the input geometry of the offset algorithm to segments and arcs.
 - **Edges** is the list of segments (lines, circles, arcs) selected in the view.
 - **Offset value** is the offset distance.
 - **Reversed** sets the reversed offset side (inside a closed contour or to the left of an open one).
