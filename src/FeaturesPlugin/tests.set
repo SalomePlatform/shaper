@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
+SET(TEST_NAMES_PARA
                TestExtrusion.py
                TestExtrusionOfCompound.py
                TestExtrusionCut.py
@@ -497,7 +497,6 @@ SET(TEST_NAMES
                Test2817.py
                Test19065.py
                Test19066.py
-               Test19115.py
                Test19196.py
                TestFillet1D_ErrorMsg.py
                TestFillet1D_Vertices_1.py
@@ -528,3 +527,9 @@ SET(TEST_NAMES
                Test23885.py
                TestNormalToFace.py
 )
+
+SET(TEST_NAMES_SEQ
+               Test19115.py
+)
+
+set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_SEQ})

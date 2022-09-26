@@ -19,8 +19,15 @@
 
 include(tests.set)
 
-foreach(tfile ${TEST_NAMES})
+foreach(tfile ${TEST_NAMES_PARA})
   set(TEST_NAME ${COMPONENT_NAME}_${tfile})
   add_test(${TEST_NAME} python ${tfile})
   set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${SALOME_TEST_LABEL_ADV}")
+endforeach()
+
+
+foreach(tfile ${TEST_NAMES_SEQ})
+  set(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  add_test(${TEST_NAME} python ${tfile})
+  set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${SALOME_TEST_LABEL_SEQ}")
 endforeach()
