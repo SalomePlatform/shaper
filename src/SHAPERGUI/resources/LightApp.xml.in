@@ -53,7 +53,7 @@
     <parameter name="scalar_bar_text_color" value="#000000" />
     <parameter name="shaper_default_transparency" value="0"/>
     <parameter name="group_names_display" value="true" />
-    <parameter name="group_names_font" value="Arial Black" />
+    <parameter name="group_names_font" value="Times-bold" />
     <parameter name="group_names_size" value="12" />
     <parameter name="group_names_color" value="#000000" />
   </section>
