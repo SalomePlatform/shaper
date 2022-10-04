@@ -121,6 +121,7 @@ SET(TEST_NAMES
                Test19932.py
                Test19989.py
                Test20170.py
+               Test26745.py
                TestMovePart1.py
                TestMovePart2.py
 )
