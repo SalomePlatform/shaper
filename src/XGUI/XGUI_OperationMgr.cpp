@@ -29,6 +29,8 @@
 #include "XGUI_Tools.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_ContextMenuMgr.h"
+#include "XGUI_Selection.h"
+#include "XGUI_SelectionMgr.h"
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
@@ -106,9 +108,16 @@ bool XGUI_ShortCutListener::eventFilter(QObject *theObject, QEvent *theEvent)
             isAccepted = myOperationMgr->onProcessDelete(theObject);
             break;
           case Qt::Key_F2:
-            myOperationMgr->xworkshop()->objectBrowser()->onEditItem();
+          {
+            QObjectPtrList anObjects = myOperationMgr->xworkshop()->selector()->selection()->selectedObjects();
+            if (myOperationMgr->xworkshop()->abortAllOperations())
+            {
+              myOperationMgr->xworkshop()->objectBrowser()->setObjectsSelected(anObjects);
+              myOperationMgr->xworkshop()->objectBrowser()->onEditItem();
+            }
             isAccepted = true;
             break;
+          }
           default:
             isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
             break;
