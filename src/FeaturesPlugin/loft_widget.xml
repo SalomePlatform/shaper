@@ -1,0 +1,19 @@
+<source>
+  <shape_selector id="first_object"
+                  label="First object:"
+                  tooltip="Select a object"
+                  shape_types="edge face wire"
+                  concealment="true"
+                  default="">
+    <validator id="GeomValidators_ShapeType" parameters="line,edge,wire,face,shell"/>
+  </shape_selector>
+  <shape_selector id="second_object"
+                  label="Second object:"
+                  tooltip="Select a object"
+                  shape_types="edge face wire"
+                  concealment="true"
+                  default="">
+    <validator id="GeomValidators_ShapeType" parameters="line,edge,wire,face,shell"/>
+  </shape_selector>
+  <validator id="FeaturesPlugin_ValidatorLoftSameTypeShape"/>
+</source>

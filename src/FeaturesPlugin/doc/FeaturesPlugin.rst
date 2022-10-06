@@ -25,6 +25,7 @@ Features plug-in provides a set of common topological operations. It implements 
    geometryCalculationFeature.rst
    importResultFeature.rst
    linearCopyFeature.rst
+   loftFeature.rst
    measurementFeature.rst
    normalToFaceFeature.rst
    pipeFeature.rst

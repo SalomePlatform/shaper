@@ -66,6 +66,10 @@
       <translation>Tuyau</translation>
     </message>
     <message>
+      <source>Loft</source>
+      <translation>Lissage</translation>
+    </message>
+    <message>
       <source>Recover</source>
       <translation>Récupérer</translation>
     </message>
@@ -1384,6 +1388,28 @@
     </message>
   </context>
 
+  <!-- Loft -->
+  <context>
+    <name>Loft</name>
+    <message>
+      <source>Loft</source>
+      <translation>Lissage</translation>
+    </message>
+  </context>
+  <context>
+    <name>Loft:first_object</name>
+    <message>
+      <source>First object:</source>
+      <translation>Premier objet:</translation>
+    </message>
+  </context>
+    <context>
+      <name>Loft:second_object</name>
+    <message>
+      <source>Second object:</source>
+      <translation>Deuxième objet:</translation>
+    </message>
+  </context>
   <!-- Recover -->
   <context>
     <name>Recover</name>

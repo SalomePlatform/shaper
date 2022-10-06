@@ -37,6 +37,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_MultiTranslation.h
   FeaturesAPI_Partition.h
   FeaturesAPI_Pipe.h
+  FeaturesAPI_Loft.h
   FeaturesAPI_Placement.h
   FeaturesAPI_PointCloudOnFace.h
   FeaturesAPI_Recover.h
@@ -75,6 +76,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_MultiTranslation.cpp
   FeaturesAPI_Partition.cpp
   FeaturesAPI_Pipe.cpp
+  FeaturesAPI_Loft.cpp
   FeaturesAPI_Placement.cpp
   FeaturesAPI_PointCloudOnFace.cpp
   FeaturesAPI_Recover.cpp
