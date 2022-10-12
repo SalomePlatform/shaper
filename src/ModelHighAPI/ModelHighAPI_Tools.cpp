@@ -559,7 +559,7 @@ static bool checkDump(SessionPtr theSession,
   // execute the dumped
   PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
   static char aReadMode[] = "r";
-  FILE* PyFileObject = _Py_fopen(theFilename, aReadMode);
+  FILE* PyFileObject = fopen(theFilename, aReadMode);
   PyRun_SimpleFileEx(PyFileObject, theFilename, 1);
   PyGILState_Release(gstate); /* release python thread */
 

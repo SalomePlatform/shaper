@@ -49,6 +49,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <array>
 
 FeaturesPlugin_Measurement::FeaturesPlugin_Measurement() : mySceenScale(1)
 {

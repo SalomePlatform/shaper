@@ -101,6 +101,7 @@
 #include <NCollection_Vector.hxx>
 
 #include <LocalAnalysis_SurfaceContinuity.hxx>
+#include<array>
 
 //==================================================================================================
 static GProp_GProps props(const TopoDS_Shape& theShape)
