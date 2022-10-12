@@ -785,23 +785,6 @@ std::wstring Model_AttributeSelection::namingName(const std::wstring& theDefault
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
 
-  // not argument has not parametric name (filters)
-  if (!this->isArgument() || (myParent && !myParent->isArgument())) {
-    GeomShapePtr aShape = value();
-    if (!aShape.get() && context().get())
-      aShape = context()->shape();
-    std::wstring aNotArgName;
-    if (aShape.get()) {
-      aNotArgName = Locale::Convert::toWString(aShape->shapeTypeStr());
-      if (myParent) {
-        std::wostringstream aStream;
-        aStream << "_" << selectionLabel().Father().Tag();
-        aNotArgName += aStream.str();
-      }
-    }
-    return aNotArgName;
-  }
-
   CenterType aCenterType = NOT_CENTER;
   std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
 
