@@ -95,9 +95,9 @@ void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
   this->setImpl(aUnifyAlgo);
 
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  aUnifyAlgo->Initialize(aShape);
+  aUnifyAlgo->Initialize(aShape, Standard_True, Standard_True, Standard_True);
   aUnifyAlgo->SetLinearTolerance(defineLinearTolerance(aShape));
-  aUnifyAlgo->SetAngularTolerance(1.e-6); // for #2697
+  aUnifyAlgo->SetAngularTolerance(1.e-5); // for #32443
   aUnifyAlgo->Build();
 
   TopoDS_Shape aResult = aUnifyAlgo->Shape();

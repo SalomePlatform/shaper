@@ -179,6 +179,7 @@ SET(TEST_NAMES_PARA
                TestMeasurementPresentation.py
                TestFusionFaces.py
                TestFusionFaces2697.py
+               TestFusionFaces32443.py
                Test1379.py
                Test1922.py
                Test1942.py
