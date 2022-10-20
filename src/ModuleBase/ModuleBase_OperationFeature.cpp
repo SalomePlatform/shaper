@@ -278,6 +278,12 @@ void ModuleBase_OperationFeature::abort()
       new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
   Events_Loop::loop()->send(aMsg);
 
+  if (myFeature.get())
+  {
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
+    ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+  }
+
   // the widgets of property panel should not process any events come from data mode
   // after abort clicked. Some signal such as redisplay/create influence on content
   // of the object browser and viewer context. Therefore it influence to the current
