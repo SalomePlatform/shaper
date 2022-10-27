@@ -1334,4 +1334,6 @@ model.testNbSubShapes(Split_6, GeomAPI_Shape.EDGE, [3636])
 model.testNbSubShapes(Split_6, GeomAPI_Shape.VERTEX, [7272])
 model.testResultsVolumes(Split_6, [612.72746616262998])
 
-assert(model.checkPythonDump())
+# After fixing bos #30178 with OCCT 33006: loading GEOMETRICAL dump gives different result (differ names of the same entities)
+#assert(model.checkPythonDump())
+assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))

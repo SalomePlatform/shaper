@@ -519,6 +519,7 @@ SET(TEST_NAMES_PARA
                Test20245_1.py
                Test20245_2.py
                Test20245_3.py
+               Test20245_3_geometrical.py
                Test20247.py
                Test22847.py
                TestPointCoordinates.py
