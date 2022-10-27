@@ -60,6 +60,8 @@ MAYBE_UNUSED static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay
 MAYBE_UNUSED static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 /// The active document becomes another one
 MAYBE_UNUSED static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
+/// All documents closed
+MAYBE_UNUSED static const char * EVENT_DOCUMENTS_CLOSED = "AllDocumentsClosed";
 
 /// Event ID that order of objects in group is changed,
 /// so, tree must be fully recreated (movement of feature)

@@ -188,6 +188,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENTS_CLOSED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LICENSE_VALID));
 
@@ -1674,7 +1675,9 @@ if (aObjIndex.isValid()) { \
 //******************************************************
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENTS_CLOSED)) {
+    closeDocument();
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     SessionPtr aMgr = ModelAPI_Session::get();
     if (!aMgr->hasModuleDocument()) // if document is closed, do not call the document creation
       return;

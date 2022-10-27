@@ -73,11 +73,11 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
 void Model_Session::closeAll()
 {
   Model_Application::getApplication()->deleteAllDocuments();
-  static const Events_ID aDocChangeEvent = Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED);
+  static const Events_ID aDocsCloseEvent = Events_Loop::eventByName(EVENT_DOCUMENTS_CLOSED);
   myCurrentDoc = NULL;
-  static std::shared_ptr<Events_Message> aMsg(new Events_Message(aDocChangeEvent));
+  static std::shared_ptr<Events_Message> aMsg(new Events_Message(aDocsCloseEvent));
   Events_Loop::loop()->send(aMsg);
-  Events_Loop::loop()->flush(aDocChangeEvent);
+  Events_Loop::loop()->flush(aDocsCloseEvent);
 }
 
 void Model_Session::startOperation(const std::string& theId, const bool theAttachedToNested)
