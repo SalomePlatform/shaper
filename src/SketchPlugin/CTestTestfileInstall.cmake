@@ -20,10 +20,16 @@
 include(tests.set)
 include(tests_change_radius.set)
 
-set(TEST_NAMES ${TEST_NAMES} ${TEST_NAMES_CHANGE_RADIUS})
+set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_CHANGE_RADIUS})
 
 foreach(tfile ${TEST_NAMES})
   set(TEST_NAME ${COMPONENT_NAME}_${tfile})
   add_test(${TEST_NAME} python ${tfile})
   set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${SALOME_TEST_LABEL_ADV}")
+endforeach()
+
+foreach(tfile ${TEST_NAMES_SEQ})
+  set(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  add_test(${TEST_NAME} python ${tfile})
+  set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${SALOME_TEST_LABEL_SEQ}")
 endforeach()
