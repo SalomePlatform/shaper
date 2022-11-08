@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR">
 <context>
+    <name>workshop</name>
+    <message>
+        <source>Inspection</source>
+        <translation>Inspection</translation>
+    </message>
+</context>
+<context>
     <name>SHAPERGUI</name>
     <message>
         <source>Inspection</source>

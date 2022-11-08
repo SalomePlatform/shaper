@@ -58,6 +58,10 @@
       <translation>Section</translation>
     </message>
     <message>
+      <source>Normal to a face</source>
+      <translation>Normale d&apos;une face</translation>
+    </message>
+    <message>
       <source>Partition</source>
       <translation>Partition</translation>
     </message>
@@ -225,6 +229,10 @@
       <source>First distance.</source>
       <translation>Première distance.</translation>
     </message>
+    <message>
+      <source>D1</source>
+      <translation>D1</translation>
+    </message>
   </context>
   <context>
     <name>Chamfer:d2</name>
@@ -232,12 +240,20 @@
       <source>Second distance.</source>
       <translation>Deuxième distance.</translation>
     </message>
+    <message>
+      <source>D2</source>
+      <translation>D2</translation>
+    </message>
   </context>
   <context>
     <name>Chamfer:d</name>
     <message>
       <source>Distance.</source>
       <translation>Distance.</translation>
+    </message>
+    <message>
+      <source>D</source>
+      <translation>D</translation>
     </message>
   </context>
   <context>
@@ -367,6 +383,19 @@
     <message>
       <source>Tool objects</source>
       <translation>Objets outils</translation>
+    </message>
+  </context>
+
+  <!-- Split -->
+  <context>
+    <name>Fill</name>
+    <message>
+      <source>Perform boolean split operation with objects</source>
+      <translation>Réaliser l&apos;opération booléenne division avec des objets</translation>
+    </message>
+    <message>
+      <source>Split</source>
+      <translation>Diviser</translation>
     </message>
   </context>
 
@@ -1395,6 +1424,10 @@
       <source>Loft</source>
       <translation>Lissage</translation>
     </message>
+    <message>
+      <source>Generates a shape with two elements</source>
+      <translation>Génére une forme avec deux éléments</translation>
+    </message>
   </context>
   <context>
     <name>Loft:first_object</name>
@@ -1402,14 +1435,44 @@
       <source>First object:</source>
       <translation>Premier objet:</translation>
     </message>
+    <message>
+      <source>Select a object</source>
+      <translation>Sélectionez un objet</translation>
+    </message>
   </context>
-    <context>
-      <name>Loft:second_object</name>
+  <context>
+    <name>Loft:first_object:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>Loft:second_object</name>
     <message>
       <source>Second object:</source>
       <translation>Deuxième objet:</translation>
     </message>
+    <message>
+      <source>Select a object</source>
+      <translation>Sélectionez un objet</translation>
+    </message>
   </context>
+  <context>
+    <name>Loft:second_object:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>Loft:FeaturesPlugin_ValidatorLoftSameTypeShape</name>
+    <message>
+      <source>Error: Could not get &quot;%1&quot; attribute.</source>
+      <translation>Erreur : Impossible de lire l&apos;attribut &quot;%1&quot;.</translation>
+    </message>
+  </context>
+
   <!-- Recover -->
   <context>
     <name>Recover</name>
@@ -1529,6 +1592,13 @@
       <translation>Sélectionnez les résultats copiés</translation>
     </message>
   </context>
+  <context>
+    <name>ImportResult:objects:FeaturesPlugin_ValidatorImportResults</name>
+    <message>
+      <source>Please select sources.</source>
+      <translation>Sélectionner les sources.</translation>
+    </message>
+  </context>
 
   <!-- Remove_SubShapes -->
   <context>
@@ -1606,6 +1676,19 @@
     <message>
       <source>Error: Empty context.</source>
       <translation>Erreur : contexte vide.</translation>
+    </message>
+  </context>
+
+  <!-- RemoveResults -->
+  <context>
+    <name>RemoveResults</name>
+    <message>
+      <source>Internal feature for results removal</source>
+      <translation>Fonctionalité interne pour la suppression de résultats</translation>
+    </message>
+    <message>
+      <source>Remove results</source>
+      <translation>Supprimer des résultats</translation>
     </message>
   </context>
 
@@ -2366,6 +2449,13 @@
     <message>
       <source>Wrong parameters in XML definition for %1 type</source>
       <translation>Mauvais paramètres dans la définition XML pour le type %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects</name>
+    <message>
+      <source>Sketch and objects from it can not be selected at the same time.</source>
+      <translation>L&apos;esquisse et ses éléments ne peuvent pas être sélectionnés en même temps.</translation>
     </message>
   </context>
   <context>
@@ -4524,12 +4614,39 @@
       <source>Bounding box</source>
       <translation>Boîte englobante</translation>
     </message>
+    <message>
+      <source>Calculate the bounding box</source>
+      <translation>Calculer la boîte englobante</translation>
+    </message>
+    <message>
+      <source>Max</source>
+      <translation>Max</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <translation>Min</translation>
+    </message>
   </context>
   <context>
     <name>BoundingBoxMacro:main_object</name>
     <message>
       <source>Object</source>
       <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+    <message>
+      <source>Select a object</source>
+      <translation>Sélectionez un objet</translation>
+    </message>
+  </context>
+  <context>
+    <name>BoundingBoxMacro:main_object:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
     </message>
   </context>
   <context>
@@ -4544,6 +4661,10 @@
     <message>
       <source>Bounding box</source>
       <translation>Boîte englobante</translation>
+    </message>
+    <message>
+      <source>Calculate the bounding box</source>
+      <translation>Calculer la boîte englobante</translation>
     </message>
   </context>
   <context>
@@ -4561,16 +4682,10 @@
       <source>Geometry calculation</source>
       <translation>Calcul de la géometrie</translation>
     </message>
-  </context>
-  <context>
-    <name>GeometryCalculation:main_object</name>
     <message>
-      <source>Object</source>
-      <translation>Objet</translation>
+      <source>Calculate properties of objects</source>
+      <translation>Calculer les propriétés des objets</translation>
     </message>
-  </context>
-  <context>
-    <name>GeometryCalculation</name>
     <message>
       <source>Length = </source>
       <translation>Longueur = </translation>
@@ -4582,6 +4697,31 @@
     <message>
       <source>Volume = </source>
       <translation>Volume = </translation>
+    </message>
+  </context>
+  <context>
+    <name>GeometryCalculation:area</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeometryCalculation:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Select a object</source>
+      <translation>Sélectionez un objet</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeometryCalculation:main_object:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
     </message>
   </context>
 
@@ -4630,6 +4770,10 @@
       <source>Select an edge</source>
       <translation>Sélectionnez une arête</translation>
     </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
   </context>
   <context>
     <name>Measurement:angle_from:GeomValidators_ShapeType</name>
@@ -4647,6 +4791,10 @@
     <message>
       <source>Start point</source>
       <translation>Point de départ</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -4720,6 +4868,10 @@
       <source>Select an edge or face</source>
       <translation>Sélectionnez une arête ou une face</translation>
     </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
   </context>
   <context>
     <name>Measurement:distance_from</name>
@@ -4730,6 +4882,10 @@
     <message>
       <source>Select a shape</source>
       <translation>Sélectionnez une forme</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -4753,12 +4909,80 @@
       <source>Select an edge</source>
       <translation>Sélectionnez une arête</translation>
     </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
   </context>
   <context>
     <name>Measurement:edge_for_length:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
       <translation>L&apos;objet est vide</translation>
+    </message>
+  </context>
+
+  <!-- Normal -->
+  <context>
+    <name>Normal</name>
+    <message>
+      <source>Calculate the normal to a face</source>
+      <translation>Calcule la normale d&apos;une face</translation>
+    </message>
+    <message>
+      <source>Normal to a face</source>
+      <translation>Normale d&apos;une face</translation>
+    </message>
+  </context>
+  <context>
+    <name>NormalMacro</name>
+    <message>
+      <source>Calculate the normal to a face</source>
+      <translation>Calcule la normale d&apos;une face</translation>
+    </message>
+    <message>
+      <source>Normal to a face</source>
+      <translation>Normale d&apos;une face</translation>
+    </message>
+  </context>
+  <context>
+    <name>NormalMacro:createnormal</name>
+    <message>
+      <source>Create normal</source>
+      <translation>Créer la normale</translation>
+    </message>
+  </context>
+  <context>
+    <name>NormalMacro:face</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+    <message>
+      <source>Face</source>
+      <translation>Face</translation>
+    </message>
+    <message>
+      <source>Select a face</source>
+      <translation>Sélectionner une face</translation>
+    </message>
+  </context>
+  <context>
+    <name>NormalMacro:face:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>L&apos;objet est vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>NormalMacro:vertex</name>
+    <message>
+      <source>Select a vertex</source>
+      <translation>Sélectionner un sommet</translation>
+    </message>
+    <message>
+      <source>Vertex</source>
+      <translation>Sommet</translation>
     </message>
   </context>
 
@@ -4862,6 +5086,45 @@
     <message>
       <source>Point coordinates</source>
       <translation>Coordonnées d'un point</translation>
+    </message>
+    <message>
+      <source>View point coordinate</source>
+      <translation>Voir les coordonnées du point</translation>
+    </message>
+  </context>
+  <context>
+    <name>PointCoordinates:point_selected</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Arête</translation>
+    </message>
+    <message>
+      <source>Select a point</source>
+      <translation>Sélectionner un point</translation>
+    </message>
+  </context>
+  <context>
+    <name>PointCoordinates:point_selected:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+  </context>
+
+  <!-- Cloud of points -->
+  <context>
+    <name>Point_cloud</name>
+    <message>
+      <source>Cloud of points</source>
+      <translation>Nuage de points</translation>
+    </message>
+    <message>
+      <source>Create points laying on the face</source>
+      <translation>Créer des points sur une face</translation>
     </message>
   </context>
 

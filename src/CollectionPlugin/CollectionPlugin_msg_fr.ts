@@ -256,6 +256,10 @@
       <source>Group Shape</source>
       <translation>Forme à partir de groupes</translation>
     </message>
+    <message>
+      <source>Join several groups to single shape</source>
+      <translation>Joindre plusieurs groupes dans une forme seule</translation>
+    </message>
   </context>
 
 </TS>

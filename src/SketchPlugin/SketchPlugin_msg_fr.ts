@@ -93,8 +93,16 @@
       <translation>Copie miroir</translation>
     </message>
     <message>
+      <source>Offset</source>
+      <translation>Décalage</translation>
+    </message>
+    <message>
       <source>Parallel</source>
       <translation>Parallèle</translation>
+    </message>
+    <message>
+      <source>B-spline</source>
+      <translation>B-spline</translation>
     </message>
     <message>
       <source>Periodic B-spline</source>
@@ -341,6 +349,18 @@
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>L'attribut "%1" est verrouillé par la valeur de modification dans la vue.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchCircle</name>
+    <message>
+      <source>Circle</source>
+      <translation>Cercle</translation>
+    </message>
+    <message>
+      <source>Create circle</source>
+      <translation>Créer un cercle</translation>
     </message>
   </context>
   <context>
@@ -846,6 +866,10 @@
       <translation>Sélectionnez un point.</translation>
     </message>
     <message>
+      <source>Attribute &quot;%1&quot; is locked by modification value in the viewer.</source>
+      <translation>L&apos;attribut &quot;%1&quot; est bloqué en modification dans la vue.</translation>
+    </message>
+    <message>
       <source>End point</source>
       <translation>Point final</translation>
     </message>
@@ -855,6 +879,10 @@
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un point.</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is locked by modification value in the viewer.</source>
+      <translation>L&apos;attribut &quot;%1&quot; est bloqué en modification dans la vue.</translation>
     </message>
     <message>
       <source>Start point</source>
@@ -873,6 +901,17 @@
     </message>
   </context>
 
+  <context>
+    <name>SketchArc</name>
+    <message>
+      <source>Arc</source>
+      <translation>Arc</translation>
+    </message>
+    <message>
+      <source>Create arc</source>
+      <translation>Créer un arc</translation>
+    </message>
+  </context>
   <context>
     <name>SketchArc:ArcRadius:GeomValidators_Positive</name>
     <message>
@@ -1303,6 +1342,77 @@
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionner la liste des objets à translater.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchOffset</name>
+    <message>
+      <source>Offset</source>
+      <translation>Décalage</translation>
+    </message>
+    <message>
+      <source>Offset a curve to a distance</source>
+      <translation>Décaler une courbe d&apos;une distance</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchOffset:add_wire</name>
+    <message>
+      <source>Add the list of segments composing a wire with the selected items through the coincidence by boundary points</source>
+      <translation>Ajouter la liste des segments composant le contour</translation>
+    </message>
+    <message>
+      <source>Select wire</source>
+      <translation>Sélectionner le contour</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchOffset:offset_joint</name>
+    <message>
+      <source>Arcs</source>
+      <translation>Arcs</translation>
+    </message>
+    <message>
+      <source>Keep distance</source>
+      <translation>Garder la distance</translation>
+    </message>
+    <message>
+      <source>Lines</source>
+      <translation>Lignes</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchOffset:offset_value</name>
+    <message>
+      <source>Offset value</source>
+      <translation>Décalage</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchOffset:reversed</name>
+    <message>
+      <source>Reverse the offset</source>
+      <translation>Inverser le décalage</translation>
+    </message>
+    <message>
+      <source>Reversed</source>
+      <translation>Inverser</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchOffset:segments</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+    <message>
+      <source>Edges</source>
+      <translation>Arêtes</translation>
+    </message>
+    <message>
+      <source>Select edges to offset</source>
+      <translation>Sélectionner les arêtes à décaler</translation>
     </message>
   </context>
 
@@ -2296,6 +2406,18 @@
   </context>
 
   <context>
+    <name>SketchConstraintCoincidenceInternal</name>
+    <message>
+      <source>Internal Coincidence</source>
+      <translation>Coïncidence interne</translation>
+    </message>
+    <message>
+      <source>Internal coincidence</source>
+      <translation>Coïncidence interne</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintCollinear</name>
     <message>
       <source>Collinear</source>
@@ -3145,6 +3267,13 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroArc:transversal_point:SketchPlugin_ArcTransversalPoint</name>
+    <message>
+      <source>The attribute %1 should be a point</source>
+      <translation>L&apos;attribut %1 doit être un point</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTangentPoint</name>
     <message>
       <source>The attribute %1 should be a point</source>
@@ -3497,6 +3626,10 @@
       <source>Create ellipse</source>
       <translation>Créer une ellipse</translation>
     </message>
+    <message>
+      <source>Ellipse</source>
+      <translation>Ellipse</translation>
+    </message>
   </context>
   <context>
     <name>SketchEllipse:Auxiliary</name>
@@ -3581,6 +3714,17 @@
     </message>
   </context>
 
+  <context>
+    <name>SketchEllipticArc</name>
+    <message>
+      <source>Create elliptic arc</source>
+      <translation>Créer un arc d&apos;ellipse</translation>
+    </message>
+    <message>
+      <source>Elliptic arc</source>
+      <translation>Arc d&apos;ellipse</translation>
+    </message>
+  </context>
   <context>
     <name>SketchEllipticArc:Auxiliary</name>
     <message>
@@ -4171,8 +4315,16 @@
   <context>
     <name>SketchBSpline</name>
     <message>
-        <source>Number of B-spline poles should be 2 or more</source>
-        <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
+      <source>B-spline</source>
+      <translation>B-spline</translation>
+    </message>
+    <message>
+      <source>Create B-spline curve</source>
+      <translation>Créer une courbe B-spline</translation>
+    </message>
+    <message>
+      <source>Number of B-spline poles should be 2 or more</source>
+      <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
     </message>
   </context>
   <context>
@@ -4208,6 +4360,14 @@
 
   <context>
     <name>SketchBSplinePeriodic</name>
+    <message>
+      <source>Create periodic B-spline curve</source>
+      <translation>Créer une courbe périodique de type B-spline</translation>
+    </message>
+    <message>
+      <source>Periodic B-spline</source>
+      <translation>B-spline périodique</translation>
+    </message>
     <message>
       <source>Number of B-spline poles should be 2 or more</source>
       <translation>Le nombre de pôles B-spline doit être de 2 ou plus</translation>
@@ -4247,6 +4407,10 @@
   <context>
     <name>SketchMacroBSpline</name>
     <message>
+      <source>B-spline</source>
+      <translation>B-spline</translation>
+    </message>
+    <message>
       <source>Create B-spline curve</source>
       <translation>Créer une courbe B-spline</translation>
     </message>
@@ -4264,6 +4428,10 @@
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Sélectionnez un autre point ou appuyez sur ESC.</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -4320,6 +4488,10 @@
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Sélectionnez un autre point ou appuyez sur ESC.</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>

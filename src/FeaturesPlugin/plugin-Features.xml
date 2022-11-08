@@ -39,7 +39,7 @@
                icon="icons/Features/pipe.png" helpfile="pipeFeature.html">
         <source path="pipe_widget.xml"/>
       </feature>
-      <feature id="Loft" title="Loft" tooltip="Generates a shape xwith two elements"
+      <feature id="Loft" title="Loft" tooltip="Generates a shape with two elements"
                icon="icons/Features/loft.png" helpfile="loftFeature.html">
         <source path="loft_widget.xml"/>
       </feature>

@@ -44,6 +44,14 @@
       <source>Create a box</source>
       <translation>Créer une boîte</translation>
     </message>
+    <message>
+        <source>Half-lengths</source>
+        <translation>Demi-longueurs</translation>
+    </message>
+    <message>
+        <source>Origin</source>
+        <translation>Origine</translation>
+    </message>
   </context>
   <context>
     <name>Box:CreationMethod</name>
@@ -70,9 +78,6 @@
       <source>Select a first point</source>
       <translation>Sélectionnez un premier point</translation>
     </message>
-  </context>
-  <context>
-    <name>Box:FirstPoint</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un premier point.</translation>
@@ -84,9 +89,6 @@
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un deuxième point.</translation>
     </message>
-  </context>
-  <context>
-    <name>Box:SecondPoint</name>
     <message>
       <source>Second point</source>
       <translation>Deuxième point</translation>
@@ -443,6 +445,10 @@
       <source>rmin</source>
       <translation>Rmin</translation>
     </message>
+    <message>
+      <source>Rmin</source>
+      <translation>Rmin</translation>
+    </message>
   </context>
   <context>
     <name>Sphere:rmax</name>
@@ -452,6 +458,10 @@
     </message>
     <message>
       <source>rmax</source>
+      <translation>Rmax</translation>
+    </message>
+    <message>
+      <source>Rmax</source>
       <translation>Rmax</translation>
     </message>
   </context>
@@ -465,6 +475,10 @@
       <source>phimin</source>
       <translation>Phi min</translation>
     </message>
+    <message>
+      <source>Phi min</source>
+      <translation>Phi min</translation>
+    </message>
   </context>
   <context>
     <name>Sphere:phimax</name>
@@ -474,6 +488,10 @@
     </message>
     <message>
       <source>phimax</source>
+      <translation>Phi max</translation>
+    </message>
+    <message>
+      <source>Phi max</source>
       <translation>Phi max</translation>
     </message>
   </context>
@@ -487,6 +505,10 @@
       <source>thetamin</source>
       <translation>Theta min</translation>
     </message>
+    <message>
+      <source>Theta min</source>
+      <translation>Theta min</translation>
+    </message>
   </context>
   <context>
     <name>Sphere:thetamax</name>
@@ -496,6 +518,10 @@
     </message>
     <message>
       <source>thetamax</source>
+      <translation>Theta max</translation>
+    </message>
+    <message>
+      <source>Theta max</source>
       <translation>Theta max</translation>
     </message>
   </context>
@@ -570,6 +596,14 @@
       <source>Create a Tube
       </source>
       <translation>Créer un tube</translation>
+    </message>
+    <message>
+      <source>Create a Tube</source>
+      <translation>Créer un tube</translation>
+    </message>
+    <message>
+      <source>Tube</source>
+      <translation>Tube</translation>
     </message>
   </context>
   <context>

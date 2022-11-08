@@ -59,6 +59,17 @@
       <translation>Le nom du fichier est vide.</translation>
     </message>
   </context>
+  <context>
+    <name>Dump:geometric_selection</name>
+    <message>
+      <source>Dump by coordinates</source>
+      <translation>Générer par coordonées</translation>
+    </message>
+    <message>
+      <source>To use geometrical point coordinates to identify selected shapes</source>
+      <translation>Utiliser les coordonnées des points pour identifier les formes</translation>
+    </message>
+  </context>
 
   <!-- Export -->
   <context>
@@ -123,6 +134,14 @@
       <source>Export to file</source>
       <translation>Exporter dans un fichier</translation>
     </message>
+    <message>
+      <source>Deflection</source>
+      <translation>Déflection</translation>
+    </message>
+    <message>
+      <source>File type</source>
+      <translation>Type de fichier</translation>
+    </message>
   </context>
   <context>
     <name>Export:ExportType</name>
@@ -137,6 +156,13 @@
     <message>
       <source>STL</source>
       <translation>STL</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:file_format</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -198,6 +224,24 @@
     </message>
   </context>
   <context>
+    <name>Export:stl_absolute</name>
+    <message>
+      <source>Absolute value.</source>
+      <translation>Valeur absolue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_deflection_type</name>
+    <message>
+      <source>Calculate by size of shape</source>
+      <translation>Calculer par taille de forme</translation>
+    </message>
+    <message>
+      <source>Value indicate by user</source>
+      <translation>Valeur indiquée par l&apos;utilisateur</translation>
+    </message>
+  </context>
+  <context>
     <name>Export:stl_file_path</name>
     <message>
       <source>Export file</source>
@@ -239,6 +283,13 @@
     <message>
       <source>ASCII</source>
       <translation>ASCII</translation>
+    </message>
+  </context>
+  <context>
+    <name>Export:stl_relative</name>
+    <message>
+      <source>Relative value.</source>
+      <translation>Valeur relative.</translation>
     </message>
   </context>
   <context>
@@ -293,6 +344,10 @@
     <message>
       <source>Import</source>
       <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Import a file</source>
+      <translation>Importer un fichier</translation>
     </message>
     <message>
       <source>Create groups from</source>
@@ -352,7 +407,22 @@
       <source>Create groups from</source>
       <translation>Créer des groupes à partir</translation>
     </message>
+    <message>
+      <source>STEP options</source>
+      <translation>Options STEP</translation>
+    </message>
   </context> 
+  <context>
+    <name>ImportMacro:ImportType</name>
+    <message>
+      <source>BREP, XAO, IGES, STL</source>
+      <translation>BREP, XAO, IGES, STL</translation>
+    </message>
+    <message>
+      <source>STEP</source>
+      <translation>STEP</translation>
+    </message>
+  </context>
   <context>
     <name>ImportMacro:target_part</name>
     <message>
@@ -365,6 +435,13 @@
     <message>
       <source>Import to</source>
       <translation>Importer vers</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportMacro:step_target_parts_list</name>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -394,6 +471,10 @@
       <source>Import file</source>
       <translation>Fichier à importer</translation>
     </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
   </context>
   <context>
     <name>ImportMacro:step_file_path</name>
@@ -409,11 +490,28 @@
       <translation>Le nom du fichier est vide.</translation>
     </message>
   </context>
+
+  <!-- Import -->
+  <context>
+    <name>ImportImage</name>
+    <message>
+      <source>Import</source>
+      <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Import a file</source>
+      <translation>Importer un fichier</translation>
+    </message>
+  </context>
   <context>
     <name>ImportImageMacro</name>
     <message>
       <source>Import</source>
       <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Import a file</source>
+      <translation>Importer un fichier</translation>
     </message>
   </context>
   <context>
@@ -422,12 +520,27 @@
       <source>Import image file</source>
       <translation>Fichier de l'image à importer</translation>
     </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportImageMacro:file_path:ExchangePlugin_ImportFormat</name>
+    <message>
+      <source>File name is empty.</source>
+      <translation>Le nom de fichier est vide.</translation>
+    </message>
   </context>
   <context>
     <name>ImportImageMacro:target_part</name>
     <message>
       <source>Import to</source>
       <translation>Importer vers</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
 
@@ -468,6 +581,10 @@
     <message>
       <source>Export file</source>
       <translation>Fichier à exporter</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>
@@ -524,6 +641,10 @@
     <message>
       <source>Import file</source>
       <translation>Fichier à importer</translation>
+    </message>
+    <message>
+      <source>Attribute &quot;%1&quot; is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
 

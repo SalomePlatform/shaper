@@ -146,6 +146,10 @@
       <source>&lt;NoValue&gt;</source>
       <translation>&lt;AucuneValeur&gt;</translation>
     </message>
+    <message>
+      <source>Import file</source>
+      <translation>Importer fichier</translation>
+    </message>
   </context>
 
   <context>

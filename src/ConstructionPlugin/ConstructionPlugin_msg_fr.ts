@@ -770,6 +770,10 @@
       <translation>Nombre de plans</translation>
     </message>
     <message>
+      <source>Number of copies of the plane </source>
+      <translation>Nombre de copies du plan </translation>
+    </message>
+    <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez le nombre d'exemplaires.</translation>
     </message>

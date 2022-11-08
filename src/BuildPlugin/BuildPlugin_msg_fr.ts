@@ -407,6 +407,10 @@
       <translation>Sélectionnez des sommets dans l'esquisse ou sur des objets.</translation>
     </message>
     <message>
+      <source>Select vertices or sketch objects or features.</source>
+      <translation>Sélectionner des sommets, esquisses ou fonctionnalités.</translation>
+    </message>
+    <message>
       <source>Vertices or sketches:</source>
       <translation>Sommets ou esquisses:</translation>
     </message>
@@ -479,6 +483,10 @@
       <source>Select edges on sketch, edges or wires objects.</source>
       <translation>Sélectionner des arêtes de l'esquisse, sur des objets ou des contours.</translation>
     </message>
+    <message>
+      <source>Select edges on sketch (or the whole sketch), edges or wires objects.</source>
+      <translation>Sélectionner les arêtes d&apos;un esquisse (ou l&apos;esquisse complète), ou des arêtes ou des contours.</translation>
+    </message>
   </context>
   <context>
     <name>BuildPlugin_Wire</name>
@@ -523,6 +531,31 @@
     </message>
   </context>
 
+  <context>
+    <name>Interpolation:interpolation_method</name>
+    <message>
+      <source>Curve analytical</source>
+      <translation>Courbe analytique</translation>
+    </message>
+    <message>
+      <source>Curve by selection</source>
+      <translation>Courbe par sélection</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:maxt</name>
+    <message>
+      <source>Max t</source>
+      <translation>Max t</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:mint</name>
+    <message>
+      <source>Min t</source>
+      <translation>Min t</translation>
+    </message>
+  </context>
   <context>
     <name>Interpolation:GeomValidators_MinObjectsSelected</name>
     <message>

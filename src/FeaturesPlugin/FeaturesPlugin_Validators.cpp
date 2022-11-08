@@ -2035,7 +2035,7 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
 
   if ((isSimpleMode && anObjectsNb < 2)
       || (!isSimpleMode && (anObjectsNb == 0 || aToolsNb == 0))) {
-    theError = "Not enough arguments for Fuse operation.";
+    theError = "Not enough arguments for Common operation.";
     return false;
   }
   return true;
