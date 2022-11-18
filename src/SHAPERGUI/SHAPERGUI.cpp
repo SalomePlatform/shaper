@@ -330,8 +330,6 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     else
       myWorkshop->updateCommandStatus();
   }
-  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
-  myIsStorePositions = aResMgr->booleanValue("Study", "store_positions", true);
   myIsEditEnabled = getApp()->isEditEnabled();
   getApp()->setEditEnabled(false);
 
@@ -463,8 +461,6 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
 
   //myWorkshop->contextMenuMgr()->disconnectViewer();
 
-  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
-  aResMgr->setValue("Study", "store_positions", myIsStorePositions);
   getApp()->setEditEnabled(myIsEditEnabled);
 
   myOldSelectionColor.clear();

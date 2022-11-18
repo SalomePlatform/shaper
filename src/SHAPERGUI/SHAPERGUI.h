@@ -276,11 +276,7 @@ private slots:
   /// Flag of opened document state
   bool myIsOpened;
 
-  // the next parameters should be restored after this module deactivation
-
-  /// The application value of the preferences parameter
-  bool myIsStorePositions;
-
+  // the next parameter should be restored after this module deactivation
   /// The application value
   bool myIsEditEnabled;
 
