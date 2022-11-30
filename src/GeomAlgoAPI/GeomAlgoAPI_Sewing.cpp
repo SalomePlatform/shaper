@@ -32,7 +32,12 @@ GeomAlgoAPI_Sewing::GeomAlgoAPI_Sewing(const ListOfShape& theShapes)
   build(theShapes);
 }
 
-void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
+GeomAlgoAPI_Sewing::GeomAlgoAPI_Sewing(const ListOfShape& theShapes, const bool theAllowNonManifold, const double theTolerance)
+{
+  build(theShapes, theAllowNonManifold, theTolerance);
+}
+
+void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes, const bool theAllowNonManifold, const double theTolerance)
 {
   if(theShapes.empty()) {
     return;
@@ -40,6 +45,11 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
 
   BRepBuilderAPI_Sewing* aSewingBuilder = new BRepBuilderAPI_Sewing();
   this->setImpl(aSewingBuilder);
+
+  aSewingBuilder->SetTolerance(theTolerance);
+  aSewingBuilder->SetFaceMode(Standard_True);
+  aSewingBuilder->SetFloatingEdgesMode(Standard_False);
+  aSewingBuilder->SetNonManifoldMode(theAllowNonManifold);
 
   for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
     const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
@@ -49,28 +59,6 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
   aSewingBuilder->Perform();
 
   TopoDS_Shape aResult = aSewingBuilder->SewedShape();
-  BRep_Builder aBuilder;
-  if(aResult.ShapeType() == TopAbs_COMPOUND) {
-    TopoDS_Compound aResultCompound;
-    aBuilder.MakeCompound(aResultCompound);
-    for(TopoDS_Iterator anIt(aResult); anIt.More(); anIt.Next()) {
-      const TopoDS_Shape aSubShape = anIt.Value();
-      if(aSubShape.ShapeType() == TopAbs_SHELL) {
-        aBuilder.Add(aResultCompound, aSubShape);
-      } else if (aSubShape.ShapeType() == TopAbs_FACE) {
-        TopoDS_Shell aShell;
-        aBuilder.MakeShell(aShell);
-        aBuilder.Add(aShell, aSubShape);
-        aBuilder.Add(aResultCompound, aShell);
-      }
-    }
-    aResult = aResultCompound;
-  } else if(aResult.ShapeType() == TopAbs_FACE) {
-    TopoDS_Shell aShell;
-    aBuilder.MakeShell(aShell);
-    aBuilder.Add(aShell, aResult);
-    aResult = aShell;
-  }
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));

@@ -47,6 +47,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_RevolutionBoolean.h
   FeaturesAPI_Rotation.h
   FeaturesAPI_Scale.h
+  FeaturesAPI_Sewing.h
   FeaturesAPI_Symmetry.h
   FeaturesAPI_Translation.h
   FeaturesAPI_Union.h
@@ -86,6 +87,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_RevolutionBoolean.cpp
   FeaturesAPI_Rotation.cpp
   FeaturesAPI_Scale.cpp
+  FeaturesAPI_Sewing.cpp
   FeaturesAPI_Symmetry.cpp
   FeaturesAPI_Translation.cpp
   FeaturesAPI_Union.cpp

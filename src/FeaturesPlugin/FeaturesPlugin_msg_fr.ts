@@ -90,6 +90,10 @@
       <translation>Supprimer les sous-formes</translation>
     </message>
     <message>
+      <source>Sewing</source>
+      <translation>Couture</translation>
+    </message>
+    <message>
       <source>Revolution</source>
       <translation>Révolution</translation>
     </message>
@@ -2257,6 +2261,63 @@
     <message>
       <source>Scale factor in Z</source>
       <translation>Facteur d&apos;échelle suivant Z</translation>
+    </message>
+  </context>
+
+  <!-- Sewing -->
+  <context>
+    <name>Sewing</name>
+    <message>
+      <source>Perform sewing operation on shapes</source>
+      <translation>Effectuer une opération de couture sur des formes</translation>
+    </message>
+    <message>
+      <source>Sewing</source>
+      <translation>Coudre les faces</translation>
+    </message>
+    <message>
+      <source>Error: No faces were sewn.</source>
+      <translation>Erreur: Aucun face n'a été cousu.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:main_objects</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objets</translation>
+    </message>
+    <message>
+      <source>Select shapes to sew.</source>
+      <translation>Sélectionnez les formes à coudre.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Tolérance</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:allow_non_manifold</name>
+    <message>
+      <source>Allow Non-Manifold</source>
+      <translation>Autoriser non multiple</translation>
+    </message>
+    <message>
+      <source>Allow the creation of non-manifold results</source>
+      <translation>Autoriser la création de résultats non multiples</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:always_create_result</name>
+    <message>
+      <source>Always create a result</source>
+      <translation>Créez toujours un résultat</translation>
+    </message>
+    <message>
+      <source>Always create a result, even if nothing is sewed</source>
+      <translation>Créez toujours un résultat, même si rien n'est cousu</translation>
     </message>
   </context>
 
@@ -5507,6 +5568,11 @@
     <message>
       <source>The result is empty</source>
       <translation>Le résultat est vide</translation>
+    </message>
+  </context>
+  <context>
+    <name></name>
+    <message>
     </message>
   </context>
 

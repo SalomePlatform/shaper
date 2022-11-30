@@ -50,6 +50,7 @@
 %feature("kwargs") addPlacement;
 %feature("kwargs") addRotation;
 %feature("kwargs") addScale;
+%feature("kwargs") addSewing;
 %feature("kwargs") addSplit;
 %feature("kwargs") addSmash;
 %feature("kwargs") addSymmetry;
@@ -87,6 +88,7 @@
 %shared_ptr(FeaturesAPI_RevolutionFuse)
 %shared_ptr(FeaturesAPI_Rotation)
 %shared_ptr(FeaturesAPI_Scale)
+%shared_ptr(FeaturesAPI_Sewing)
 %shared_ptr(FeaturesAPI_Symmetry)
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
@@ -229,6 +231,7 @@
 %include "FeaturesAPI_RevolutionBoolean.h"
 %include "FeaturesAPI_Rotation.h"
 %include "FeaturesAPI_Scale.h"
+%include "FeaturesAPI_Sewing.h"
 %include "FeaturesAPI_Symmetry.h"
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"

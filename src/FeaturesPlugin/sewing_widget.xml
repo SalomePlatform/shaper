@@ -1,0 +1,20 @@
+<source>
+  <multi_selector id="main_objects"
+    label="Objects"
+    icon=""
+    tooltip="Select shapes to sew."
+    concealment="true">
+    <validator id="FeaturesPlugin_ValidatorSewingSelection"/>
+  </multi_selector>
+  <groupbox>
+    <doublevalue id="tolerance"
+                  label="Tolerance"
+                  min="1.0e-8"
+                  max="1"
+                  default="1.0e-7"
+                  tooltip="Tolerance"/>
+    <!-- validator id="GeomValidators_Positive"/ -->
+  </groupbox>
+  <boolvalue id="allow_non_manifold" label="Allow Non-Manifold" default="false" tooltip="Allow the creation of non-manifold results"/>
+  <boolvalue id="always_create_result" label="Always create a result" default="true" tooltip="Always create a result, even if nothing is sewn"/>
+</source>

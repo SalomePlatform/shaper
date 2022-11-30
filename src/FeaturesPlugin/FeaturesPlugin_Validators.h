@@ -466,4 +466,20 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorSewingSelection
+/// \ingroup Validators
+/// \brief Validates selection for sewing operation.
+class FeaturesPlugin_ValidatorSewingSelection : public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for sewing operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif
