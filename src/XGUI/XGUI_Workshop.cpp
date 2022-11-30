@@ -1321,6 +1321,11 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
   facesPanel()->reset(true);
   updateCommandStatus();
 
+  QObjectPtrList aList = myDisplayer->displayedObjects();
+  foreach(ObjectPtr aObj, aList) {
+    module()->customizePresentation(aObj, myDisplayer->getAISObject(aObj));
+  }
+
   // unblock the viewer update functionality and make update on purpose
   myDisplayer->enableUpdateViewer(isUpdateEnabled);
   myDisplayer->updateViewer();
