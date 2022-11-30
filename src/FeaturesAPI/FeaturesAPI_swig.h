@@ -49,6 +49,7 @@
   #include "FeaturesAPI_RevolutionBoolean.h"
   #include "FeaturesAPI_Rotation.h"
   #include "FeaturesAPI_Scale.h"
+  #include "FeaturesAPI_Sewing.h"
   #include "FeaturesAPI_Symmetry.h"
   #include "FeaturesAPI_Translation.h"
   #include "FeaturesAPI_Union.h"

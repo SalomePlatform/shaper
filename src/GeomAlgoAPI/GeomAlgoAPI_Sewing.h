@@ -35,6 +35,9 @@ public:
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Sewing(const ListOfShape& theShapes);
 
+  /// Constructor with additional arguments
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Sewing(const ListOfShape& theShapes, const bool theAllowNonManifold, const double theTolerance);
+
   /// \return the list of shapes modified from the shape \a theShape.
   /// \param[in] theShape base shape.
   /// \param[out] theHistory modified shapes.
@@ -43,7 +46,7 @@ public:
 
 private:
   /// Builds resulting shape.
-  void build(const ListOfShape& theShapes);
+  void build(const ListOfShape& theShapes, const bool theAllowNonManifold = false, const double theTolerance = 1.e-6);
 };
 
 #endif

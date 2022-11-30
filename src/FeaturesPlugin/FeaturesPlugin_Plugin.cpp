@@ -53,6 +53,7 @@
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_Scale.h>
+#include <FeaturesPlugin_Sewing.h>
 #include <FeaturesPlugin_Symmetry.h>
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Union.h>
@@ -134,6 +135,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorImportResults);
   aFactory->registerValidator("FeaturesPlugin_ValidatorDefeaturingSelection",
                               new FeaturesPlugin_ValidatorDefeaturingSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorSewingSelection",
+                              new FeaturesPlugin_ValidatorSewingSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -189,6 +192,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Symmetry);
   } else if (theFeatureID == FeaturesPlugin_Scale::ID()) {
     return FeaturePtr(new FeaturesPlugin_Scale);
+  } else if (theFeatureID == FeaturesPlugin_Sewing::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Sewing);
   } else if (theFeatureID == FeaturesPlugin_MultiTranslation::ID()) {
     return FeaturePtr(new FeaturesPlugin_MultiTranslation);
   } else if (theFeatureID == FeaturesPlugin_MultiRotation::ID()) {

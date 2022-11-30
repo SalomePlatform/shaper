@@ -293,4 +293,61 @@
     </message>
   </context>
 
+  <!-- Sewing -->
+  <context>
+    <name>Sewing</name>
+    <message>
+      <source>Perform sewing operation on shapes</source>
+      <translation>Выполнение операции шитья на фигурах</translation>
+    </message>
+    <message>
+      <source>Sewing</source>
+      <translation>Шитье лица</translation>
+    </message>
+    <message>
+      <source>Error: No faces were sewn.</source>
+      <translation>Ошибка: лица не были сшиты.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:main_objects</name>
+    <message>
+      <source>Objects</source>
+      <translation>Объекты</translation>
+    </message>
+    <message>
+      <source>Select shapes to sew.</source>
+      <translation>Выберите фигуры для шитья.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Толерантность</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:allow_non_manifold</name>
+    <message>
+      <source>Allow Non-Manifold</source>
+      <translation>Разрешить не многообразие</translation>
+    </message>
+    <message>
+      <source>Allow the creation of non-manifold results</source>
+      <translation>Разрешить создание однократных результатов</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sewing:always_create_result</name>
+    <message>
+      <source>Always create a result</source>
+      <translation>Всегда создавайте результат</translation>
+    </message>
+    <message>
+      <source>Always create a result, even if nothing is sewn</source>
+      <translation>Всегда создавайте результат, даже если ничего не шьется</translation>
+    </message>
+  </context>
+
 </TS>

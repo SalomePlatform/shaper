@@ -146,6 +146,13 @@
         <source path="defeaturing_widget.xml"/>
       </feature>
     </group>
+    <group id="Repair" toolbar="yes">
+      <feature id="Sewing" title="Sewing" tooltip="Perform sewing operation on shapes"
+                icon="icons/Features/sewing.png" helpfile="sewingFeature.html"
+                auto_preview="false">
+          <source path="sewing_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
   <workbench id="Part">
     <group id="Movement">

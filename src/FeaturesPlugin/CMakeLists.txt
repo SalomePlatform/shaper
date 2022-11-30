@@ -57,6 +57,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Tools.h
     FeaturesPlugin_Symmetry.h
     FeaturesPlugin_Scale.h
+    FeaturesPlugin_Sewing.h
     FeaturesPlugin_MultiTranslation.h
     FeaturesPlugin_MultiRotation.h
     FeaturesPlugin_Fillet.h
@@ -113,6 +114,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Tools.cpp
     FeaturesPlugin_Symmetry.cpp
     FeaturesPlugin_Scale.cpp
+    FeaturesPlugin_Sewing.cpp
     FeaturesPlugin_MultiTranslation.cpp
     FeaturesPlugin_MultiRotation.cpp
     FeaturesPlugin_Fillet.cpp
@@ -159,6 +161,7 @@ SET(XML_RESOURCES
   union_widget.xml
   symmetry_widget.xml
   scale_widget.xml
+  sewing_widget.xml
   multitranslation_widget.xml
   multirotation_widget.xml
   fillet_widget.xml
