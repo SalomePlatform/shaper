@@ -23,7 +23,6 @@
 #include <FeaturesPlugin.h>
 
 #include <ModelAPI_Feature.h>
-//#include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAPI_Shape.h>
 
 
