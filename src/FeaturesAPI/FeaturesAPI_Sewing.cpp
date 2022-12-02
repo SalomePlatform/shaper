@@ -93,10 +93,10 @@ void FeaturesAPI_Sewing::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << ", " << anAttrTolerance;
 
   AttributeBooleanPtr anAttrAllowNonMFold = aBase->boolean(FeaturesPlugin_Sewing::ALLOW_NON_MANIFOLD_ID());
-  theDumper << ", " << anAttrAllowNonMFold;
+  theDumper << ", allowNonManifold = " << anAttrAllowNonMFold;
 
   AttributeBooleanPtr anAttrAlwaysResult = aBase->boolean(FeaturesPlugin_Sewing::ALWAYS_CREATE_RESULT_ID());
-  theDumper << ", " << anAttrAlwaysResult;
+  theDumper << ", alwaysCreateResult = " << anAttrAlwaysResult;
 
   theDumper << ")" << std::endl;
 }
@@ -105,11 +105,11 @@ void FeaturesAPI_Sewing::dump(ModelHighAPI_Dumper& theDumper) const
 SewingPtr addSewing(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const std::list<ModelHighAPI_Selection>& theMainObjects,
                     const ModelHighAPI_Double& theTolerance,
-                    const bool theIsAllowNonManifold,
-                    const bool theIsAlwaysCreateResult)
+                    const bool allowNonManifold,
+                    const bool alwaysCreateResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Sewing::ID());
   SewingPtr aSewing;
-  aSewing.reset(new FeaturesAPI_Sewing(aFeature, theMainObjects, theTolerance, theIsAllowNonManifold, theIsAlwaysCreateResult));
+  aSewing.reset(new FeaturesAPI_Sewing(aFeature, theMainObjects, theTolerance, allowNonManifold, alwaysCreateResult));
   return aSewing;
 }
