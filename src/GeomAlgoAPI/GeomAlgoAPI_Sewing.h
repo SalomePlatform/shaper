@@ -44,6 +44,9 @@ public:
   GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                            ListOfShape& theHistory);
 
+protected:
+  bool  myBuildShell;
+  
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theShapes, const bool theAllowNonManifold = false, const double theTolerance = 1.e-6);
