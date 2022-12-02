@@ -89,11 +89,11 @@ typedef std::shared_ptr<FeaturesAPI_Sewing> SewingPtr;
 
 /// \ingroup CPPHighAPI
 /// \brief Create Sewing feature.
-FEATURESAPI_EXPORT
-SewingPtr addSewing(const std::shared_ptr<ModelAPI_Document>& thePart,
-                    const std::list<ModelHighAPI_Selection>& theMainObjects,
-                    const ModelHighAPI_Double& theTolerance,
-                    const bool theIsAllowNonManifold,
-                    const bool theIsAlwaysCreateResult);
+FEATURESAPI_EXPORT SewingPtr addSewing(
+    const std::shared_ptr<ModelAPI_Document>& thePart,
+    const std::list<ModelHighAPI_Selection>& theMainObjects,
+    const ModelHighAPI_Double& theTolerance,
+    const bool allowNonManifold,
+    const bool alwaysCreateResult);
 
 #endif // FEATURESAPI_SEWING_H_
