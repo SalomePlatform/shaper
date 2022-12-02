@@ -36,3 +36,4 @@ from FeaturesAPI import makeVertexInsideFace
 from FeaturesAPI import addRemoveResults
 from FeaturesAPI import addCopy, addImportResult
 from FeaturesAPI import addDefeaturing
+from FeaturesAPI import addSewing
