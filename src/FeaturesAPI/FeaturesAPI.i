@@ -43,6 +43,7 @@
 %feature("kwargs") addCut;
 %feature("kwargs") addFillet;
 %feature("kwargs") addFuse;
+%feature("kwargs") addGlueFaces;
 %feature("kwargs") addIntersection;
 %feature("kwargs") addMultiRotation;
 %feature("kwargs") addMultiTranslation;
@@ -72,6 +73,7 @@
 %shared_ptr(FeaturesAPI_Fillet)
 %shared_ptr(FeaturesAPI_Fillet1D)
 %shared_ptr(FeaturesAPI_Fillet2D)
+%shared_ptr(FeaturesAPI_GlueFaces)
 %shared_ptr(FeaturesAPI_Intersection)
 %shared_ptr(FeaturesAPI_MultiRotation)
 %shared_ptr(FeaturesAPI_MultiTranslation)
@@ -215,6 +217,7 @@
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Fillet.h"
+%include "FeaturesAPI_GlueFaces.h"
 %include "FeaturesAPI_Intersection.h"
 %include "FeaturesAPI_Measurement.h"
 %include "FeaturesAPI_NormalToFace.h"

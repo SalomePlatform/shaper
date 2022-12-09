@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
   FeaturesAPI_Fillet.h
+  FeaturesAPI_GlueFaces.h
   FeaturesAPI_Intersection.h
   FeaturesAPI_Measurement.h
   FeaturesAPI_NormalToFace.h
@@ -70,6 +71,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
   FeaturesAPI_Fillet.cpp
+  FeaturesAPI_GlueFaces.cpp
   FeaturesAPI_Intersection.cpp
   FeaturesAPI_Measurement.cpp
   FeaturesAPI_NormalToFace.cpp

@@ -482,4 +482,20 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorGlueFacesSelection
+/// \ingroup Validators
+/// \brief Validates selection for glue faces operation.
+class FeaturesPlugin_ValidatorGlueFacesSelection : public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for glue faces operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

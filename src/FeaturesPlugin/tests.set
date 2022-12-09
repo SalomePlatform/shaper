@@ -532,6 +532,9 @@ SET(TEST_NAMES_PARA
                TestSewing_Manifold.py
                TestSewing_NonManifold.py
                TestSewing_Groups.py
+               TestGlueFaces_Compound.py
+               TestGlueFaces_Shell.py
+               TestGlueFaces_Solids.py
 )
 
 SET(TEST_NAMES_SEQ

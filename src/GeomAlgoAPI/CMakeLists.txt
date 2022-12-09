@@ -97,7 +97,8 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_NormalToFace.h
     GeomAlgoAPI_Tube.h
     GeomAlgoAPI_ShapeInfo.h
-	GeomAlgoAPI_CanonicalRecognition.h
+	  GeomAlgoAPI_CanonicalRecognition.h
+    GeomAlgoAPI_GlueFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -174,7 +175,8 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_NormalToFace.cpp
     GeomAlgoAPI_Tube.cpp
     GeomAlgoAPI_ShapeInfo.cpp
-	GeomAlgoAPI_CanonicalRecognition.cpp
+	  GeomAlgoAPI_CanonicalRecognition.cpp
+    GeomAlgoAPI_GlueFaces.cpp
 )
 
 SET(PROJECT_LIBRARIES
