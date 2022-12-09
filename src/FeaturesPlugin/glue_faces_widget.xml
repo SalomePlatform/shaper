@@ -1,0 +1,18 @@
+<source>
+  <multi_selector id="main_objects"
+    label="Objects"
+    icon=""
+    tooltip="Select shapes to glue."
+    concealment="true">
+    <validator id="FeaturesPlugin_ValidatorGlueFacesSelection"/>
+  </multi_selector>
+  <groupbox>
+    <doublevalue id="tolerance"
+                  label="Tolerance"
+                  min="1.0e-7"
+                  step="1.0e-7"
+                  default="1.0e-7"
+                  tooltip="Tolerance"/>
+  </groupbox>
+  <boolvalue id="keep_non_solids" label="Keep non-solid shapes" default="true" tooltip="Keep non-solid shapes"/>
+</source>

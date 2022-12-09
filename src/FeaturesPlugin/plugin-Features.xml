@@ -152,6 +152,11 @@
                 auto_preview="false">
           <source path="sewing_widget.xml"/>
       </feature>
+      <feature id="GlueFaces" title="Glue Faces" tooltip="Perform gluing of connected faces"
+                icon="icons/Features/glue_faces.png" helpfile="glueFeatureFaces.html"
+                auto_preview="false">
+          <source path="glue_faces_widget.xml"/>
+      </feature>
     </group>
   </workbench>
   <workbench id="Part">

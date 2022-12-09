@@ -21,11 +21,43 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
     GeomAlgoImpl.h
+    GEOMAlgo_Algo.hxx
+    GEOMAlgo_AlgoTools.hxx
+    GEOMAlgo_BndSphere.hxx
+    GEOMAlgo_BndSphereTree.hxx
+    GEOMAlgo_BuilderShape.hxx
+    GEOMAlgo_CoupleOfShapes.hxx
+    GEOMAlgo_GlueDetector.hxx
+    GEOMAlgo_Gluer2.hxx
+    GEOMAlgo_GluerAlgo.hxx
+    GEOMAlgo_IndexedDataMapOfIntegerShape.hxx
+    GEOMAlgo_IndexedDataMapOfPassKeyShapeListOfShape.hxx
+    GEOMAlgo_IndexedDataMapOfShapeBndSphere.hxx
+    GEOMAlgo_IndexedDataMapOfShapeIndexedMapOfShape.hxx
+    GEOMAlgo_ListIteratorOfListOfCoupleOfShapes.hxx
+    GEOMAlgo_ListOfCoupleOfShapes.hxx
+    GEOMAlgo_PassKeyShape.hxx
+    GEOMAlgo_PassKeyShapeMapHasher.hxx
     GEOMAlgo_Splitter.hxx
     GEOMImpl_Fillet1d.hxx
 )
 
 SET(PROJECT_SOURCES
+    GEOMAlgo_Algo.cxx
+    GEOMAlgo_AlgoTools.cxx
+    GEOMAlgo_AlgoTools_1.cxx
+    GEOMAlgo_BndSphere.cxx
+    GEOMAlgo_BndSphereTree.cxx
+    GEOMAlgo_BuilderShape.cxx
+    GEOMAlgo_CoupleOfShapes.cxx
+    GEOMAlgo_GlueDetector.cxx
+    GEOMAlgo_Gluer2.cxx
+    GEOMAlgo_Gluer2_1.cxx
+    GEOMAlgo_Gluer2_2.cxx
+    GEOMAlgo_Gluer2_3.cxx
+    GEOMAlgo_GluerAlgo.cxx
+    GEOMAlgo_PassKeyShape.cxx
+    GEOMAlgo_PassKeyShapeMapHasher.cxx
     GEOMAlgo_Splitter.cxx
     GEOMImpl_Fillet1d.cxx
 )

@@ -2149,3 +2149,55 @@ bool FeaturesPlugin_ValidatorSewingSelection::isValid(const AttributePtr& theAtt
 
   return true;
 }
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorGlueFacesSelection::isValid(const AttributePtr& theAttribute,
+                                                         const std::list<std::string>& theArguments,
+                                                         Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!anAttrSelectionList.get()) {
+    theError = "Error: This validator can only work with selection list attributes.";
+    return false;
+  }
+
+  // Check selected entities are of valid types
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Empty selection context.";
+      return false;
+    }
+    if (aContext->groupName() != ModelAPI_ResultBody::group()) {
+      theError = "Error: Not a result body.";
+      return false;
+    }
+
+    GeomShapePtr aContextShape = aContext->shape();
+    if (!aContextShape.get()) {
+      theError = "Error: Empty shape.";
+      return false;
+    }
+
+    GeomAPI_Shape::ShapeType aShapeType = aContextShape->shapeType();
+    std::set<GeomAPI_Shape::ShapeType> anAllowedTypes;
+    anAllowedTypes.insert(GeomAPI_Shape::FACE);
+    anAllowedTypes.insert(GeomAPI_Shape::SHELL);
+    anAllowedTypes.insert(GeomAPI_Shape::SOLID);
+    anAllowedTypes.insert(GeomAPI_Shape::COMPSOLID);
+    anAllowedTypes.insert(GeomAPI_Shape::COMPOUND);
+    if (anAllowedTypes.find(aShapeType) == anAllowedTypes.end()) {
+      theError = "Error: Selected shape has the wrong type.";
+      return false;
+    }
+
+  }
+
+  return true;
+}

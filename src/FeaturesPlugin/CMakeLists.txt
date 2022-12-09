@@ -77,6 +77,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_InspectBoundingBox.h
     FeaturesPlugin_NormalToFace.h
     FeaturesPlugin_InspectNormalToFace.h
+    FeaturesPlugin_GlueFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -134,6 +135,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_InspectBoundingBox.cpp
     FeaturesPlugin_NormalToFace.cpp
     FeaturesPlugin_InspectNormalToFace.cpp
+    FeaturesPlugin_GlueFaces.cpp
 )
 
 SET(XML_RESOURCES
@@ -168,6 +170,7 @@ SET(XML_RESOURCES
   fillet1d_widget.xml
   measurement_widget.xml
   fusion_faces_widget.xml
+  glue_faces_widget.xml
   chamfer_widget.xml
   copy_widget.xml
   import_result_widget.xml

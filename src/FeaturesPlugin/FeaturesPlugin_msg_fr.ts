@@ -94,6 +94,10 @@
       <translation>Couture</translation>
     </message>
     <message>
+      <source>Glue Faces</source>
+      <translation>Recoller les faces</translation>
+    </message>
+    <message>
       <source>Revolution</source>
       <translation>Révolution</translation>
     </message>
@@ -2318,6 +2322,48 @@
     <message>
       <source>Always create a result, even if nothing is sewed</source>
       <translation>Créez toujours un résultat, même si rien n'est cousu</translation>
+    </message>
+  </context>
+
+  <!-- GlueFaces -->
+  <context>
+    <name>GlueFaces</name>
+    <message>
+      <source>Perform gluing of connected faces</source>
+      <translation>Effectuer le collage des faces connectées</translation>
+    </message>
+    <message>
+      <source>Glue Faces</source>
+      <translation>Recoller les faces</translation>
+    </message>
+    <message>
+      <source>No shapes to glue.</source>
+      <translation>Aucune forme à coller.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:main_objects</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objets</translation>
+    </message>
+    <message>
+      <source>Select shapes to glue.</source>
+      <translation>Sélectionnez les formes à coller.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Tolérance</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:keep_non_solids</name>
+    <message>
+      <source>Keep non-solid shapes</source>
+      <translation>Conserver les formes non solides</translation>
     </message>
   </context>
 

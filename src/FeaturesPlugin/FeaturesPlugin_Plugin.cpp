@@ -33,6 +33,7 @@
 #include <FeaturesPlugin_Fillet.h>
 #include <FeaturesPlugin_Fillet1D.h>
 #include <FeaturesPlugin_GeometryCalculation.h>
+#include <FeaturesPlugin_GlueFaces.h>
 #include <FeaturesPlugin_InspectBoundingBox.h>
 #include <FeaturesPlugin_InspectNormalToFace.h>
 #include <FeaturesPlugin_Intersection.h>
@@ -137,6 +138,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorDefeaturingSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorSewingSelection",
                               new FeaturesPlugin_ValidatorSewingSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorGlueFacesSelection",
+                              new FeaturesPlugin_ValidatorGlueFacesSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -210,6 +213,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Chamfer);
   } else if (theFeatureID == FeaturesPlugin_Copy::ID()) {
     return FeaturePtr(new FeaturesPlugin_Copy);
+  } else if (theFeatureID == FeaturesPlugin_GlueFaces::ID()) {
+    return FeaturePtr(new FeaturesPlugin_GlueFaces);
   } else if (theFeatureID == FeaturesPlugin_ImportResult::ID()) {
     return FeaturePtr(new FeaturesPlugin_ImportResult);
   } else if (theFeatureID == FeaturesPlugin_Defeaturing::ID()) {

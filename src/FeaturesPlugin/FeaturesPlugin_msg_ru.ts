@@ -350,4 +350,46 @@
     </message>
   </context>
 
+  <!-- GlueFaces -->
+  <context>
+    <name>GlueFaces</name>
+    <message>
+      <source>Perform gluing of connected faces</source>
+      <translation>Выполнить склейку соединенных граней</translation>
+    </message>
+    <message>
+      <source>Glue Faces</source>
+      <translation>Склеиваем лица</translation>
+    </message>
+    <message>
+      <source>No shapes to glue.</source>
+      <translation>Нет фигур для склеивания.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:main_objects</name>
+    <message>
+      <source>Objects</source>
+      <translation>Объекты</translation>
+    </message>
+    <message>
+      <source>Select shapes to glue.</source>
+      <translation>Выберите фигуры для склеивания.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Толерантность</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlueFaces:keep_non_solids</name>
+    <message>
+      <source>Keep non-solid shapes</source>
+      <translation>Сохраняйте нетвердые формы</translation>
+    </message>
+  </context>
+
 </TS>
