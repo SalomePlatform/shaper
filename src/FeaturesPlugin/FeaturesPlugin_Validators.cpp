@@ -2098,24 +2098,11 @@ bool FeaturesPlugin_ValidatorDefeaturingSelection::isValid(
   return true;
 }
 
-
-//---------------------------------------------------------
-// #define USE_DEBUG
-// #define DEBUG
-// static const char *dbg_class = "FeaturesPlugin_ValidatorSewingSelection";
-// #include "MBDebug.h"
-// #include "MBModel.h"
-// #include "MBGeom.h"
-//---------------------------------------------------------
-
 //==================================================================================================
 bool FeaturesPlugin_ValidatorSewingSelection::isValid(const AttributePtr& theAttribute,
                                                       const std::list<std::string>& theArguments,
                                                       Events_InfoMessage& theError) const
 {
-  // DBG_FUN();
-  // ARG(theAttribute);
-
   AttributeSelectionListPtr anAttrSelectionList =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if (!anAttrSelectionList.get()) {
@@ -2160,6 +2147,5 @@ bool FeaturesPlugin_ValidatorSewingSelection::isValid(const AttributePtr& theAtt
 
   }
 
-  // MSGEL("...selection is VALID.");
   return true;
 }
