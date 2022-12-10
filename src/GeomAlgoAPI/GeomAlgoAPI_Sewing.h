@@ -32,10 +32,14 @@
 class GeomAlgoAPI_Sewing : public GeomAlgoAPI_MakeShape
 {
 public:
-  /// Constructor.
+  /// Constructor (used by MakeShell).
+  /// \param[in] theShapes list of selected shapes.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Sewing(const ListOfShape& theShapes);
 
-  /// Constructor with additional arguments
+  /// Constructor with additional arguments (used by Sewing feature)
+  /// \param[in] theShapes list of selected shapes.
+  /// \param[in] theAllowNonManifold if True, non-manifold results are allowed.
+  /// \param[in] theTolerance tolerance value used for the sewing operation.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Sewing(const ListOfShape& theShapes, const bool theAllowNonManifold, const double theTolerance);
 
   /// \return the list of shapes modified from the shape \a theShape.
@@ -45,7 +49,7 @@ public:
                                            ListOfShape& theHistory);
 
 protected:
-  bool  myBuildShell;
+  bool  myBuildShell; // whether algorithm is used by MakeShell or by Sewing
   
 private:
   /// Builds resulting shape.

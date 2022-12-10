@@ -37,6 +37,7 @@ Features plug-in provides a set of common topological operations. It implements 
    revolutionFeature.rst
    revolutionFuseFeature.rst
    rotationFeature.rst
+   sewingFeature.rst
    symmetryFeature.rst
    transformationFeature.rst
    translationFeature.rst

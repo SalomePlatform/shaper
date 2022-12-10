@@ -5570,10 +5570,5 @@
       <translation>Le résultat est vide</translation>
     </message>
   </context>
-  <context>
-    <name></name>
-    <message>
-    </message>
-  </context>
 
 </TS>
