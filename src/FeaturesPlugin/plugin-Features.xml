@@ -157,6 +157,11 @@
                 auto_preview="false">
           <source path="glue_faces_widget.xml"/>
       </feature>
+      <feature id="LimitTolerance" title="Limit Tolerance" tooltip="Limit the tolerance on a shape"
+                icon="icons/Features/limit_tolerance.png" helpfile="limitToleranceFeature.html"
+                auto_preview="false">
+          <source path="limit_tolerance_widget.xml"/>
+      </feature>
     </group>
   </workbench>
   <workbench id="Part">

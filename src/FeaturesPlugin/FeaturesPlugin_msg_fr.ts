@@ -96,6 +96,10 @@
     <message>
       <source>Glue Faces</source>
       <translation>Recoller les faces</translation>
+      </message>
+      <message>
+        <source>Limit Tolerance</source>
+      <translation>Limiter Tolérance</translation>
     </message>
     <message>
       <source>Revolution</source>
@@ -2367,6 +2371,44 @@
     </message>
   </context>
 
+  <!-- LimitTolerance -->
+  <context>
+    <name>LimitTolerance</name>
+    <message>
+      <source>Limit the tolerance on a shape</source>
+      <translation>Limiter la tolérance sur une forme</translation>
+    </message>
+    <message>
+      <source>Limit Tolerance</source>
+      <translation>Limiter la tolérance</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:object</name>
+    <message>
+      <source>Shape:</source>
+      <translation>Forme:</translation>
+    </message>
+    <message>
+      <source>Select a shape to modify.</source>
+      <translation>Sélectionnez la forme à modifier.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Tolérance</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:object:GeomValidators_BodyShapes</name>
+    <message>
+      <source>Error: Context is empty.</source>
+      <translation>Erreur : le contexte est vide.</translation>
+    </message>
+  </context>
+  
   <!-- Smash -->
   <context>
     <name>Smash</name>

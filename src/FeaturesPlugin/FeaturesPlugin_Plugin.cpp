@@ -37,6 +37,7 @@
 #include <FeaturesPlugin_InspectBoundingBox.h>
 #include <FeaturesPlugin_InspectNormalToFace.h>
 #include <FeaturesPlugin_Intersection.h>
+#include <FeaturesPlugin_LimitTolerance.h>
 #include <FeaturesPlugin_Measurement.h>
 #include <FeaturesPlugin_PointCoordinates.h>
 #include <FeaturesPlugin_MultiRotation.h>
@@ -233,6 +234,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_NormalToFace);
   } else if (theFeatureID == FeaturesPlugin_PointCloudOnFace::ID()) {
     return FeaturePtr(new FeaturesPlugin_PointCloudOnFace);
+  } else if (theFeatureID == FeaturesPlugin_LimitTolerance::ID()) {
+    return FeaturePtr(new FeaturesPlugin_LimitTolerance);
   }
 
 

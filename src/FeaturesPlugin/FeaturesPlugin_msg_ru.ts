@@ -392,4 +392,42 @@
     </message>
   </context>
 
+  <!-- LimitTolerance -->
+  <context>
+    <name>LimitTolerance</name>
+    <message>
+      <source>Limit the tolerance on a shape</source>
+      <translation>Ограничить допуск формы</translation>
+    </message>
+    <message>
+      <source>Limit Tolerance</source>
+      <translation>Предельный допуск</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:object</name>
+    <message>
+      <source>Shape:</source>
+      <translation>Форма:</translation>
+    </message>
+    <message>
+      <source>Select a shape to modify.</source>
+      <translation>Выберите форму для изменения.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:tolerance</name>
+    <message>
+      <source>Tolerance</source>
+      <translation>Толерантность</translation>
+    </message>
+  </context>
+  <context>
+    <name>LimitTolerance:object:GeomValidators_BodyShapes</name>
+    <message>
+      <source>Error: Context is empty.</source>
+      <translation>Ошибка: Контекст пуст.</translation>
+    </message>
+  </context>
+
 </TS>

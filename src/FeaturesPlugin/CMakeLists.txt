@@ -78,6 +78,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_NormalToFace.h
     FeaturesPlugin_InspectNormalToFace.h
     FeaturesPlugin_GlueFaces.h
+    FeaturesPlugin_LimitTolerance.h
 )
 
 SET(PROJECT_SOURCES
@@ -136,6 +137,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_NormalToFace.cpp
     FeaturesPlugin_InspectNormalToFace.cpp
     FeaturesPlugin_GlueFaces.cpp
+    FeaturesPlugin_LimitTolerance.cpp
 )
 
 SET(XML_RESOURCES
@@ -181,6 +183,7 @@ SET(XML_RESOURCES
   create_bounding_box_widget.xml
   normal_to_face_widget.xml
   create_normal_to_face_widget.xml
+  limit_tolerance_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -244,4 +247,5 @@ IF(${HAVE_SALOME})
   endforeach(tfile ${TEST_NAMES})
 
   install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+  install(DIRECTORY data DESTINATION ${TEST_INSTALL_DIRECTORY})
 ENDIF(${HAVE_SALOME})
