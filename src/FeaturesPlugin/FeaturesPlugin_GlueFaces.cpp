@@ -35,6 +35,8 @@
 #include <GeomAlgoAPI_GlueFaces.h>
 #include <GeomAlgoAPI_Tools.h>
 
+#include <sstream>
+
 
 //==================================================================================================
 FeaturesPlugin_GlueFaces::FeaturesPlugin_GlueFaces()
@@ -87,6 +89,13 @@ void FeaturesPlugin_GlueFaces::execute()
   ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
   aResultBody->storeModified(aShapes, aResult, aGluingAlgo);
 
+  // Ensure the result body is named after this feature
+  std::wstring aBaseName = feature(aResultBody)->data()->name();
+  std::wostringstream aNameStr;
+  aNameStr << aBaseName << "_" << (anIndex+1);
+  std::wstring aName = aNameStr.str();
+  aResultBody->data()->setName(aName);
+
   setResult(aResultBody, anIndex);
 }
 
@@ -118,7 +127,7 @@ bool FeaturesPlugin_GlueFaces::isGlued(const ListOfShape& theInputs,
 
   // Consider the list of input shapes the same as the result, if
   //  * the total number of faces did NOT change.
-  int nbInputFaces = 0;
+  int nbInputFaces = 0, nbInputEdges = 0;
   for (ListOfShape::const_iterator anIt = theInputs.cbegin();
        anIt != theInputs.cend();
        ++anIt)
@@ -127,12 +136,14 @@ bool FeaturesPlugin_GlueFaces::isGlued(const ListOfShape& theInputs,
     if (aShape.get())
     {
       nbInputFaces += aShape->subShapes(GeomAPI_Shape::FACE, true).size();
+      nbInputEdges += aShape->subShapes(GeomAPI_Shape::EDGE, true).size();
     }
   }
 
-  int nbResultFaces = 0;
+  int nbResultFaces = 0, nbResultEdges = 0;
   nbResultFaces = theResult->subShapes(GeomAPI_Shape::FACE, true).size();
-  return(0 < nbResultFaces && nbResultFaces < nbInputFaces);
+  nbResultEdges = theResult->subShapes(GeomAPI_Shape::EDGE, true).size();
+  return(0 < nbResultFaces && ((nbResultFaces < nbInputFaces) || (nbResultFaces == nbInputFaces && nbResultEdges < nbInputEdges)));
 }
 
 //=================================================================================================

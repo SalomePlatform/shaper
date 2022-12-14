@@ -92,7 +92,7 @@ GlueFaces_2 = model.addGlueFaces(Part_1_doc, [model.selection("COMPOUND", "Compo
 model.end()
 
 # no faces glued
-testCompound(GlueFaces_2, model, [2], [2], [12], [24], [16])
+testCompound(GlueFaces_2, model, [2], [2], [12], [23], [14])
 
 # =============================================================================
 # Test 3. Glue faces for 2 solids with 2 adjacent faces above default tolerance
