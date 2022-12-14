@@ -536,6 +536,8 @@ SET(TEST_NAMES_PARA
                TestGlueFaces_Faces.py
                TestGlueFaces_Shell.py
                TestGlueFaces_Solids.py
+               TestLimitTolerance.py
+               TestLimitTolerance_Face.py
 )
 
 SET(TEST_NAMES_SEQ

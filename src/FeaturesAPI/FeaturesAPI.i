@@ -45,6 +45,7 @@
 %feature("kwargs") addFuse;
 %feature("kwargs") addGlueFaces;
 %feature("kwargs") addIntersection;
+%feature("kwargs") addLimitTolerance;
 %feature("kwargs") addMultiRotation;
 %feature("kwargs") addMultiTranslation;
 %feature("kwargs") addPartition;
@@ -64,8 +65,10 @@
 %shared_ptr(FeaturesAPI_BooleanCommon)
 %shared_ptr(FeaturesAPI_BooleanSmash)
 %shared_ptr(FeaturesAPI_BooleanFill)
+%shared_ptr(FeaturesAPI_BoundingBox)
 %shared_ptr(FeaturesAPI_Chamfer)
-%shared_ptr(FeaturesAPI_NormalToFace)
+%shared_ptr(FeaturesAPI_Copy)
+%shared_ptr(FeaturesAPI_Defeaturing)
 %shared_ptr(FeaturesAPI_Extrusion)
 %shared_ptr(FeaturesAPI_ExtrusionBoolean)
 %shared_ptr(FeaturesAPI_ExtrusionCut)
@@ -73,16 +76,21 @@
 %shared_ptr(FeaturesAPI_Fillet)
 %shared_ptr(FeaturesAPI_Fillet1D)
 %shared_ptr(FeaturesAPI_Fillet2D)
+%shared_ptr(FeaturesAPI_FusionFaces)
 %shared_ptr(FeaturesAPI_GlueFaces)
+%shared_ptr(FeaturesAPI_ImportResult)
 %shared_ptr(FeaturesAPI_Intersection)
+%shared_ptr(FeaturesAPI_LimitTolerance)
+%shared_ptr(FeaturesAPI_Loft)
 %shared_ptr(FeaturesAPI_MultiRotation)
 %shared_ptr(FeaturesAPI_MultiTranslation)
+%shared_ptr(FeaturesAPI_NormalToFace)
 %shared_ptr(FeaturesAPI_Partition)
 %shared_ptr(FeaturesAPI_Pipe)
-%shared_ptr(FeaturesAPI_Loft)
 %shared_ptr(FeaturesAPI_Placement)
 %shared_ptr(FeaturesAPI_PointCloudOnFace)
 %shared_ptr(FeaturesAPI_Recover)
+%shared_ptr(FeaturesAPI_RemoveResults)
 %shared_ptr(FeaturesAPI_RemoveSubShapes)
 %shared_ptr(FeaturesAPI_Revolution)
 %shared_ptr(FeaturesAPI_RevolutionBoolean)
@@ -94,12 +102,6 @@
 %shared_ptr(FeaturesAPI_Symmetry)
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
-%shared_ptr(FeaturesAPI_FusionFaces)
-%shared_ptr(FeaturesAPI_RemoveResults)
-%shared_ptr(FeaturesAPI_Copy)
-%shared_ptr(FeaturesAPI_ImportResult)
-%shared_ptr(FeaturesAPI_Defeaturing)
-%shared_ptr(FeaturesAPI_BoundingBox)
 
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::pair<std::list<ModelHighAPI_Selection>, bool>, const std::pair<std::list<ModelHighAPI_Selection>, bool> & {
@@ -212,23 +214,31 @@
 %include "FeaturesAPI_BooleanCommon.h"
 %include "FeaturesAPI_BooleanSmash.h"
 %include "FeaturesAPI_BooleanFill.h"
+%include "FeaturesAPI_BoundingBox.h"
 %include "FeaturesAPI_Chamfer.h"
+%include "FeaturesAPI_Copy.h"
 %include "FeaturesAPI_Defeaturing.h"
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Fillet.h"
+%include "FeaturesAPI_FusionFaces.h"
+%include "FeaturesAPI_GeometryCalculation.h"
 %include "FeaturesAPI_GlueFaces.h"
+%include "FeaturesAPI_ImportResult.h"
 %include "FeaturesAPI_Intersection.h"
+%include "FeaturesAPI_LimitTolerance.h"
+%include "FeaturesAPI_Loft.h"
 %include "FeaturesAPI_Measurement.h"
 %include "FeaturesAPI_NormalToFace.h"
 %include "FeaturesAPI_MultiRotation.h"
 %include "FeaturesAPI_MultiTranslation.h"
 %include "FeaturesAPI_Partition.h"
 %include "FeaturesAPI_Pipe.h"
-%include "FeaturesAPI_Loft.h"
 %include "FeaturesAPI_Placement.h"
 %include "FeaturesAPI_PointCloudOnFace.h"
+%include "FeaturesAPI_PointCoordinates.h"
 %include "FeaturesAPI_Recover.h"
+%include "FeaturesAPI_RemoveResults.h"
 %include "FeaturesAPI_RemoveSubShapes.h"
 %include "FeaturesAPI_Revolution.h"
 %include "FeaturesAPI_RevolutionBoolean.h"
@@ -238,10 +248,3 @@
 %include "FeaturesAPI_Symmetry.h"
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"
-%include "FeaturesAPI_FusionFaces.h"
-%include "FeaturesAPI_RemoveResults.h"
-%include "FeaturesAPI_Copy.h"
-%include "FeaturesAPI_ImportResult.h"
-%include "FeaturesAPI_PointCoordinates.h"
-%include "FeaturesAPI_GeometryCalculation.h"
-%include "FeaturesAPI_BoundingBox.h"

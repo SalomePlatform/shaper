@@ -36,5 +36,4 @@ from FeaturesAPI import makeVertexInsideFace
 from FeaturesAPI import addRemoveResults
 from FeaturesAPI import addCopy, addImportResult
 from FeaturesAPI import addDefeaturing
-from FeaturesAPI import addSewing
-from FeaturesAPI import addGlueFaces
+from FeaturesAPI import addSewing, addGlueFaces, addLimitTolerance

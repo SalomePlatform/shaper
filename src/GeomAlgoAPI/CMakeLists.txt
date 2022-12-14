@@ -99,6 +99,8 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_ShapeInfo.h
 	  GeomAlgoAPI_CanonicalRecognition.h
     GeomAlgoAPI_GlueFaces.h
+    GeomAlgoAPI_LimitTolerance.h
+    GeomAlgoAPI_Utils.h
 )
 
 SET(PROJECT_SOURCES
@@ -177,6 +179,9 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_ShapeInfo.cpp
 	  GeomAlgoAPI_CanonicalRecognition.cpp
     GeomAlgoAPI_GlueFaces.cpp
+  	GeomAlgoAPI_CanonicalRecognition.cpp
+    GeomAlgoAPI_LimitTolerance.cpp
+    GeomAlgoAPI_Utils.cpp
 )
 
 SET(PROJECT_LIBRARIES
