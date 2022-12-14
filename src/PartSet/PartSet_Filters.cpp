@@ -31,6 +31,8 @@
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
+#include <AIS_Trihedron.hxx>
+#include <AIS_ViewCube.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
 
@@ -59,9 +61,19 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
 
 #ifdef HAVE_SALOME
-  // Issue #3161: Do not use presentations for non-SHAPER objects
-  if (!anOperation && !aObj.get())
-    return false;
+  if (!aObj.get()) {
+    // Workaround to enable View Cube and Trihedron selection
+    if (!aAisObj.IsNull()) {
+      if (aAisObj->IsKind(STANDARD_TYPE(AIS_Trihedron)) ||
+          aAisObj->IsKind(STANDARD_TYPE(AIS_ViewCube))) {
+        return true;
+      }
+    }
+
+    // Issue #3161: Do not use presentations for non-SHAPER objects
+    if (!anOperation)
+      return false;
+  }
 #endif
 
   // the shapes from different documents should be provided if there is no started operation
