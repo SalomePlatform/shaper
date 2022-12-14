@@ -93,8 +93,8 @@ model.do()
 GlueFaces_2 = model.addGlueFaces(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("SHELL", "Shell_2_1")], 1.0e-7, True)
 model.end()
 
-# no faces glued
-testCompound(GlueFaces_2, model, [2], [0], [4], [14], [12])
+# gluing successful
+testCompound(GlueFaces_2, model, [2], [0], [4], [13], [10])
 
 # =============================================================================
 # Test 3. Glue faces for 2 shells with 2 adjacent faces above default tolerance
