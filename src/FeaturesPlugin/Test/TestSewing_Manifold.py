@@ -63,7 +63,7 @@ Param_dx = model.addParameter(Part_1_doc, "dx", '10')
 Param_alfa = model.addParameter(Part_1_doc, "alfa", '90')
 
 # =============================================================================
-# Test 1. Sew two shells with a single common edge
+# Test 1a. Sew two shells with a single common edge (create result)
 # =============================================================================
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Box_2 = model.addBox(Part_1_doc, 10, 10, 10)
@@ -85,50 +85,98 @@ Shell_2_objects = [model.selection("FACE", "Rotation_1_1/MF:Rotated&Box_2_1/Top"
 Shell_2 = model.addShell(Part_1_doc, Shell_2_objects)
 model.do()
 
-Sewing_1 = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
+Sewing_1a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
 model.end()
 
 # sewing successful
-testResults(Sewing_1, model, 1, [0], [1], [10], [23], [14])
+testResults(Sewing_1a, model, 1, [0], [1], [10], [23], [14])
 
 # =============================================================================
-# Test 2. Sew two shells with four common edges
+# Test 1b. Sew two shells with a single common edge (do not create result)
+# =============================================================================
+model.undo()
+model.begin()
+
+Sewing_1b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = False)
+model.end()
+
+# sewing successful
+testResults(Sewing_1b, model, 1, [0], [1], [10], [23], [14])
+
+# =============================================================================
+# Test 2a. Sew two shells with four common edges (create result)
 # =============================================================================
 model.undo()
 model.begin()
 Param_alfa.setValue(0)
 model.do()
 
-Sewing_2 = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
+Sewing_2a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
 model.end()
 
 # sewing successful
-testResults(Sewing_2, model, 1, [0], [1], [10], [20], [12])
+testResults(Sewing_2a, model, 1, [0], [1], [10], [20], [12])
 
 # =============================================================================
-# Test 3. Sew two slightly disconnected shells
+# Test 2b. Sew two shells with four common edges (do not create result)
+# =============================================================================
+model.undo()
+model.begin()
+
+Sewing_2b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = False)
+model.end()
+
+# sewing successful
+testResults(Sewing_2b, model, 1, [0], [1], [10], [20], [12])
+
+# =============================================================================
+# Test 3a. Sew two slightly disconnected shells (create result)
 # =============================================================================
 model.undo()
 model.begin()
 Param_dx.setValue(10.0001)
 model.do()
 
-Sewing_3 = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
+Sewing_3a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = True)
 model.end()
 
 # no sewing done (result is a compound with the two input shells)
-testResults(Sewing_3, model, 1, [2], [2], [10], [24], [16])
+testResults(Sewing_3a, model, 1, [2], [2], [10], [24], [16])
 
 # =============================================================================
-# Test 4. Sew two slightly disconnected shells with larger tolerance
+# Test 3b. Sew two slightly disconnected shells (do not create result)
+# =============================================================================
+model.undo()
+model.begin()
+
+Sewing_3b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-07, allowNonManifold = False, alwaysCreateResult = False)
+model.end()
+
+# no sewing done (no result was created)
+model.testNbResults(Sewing_3b, 0)
+
+# =============================================================================
+# Test 4a. Sew two slightly disconnected shells with larger tolerance (create result)
 # =============================================================================
 model.undo()
 model.begin()
 Param_dx.setValue(10.0001)
 model.do()
 
-Sewing_4 = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-04, allowNonManifold = False, alwaysCreateResult = True)
+Sewing_4a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-04, allowNonManifold = False, alwaysCreateResult = True)
 model.end()
 
 # sewing successful
-testResults(Sewing_4, model, 1, [0], [1], [10], [20], [12])
+testResults(Sewing_4a, model, 1, [0], [1], [10], [20], [12])
+
+# =============================================================================
+# Test 4b. Sew two slightly disconnected shells with larger tolerance (do not create result)
+# =============================================================================
+model.undo()
+model.begin()
+
+Sewing_4b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_1_1")], 1e-04, allowNonManifold = False, alwaysCreateResult = False)
+model.end()
+
+# sewing successful
+testResults(Sewing_4b, model, 1, [0], [1], [10], [20], [12])
