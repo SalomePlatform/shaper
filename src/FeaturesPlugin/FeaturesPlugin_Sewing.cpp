@@ -115,9 +115,9 @@ bool FeaturesPlugin_Sewing::isSewn(const ListOfShape& theInputs,
        ++anIt)
   {
     GeomShapePtr aShape = *anIt;
-    if (aShape.get() && aShape->isShell())
+    if (aShape.get())
     {
-      nbInputShells++;
+      if (aShape->isShell()) nbInputShells++;
       nbInputFaces += aShape->subShapes(GeomAPI_Shape::FACE, true).size();
     }
   }
@@ -144,5 +144,5 @@ bool FeaturesPlugin_Sewing::isSewn(const ListOfShape& theInputs,
     nbResultFaces = theResult->subShapes(GeomAPI_Shape::FACE, true).size();
   }
 
-  return (nbResultShells > nbInputShells || (nbResultShells == nbInputShells && nbResultFaces > nbInputFaces));
+  return ((nbInputShells == 0 && nbResultShells > 0) || (nbResultShells < nbInputShells) || (nbResultShells == nbInputShells && nbResultFaces > nbInputFaces));
 }

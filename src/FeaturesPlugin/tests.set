@@ -531,6 +531,7 @@ SET(TEST_NAMES_PARA
                TestLoft.py
                TestSewing_Manifold.py
                TestSewing_NonManifold.py
+               TestSewing_Groups.py
 )
 
 SET(TEST_NAMES_SEQ
