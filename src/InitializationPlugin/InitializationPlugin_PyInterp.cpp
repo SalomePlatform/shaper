@@ -24,6 +24,7 @@
 #include <string>
 #include <stdexcept>
 #include <clocale>
+#include <Python.h>
 
 InitializationPlugin_PyInterp::InitializationPlugin_PyInterp()
 : PyInterp_Interp()
@@ -118,7 +119,11 @@ std::list<std::wstring> InitializationPlugin_PyInterp::compile(const std::wstrin
   }
 
   PyCodeObject* aCodeObj = (PyCodeObject*) aCodePyObj;
+#if PY_VERSION_HEX >= 0x030B0000
+  std::string aCodeName(PyBytes_AsString(PyObject_GetAttrString((PyObject *)(aCodeObj), "co_code")));
+#else
   std::string aCodeName(PyBytes_AsString(aCodeObj->co_code));
+#endif
   // co_names should be tuple, but can be changed in modern versions of python (>2.7.3)
   if(!PyTuple_Check(aCodeObj->co_names)) {
     return aResult;
