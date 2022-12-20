@@ -35,12 +35,14 @@ FeaturesAPI_BooleanFill::FeaturesAPI_BooleanFill(
 FeaturesAPI_BooleanFill::FeaturesAPI_BooleanFill(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects)
+  const std::list<ModelHighAPI_Selection>& theToolObjects,
+  const ModelHighAPI_Double& theFuzzy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
+    fillAttribute(theFuzzy, myfuzzyParam);
 
     execute(false);
   }
@@ -71,6 +73,14 @@ void FeaturesAPI_BooleanFill::setToolObjects(
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanFill::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
+{
+  fillAttribute(theFuzzy, myfuzzyParam);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -82,8 +92,11 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanFill::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanFill::TOOL_LIST_ID());
+  double aFuzzy = aBase->real(FeaturesPlugin_BooleanFill::FUZZY_PARAM_ID())->value();
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
+
+  theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
@@ -95,10 +108,11 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const std::list<ModelHighAPI_Selection>& theToolObjects,
+                        const ModelHighAPI_Double& fuzzyParam,
                         const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFill::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature, theMainObjects, theToolObjects));
+  return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature, theMainObjects, theToolObjects, fuzzyParam));
 }

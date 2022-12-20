@@ -21,6 +21,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultBody.h>
@@ -54,12 +55,14 @@ FeaturesPlugin_Boolean::FeaturesPlugin_Boolean(const OperationType theOperationT
 //=================================================================================================
 void FeaturesPlugin_Boolean::initAttributes()
 {
-  AttributeSelectionListPtr aSelection =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  data()->addAttribute(FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  aSelection = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  data()->addAttribute(FeaturesPlugin_Boolean::FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
@@ -120,10 +123,10 @@ void FeaturesPlugin_Boolean::storeResult(
       document()->createBody(data(), theResultIndex);
 
   ModelAPI_Tools::loadModifiedShapes(aResultBody,
-                                           theObjects,
-                                           theTools,
-                                           theMakeShapeList,
-                                           theResultShape);
+                                     theObjects,
+                                     theTools,
+                                     theMakeShapeList,
+                                     theResultShape);
   setResult(aResultBody, theResultIndex++);
 
   // merge algorithms

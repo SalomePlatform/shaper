@@ -27,42 +27,47 @@
 #include <TopoDS_Iterator.hxx>
 #include <TopExp_Explorer.hxx>
 
+
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const GeomShapePtr theTool,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy/*= 1.e-8*/)
 {
   ListOfShape aListWithObject, aListWithTool;
   aListWithObject.push_back(theObject);
   aListWithTool.push_back(theTool);
-  build(aListWithObject, aListWithTool, theOperationType);
+  build(aListWithObject, aListWithTool, theOperationType, theFuzzy);
 }
 
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy/*= 1.e-8*/)
 {
   ListOfShape aListWithObject;
   aListWithObject.push_back(theObject);
-  build(aListWithObject, theTools, theOperationType);
+  build(aListWithObject, theTools, theOperationType, theFuzzy);
 }
 
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy/*= 1.e-8*/)
 {
-  build(theObjects, theTools, theOperationType);
+  build(theObjects, theTools, theOperationType, theFuzzy);
 }
 
 
 //=================================================================================================
 void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
                                 const ListOfShape& theTools,
-                                const GeomAlgoAPI_Tools::BOPType theOperationType)
+                                const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                const double theFuzzy)
 {
-  if(theObjects.empty() || theTools.empty()) {
+  if (theObjects.empty() || theTools.empty()) {
     return;
   }
 
@@ -111,7 +116,9 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   aBuilder->SetRunParallel(bRunParallel);
 
   // Set fuzzy value to eliminate thin results
-  static const Standard_Real aFuzzy = 1.e-5;
+  // => Either use the value set by the user (greater or equal than minimum valid value 1.e-7)
+  // => or use the old default value of 1.e-5
+  Standard_Real aFuzzy = (theFuzzy >= 1.e-7 ? theFuzzy : 1.e-5);
   aBuilder->SetFuzzyValue(aFuzzy);
 
   // Building and getting result.
@@ -139,11 +146,13 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   this->setDone(true);
 }
 
+//=================================================================================================
 static bool isHistoryType(TopAbs_ShapeEnum theType) {
   return theType == TopAbs_VERTEX || theType == TopAbs_EDGE ||
          theType == TopAbs_FACE || theType == TopAbs_SOLID;
 }
 
+//=================================================================================================
 /// searches the corresponding result for theOld
 static void searchResult(const TopoDS_Shape& theOld, const TopoDS_Shape& theResult,
   BOPAlgo_BOP* theBuilder, TopTools_MapOfShape& theNews)
@@ -179,6 +188,7 @@ static void searchResult(const TopoDS_Shape& theOld, const TopoDS_Shape& theResu
   }
 }
 
+//=================================================================================================
 // check the shape is on the higher level of compound or compsolid
 bool isInComp(const TopoDS_Shape& theComp, const TopoDS_Shape& theShape) {
   if (theComp.ShapeType() == TopAbs_COMPOUND || theComp.ShapeType() == TopAbs_COMPSOLID) {

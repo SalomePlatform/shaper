@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_BooleanCommon.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -38,6 +39,7 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
 
+
 //==================================================================================================
 FeaturesPlugin_BooleanCommon::FeaturesPlugin_BooleanCommon()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_COMMON)
@@ -51,6 +53,13 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
 
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
 
   initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
@@ -86,6 +95,10 @@ void FeaturesPlugin_BooleanCommon::execute()
     return;
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   // version of COMMON feature
   const std::string aCommonVersion = data()->version();
 
@@ -104,7 +117,8 @@ void FeaturesPlugin_BooleanCommon::execute()
       std::shared_ptr<GeomAlgoAPI_Boolean> aCommonAlgo(
         new GeomAlgoAPI_Boolean(aShape,
                                 *anObjectsIt,
-                                GeomAlgoAPI_Tools::BOOL_COMMON));
+                                GeomAlgoAPI_Tools::BOOL_COMMON,
+                                aFuzzy));
 
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCommonAlgo, getKind(), anError)) {
         setError(anError);
@@ -129,10 +143,10 @@ void FeaturesPlugin_BooleanCommon::execute()
       ListOfShape anObjectList = anObjects.objects();
       ListOfShape aToolsList;
       ModelAPI_Tools::loadModifiedShapes(aResultBody,
-                                               anObjectList,
-                                               aToolsList,
-                                               aMakeShapeList,
-                                               aShape);
+                                         anObjectList,
+                                         aToolsList,
+                                         aMakeShapeList,
+                                         aShape);
       GeomShapePtr aBaseShape = anObjectList.front();
       anObjectList.pop_front();
       setResult(aResultBody, aResultIndex);
@@ -167,6 +181,7 @@ void FeaturesPlugin_BooleanCommon::execute()
           // Compound handling
           isOk = processCompound(GeomAlgoAPI_Tools::BOOL_COMMON,
                                  anObjects, aParent, aTools.objects(),
+                                 aFuzzy,
                                  aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                  aResultCompound);
         }
@@ -174,6 +189,7 @@ void FeaturesPlugin_BooleanCommon::execute()
           // Compsolid handling
           isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_COMMON,
                                   anObjects, aParent, aTools.objects(), ListOfShape(),
+                                  aFuzzy,
                                   aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                   aResultCompound);
         }
@@ -181,6 +197,7 @@ void FeaturesPlugin_BooleanCommon::execute()
         // process object as is
         isOk = processObject(GeomAlgoAPI_Tools::BOOL_COMMON,
                              anObject, aTools.objects(), aPlanes,
+                             aFuzzy,
                              aResultIndex, aResultBaseAlgoList, aResultShapesList,
                              aResultCompound);
       }
@@ -195,8 +212,8 @@ void FeaturesPlugin_BooleanCommon::execute()
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
-                                          aTools.objects(),
-                                          aResultCompound);
+                                    aTools.objects(),
+                                    aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

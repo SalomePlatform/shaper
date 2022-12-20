@@ -127,9 +127,10 @@ static void sortCompound(TopoDS_Shape& theCompound, GEOMAlgo_Splitter* theOperat
 
 //=================================================================================================
 GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
-                                             const ListOfShape& theTools)
+                                             const ListOfShape& theTools,
+                                             const double theFuzzy)
 {
-  build(theObjects, theTools);
+  build(theObjects, theTools, theFuzzy);
 }
 
 static void prepareShapes(const TopoDS_Shape&   theShape,
@@ -150,7 +151,8 @@ static void prepareShapes(const TopoDS_Shape&   theShape,
 
 //=================================================================================================
 void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
-                                  const ListOfShape& theTools)
+                                  const ListOfShape& theTools,
+                                  const double theFuzzy)
 {
   if (theObjects.empty()) {
     return;
@@ -199,6 +201,8 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   // Set parallel processing mode (default is false)
   Standard_Boolean bRunParallel = Standard_True;
   anOperation->SetRunParallel(bRunParallel);
+
+  if (theFuzzy >= 1.e-7) anOperation->SetFuzzyValue(theFuzzy);
 
   // Building and getting result.
   anOperation->Perform();

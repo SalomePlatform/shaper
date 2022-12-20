@@ -38,6 +38,17 @@
       </multi_selector>
     </box>
   </toolbox>
+  <groupbox>
+    <doublevalue id="fuzzy_param"
+                  label="Fuzzy parameter"
+                  tooltip="Additional tolerance to eliminate tiny result."
+                  min="1.e-7"
+                  max="10"
+                  step="1.e-7"
+                  default="1.e-7">
+      <validator id="GeomValidators_Positive"/>
+    </doublevalue>
+  </groupbox>
   <boolvalue id="remove_intersection_edges"
            label="Remove intersection edges"
            tooltip="Remove intersection edges if they laying on the same surface"

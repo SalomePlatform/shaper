@@ -35,12 +35,16 @@ public:
   /// \brief Constructor.
   /// \param[in] theListOfShape list of shape which should be splitted.
   /// \param[in] theIsMakeCompSolids if true gather shapes with shared faces to compsolids.
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            algorithm will use the default internal fuzzy value from OCCT.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape,
-                                            const bool theIsMakeCompSolids = false);
+                                            const bool theIsMakeCompSolids = false,
+                                            const double theFuzzy = 1.e-8);
 
 private:
   /// Builds resulting shape.
-  void build(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids);
+  void build(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids, const double theFuzzy);
 };
 
 #endif

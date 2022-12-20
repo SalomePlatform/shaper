@@ -24,19 +24,22 @@
 #include <BOPAlgo_PaveFiller.hxx>
 #include <BOPAlgo_Section.hxx>
 
+
 //==================================================================================================
-GeomAlgoAPI_Intersection::GeomAlgoAPI_Intersection(const ListOfShape& theObjects)
+GeomAlgoAPI_Intersection::GeomAlgoAPI_Intersection(const ListOfShape& theObjects, const double theFuzzy)
   : myFiller(0)
 {
-  build(theObjects);
+  build(theObjects, theFuzzy);
 }
 
+//==================================================================================================
 GeomAlgoAPI_Intersection::~GeomAlgoAPI_Intersection() {
   if (myFiller)
     delete (BOPAlgo_PaveFiller*)myFiller;
 }
+
 //==================================================================================================
-void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
+void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects, const double theFuzzy)
 {
   if (theObjects.empty()) {
     return;
@@ -64,6 +67,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
   aDSFiller->SetRunParallel(false);
   aDSFiller->SetNonDestructive(false);
   aDSFiller->SetGlue(BOPAlgo_GlueOff);
+  if (theFuzzy >= 1.e-7) aDSFiller->SetFuzzyValue(theFuzzy);
 
   // optimization for the issue #2399
   BOPAlgo_SectionAttribute theSecAttr(Standard_True,
@@ -79,6 +83,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
   anOperation->SetArguments(anObjects);
   anOperation->SetRunParallel(false);
   anOperation->SetCheckInverted(true);
+  if (theFuzzy >= 1.e-7) anOperation->SetFuzzyValue(theFuzzy);
 
   anOperation->PerformWithFiller(*aDSFiller); // it references a filler fields, so keep the filler
   myFiller = 0;

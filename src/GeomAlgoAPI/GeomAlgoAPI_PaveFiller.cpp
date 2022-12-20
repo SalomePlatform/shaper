@@ -27,17 +27,20 @@
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Iterator.hxx>
 
+
 //=================================================================================================
 GeomAlgoAPI_PaveFiller::GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape,
-                                               const bool theIsMakeCompSolids)
+                                               const bool theIsMakeCompSolids,
+                                               const double theFuzzy)
 {
-  build(theListOfShape, theIsMakeCompSolids);
+  build(theListOfShape, theIsMakeCompSolids, theFuzzy);
 }
 
 
 //=================================================================================================
 void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
-                                   const bool theIsMakeCompSolids)
+                                   const bool theIsMakeCompSolids,
+                                   const double theFuzzy)
 {
   BOPAlgo_PaveFiller* aPaveFiller = new BOPAlgo_PaveFiller;
   TopTools_ListOfShape aListOfShape;
@@ -53,6 +56,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
     }
   }
   aPaveFiller->SetArguments(aListOfShape);
+  if (theFuzzy >= 1.e-7) aPaveFiller->SetFuzzyValue(theFuzzy);
   aPaveFiller->Perform();
   if (aPaveFiller->HasErrors())
     return;
@@ -61,6 +65,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
   this->setImpl(aBuilder);
   this->setBuilderType(OCCT_BOPAlgo_Builder);
   aBuilder->SetArguments(aListOfShape);
+  if (theFuzzy >= 1.e-7) aBuilder->SetFuzzyValue(theFuzzy);
   aBuilder->PerformWithFiller(*aPaveFiller);
   if (aBuilder->HasErrors())
     return;

@@ -66,20 +66,6 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name of main objects.
-  inline static const std::string& OBJECT_LIST_ID()
-  {
-    static const std::string MY_OBJECT_LIST_ID("main_objects");
-    return MY_OBJECT_LIST_ID;
-  }
-
-  /// Attribute name of tool objects.
-  inline static const std::string& TOOL_LIST_ID()
-  {
-    static const std::string MY_TOOL_LIST_ID("tool_objects");
-    return MY_TOOL_LIST_ID;
-  }
-
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 

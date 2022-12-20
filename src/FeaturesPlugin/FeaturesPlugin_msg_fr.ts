@@ -345,6 +345,17 @@
     </message>
   </context>
   <context>
+    <name>Common:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
+    </message>
+  </context>
+  <context>
     <name>Model_Data</name>
     <message>
       <source>%1 has failed during the update</source>
@@ -395,6 +406,17 @@
     <message>
       <source>Tool objects</source>
       <translation>Objets outils</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
     </message>
   </context>
 
@@ -1231,6 +1253,17 @@
       <translation>Objets outils</translation>
     </message>
   </context>
+  <context>
+    <name>Fuse:fuzzy_param</name>
+    <message>
+      <source>Fuzzy Parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
+    </message>
+  </context>
 
   <!-- FusionFaces -->
   <context>
@@ -1294,6 +1327,17 @@
       <translation>Sélectionner des objets.</translation>
     </message>
   </context>
+  <context>
+    <name>Intersection:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
+    </message>
+  </context>
 
   <!-- Partition -->
   <context>
@@ -1335,6 +1379,17 @@
     <message>
       <source>Select objects for partitioning.</source>
       <translation>Sélectionner des objets pour le partitionnement.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Partition:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
     </message>
   </context>
 
@@ -2454,6 +2509,17 @@
       <translation>Objets outils</translation>
     </message>
   </context>
+  <context>
+    <name>Smash:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
+    </message>
+  </context>
 
   <!-- Split -->
   <context>
@@ -2496,6 +2562,17 @@
       <translation>Objets outils</translation>
     </message>
   </context>
+  <context>
+    <name>Split:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
+    </message>
+  </context>
 
   <!-- Union -->
   <context>
@@ -2518,6 +2595,17 @@
     <message>
       <source>Select solids for union.</source>
       <translation>Sélectionner les solides pour la réunion.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Union:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
     </message>
   </context>
 
@@ -3992,6 +4080,17 @@
     <message>
       <source>Error: Selected shape has the wrong type.</source>
       <translation>La forme sélectionnée est du mauvais type.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Paramètre flou</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Tolérance supplémentaire pour éliminer les petits résultats.</translation>
     </message>
   </context>
   <context>

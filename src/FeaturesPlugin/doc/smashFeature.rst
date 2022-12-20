@@ -25,17 +25,19 @@ The following property panel will be opened:
   other objects (to avoid self intersection) and added to the result.
 - **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be smashed into main objects.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
 - **See preview** button shows a result of the operation.
 
 Main objects and Tools objects should have the same dimension. There are supported 2-dimensional (face) or 3-dimensional (solid, compsolid) arguments.
 
 **TUI Command**:
 
-.. py:function:: model.addSmash(Part_doc, mainObjects, toolObjects)
+.. py:function:: model.addSmash(Part_doc, mainObjects, toolObjects, fuzzy)
 
     :param part: The current part object.
     :param list: A list of main objects.
     :param list: A list of tool objects.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Rotated object.
 
 Result

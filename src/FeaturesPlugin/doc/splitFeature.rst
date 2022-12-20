@@ -22,15 +22,17 @@ The following property panel will be opened:
 
 - **Main Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be cut and splitted by tool objects.
 - **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut and split the main objects. Construction planes may be selected too.
+- **Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
 - **See preview** button shows a result of the operation.
 
 **TUI Command**:
 
-.. py:function:: model.addSplit(Part_doc, mainObjects, toolObjects)
+.. py:function:: model.addSplit(Part_doc, mainObjects, toolObjects, fuzzy)
 
     :param part: The current part object.
     :param list: A list of main objects.
     :param list: A list of tool objects.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Result object.
 
 Result

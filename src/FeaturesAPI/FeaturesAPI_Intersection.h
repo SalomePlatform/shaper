@@ -26,6 +26,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Double.h>
 
 class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
@@ -43,19 +44,26 @@ public:
   /// Constructor with values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Intersection(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                    const std::list<ModelHighAPI_Selection>& theObjects);
+                                    const std::list<ModelHighAPI_Selection>& theObjects,
+                                    const ModelHighAPI_Double& aFuzzy = ModelHighAPI_Double(1.e-8));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Intersection();
 
-  INTERFACE_1(FeaturesPlugin_Intersection::ID(),
+  INTERFACE_2(FeaturesPlugin_Intersection::ID(),
               objects, FeaturesPlugin_Intersection::OBJECT_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Objects */)
+              ModelAPI_AttributeSelectionList, /** Objects */,
+              fuzzyParam, FeaturesPlugin_Intersection::FUZZY_PARAM_ID(),
+              ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT
   void setObjects(const std::list<ModelHighAPI_Selection>& theObjects);
+
+  /// Set fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setFuzzyValue(const ModelHighAPI_Double& theFuzzy);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -70,6 +78,7 @@ typedef std::shared_ptr<FeaturesAPI_Intersection> IntersectionPtr;
 FEATURESAPI_EXPORT
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& part,
                                 const std::list<ModelHighAPI_Selection>& objects,
+                                const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
                                 const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Intersection_H_

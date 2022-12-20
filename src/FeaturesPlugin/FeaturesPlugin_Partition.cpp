@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_Partition.h"
 
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -58,6 +59,13 @@ FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 void FeaturesPlugin_Partition::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
+  
   initVersion(BOP_VERSION_9_4(), selectionList(BASE_OBJECTS_ID()));
 }
 
@@ -75,6 +83,10 @@ void FeaturesPlugin_Partition::execute()
     return;
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   ListOfShape aBaseObjects = anObjects.objects();
   aBaseObjects.insert(aBaseObjects.end(), aPlanes.begin(), aPlanes.end());
 
@@ -85,7 +97,7 @@ void FeaturesPlugin_Partition::execute()
   // cut unused solids of composolids from the objects of partition
   ListOfShape aTargetObjects, anUnusedSubs;
   std::string aError;
-  if (!cutSubs(anObjects, aTargetObjects, anUnusedSubs, aMakeShapeList, aError)) {
+  if (!cutSubs(anObjects, aTargetObjects, anUnusedSubs, aFuzzy, aMakeShapeList, aError)) {
     setError(aError);
     return;
   }
@@ -93,7 +105,7 @@ void FeaturesPlugin_Partition::execute()
 
   // perform partition first time to split target solids by planes
   std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(
-      new GeomAlgoAPI_Partition(aTargetObjects, aPlanes));
+      new GeomAlgoAPI_Partition(aTargetObjects, aPlanes, aFuzzy));
 
   // Checking that the algorithm worked properly.
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), aError)) {
@@ -209,9 +221,9 @@ void FeaturesPlugin_Partition::storeResult(
 
 
 //=================================================================================================
-
 static bool cutSubs(ListOfShape& theSubsToCut,
                     const ListOfShape& theTools,
+                    const double theFuzzy,
                     std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
                     std::string& theError)
 {
@@ -220,7 +232,7 @@ static bool cutSubs(ListOfShape& theSubsToCut,
 
   // cut from current list of solids
   std::shared_ptr<GeomAlgoAPI_MakeShape> aCutAlgo(
-      new GeomAlgoAPI_Boolean(theSubsToCut, theTools, GeomAlgoAPI_Tools::BOOL_CUT));
+      new GeomAlgoAPI_Boolean(theSubsToCut, theTools, GeomAlgoAPI_Tools::BOOL_CUT, theFuzzy));
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, "", theError))
     return false;
   theMakeShapeList->appendAlgo(aCutAlgo);
@@ -233,10 +245,12 @@ static bool cutSubs(ListOfShape& theSubsToCut,
   return true;
 }
 
+//=================================================================================================
 bool FeaturesPlugin_Partition::cutSubs(
     GeomAPI_ShapeHierarchy& theHierarchy,
     ListOfShape& theUsed,
     ListOfShape& theNotUsed,
+    const double theFuzzy,
     std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
     std::string& theError)
 {
@@ -272,8 +286,8 @@ bool FeaturesPlugin_Partition::cutSubs(
     else
       aUsed.push_back(*anIt);
 
-    isOk = ::cutSubs(aUsed, aToolsForUsed, theMakeShapeList, theError)
-        && ::cutSubs(aNotUsed, aToolsForUnused, theMakeShapeList, theError);
+    isOk = ::cutSubs(aUsed, aToolsForUsed, theFuzzy, theMakeShapeList, theError)
+        && ::cutSubs(aNotUsed, aToolsForUnused, theFuzzy, theMakeShapeList, theError);
     if (isOk) {
       theUsed.insert(theUsed.end(), aUsed.begin(), aUsed.end());
       theNotUsed.insert(theNotUsed.end(), aNotUsed.begin(), aNotUsed.end());

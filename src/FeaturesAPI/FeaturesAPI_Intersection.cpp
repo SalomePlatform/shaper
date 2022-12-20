@@ -33,11 +33,13 @@ FeaturesAPI_Intersection::FeaturesAPI_Intersection(
 //==================================================================================================
 FeaturesAPI_Intersection::FeaturesAPI_Intersection(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<ModelHighAPI_Selection>& theObjects)
+  const std::list<ModelHighAPI_Selection>& theObjects,
+  const ModelHighAPI_Double& theFuzzy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theObjects, myobjects);
+    fillAttribute(theFuzzy, myfuzzyParam);
 
     execute();
   }
@@ -58,6 +60,14 @@ void FeaturesAPI_Intersection::setObjects(const std::list<ModelHighAPI_Selection
 }
 
 //==================================================================================================
+void FeaturesAPI_Intersection::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
+{
+  fillAttribute(theFuzzy, myfuzzyParam);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -65,8 +75,11 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
+  double aFuzzy = aBase->real(FeaturesPlugin_Intersection::FUZZY_PARAM_ID())->value();
 
   theDumper << aBase << " = model.addIntersection(" << aDocName << ", " << anAttrObjects;
+
+  theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
@@ -77,10 +90,11 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 //==================================================================================================
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
                                 const std::list<ModelHighAPI_Selection>& theObjects,
+                                const ModelHighAPI_Double& fuzzyParam,
                                 const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Intersection::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects));
+  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects, fuzzyParam));
 }

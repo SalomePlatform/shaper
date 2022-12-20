@@ -26,17 +26,19 @@ The following property panel will be opened:
 - **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut main objects.
   Any kind of shape can be selected, including subshapes of compsolids/compounds.
   Non-selected subshapes from compsolids/compounds will be ignored.
+- **Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
 - **See preview** button shows a result of the operation.
 
 The minimal dimension of Tool Objects should be not less than the maximal dimension of Main Objects.
 
 **TUI Command**:
 
-.. py:function:: model.addCut(Part_doc, mainObjects, toolObjects)
+.. py:function:: model.addCut(Part_doc, mainObjects, toolObjects, fuzzy)
 
     :param part: The current part object
     :param list: A list of main objects.
     :param list: A list of tool objects.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Created object
 
 Result
