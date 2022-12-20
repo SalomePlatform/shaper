@@ -34,20 +34,41 @@ class GeomAlgoAPI_Boolean : public GeomAlgoAPI_MakeShape
 public:
 
   /// Constructor.
+  /// \param[in] theObject the main object.
+  /// \param[in] theTool the tool object.
+  /// \param[in] theOperationType type of boolean operation.
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            boolean operation will use a default additional tolerance value of 1.e-5.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const GeomShapePtr theTool,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy = 1.e-8);
 
   /// Constructor.
+  /// \param[in] theObject the main object.
+  /// \param[in] theTools list of tools.
+  /// \param[in] theOperationType type of boolean operation.
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            boolean operation will use a default additional tolerance value of 1.e-5.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy = 1.e-8);
 
 
   /// Constructor.
+  /// \param[in] theObjects list of main objects.
+  /// \param[in] theTools list of tools.
+  /// \param[in] theOperationType type of boolean operation.
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            boolean operation will use a default additional tolerance value of 1.e-5.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
-                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType,
+                                         const double theFuzzy = 1.e-8);
 
   /// Redefinition of the generic method for the Fuse problem: OCCT 30481
   GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
@@ -57,7 +78,8 @@ private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects,
              const ListOfShape& theTools,
-             const GeomAlgoAPI_Tools::BOPType theOperationType);
+             const GeomAlgoAPI_Tools::BOPType theOperationType,
+             const double theFuzzy);
 };
 
 #endif

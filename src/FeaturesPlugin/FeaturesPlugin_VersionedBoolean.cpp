@@ -46,10 +46,13 @@
 #include <algorithm>
 #include <map>
 
+
+//=================================================================================================
 static void performBoolean(const GeomAlgoAPI_Tools::BOPType theBooleanType,
                            GeomMakeShapePtr& theBooleanAlgo,
                            const ListOfShape& theObjects,
-                           const ListOfShape& theTools)
+                           const ListOfShape& theTools,
+                           const double theFuzzy)
 {
   if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
     theBooleanAlgo.reset(new GeomAlgoAPI_Partition(theObjects, theTools));
@@ -62,11 +65,11 @@ static void performBoolean(const GeomAlgoAPI_Tools::BOPType theBooleanType,
         ListOfShape anObjects = theObjects;
         ListOfShape aTools;
         aTools.splice(aTools.begin(), anObjects, anObjects.begin());
-        theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(anObjects, aTools, theBooleanType));
+        theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(anObjects, aTools, theBooleanType, theFuzzy));
       }
     }
     else
-      theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(theObjects, theTools, theBooleanType));
+      theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(theObjects, theTools, theBooleanType, theFuzzy));
   }
 }
 
@@ -122,6 +125,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
     const GeomShapePtr& theObject,
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
+    const double theFuzzy,
     int& theResultIndex,
     std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
@@ -140,11 +144,12 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
   aToolsWithPlanes.insert(aToolsWithPlanes.end(), aPlanesCopy.begin(), aPlanesCopy.end());
 
   if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
-    aBoolAlgo.reset(new GeomAlgoAPI_Partition(aListWithObject, aToolsWithPlanes));
+    aBoolAlgo.reset(new GeomAlgoAPI_Partition(aListWithObject, aToolsWithPlanes, theFuzzy));
   else
     aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aListWithObject,
                                             aToolsWithPlanes,
-                                            theBooleanType));
+                                            theBooleanType,
+                                            theFuzzy));
 
   // Checking that the algorithm worked properly.
   std::string anError;
@@ -214,6 +219,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
     const GeomShapePtr& theCompsolid,
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
+    const double theFuzzy,
     int& theResultIndex,
     std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
@@ -232,7 +238,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
   aToolsWithPlanes.insert(aToolsWithPlanes.end(), aPlanesCopy.begin(), aPlanesCopy.end());
 
   std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
-  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationSolids, aToolsWithPlanes);
+  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationSolids, aToolsWithPlanes, theFuzzy);
 
   // Checking that the algorithm worked properly.
   std::string anError;
@@ -251,7 +257,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
     ListOfShape aShapesToAdd = aNotUsedSolids;
     aShapesToAdd.push_back(aBoolAlgo->shape());
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-        new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+        new GeomAlgoAPI_PaveFiller(aShapesToAdd, true, theFuzzy));
     if (!aFillerAlgo->isDone()) {
       std::string aFeatureError = "Error: PaveFiller algorithm failed.";
       setError(aFeatureError);
@@ -308,6 +314,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
     GeomAPI_ShapeHierarchy& theCompoundHierarchy,
     const GeomShapePtr& theCompound,
     const ListOfShape& theTools,
+    const double theFuzzy,
     int& theResultIndex,
     std::vector<ModelAPI_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
     ListOfShape& theResultShapesList,
@@ -324,7 +331,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
-  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationShapes, theTools);
+  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationShapes, theTools, theFuzzy);
 
   // Checking that the algorithm worked properly.
   std::string anError;

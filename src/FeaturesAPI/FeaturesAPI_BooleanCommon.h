@@ -26,6 +26,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Double.h>
 
 class ModelHighAPI_Integer;
 class ModelHighAPI_Selection;
@@ -43,25 +44,29 @@ public:
     /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                            const std::list<ModelHighAPI_Selection>& theMainObjects);
+                            const std::list<ModelHighAPI_Selection>& theMainObjects,
+                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                             const std::list<ModelHighAPI_Selection>& theMainObjects,
-                            const std::list<ModelHighAPI_Selection>& theToolObjects);
+                            const std::list<ModelHighAPI_Selection>& theToolObjects,
+                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanCommon();
 
-  INTERFACE_3(FeaturesPlugin_BooleanCommon::ID(),
+  INTERFACE_4(FeaturesPlugin_BooleanCommon::ID(),
               creationMethod, FeaturesPlugin_BooleanCommon::CREATION_METHOD(),
               ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanCommon::TOOL_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Tool objects*/)
+              ModelAPI_AttributeSelectionList, /** Tool objects*/,
+              fuzzyValue, FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID(),
+              ModelAPI_AttributeDouble, /** Fuzzy parameter*/)
 
   /// Set main objects.
   FEATURESAPI_EXPORT
@@ -70,6 +75,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Set fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setFuzzyValue(const ModelHighAPI_Double& theFuzzy);
 
   /// Set mode.
   FEATURESAPI_EXPORT
@@ -89,6 +98,7 @@ FEATURESAPI_EXPORT BooleanCommonPtr addCommon(
     const std::shared_ptr<ModelAPI_Document>& part,
     const std::list<ModelHighAPI_Selection>& objects,
     const std::list<ModelHighAPI_Selection>& tools = std::list<ModelHighAPI_Selection>(),
+    const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
     const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanCommon_H_

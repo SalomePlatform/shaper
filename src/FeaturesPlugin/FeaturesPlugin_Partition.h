@@ -46,6 +46,13 @@ public:
     return MY_BASE_OBJECTS_ID;
   }
 
+  /// Attribute name of fuzzy parameter.
+  inline static const std::string& FUZZY_PARAM_ID()
+  {
+    static const std::string MY_FUZZY_PARAM_ID("fuzzy_param");
+    return MY_FUZZY_PARAM_ID;
+  }
+
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -76,6 +83,7 @@ private:
   bool cutSubs(GeomAPI_ShapeHierarchy& theHierarchy,
                ListOfShape& theUsed,
                ListOfShape& theNotUsed,
+               const double theFuzzy,
                std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
                std::string& theError);
 };

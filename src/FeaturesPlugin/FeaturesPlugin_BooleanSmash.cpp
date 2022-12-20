@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_BooleanSmash.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 
@@ -33,6 +34,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+
 //==================================================================================================
 FeaturesPlugin_BooleanSmash::FeaturesPlugin_BooleanSmash()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_SMASH)
@@ -44,6 +46,12 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
 {
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
 
   initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
@@ -100,13 +108,18 @@ void FeaturesPlugin_BooleanSmash::execute()
     }
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   if (!aShapesToAdd.empty()) {
     // Cut objects with not used solids.
     std::shared_ptr<GeomAlgoAPI_Boolean> anObjectsCutAlgo(
       new GeomAlgoAPI_Boolean(aShapesToSmash,
                               aShapesToAdd,
-                              GeomAlgoAPI_Tools::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT,
+                              aFuzzy));
 
     if (GeomAlgoAPI_ShapeTools::area(anObjectsCutAlgo->shape()) > 1.e-27) {
       aShapesToSmash.clear();
@@ -118,7 +131,8 @@ void FeaturesPlugin_BooleanSmash::execute()
     std::shared_ptr<GeomAlgoAPI_Boolean> aToolsCutAlgo(
       new GeomAlgoAPI_Boolean(aTools,
                               aShapesToAdd,
-                              GeomAlgoAPI_Tools::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT,
+                              aFuzzy));
 
     if (GeomAlgoAPI_ShapeTools::area(aToolsCutAlgo->shape()) > 1.e-27) {
       aTools.clear();
@@ -131,7 +145,8 @@ void FeaturesPlugin_BooleanSmash::execute()
   std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(
     new GeomAlgoAPI_Boolean(aShapesToSmash,
                             aTools,
-                            GeomAlgoAPI_Tools::BOOL_CUT));
+                            GeomAlgoAPI_Tools::BOOL_CUT,
+                            aFuzzy));
 
   // Checking that the algorithm worked properly.
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
@@ -154,7 +169,7 @@ void FeaturesPlugin_BooleanSmash::execute()
   }
   else {
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true, aFuzzy));
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
       setError(anError);
       return;

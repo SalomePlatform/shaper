@@ -26,6 +26,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Double.h>
 
 class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
@@ -43,19 +44,26 @@ public:
   /// Constructor with values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                 const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                                 const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                 const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Partition();
 
-  INTERFACE_1(FeaturesPlugin_Partition::ID(),
+  INTERFACE_2(FeaturesPlugin_Partition::ID(),
               baseObjects, FeaturesPlugin_Partition::BASE_OBJECTS_ID(),
-              ModelAPI_AttributeSelectionList, /** Base objects */)
+              ModelAPI_AttributeSelectionList, /** Base objects */,
+              fuzzyParam, FeaturesPlugin_Partition::FUZZY_PARAM_ID(),
+              ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
   void setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects);
+
+  /// Modify fuzzy parameter attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setFuzzy(const ModelHighAPI_Double& theFuzzy);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -70,6 +78,7 @@ typedef std::shared_ptr<FeaturesAPI_Partition> PartitionPtr;
 FEATURESAPI_EXPORT
 PartitionPtr addPartition(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                          const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
                           const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Partition_H_

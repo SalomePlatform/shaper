@@ -19,6 +19,17 @@
     <validator id="PartSet_DifferentObjects"/>
     <validator id="FeaturesPlugin_ValidatorBooleanSelection"/>
   </multi_selector>
+  <groupbox>
+    <doublevalue id="fuzzy_param"
+                  label="Fuzzy parameter"
+                  tooltip="Additional tolerance to eliminate tiny result."
+                  min="1.e-7"
+                  max="10"
+                  step="1.e-5"
+                  default="1.e-5">
+      <validator id="GeomValidators_Positive"/>
+    </doublevalue>
+  </groupbox>
   <validator id="FeaturesPlugin_ValidatorBooleanArguments" parameters="main_objects,tool_objects"/>
   <validator id="GeomValidators_NotSelfIntersected" parameters="main_objects,tool_objects"/>
 </source>

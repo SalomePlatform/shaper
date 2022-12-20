@@ -32,13 +32,20 @@ class GeomAlgoAPI_Partition : public GeomAlgoAPI_MakeShape
 {
 public:
   /// Constructor.
+  /// \param[in] theObjects list of main objects.
+  /// \param[in] theTools list of tools.
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            algorithm will use the default internal fuzzy value from OCCT.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Partition(const ListOfShape& theObjects,
-                                           const ListOfShape& theTools);
+                                           const ListOfShape& theTools,
+                                           const double theFuzzy = 1.e-8);
 
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects,
-             const ListOfShape& theTools);
+             const ListOfShape& theTools,
+             const double theFuzzy);
 };
 
 #endif

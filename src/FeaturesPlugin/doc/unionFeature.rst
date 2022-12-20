@@ -23,16 +23,19 @@ The following property panel will be opened:
 
 Here it is necessary to select some objects. Only faces with shared edges or solids with shared faces are allowed for selection.
 
+**Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
+
 **Apply** button creates a union shape.
   
 **Cancel** button cancels the operation.
 
 **TUI Command**:
 
-.. py:function:: model.addUnion(Part_doc, objects)
+.. py:function:: model.addUnion(Part_doc, objects, fuzzy)
 
     :param part: The current part object.
     :param objects: A list of objects.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Result object.
 
 Result

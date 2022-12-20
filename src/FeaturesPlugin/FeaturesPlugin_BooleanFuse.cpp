@@ -21,6 +21,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -39,6 +40,8 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+
+//==================================================================================================
 static void explodeCompound(const GeomShapePtr& theShape, ListOfShape& theResult)
 {
   if (theShape->shapeType() == GeomAPI_Shape::COMPOUND) {
@@ -68,6 +71,12 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
 
   data()->addAttribute(REMOVE_INTERSECTION_EDGES_ID(), ModelAPI_AttributeBoolean::typeId());
 
@@ -115,6 +124,10 @@ void FeaturesPlugin_BooleanFuse::execute()
     return;
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   // version of FUSE feature
   const std::string aFuseVersion = data()->version();
 
@@ -161,7 +174,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   GeomShapePtr aCuttedEdgesAndFaces;
   if (!anEdgesAndFaces.empty()) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
-      anOriginalShapes, GeomAlgoAPI_Tools::BOOL_CUT));
+      anOriginalShapes, GeomAlgoAPI_Tools::BOOL_CUT, aFuzzy));
     if (aCutAlgo->isDone()) {
       aCuttedEdgesAndFaces = aCutAlgo->shape();
       aMakeShapeList->appendAlgo(aCutAlgo);
@@ -181,7 +194,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       ListOfShape aOneObjectList;
       aOneObjectList.push_back(*anIt);
       std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(
-        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Tools::BOOL_CUT));
+        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Tools::BOOL_CUT, aFuzzy));
 
       if (GeomAlgoAPI_ShapeTools::area(aCutAlgo->shape()) > 1.e-27) {
         aSolidsToFuse.push_back(aCutAlgo->shape());
@@ -206,7 +219,8 @@ void FeaturesPlugin_BooleanFuse::execute()
   } else if ((anObjects.size() + aTools.size()) > 1) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
       aTools,
-      GeomAlgoAPI_Tools::BOOL_FUSE));
+      GeomAlgoAPI_Tools::BOOL_FUSE,
+      aFuzzy));
 
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFuseAlgo, getKind(), anError)) {
@@ -229,7 +243,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       aShapesToAdd.push_back(aShape);
     }
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true, aFuzzy));
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
       setError(anError);
       return;

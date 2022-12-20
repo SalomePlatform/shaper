@@ -68,3 +68,8 @@ Construction planes (mentioned PLANE) can be used in several operations, but not
 | |union.icon|            | 3 (SOLIDs from COMPSOLID) |          ---            |
 | :ref:`featureUnion`     |                           |                         |
 +-------------------------+---------------------------+-------------------------+
+
+The fuzzy parameter of each boolean operation is used as an additional tolerance to eliminate tiny results.
+
+*Note*: If a value is given, which is smaller than the lowest meaningful tolerance of 1.e-7, the boolean operation
+will use the default internal fuzzy parameter.

@@ -26,6 +26,7 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Double.h>
 
 class ModelHighAPI_Integer;
 class ModelHighAPI_Selection;
@@ -44,17 +45,20 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
-                         const std::list<ModelHighAPI_Selection>& theToolObjects);
+                         const std::list<ModelHighAPI_Selection>& theToolObjects,
+                         const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanCut();
 
-  INTERFACE_2(FeaturesPlugin_BooleanCut::ID(),
+  INTERFACE_3(FeaturesPlugin_BooleanCut::ID(),
               mainObjects, FeaturesPlugin_BooleanCut::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanCut::TOOL_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Tool objects*/)
+              ModelAPI_AttributeSelectionList, /** Tool objects*/,
+              fuzzyParam, FeaturesPlugin_BooleanCut::FUZZY_PARAM_ID(),
+              ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
   /// Set main objects.
   FEATURESAPI_EXPORT
@@ -63,6 +67,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Set fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setFuzzyValue(const ModelHighAPI_Double& theFuzzy);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -78,6 +86,7 @@ FEATURESAPI_EXPORT
 BooleanCutPtr addCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const std::list<ModelHighAPI_Selection>& theMainObjects,
                      const std::list<ModelHighAPI_Selection>& theToolObjects,
+                     const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
                      const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanCut_H_

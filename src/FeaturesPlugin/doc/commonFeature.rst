@@ -39,14 +39,16 @@ Simple
 
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
 - **See preview** button shows a result of the operation.
 
 **TUI Command**:
 
-.. py:function:: model.addCommon(Part_doc, objects)
+.. py:function:: model.addCommon(Part_doc, objects, fuzzy)
 
     :param part: The current part object
     :param list: A list of objects.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Created object
 
 Result
@@ -74,17 +76,19 @@ Advanced
   other objects (to avoid self-intersection) and added to the result.
 - **Tools** contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected with tool objects.
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Fuzzy Parameter** defines the additional tolerance value used to eliminate tiny results.
 - **See preview** button shows a result of the operation.
 
 Any kind of shape is supported as an object or a tool of Common. Moreover, constructions planes can be selected as tools.
 
 **TUI Command**:
 
-.. py:function:: model.addCommon(Part_doc, objects, tools)
+.. py:function:: model.addCommon(Part_doc, objects, tools, fuzzy)
 
     :param part: The current part object
     :param list: A list of objects.
     :param list: A list of tools.
+    :param real: Additional tolerance used to eliminate tiny results (optional).
     :return: Created object
 
 Result

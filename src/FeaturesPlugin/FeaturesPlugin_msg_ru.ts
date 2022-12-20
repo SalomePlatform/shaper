@@ -109,7 +109,7 @@
     <message>
       <source>Error: Empty shape.</source>
       <translation>Выбранные вспомогательные объекты невалидны.</translation>
-  </message>
+    </message>
     <message>
       <source>Error: Local selection not allowed.</source>
       <translation>Локальная селекция запрещена.</translation>
@@ -117,6 +117,17 @@
     <message>
       <source>Error: Selected shape has the wrong type.</source>
       <translation>Выбраныне вспомогательные объекты имеют недопустимый тип.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:fuzzy_param</name>
+    <message>
+      <source>Fuzzy parameter</source>
+      <translation>Нечеткий параметр</translation>
+    </message>
+    <message>
+      <source>Additional tolerance to eliminate tiny result.</source>
+      <translation>Дополнительный допуск для устранения крошечного результата.</translation>
     </message>
   </context>
   <context>

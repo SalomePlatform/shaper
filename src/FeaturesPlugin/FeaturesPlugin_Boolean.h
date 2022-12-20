@@ -51,6 +51,13 @@ public:
     return MY_TOOL_LIST_ID;
   }
 
+  /// Attribute name of fuzzy parameter.
+  inline static const std::string& FUZZY_PARAM_ID()
+  {
+    static const std::string MY_FUZZY_PARAM_ID("fuzzy_param");
+    return MY_FUZZY_PARAM_ID;
+  }
+
   /// \return boolean operation type.
   FEATURESPLUGIN_EXPORT OperationType operationType();
 

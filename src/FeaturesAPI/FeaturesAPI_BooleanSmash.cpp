@@ -35,12 +35,14 @@ FeaturesAPI_BooleanSmash::FeaturesAPI_BooleanSmash(
 FeaturesAPI_BooleanSmash::FeaturesAPI_BooleanSmash(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects)
+  const std::list<ModelHighAPI_Selection>& theToolObjects,
+  const ModelHighAPI_Double& theFuzzy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
+    fillAttribute(theFuzzy, myfuzzyParam);
 
     execute(false);
   }
@@ -71,6 +73,14 @@ void FeaturesAPI_BooleanSmash::setToolObjects(
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanSmash::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
+{
+  fillAttribute(theFuzzy, myfuzzyParam);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanSmash::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -82,8 +92,11 @@ void FeaturesAPI_BooleanSmash::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanSmash::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanSmash::TOOL_LIST_ID());
+  double aFuzzy = aBase->real(FeaturesPlugin_BooleanSmash::FUZZY_PARAM_ID())->value();
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
+
+  theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
@@ -95,10 +108,11 @@ void FeaturesAPI_BooleanSmash::dump(ModelHighAPI_Dumper& theDumper) const
 BooleanSmashPtr addSmash(const std::shared_ptr<ModelAPI_Document>& thePart,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
                          const std::list<ModelHighAPI_Selection>& theToolObjects,
+                         const ModelHighAPI_Double& fuzzyParam,
                          const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanSmash::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return BooleanSmashPtr(new FeaturesAPI_BooleanSmash(aFeature, theMainObjects, theToolObjects));
+  return BooleanSmashPtr(new FeaturesAPI_BooleanSmash(aFeature, theMainObjects, theToolObjects, fuzzyParam));
 }

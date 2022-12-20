@@ -34,12 +34,14 @@ FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
 //==================================================================================================
 FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<ModelHighAPI_Selection>& theMainObjects)
+  const std::list<ModelHighAPI_Selection>& theMainObjects,
+  const ModelHighAPI_Double& theFuzzy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_SIMPLE(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theFuzzy, myfuzzyValue);
 
     execute(false);
   }
@@ -49,13 +51,15 @@ FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
 FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects)
+  const std::list<ModelHighAPI_Selection>& theToolObjects,
+  const ModelHighAPI_Double& theFuzzy)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
+    fillAttribute(theFuzzy, myfuzzyValue);
 
     execute(false);
   }
@@ -87,6 +91,14 @@ void FeaturesAPI_BooleanCommon::setToolObjects(
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanCommon::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
+{
+  fillAttribute(theFuzzy, myfuzzyValue);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanCommon::setAdvancedMode(const bool theMode)
 {
   if (theMode) {
@@ -111,12 +123,15 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanCommon::TOOL_LIST_ID());
+  double aFuzzy = aBase->real(FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID())->value();
 
   theDumper << "(" << aDocName << ", " << anObjects;
 
   if (aMode->value() == FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED()) {
     theDumper << ", " << aTools;
   }
+
+  theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
@@ -128,6 +143,7 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
 BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                            const std::list<ModelHighAPI_Selection>& theMainObjects,
                            const std::list<ModelHighAPI_Selection>& theToolObjects,
+                           const ModelHighAPI_Double& fuzzyParam,
                            const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
@@ -135,8 +151,8 @@ BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
     aFeature->data()->setVersion("");
   BooleanCommonPtr aCommon;
   if (theToolObjects.empty())
-    aCommon.reset(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects));
+    aCommon.reset(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects, fuzzyParam));
   else
-    aCommon.reset(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects, theToolObjects));
+    aCommon.reset(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects, theToolObjects, fuzzyParam));
   return aCommon;
 }

@@ -23,6 +23,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 
@@ -32,6 +33,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <sstream>
+
 
 static const std::string INTERSECTION_VERSION_1("v9.5");
 
@@ -45,6 +47,12 @@ void FeaturesPlugin_Intersection::initAttributes()
 {
   AttributePtr anObjectsAttr = data()->addAttribute(OBJECT_LIST_ID(),
                        ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
+  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
+  // that the internal algorithms should use their default fuzzy value, if none was specified
+  // by the user.
+  real(FUZZY_PARAM_ID())->setValue(1.e-8);
 
   initVersion(INTERSECTION_VERSION_1, anObjectsAttr, AttributePtr());
 }
@@ -60,11 +68,15 @@ void FeaturesPlugin_Intersection::execute()
     return;
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   int aResultIndex = 0;
 
   // Create result.
   const ListOfShape& anObjects = anObjectsHierarchy.objects();
-  GeomMakeShapePtr anIntersectionAlgo(new GeomAlgoAPI_Intersection(anObjects));
+  GeomMakeShapePtr anIntersectionAlgo(new GeomAlgoAPI_Intersection(anObjects, aFuzzy));
 
   // Checking that the algorithm worked properly.
   std::string anError;

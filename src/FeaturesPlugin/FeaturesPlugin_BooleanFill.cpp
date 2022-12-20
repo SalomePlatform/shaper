@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_BooleanFill.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 
@@ -38,6 +39,7 @@
 
 #include <algorithm>
 #include <map>
+
 
 //=================================================================================================
 FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
@@ -89,6 +91,10 @@ void FeaturesPlugin_BooleanFill::execute()
         keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);
   }
 
+  // Getting fuzzy parameter.
+  // Used as additional tolerance to eliminate tiny results.
+  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+
   // For solids cut each object with all tools.
   bool isOk = true;
   for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
@@ -103,12 +109,14 @@ void FeaturesPlugin_BooleanFill::execute()
       // compsolid handling
       isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_PARTITION,
                               anObjects, aParent, aTools.objects(), aPlanes,
+                              aFuzzy,
                               aResultIndex, aResultBaseAlgoList, aResultShapesList,
                               aResultCompound);
     } else {
       // process object as is
       isOk = processObject(GeomAlgoAPI_Tools::BOOL_PARTITION,
                            anObject, aTools.objects(), aPlanes,
+                           aFuzzy,
                            aResultIndex, aResultBaseAlgoList, aResultShapesList,
                            aResultCompound);
     }
@@ -122,8 +130,8 @@ void FeaturesPlugin_BooleanFill::execute()
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
-                                          aTools.objects(),
-                                          aResultCompound);
+                                    aTools.objects(),
+                                    aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

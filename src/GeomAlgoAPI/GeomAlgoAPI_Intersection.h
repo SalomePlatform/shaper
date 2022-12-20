@@ -34,15 +34,18 @@ class GeomAlgoAPI_Intersection : public GeomAlgoAPI_MakeShape
 public:
   /// \brief Constructor.
   /// \param[in] theObjects list of objects.
-  /// \param[in] theTools list of tools.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Intersection(const ListOfShape& theObjects);
+  /// \param[in] theFuzzy additional tolerance value.
+  ///            If the fuzzy value is below the minimum tolerance value (1.e-7), the
+  ///            algorithm will use the default internal fuzzy value from OCCT.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Intersection(const ListOfShape& theObjects,
+      const double theFuzzy = 1.e-8);
 
   /// Destructor to erase the filler
   GEOMALGOAPI_EXPORT virtual ~GeomAlgoAPI_Intersection();
 
 private:
   /// Builds resulting shape.
-  void build(const ListOfShape& theObjects);
+  void build(const ListOfShape& theObjects, const double theFuzzy);
 
 };
 
