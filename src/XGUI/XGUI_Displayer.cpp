@@ -36,6 +36,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultGroup.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -94,6 +95,12 @@
 
 /// defines the local context mouse selection sensitivity
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
+
+/// defines the display priority for results brought to front
+constexpr int FRONT_DISPLAY_PRIORITY = 8; /* = Graphic3d_DisplayPriority_Highlight-1 */
+
+/// defines the default (normal) display priority for all results
+constexpr int DEFAULT_DISPLAY_PRIORITY = 5; /* = Graphic3d_DisplayPriority_Normal */
 
 //#define DEBUG_DISPLAY
 //#define DEBUG_FEATURE_REDISPLAY
@@ -215,6 +222,13 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     int aDispMode = isShading? Shading : Wireframe;
     anAISIO->SetDisplayMode(aDispMode);
     aContext->Display(anAISIO, aDispMode, 0, false, AIS_DS_Displayed);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (ModelAPI_Tools::isBringToFront(aResult)) {
+      // NOTE: do not use a priority higher than 8 as highlight uses priority 9!
+      //       Any higher level prevents the highlight from being visible as it would
+      //       appear "behind" the Groups.
+      aContext->SetDisplayPriority(anAISIO, FRONT_DISPLAY_PRIORITY);
+    }
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
@@ -329,6 +343,13 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       Handle(ModuleBase_ResultPrs) aResPrs = Handle(ModuleBase_ResultPrs)::DownCast(aAISIO);
       if (!aResPrs.IsNull())
         aResPrs->updateIsoLines();
+
+      // Only support the "Bring To Front" command for Groups (for now)
+      ResultGroupPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aResult);
+      if (aGroup.get()) {
+        bool isInFront = ModelAPI_Tools::isBringToFront(aResult);
+        aContext->SetDisplayPriority(aAISIO, (isInFront ? FRONT_DISPLAY_PRIORITY : DEFAULT_DISPLAY_PRIORITY));
+      }
     }
     //myWorkshop->module()->storeSelection();
 

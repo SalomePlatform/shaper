@@ -144,6 +144,7 @@ signals:
   QAction* mySeparator1;
   QAction* mySeparator2;
   QAction* mySeparator3;
+  QAction* mySeparator4;
 };
 
 #endif

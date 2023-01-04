@@ -189,7 +189,7 @@ MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
 /// \param hasFolder will be set to true if one of folder is in the list
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult,
                            bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner,
-                           bool& hasResultInHistory, bool& hasFolder);
+                           bool& hasResultInHistory, bool& hasFolder, bool &hasGroupsOnly);
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for results of construction type

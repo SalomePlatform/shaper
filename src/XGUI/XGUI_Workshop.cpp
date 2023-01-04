@@ -1827,6 +1827,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(anObjects, XGUI_Displayer::Wireframe);
   else if (theId == "SHOW_EDGES_DIRECTION_CMD")
     toggleEdgesDirection(anObjects);
+  else if (theId == "BRING_TO_FRONT_CMD")
+    toggleBringToFront(anObjects);
   else if (theId == "HIDEALL_CMD") {
     QObjectPtrList aList = myDisplayer->displayedObjects();
     foreach (ObjectPtr aObj, aList) {
@@ -2034,8 +2036,9 @@ void XGUI_Workshop::deleteObjects()
   bool hasCompositeOwner = false;
   bool hasResultInHistory = false;
   bool hasFolder = false;
+  bool hasGroupsOnly = false;
   ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
-                                 hasResultInHistory, hasFolder);
+                                 hasResultInHistory, hasFolder, hasGroupsOnly);
   if (!(hasResult || hasFeature || hasParameter || hasFolder))
     return;
 
@@ -3079,6 +3082,23 @@ void XGUI_Workshop::toggleEdgesDirection(const QObjectPtrList& theList)
         }
       }
       ModelAPI_Tools::showEdgesDirection(aResult, aToShow);
+      myDisplayer->redisplay(anObj, false);
+    }
+  }
+  if (theList.size() > 0)
+    myDisplayer->updateViewer();
+}
+
+//**************************************************************
+void XGUI_Workshop::toggleBringToFront(const QObjectPtrList& theList)
+{
+  // Toggle the "BringToFront" state of all objects in the list
+  foreach(ObjectPtr anObj, theList) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL)
+    {
+      bool aBringToFront = !ModelAPI_Tools::isBringToFront(aResult);
+      ModelAPI_Tools::bringToFront(aResult, aBringToFront);
       myDisplayer->redisplay(anObj, false);
     }
   }

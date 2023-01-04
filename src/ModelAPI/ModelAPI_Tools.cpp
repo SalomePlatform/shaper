@@ -1194,6 +1194,31 @@ bool isShowEdgesDirection(std::shared_ptr<ModelAPI_Result> theResult)
   return false;
 }
 
+//******************************************************
+void bringToFront(std::shared_ptr<ModelAPI_Result> theResult, bool theFlag)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::BRING_TO_FRONT_ID());
+  if (aAttr.get() != NULL) {
+    aAttr->setValue(theFlag);
+  }
+}
+
+//******************************************************
+bool isBringToFront(std::shared_ptr<ModelAPI_Result> theResult)
+{
+  if (!theResult.get())
+    return false;
+
+  AttributeBooleanPtr aAttr = theResult->data()->boolean(ModelAPI_Result::BRING_TO_FRONT_ID());
+  if (aAttr.get() != NULL) {
+    return aAttr->value();
+  }
+  return false;
+}
+
 //**************************************************************
 void setTransparency(ResultPtr theResult, double theTransparency)
 {

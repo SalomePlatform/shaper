@@ -87,6 +87,14 @@ class ModelAPI_Result : public ModelAPI_Object
     return MY_SHOW_EDGES_DIRECTION_ID;
   }
 
+  /// Reference to the BringToFront flag of the result.
+  /// The bool value is used.
+  inline static const std::string& BRING_TO_FRONT_ID()
+  {
+    static const std::string MY_BRING_TO_FRONT_ID("Bring_To_Front");
+    return MY_BRING_TO_FRONT_ID;
+  }
+
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
   MODELAPI_EXPORT virtual bool isConcealed();
 

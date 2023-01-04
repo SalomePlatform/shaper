@@ -170,6 +170,10 @@ void XGUI_ContextMenuMgr::createActions()
   anAction->setCheckable(true);
   addAction("SHOW_ISOLINES_CMD", anAction);
 
+  anAction = ModuleBase_Tools::createAction(QIcon(), tr("Bring To Front"), aDesktop);
+  anAction->setCheckable(true);
+  addAction("BRING_TO_FRONT_CMD", anAction);
+
   mySeparator1 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator1->setSeparator(true);
 
@@ -178,6 +182,9 @@ void XGUI_ContextMenuMgr::createActions()
 
   mySeparator3 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator3->setSeparator(true);
+
+  mySeparator4 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
+  mySeparator4->setSeparator(true);
 
   anAction = ModuleBase_Tools::createAction(QIcon(":pictures/vertex.png"), tr("Vertices"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
@@ -327,8 +334,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasCompositeOwner = false;
     bool hasResultInHistory = false;
     bool hasFolder = false;
+    bool hasGroupsOnly = false;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                   hasCompositeOwner, hasResultInHistory, hasFolder);
+                                   hasCompositeOwner, hasResultInHistory, hasFolder, hasGroupsOnly);
     //Process Feature
     if (aSelected == 1) { // single selection
       ObjectPtr aObject = aObjects.first();
@@ -347,6 +355,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           }
           action("SHOW_EDGES_DIRECTION_CMD")->setEnabled(true);
           action("SHOW_EDGES_DIRECTION_CMD")->setChecked(ModelAPI_Tools::isShowEdgesDirection(aResult));
+
+          action("BRING_TO_FRONT_CMD")->setEnabled(hasGroupsOnly);
+          action("BRING_TO_FRONT_CMD")->setChecked(ModelAPI_Tools::isBringToFront(aResult));
 
           action("SHOW_ISOLINES_CMD")->setEnabled(true);
           action("SHOW_ISOLINES_CMD")->setChecked(ModelAPI_Tools::isShownIsoLines(aResult));
@@ -405,6 +416,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
         action("SHOW_EDGES_DIRECTION_CMD")->setEnabled(true);
+        action("BRING_TO_FRONT_CMD")->setEnabled(hasGroupsOnly);
         action("SHOW_ISOLINES_CMD")->setEnabled(true);
         action("ISOLINES_CMD")->setEnabled(true);
       }
@@ -603,6 +615,11 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
             action("SHOW_EDGES_DIRECTION_CMD")->setEnabled(true);
             action("SHOW_EDGES_DIRECTION_CMD")->setChecked(
               ModelAPI_Tools::isShowEdgesDirection(aResult));
+
+            // Only enable the "Bring To Front" command for Groups
+            ResultGroupPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aResult);
+            action("BRING_TO_FRONT_CMD")->setEnabled(aGroup.get() != NULL);
+            action("BRING_TO_FRONT_CMD")->setChecked(ModelAPI_Tools::isBringToFront(aResult));
           }
         }
       }
@@ -690,6 +707,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
 
   QActionsList aList;
 
+  //-------------------------------------
   // Result construction menu
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
@@ -705,7 +723,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
 
   //-------------------------------------
-  // Result body menu
+  // Result body/field/part menu
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
@@ -725,22 +743,26 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_FEATURE_CMD"));
   aList.append(mySeparator3);
   aList.append(action("DELETE_CMD"));
+  // Result body menu
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
-  // Group menu
+  // Field menu
   myObjBrowserMenus[ModelAPI_ResultField::group()] = aList;
   // Result part menu
   myObjBrowserMenus[ModelAPI_ResultPart::group()] = aList;
 
+  //-------------------------------------
+  // Group menu
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
   aList.append(action("SHOW_EDGES_DIRECTION_CMD"));
-  aList.append(mySeparator1); // this separator is not shown as this action is added after show only
-  // qt list container contains only one instance of the same action
+  aList.append(mySeparator1);
+  aList.append(action("BRING_TO_FRONT_CMD"));
+  aList.append(mySeparator2);
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator2);
+  aList.append(mySeparator3);
   aList.append(action("AUTOCOLOR_CMD"));
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
@@ -749,10 +771,10 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_ISOLINES_CMD"));
   aList.append(action("ISOLINES_CMD"));
   aList.append(action("SHOW_FEATURE_CMD"));
-  aList.append(mySeparator3);
+  aList.append(mySeparator4);
   aList.append(action("DELETE_CMD"));
-  // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
+
   //-------------------------------------
   // Feature menu
   aList.clear();
@@ -773,14 +795,17 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
 
+  //-------------------------------------
+  // Parameter menu
   aList.clear();
   aList.append(action("RENAME_CMD"));
   aList.append(mySeparator1);
   aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
-  //-------------------------------------
 
+  //-------------------------------------
+  // Folder menu
   aList.clear();
   aList.append(action("RENAME_CMD"));
   aList.append(action("DELETE_CMD"));
@@ -798,7 +823,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
 void XGUI_ContextMenuMgr::buildViewerMenu()
 {
   QActionsList aList;
-  // Result construction menu
+  // Result construction/part menu
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
   aList.append(action("TRANSPARENCY_CMD"));
@@ -809,8 +834,8 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(action("HIDE_CMD"));
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
-  // Result part menu
   myViewerMenu[ModelAPI_ResultPart::group()] = aList;
+
   //-------------------------------------
   // Result body menu
   aList.clear();
@@ -830,9 +855,30 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(action("HIDE_CMD"));
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
-  // Group menu
-  myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
   myViewerMenu[ModelAPI_ResultField::group()] = aList;
+
+  //-------------------------------------
+  // Group menu
+  aList.clear();
+  aList.append(action("WIREFRAME_CMD"));
+  aList.append(action("SHADING_CMD"));
+  aList.append(action("SHOW_EDGES_DIRECTION_CMD"));
+  aList.append(mySeparator1);
+  aList.append(action("BRING_TO_FRONT_CMD"));
+  aList.append(mySeparator2);
+  aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
+  aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(action("SHOW_ISOLINES_CMD"));
+  aList.append(action("ISOLINES_CMD"));
+  aList.append(mySeparator3);
+  aList.append(action("SET_VIEW_NORMAL_CMD"));
+  aList.append(action("SET_VIEW_INVERTEDNORMAL_CMD"));
+  aList.append(mySeparator4);
+  aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(action("HIDE_CMD"));
+  myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
+
   //-------------------------------------
   // Step objects menu
   aList.clear();
@@ -863,15 +909,17 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       anActions.append(action("SHADING_CMD"));
       anActions.append(action("SHOW_EDGES_DIRECTION_CMD"));
       anActions.append(mySeparator1);
+      anActions.append(action("BRING_TO_FRONT_CMD"));
+      anActions.append(mySeparator2);
       anActions.append(action("SHOW_CMD"));
       anActions.append(action("HIDE_CMD"));
       anActions.append(action("SHOW_ONLY_CMD"));
-      anActions.append(mySeparator2);
+      anActions.append(mySeparator3);
       anActions.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
       anActions.append(action("ADD_TO_FOLDER_AFTER_CMD"));
       anActions.append(action("ADD_OUT_FOLDER_BEFORE_CMD"));
       anActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
-      anActions.append(mySeparator3);
+      anActions.append(mySeparator4);
       anActions.append(action("MOVE_CMD"));
       anActions.append(action("MOVE_SPLIT_CMD"));
       anActions.append(action("COLOR_CMD"));
