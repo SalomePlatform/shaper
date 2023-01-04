@@ -239,6 +239,9 @@ Q_OBJECT
   /// Toggle visualisation of edges direction
   void toggleEdgesDirection(const QObjectPtrList& theList);
 
+  /// Toggle state of display priority (normal/in front)
+  void toggleBringToFront(const QObjectPtrList& theList);
+
   /// Set selection mode in viewer. If theMode=-1 then activate default mode
   /// \param theMode the selection mode (according to TopAbs_ShapeEnum)
   void setViewerSelectionMode(int theMode);

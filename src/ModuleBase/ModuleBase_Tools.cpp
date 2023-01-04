@@ -446,7 +446,7 @@ int shapeType(const QString& theType)
 
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature,
                   bool& hasParameter, bool& hasCompositeOwner, bool& hasResultInHistory,
-                  bool& hasFolder)
+                  bool& hasFolder, bool &hasGroupsOnly)
 {
   hasResult = false;
   hasFeature = false;
@@ -454,9 +454,11 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
   hasCompositeOwner = false;
   hasResultInHistory = false;
   hasFolder = false;
+  bool hasNonGroup = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    ResultGroupPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObj);
     FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
     FieldStepPtr aStep = std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObj);
@@ -465,6 +467,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasFeature |= (aFeature.get() != NULL);
     hasFolder |= (aFolder.get() != NULL);
     hasParameter |= (aConstruction.get() != NULL);
+    hasNonGroup |= (aGroup.get() == NULL);
     if (hasFeature)
       hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
     else if (aResult.get())
@@ -475,9 +478,10 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
       hasResultInHistory = aFeature.get() && aFeature->isInHistory();
     }
 
-    if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
+    if (hasFeature && hasResult && hasParameter && hasCompositeOwner && hasNonGroup)
       break;
   }
+  hasGroupsOnly = !hasNonGroup;
 }
 
 void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,

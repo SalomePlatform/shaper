@@ -232,6 +232,10 @@
         <source>Show edges direction</source>
         <translation>Afficher la direction des bords</translation>
     </message>
+    <message>
+        <source>Bring To Front</source>
+        <translation>Afficher au premier plan</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>
