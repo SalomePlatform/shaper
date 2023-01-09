@@ -1,4 +1,3 @@
-
 Python addons
 =============
 
@@ -19,7 +18,8 @@ Some examples of already created custom features are:
    :titlesonly:
    :maxdepth: 1
 
-   rectangleFeature.rst
    compoundVerticesFeature.rst
    importParametersFeature.rst
+   midSurfaceFeature.rst
+   rectangleFeature.rst
    pipeNetworkFeature.rst

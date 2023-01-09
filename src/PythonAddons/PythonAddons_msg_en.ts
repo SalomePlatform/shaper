@@ -63,6 +63,30 @@
     </message>
   </context>
 
+  <!-- midSurface -->
+  <context>
+    <name>midSurface</name>
+    <message>
+      <source>Fibre neutre</source>
+      <translation>Create midsurfaces</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Create midsurfaces</translation>
+    </message>
+  </context>
+  <context>
+    <name>midSurface:file_path</name>
+    <message>
+      <source>Import file</source>
+      <translation>CAD file of the object</translation>
+    </message>
+    <message>
+      <source>Select file</source>
+      <translation>Select the CAD file of the object</translation>
+    </message>
+  </context>
+
   <!-- pipeNetwork -->
   <context>
     <name>pipeNetwork</name>

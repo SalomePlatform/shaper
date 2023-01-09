@@ -63,6 +63,30 @@
     </message>
   </context>
 
+  <!-- midSurface -->
+  <context>
+    <name>midSurface</name>
+    <message>
+      <source>Fibre neutre</source>
+      <translation>Créer des fibres neutres</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Créer des fibres neutres</translation>
+    </message>
+  </context>
+  <context>
+    <name>midSurface:file_path</name>
+    <message>
+      <source>Import file</source>
+      <translation>Fichier CAO de l'objet à traiter</translation>
+    </message>
+    <message>
+      <source>Select file</source>
+      <translation>Choisir le fichier de type CAO contenant l'objet à traiter</translation>
+    </message>
+  </context>
+
   <!-- pipeNetwork -->
   <context>
     <name>pipeNetwork</name>
