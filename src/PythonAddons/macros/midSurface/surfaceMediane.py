@@ -2089,6 +2089,9 @@ Sorties :
 # 1. Définition de la pièce
 
       self.part_doc = model.activeDocument()
+      if ( self.part_doc.kind() == "PartSet" ):
+        part = model.addPart(self.part_doc)
+        self.part_doc = part.document()
 
 # 2. Import de la CAO
 
