@@ -34,7 +34,6 @@ alexandre.prunie@blastsolutions.io
 guillaume.schweitzer@blastsolutions.io
 
 Gérald NICOLAS
-+33.1.78.19.43.52
 """
 
 __revision__ = "V10.48"
