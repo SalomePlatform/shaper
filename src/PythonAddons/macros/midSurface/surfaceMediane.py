@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V10.48"
+__revision__ = "V10.49"
 
 #========================= Les imports - Début ===================================
 
@@ -1819,6 +1819,7 @@ Sorties :
       texte = "Création de la boite englobante pour l'objet '{}' ".format(objet.name())
       texte += "de type '{}'".format(objet.shapeType())
       print (texte)
+    #print ('bbox = model.getBoundingBox(self.part_doc, model.selection("{}", "{}"))'.format(objet.shapeType(),objet.name()))
     bbox = model.getBoundingBox(self.part_doc, model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
 
     bbox_nom = bbox.name()
@@ -2449,12 +2450,13 @@ Sorties :
 if __name__ == "__main__" :
 
 # 1. Options
+  FIC_CAO = os.path.join(os.getenv("HOME"), "dev", "git", "shaper", "src", "PythonAddons", "macros", "midSurface", "midSurface.stp")
 
   L_OPTIONS = list()
+  #L_OPTIONS.append("-h")
+  #L_OPTIONS.append("-v")
   L_OPTIONS.append("-vmax")
   #L_OPTIONS.append("-export_step")
-  FIC_CAO = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "macros", "midSurface", "midSurface.stp")
-  #FIC_CAO = os.path.join(os.getenv("HOME"), "salome-dev", "DEV_package", "modules", "src", "SHAPER", "src", "PythonAddons", "macros", "midSurface", "Objet_1.stp")
 
 # 2. Lancement de la classe
 
