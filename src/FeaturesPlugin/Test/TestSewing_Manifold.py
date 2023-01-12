@@ -18,41 +18,7 @@
 #
 
 from salome.shaper import model
-from GeomAPI import GeomAPI_Shape
 
-aShapeTypes = {
-  GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
-  GeomAPI_Shape.FACE:   "GeomAPI_Shape.FACE",
-  GeomAPI_Shape.EDGE:   "GeomAPI_Shape.EDGE",
-  GeomAPI_Shape.VERTEX: "GeomAPI_Shape.VERTEX"}
-
-def testNbUniqueSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
-  """ Tests number of unique feature sub-shapes of passed type for each result.
-  :param theFeature: feature to test.
-  :param theShapeType: shape type of sub-shapes to test.
-  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  aListSize = len(theExpectedNbSubShapes)
-  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
-  for anIndex in range(0, aNbResults):
-    aNbResultSubShapes = 0
-    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
-    aNbResultSubShapes = aResults[anIndex].shape().subShapes(theShapeType, True).size()
-    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
-
-def testResults(theFeature,theModel,NbRes,NbSubRes,NbShell,NbFace,NbEdge,NbVertex):
-  """ Tests numbers of unique sub-shapes in the results
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  assert (aNbResults == NbRes), "Number of results: {} not equal to {}}.".format(aNbResults, NbRes)
-  theModel.testNbSubResults(theFeature, NbSubRes)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SHELL, NbShell)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
 
 # Create document
 model.begin()
@@ -89,7 +55,7 @@ Sewing_1a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_1a, model, 1, [0], [1], [10], [23], [14])
+model.testResults(Sewing_1a, 1, [0], [1], [10], [23], [14])
 
 # =============================================================================
 # Test 1b. Sew two shells with a single common edge (do not create result)
@@ -101,7 +67,7 @@ Sewing_1b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_1b, model, 1, [0], [1], [10], [23], [14])
+model.testResults(Sewing_1b, 1, [0], [1], [10], [23], [14])
 
 # =============================================================================
 # Test 2a. Sew two shells with four common edges (create result)
@@ -115,7 +81,7 @@ Sewing_2a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_2a, model, 1, [0], [1], [10], [20], [12])
+model.testResults(Sewing_2a, 1, [0], [1], [10], [20], [12])
 
 # =============================================================================
 # Test 2b. Sew two shells with four common edges (do not create result)
@@ -127,7 +93,7 @@ Sewing_2b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_2b, model, 1, [0], [1], [10], [20], [12])
+model.testResults(Sewing_2b, 1, [0], [1], [10], [20], [12])
 
 # =============================================================================
 # Test 3a. Sew two slightly disconnected shells (create result)
@@ -141,7 +107,7 @@ Sewing_3a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # no sewing done (result is a compound with the two input shells)
-testResults(Sewing_3a, model, 1, [2], [2], [10], [24], [16])
+model.testResults(Sewing_3a, 1, [2], [2], [10], [24], [16])
 
 # =============================================================================
 # Test 3b. Sew two slightly disconnected shells (do not create result)
@@ -167,7 +133,7 @@ Sewing_4a = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_4a, model, 1, [0], [1], [10], [20], [12])
+model.testResults(Sewing_4a, 1, [0], [1], [10], [20], [12])
 
 # =============================================================================
 # Test 4b. Sew two slightly disconnected shells with larger tolerance (do not create result)
@@ -179,4 +145,4 @@ Sewing_4b = model.addSewing(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), 
 model.end()
 
 # sewing successful
-testResults(Sewing_4b, model, 1, [0], [1], [10], [20], [12])
+model.testResults(Sewing_4b, 1, [0], [1], [10], [20], [12])

@@ -123,6 +123,50 @@ def testNbSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
     assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
 
 
+def testNbUniqueSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
+  """ Tests number of unique feature sub-shapes of passed type for each result.
+  :param theFeature: feature to test.
+  :param theShapeType: shape type of sub-shapes to test.
+  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
+  """
+  aResults = theFeature.feature().results()
+  aNbResults = len(aResults)
+  aListSize = len(theExpectedNbSubShapes)
+  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
+  for anIndex in range(0, aNbResults):
+    aNbResultSubShapes = 0
+    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
+    aNbResultSubShapes = aResults[anIndex].shape().subShapes(theShapeType, True).size()
+    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
+
+
+def testCompound(theFeature, NbSubRes, NbSolid, NbFace, NbEdge, NbVertex):
+  """ Tests number of unique sub-shapes in compound result
+  """
+  aResults = theFeature.feature().results()
+  aNbResults = len(aResults)
+  assert (aNbResults == 1), "Number of results: {} not equal to 1.".format(aNbResults)
+  assert aResults[0].shape().isCompound(), "Result shape type: {}. Expected: COMPOUND.".format(aResults[0].shape().shapeTypeStr())
+  testNbSubResults(theFeature, NbSubRes)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SOLID, NbSolid)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
+
+
+def testResults(theFeature, NbRes, NbSubRes, NbShell, NbFace, NbEdge, NbVertex):
+  """ Tests numbers of unique sub-shapes in the results
+  """
+  aResults = theFeature.feature().results()
+  aNbResults = len(aResults)
+  assert (aNbResults == NbRes), "Number of results: {} not equal to {}}.".format(aNbResults, NbRes)
+  testNbSubResults(theFeature, NbSubRes)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SHELL, NbShell)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
+
+
 def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 7):
   """ Tests results volumes.
   :param theFeature: feature to test.

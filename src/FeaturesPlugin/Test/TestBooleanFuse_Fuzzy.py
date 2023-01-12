@@ -20,28 +20,6 @@
 from salome.shaper import model
 from GeomAPI import GeomAPI_Shape
 
-aShapeTypes = {
-  GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
-  GeomAPI_Shape.FACE:   "GeomAPI_Shape.FACE",
-  GeomAPI_Shape.EDGE:   "GeomAPI_Shape.EDGE",
-  GeomAPI_Shape.VERTEX: "GeomAPI_Shape.VERTEX"}
-
-def testNbUniqueSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
-  """ Tests number of unique feature sub-shapes of passed type for each result.
-  :param theFeature: feature to test.
-  :param theShapeType: shape type of sub-shapes to test.
-  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  aListSize = len(theExpectedNbSubShapes)
-  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
-  for anIndex in range(0, aNbResults):
-    aNbResultSubShapes = 0
-    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
-    aNbResultSubShapes = aResults[anIndex].shape().subShapes(theShapeType, True).size()
-    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
-
 
 model.begin()
 partSet = model.moduleDocument()
@@ -64,10 +42,10 @@ model.do()
 
 model.testNbResults(Fuse_1, 1)
 model.testNbSubResults(Fuse_1, [0])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [1])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.FACE, [11])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [24])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [15])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [1])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.FACE, [11])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [24])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [15])
 model.testResultsVolumes(Fuse_1, [2000.02000010])
 
 ### Set a higher fuzzy value
@@ -78,8 +56,8 @@ model.end()
 
 model.testNbResults(Fuse_1, 1)
 model.testNbSubResults(Fuse_1, [0])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [1])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.FACE, [10])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [20])
-testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [12])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [1])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.FACE, [10])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [20])
+model.testNbUniqueSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [12])
 model.testResultsVolumes(Fuse_1, [2000.02166677])
