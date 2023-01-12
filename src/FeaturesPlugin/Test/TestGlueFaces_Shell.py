@@ -18,42 +18,7 @@
 #
 
 from salome.shaper import model
-from GeomAPI import GeomAPI_Shape
 
-aShapeTypes = {
-  GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
-  GeomAPI_Shape.FACE:   "GeomAPI_Shape.FACE",
-  GeomAPI_Shape.EDGE:   "GeomAPI_Shape.EDGE",
-  GeomAPI_Shape.VERTEX: "GeomAPI_Shape.VERTEX"}
-
-def testNbUniqueSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
-  """ Tests number of unique feature sub-shapes of passed type for each result.
-  :param theFeature: feature to test.
-  :param theShapeType: shape type of sub-shapes to test.
-  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  aListSize = len(theExpectedNbSubShapes)
-  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
-  for anIndex in range(0, aNbResults):
-    aNbResultSubShapes = 0
-    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
-    aNbResultSubShapes = aResults[anIndex].shape().subShapes(theShapeType, True).size()
-    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
-
-def testCompound(theFeature,theModel,NbSubRes,NbSolid,NbFace,NbEdge,NbVertex):
-  """ Tests numbers of unique sub-shapes in compound result
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  assert (aNbResults == 1), "Number of results: {} not equal to 1.".format(aNbResults)
-  assert aResults[0].shape().isCompound(), "Result shape type: {}. Expected: COMPOUND.".format(aResults[0].shape().shapeTypeStr())
-  theModel.testNbSubResults(theFeature, NbSubRes)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SOLID, NbSolid)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
 
 # Create document
 model.begin()
@@ -80,7 +45,7 @@ GlueFaces_1 = model.addGlueFaces(Part_1_doc, [model.selection("SHELL", "Shell_1_
 model.end()
 
 # gluing successful
-testCompound(GlueFaces_1, model, [2], [0], [3], [10], [8])
+model.testCompound(GlueFaces_1, [2], [0], [3], [10], [8])
 
 # =============================================================================
 # Test 2. Glue faces for 2 shells with 1 common edge only
@@ -94,7 +59,7 @@ GlueFaces_2 = model.addGlueFaces(Part_1_doc, [model.selection("SHELL", "Shell_1_
 model.end()
 
 # gluing successful
-testCompound(GlueFaces_2, model, [2], [0], [4], [13], [10])
+model.testCompound(GlueFaces_2, [2], [0], [4], [13], [10])
 
 # =============================================================================
 # Test 3. Glue faces for 2 shells with 2 adjacent faces above default tolerance
@@ -110,7 +75,7 @@ GlueFaces_3 = model.addGlueFaces(Part_1_doc, [model.selection("SHELL", "Shell_1_
 model.end()
 
 # no faces glued
-testCompound(GlueFaces_3, model, [2], [0], [4], [14], [12])
+model.testCompound(GlueFaces_3, [2], [0], [4], [14], [12])
 
 # =============================================================================
 # Test 4. Glue faces for 2 solids with 2 adjacent faces using different tolerance
@@ -123,7 +88,7 @@ GlueFaces_4 = model.addGlueFaces(Part_1_doc, [model.selection("SHELL", "Shell_1_
 model.end()
 
 # gluing successful
-testCompound(GlueFaces_4, model, [2], [0], [3], [10], [8])
+model.testCompound(GlueFaces_4, [2], [0], [3], [10], [8])
 
 # =============================================================================
 # Test 5. Check Python dump

@@ -8,40 +8,6 @@ from GeomAPI import GeomAPI_Shape
 
 from salome.shaper import model
 
-aShapeTypes = {
-  GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
-  GeomAPI_Shape.FACE:   "GeomAPI_Shape.FACE",
-  GeomAPI_Shape.EDGE:   "GeomAPI_Shape.EDGE",
-  GeomAPI_Shape.VERTEX: "GeomAPI_Shape.VERTEX"}
-
-def testNbUniqueSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
-  """ Tests number of unique feature sub-shapes of passed type for each result.
-  :param theFeature: feature to test.
-  :param theShapeType: shape type of sub-shapes to test.
-  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  aListSize = len(theExpectedNbSubShapes)
-  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
-  for anIndex in range(0, aNbResults):
-    aNbResultSubShapes = 0
-    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
-    aNbResultSubShapes = aResults[anIndex].shape().subShapes(theShapeType, True).size()
-    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
-
-def testResults(theFeature,theModel,NbRes,NbSubRes,NbShell,NbFace,NbEdge,NbVertex):
-  """ Tests numbers of unique sub-shapes in the results
-  """
-  aResults = theFeature.feature().results()
-  aNbResults = len(aResults)
-  assert (aNbResults == NbRes), "Number of results: {} not equal to {}}.".format(aNbResults, NbRes)
-  theModel.testNbSubResults(theFeature, NbSubRes)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SHELL, NbShell)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
-  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
-
 
 model.begin()
 partSet = model.moduleDocument()
@@ -149,13 +115,17 @@ model.testNbSubShapes(Group_2, GeomAPI_Shape.EDGE, [4])
 Sewing_1 = model.addSewing(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")], 0.0001, allowNonManifold = True, alwaysCreateResult = False)
 model.do()
 
-testResults(Sewing_1, model, 1, [0], [1], [2], [7], [6])
+model.testResults(Sewing_1, 1, [0], [1], [2], [7], [6])
 
 # Move the groups after Sewing (move to the end)
 Part_1_doc.moveFeature(Group_1.feature(), Sewing_1.feature())
 Part_1_doc.moveFeature(Group_2.feature(), Sewing_1.feature())
 model.end()
 
+print("-------------------------------------------------------------------------")
+print("IMPORTANT NOTE:")
+print("The following checks will fail, as long as bos #33216 does not get fixed!")
+print("-------------------------------------------------------------------------")
 model.testNbResults(Group_1, 1)
 model.testNbSubShapes(Group_1, GeomAPI_Shape.EDGE, [4])
 model.testNbResults(Group_2, 1)
@@ -172,7 +142,7 @@ model.begin()
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
 model.do()
 
-testResults(Shell_1, model, 2, [0,0], [1,1], [1,1], [4,4], [4,4])
+model.testResults(Shell_1, 2, [0,0], [1,1], [1,1], [4,4], [4,4])
 model.testNbSubShapes(Shell_1, GeomAPI_Shape.EDGE, [4,4])
 
 # Move the groups after Shell (move to the end)
