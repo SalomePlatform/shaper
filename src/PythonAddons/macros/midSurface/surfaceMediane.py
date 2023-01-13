@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V10.52"
+__revision__ = "V10.53"
 
 #========================= Les imports - Début ===================================
 
@@ -433,20 +433,16 @@ Sorties :
     """
 
     nom_fonction = __name__ + "/_couleur_objet"
-    blabla = "Dans {} :\n".format(nom_fonction)
+    blabla = "Dans {} :".format(nom_fonction)
 
     if self._verbose_max:
-      prefixe = ""
-      for _ in range(n_recur):
-        prefixe += "\t"
-      texte = "\n{}{}".format(prefixe,blabla)
-      texte += "{}n_recur = {}".format(prefixe,n_recur)
-      texte += "\n{}RGB = ({},{},{})".format(prefixe,coul_r,coul_g,coul_b)
-      print (texte)
+      print (blabla)
+      print_tab(n_recur, "objet : ", objet.name())
+      print_tab(n_recur, "RGB = ({},{},{})".format(coul_r,coul_g,coul_b))
 
 # 1. Au premier passage, il faut garder la référence au résultat principal
 
-    if ( n_recur ==  0 ):
+    if ( n_recur == 0 ):
       objet_0 = objet.result()
     else:
       objet_0 = objet
@@ -456,10 +452,10 @@ Sorties :
     nb_sub_results = objet_0.numberOfSubs()
 
     if self._verbose_max:
-      texte = "{}Examen de l'objet '{}' ".format(prefixe,objet_0.name())
-      texte += "de type '{}' ".format(objet_0.shapeType())
+      print_tab(n_recur, "Examen de l'objet ",objet_0.name())
+      texte = "de type '{}' ".format(objet_0.shapeType())
       texte += "et de {} sous-objets".format(nb_sub_results)
-      print (texte)
+      print_tab(n_recur, texte)
 
     for n_sobj in range(nb_sub_results):
 
@@ -469,8 +465,7 @@ Sorties :
 
 # 2.2. Cet objet n'a pas de sous-objets : on le colore
     if self._verbose_max:
-      texte = "{}Couleur affectée à l'objet '{}' ".format(prefixe,objet_0.name())
-      print (texte)
+      print_tab(n_recur, "Couleur affectée à l'objet ",objet_0.name())
     objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
 
     #print ("sortie de {}".format(nom_fonction))
@@ -842,13 +837,15 @@ Entrées :
     """
 
     nom_fonction = __name__ + "/_cree_face_mediane_0"
-    blabla = "\nDans {} :\n".format(nom_fonction)
+    blabla = "\nDans {} :".format(nom_fonction)
 
     if self._verbose_max:
       print (blabla)
 
 # 1. Nom de la face
     nom_face = self.nom_solide+"_M"
+    if self._verbose_max:
+      print_tab (n_recur,"Nom de la face créée : ", nom_face)
     #if ( self.nom_solide_aux != self.objet_principal.name() ):
       #nom_face += "S"
     face.setName(nom_face)
@@ -970,6 +967,7 @@ Entrées :
   :vnor_x, vnor_y, vnor_z: coordonnées du vecteur normal
   :taille: estimation de la taille de la future face
   :d_face_1_2: la distance entre les deux faces
+  :n_recur: niveau de récursivité
 
 Sorties :
   :face: la face médiane
@@ -1066,25 +1064,53 @@ Sorties :
       face = self._cree_face_mediane_plane_2 ( nom_sketch, nom_normal, nom_solide, distance, iaux )
 
       if face.results():
-        # Si on traite un objet solide unique, on le récupère
-        if ( self.nom_solide_aux == self.objet_principal.name() ):
-          if self._verbose_max:
-            print_tab (n_recur, "On traite un objet solide unique ==> on le récupère.")
-          Recover_2 = model.addRecover(self.part_doc, face, [Recover_1.result()])
-          Recover_2.result().setName("{}_S".format(self.nom_solide_aux))
-        nb_inter = face.result().numberOfSubs()
-        if self._verbose_max:
-          print_tab (n_recur, "Nombre d'intersections : ", nb_inter)
-        # Une seule intersection : c'est la bonne
-        # Sinon, c'est que le solide est trop mince. On fusionnerait les faces.
-        if (nb_inter > 1 ):
-          face = self._cree_face_mediane_plane_3 ( face )
+        face = self._cree_face_mediane_plane_11 ( face, Recover_1, n_recur )
         break
       # Si l'intersection est vide, on la translate dans l'autre sens
       else:
         if self._verbose_max:
           print_tab (n_recur, "L'intersection est vide.")
         face = None
+
+    return face
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _cree_face_mediane_plane_11 ( self, face, Recover_1, n_recur ):
+    """Crée la face médiane entre deux autres - cas des surfaces planes
+
+Création des objets temporaires et de la face médiane
+
+Entrées :
+  :face: la face médiane
+  :Recover_1: la récupératiuon du solide
+  :n_recur: niveau de récursivité
+
+Sorties :
+  :face: la face médiane
+    """
+
+    nom_fonction = __name__ + "/_cree_face_mediane_plane_11"
+    blabla = "\nDans {} :".format(nom_fonction)
+    if self._verbose_max:
+      print (blabla)
+      print_tab (n_recur, "face : ", face.name())
+
+    # Si on traite un objet solide unique, on le récupère
+    if ( self.nom_solide_aux == self.objet_principal.name() ):
+      if self._verbose_max:
+        print_tab (n_recur, "On traite un objet solide unique ==> on le récupère.")
+      Recover_2 = model.addRecover(self.part_doc, face, [Recover_1.result()])
+      Recover_2.result().setName("{}_S".format(self.nom_solide_aux))
+
+    nb_inter = face.result().numberOfSubs()
+    if self._verbose_max:
+      print_tab (n_recur, "Nombre d'intersections : ", nb_inter)
+
+    if (nb_inter > 1 ):
+      face = self._cree_face_mediane_plane_3 ( face )
 
     return face
 
@@ -1206,7 +1232,7 @@ Sorties :
     if not erreur:
       face = self._cree_face_mediane_cylindre_1 ( coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon, hauteur )
     else:
-      self._couleur_objet (solide, coul_r=0, coul_g=0, coul_b=255)
+      self._couleur_objet (solide, n_recur, coul_r=0, coul_g=0, coul_b=255)
       face = None
 
     return erreur, face
@@ -1687,7 +1713,7 @@ Sorties :
       print_tab (n_recur, "face_2 : ", caract_face_2)
 
 #   Caractéristiques des cones
-    coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur = self._cree_face_mediane_cone_0 ( geompy, caract_face_1, caract_face_2 )
+    coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur = self._cree_face_mediane_cone_0 ( geompy, caract_face_1, caract_face_2, n_recur )
 
 #   Contrôle de la validité de l'épaisseur (bidon)
     erreur = self._verif_epaisseur ( EP_MIN*10. )
@@ -2342,8 +2368,11 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _surf_objet_shaper_1 (self):
+  def _surf_objet_shaper_1 (self, n_recur=0):
     """Gestion des surfaces médianes créées
+
+Entrées :
+  :n_recur: niveau de récursivité
 
 Sorties :
   :erreur: code d'erreur
@@ -2363,7 +2392,7 @@ Sorties :
         texte = "1 face pose"
       else:
         texte = "{} faces posent".format(self.faces_pb_nb)
-      print ("\n{} problème.\n{}".format(texte,self.faces_pb_msg))
+      print_tab (n_recur, "{} problème.".format(texte), self.faces_pb_msg, saut_av=True)
 
 # 2. Si plus d'une face a été créée
     if ( len(self.l_faces_m) > 1 ):
@@ -2371,7 +2400,7 @@ Sorties :
 # 2.1. Partition du paquet de faces
 
       if self._verbose_max:
-        print ("Partitionnnement des faces créées.")
+        print_tab (n_recur, "Partitionnnement des faces créées.")
 
       l_objets = list()
       for (face,_) in self.l_faces_m:
@@ -2382,12 +2411,12 @@ Sorties :
       Partition_1.result().setName("{}_M".format(self.objet_principal.name()))
       for iaux, (face,_) in enumerate(self.l_faces_m):
         Partition_1.result().subResult(iaux).setName("{}".format(face.name()))
-      self._couleur_objet (Partition_1, coul_r=0, coul_g=170, coul_b=0)
+      self._couleur_objet (Partition_1, n_recur, coul_r=0, coul_g=170, coul_b=0)
 
 # 2.2. Récupération des faces individuelles
 
       if self._verbose_max:
-        print ("Récupération des faces individuelles.")
+        print_tab (n_recur, "Récupération des faces individuelles.")
 
       l_objets = list()
       for iaux, (face,_) in enumerate(self.l_faces_m):
@@ -2401,7 +2430,7 @@ Sorties :
 # 2.3. Mise en dossier
 
       if self._verbose_max:
-        print ("Mise en dossier.")
+        print_tab (n_recur, "Mise en dossier.")
 
       for (face,fonction_0) in self.l_faces_m:
         dossier = model.addFolder(self.part_doc, fonction_0, face)
