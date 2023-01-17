@@ -36,7 +36,7 @@ if __name__ == '__main__':
     testdatafile = sys.argv[2]
 
   tempfile = tempfile.NamedTemporaryFile()
-  testlogfile = tempfile.name
+  testlogfile = tempfile.name + "_" + hdffile.replace(".", "_")
   tempfile.close()
 
   isOk = True
