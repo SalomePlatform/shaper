@@ -22,6 +22,10 @@
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
+
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -37,8 +41,11 @@ FeaturesAPI_Partition::FeaturesAPI_Partition(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    bool aUseFuzzy = (theFuzzy.value() > 0);
+    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(theFuzzy, myfuzzyParam);
+    fillAttribute(aUseFuzzy, myuseFuzzy);
+    fillAttribute(aFuzzy, myfuzzyParam);
     execute();
   }
 }
@@ -53,6 +60,14 @@ FeaturesAPI_Partition::~FeaturesAPI_Partition()
 void FeaturesAPI_Partition::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
   fillAttribute(theBaseObjects, mybaseObjects);
+
+  execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Partition::setUseFuzzy(bool theUseFuzzy)
+{
+  fillAttribute(theUseFuzzy, myuseFuzzy);
 
   execute();
 }
@@ -73,11 +88,13 @@ void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
+  bool aUseFuzzy = aBase->boolean(FeaturesPlugin_Partition::USE_FUZZY_ID())->value();
   double aFuzzy = aBase->real(FeaturesPlugin_Partition::FUZZY_PARAM_ID())->value();
 
   theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects;
 
-  theDumper << ", fuzzyParam = " << aFuzzy;
+  if (aUseFuzzy)
+    theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";

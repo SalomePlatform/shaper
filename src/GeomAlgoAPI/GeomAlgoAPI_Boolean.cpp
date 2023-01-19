@@ -32,7 +32,7 @@
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const GeomShapePtr theTool,
                                          const GeomAlgoAPI_Tools::BOPType theOperationType,
-                                         const double theFuzzy/*= 1.e-8*/)
+                                         const double theFuzzy/*= -1*/)
 {
   ListOfShape aListWithObject, aListWithTool;
   aListWithObject.push_back(theObject);
@@ -44,7 +44,7 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
                                          const GeomAlgoAPI_Tools::BOPType theOperationType,
-                                         const double theFuzzy/*= 1.e-8*/)
+                                         const double theFuzzy/*= -1*/)
 {
   ListOfShape aListWithObject;
   aListWithObject.push_back(theObject);
@@ -55,7 +55,7 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
                                          const GeomAlgoAPI_Tools::BOPType theOperationType,
-                                         const double theFuzzy/*= 1.e-8*/)
+                                         const double theFuzzy/*= -1*/)
 {
   build(theObjects, theTools, theOperationType, theFuzzy);
 }
@@ -116,9 +116,9 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   aBuilder->SetRunParallel(bRunParallel);
 
   // Set fuzzy value to eliminate thin results
-  // => Either use the value set by the user (greater or equal than minimum valid value 1.e-7)
+  // => Either use the value set by the user (if positive)
   // => or use the old default value of 1.e-5
-  Standard_Real aFuzzy = (theFuzzy >= 1.e-7 ? theFuzzy : 1.e-5);
+  Standard_Real aFuzzy = (theFuzzy > 0 ? theFuzzy : 1.e-5);
   aBuilder->SetFuzzyValue(aFuzzy);
 
   // Building and getting result.

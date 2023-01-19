@@ -67,7 +67,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects, const double
   aDSFiller->SetRunParallel(false);
   aDSFiller->SetNonDestructive(false);
   aDSFiller->SetGlue(BOPAlgo_GlueOff);
-  if (theFuzzy >= 1.e-7) aDSFiller->SetFuzzyValue(theFuzzy);
+  if (theFuzzy > 0) aDSFiller->SetFuzzyValue(theFuzzy);
 
   // optimization for the issue #2399
   BOPAlgo_SectionAttribute theSecAttr(Standard_True,
@@ -83,7 +83,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects, const double
   anOperation->SetArguments(anObjects);
   anOperation->SetRunParallel(false);
   anOperation->SetCheckInverted(true);
-  if (theFuzzy >= 1.e-7) anOperation->SetFuzzyValue(theFuzzy);
+  if (theFuzzy > 0) anOperation->SetFuzzyValue(theFuzzy);
 
   anOperation->PerformWithFiller(*aDSFiller); // it references a filler fields, so keep the filler
   myFiller = 0;

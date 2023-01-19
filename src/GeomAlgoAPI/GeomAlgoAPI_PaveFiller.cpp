@@ -56,7 +56,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
     }
   }
   aPaveFiller->SetArguments(aListOfShape);
-  if (theFuzzy >= 1.e-7) aPaveFiller->SetFuzzyValue(theFuzzy);
+  if (theFuzzy > 0) aPaveFiller->SetFuzzyValue(theFuzzy);
   aPaveFiller->Perform();
   if (aPaveFiller->HasErrors())
     return;
@@ -65,7 +65,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
   this->setImpl(aBuilder);
   this->setBuilderType(OCCT_BOPAlgo_Builder);
   aBuilder->SetArguments(aListOfShape);
-  if (theFuzzy >= 1.e-7) aBuilder->SetFuzzyValue(theFuzzy);
+  if (theFuzzy > 0) aBuilder->SetFuzzyValue(theFuzzy);
   aBuilder->PerformWithFiller(*aPaveFiller);
   if (aBuilder->HasErrors())
     return;

@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_BooleanFill.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -93,7 +94,9 @@ void FeaturesPlugin_BooleanFill::execute()
 
   // Getting fuzzy parameter.
   // Used as additional tolerance to eliminate tiny results.
-  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+  // Using -1 as fuzzy value in the GeomAlgoAPI means to ignore it during the boolean operation!
+  bool aUseFuzzy = boolean(USE_FUZZY_ID())->value();
+  double aFuzzy = (aUseFuzzy ? real(FUZZY_PARAM_ID())->value() : -1);
 
   // For solids cut each object with all tools.
   bool isOk = true;

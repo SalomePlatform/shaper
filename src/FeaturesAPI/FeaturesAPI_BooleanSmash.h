@@ -46,17 +46,19 @@ public:
   FeaturesAPI_BooleanSmash(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::list<ModelHighAPI_Selection>& theMainObjects,
                            const std::list<ModelHighAPI_Selection>& theToolObjects,
-                           const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                           const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanSmash();
 
-  INTERFACE_3(FeaturesPlugin_BooleanSmash::ID(),
+  INTERFACE_4(FeaturesPlugin_BooleanSmash::ID(),
               mainObjects, FeaturesPlugin_BooleanSmash::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanSmash::TOOL_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Tool objects*/,
+              useFuzzy, FeaturesPlugin_BooleanSmash::USE_FUZZY_ID(),
+              ModelAPI_AttributeBoolean, /** Use Fuzzy parameter*/,
               fuzzyParam, FeaturesPlugin_BooleanSmash::FUZZY_PARAM_ID(),
               ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
@@ -67,6 +69,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Set use fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setUseFuzzy(bool theUseFuzzy);
 
   /// Set fuzzy parameter.
   FEATURESAPI_EXPORT
@@ -86,7 +92,7 @@ FEATURESAPI_EXPORT
 BooleanSmashPtr addSmash(const std::shared_ptr<ModelAPI_Document>& thePart,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
                          const std::list<ModelHighAPI_Selection>& theToolObjects,
-                         const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
+                         const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(-1),
                          const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanSmash_H_

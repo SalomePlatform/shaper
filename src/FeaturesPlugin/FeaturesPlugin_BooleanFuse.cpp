@@ -41,6 +41,9 @@
 #include <GeomAPI_ShapeIterator.h>
 
 
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 static void explodeCompound(const GeomShapePtr& theShape, ListOfShape& theResult)
 {
@@ -72,11 +75,10 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
+  data()->addAttribute(FeaturesPlugin_Boolean::USE_FUZZY_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
-  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
-  // that the internal algorithms should use their default fuzzy value, if none was specified
-  // by the user.
-  real(FUZZY_PARAM_ID())->setValue(1.e-8);
+  boolean(USE_FUZZY_ID())->setValue(false); // Do NOT use the fuzzy parameter by default.
+  real(FUZZY_PARAM_ID())->setValue(DEFAULT_FUZZY);
 
   data()->addAttribute(REMOVE_INTERSECTION_EDGES_ID(), ModelAPI_AttributeBoolean::typeId());
 
@@ -126,7 +128,9 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // Getting fuzzy parameter.
   // Used as additional tolerance to eliminate tiny results.
-  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+  // Using -1 as fuzzy value in the GeomAlgoAPI means to ignore it during the boolean operation!
+  bool aUseFuzzy = boolean(USE_FUZZY_ID())->value();
+  double aFuzzy = (aUseFuzzy ? real(FUZZY_PARAM_ID())->value() : -1);
 
   // version of FUSE feature
   const std::string aFuseVersion = data()->version();

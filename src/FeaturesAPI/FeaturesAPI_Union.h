@@ -45,21 +45,27 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                             const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                             const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Union();
 
-  INTERFACE_2(FeaturesPlugin_Union::ID(),
+  INTERFACE_3(FeaturesPlugin_Union::ID(),
               baseObjects, FeaturesPlugin_Union::BASE_OBJECTS_ID(),
               ModelAPI_AttributeSelectionList, /** Base objects */,
+              useFuzzy, FeaturesPlugin_Union::USE_FUZZY_ID(),
+              ModelAPI_AttributeBoolean, /** Use Fuzzy parameter*/,
               fuzzyParam, FeaturesPlugin_Union::FUZZY_PARAM_ID(),
               ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
   void setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects);
+
+  /// Set use fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setUseFuzzy(bool theUseFuzzy);
 
   /// Set fuzzy parameter.
   FEATURESAPI_EXPORT
@@ -78,7 +84,7 @@ typedef std::shared_ptr<FeaturesAPI_Union> UnionPtr;
 FEATURESAPI_EXPORT
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                  const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
+                  const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(-1),
                   const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Union_H_

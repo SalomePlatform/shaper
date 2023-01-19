@@ -20,6 +20,7 @@
 #include "FeaturesPlugin_BooleanSmash.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -35,6 +36,9 @@
 #include <GeomAPI_ShapeIterator.h>
 
 
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 FeaturesPlugin_BooleanSmash::FeaturesPlugin_BooleanSmash()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_SMASH)
@@ -47,11 +51,10 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
+  data()->addAttribute(USE_FUZZY_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
-  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
-  // that the internal algorithms should use their default fuzzy value, if none was specified
-  // by the user.
-  real(FUZZY_PARAM_ID())->setValue(1.e-8);
+  boolean(USE_FUZZY_ID())->setValue(false); // Do NOT use the fuzzy parameter by default.
+  real(FUZZY_PARAM_ID())->setValue(DEFAULT_FUZZY);
 
   initVersion(BOP_VERSION_9_4(), selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
@@ -110,7 +113,9 @@ void FeaturesPlugin_BooleanSmash::execute()
 
   // Getting fuzzy parameter.
   // Used as additional tolerance to eliminate tiny results.
-  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+  // Using -1 as fuzzy value in the GeomAlgoAPI means to ignore it during the boolean operation!
+  bool aUseFuzzy = boolean(USE_FUZZY_ID())->value();
+  double aFuzzy = (aUseFuzzy ? real(FUZZY_PARAM_ID())->value() : -1);
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   if (!aShapesToAdd.empty()) {

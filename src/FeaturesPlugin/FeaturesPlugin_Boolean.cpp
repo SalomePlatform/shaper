@@ -21,6 +21,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -46,6 +47,10 @@
 #include <algorithm>
 #include <map>
 
+
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //=================================================================================================
 FeaturesPlugin_Boolean::FeaturesPlugin_Boolean(const OperationType theOperationType)
 : myOperationType(theOperationType)
@@ -58,11 +63,10 @@ void FeaturesPlugin_Boolean::initAttributes()
   data()->addAttribute(FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
+  data()->addAttribute(FeaturesPlugin_Boolean::USE_FUZZY_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(FeaturesPlugin_Boolean::FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
-  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
-  // that the internal algorithms should use their default fuzzy value, if none was specified
-  // by the user.
-  real(FUZZY_PARAM_ID())->setValue(1.e-8);
+  boolean(USE_FUZZY_ID())->setValue(false); // Do NOT use the fuzzy parameter by default.
+  real(FUZZY_PARAM_ID())->setValue(DEFAULT_FUZZY);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());

@@ -29,10 +29,14 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+#include <ModelAPI_AttributeBoolean.h>>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+
+
+static const double DEFAULT_FUZZY = 1.e-5;
 
 
 //=================================================================================================
@@ -45,11 +49,10 @@ void FeaturesPlugin_Union::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
 
+  data()->addAttribute(USE_FUZZY_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
-  // Initialize the fuzzy parameter with a value below Precision::Confusion() to indicate,
-  // that the internal algorithms should use their default fuzzy value, if none was specified
-  // by the user.
-  real(FUZZY_PARAM_ID())->setValue(1.e-8);
+  boolean(USE_FUZZY_ID())->setValue(false); // Do NOT use the fuzzy parameter by default.
+  real(FUZZY_PARAM_ID())->setValue(DEFAULT_FUZZY);
 
   initVersion(BOP_VERSION_9_4(), selectionList(BASE_OBJECTS_ID()));
 }
@@ -71,7 +74,9 @@ void FeaturesPlugin_Union::execute()
 
   // Getting fuzzy parameter.
   // Used as additional tolerance to eliminate tiny results.
-  double aFuzzy = real(FUZZY_PARAM_ID())->value();
+  // Using -1 as fuzzy value in the GeomAlgoAPI means to ignore it during the boolean operation!
+  bool aUseFuzzy = boolean(USE_FUZZY_ID())->value();
+  double aFuzzy = (aUseFuzzy ? real(FUZZY_PARAM_ID())->value() : -1);
 
   std::string anError;
   int aResultIndex = 0;

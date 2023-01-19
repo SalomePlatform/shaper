@@ -23,6 +23,10 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 FeaturesAPI_BooleanCut::FeaturesAPI_BooleanCut(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -39,9 +43,12 @@ FeaturesAPI_BooleanCut::FeaturesAPI_BooleanCut(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    bool aUseFuzzy = (theFuzzy.value() > 0);
+    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
-    fillAttribute(theFuzzy, myfuzzyParam);
+    fillAttribute(aUseFuzzy, myuseFuzzy);
+    fillAttribute(aFuzzy, myfuzzyParam);
 
     execute(false);
   }
@@ -70,6 +77,14 @@ void FeaturesAPI_BooleanCut::setToolObjects(const std::list<ModelHighAPI_Selecti
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanCut::setUseFuzzy(bool theUseFuzzy)
+{
+  fillAttribute(theUseFuzzy, myuseFuzzy);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanCut::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
   fillAttribute(theFuzzy, myfuzzyParam);
@@ -89,11 +104,13 @@ void FeaturesAPI_BooleanCut::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanCut::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanCut::TOOL_LIST_ID());
+  bool aUseFuzzy = aBase->boolean(FeaturesPlugin_BooleanCut::USE_FUZZY_ID())->value();
   double aFuzzy = aBase->real(FeaturesPlugin_BooleanCut::FUZZY_PARAM_ID())->value();
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
 
-  theDumper << ", fuzzyParam = " << aFuzzy;
+  if (aUseFuzzy)
+    theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";

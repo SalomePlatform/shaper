@@ -46,7 +46,7 @@ public:
   FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
                           const bool theRemoveEdges = false,
-                          const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                          const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
@@ -54,13 +54,13 @@ public:
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
                           const std::list<ModelHighAPI_Selection>& theToolObjects,
                           const bool theRemoveEdges = false,
-                          const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                          const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanFuse();
 
-  INTERFACE_5(FeaturesPlugin_BooleanFuse::ID(),
+  INTERFACE_6(FeaturesPlugin_BooleanFuse::ID(),
               creationMethod, FeaturesPlugin_BooleanFuse::CREATION_METHOD(),
               ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_BooleanFuse::OBJECT_LIST_ID(),
@@ -69,6 +69,8 @@ public:
               ModelAPI_AttributeSelectionList, /** Tool objects*/,
               removeEdges, FeaturesPlugin_BooleanFuse::REMOVE_INTERSECTION_EDGES_ID(),
               ModelAPI_AttributeBoolean, /** Remove edges */,
+              useFuzzy, FeaturesPlugin_BooleanFuse::USE_FUZZY_ID(),
+              ModelAPI_AttributeBoolean, /** Use Fuzzy parameter*/,
               fuzzyParam, FeaturesPlugin_BooleanFuse::FUZZY_PARAM_ID(),
               ModelAPI_AttributeDouble, /** Fuzzy parameter */)
 
@@ -83,6 +85,10 @@ public:
   /// Set remove edges.
   FEATURESAPI_EXPORT
   void setRemoveEdges(const bool theRemoveEdges);
+
+  /// Set use fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setUseFuzzy(bool theUseFuzzy);
 
   /// Set fuzzy parameter.
   FEATURESAPI_EXPORT
@@ -110,7 +116,7 @@ FEATURESAPI_EXPORT BooleanFusePtr addFuse(
     const std::list<ModelHighAPI_Selection>& objects,
     const std::pair<std::list<ModelHighAPI_Selection>, bool>& tools = DUMMY_TOOLS,
     const bool removeEdges = false,
-    const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
+    const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(-1),
     const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanFuse_H_

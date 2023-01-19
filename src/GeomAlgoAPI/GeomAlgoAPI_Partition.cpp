@@ -202,7 +202,7 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   Standard_Boolean bRunParallel = Standard_True;
   anOperation->SetRunParallel(bRunParallel);
 
-  if (theFuzzy >= 1.e-7) anOperation->SetFuzzyValue(theFuzzy);
+  if (theFuzzy > 0) anOperation->SetFuzzyValue(theFuzzy);
 
   // Building and getting result.
   anOperation->Perform();
