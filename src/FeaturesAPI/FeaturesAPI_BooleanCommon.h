@@ -45,26 +45,28 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                             const std::list<ModelHighAPI_Selection>& theMainObjects,
-                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                             const std::list<ModelHighAPI_Selection>& theMainObjects,
                             const std::list<ModelHighAPI_Selection>& theToolObjects,
-                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(1.e-8));
+                            const ModelHighAPI_Double& theFuzzy = ModelHighAPI_Double(-1));
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanCommon();
 
-  INTERFACE_4(FeaturesPlugin_BooleanCommon::ID(),
+  INTERFACE_5(FeaturesPlugin_BooleanCommon::ID(),
               creationMethod, FeaturesPlugin_BooleanCommon::CREATION_METHOD(),
               ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanCommon::TOOL_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Tool objects*/,
+              useFuzzy, FeaturesPlugin_BooleanCommon::USE_FUZZY_ID(),
+              ModelAPI_AttributeBoolean, /** Use Fuzzy parameter*/,
               fuzzyValue, FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID(),
               ModelAPI_AttributeDouble, /** Fuzzy parameter*/)
 
@@ -75,6 +77,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Set use fuzzy parameter.
+  FEATURESAPI_EXPORT
+  void setUseFuzzy(bool theUseFuzzy);
 
   /// Set fuzzy parameter.
   FEATURESAPI_EXPORT
@@ -98,7 +104,7 @@ FEATURESAPI_EXPORT BooleanCommonPtr addCommon(
     const std::shared_ptr<ModelAPI_Document>& part,
     const std::list<ModelHighAPI_Selection>& objects,
     const std::list<ModelHighAPI_Selection>& tools = std::list<ModelHighAPI_Selection>(),
-    const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(1.e-8),
+    const ModelHighAPI_Double& fuzzyParam = ModelHighAPI_Double(-1),
     const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanCommon_H_

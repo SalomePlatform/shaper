@@ -48,6 +48,13 @@ public:
     return MY_OBJECT_LIST_ID;
   }
 
+  /// Attribute name of use fuzzy parameter.
+  inline static const std::string& USE_FUZZY_ID()
+  {
+    static const std::string MY_USE_FUZZY_ID("use_fuzzy");
+    return MY_USE_FUZZY_ID;
+  }
+
   /// Attribute name of fuzzy parameter.
   inline static const std::string& FUZZY_PARAM_ID()
   {

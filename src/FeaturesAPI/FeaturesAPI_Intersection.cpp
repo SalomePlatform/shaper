@@ -22,6 +22,10 @@
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
+
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 FeaturesAPI_Intersection::FeaturesAPI_Intersection(
   const std::shared_ptr<ModelAPI_Feature>& theFeature)
@@ -38,8 +42,11 @@ FeaturesAPI_Intersection::FeaturesAPI_Intersection(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    bool aUseFuzzy = (theFuzzy.value() > 0);
+    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
     fillAttribute(theObjects, myobjects);
-    fillAttribute(theFuzzy, myfuzzyParam);
+    fillAttribute(aUseFuzzy, myuseFuzzy);
+    fillAttribute(aFuzzy, myfuzzyParam);
 
     execute();
   }
@@ -60,6 +67,14 @@ void FeaturesAPI_Intersection::setObjects(const std::list<ModelHighAPI_Selection
 }
 
 //==================================================================================================
+void FeaturesAPI_Intersection::setUseFuzzy(bool theUseFuzzy)
+{
+  fillAttribute(theUseFuzzy, myuseFuzzy);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_Intersection::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
   fillAttribute(theFuzzy, myfuzzyParam);
@@ -75,11 +90,13 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
+  bool aUseFuzzy = aBase->boolean(FeaturesPlugin_Intersection::USE_FUZZY_ID())->value();
   double aFuzzy = aBase->real(FeaturesPlugin_Intersection::FUZZY_PARAM_ID())->value();
 
   theDumper << aBase << " = model.addIntersection(" << aDocName << ", " << anAttrObjects;
 
-  theDumper << ", fuzzyParam = " << aFuzzy;
+  if (aUseFuzzy)
+    theDumper << ", fuzzyParam = " << aFuzzy;
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";

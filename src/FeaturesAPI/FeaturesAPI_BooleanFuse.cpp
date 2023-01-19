@@ -23,6 +23,10 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+
+static const double DEFAULT_FUZZY = 1.e-5;
+
+
 //==================================================================================================
 FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   const std::shared_ptr<ModelAPI_Feature>& theFeature)
@@ -40,10 +44,13 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
+    bool aUseFuzzy = (theFuzzy.value() > 0);
+    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
     fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theRemoveEdges, myremoveEdges);
-    fillAttribute(theFuzzy, myfuzzyParam);
+    fillAttribute(aUseFuzzy, myuseFuzzy);
+    fillAttribute(aFuzzy, myfuzzyParam);
 
     execute(false);
   }
@@ -59,11 +66,14 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    bool aUseFuzzy = (theFuzzy.value() > 0);
+    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
     fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
     fillAttribute(theRemoveEdges, myremoveEdges);
-    fillAttribute(theFuzzy, myfuzzyParam);
+    fillAttribute(aUseFuzzy, myuseFuzzy);
+    fillAttribute(aFuzzy, myfuzzyParam);
 
     execute(false);
   }
@@ -103,6 +113,14 @@ void FeaturesAPI_BooleanFuse::setRemoveEdges(const bool theRemoveEdges)
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanFuse::setUseFuzzy(bool theUseFuzzy)
+{
+  fillAttribute(theUseFuzzy, myuseFuzzy);
+
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanFuse::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
   fillAttribute(theFuzzy, myfuzzyParam);
@@ -137,6 +155,7 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanFuse::TOOL_LIST_ID());
   AttributeBooleanPtr aRemoveEdges =
     aBase->boolean(FeaturesPlugin_BooleanFuse::REMOVE_INTERSECTION_EDGES_ID());
+  bool aUseFuzzy = aBase->boolean(FeaturesPlugin_BooleanFuse::USE_FUZZY_ID())->value();
   double aFuzzy = aBase->real(FeaturesPlugin_BooleanFuse::FUZZY_PARAM_ID())->value();
 
   theDumper << "(" << aDocName << ", " << anObjects;
@@ -149,9 +168,8 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", removeEdges = True";
   }
 
-  if (aFuzzy != 1.e-8) {
+  if (aUseFuzzy)
     theDumper << ", fuzzyParam = " << aFuzzy;
-  }
 
   if (!aBase->data()->version().empty())
     theDumper << ", keepSubResults = True";
