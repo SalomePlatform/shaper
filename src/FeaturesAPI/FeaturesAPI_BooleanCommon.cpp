@@ -142,7 +142,7 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanCommon::TOOL_LIST_ID());
   bool aUseFuzzy = aBase->boolean(FeaturesPlugin_BooleanCommon::USE_FUZZY_ID())->value();
-  double aFuzzy = aBase->real(FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID())->value();
+  AttributeDoublePtr aFuzzy = aBase->real(FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects;
 

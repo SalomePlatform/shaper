@@ -89,7 +89,7 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
   bool aUseFuzzy = aBase->boolean(FeaturesPlugin_Union::USE_FUZZY_ID())->value();
-  double aFuzzy = aBase->real(FeaturesPlugin_Union::FUZZY_PARAM_ID())->value();
+  AttributeDoublePtr aFuzzy = aBase->real(FeaturesPlugin_Union::FUZZY_PARAM_ID());
 
   theDumper << aBase << " = model.addUnion(" << aDocName << ", " << anAttrObjects;
 

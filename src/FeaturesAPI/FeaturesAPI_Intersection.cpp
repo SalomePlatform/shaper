@@ -91,7 +91,7 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
   bool aUseFuzzy = aBase->boolean(FeaturesPlugin_Intersection::USE_FUZZY_ID())->value();
-  double aFuzzy = aBase->real(FeaturesPlugin_Intersection::FUZZY_PARAM_ID())->value();
+  AttributeDoublePtr aFuzzy = aBase->real(FeaturesPlugin_Intersection::FUZZY_PARAM_ID());
 
   theDumper << aBase << " = model.addIntersection(" << aDocName << ", " << anAttrObjects;
 
