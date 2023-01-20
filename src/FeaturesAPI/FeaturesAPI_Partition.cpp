@@ -89,7 +89,7 @@ void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
   bool aUseFuzzy = aBase->boolean(FeaturesPlugin_Partition::USE_FUZZY_ID())->value();
-  double aFuzzy = aBase->real(FeaturesPlugin_Partition::FUZZY_PARAM_ID())->value();
+  AttributeDoublePtr aFuzzy = aBase->real(FeaturesPlugin_Partition::FUZZY_PARAM_ID());
 
   theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects;
 

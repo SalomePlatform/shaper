@@ -156,7 +156,7 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeBooleanPtr aRemoveEdges =
     aBase->boolean(FeaturesPlugin_BooleanFuse::REMOVE_INTERSECTION_EDGES_ID());
   bool aUseFuzzy = aBase->boolean(FeaturesPlugin_BooleanFuse::USE_FUZZY_ID())->value();
-  double aFuzzy = aBase->real(FeaturesPlugin_BooleanFuse::FUZZY_PARAM_ID())->value();
+  AttributeDoublePtr aFuzzy = aBase->real(FeaturesPlugin_BooleanFuse::FUZZY_PARAM_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects;
 
