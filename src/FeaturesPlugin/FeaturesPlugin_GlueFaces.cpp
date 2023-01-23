@@ -33,6 +33,7 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_GlueFaces.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
 
 #include <sstream>
@@ -83,6 +84,20 @@ void FeaturesPlugin_GlueFaces::execute()
     eraseResults();
     setResultFromInput(aShapes);
     return;
+  }
+
+  if (aResult->isCompound()) {
+    aResult = GeomAlgoAPI_ShapeTools::groupSharedTopology(aResult);
+
+    // If the subshape of the compound is already a Compound or CompSolid,
+    // use that compound subshape as the result.
+    if (aResult->typeOfCompoundShapes() == GeomAPI_Shape::COMPSOLID) {
+      ListOfShape aResults;
+      aResult = GeomAlgoAPI_ShapeTools::combineShapes(aResult, GeomAPI_Shape::COMPSOLID, aResults);
+    }
+    else if (aResult->typeOfCompoundShapes() == GeomAPI_Shape::COMPOUND) {
+      aResult = aResult->subShapes(GeomAPI_Shape::COMPOUND).front();
+    }
   }
 
   int anIndex = 0;

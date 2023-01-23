@@ -48,7 +48,7 @@ GlueFaces_1 = model.addGlueFaces(Part_1_doc, [model.selection("SOLID", "Translat
 model.do()
 
 # gluing successful
-model.testCompound(GlueFaces_1, [2], [2], [11], [20], [12])
+model.testCompSolid(GlueFaces_1, [2], [2], [11], [20], [12])
 
 # =============================================================================
 # Test 2. Glue faces for 2 faces with 1 common edge only

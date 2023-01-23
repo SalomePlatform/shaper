@@ -41,7 +41,7 @@ GlueFaces_1 = model.addGlueFaces(Part_1_doc, [model.selection("SOLID", "Box_1_1"
 model.end()
 
 # gluing successful
-model.testCompound(GlueFaces_1, [2], [2], [11], [20], [12])
+model.testCompSolid(GlueFaces_1, [2], [2], [11], [20], [12])
 
 # =============================================================================
 # Test 2. Glue faces for 2 solids with 1 common edge only
@@ -84,7 +84,7 @@ GlueFaces_4 = model.addGlueFaces(Part_1_doc, [model.selection("SOLID", "Box_1_1"
 model.end()
 
 # gluing successful
-model.testCompound(GlueFaces_4, [2], [2], [11], [20], [12])
+model.testCompSolid(GlueFaces_4, [2], [2], [11], [20], [12])
 
 # =============================================================================
 # Test 5. Check Python dump
