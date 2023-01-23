@@ -34,7 +34,7 @@ FeaturesAPI_GlueFaces::FeaturesAPI_GlueFaces(const std::shared_ptr<ModelAPI_Feat
 FeaturesAPI_GlueFaces::FeaturesAPI_GlueFaces(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const std::list<ModelHighAPI_Selection>& theMainObjects,
                                              const ModelHighAPI_Double& theTolerance,
-                                             bool theIsKeepNonSolids=true)
+                                             bool theIsKeepNonSolids)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {

@@ -154,6 +154,20 @@ def testCompound(theFeature, NbSubRes, NbSolid, NbFace, NbEdge, NbVertex):
   testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
 
 
+def testCompSolid(theFeature, NbSubRes, NbSolid, NbFace, NbEdge, NbVertex):
+  """ Tests number of unique sub-shapes in compsolid result
+  """
+  aResults = theFeature.feature().results()
+  aNbResults = len(aResults)
+  assert (aNbResults == 1), "Number of results: {} not equal to 1.".format(aNbResults)
+  assert aResults[0].shape().isCompSolid(), "Result shape type: {}. Expected: COMPSOLID.".format(aResults[0].shape().shapeTypeStr())
+  testNbSubResults(theFeature, NbSubRes)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.SOLID, NbSolid)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
+  testNbUniqueSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
+
+
 def testResults(theFeature, NbRes, NbSubRes, NbShell, NbFace, NbEdge, NbVertex):
   """ Tests numbers of unique sub-shapes in the results
   """
