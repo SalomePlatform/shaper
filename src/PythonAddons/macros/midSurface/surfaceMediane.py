@@ -497,34 +497,10 @@ Sorties :
       print_tab (n_recur, texte)
 
     if ( solide.name() != self.objet_principal.name() ):
-
-      if self._verbose_max:
-        print_tab (n_recur, ". Extraction du solide")
-
-# 1. Extraction du solide
-      remove_subshapes = model.addRemoveSubShapes(self.part_doc, model.selection("COMPOUND", self.objet_principal.name()))
-      remove_subshapes.setSubShapesToKeep([model.selection("SOLID", solide.name())])
-
-      self.nom_solide_aux = "{}_S".format(solide.name())
-      remove_subshapes.result().setName(self.nom_solide_aux)
-
-      self.fonction_0 = remove_subshapes
-
-# 2. Récupération de l'objet principal
-      recover = model.addRecover(self.part_doc, remove_subshapes, [self.objet_principal])
-      recover.result().setName(self.objet_principal.name())
-
-      objet = remove_subshapes.result()
+      objet, recover = self._isole_solide_a ( solide, n_recur )
 
     else:
-
-      if self._verbose_max:
-        print_tab (n_recur, ". Mise en place du solide")
-
-      objet = solide
-      self.nom_solide_aux = self.objet_principal.name()
-      self.fonction_0 = None
-      recover = None
+      objet, recover = self._isole_solide_b ( solide, n_recur )
 
     if self._verbose_max:
       print_tab (n_recur, "objet final : ", objet.name())
@@ -532,6 +508,84 @@ Sorties :
       print_tab (n_recur, "recover : ", recover)
 
     return objet, recover
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _isole_solide_a ( self, solide, n_recur ):
+    """Isole le solide de son arboresence
+
+Entrées :
+  :solide: le solide à traiter
+  :n_recur: numéro de la récurrence
+
+Sorties :
+  :objet: le solide isolé
+  :recover: la fonction de récupération
+    """
+
+    nom_fonction = __name__ + "/_isole_solide_a"
+    blabla = "\nDans {} :".format(nom_fonction)
+    if self._verbose_max:
+      print (blabla)
+      texte = "Pour le solide '{}' ".format(solide.name())
+      texte += "de l'objet principal '{}'".format(self.objet_principal.name())
+      print_tab (n_recur, texte)
+
+    if self._verbose_max:
+      print_tab (n_recur, ". Extraction du solide '{}'".format(self.objet_principal.name()))
+
+# 1. Extraction du solide
+    remove_subshapes = model.addRemoveSubShapes(self.part_doc, model.selection("COMPOUND", self.objet_principal.name()))
+    remove_subshapes.setSubShapesToKeep([model.selection("SOLID", solide.name())])
+
+    self.nom_solide_aux = "{}_S".format(solide.name())
+    if self._verbose_max:
+      print_tab (n_recur, "\tAttribution à remove_subshapes.result() du nom '{}'".format(self.nom_solide_aux))
+    remove_subshapes.result().setName(self.nom_solide_aux)
+
+    self.fonction_0 = remove_subshapes
+
+# 2. Récupération de l'objet principal
+    recover = model.addRecover(self.part_doc, remove_subshapes, [self.objet_principal])
+    if self._verbose_max:
+      print_tab (n_recur, "\tAttribution à recover du nom '{}'".format(self.objet_principal.name()))
+    recover.result().setName(self.objet_principal.name())
+
+    return remove_subshapes.result(), recover
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _isole_solide_b ( self, solide, n_recur ):
+    """Isole le solide de son arboresence
+
+Entrées :
+  :solide: le solide à traiter
+  :n_recur: numéro de la récurrence
+
+Sorties :
+  :objet: le solide isolé
+  :recover: la fonction de récupération
+    """
+
+    nom_fonction = __name__ + "/_isole_solide_b"
+    blabla = "\nDans {} :".format(nom_fonction)
+    if self._verbose_max:
+      print (blabla)
+      texte = "Pour le solide '{}' ".format(solide.name())
+      texte += "de l'objet principal '{}'".format(self.objet_principal.name())
+      print_tab (n_recur, texte)
+
+    if self._verbose_max:
+      print_tab (n_recur, ". Mise en place du solide")
+
+    self.nom_solide_aux = self.objet_principal.name()
+    self.fonction_0 = None
+
+    return solide, None
 
 #===========================  Fin de la méthode ==================================
 
