@@ -43,12 +43,17 @@ FeaturesAPI_BooleanCut::FeaturesAPI_BooleanCut(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    bool aUseFuzzy = (theFuzzy.value() > 0);
-    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
-    fillAttribute(theMainObjects, mymainObjects);
-    fillAttribute(theToolObjects, mytoolObjects);
-    fillAttribute(aUseFuzzy, myuseFuzzy);
-    fillAttribute(aFuzzy, myfuzzyParam);
+    fillAttribute(theMainObjects, VAR_NAME(mainObjects));
+    fillAttribute(theToolObjects, VAR_NAME(toolObjects));
+    fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
+
+    // Get the evaluated fuzzy parameter from the attribute!!
+    bool aUseFuzzy = (fuzzyParam()->value() > 0);
+    fillAttribute(aUseFuzzy, VAR_NAME(useFuzzy));
+    if (!aUseFuzzy) {
+      ModelHighAPI_Double aFuzzy(DEFAULT_FUZZY);
+      fillAttribute(aFuzzy, VAR_NAME(fuzzyParam));
+    }
 
     execute(false);
   }
@@ -63,7 +68,7 @@ FeaturesAPI_BooleanCut::~FeaturesAPI_BooleanCut()
 //==================================================================================================
 void FeaturesAPI_BooleanCut::setMainObjects(const std::list<ModelHighAPI_Selection>& theMainObjects)
 {
-  fillAttribute(theMainObjects, mymainObjects);
+  fillAttribute(theMainObjects, VAR_NAME(mainObjects));
 
   execute();
 }
@@ -71,7 +76,7 @@ void FeaturesAPI_BooleanCut::setMainObjects(const std::list<ModelHighAPI_Selecti
 //==================================================================================================
 void FeaturesAPI_BooleanCut::setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
-  fillAttribute(theToolObjects, mytoolObjects);
+  fillAttribute(theToolObjects, VAR_NAME(toolObjects));
 
   execute();
 }
@@ -79,7 +84,7 @@ void FeaturesAPI_BooleanCut::setToolObjects(const std::list<ModelHighAPI_Selecti
 //==================================================================================================
 void FeaturesAPI_BooleanCut::setUseFuzzy(bool theUseFuzzy)
 {
-  fillAttribute(theUseFuzzy, myuseFuzzy);
+  fillAttribute(theUseFuzzy, VAR_NAME(useFuzzy));
 
   execute();
 }
@@ -87,7 +92,7 @@ void FeaturesAPI_BooleanCut::setUseFuzzy(bool theUseFuzzy)
 //==================================================================================================
 void FeaturesAPI_BooleanCut::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
-  fillAttribute(theFuzzy, myfuzzyParam);
+  fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
 
   execute();
 }
@@ -122,11 +127,11 @@ void FeaturesAPI_BooleanCut::dump(ModelHighAPI_Dumper& theDumper) const
 BooleanCutPtr addCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const std::list<ModelHighAPI_Selection>& theMainObjects,
                      const std::list<ModelHighAPI_Selection>& theToolObjects,
-                     const ModelHighAPI_Double& fuzzyParam,
+                     const ModelHighAPI_Double& theFuzzy,
                      const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCut::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return BooleanCutPtr(new FeaturesAPI_BooleanCut(aFeature, theMainObjects, theToolObjects, fuzzyParam));
+  return BooleanCutPtr(new FeaturesAPI_BooleanCut(aFeature, theMainObjects, theToolObjects, theFuzzy));
 }

@@ -40,11 +40,16 @@ FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& th
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    bool aUseFuzzy = (theFuzzy.value() > 0);
-    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
-    fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(aUseFuzzy, myuseFuzzy);
-    fillAttribute(aFuzzy, myfuzzyParam);
+    fillAttribute(theBaseObjects, VAR_NAME(baseObjects));
+    fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
+
+    // Get the evaluated fuzzy parameter from the attribute!!
+    bool aUseFuzzy = (fuzzyParam()->value() > 0);
+    fillAttribute(aUseFuzzy, VAR_NAME(useFuzzy));
+    if (!aUseFuzzy) {
+      ModelHighAPI_Double aFuzzy(DEFAULT_FUZZY);
+      fillAttribute(aFuzzy, VAR_NAME(fuzzyParam));
+    }
 
     execute();
   }
@@ -59,7 +64,7 @@ FeaturesAPI_Union::~FeaturesAPI_Union()
 //==================================================================================================
 void FeaturesAPI_Union::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
-  fillAttribute(theBaseObjects, mybaseObjects);
+  fillAttribute(theBaseObjects, VAR_NAME(baseObjects));
 
   execute();
 }
@@ -67,7 +72,7 @@ void FeaturesAPI_Union::setBase(const std::list<ModelHighAPI_Selection>& theBase
 //==================================================================================================
 void FeaturesAPI_Union::setUseFuzzy(bool theUseFuzzy)
 {
-  fillAttribute(theUseFuzzy, myuseFuzzy);
+  fillAttribute(theUseFuzzy, VAR_NAME(useFuzzy));
 
   execute();
 }
@@ -75,7 +80,7 @@ void FeaturesAPI_Union::setUseFuzzy(bool theUseFuzzy)
 //==================================================================================================
 void FeaturesAPI_Union::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
-  fillAttribute(theFuzzy, myfuzzyParam);
+  fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
 
   execute();
 }
@@ -105,11 +110,11 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
 //==================================================================================================
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                  const ModelHighAPI_Double& fuzzyParam,
+                  const ModelHighAPI_Double& theFuzzy,
                   const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Union::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects, fuzzyParam));
+  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects, theFuzzy));
 }
