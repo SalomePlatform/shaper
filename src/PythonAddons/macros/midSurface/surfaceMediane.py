@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V10.53"
+__revision__ = "V10.54"
 
 #========================= Les imports - Début ===================================
 
@@ -240,7 +240,7 @@ On sait traiter les faces :
   . toriques
   . coniques
 
-Si la création n'a pas eu lieu, un message est émis et les solides sont mise en couleur :
+Si la création n'a pas eu lieu, un message est émis et les solides sont mis en couleur :
 . Rouge : le solide n'est pas assez mince.
 . Bleu : le solide est trop mince, vis-à-vis de la précision de SHAPER.
 . Orange : la forme de la face n'est pas reconnue.
@@ -617,7 +617,7 @@ Sorties :
     for iaux, face in enumerate(l_faces):
       _, aire, _ = geompy.BasicProperties(face)
       #longueur, aire, volume = geompy.BasicProperties(face)
-      if self._verbose_max or True:
+      if self._verbose_max:
         texte = "\t. Face numéro {}".format(iaux)
         #texte += "\n\t. longueur, aire, volume : {}, {}, {}".format(longueur,aire,volume)
         texte += ", surface : {}".format(aire)
@@ -2233,7 +2233,7 @@ Sorties :
     nom_fonction = __name__ + "/surf_objet_shaper"
     blabla = "Dans {} :".format(nom_fonction)
 
-    if self._verbose_max or True:
+    if self._verbose_max:
       print (blabla)
 
 # 1. Acquisition de la liste des noms des sous-objets solides
@@ -2252,7 +2252,7 @@ Sorties :
 
 # 3. Gestion des faces créées
 
-    #self._surf_objet_shaper_1 ( )
+    self._surf_objet_shaper_1 ( )
 
 # 4. Futur message pour le résultat
 
@@ -2280,7 +2280,7 @@ Sorties :
     nom_fonction = __name__ + "/_surf_objet_shaper_0"
     blabla = "Dans {} :\n".format(nom_fonction)
 
-    if self._verbose_max or True:
+    if self._verbose_max:
       prefixe = ""
       for _ in range(n_recur):
         prefixe += "\t"
@@ -2333,7 +2333,7 @@ Sorties :
 
       nb_sub_results = objet_0.numberOfSubs()
 
-      if self._verbose_max or True:
+      if self._verbose_max:
         print_tab (n_recur, "Examen de l'objet '{}' de type ".format(objet_0.name()), objet_0.shapeType())
         print_tab (n_recur, "objet.result().numberOfSubs() : ", nb_sub_results)
 
@@ -2457,7 +2457,7 @@ Sorties :
     nom_fonction = __name__ + "/surf_solide_shaper"
     blabla = "Dans {} :".format(nom_fonction)
 
-    if self._verbose_max or True:
+    if self._verbose_max:
       print (blabla)
 
     erreur = 0
@@ -2466,7 +2466,7 @@ Sorties :
     while not erreur :
 
       self.nom_solide = solide.name()
-      if self._verbose_max or True:
+      if self._verbose_max:
         print_tab (n_recur, "solide", self.nom_solide)
 
 # 1. Isolement du solide
@@ -2597,7 +2597,7 @@ if __name__ == "__main__" :
     #L_OPTIONS.append("-h")
     #L_OPTIONS.append("-v")
     L_OPTIONS.append("-vmax")
-    #L_OPTIONS.append("-export_step")
+    L_OPTIONS.append("-export_step")
 
 # 2. Lancement de la classe
 
