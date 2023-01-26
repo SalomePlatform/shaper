@@ -788,7 +788,7 @@ Sorties :
 
 # 2. Traitement selon la forme de la face
 # 2.1. Face plane
-    if forme in ( geompy.kind.DISK_CIRCLE, geompy.kind.DISK_ELLIPSE, geompy.kind.POLYGON, geompy.kind.PLANE, geompy.kind.PLANAR):
+    if forme in ( geompy.kind.DISK_CIRCLE, geompy.kind.DISK_ELLIPSE, geompy.kind.POLYGON, geompy.kind.PLANE, geompy.kind.PLANAR ):
       erreur, face = self._cree_face_mediane_plane ( geompy, solide, caract_face_1, caract_face_2, n_recur )
 
 # 2.2. Face cylindrique
