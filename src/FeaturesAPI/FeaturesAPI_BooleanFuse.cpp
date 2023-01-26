@@ -44,13 +44,18 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
-    bool aUseFuzzy = (theFuzzy.value() > 0);
-    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
-    fillAttribute(theMainObjects, mymainObjects);
-    fillAttribute(theRemoveEdges, myremoveEdges);
-    fillAttribute(aUseFuzzy, myuseFuzzy);
-    fillAttribute(aFuzzy, myfuzzyParam);
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), VAR_NAME(creationMethod));
+    fillAttribute(theMainObjects, VAR_NAME(mainObjects));
+    fillAttribute(theRemoveEdges, VAR_NAME(removeEdges));
+    fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
+
+    // Get the evaluated fuzzy parameter from the attribute!!
+    bool aUseFuzzy = (fuzzyParam()->value() > 0);
+    fillAttribute(aUseFuzzy, VAR_NAME(useFuzzy));
+    if (!aUseFuzzy) {
+      ModelHighAPI_Double aFuzzy(DEFAULT_FUZZY);
+      fillAttribute(aFuzzy, VAR_NAME(fuzzyParam));
+    }
 
     execute(false);
   }
@@ -66,14 +71,19 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    bool aUseFuzzy = (theFuzzy.value() > 0);
-    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
-    fillAttribute(theMainObjects, mymainObjects);
-    fillAttribute(theToolObjects, mytoolObjects);
-    fillAttribute(theRemoveEdges, myremoveEdges);
-    fillAttribute(aUseFuzzy, myuseFuzzy);
-    fillAttribute(aFuzzy, myfuzzyParam);
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), VAR_NAME(creationMethod));
+    fillAttribute(theMainObjects, VAR_NAME(mainObjects));
+    fillAttribute(theToolObjects, VAR_NAME(toolObjects));
+    fillAttribute(theRemoveEdges, VAR_NAME(removeEdges));
+    fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
+
+    // Get the evaluated fuzzy parameter from the attribute!!
+    bool aUseFuzzy = (fuzzyParam()->value() > 0);
+    fillAttribute(aUseFuzzy, VAR_NAME(useFuzzy));
+    if (!aUseFuzzy) {
+      ModelHighAPI_Double aFuzzy(DEFAULT_FUZZY);
+      fillAttribute(aFuzzy, VAR_NAME(fuzzyParam));
+    }
 
     execute(false);
   }
@@ -89,7 +99,7 @@ FeaturesAPI_BooleanFuse::~FeaturesAPI_BooleanFuse()
 void FeaturesAPI_BooleanFuse::setMainObjects(
   const std::list<ModelHighAPI_Selection>& theMainObjects)
 {
-  fillAttribute(theMainObjects, mymainObjects);
+  fillAttribute(theMainObjects, VAR_NAME(mainObjects));
 
   execute();
 }
@@ -98,8 +108,8 @@ void FeaturesAPI_BooleanFuse::setMainObjects(
 void FeaturesAPI_BooleanFuse::setToolObjects(
   const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
-  fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
-  fillAttribute(theToolObjects, mytoolObjects);
+  fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), VAR_NAME(creationMethod));
+  fillAttribute(theToolObjects, VAR_NAME(toolObjects));
 
   execute();
 }
@@ -107,7 +117,7 @@ void FeaturesAPI_BooleanFuse::setToolObjects(
 //==================================================================================================
 void FeaturesAPI_BooleanFuse::setRemoveEdges(const bool theRemoveEdges)
 {
-  fillAttribute(theRemoveEdges, myremoveEdges);
+  fillAttribute(theRemoveEdges, VAR_NAME(removeEdges));
 
   execute();
 }
@@ -115,7 +125,7 @@ void FeaturesAPI_BooleanFuse::setRemoveEdges(const bool theRemoveEdges)
 //==================================================================================================
 void FeaturesAPI_BooleanFuse::setUseFuzzy(bool theUseFuzzy)
 {
-  fillAttribute(theUseFuzzy, myuseFuzzy);
+  fillAttribute(theUseFuzzy, VAR_NAME(useFuzzy));
 
   execute();
 }
@@ -123,7 +133,7 @@ void FeaturesAPI_BooleanFuse::setUseFuzzy(bool theUseFuzzy)
 //==================================================================================================
 void FeaturesAPI_BooleanFuse::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
-  fillAttribute(theFuzzy, myfuzzyParam);
+  fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
 
   execute();
 }
@@ -132,9 +142,9 @@ void FeaturesAPI_BooleanFuse::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 void FeaturesAPI_BooleanFuse::setAdvancedMode(const bool theMode)
 {
   if (theMode) {
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), VAR_NAME(creationMethod));
   } else {
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), VAR_NAME(creationMethod));
   }
 
   execute();
@@ -182,7 +192,7 @@ BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                        const std::list<ModelHighAPI_Selection>& theMainObjects,
                        const std::pair<std::list<ModelHighAPI_Selection>, bool>& theToolObjects,
                        const bool theRemoveEdges,
-                       const ModelHighAPI_Double& fuzzyParam,
+                       const ModelHighAPI_Double& theFuzzy,
                        const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFuse::ID());
@@ -195,10 +205,10 @@ BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
 
   BooleanFusePtr aFuse;
   if (theToolObjects.first.empty())
-    aFuse.reset(new FeaturesAPI_BooleanFuse(aFeature, theMainObjects, aRemoveEdges, fuzzyParam));
+    aFuse.reset(new FeaturesAPI_BooleanFuse(aFeature, theMainObjects, aRemoveEdges, theFuzzy));
   else {
     aFuse.reset(new FeaturesAPI_BooleanFuse(aFeature, theMainObjects, theToolObjects.first,
-                                            aRemoveEdges, fuzzyParam));
+                                            aRemoveEdges, theFuzzy));
   }
   return aFuse;
 }

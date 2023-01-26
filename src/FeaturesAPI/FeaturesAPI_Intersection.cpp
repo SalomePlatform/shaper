@@ -42,11 +42,16 @@ FeaturesAPI_Intersection::FeaturesAPI_Intersection(
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    bool aUseFuzzy = (theFuzzy.value() > 0);
-    ModelHighAPI_Double aFuzzy = (aUseFuzzy ? theFuzzy : ModelHighAPI_Double(DEFAULT_FUZZY));
-    fillAttribute(theObjects, myobjects);
-    fillAttribute(aUseFuzzy, myuseFuzzy);
-    fillAttribute(aFuzzy, myfuzzyParam);
+    fillAttribute(theObjects, VAR_NAME(objects));
+    fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
+
+    // Get the evaluated fuzzy parameter from the attribute!!
+    bool aUseFuzzy = (fuzzyParam()->value() > 0);
+    fillAttribute(aUseFuzzy, VAR_NAME(useFuzzy));
+    if (!aUseFuzzy) {
+      ModelHighAPI_Double aFuzzy(DEFAULT_FUZZY);
+      fillAttribute(aFuzzy, VAR_NAME(fuzzyParam));
+    }
 
     execute();
   }
@@ -61,7 +66,7 @@ FeaturesAPI_Intersection::~FeaturesAPI_Intersection()
 //==================================================================================================
 void FeaturesAPI_Intersection::setObjects(const std::list<ModelHighAPI_Selection>& theObjects)
 {
-  fillAttribute(theObjects, myobjects);
+  fillAttribute(theObjects, VAR_NAME(objects));
 
   execute();
 }
@@ -69,7 +74,7 @@ void FeaturesAPI_Intersection::setObjects(const std::list<ModelHighAPI_Selection
 //==================================================================================================
 void FeaturesAPI_Intersection::setUseFuzzy(bool theUseFuzzy)
 {
-  fillAttribute(theUseFuzzy, myuseFuzzy);
+  fillAttribute(theUseFuzzy, VAR_NAME(useFuzzy));
 
   execute();
 }
@@ -77,7 +82,7 @@ void FeaturesAPI_Intersection::setUseFuzzy(bool theUseFuzzy)
 //==================================================================================================
 void FeaturesAPI_Intersection::setFuzzyValue(const ModelHighAPI_Double& theFuzzy)
 {
-  fillAttribute(theFuzzy, myfuzzyParam);
+  fillAttribute(theFuzzy, VAR_NAME(fuzzyParam));
 
   execute();
 }
@@ -107,11 +112,11 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 //==================================================================================================
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
                                 const std::list<ModelHighAPI_Selection>& theObjects,
-                                const ModelHighAPI_Double& fuzzyParam,
+                                const ModelHighAPI_Double& theFuzzy,
                                 const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Intersection::ID());
   if (!keepSubResults)
     aFeature->data()->setVersion("");
-  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects, fuzzyParam));
+  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects, theFuzzy));
 }

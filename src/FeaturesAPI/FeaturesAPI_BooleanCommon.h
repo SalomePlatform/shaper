@@ -67,7 +67,7 @@ public:
               ModelAPI_AttributeSelectionList, /** Tool objects*/,
               useFuzzy, FeaturesPlugin_BooleanCommon::USE_FUZZY_ID(),
               ModelAPI_AttributeBoolean, /** Use Fuzzy parameter*/,
-              fuzzyValue, FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID(),
+              fuzzyParam, FeaturesPlugin_BooleanCommon::FUZZY_PARAM_ID(),
               ModelAPI_AttributeDouble, /** Fuzzy parameter*/)
 
   /// Set main objects.
