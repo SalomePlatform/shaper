@@ -91,11 +91,11 @@ class midSurface(model.Feature):
                 print("l_options : '{}'".format(l_options))
                 s_med = SurfaceMediane(l_options)
                 with open("/tmp/grr_1", "w") as fic :
-                      fic.write("{}".format(dir(s_med)))
-                      fic.write("\n{}".format(filepath))
+                    fic.write("{}\n".format(dir(s_med)))
+                    fic.write("\nFichier : {}".format(filepath))
                 erreur, message = s_med.surf_fic_cao (filepath)
                 with open("/tmp/grr_2", "w") as fic :
-                      fic.write("erreur = {}, message = '{}'".format(erreur, message))
+                    fic.write("erreur = {}, message = '{}'".format(erreur, message))
                 del s_med
                 if erreur:
                     self.setError(message)
