@@ -32,7 +32,6 @@ def getFilePath(fileName):
     return os.path.join(path, fileName)
 
 theFile = getFilePath("midSurface.stp")
-theFile = getFilePath("Objet_1.stp")
 
 aSession.startOperation("Create part for mid surface")
 aPartFeature = aSession.moduleDocument().addFeature("Part")
