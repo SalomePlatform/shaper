@@ -209,6 +209,7 @@ model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))
 SketchRectangle_1 = Sketch_2.addRectangle(20, 0, 100, 50)
 [SketchLine_6, SketchLine_7, SketchLine_8, SketchLine_9] = SketchRectangle_1.lines()
+Sketch_2.setVertical(SketchLine_9.result())
 SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_1"))
 SketchLine_10 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_7).startPoint(), SketchAPI_Line(SketchLine_10).startPoint())
@@ -382,3 +383,4 @@ model.testNbSubShapes(ExtrusionFuse_1, GeomAPI_Shape.VERTEX, [280])
 model.testResultsVolumes(ExtrusionFuse_1, [260653.824775497108930721879005432])
 
 assert(model.checkPythonDump())
+

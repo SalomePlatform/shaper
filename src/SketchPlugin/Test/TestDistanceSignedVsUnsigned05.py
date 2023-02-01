@@ -30,6 +30,7 @@ distParam = model.addParameter(partSet, "d", "30")
 Sketch_1 = model.addSketch(partSet, model.defaultPlane("XOY"))
 Rectangle_1 = Sketch_1.addRectangle(0, 0, 200, 100)
 [Line_1, Line_2, Line_3, Line_4] = Rectangle_1.lines()
+Sketch_1.setVertical(Line_4.result())
 Origin = Sketch_1.addPoint(model.selection("VERTEX", "Origin"))
 Sketch_1.setCoincident(SketchAPI_Line(Line_1).endPoint(), Origin.result())
 Sketch_1.setLength(SketchAPI_Line(Line_1).result(), "w")
@@ -51,7 +52,7 @@ signedDist24 = model.signedDistancePointLine(Point_2, line4)
 signedDist25 = model.signedDistancePointLine(Point_2, line5)
 
 # change rectangle width and check distances
-widthParam.setValue(2000)
+widthParam.setValue(300)
 model.do()
 curDist = model.signedDistancePointLine(Point_1, line4)
 assert(math.fabs(signedDist14 - curDist) < TOLERANCE), "Expected {}, actual {}".format(signedDist14, curDist)
@@ -77,3 +78,4 @@ assert(math.fabs(math.fabs(signedDist25) - math.fabs(curDist)) < TOLERANCE), "Ex
 assert Sketch_1.solverError().value() == "", "FAILED: Sketch should NOT report over-constrained situation"
 
 model.end()
+
