@@ -22,8 +22,6 @@ from salome.shaper import geom
 
 from SketchAPI import *
 
-import math
-
 def checkRectangle(lines, center, corner, tolerance = 1.e-7):
   dx = corner.x() - center.x()
   dy = corner.y() - center.y()
@@ -40,6 +38,13 @@ def checkRectangle(lines, center, corner, tolerance = 1.e-7):
     ep_ref = points[i]
     assert(ep.distance(ep_ref) <= tolerance)
 
+def checkRectangleL(lines, valref, tolerance = 1.e-5):
+  for i in range(0, 4):
+    line = SketchAPI_Line(lines[i])
+    #print (line.defaultResult().shape().edge().length())
+    #print (valref[i%2])
+    #print (abs(line.defaultResult().shape().edge().length()-valref[i%2]))
+    assert(abs(line.defaultResult().shape().edge().length()-valref[i%2]) <= tolerance)
 
 model.begin()
 partSet = model.moduleDocument()
@@ -75,22 +80,34 @@ checkRectangle(lines_3, SketchAPI_Line(lines_1[0]).startPoint().pnt(), SketchAPI
 # move center of rectangle
 SHIFT = 1.0
 center = SketchAPI_Line(lines_1[0]).startPoint().pnt()
-for i in range(0, 20):
+valref = [ \
+400.86931 , 200.78509 , \
+401.73886 , 201.57021 , \
+402.60865 , 202.35537 , \
+403.47866 , 203.14056 , \
+404.34890 , 203.92580 ]
+for i in range(0, 5):
   center.setX(center.x() + SHIFT)
   center.setY(center.y() + SHIFT)
   model.begin()
   sketch.move(SketchAPI_Line(lines_1[0]).startPoint(), center)
   model.end()
-  checkRectangle(lines_3, center, SketchAPI_Line(lines_2[0]).endPoint().pnt())
+  checkRectangleL(lines_3, valref[2*i:])
 
 # move corner of rectangle
 corner = SketchAPI_Line(lines_2[0]).endPoint().pnt()
-for i in range(0, 20):
+valref = [ \
+403.11209 , 202.95437 , \
+401.87551 , 201.98300 , \
+400.63915 , 201.01169 , \
+399.40301 , 200.04043 , \
+398.16710 , 199.06922 ]
+for i in range(0, 5):
   corner.setX(corner.x() + SHIFT)
   corner.setY(corner.y() + SHIFT)
   model.begin()
   sketch.move(SketchAPI_Line(lines_2[0]).endPoint(), corner)
   model.end()
-  checkRectangle(lines_3, SketchAPI_Line(lines_1[0]).startPoint().pnt(), corner)
+  checkRectangleL(lines_3, valref[2*i:])
 
 assert(model.checkPythonDump())

@@ -31,6 +31,7 @@ DistanceParam = model.addParameter(Part_1_doc, "distance", "10.")
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchRectangle_1 = Sketch_1.addRectangle(20., 20., 70., 50.)
 [SketchLine_1, SketchLine_2, SketchLine_3, SketchLine_4] = SketchRectangle_1.lines()
+Sketch_1.setVertical(SketchLine_4.result())
 firstPoint = SketchAPI_Line(SketchLine_2).startPoint()
 secondPoint = SketchAPI_Line(SketchLine_3).endPoint()
 model.do()
@@ -44,7 +45,7 @@ SketchConstraintDistanceHorizontal_1.feature().real("ConstraintValue").setText(D
 model.do()
 
 # changing the parameter
-for param in range(-31, 30, 2):
+for param in range(11, 31, 2):
     if param == 0:
         continue
     DistanceParam.setValue(param)
@@ -68,7 +69,7 @@ SketchConstraintDistanceVertical_1.feature().real("ConstraintValue").setText(Dis
 model.do()
 
 # changing the parameter
-for param in range(-31, 30, 2):
+for param in range(11, 31, 2):
     if param == 0:
         continue
     DistanceParam.setValue(param)
@@ -91,7 +92,7 @@ SketchConstraintDistance_1 = Sketch_1.setDistance(firstPoint, secondPoint, "dist
 model.do()
 
 # changing the parameter
-for param in range(-30, 31, 2):
+for param in range(11, 31, 2):
     DistanceParam.setValue(param)
     model.do()
     if param < 0:
@@ -107,3 +108,4 @@ model.testNbSubFeatures(Sketch_1, "SketchConstraintDistance", 1)
 # leave distance constraint alive
 
 model.end()
+

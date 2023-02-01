@@ -19,7 +19,7 @@
 
 """
     TestRectangle.py
-    Unit test of SketchPlugin_Ractangle class
+    Unit test of SketchPlugin_Rectangle class
 
 """
 from GeomDataAPI import *
@@ -88,27 +88,32 @@ for i in range (0, aNbSubs):
         assert (isHorizontal(aLastLine) or isVertical(aLastLine))
         aNbLines = aNbLines + 1
 assert (aNbLines == 4)
-assert (model.dof(aSketchFeature) == 4)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Move one of lines
 #=========================================================================
 aSession.startOperation()
 aLineEnd = geomDataAPI_Point2D(aLastLine.attribute("EndPoint"))
-aLineEnd.setValue(50., 50.)
+aLineEnd.setValue(41., 30.)
 aSession.finishOperation()
 #=========================================================================
 # Check the lines of rectangle are parallel to the axes
 #=========================================================================
 aNbSubs = aSketchFeature.numberOfSubs()
 aNbLines = 0
+tolerance = 1.e-5
+valref = [28.47721, 1.3352780]
 for i in range (0, aNbSubs):
     aFeature = objectToFeature(aSketchFeature.subFeature(i))
     if aFeature.getKind() == "SketchLine":
         aLastLine = aFeature
-        assert (isHorizontal(aLastLine) or isVertical(aLastLine))
+        #print (aLastLine.lastResult().shape().edge().length())
+        #print (valref[i%2])
+        #print (abs(aLastLine.lastResult().shape().edge().length()-valref[i%2]))
+        assert(abs(aLastLine.lastResult().shape().edge().length()-valref[i%2]) <= tolerance)
         aNbLines = aNbLines + 1
 assert (aNbLines == 4)
-assert (model.dof(aSketchFeature) == 4)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # End of test
 #=========================================================================

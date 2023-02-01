@@ -156,8 +156,8 @@ class SketchPlugin_Rectangle(model.Feature):
                 aRefAttrA.setAttr(aPrevLine.attribute("EndPoint"))
                 aRefAttrB.setAttr(aLine.attribute("StartPoint"))
                 aStartPoints.append(aLine.attribute("StartPoint"))
-            # Flags which show horizontal or vertical constraint is build for correponding line
-            self.__isHV = [False, False, False, False]
+            # Flags which show perpendicular constraint is build for correponding line
+            self.__isPERP = [False, False, False]
             # Update coordinates of created lines
             self.updateLines()
             # Create auxiliary diagonals in case of centered rectangle
@@ -186,21 +186,24 @@ class SketchPlugin_Rectangle(model.Feature):
                         aCoincidence = self.__sketch.addFeature("SketchConstraintCoincidence")
                         aCoincidence.refattr("ConstraintEntityA").setAttr(refPnt)
                         aCoincidence.refattr("ConstraintEntityB").setObject(line)
-        # Add horizontal and vertical constraint for the lines which already have result
-        for i in range (0, 4):
-            if self.__isHV[i]:
+        # Perpendicular for the lines which already have result
+        for i in range (0, 3):
+            if self.__isPERP[i]:
                 continue
-            aLine = ModelAPI.objectToFeature(aLinesList.object(i))
-            aLineResult = aLine.lastResult()
-            if aLineResult is None:
+            aLine_A = ModelAPI.objectToFeature(aLinesList.object(i))
+            aLineResult_A = aLine_A.lastResult()
+            if aLineResult_A is None:
                 continue
-            aHVName = "SketchConstraintHorizontal"
-            if i % 2 == 1:
-                aHVName = "SketchConstraintVertical"
-            aHVConstraint = self.__sketch.addFeature(aHVName)
-            aRefAttrA = aHVConstraint.refattr("ConstraintEntityA")
-            aRefAttrA.setObject(aLine.lastResult())
-            self.__isHV[i] = True
+            aLine_B = ModelAPI.objectToFeature(aLinesList.object(i+1))
+            aLineResult_B = aLine_B.lastResult()
+            if aLineResult_B is None:
+                continue
+            aHVConstraint = self.__sketch.addFeature("SketchConstraintPerpendicular")
+            refattrA = aHVConstraint.refattr("ConstraintEntityA")
+            refattrA.setObject(aLine_A.lastResult())
+            refattrB = aHVConstraint.refattr("ConstraintEntityB")
+            refattrB.setObject(aLine_B.lastResult())
+            self.__isPERP[i] = True
 
     def attributeChanged(self, theID):
         if theID == self.START_ID() or theID == self.END_ID() or theID == self.CENTER_ID() or theID == self.CENTER_REF_ID() or theID == self.CORNER_ID():
