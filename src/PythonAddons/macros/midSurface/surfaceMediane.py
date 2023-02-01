@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V10.54"
+__revision__ = "V10.55"
 
 #========================= Les imports - Début ===================================
 
@@ -313,7 +313,7 @@ _cree_face_mediane --> _cree_face_mediane_plane
 
 Décodage des arguments
 On cherche ici les arguments généraux : aide, verbeux
-    """
+"""
 
     for option in liste_option :
 
@@ -357,7 +357,7 @@ Entrées :
 
 Sorties :
   :rang: rang du sous-objet
-    """
+"""
 
     nom_fonction = __name__ + "/_nom_sous_objets"
     blabla = "Dans {} :\n".format(nom_fonction)
@@ -430,7 +430,7 @@ Entrées :
 
 Sorties :
   :rang: rang du sous-objet
-    """
+"""
 
     nom_fonction = __name__ + "/_couleur_objet"
     blabla = "Dans {} :".format(nom_fonction)
@@ -486,7 +486,7 @@ Entrées :
 Sorties :
   :objet: le solide isolé
   :recover: la fonction de récupération
-    """
+"""
 
     nom_fonction = __name__ + "/_isole_solide"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -523,7 +523,7 @@ Entrées :
 Sorties :
   :objet: le solide isolé
   :recover: la fonction de récupération
-    """
+"""
 
     nom_fonction = __name__ + "/_isole_solide_a"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -569,7 +569,7 @@ Entrées :
 Sorties :
   :objet: le solide isolé
   :recover: la fonction de récupération
-    """
+"""
 
     nom_fonction = __name__ + "/_isole_solide_b"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -603,7 +603,7 @@ Entrées :
 Sorties :
   :l_faces_geom: liste des faces du solide au format GEOM
   :l_faces: liste des faces du solide
-    """
+"""
 
     nom_fonction = __name__ + "/_faces_du_solide"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -658,7 +658,7 @@ Entrées :
 
 Sorties :
   :tb_caract: tableau des caractéristiques géométriques des faces
-    """
+"""
 
     nom_fonction = __name__ + "/_calcul_caract_faces"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -697,7 +697,7 @@ Entrées :
 
 Sorties :
   :tb_caract_1[-1], tb_caract_1[-2]: les caractéristiques des 2 faces les plus grandes
-    """
+"""
 
     erreur = 0
     message = ""
@@ -750,7 +750,7 @@ Entrées :
 
 Sorties :
   :caract_arete_face: les caractéristiques des arêtes de la face
-    """
+"""
 
     nom_fonction = __name__ + "/_calcul_caract_aretes_face"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -781,7 +781,7 @@ Sorties :
 
 Entrées :
   :epaisseur: épaisseur du solide
-    """
+"""
 
     nom_fonction = __name__ + "/_verif_epaisseur"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -822,7 +822,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane créée
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -888,7 +888,7 @@ Sorties :
 Entrées :
   :face: la face médiane créée
   :n_recur: niveau de récursivité
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_0"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -931,7 +931,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -946,7 +946,7 @@ Sorties :
 
 #   Création de la face
     if not erreur:
-      face = self._cree_face_mediane_plane_1 ( solide, coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2, n_recur )
+      face = self._cree_face_mediane_plane_1 ( solide, (coo_x, coo_y, coo_z),(vnor_x, vnor_y, vnor_z), taille, d_face_1_2, n_recur )
     else:
       face = None
 
@@ -972,7 +972,7 @@ Sorties :
   :vnor_x, vnor_y, vnor_z: coordonnées du vecteur normal
   :taille: estimation de la taille de la future face
   :d_face_1_2: la distance entre les deux faces
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_0"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1010,29 +1010,29 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane_1 ( self, solide, coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2, n_recur ):
+  def _cree_face_mediane_plane_1 ( self, solide, coo_c, vnor, taille, d_face_1_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Création des objets temporaires et de la face médiane
 
 Entrées :
   :solide: l'objet solide à traiter
-  :coo_x, coo_y, coo_z: coordonnées du centre de la base
-  :vnor_x, vnor_y, vnor_z: coordonnées du vecteur normal
+  :coo_c: coordonnées du centre de la base
+  :vnor: coordonnées du vecteur normal
   :taille: estimation de la taille de la future face
   :d_face_1_2: la distance entre les deux faces
   :n_recur: niveau de récursivité
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_1"
     blabla = "\nDans {} :".format(nom_fonction)
     if self._verbose_max:
       print (blabla)
-      print_tab (n_recur, "Centre   : ({}, {}, {})".format(coo_x, coo_y, coo_z))
-      print_tab (n_recur, "Normale  : ({}, {}, {})".format(vnor_x, vnor_y, vnor_z))
+      print_tab (n_recur, "Centre   : ({}, {}, {})".format(coo_c[0], coo_c[1], coo_c[2]))
+      print_tab (n_recur, "Normale  : ({}, {}, {})".format(vnor[0], vnor[1], vnor[2]))
       print_tab (n_recur, "Taille   : ", taille)
       print_tab (n_recur, "Distance entre les deux faces : ", d_face_1_2)
 
@@ -1041,12 +1041,12 @@ Sorties :
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(taille))
 
 #   Création du point central
-    centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
+    centre = model.addPoint(self.part_doc, coo_c[0], coo_c[1], coo_c[2])
     nom_centre = "{}_centre".format(self.nom_solide)
     centre.result().setName(nom_centre)
 
 #   Création du vecteur normal
-    v_norm = model.addAxis(self.part_doc, vnor_x, vnor_y, vnor_z)
+    v_norm = model.addAxis(self.part_doc, vnor[0], vnor[1], vnor[2])
     nom_normal = "{}_normale".format(self.nom_solide)
     v_norm.result().setName(nom_normal)
 
@@ -1055,7 +1055,61 @@ Sorties :
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création d'un sketch
+#   Création de l'esquisse
+    sketch = self._cree_face_mediane_plane_1a ( nom_plan, nom_centre, nom_par_1, taille, n_recur )
+
+    ### Create LinearCopy
+    LinearCopy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
+    LinearCopy_1.result().subResult(0).setName("{}_0".format(self.nom_solide_aux))
+
+    ### Create Recover
+    Recover_1 = model.addRecover(self.part_doc, LinearCopy_1, [solide])
+    Recover_1.result().setName("{}_1".format(self.nom_solide_aux))
+
+    # Création d'une face ; on la translate d'une demi-épaisseur.
+    for iaux in range(2):
+
+      distance = -0.5*d_face_1_2*float(2*iaux-1)
+      nom_solide = "{}_{}".format(self.nom_solide_aux,iaux)
+      face = self._cree_face_mediane_plane_2 ( sketch.name(), nom_normal, nom_solide, distance, iaux )
+
+      if face.results():
+        face = self._cree_face_mediane_plane_11 ( face, Recover_1, n_recur )
+        break
+      # Si l'intersection est vide, on la translate dans l'autre sens
+      else:
+        if self._verbose_max:
+          print_tab (n_recur, "L'intersection est vide.")
+        face = None
+
+    return face
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _cree_face_mediane_plane_1a ( self, nom_plan, nom_centre, nom_par_1, taille, n_recur ):
+    """Crée la face médiane entre deux autres - cas des surfaces planes - l'esquisse
+
+Entrées :
+  :nom_plan: nom du plan
+  :nom_centre: nom du centre
+  :nom_par_1: nom du paramètre
+  :taille: estimation de la taille de la future face
+  :n_recur: niveau de récursivité
+
+Sorties :
+  :sketch: l'esquisse
+"""
+
+    nom_fonction = __name__ + "/_cree_face_mediane_plane_1a"
+    blabla = "\nDans {} :".format(nom_fonction)
+    if self._verbose_max:
+      print (blabla)
+      print_tab (n_recur, "Plan      : {}".format(nom_plan))
+      print_tab (n_recur, "Centre    : {}".format(nom_centre))
+      print_tab (n_recur, "Paramètre : {}".format(nom_par_1))
+
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
@@ -1098,35 +1152,12 @@ Sorties :
     sketch.setEqual(SketchLine_3.result(), SketchLine_4.result())
 
     model.do()
+
     nom_sketch = "{}_esquisse".format(self.nom_solide)
     sketch.setName(nom_sketch)
     sketch.result().setName(nom_sketch)
 
-    ### Create LinearCopy
-    LinearCopy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
-    LinearCopy_1.result().subResult(0).setName("{}_0".format(self.nom_solide_aux))
-
-    ### Create Recover
-    Recover_1 = model.addRecover(self.part_doc, LinearCopy_1, [solide])
-    Recover_1.result().setName("{}_1".format(self.nom_solide_aux))
-
-    # Création d'une face ; on la translate d'une demi-épaisseur.
-    for iaux in range(2):
-
-      distance = -0.5*d_face_1_2*float(2*iaux-1)
-      nom_solide = "{}_{}".format(self.nom_solide_aux,iaux)
-      face = self._cree_face_mediane_plane_2 ( nom_sketch, nom_normal, nom_solide, distance, iaux )
-
-      if face.results():
-        face = self._cree_face_mediane_plane_11 ( face, Recover_1, n_recur )
-        break
-      # Si l'intersection est vide, on la translate dans l'autre sens
-      else:
-        if self._verbose_max:
-          print_tab (n_recur, "L'intersection est vide.")
-        face = None
-
-    return face
+    return sketch
 
 #===========================  Fin de la méthode ==================================
 
@@ -1144,7 +1175,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_11"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1178,7 +1209,7 @@ Sorties :
 Intersection de la face avec le solide
 
 Entrées :
-  :nom_sketch: nom du sketch
+  :nom_sketch: nom de l'esquisse
   :nom_normal: nom du vecteur normal
   :nom_solide: nom du solide à intersecter
   :distance: la distance de translation
@@ -1186,7 +1217,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_2"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1229,7 +1260,7 @@ Entrées :
 
 Sorties :
   :face_m: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_3"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1265,7 +1296,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_cylindre"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1311,7 +1342,7 @@ Sorties :
   :rayon: rayon moyen entre les deux faces
   :hauteur: hauteur du cylindre
   :epaisseur: épaisseur de l'interface entre les deux faces
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_cylindre_0"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1358,7 +1389,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
     nom_fonction = __name__ + "/_cree_face_mediane_cylindre_1"
     blabla = "\nDans {} :\n".format(nom_fonction)
 
@@ -1386,7 +1417,7 @@ Sorties :
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création d'un sketch
+#   Création de l'esquisse
     nom_par_1 = "{}_R".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon))
     nom_par_2 = "{}_H".format(self.nom_solide)
@@ -1430,7 +1461,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_sphere"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1472,7 +1503,7 @@ Sorties :
   :coo_x, coo_y, coo_z: coordonnées du centre de la sphère
   :rayon: rayon moyen entre les deux faces
   :epaisseur: épaisseur de l'interface entre les deux faces
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_sphere_0"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1509,7 +1540,7 @@ Entrées :
 
 Sorties :
   :face: la face externe de la sphère support
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_sphere_1"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1531,7 +1562,7 @@ Sorties :
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création d'un sketch
+#   Création de l'esquisse
     nom_par_1 = "{}_R".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon))
 
@@ -1586,7 +1617,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_tore"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1629,7 +1660,7 @@ Sorties :
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon_1 : rayon principal
   :rayon_2 : rayon secondaire
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_tore_0"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1671,7 +1702,7 @@ Entrées :
 
 Sorties :
   :face: la face externe du tore support
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_tore_1"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -1700,7 +1731,7 @@ Sorties :
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création d'un sketch
+#   Création de l'esquisse
     nom_par_1 = "{}_R_1".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
     nom_par_2 = "{}_R_2".format(self.nom_solide)
@@ -1755,7 +1786,7 @@ Entrées :
 
 Sorties :
   :face: la face médiane
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_cone"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1799,7 +1830,7 @@ Sorties :
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
   :hauteur: hauteur du cone
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_face_mediane_cone_0"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1862,7 +1893,7 @@ Entrées :
 
 Sorties :
   :face: la face externe du cone support
-    """
+"""
     nom_fonction = __name__ + "/_cree_face_mediane_cone_1"
     blabla = "\nDans {} :\n".format(nom_fonction)
 
@@ -1890,7 +1921,7 @@ Sorties :
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création d'un sketch
+#   Création de l'esquisse
     nom_par_1 = "{}_R_1".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
     nom_par_2 = "{}_R_2".format(self.nom_solide)
@@ -1954,7 +1985,7 @@ Entrées :
 
 Sorties :
   :l_diag: longueur de la diagonale de la boîte englobante
-    """
+"""
 
     nom_fonction = __name__ + "/_calcul_boite_englobante"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -1968,6 +1999,7 @@ Sorties :
       print_tab (n_recur, "de type ", objet.shapeType())
     #print ('bbox = model.getBoundingBox(self.part_doc, model.selection("{}", "{}"))'.format(objet.shapeType(),objet.name()))
     bbox = model.getBoundingBox(self.part_doc, model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
+    bbox.execute(True)
 
     bbox_nom = bbox.name()
     if self._verbose_max:
@@ -1999,14 +2031,14 @@ Sorties :
     """Crée un volume de révolution
 
 Entrées :
-  :nom_sketch: nom du sketch à révolutionner
+  :nom_sketch: nom de l'esquisse à révolutionner
   :nom_centre: nom du point associé au centre du volume de révolution
   :coo_x, coo_y, coo_z: coordonnées du centre du tore
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon_1 : rayon principal
   :rayon_2 : rayon secondaire
   :nom_objet: nom de l'objet 2D créé
-    """
+"""
 
     nom_fonction = __name__ + "/_cree_revolution"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -2050,7 +2082,7 @@ Entrées :
 
 Sorties :
   :face: la face externe de l'objet support intersecté avec le solide initial
-    """
+"""
 
     nom_fonction = __name__ + "/_creation_face_inter"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -2078,7 +2110,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/face_mediane_solide"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -2149,7 +2181,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/_traitement_objet"
     blabla = "\nDans {} :".format(nom_fonction)
@@ -2222,7 +2254,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/surf_fic_cao"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -2282,7 +2314,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/surf_objet_shaper"
     blabla = "Dans {} :".format(nom_fonction)
@@ -2329,7 +2361,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/_surf_objet_shaper_0"
     blabla = "Dans {} :\n".format(nom_fonction)
@@ -2350,33 +2382,7 @@ Sorties :
 # 1. Au premier passage, il faut récupérer la pièce et garder la référence au résultat principal
 
       if ( n_recur == 0 ):
-        self.part_doc = model.activeDocument()
-        objet_0 = objet.result()
-        self.objet_principal = objet_0
-        objet_bis = objet.defaultResult().shape()
-        print_tab (n_recur, "Examen de l'objet ", objet.result().name(), saut_av=True)
-        print_tab (n_recur, "Type python : ", type(objet))
-        print_tab (n_recur, "Type {} / {} ; volume = ".format(objet_bis.shapeType(),objet_bis.shapeTypeStr()), GeomAlgoAPI_ShapeTools.volume(objet_bis))
-        l_volumes = list()
-        exp = GeomAPI_ShapeExplorer(objet_bis, GeomAPI_Shape.SOLID)
-        while exp.more():
-          l_volumes.append(exp.current().solid())
-          exp.next()
-
-        for ivolume, volume in enumerate(l_volumes):
-          print_tab (n_recur+1, "Type python : ", type(volume))
-          print_tab (n_recur+1, "Volume n°{} ; volume = ".format(ivolume), GeomAlgoAPI_ShapeTools.volume(volume))
-          print_tab (n_recur+1, "Type {} / ".format(volume.shapeType()), volume.shapeTypeStr())
-          #print ("\tInformations : {}".format(volume.shapeInfo()))
-
-          l_faces = list()
-          exp = GeomAPI_ShapeExplorer(volume, GeomAPI_Shape.FACE)
-          while exp.more():
-            l_faces.append(exp.current().face())
-            exp.next()
-
-          for iface, face in enumerate(l_faces):
-            print_tab (n_recur+2, "Face n°{} ; surface = ".format(iface), GeomAlgoAPI_ShapeTools.area(face))
+        objet_0, l_faces = self._surf_objet_shaper_00 (objet)
       else:
         objet_0 = objet
         print_tab (n_recur, "Examen de l'objet ", objet.name(), saut_av=True)
@@ -2399,15 +2405,15 @@ Sorties :
         if erreur:
           break
 
+      if erreur:
+        break
+
 # 2.2. Cet objet n'a pas de sous-objets. Si c'est un solide, on le traite
 
       if ( objet_0.shapeType() == "SOLID" ):
         erreur, message = self.surf_solide_shaper ( objet_0, n_recur )
         if erreur:
           break
-
-      if erreur:
-        break
 
 # 3. Futur message pour le résultat
 
@@ -2422,6 +2428,57 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
+  def _surf_objet_shaper_00 (self, objet):
+    """Liste les faces d'un objet SHAPER passé en argument
+
+Entrées :
+  :objet: objet à traiter
+
+Sorties :
+  :objet_0: le résultat associé à l'objet
+  :l_faces: liste des faces
+"""
+
+    nom_fonction = __name__ + "/_surf_objet_shaper_00"
+    blabla = "Dans {} :\n".format(nom_fonction)
+
+    if self._verbose_max:
+      print (blabla)
+
+    self.part_doc = model.activeDocument()
+    objet_0 = objet.result()
+    self.objet_principal = objet_0
+    objet_bis = objet.defaultResult().shape()
+    print_tab (0, "Examen de l'objet ", objet.result().name(), saut_av=True)
+    print_tab (0, "Type python : ", type(objet))
+    print_tab (0, "Type {} / {} ; volume = ".format(objet_bis.shapeType(),objet_bis.shapeTypeStr()), GeomAlgoAPI_ShapeTools.volume(objet_bis))
+    l_volumes = list()
+    exp = GeomAPI_ShapeExplorer(objet_bis, GeomAPI_Shape.SOLID)
+    while exp.more():
+      l_volumes.append(exp.current().solid())
+      exp.next()
+
+    for ivolume, volume in enumerate(l_volumes):
+      print_tab (1, "Type python : ", type(volume))
+      print_tab (1, "Volume n°{} ; volume = ".format(ivolume), GeomAlgoAPI_ShapeTools.volume(volume))
+      print_tab (1, "Type {} / ".format(volume.shapeType()), volume.shapeTypeStr())
+      #print ("\tInformations : {}".format(volume.shapeInfo()))
+
+      l_faces = list()
+      exp = GeomAPI_ShapeExplorer(volume, GeomAPI_Shape.FACE)
+      while exp.more():
+        l_faces.append(exp.current().face())
+        exp.next()
+
+      for iface, face in enumerate(l_faces):
+        print_tab (2, "Face n°{} ; surface = ".format(iface), GeomAlgoAPI_ShapeTools.area(face))
+
+    return objet_0, l_faces
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
   def _surf_objet_shaper_1 (self, n_recur=0):
     """Gestion des surfaces médianes créées
 
@@ -2431,7 +2488,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/_surf_objet_shaper_1"
     blabla = "Dans {} :\n".format(nom_fonction)
@@ -2506,7 +2563,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/surf_solide_shaper"
     blabla = "Dans {} :".format(nom_fonction)
@@ -2581,7 +2638,7 @@ Entrées :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/surf_objet_geom"
     blabla = "\nDans {} :\n".format(nom_fonction)
@@ -2607,7 +2664,7 @@ Sorties :
 Sorties :
   :erreur: code d'erreur
   :message: message d'erreur
-    """
+"""
 
     nom_fonction = __name__ + "/lancement"
     blabla = "\nDans {} :\n".format(nom_fonction)
