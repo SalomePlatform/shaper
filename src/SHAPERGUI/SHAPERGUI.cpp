@@ -100,7 +100,7 @@ static const QString ToolbarsSection("SHAPER_Toolbars");
 static const QString FreeCommandsParam("OutOFToolbars");
 
 
-/** 
+/**
 * Class for preferences management
 */
 class SHAPERGUI_PrefMgr: public ModuleBase_IPrefMgr
@@ -383,6 +383,16 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
   connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
           this, SLOT(onSaveAsDocByShaper()));
   updateInfoPanel();
+
+  //connect(myWorkshop->operationMgr(), SIGNAL(operationResumed(ModuleBase_Operation*)),
+  //        this, SLOT(onOperationResumed(ModuleBase_Operation*)));
+  //connect(myWorkshop->operationMgr(), SIGNAL(operationStopped(ModuleBase_Operation*)),
+  //        this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myWorkshop->operationMgr(), SIGNAL(operationCommitted(ModuleBase_Operation*)),
+          this, SLOT(onOperationCommitted(ModuleBase_Operation*)));
+  connect(myWorkshop->operationMgr(), SIGNAL(operationAborted(ModuleBase_Operation*)),
+          this, SLOT(onOperationAborted(ModuleBase_Operation*)));
+
   return isDone;
 }
 
@@ -482,6 +492,39 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   publishToStudy();
 
   return LightApp_Module::deactivateModule(theStudy);
+}
+
+//******************************************************
+void SHAPERGUI::logShaperGUIEvent()
+{
+  QAction* anAction = static_cast<QAction*>(sender());
+  QString anId = anAction->data().toString();
+  QString anEventDescription ("SHAPER");
+  if (anId.contains("Sketch"))
+    anEventDescription += " sketcher";
+  anEventDescription += ": ";
+  anEventDescription += anAction->text();
+  anEventDescription += " has been started";
+  CAM_Application::logUserEvent(anEventDescription);
+}
+
+//******************************************************
+void SHAPERGUI::onOperationCommitted(ModuleBase_Operation* theOperation)
+{
+  //QString anEventDescription ("SHAPER operation has been committed");
+  QString anEventDescription ("SHAPER operation ");
+  anEventDescription += theOperation->id();
+  anEventDescription += " has been committed";
+  CAM_Application::logUserEvent(anEventDescription);
+}
+
+//******************************************************
+void SHAPERGUI::onOperationAborted(ModuleBase_Operation* theOperation)
+{
+  QString anEventDescription ("SHAPER operation ");
+  anEventDescription += theOperation->id();
+  anEventDescription += " has been aborted";
+  CAM_Application::logUserEvent(anEventDescription);
 }
 
 //******************************************************
@@ -704,6 +747,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
     createTool(separator(), aWBTool);
     registerCommandToolbar(theTBName, -1);
   }
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(logShaperGUIEvent()));
   return aAction;
 }
 
