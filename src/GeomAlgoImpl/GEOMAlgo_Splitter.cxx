@@ -166,7 +166,11 @@ void GEOMAlgo_Splitter::BuildResult(const TopAbs_ShapeEnum theType)
 //function : PostTreat
 //purpose  : 
 //=======================================================================
+#if OCC_VERSION_LARGE < 0x07070000
 void GEOMAlgo_Splitter::PostTreat()
+#else
+void GEOMAlgo_Splitter::PostTreat(const Message_ProgressRange& theRange)
+#endif
 {
   if (myLimit!=TopAbs_SHAPE) {
     Standard_Integer i, aNbS;
@@ -268,7 +272,11 @@ void GEOMAlgo_Splitter::PostTreat()
     myShape=aLS.First();
   }
   //
+#if OCC_VERSION_LARGE < 0x07070000
   BOPAlgo_Builder::PostTreat();
+#else
+  BOPAlgo_Builder::PostTreat(theRange);
+#endif
 }
 //=======================================================================
 //function : TreatCompound

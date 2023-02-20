@@ -35,6 +35,8 @@
 
 #include <BOPAlgo_Builder.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 //=======================================================================
 //class    : GEOMAlgo_Splitter
 //purpose  :
@@ -86,7 +88,11 @@
   GEOMALGOIMPL_EXPORT virtual void BuildResult(const TopAbs_ShapeEnum theType);
 
   /// Post processing of the calculation
+#if OCC_VERSION_LARGE < 0x07070000
   GEOMALGOIMPL_EXPORT virtual void PostTreat();
+#else
+  GEOMALGOIMPL_EXPORT virtual void PostTreat(const Message_ProgressRange& theRange);
+#endif
   
  protected:
    /// List of tools

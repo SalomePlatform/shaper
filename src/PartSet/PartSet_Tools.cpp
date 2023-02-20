@@ -93,7 +93,6 @@
 #include <AIS_InteractiveObject.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
-#include <V3d_Coordinate.hxx>
 
 #include <QMouseEvent>
 
@@ -115,7 +114,7 @@ gp_Pnt PartSet_Tools::convertClickToPoint(QPoint thePoint, Handle(V3d_View) theV
   if (theView.IsNull())
     return gp_Pnt();
 
-  V3d_Coordinate XAt, YAt, ZAt;
+  Standard_Real XAt, YAt, ZAt;
   theView->At(XAt, YAt, ZAt);
   gp_Pnt AtPoint(XAt, YAt, ZAt);
 
@@ -157,7 +156,7 @@ Handle(V3d_View) theView,
   gp_Vec aVec(anOriginPnt, thePoint);
 
   if (!theView.IsNull()) {
-    V3d_Coordinate XEye, YEye, ZEye, XAt, YAt, ZAt;
+    Standard_Real XEye, YEye, ZEye, XAt, YAt, ZAt;
     theView->Eye(XEye, YEye, ZEye);
 
     theView->At(XAt, YAt, ZAt);

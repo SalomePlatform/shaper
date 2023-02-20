@@ -28,6 +28,8 @@
 #include "GeomAPI_Cone.h"
 #include "GeomAPI_Torus.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <Bnd_Box2d.hxx>
 #include <BndLib_Add2dCurve.hxx>
 #include <BOPTools_AlgoTools.hxx>
@@ -47,7 +49,6 @@
 #include <Geom_SurfaceOfRevolution.hxx>
 #include <Geom_SweptSurface.hxx>
 #include <Geom_ToroidalSurface.hxx>
-#include <GeomAdaptor_HSurface.hxx>
 #include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <IntPatch_ImpImpIntersection.hxx>
@@ -55,6 +56,12 @@
 #include <Standard_Type.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
+
+#if OCC_VERSION_LARGE < 0x07070000
+#include <GeomAdaptor_HSurface.hxx>
+#else
+#include <GeomAdaptor_Surface.hxx>
+#endif
 
 #include <gp_Sphere.hxx>
 #include <gp_Cylinder.hxx>
@@ -156,8 +163,13 @@ bool GeomAPI_Face::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape)
   if (anOwnSurf->IsKind(STANDARD_TYPE(Geom_ElementarySurface)) &&
       anOtherSurf->IsKind(STANDARD_TYPE(Geom_ElementarySurface)))
   {
+#if OCC_VERSION_LARGE < 0x07070000
     Handle(GeomAdaptor_HSurface) aGA1 = new GeomAdaptor_HSurface(anOwnSurf);
     Handle(GeomAdaptor_HSurface) aGA2 = new GeomAdaptor_HSurface(anOtherSurf);
+#else
+    Handle(GeomAdaptor_Surface) aGA1 = new GeomAdaptor_Surface(anOwnSurf);
+    Handle(GeomAdaptor_Surface) aGA2 = new GeomAdaptor_Surface(anOtherSurf);
+#endif
 
     Handle(BRepTopAdaptor_TopolTool) aTT1 = new BRepTopAdaptor_TopolTool();
     Handle(BRepTopAdaptor_TopolTool) aTT2 = new BRepTopAdaptor_TopolTool();

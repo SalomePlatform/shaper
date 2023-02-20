@@ -153,6 +153,8 @@
 
 #include <SUIT_ResourceMgr.h>
 
+#include <Basics_OCCTVersion.hxx>
+
 #define FEATURE_ITEM_COLOR "0,0,225"
 
 
@@ -1474,7 +1476,11 @@ void PartSet_Module::setTexture(const AISObjectPtr& thePrs,
 
       //aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage());
       Handle(Image_PixMap) aPixmap = new Image_PixMap();
+#if OCC_VERSION_LARGE < 0x07070000
       aPixmap->InitTrash(Image_PixMap::ImgBGRA, aWidth, aHeight);
+#else
+      aPixmap->InitTrash(Image_Format_BGRA, aWidth, aHeight);
+#endif
       std::list<unsigned char>::iterator aByteIter = aByteList.begin();
       for (int aLine = 0; aLine < aHeight; ++aLine) {
         // convert pixels from ARGB to renderer-compatible RGBA

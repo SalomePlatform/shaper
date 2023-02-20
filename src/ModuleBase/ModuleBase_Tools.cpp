@@ -56,6 +56,8 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <SUIT_ResourceMgr.h>
 
+#include <Basics_OCCTVersion.hxx>
+
 #ifdef HAVE_SALOME
 #include <SUIT_Application.h>
 #include <SUIT_Session.h>
@@ -1235,11 +1237,19 @@ void setPointBallHighlighting(AIS_InteractiveObject* theAIS)
       anAspect = aPntAspect->Aspect();
       anAspect->SetType(Aspect_TOM_BALL);
     } else {
+#if OCC_VERSION_LARGE < 0x07070000
       if(aPixMap->Format() == Image_PixMap::ImgGray) {
         aPixMap->SetFormat (Image_PixMap::ImgAlpha);
       } else if(aPixMap->Format() == Image_PixMap::ImgGrayF) {
         aPixMap->SetFormat (Image_PixMap::ImgAlphaF);
       }
+#else
+      if(aPixMap->Format() == Image_Format_Gray) {
+        aPixMap->SetFormat (Image_Format_Alpha);
+      } else if(aPixMap->Format() == Image_Format_GrayF) {
+        aPixMap->SetFormat (Image_Format_AlphaF);
+      }
+#endif
       anAspect = new Graphic3d_AspectMarker3d(aPixMap);
       aPntAspect->SetAspect(anAspect);
     }

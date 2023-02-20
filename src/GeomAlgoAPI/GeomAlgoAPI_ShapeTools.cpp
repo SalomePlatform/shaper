@@ -21,6 +21,8 @@
 
 #include "GeomAlgoAPI_SketchBuilder.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Dir.h>
@@ -67,7 +69,11 @@
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
 
+#if OCC_VERSION_LARGE < 0x07070000
 #include <GeomAdaptor_HCurve.hxx>
+#else
+#include <GeomAdaptor_Curve.hxx>
+#endif
 
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ShapeIterator.h>
@@ -1303,7 +1309,11 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
       static const int THE_MAX_INTERVALS = 32;
       double aFirst, aLast;
       Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aNewEdge, aFirst, aLast);
+#if OCC_VERSION_LARGE < 0x07070000
       Handle(GeomAdaptor_HCurve) aHCurve = new GeomAdaptor_HCurve(aCurve);
+#else
+      Handle(GeomAdaptor_Curve) aHCurve = new GeomAdaptor_Curve(aCurve);
+#endif
       Approx_CurvilinearParameter anApprox(aHCurve, Precision::Confusion(), aCurve->Continuity(),
                                            THE_MAX_DEGREE, THE_MAX_INTERVALS);
       if (anApprox.HasResult()) {
