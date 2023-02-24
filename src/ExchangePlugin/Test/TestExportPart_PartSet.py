@@ -70,3 +70,5 @@ model.begin()
 model.exportPart(partSet, filename, [Axis_4.result()])
 model.end()
 assert os.path.exists(filename), "ERROR: Cannot export construction elements of PartSet"
+
+model.removeTmpFile(filename)

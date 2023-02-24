@@ -70,3 +70,5 @@ model.begin()
 model.exportPart(Part_2_doc, filename)
 model.end()
 assert os.path.exists(filename), "ERROR: Cannot export Part_2 to file {}".format(filename)
+
+model.removeTmpFile(filename)

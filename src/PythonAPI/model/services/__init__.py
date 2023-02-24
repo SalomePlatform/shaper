@@ -74,6 +74,7 @@ def checkPythonDump(theDumpMode = CHECK_NAMING_AND_GEOMETRICAL):
   aGeo  = aPrefix + "_geo.py"
   aWeak = aPrefix + "_weak.py"
   isOk = checkPyDump(aNaming, aGeo, aWeak, theDumpMode)
+  removeTmpFile(aPrefix)
   removeTmpFile(aNaming)
   removeTmpFile(aGeo)
   removeTmpFile(aWeak)
