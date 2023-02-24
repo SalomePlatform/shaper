@@ -72,3 +72,5 @@ model.begin()
 model.exportPart(Part_2_doc, filename, [featureToExport.result()])
 model.end()
 assert os.path.exists(filename), "ERROR: Cannot export feature {}".format(featureToExport.name())
+
+model.removeTmpFile(filename)

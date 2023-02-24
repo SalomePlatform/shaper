@@ -112,4 +112,6 @@ model.importPart(Part_1_doc, filename, Translation_1)
 model.end()
 checkUniqueNames(Part_1_doc)
 
+model.removeTmpFile(filename)
+
 assert(model.checkPythonDump())

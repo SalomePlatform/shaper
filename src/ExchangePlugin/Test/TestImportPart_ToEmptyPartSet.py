@@ -85,6 +85,8 @@ partSet = model.moduleDocument()
 model.importPart(partSet, filename)
 model.end()
 
+model.removeTmpFile(filename)
+
 # Test 1. New Part should be created
 assert(partSet.size(ModelAPI_ResultPart.group()) == 1)
 newPart = modelAPI_ResultPart(objectToResult(partSet.object(ModelAPI_ResultPart.group(), 0)))

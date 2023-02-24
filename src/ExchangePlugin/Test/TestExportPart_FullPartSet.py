@@ -70,3 +70,5 @@ model.begin()
 model.exportPart(partSet, filename)
 model.end()
 assert os.path.exists(filename), "ERROR: Failed to export full PartSet"
+
+model.removeTmpFile(filename)

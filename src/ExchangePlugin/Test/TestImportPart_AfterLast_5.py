@@ -122,6 +122,8 @@ model.begin()
 model.importPart(Part_1_doc, filename)
 model.end()
 
+model.removeTmpFile(filename)
+
 # compare results with the reference data
 TOLERANCE = 1.e-7
 features = Part_1_doc.allFeatures()
