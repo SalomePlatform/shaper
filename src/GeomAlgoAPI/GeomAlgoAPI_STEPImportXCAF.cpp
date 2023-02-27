@@ -166,7 +166,7 @@ std::shared_ptr<GeomAPI_Shape> setGeom(const Handle(XCAFDoc_ShapeTool) &theShape
     aGeomShape->setImpl(new TopoDS_Shape(shape));
     return aGeomShape;
   } else {
-    for (Standard_Integer i=1; i<aFrshapes.Length(); i++) {
+    for (Standard_Integer i=1; i<=aFrshapes.Length(); i++) {
       TopoDS_Shape aS = theShapeTool->GetShape(aFrshapes.Value(i));
       TDF_Label aLabel = theShapeTool->FindShape(aS, Standard_False);
       if ( (!aLabel.IsNull()) && (theShapeTool->IsShape(aLabel)) ) {
@@ -174,7 +174,7 @@ std::shared_ptr<GeomAPI_Shape> setGeom(const Handle(XCAFDoc_ShapeTool) &theShape
           if (aS.IsNull()) {
             continue;
           } else {
-            if (!theShapeTool->IsReference(aLabel) ){
+            if (aS.ShapeType() != TopAbs_SOLID && !theShapeTool->IsReference(aLabel)){
               for(TDF_ChildIterator anIt(aLabel); anIt.More(); anIt.Next()) {
                 aB.Add(aCompound, theShapeTool->GetShape(anIt.Value()) );
               }
