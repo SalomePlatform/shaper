@@ -34,6 +34,8 @@
 #include <Interface_Static.hxx>
 #include <Quantity_Color.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 // a structure to manage step document exported attributes
 struct GeomAlgoAPI_STEPAttributes {
   bool myHasColor; ///< true if color is defined
@@ -145,10 +147,19 @@ bool STEPExport(const std::string& theFileName,
   // store the XCAF document to STEP file
   try {
     GeomAlgoAPI_Tools::Localizer aLocalizer; // Set "C" numeric locale to save numbers correctly
+
+#if OCC_VERSION_LARGE < 0x07070000
     STEPCAFControl_Writer aWriter;
     Interface_Static::SetCVal("xstep.cascade.unit", "M");
     Interface_Static::SetIVal("write.step.nonmanifold", 0); // 1 don't allow to export assemly tree
     Interface_Static::SetCVal("write.step.unit", "M");
+#else
+    STEPCAFControl_Writer aWriterTmp;
+    Interface_Static::SetCVal("xstep.cascade.unit", "M");
+    Interface_Static::SetIVal("write.step.nonmanifold", 0); // 1 don't allow to export assemly tree
+    Interface_Static::SetCVal("write.step.unit", "M");
+    STEPCAFControl_Writer aWriter;
+#endif
 
     auto aStatus = aWriter.Transfer(aDoc, STEPControl_AsIs);
     if (aStatus == IFSelect_RetDone)
@@ -156,7 +167,7 @@ bool STEPExport(const std::string& theFileName,
     if (aStatus != IFSelect_RetDone)
       theError = "STEP Export failed";
   }
-  catch (Standard_Failure exception) {
+  catch (Standard_Failure&) {
     theError = "Exception catched in STEPExport";
   }
   return theError.empty();

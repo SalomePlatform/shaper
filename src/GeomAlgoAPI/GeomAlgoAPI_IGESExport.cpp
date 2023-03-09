@@ -21,13 +21,21 @@
 
 #include "GeomAlgoAPI_Tools.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 // OOCT includes
 #include <IGESControl_Controller.hxx>
 #include <IGESControl_Writer.hxx>
+#include <IGESData_IGESModel.hxx>
 #include <Interface_Static.hxx>
+
+#include <XSAlgo.hxx>
+#include <XSAlgo_AlgoContainer.hxx>
 
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Iterator.hxx>
+
+#include <UnitsMethods.hxx>
 
 //=============================================================================
 /*!
@@ -139,6 +147,13 @@ bool IGESExport(const std::string& theFileName,
   IGESControl_Controller::Init();
   IGESControl_Writer ICW( "M", aBrepMode ); // export explicitly in meters
   Interface_Static::SetCVal( "xstep.cascade.unit", "M" );
+
+#if OCC_VERSION_LARGE >= 0x07070000
+  Interface_Static::SetCVal("write.iges.unit", "M");
+  XSAlgo::AlgoContainer()->PrepareForTransfer(); // update unit info
+  Standard_Real aScaleFactorMM = UnitsMethods::GetCasCadeLengthUnit();
+  ICW.Model()->ChangeGlobalSection().SetCascadeUnit(aScaleFactorMM);
+#endif
 
   // 09.03.2010 skl for bug 0020726
   // change default value "Average" to "Max"
