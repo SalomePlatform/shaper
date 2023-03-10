@@ -18,12 +18,17 @@
 //
 
 #include <GeomAlgoAPI_STLImport.h>
+
 #include "GeomAlgoAPI_Tools.h"
-#include <TopoDS_Shape.hxx>
-#include <StlAPI_Reader.hxx>
-#include <TopoDS_Shell.hxx>
+
+#include <Basics_OCCTVersion.hxx>
+
 #include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Shell.hxx>
 #include <BRepBuilderAPI_MakeSolid.hxx>
+#include <BRepBuilderAPI_Sewing.hxx>
+#include <StlAPI_Reader.hxx>
 
 std::shared_ptr<GeomAPI_Shape> STLImport(const std::string& theFileName,
                                          std::string& theError)
@@ -38,6 +43,15 @@ std::shared_ptr<GeomAPI_Shape> STLImport(const std::string& theFileName,
       theError = "Can't import file.";
       aResShape.Nullify();
     }
+#if OCC_VERSION_LARGE >= 0x07070000
+    BRepBuilderAPI_Sewing aSewingTool;
+    aSewingTool.Init(1.0e-06, Standard_True);
+    aSewingTool.Load(aResShape);
+    aSewingTool.Perform();
+    TopoDS_Shape aSewedShape = aSewingTool.SewedShape();
+    if (!aSewedShape.IsNull())
+      aResShape = aSewedShape;
+#endif
     if(aResShape.ShapeType() == TopAbs_SHELL)
     {
       BRepBuilderAPI_MakeSolid soliMaker(TopoDS::Shell(aResShape));
