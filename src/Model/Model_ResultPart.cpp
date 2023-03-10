@@ -18,6 +18,7 @@
 //
 
 #include <Model_ResultPart.h>
+
 #include <ModelAPI_Data.h>
 #include <Model_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -46,6 +47,8 @@
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
 #include <TopExp_Explorer.hxx>
+
+#include <Basics_OCCTVersion.hxx>
 
 #define baseRef() \
   std::dynamic_pointer_cast<Model_ResultPart>(data()->reference(BASE_REF_ID())->value())
@@ -196,7 +199,11 @@ static GeomShapePtr transformShape(const GeomShapePtr theShape, const gp_Trsf& t
     // just update the location of the shape in case of affine transformation
     TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
     if (!aShape.IsNull()) {
+#if OCC_VERSION_LARGE < 0x07070000
       aShape.Move(theTrsf);
+#else
+      aShape.Move(theTrsf, Standard_False);
+#endif
       aResult->setImpl(new TopoDS_Shape(aShape));
     }
   }
@@ -289,7 +296,11 @@ std::wstring Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& 
       TopExp_Explorer anExp(anOrigMain, aSelection.ShapeType());
       for(; anExp.More(); anExp.Next()) {
         if (anExp.Current().IsPartner(aSelection)) {
+#if OCC_VERSION_LARGE < 0x07070000
           TopoDS_Shape anOrigMoved = anExp.Current().Moved(*(myTrsf.get()));
+#else
+          TopoDS_Shape anOrigMoved = anExp.Current().Moved(*(myTrsf.get()), Standard_False);
+#endif
           //if (anOrigMoved.IsSame(aSelection)) {
           if (IsEqualTrsf(aSelTrsf, anOrigMoved.Location().Transformation())) {
             std::shared_ptr<GeomAPI_Shape> anOrigSel(new GeomAPI_Shape);
@@ -409,7 +420,11 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
   aResult = aSelAttr->value(theIndex - 1)->value();
   if (myTrsf.get() && aResult.get() && !aResult->isNull()) {
     gp_Trsf aSumTrsf = sumTrsf();
+#if OCC_VERSION_LARGE < 0x07070000
     TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf);
+#else
+    TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf, Standard_False);
+#endif
     aResult->setImpl(new TopoDS_Shape(anOrigMoved));
   }
   return aResult;
@@ -426,7 +441,11 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::selectionValue(const int theInd
   aResult = aSelAttr->value(theIndex - 1)->value();
   if (myTrsf.get() && aResult.get() && !aResult->isNull()) {
     gp_Trsf aSumTrsf = sumTrsf();
+#if OCC_VERSION_LARGE < 0x07070000
     TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf);
+#else
+    TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf, Standard_False);
+#endif
     aResult->setImpl(new TopoDS_Shape(anOrigMoved));
   }
   return aResult;
