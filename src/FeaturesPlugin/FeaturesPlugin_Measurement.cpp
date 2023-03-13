@@ -47,6 +47,8 @@
 #include <PrsDim_AngleDimension.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <iomanip>
 #include <sstream>
 #include <array>
@@ -617,6 +619,12 @@ void FeaturesPlugin_Measurement::setupDimension(AISObjectPtr theDim)
     std::string aFont = Config_PropManager::string("Visualization", "dimension_font");
 
     Handle(Prs3d_DimensionAspect) anAspect = aDim->DimensionAspect();
+#if OCC_VERSION_LARGE >= 0x07070000
+    if (anAspect.IsNull()) {
+      aDim->Attributes()->SetupOwnDefaults();
+      anAspect = aDim->DimensionAspect();
+    }
+#endif
     anAspect->MakeArrows3d(false);
     anAspect->MakeText3d(false);
     anAspect->MakeTextShaded(false);
