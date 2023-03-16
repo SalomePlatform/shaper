@@ -64,8 +64,8 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
         aPartSet = aSession.moduleDocument()
         # check that the PartSet document current feature is the last to avoid problems with all
         # features update
-        if aPartSet.size(model.ModelAPI_Feature_group()) > 0:
-          aLastFeature = ModelAPI.objectToFeature(aPartSet.object(model.ModelAPI_Feature_group(), aPartSet.size(model.ModelAPI_Feature_group()) - 1))
+        if aPartSet.size(model.ModelAPI_Feature.group()) > 0:
+          aLastFeature = ModelAPI.objectToFeature(aPartSet.object(model.ModelAPI_Feature.group(), aPartSet.size(model.ModelAPI_Feature.group()) - 1))
           aCurrentFeature = aPartSet.currentFeature(True)
           if aLastFeature.data().featureId() != aCurrentFeature.data().featureId():
             EventsAPI.Events_InfoMessage("PublishToStudy", "Not all PartSet parts are up-to-date, nothing is published. Please, make the last PartSet feature as current.", self).send()
@@ -78,8 +78,8 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
         allProcessed = []
 
         # iterate all parts and all results to publish them in SHAPER_STUDY
-        for aPartId in range(aPartSet.size(model.ModelAPI_ResultPart_group())):
-          aPartObject = aPartSet.object(model.ModelAPI_ResultPart_group(), aPartId)
+        for aPartId in range(aPartSet.size(model.ModelAPI_ResultPart.group())):
+          aPartObject = aPartSet.object(model.ModelAPI_ResultPart.group(), aPartId)
           aPartRes = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject))
           aPartDoc = aPartRes.partDoc()
           if aPartDoc is None and aPartObject is not None:
@@ -89,8 +89,8 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
           # Collects all features of exported results to find results of the same features and extend id.
           # Map from feature index to index of result. If index is zero (initial), no surrfix to entry is added.
           aFeaturesIndices = {}
-          for aResId in range(aPartDoc.size(model.ModelAPI_ResultBody_group())):
-            aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)
+          for aResId in range(aPartDoc.size(model.ModelAPI_ResultBody.group())):
+            aResObject = aPartDoc.object(model.ModelAPI_ResultBody.group(), aResId)
             aRes = model.objectToResult(aResObject)
             #do not export images
             if aRes.hasTexture() is True:

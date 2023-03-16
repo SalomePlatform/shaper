@@ -60,8 +60,8 @@ class compoundVertices(model.Feature):
     def initAttributes(self):
         """Override Feature.initAttributes()"""
         # Creating the input argument of the feature
-        self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
-        self.data().addAttribute(self.SEPARATOR_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
+        self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString.typeId())
+        self.data().addAttribute(self.SEPARATOR_ID(), ModelAPI.ModelAPI_AttributeString.typeId())
 
         self.lfeatures = []
         self.folder = None

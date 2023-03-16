@@ -61,9 +61,9 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
     def exportViaXAO(self):
         # if part-set is active, iterate also parts
         for isPart in (True, False):
-          aResultType = model.ModelAPI_ResultBody_group()
+          aResultType = model.ModelAPI_ResultBody.group()
           if isPart:
-            aResultType = model.ModelAPI_ResultPart_group()
+            aResultType = model.ModelAPI_ResultPart.group()
           # iterate all results of Part, export one by one due to issue 2882
           for aResIndex in range(self.Part.size(aResultType)):
             anObject = self.Part.object(aResultType, aResIndex)

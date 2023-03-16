@@ -235,7 +235,7 @@ model.testNbSubShapes(Partition_1, GeomAPI_Shape.VERTEX, [499])
 
 import math
 from GeomAlgoAPI import *
-aResultArea = GeomAlgoAPI_ShapeTools_area(Partition_1.results()[0].resultSubShapePair()[0].shape())
+aResultArea = GeomAlgoAPI_ShapeTools.area(Partition_1.results()[0].resultSubShapePair()[0].shape())
 anExpectedArea = 70.18465
 assert(math.fabs(aResultArea-anExpectedArea)/anExpectedArea<1e-7)
 

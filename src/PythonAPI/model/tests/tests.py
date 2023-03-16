@@ -69,14 +69,14 @@ def generateTests(theFeature, theFeatureName, theTestsList = []):
     aNbResults = len(theFeature.results())
     aResultsVolumes = []
     for anIndex in range(0, aNbResults):
-      aResultsVolumes.append(GeomAlgoAPI_ShapeTools_volume(theFeature.results()[anIndex].resultSubShapePair()[0].shape()))
+      aResultsVolumes.append(GeomAlgoAPI_ShapeTools.volume(theFeature.results()[anIndex].resultSubShapePair()[0].shape()))
     print("model.testResultsVolumes({}, [{}])".format(theFeatureName, ", ".join("{:0.27f}".format(i) for i in aResultsVolumes)))
 
   if "testResultsAreas" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
     aResultsAreas = []
     for anIndex in range(0, aNbResults):
-      aResultsAreas.append(GeomAlgoAPI_ShapeTools_area(theFeature.results()[anIndex].resultSubShapePair()[0].shape()))
+      aResultsAreas.append(GeomAlgoAPI_ShapeTools.area(theFeature.results()[anIndex].resultSubShapePair()[0].shape()))
     print("model.testResultsAreas({}, [{}])".format(theFeatureName, ", ".join("{:0.27f}".format(i) for i in aResultsAreas)))
 
 
@@ -191,7 +191,7 @@ def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDi
   aListSize = len(theExpectedResultsVolumes)
   assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
   for anIndex in range(0, aNbResults):
-    aResultVolume = GeomAlgoAPI_ShapeTools_volume(theFeature.results()[anIndex].resultSubShapePair()[0].shape())
+    aResultVolume = GeomAlgoAPI_ShapeTools.volume(theFeature.results()[anIndex].resultSubShapePair()[0].shape())
     aResultVolumeStr = "{:0.27f}".format(aResultVolume).lstrip("0").lstrip(".").lstrip("0")
     anExpectedResultVolume = theExpectedResultsVolumes[anIndex]
     anExpectedResultVolumeStr = "{:0.27f}".format(anExpectedResultVolume).lstrip("0").lstrip(".").lstrip("0")
@@ -208,7 +208,7 @@ def testResultsAreas(theFeature, theExpectedResultsVolumes, theNbSignificantDigi
   aListSize = len(theExpectedResultsVolumes)
   assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
   for anIndex in range(0, aNbResults):
-    aResultVolume = GeomAlgoAPI_ShapeTools_area(theFeature.results()[anIndex].resultSubShapePair()[0].shape())
+    aResultVolume = GeomAlgoAPI_ShapeTools.area(theFeature.results()[anIndex].resultSubShapePair()[0].shape())
     aResultVolumeStr = "{:0.27f}".format(aResultVolume).lstrip("0").lstrip(".").lstrip("0")
     anExpectedResultVolume = theExpectedResultsVolumes[anIndex]
     anExpectedResultVolumeStr = "{:0.27f}".format(anExpectedResultVolume).lstrip("0").lstrip(".").lstrip("0")

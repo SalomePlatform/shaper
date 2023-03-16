@@ -61,8 +61,8 @@ model.end()
 assert(partSet.size("Parts") == 1)
 resShape = modelAPI_Result(partSet.object("Parts", 0)).shape()
 # height of extrusion 90 / 2 + translation 100
-assert(GeomAlgoAPI_ShapeTools_centreOfMass(resShape).x() == 145)
+assert(GeomAlgoAPI_ShapeTools.centreOfMass(resShape).x() == 145)
 # rotated
-assert(floor(GeomAlgoAPI_ShapeTools_centreOfMass(resShape).z()) == -30)
+assert(floor(GeomAlgoAPI_ShapeTools.centreOfMass(resShape).z()) == -30)
 
 assert(model.checkPythonDump())

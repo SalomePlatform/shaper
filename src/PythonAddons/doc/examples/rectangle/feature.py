@@ -74,12 +74,12 @@ class SketchPlugin_Rectangle(model.Feature):
     def initAttributes(self):
         """Override Feature.initAttributes()"""
         # Flag whether the rectangle is accessory
-        self.data().addAttribute(self.AUXILIARY_ID(), ModelAPI.ModelAPI_AttributeBoolean_typeId())
+        self.data().addAttribute(self.AUXILIARY_ID(), ModelAPI.ModelAPI_AttributeBoolean.typeId())
         # Creating corners of the rectangle
-        self.data().addAttribute(self.START_ID(), GeomDataAPI.GeomDataAPI_Point2D_typeId())
-        self.data().addAttribute(self.END_ID(), GeomDataAPI.GeomDataAPI_Point2D_typeId())
+        self.data().addAttribute(self.START_ID(), GeomDataAPI.GeomDataAPI_Point2D.typeId())
+        self.data().addAttribute(self.END_ID(), GeomDataAPI.GeomDataAPI_Point2D.typeId())
         # Creating list to store lines
-        self.data().addAttribute(self.LINES_LIST_ID(), ModelAPI.ModelAPI_AttributeRefList_typeId())
+        self.data().addAttribute(self.LINES_LIST_ID(), ModelAPI.ModelAPI_AttributeRefList.typeId())
         ModelAPI.ModelAPI_Session.get().validators().registerNotObligatory(self.getKind(), self.LINES_LIST_ID())
 
     def isMacro(self):

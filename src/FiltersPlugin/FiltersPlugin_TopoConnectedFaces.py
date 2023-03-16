@@ -102,8 +102,8 @@ class FiltersPlugin_TopoConnectedFaces(ModelAPI_Filter):
 
   def initAttributes(self, theArgs):
     """ Initializes arguments of a filter """
-    theArgs.initAttribute("Shape", ModelAPI_AttributeSelection_typeId())
-    theArgs.initAttribute("Propagation", ModelAPI_AttributeBoolean_typeId())
+    theArgs.initAttribute("Shape", ModelAPI_AttributeSelection.typeId())
+    theArgs.initAttribute("Propagation", ModelAPI_AttributeBoolean.typeId())
 
   def adjacentFaces(self, theFace, theMapSA, theShapeType, theApplicableFaces, theRecursive = True):
     """ Find all faces neighbour to theFace """
