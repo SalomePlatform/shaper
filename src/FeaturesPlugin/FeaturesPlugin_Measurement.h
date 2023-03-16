@@ -74,6 +74,13 @@ public:
     return MY_MEASURE_ID;
   }
 
+  /// Attribute name for distance measure.
+  inline static const std::string& MEASURE_PROXIMITY()
+  {
+    static const std::string MY_MEASURE_ID("Proximity");
+    return MY_MEASURE_ID;
+  }
+
   /// Attribute name for radius measure.
   inline static const std::string& MEASURE_RADIUS()
   {
@@ -211,6 +218,8 @@ private:
   void computeLength();
   /// Compute minimal distance between pair of shapes
   void computeDistance();
+  /// Compute proximity (maximum of all minimal distances between pair of shapes)
+  void computeProximity();
   /// Compute radius of circular edge, cylindrical surface or sphere.
   void computeRadius();
   /// Compute angle(s) between pair of edges if they are intersected
