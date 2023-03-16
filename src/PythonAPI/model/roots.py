@@ -33,7 +33,7 @@ class Feature(ModelAPI.ModelAPI_Feature):
     def addRealInput(self, inputid):
         """F.addRealInput(str) -- add real attribute"""
         self.data().addAttribute(inputid,
-                                 ModelAPI.ModelAPI_AttributeDouble_typeId())
+                                 ModelAPI.ModelAPI_AttributeDouble.typeId())
 
     def getRealInput(self, inputid):
         """F.getRealInput(str) -- get real value of the attribute"""

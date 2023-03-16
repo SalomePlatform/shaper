@@ -56,7 +56,7 @@ assert(selectionList.size() == 9)
 assert(aFactory.validate(Group_1.feature()))
 # checkthat solids in the first group are small, like the origin
 for i in range(9):
-  delta = GeomAlgoAPI_ShapeTools_volume(selectionList.value(i).value()) - 8.236773528312948
+  delta = GeomAlgoAPI_ShapeTools.volume(selectionList.value(i).value()) - 8.236773528312948
   assert(fabs(delta) < 1.e-5)
 
 # same-plane faces should be merged
@@ -66,7 +66,7 @@ assert(aFactory.validate(Group_2.feature()))
 
 # checkthat solids in the secong group are big, like the origin
 for i in range(9):
-  delta = GeomAlgoAPI_ShapeTools_volume(selectionList.value(i).value()) - 150.66735294710597
+  delta = GeomAlgoAPI_ShapeTools.volume(selectionList.value(i).value()) - 150.66735294710597
   assert(fabs(delta) < 1.e-5)
 
 assert(model.checkPythonDump())

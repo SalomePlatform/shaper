@@ -94,8 +94,8 @@ class pipeNetwork(model.Feature):
     def initAttributes(self):
         """Override Feature.initAttributes()"""
         # Creating the input argument of the feature
-        self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
-        #self.data().addAttribute(self.HEXAS_ID(), ModelAPI.ModelAPI_AttributeBoolean_typeId())
+        self.data().addAttribute(self.FILE_ID(), ModelAPI.ModelAPI_AttributeString.typeId())
+        #self.data().addAttribute(self.HEXAS_ID(), ModelAPI.ModelAPI_AttributeBoolean.typeId())
 
 #====================================================================================
 # Retrieve parent pipe

@@ -21,6 +21,16 @@
 %module GeomAlgoAPI
 %{
   #include "GeomAlgoAPI_swig.h"
+
+// fix for SWIG v4.1.1
+#if PY_VERSION_HEX >= 0x03020000
+# define SWIGPY_SLICEOBJECT PyObject
+#else
+# define SWIGPY_SLICEOBJECT PySliceObject
+#endif
+
+// fix for SWIG v2.0.4
+#define SWIGPY_SLICE_ARG(obj)   ((SWIGPY_SLICEOBJECT*)(obj))
 %}
 
 // import other modules
