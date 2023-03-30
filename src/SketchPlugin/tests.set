@@ -64,7 +64,6 @@ SET(TEST_NAMES_PARA
   Test3154.py
   Test3170.py
   Test3240.py
-  Test19089.py
   Test19101.py
   Test20274_1.py
   Test20274_2.py
@@ -235,6 +234,7 @@ SET(TEST_NAMES_PARA
 
 SET(TEST_NAMES_SEQ
   Test1673.py
+  Test19089.py
 )
 
 set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_SEQ})
