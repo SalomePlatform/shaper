@@ -139,9 +139,11 @@ gp_Pnt GetMidPnt2d(const TopoDS_Face&     theFace,
 
     BRepTools_WireExplorer aWexp (aWire, theFace);
     Standard_Integer anInd = 0;
+    TopTools_MapOfShape aUsedEmap;
     for (; aWexp.More(); aWexp.Next())
     {
       const TopoDS_Edge& anEdge = aWexp.Current();
+      if (!aUsedEmap.Add(anEdge)) continue;
       BRepAdaptor_Curve2d aBAcurve2d (anEdge, theFace);
       Standard_Real aDelta = (aBAcurve2d.LastParameter() - aBAcurve2d.FirstParameter())/aNbSamples;
       for (Standard_Integer ii = 0; ii < aNbSamples; ii++)
@@ -209,6 +211,9 @@ void ModifyFacesForGlobalResult(const TopoDS_Face&     theInputFace,
                                 TopoDS_Shape&          theGlobalRes,
                                 TopTools_MapOfShape&   theRemovedFaces)
 {
+  BRepAdaptor_Surface aBAsurf (theInputFace, Standard_False);
+  GeomAbs_SurfaceType aType = aBAsurf.GetType();
+
   BRep_Builder aBB;
   const Standard_Integer aNbFaces = (Standard_Integer) theFacesAndAreas.size();
 
@@ -312,6 +317,19 @@ void ModifyFacesForGlobalResult(const TopoDS_Face&     theInputFace,
           if (aFace.IsSame (aStartFace))
           {
             anIsRound = Standard_True;
+            if (aType > GeomAbs_Torus) { // non-elementary surfaces
+              // remove last face to prevent close tape creation
+              // it is a workaround for Tulip bos #26791
+              // as there is a problem with closed tape on some surface types
+              aBB.Remove (aShell, aCurrentFace);
+              aNbFacesInTape--;
+              anAreaOfTape -= theFaceAreaMap(aCurrentFace);
+              aBB.Add(theRes, aCurrentFace); // aaajfa ???
+              theRemovedFaces.Remove(aCurrentFace);
+              if (theExtremalFaces.Contains(aCurrentFace)) {
+                aNbFacesDone--;
+              }
+            }
             break;
           }
           if (theRemovedFaces.Contains(aFace))
@@ -367,7 +385,9 @@ void ModifyFacesForGlobalResult(const TopoDS_Face&     theInputFace,
         if (aNewNumberToSplit < aNbFacesInTape)
         {
           Standard_Integer aNumberToIncrease = aNewNumberToSplit - aNumberToSplit;
-          for (Standard_Integer jj = theNbExtremalFaces; jj < theNbExtremalFaces + aNumberToIncrease; jj++)
+          for (Standard_Integer jj = theNbExtremalFaces;
+               jj < theNbExtremalFaces + aNumberToIncrease && jj < aNbFaces;
+               jj++)
             theExtremalFaces.Add (theFacesAndAreas[jj].first);
           theNbExtremalFaces += aNumberToIncrease;
           aNumberToSplit = aNewNumberToSplit;
@@ -377,7 +397,9 @@ void ModifyFacesForGlobalResult(const TopoDS_Face&     theInputFace,
     if (anIsRound && aNumberToSplit <= 1)
     {
       Standard_Integer aNumberToIncrease = 3 - aNumberToSplit;
-      for (Standard_Integer jj = theNbExtremalFaces; jj < theNbExtremalFaces + aNumberToIncrease; jj++)
+      for (Standard_Integer jj = theNbExtremalFaces;
+           jj < theNbExtremalFaces + aNumberToIncrease && jj < aNbFaces;
+           jj++)
         theExtremalFaces.Add (theFacesAndAreas[jj].first);
       theNbExtremalFaces += aNumberToIncrease;
       aNumberToSplit = 3;
@@ -411,8 +433,10 @@ void ModifyFacesForGlobalResult(const TopoDS_Face&     theInputFace,
     {
       if (aNumberToSplit == 0)
       {
-        theExtremalFaces.Add (theFacesAndAreas[theNbExtremalFaces].first);
-        theNbExtremalFaces++;
+        if (theNbExtremalFaces < aNbFaces) {
+          theExtremalFaces.Add (theFacesAndAreas[theNbExtremalFaces].first);
+          theNbExtremalFaces++;
+        }
       }
     }
     aBB.Add (theGlobalRes, aLocalResult);
@@ -640,9 +664,12 @@ bool GeomAlgoAPI_PointCloudOnFace::PointCloud(GeomShapePtr theFace,
 
   aBB.Add (aGlobalRes, res);
 
+  int iface = 1;
   TopoDS_Compound aCompound;
   aBB.MakeCompound (aCompound);
-  for (TopExp_Explorer aGlobalExplo(aGlobalRes, TopAbs_FACE); aGlobalExplo.More(); aGlobalExplo.Next())
+  for (TopExp_Explorer aGlobalExplo(aGlobalRes, TopAbs_FACE);
+       aGlobalExplo.More(), iface <= theNumberOfPoints;
+       aGlobalExplo.Next(), iface++)
   {
     const TopoDS_Face& aFace = TopoDS::Face (aGlobalExplo.Current());
     Standard_Boolean anIsNaturalRestrictions = Standard_True;
