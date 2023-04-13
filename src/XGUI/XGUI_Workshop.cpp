@@ -2414,6 +2414,7 @@ bool XGUI_Workshop::canMoveFeature()
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   QObjectPtrList aValidatedObjects;
+  std::list<FeaturePtr> aSelectedFeatures;
   foreach (ObjectPtr anObject, anObjects) {
     if (!myModule->canApplyAction(anObject, anActionId))
       continue;
@@ -2421,6 +2422,8 @@ bool XGUI_Workshop::canMoveFeature()
     if (anObject->document() != ModelAPI_Session::get()->activeDocument())
       continue;
     aValidatedObjects.append(anObject);
+    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    aSelectedFeatures.push_back(aFeat);
   }
   if (aValidatedObjects.size() != anObjects.size())
     anObjects = aValidatedObjects;
@@ -2435,11 +2438,24 @@ bool XGUI_Workshop::canMoveFeature()
       break;
     }
     FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    // only groups can be moved to the end for now (#2451)
-    if (aFeat.get() && aFeat->getKind() != "Group") {
-      aCanMove = false;
-      break;
+    // only groups can be moved to the end for now (#2451 old_id, #23105 tuleap id)
+    // and groups created by other groups (#34401)
+    if (aFeat.get()) {
+      std::string aKindOfFeature = aFeat->getKind();
+      if (aKindOfFeature != "Group" &&
+          aKindOfFeature != "GroupSubstraction" &&
+          aKindOfFeature != "GroupAddition" &&
+          aKindOfFeature != "GroupIntersection") {
+        aCanMove = false;
+        break;
+      }
     }
+
+    // Check that the feature can be moved due to its dependencies
+    // i.e. Check that there are no features between the moved one and its destination
+    // with references to it
+    // Details on #21340 (old_id #660)
+    // NOTE: we can ignore dependend features, if they are also moved!
 
     // 1. Get features placed between selected and current in the document
     std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(anObject);
@@ -2455,12 +2471,21 @@ bool XGUI_Workshop::canMoveFeature()
       if (aRefFeatures.empty())
         continue;
       else {
-        // 3. Find any placed features in all reference features
+        // 3.1. Check, if any reference feature is going to be moved, too.
+        //      If it is, we can ignore its dependency in our subsequent check (3.2)
+        std::set<FeaturePtr> aNoMoveRefFeatures;
+        std::set_difference(aRefFeatures.begin(), aRefFeatures.end(),
+                            aSelectedFeatures.begin(), aSelectedFeatures.end(),
+                            std::inserter(aNoMoveRefFeatures, aNoMoveRefFeatures.begin()));
+        if (aNoMoveRefFeatures.empty())
+          continue;
+
+        // 3.2. Find any placed features in all remaining (non-moved) reference features
         std::set<FeaturePtr> aIntersectionFeatures;
-        std::set_intersection(aRefFeatures.begin(), aRefFeatures.end(),
+        std::set_intersection(aNoMoveRefFeatures.begin(), aNoMoveRefFeatures.end(),
                               aPlacedFeatures.begin(), aPlacedFeatures.end(),
                               std::inserter(aIntersectionFeatures, aIntersectionFeatures.begin()));
-        // 4. Return false if any reference feature is placed before current feature
+        // 4. Return false if any (non-moved) reference feature is placed before current feature
         if (!aIntersectionFeatures.empty())
           aCanMove = false;
       }
