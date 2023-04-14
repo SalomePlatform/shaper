@@ -2414,7 +2414,7 @@ bool XGUI_Workshop::canMoveFeature()
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   QObjectPtrList aValidatedObjects;
-  std::list<FeaturePtr> aSelectedFeatures;
+  std::set<FeaturePtr> aSelectedFeatures;
   foreach (ObjectPtr anObject, anObjects) {
     if (!myModule->canApplyAction(anObject, anActionId))
       continue;
@@ -2423,7 +2423,7 @@ bool XGUI_Workshop::canMoveFeature()
       continue;
     aValidatedObjects.append(anObject);
     FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    aSelectedFeatures.push_back(aFeat);
+    aSelectedFeatures.insert(aFeat);
   }
   if (aValidatedObjects.size() != anObjects.size())
     anObjects = aValidatedObjects;
