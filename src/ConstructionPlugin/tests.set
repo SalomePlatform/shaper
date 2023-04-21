@@ -21,6 +21,7 @@ SET(TEST_NAMES
     TestAxisCreation.py
     TestAxis_ErrorMsg.py
     UnitTestAxis.py
+    TestPoint_34658.py
     TestPoint_XYZ.py
     TestPoint_IntersectLines.py
     TestPoint_IntersectLineAndPlane.py
