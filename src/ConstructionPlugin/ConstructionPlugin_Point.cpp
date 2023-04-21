@@ -121,6 +121,7 @@ void ConstructionPlugin_Point::execute()
         for (; aPIter != aPoints.end(); aPIter++, anIndex++) {
           std::shared_ptr<ModelAPI_ResultConstruction> aConstr =
             document()->createConstruction(data(), anIndex);
+          aConstr->setInfinite(true);
           aConstr->setShape(*aPIter);
           setResult(aConstr, anIndex);
         }
