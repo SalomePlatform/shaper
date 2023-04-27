@@ -44,6 +44,7 @@
 
 #include <QBrush>
 #include <QMap>
+#include <QPalette>
 
 
 #define ACTIVE_COLOR QColor(Qt::black)
@@ -94,7 +95,11 @@ QVariant PartSet_TreeNode::data(int theColumn, int theRole) const
 
 QColor PartSet_TreeNode::activeItemColor() const
 {
-  return ACTIVE_COLOR;
+  // instead of ACTIVE_COLOR (black),
+  // use the color text of the current theme (white or black or other)
+  // to make it readable in dark theme (and light theme as well)
+  QColor color = QPalette().text().color() ;
+  return color;
 }
 
 
