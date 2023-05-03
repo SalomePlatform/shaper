@@ -228,6 +228,7 @@ SET(TEST_NAMES_PARA
                TestBooleanCut_Shell_Shell.py
                TestBooleanCut_ShellCompound_ShellCompound.py
                TestBooleanCut_Solid_Solid.py
+               TestBooleanCut_Solid_Compound.py
                TestBooleanCut_SolidCompound_SolidCompound.py
                TestBooleanCut_Vertex_Vertex.py
                TestBooleanCut_VertexCompound_Solid.py
