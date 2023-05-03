@@ -36,6 +36,25 @@
 #include <GeomAPI_ShapeIterator.h>
 
 
+static const ListOfShape ExplodeCompounds(const ListOfShape &aList)
+{
+  ListOfShape subShapes;
+  for (auto shp = aList.cbegin(); shp != aList.cend(); ++shp)
+  {
+    if ((*shp).get() && (*shp)->isCompound()) {
+      // Use all sub shapes of the compound
+      for (GeomAPI_ShapeIterator anExp(*shp); anExp.more(); anExp.next()) {
+        GeomShapePtr aCurrent = anExp.current();
+        subShapes.push_back(aCurrent);
+      }
+    }
+    else
+      subShapes.push_back(*shp);
+  }
+
+  return subShapes;
+}
+
 //==================================================================================================
 FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_CUT)
@@ -87,6 +106,9 @@ void FeaturesPlugin_BooleanCut::execute()
   bool aUseFuzzy = boolean(USE_FUZZY_ID())->value();
   double aFuzzy = (aUseFuzzy ? real(FUZZY_PARAM_ID())->value() : -1);
 
+  // When selecting a compound tool object, use its exploded subshapes as tool object instead.
+  const ListOfShape aToolList = ExplodeCompounds(aTools.objects());
+
   // For solids cut each object with all tools.
   bool isOk = true;
   for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();
@@ -100,7 +122,7 @@ void FeaturesPlugin_BooleanCut::execute()
       if (aShapeType == GeomAPI_Shape::COMPOUND) {
         // Compound handling
         isOk = processCompound(GeomAlgoAPI_Tools::BOOL_CUT,
-                               anObjects, aParent, aTools.objects(),
+                               anObjects, aParent, aToolList,
                                aFuzzy,
                                aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                aResultCompound);
@@ -108,7 +130,7 @@ void FeaturesPlugin_BooleanCut::execute()
       else if (aShapeType == GeomAPI_Shape::COMPSOLID) {
         // Compsolid handling
         isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_CUT,
-                                anObjects, aParent, aTools.objects(), ListOfShape(),
+                                anObjects, aParent, aToolList, ListOfShape(),
                                 aFuzzy,
                                 aResultIndex, aResultBaseAlgoList, aResultShapesList,
                                 aResultCompound);
@@ -116,14 +138,14 @@ void FeaturesPlugin_BooleanCut::execute()
     } else {
       // process object as is
       isOk = processObject(GeomAlgoAPI_Tools::BOOL_CUT,
-                           anObject, aTools.objects(), aPlanes,
+                           anObject, aToolList, aPlanes,
                            aFuzzy,
                            aResultIndex, aResultBaseAlgoList, aResultShapesList,
                            aResultCompound);
     }
   }
 
-  storeResult(anObjects.objects(), aTools.objects(), aResultCompound, aResultIndex,
+  storeResult(anObjects.objects(), aToolList, aResultCompound, aResultIndex,
               aMakeShapeList, aResultBaseAlgoList);
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
@@ -131,7 +153,7 @@ void FeaturesPlugin_BooleanCut::execute()
   if (!aResultCompound)
     aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   ModelAPI_Tools::loadDeletedShapes(aResultBaseAlgoList,
-                                    aTools.objects(),
+                                    aToolList,
                                     aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
