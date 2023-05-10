@@ -135,7 +135,7 @@ Sorties :
     message = blabla + message_0
     message += "nom_objet : {}".format(nom_objet)
     print (message)
-    message = message_0
+  message = message_0
 
   erreur = 0
 
@@ -488,8 +488,6 @@ Sorties :
 
     #print ("sortie de {}".format(nom_fonction))
 
-    return
-
 #===========================  Fin de la méthode ==================================
 
 #=========================== Début de la méthode =================================
@@ -522,8 +520,8 @@ Sorties :
 
     if self._verbose_max:
       print_tab (n_recur, "objet final : ", objet.name())
-      print_tab (n_recur, "fonction_0 : ", self.fonction_0)
-      print_tab (n_recur, "recover : ", recover)
+      print_tab (n_recur, "fonction_0 : {}".format(self.fonction_0))
+      print_tab (n_recur, "recover : {}".format(recover))
 
     return objet, recover
 
@@ -820,8 +818,6 @@ Sorties :
 
 # 1. Forme de la face
     forme = caract_face_1[2][0]
-    if self._verbose_max:
-      print_tab (n_recur, "forme = {}".format(forme) )
 
 # 2. Traitement selon la forme de la face
 # 2.1. Face plane
@@ -896,8 +892,6 @@ Entrées :
 # 4. Changement de statut pour le solide
     self.d_statut_so[self.nom_solide] = 1
 
-    return
-
 #===========================  Fin de la méthode ==================================
 
 #=========================== Début de la méthode =================================
@@ -971,8 +965,8 @@ Sorties :
     vnor_x = caract_face_1[2][4]
     vnor_y = caract_face_1[2][5]
     vnor_z = caract_face_1[2][6]
-#   taille : la diagonale de la boîte englobante permet d'être certain de tout prendre
-    l_diag = self._calcul_boite_englobante ( solide, n_recur )
+#   taille : une longueur caractéristique pour être certain de tout prendre
+    l_diag = self._calcul_lg_caract ( solide, n_recur )
     taille = 10.*l_diag
     if self._verbose_max:
       print_tab (n_recur, "Taille englobante : ",taille)
@@ -1367,8 +1361,8 @@ Sorties :
     axe_z = caract_face_1[2][6]
 #   Rayons
     rayon = (caract_face_2[2][7]+caract_face_1[2][7])/2.
-#   Hauteur : la diagonale de la boîte englobante permet d'être certain de tout prendre
-    l_diag = self._calcul_boite_englobante ( solide, n_recur )
+#   Hauteur : une longueur caractéristique pour être certain de tout prendre
+    l_diag = self._calcul_lg_caract ( solide, n_recur )
     hauteur = 10.*l_diag
     if self._verbose_max:
       print_tab (n_recur, "Hauteur englobante : ", hauteur)
@@ -2076,7 +2070,6 @@ Sorties :
     centre = model.addPoint(self.part_doc, coo_c[0], coo_c[1], coo_c[2])
     nom_centre = "{}_centre".format(prefixe)
     nommage (centre, nom_centre)
-    model.do()
 
 #   Création du vecteur normal
     v_norm = model.addAxis(self.part_doc, vnor[0], vnor[1], vnor[2])
@@ -2099,12 +2092,15 @@ Sorties :
   def _calcul_boite_englobante ( self, objet, n_recur ):
     """Crée la hauteur englobant à coup sûr l'objet
 
+Remarque : pour une raison inconnue, le calcul de la boître englobante fait planter
+           en mode GUI. On controune l'obstacle enclculantr une lingueur caractéristique
+
 Entrées :
   :objet: l'objet à traiter
   :n_recur: niveau de récursivité
 
 Sorties :
-  :l_diag: longueur de la diagonale de la boîte englobante
+  :l_caract: longueur caractéristique ; longueur de la diagonale de la boîte englobante
 """
 
     nom_fonction = __name__ + "/_calcul_boite_englobante"
@@ -2114,34 +2110,67 @@ Sorties :
       print_tab (n_recur, blabla)
 
 #   Hauteur : la diagonale de la boîte englobante permet d'être certain de tout prendre
-    if self._verbose_max:
-      print_tab (n_recur, "Création de la boite englobante pour l'objet ", objet.name())
-      print_tab (n_recur, "de type ", objet.shapeType())
-    #print ('bbox = model.getBoundingBox(self.part_doc, model.selection("{}", "{}"))'.format(objet.shapeType(),objet.name()))
-    bbox = model.getBoundingBox(self.part_doc, model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
-    bbox.execute(True)
+    #if self._verbose_max:
+      #print_tab (n_recur, "Création de la boite englobante pour l'objet ", objet.name())
+      #print_tab (n_recur, "de type ", objet.shapeType())
+    #bbox = model.getBoundingBox(self.part_doc, model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
+    #bbox.execute(True)
 
-    bbox_nom = bbox.result().name()
-    if self._verbose_max:
-      print_tab (n_recur, "Boîte englobante : '{}' '{}'".format(bbox.name(), bbox_nom))
+    #bbox_nom = bbox.result().name()
+    #if self._verbose_max:
+      #print_tab (n_recur, "Boîte englobante : '{}' '{}'".format(bbox.name(), bbox_nom))
+
+    #saux_0 = "[{}/Back]".format(bbox_nom)
+    #saux_0 +="[{}/Left]".format(bbox_nom)
+    #saux_0 +="[{}/Bottom]".format(bbox_nom)
+    #saux_1 = "[{}/Front]".format(bbox_nom)
+    #saux_1 +="[{}/Right]".format(bbox_nom)
+    #saux_1 +="[{}/Top]".format(bbox_nom)
+    #if self._verbose_max:
+      #coo_min = model.getPointCoordinates(self.part_doc, model.selection("VERTEX", saux_0))
+      #coo_max = model.getPointCoordinates(self.part_doc, model.selection("VERTEX", saux_1))
+      #texte = "Xmin = {}, Xmax = {}\n".format(coo_min[0],coo_max[0])
+      #texte += "\tYmin = {}, Ymax = {}\n".format(coo_min[1],coo_max[1])
+      #texte += "\tZmin = {}, Zmax = {}".format(coo_min[2],coo_max[2])
+      #print_tab (n_recur, texte)
+
+    #l_caract = model.measureDistance(self.part_doc, model.selection("VERTEX", saux_0), model.selection("VERTEX", saux_1) )
+    properties = model.getGeometryCalculation(self.part_doc,model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
+    l_caract = properties[0]
 
     if self._verbose_max:
-      coo_min = model.getPointCoordinates(self.part_doc, \
-      model.selection("VERTEX", "[{}/Back][{}/Left][{}/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)))
-      coo_max = model.getPointCoordinates(self.part_doc, \
-      model.selection("VERTEX", "[{}/Front][{}/Right][{}/Top]".format(bbox_nom,bbox_nom,bbox_nom)))
-      texte = "Xmin = {}, Xmax = {}\n".format(coo_min[0],coo_max[0])
-      texte += "\tYmin = {}, Ymax = {}\n".format(coo_min[1],coo_max[1])
-      texte += "\tZmin = {}, Zmax = {}".format(coo_min[2],coo_max[2])
-      print_tab (n_recur, texte)
+      print_tab (n_recur, "Longueur caractéristique : ", l_caract)
 
-    l_diag = model.measureDistance(self.part_doc, \
-      model.selection("VERTEX", "[{}/Back][{}/Left][{}/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)), \
-      model.selection("VERTEX", "[{}/Front][{}/Right][{}/Top]".format(bbox_nom,bbox_nom,bbox_nom)) )
+    return l_caract
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _calcul_lg_caract ( self, objet, n_recur ):
+    """Crée une longueur caractéristique de l'objet
+
+Entrées :
+  :objet: l'objet à traiter
+  :n_recur: niveau de récursivité
+
+Sorties :
+  :l_caract: longueur caractéristique de l'objet
+"""
+
+    nom_fonction = __name__ + "/_calcul_lg_caract"
+    blabla = "Dans {} :".format(nom_fonction)
+
     if self._verbose_max:
-      print_tab (n_recur, "Longueur de la diagonale : ", l_diag)
+      print_tab (n_recur, blabla)
 
-    return l_diag
+    properties = model.getGeometryCalculation(self.part_doc,model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
+    l_caract = properties[0]
+
+    if self._verbose_max:
+      print_tab (n_recur, "Longueur caractéristique : ", l_caract)
+
+    return l_caract
 
 #===========================  Fin de la méthode ==================================
 
@@ -2183,8 +2212,6 @@ Entrées :
     objet = model.addRevolution(self.part_doc, [model.selection("COMPOUND", nom_sketch)], model.selection("EDGE", nom_axe_r), 360, 0, "Edges")
 
     nommage (objet, nom_objet, (85, 0, 255))
-
-    return
 
 #===========================  Fin de la méthode ==================================
 
@@ -2629,8 +2656,6 @@ Sorties :
         dossier.setName(face.name()[:-2])
       dossier = model.addFolder(self.part_doc, Partition_1, Recover_1)
       dossier.setName(self.objet_principal.name())
-
-    return
 
 #===========================  Fin de la méthode ==================================
 
