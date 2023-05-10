@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.03"
+__revision__ = "V11.04"
 
 #========================= Les imports - Début ===================================
 
@@ -987,7 +987,7 @@ Sorties :
   def _cree_face_mediane_plane_1 ( self, solide, coo_c, vnor, taille, d_face_1_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
-Création des objets temporaires et de la face médiane
+Création des objets de construction et de la face médiane
 
 Entrées :
   :solide: l'objet solide à traiter
@@ -1167,7 +1167,7 @@ Sorties :
   def _cree_face_mediane_plane_11 ( self, face, Recover_1, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
-Création des objets temporaires et de la face médiane
+Création des objets de construction et de la face médiane
 
 Entrées :
   :face: la face médiane
@@ -1468,7 +1468,7 @@ Sorties :
   def _cree_face_mediane_cylindre_1_b ( self, sketch, nom_par_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des cylindres
 
-Création des objets temporaires et de la face externe du cylindre support
+Création des objets de construction et de la face externe du cylindre support
 
 Entrées :
   :sketch: l'esquisse
@@ -1581,7 +1581,7 @@ Sorties :
   def _cree_face_mediane_sphere_1 ( self, coo_x, coo_y, coo_z, rayon ):
     """Crée la face médiane entre deux autres - cas des sphères
 
-Création des objets temporaires et de la face externe de la sphère support
+Création des objets de construction et de la face externe de la sphère support
 
 Entrées :
   :coo_x, coo_y, coo_z: coordonnées du centre de la sphère
@@ -1606,7 +1606,7 @@ Sorties :
     nom_centre = "{}_centre".format(self.nom_solide)
     centre.result().setName(nom_centre)
 
-#   Création d'un plan passant par ce centre et cet axe
+#   Création d'un plan passant par ce centre et l'axe OX
     plan = model.addPlane(self.part_doc, model.selection("EDGE", "PartSet/OX"), model.selection("VERTEX", nom_centre), False)
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
@@ -1740,7 +1740,7 @@ Sorties :
   def _cree_face_mediane_tore_1 ( self, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2 ):
     """Crée la face médiane entre deux autres - cas des tores
 
-Création des objets temporaires et de la face externe du tore support
+Création des objets de construction et de la face externe du tore support
 
 Entrées :
   :coo_x, coo_y, coo_z: coordonnées du centre du tore
@@ -1922,7 +1922,7 @@ Sorties :
   def _cree_face_mediane_cone_1 ( self, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur ):
     """Crée la face médiane entre deux autres - cas des cones
 
-Création des objets temporaires et de la face externe du cone support
+Création des objets de construction et de la face externe du cone support
 
 Entrées :
   :coo_x, coo_y, coo_z: coordonnées du centre de la base
