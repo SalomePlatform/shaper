@@ -17,6 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+from salome.shaper import model
 from ModelAPI import *
 
 import os
