@@ -16,18 +16,14 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-"""Test de la création de surfaces médianes"""
-
-__revision__ = "V01.03"
-
-import os
 
 from ModelAPI import *
+
+import os
 
 aSession = ModelAPI_Session.get()
 
 def getFilePath(fileName):
-    """Le fichier décrivant l'objet"""
     path = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "macros", "midSurface")
     return os.path.join(path, fileName)
 
