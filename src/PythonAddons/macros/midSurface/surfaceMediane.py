@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V10.56"
+__revision__ = "V11.03"
 
 #========================= Les imports - Début ===================================
 
@@ -52,10 +52,9 @@ salome.salome_init()
 import SALOMEDS
 from SketchAPI import *
 from salome.shaper import model
+from salome.shaper import geom
 from GeomAPI import *
 from GeomAlgoAPI import *
-
-from salome.geom import geomBuilder
 
 import numpy as np
 
@@ -101,7 +100,7 @@ Entrées :
   :fmt_cao: format du fichier, step, iges, etc.
 Sorties :
   :fmt_cao_0: format décodé
-  """
+"""
 
   fmt_cao_0 = ""
 
@@ -127,7 +126,7 @@ Entrées :
   :nom_objet: nom à donner à l'objet lu, éventuellement
 Sorties :
   :objet: l'objet importé dans SHAPER
-  """
+"""
 
   nom_fonction = __name__ + "/import_cao"
   blabla = "Dans {} :\n".format(nom_fonction)
@@ -187,7 +186,7 @@ Entrées :
   :argu: argument du format
   :saut_av: saut de ligne avant le texte
   :saut_ap: saut de ligne après le texte
-  """
+"""
 
   texte = ""
 
@@ -217,7 +216,7 @@ Entrées :
   :objet: objet à traiter
   :nom: nom à attribuer
   :couleur: éventuellement couleur
-  """
+"""
 
   objet.setName(nom)
   objet.result().setName(nom)
@@ -290,7 +289,7 @@ _cree_face_mediane --> _cree_face_mediane_plane
                    --> _cree_face_mediane_cone
                    --> _cree_face_mediane_0
 
-  """
+"""
 
 # A. La base
 
@@ -311,7 +310,6 @@ _cree_face_mediane --> _cree_face_mediane_plane
   ficcao = None
   rep_step = None
   objet_principal = None
-  objet_geom = None
   # Pour chaque sous-objet dans l'ordre de l'arborescence : nom
   l_noms_so = list()
   # Statut de chaque sous-objet connu par son nom :
@@ -611,18 +609,15 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _faces_du_solide ( self, geompy, objet_geom, solide, n_recur=0 ):
+  def _faces_du_solide ( self, solide, n_recur=0 ):
     """Détermine les faces d'un solide
 
 Entrées :
-  :geompy: environnement de GEOM
-  :objet_geom: l'objet solide à traiter au format GEOM
   :solide: solide SHAPER à traiter
   :n_recur: niveau de récursivité
 
 Sorties :
-  :l_faces_geom: liste des faces du solide au format GEOM
-  :l_faces: liste des faces du solide
+  :l_faces_car: pour chaque face du solide (surface,caractéristiques)
 """
 
     nom_fonction = __name__ + "/_faces_du_solide"
@@ -630,51 +625,42 @@ Sorties :
     if self._verbose_max:
       print_tab (n_recur, blabla, saut_av=True)
 
-    erreur = 0
-    message = ""
-    l_faces_geom = list()
     l_faces = list()
 
-    while ( not erreur ):
+    if self._verbose_max:
+      print_tab (n_recur, ".. Traitement du solide ", self.nom_solide)
+      print_tab (n_recur, ".. shapeType : ", solide.shapeType())
 
+    #print (dir(solide))
+    #print_tab (n_recur, "volume = ", GeomAlgoAPI_ShapeTools.volume(solide.shape()))
+# 1. Repérage des faces
+    objResult = solide.resultSubShapePair()[0]
+    l_faces = list()
+    exp = GeomAPI_ShapeExplorer(objResult.shape(), GeomAPI_Shape.FACE)
+    while exp.more():
+      l_faces.append(exp.current().face())
+      exp.next()
+
+# 2. Calcul
+    l_faces_car = list()
+    for iface, face in enumerate(l_faces):
+      surf = GeomAlgoAPI_ShapeTools.area(face)
+      caract = geom.shapeInfo(face)
       if self._verbose_max:
-        print_tab (n_recur, ".. Traitement du solide ", self.nom_solide)
-        longueur, aire, volume = geompy.BasicProperties(objet_geom)
-        texte = "{}".format(geompy.WhatIs(objet_geom))
-        texte += ". longueur, aire, volume : {}, {}, {}".format(longueur,aire,volume)
-        print (texte)
+        print_tab (n_recur, "\tFace n°{} ; ".format(iface), "surface = {}, caractéristiques = {}".format(surf,caract))
+      l_faces_car.append((surf,caract))
 
-# Liste des faces qui composent le solide
-      l_faces_geom = geompy.ExtractShapes(objet_geom, geompy.ShapeType["FACE"], True)
-      #if self._verbose_max:
-        #print ("Liste des {} faces qui composent le solide :".format(len(l_faces_geom)))
-        #for iaux, face in enumerate(l_faces_geom):
-          #print ("Face n° {} :\n {}".format(iaux,geompy.WhatIs(face)))
-
-      print_tab (n_recur, "Type python : ", type(solide))
-      print_tab (n_recur, "Type ", solide.shapeType())
-      #print ("Type {}".format(solide.shapeTypeStr()))
-      #print ("volume = {}".format(GeomAlgoAPI_ShapeTools.volume(solide)))
-      l_faces = list()
-      #exp = GeomAPI_ShapeExplorer(solide, GeomAPI_Shape.FACE)
-      #while exp.more():
-        #l_faces.append(exp.current().face())
-        #exp.next()
-
-      break
-
-    return erreur, message, l_faces_geom, l_faces
+    return l_faces_car
 
 #===========================  Fin de la méthode ==================================
 
 #=========================== Début de la méthode =================================
 
-  def _calcul_caract_faces ( self, geompy, l_faces, n_recur ):
-    """Calcule les caractéristiques géométriques des faces
+  def _calcul_caract_faces ( self, solide, n_recur ):
+    """Calcule les caractéristiques géométriques des faces du solide
 
 Entrées :
-  :geompy: environnement de GEOM
-  :l_faces: liste des faces du solide
+  :solide: solide SHAPER à traiter
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -683,27 +669,35 @@ Sorties :
 
     nom_fonction = __name__ + "/_calcul_caract_faces"
     blabla = "Dans {} :".format(nom_fonction)
-
-    nb_faces = len(l_faces)
     if self._verbose_max:
       print_tab (n_recur, blabla, saut_av=True)
-      print_tab (n_recur, "Nombre de faces : ", nb_faces)
+      print_tab (n_recur, ".. Traitement du solide ", self.nom_solide)
+      print_tab (n_recur, ".. shapeType : ", solide.shapeType())
 
+# 1. Repérage des faces
+    objResult = solide.resultSubShapePair()[0]
+    l_faces = list()
+    exp = GeomAPI_ShapeExplorer(objResult.shape(), GeomAPI_Shape.FACE)
+    while exp.more():
+      l_faces.append(exp.current().face())
+      exp.next()
+
+# 2. Caractéristiques
+    nb_faces = len(l_faces)
     tb_caract = np.zeros((nb_faces,3), dtype = 'object')
     for iaux, face in enumerate(l_faces):
-      _, aire, _ = geompy.BasicProperties(face)
-      #longueur, aire, volume = geompy.BasicProperties(face)
+      surf = GeomAlgoAPI_ShapeTools.area(face)
+      caract = geom.shapeInfo(face)
       if self._verbose_max:
-        texte = "\t. Face numéro {}".format(iaux)
-        #texte += "\n\t. longueur, aire, volume : {}, {}, {}".format(longueur,aire,volume)
-        texte += ", surface : {}".format(aire)
-        print (texte)
+        print_tab (n_recur, "\tFace n°{} ; ".format(iaux), "surface = {}, caractéristiques = {}".format(surf,caract))
 
       tb_caract [iaux][0] = face
-      tb_caract [iaux][1] = aire
-      tb_caract [iaux][2] = geompy.KindOfShape(face)
-      if self._verbose_max:
-        print ("\t. tb_caract : {} {}".format(aire,tb_caract[iaux][2]))
+      tb_caract [iaux][1] = surf
+      tb_caract [iaux][2] = caract
+
+    #if self._verbose_max:
+      #for iaux in range(nb_faces):
+        #print ("\t. tb_caract : {} {}".format(surf,tb_caract[iaux][2]))
 
     return tb_caract
 
@@ -765,41 +759,6 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _calcul_caract_aretes_face ( self, geompy, caract_face ):
-    """Détermine les caractéristiques des arêtes d'une face
-
-Entrées :
-  :geompy: environnement de GEOM
-  :caract_face: les caractéristiques de la face
-
-Sorties :
-  :caract_arete_face: les caractéristiques des arêtes de la face
-"""
-
-    nom_fonction = __name__ + "/_calcul_caract_aretes_face"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-    if self._verbose_max:
-      texte = blabla
-      texte += "face : {}\n".format(caract_face)
-      print (texte)
-
-# Détermination des arêtes pour chaque face
-    face = caract_face[0]
-    l_aretes = geompy.ExtractShapes(face, geompy.ShapeType["EDGE"], True)
-    caract_arete_face = list()
-    for arete in l_aretes:
-      caract_arete_face.append(geompy.KindOfShape(arete))
-
-    if self._verbose_max:
-      print ("Aretes de la face : {}".format(caract_arete_face))
-
-    return caract_arete_face
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
   def _verif_epaisseur ( self, epaisseur ):
     """Contrôle de la validité de l'épaisseur
 
@@ -836,12 +795,11 @@ Entrées :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane ( self, solide, geompy, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane ( self, solide, caract_face_1, caract_face_2, n_recur ):
     """Crée la face médiane entre deux autres
 
 Entrées :
   :solide: solide SHAPER à traiter
-  :geompy: environnement de GEOM
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
   :n_recur: niveau de récursivité
 
@@ -863,28 +821,28 @@ Sorties :
 # 1. Forme de la face
     forme = caract_face_1[2][0]
     if self._verbose_max:
-      print ("forme = {}".format(forme) )
+      print_tab (n_recur, "forme = {}".format(forme) )
 
 # 2. Traitement selon la forme de la face
 # 2.1. Face plane
-    if forme in ( geompy.kind.DISK_CIRCLE, geompy.kind.DISK_ELLIPSE, geompy.kind.POLYGON, geompy.kind.PLANE, geompy.kind.PLANAR ):
-      erreur, face = self._cree_face_mediane_plane ( geompy, solide, caract_face_1, caract_face_2, n_recur )
+    if forme in ( "Disk" , "Plane", "Rectangle"):
+      erreur, face = self._cree_face_mediane_plane ( solide, caract_face_1, caract_face_2, n_recur )
 
 # 2.2. Face cylindrique
-    elif forme == geompy.kind.CYLINDER2D:
+    elif ( forme == "Cylinder" ):
       erreur, face = self._cree_face_mediane_cylindre ( solide, caract_face_1, caract_face_2, n_recur )
 
 # 2.3. Face sphérique
-    elif forme == geompy.kind.SPHERE2D:
+    elif ( forme == "Sphere" ):
       erreur, face = self._cree_face_mediane_sphere ( caract_face_1, caract_face_2, n_recur )
 
 # 2.4. Face torique
-    elif forme == geompy.kind.TORUS2D:
+    elif ( forme == "Torus" ):
       erreur, face = self._cree_face_mediane_tore ( caract_face_1, caract_face_2, n_recur )
 
 # 2.5. Face conique
-    elif forme == geompy.kind.CONE2D:
-      erreur, face = self._cree_face_mediane_cone ( geompy, caract_face_1, caract_face_2, n_recur )
+    elif ( forme == "Cone" ):
+      erreur, face = self._cree_face_mediane_cone ( caract_face_1, caract_face_2, n_recur )
 
 # 2.N. Face de forme inconnue
     else:
@@ -944,11 +902,10 @@ Entrées :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane ( self, geompy, solide, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_plane ( self, solide, caract_face_1, caract_face_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Entrées :
-  :geompy: environnement de GEOM
   :solide: l'objet solide à traiter
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
   :n_recur: niveau de récursivité
@@ -963,7 +920,7 @@ Sorties :
       print_tab (n_recur, blabla)
 
 #   Caractéristiques des surfaces
-    coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2 = self._cree_face_mediane_plane_0 ( geompy, solide, caract_face_1, caract_face_2, n_recur )
+    coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2 = self._cree_face_mediane_plane_0 ( solide, caract_face_1, caract_face_2, n_recur )
 
 #   Contrôle de la validité de l'épaisseur
     erreur = self._verif_epaisseur ( d_face_1_2 )
@@ -980,13 +937,12 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane_0 ( self, geompy, solide, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_plane_0 ( self, solide, caract_face_1, caract_face_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Décodage des caractéristiques
 
 Entrées :
-  :geompy: environnement de GEOM
   :solide: l'objet solide à traiter
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
   :n_recur: niveau de récursivité
@@ -1003,8 +959,8 @@ Sorties :
 
     if self._verbose_max:
       print_tab (n_recur, blabla)
-      print_tab (n_recur, "face_1 : ", caract_face_1)
-      print_tab (n_recur, "face_2 : ", caract_face_2)
+      print_tab (n_recur, "caract_face_1 : ", caract_face_1)
+      print_tab (n_recur, "caract_face_2 : ", caract_face_2)
 
 # 1. Caractéristiques de la base
 #   Coordonnées du centre de la base
@@ -1024,7 +980,7 @@ Sorties :
 # 2. Distance entre les deux faces
     face_1 = caract_face_1[0]
     face_2 = caract_face_2[0]
-    d_face_1_2 = geompy.MinDistance(face_1, face_2)
+    d_face_1_2 = GeomAlgoAPI_ShapeTools.minimalDistance(face_1, face_2)
     if self._verbose_max:
       print_tab (n_recur, "Distance entre les deux faces = ", d_face_1_2)
 
@@ -1072,7 +1028,7 @@ Sorties :
 # 3. La face
     face = self._cree_face_mediane_plane_1_b ( solide, sketch, v_norm, d_face_1_2, n_recur )
 
-    print ("fin de {}".format(nom_fonction))
+    #print ("fin de {}".format(nom_fonction))
 
     return face
 
@@ -1149,7 +1105,7 @@ Sorties :
     nom_sketch = "{}_esquisse".format(self.nom_solide)
     nommage (sketch, nom_sketch)
 
-    print ("fin de {}".format(nom_fonction))
+    #print ("fin de {}".format(nom_fonction))
 
     return sketch
 
@@ -1206,7 +1162,7 @@ Sorties :
           print_tab (n_recur, "L'intersection est vide.")
         face = None
 
-    print ("fin de {}".format(nom_fonction))
+    #print ("fin de {}".format(nom_fonction))
 
     return face
 
@@ -1457,7 +1413,7 @@ Sorties :
     nom_par_2 = "{}_H".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(hauteur))
 
-    centre, axe, plan = self._cree_centre_axe_plan ( coo_c, v_axe, self.nom_solide, n_recur )
+    centre, _, plan = self._cree_centre_axe_plan ( coo_c, v_axe, self.nom_solide, n_recur )
 
 # 2. Création de l'esquisse
     sketch = self._cree_face_mediane_cylindre_1_a ( plan, centre, rayon, nom_par_1, n_recur )
@@ -1874,11 +1830,10 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_cone ( self, geompy, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_cone ( self, caract_face_1, caract_face_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des cones
 
 Entrées :
-  :geompy: environnement de GEOM
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
   :n_recur: niveau de récursivité
 
@@ -1896,7 +1851,7 @@ Sorties :
       print_tab (n_recur, "face_2 : ", caract_face_2)
 
 #   Caractéristiques des cones
-    coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur = self._cree_face_mediane_cone_0 ( geompy, caract_face_1, caract_face_2, n_recur )
+    coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur = self._cree_face_mediane_cone_0 ( caract_face_1, caract_face_2, n_recur )
 
 #   Contrôle de la validité de l'épaisseur (bidon)
     erreur = self._verif_epaisseur ( EP_MIN*10. )
@@ -1913,13 +1868,12 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_cone_0 ( self, geompy, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_cone_0 ( self, caract_face_1, caract_face_2, n_recur ):
     """Crée la face médiane entre deux autres - cas des cones
 
 Décodage des caractéristiques
 
 Entrées :
-  :geompy: environnement de GEOM
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
   :n_recur: niveau de récursivité
 
@@ -1948,29 +1902,22 @@ Sorties :
     axe_y = caract_face_1[2][5]
     axe_z = caract_face_1[2][6]
 #   Rayons
-#   Pour un cone complet, les caractéristiques fournies par GEOM sont correctes
-#   Mais s'il est découpé, malheureusement,bug dans GEOM et caract_face_2[2][8] est toujours nul !
-#   Alors on passe par le décodage des arêtes
-    #rayon_1 = (caract_face_2[2][7]+caract_face_1[2][7])/2.
-    #rayon_2 = (caract_face_2[2][8]+caract_face_1[2][8])/2.
-    caract_arete_face_1 = self._calcul_caract_aretes_face ( geompy, caract_face_1 )
-    caract_arete_face_2 = self._calcul_caract_aretes_face ( geompy, caract_face_2 )
-    rayon_1 = 0.
-    rayon_2 = 0.
-    for caract_aretes_face in [caract_arete_face_1,caract_arete_face_2]:
-      prem = True
-      for l_aux in caract_aretes_face:
-        if ( l_aux[0] in ( geompy.kind.CIRCLE, geompy.kind.ARC_CIRCLE ) ):
-          #print ("R =",l_aux[7])
-          if prem:
-            rayon_1 += l_aux[7]
-            prem = False
-          else:
-            rayon_2 += l_aux[7]
-    rayon_1 *= 0.5
-    rayon_2 *= 0.5
+    rayon_1 = (caract_face_2[2][7]+caract_face_1[2][7])/2.
+    rayon_2 = (caract_face_2[2][8]+caract_face_1[2][8])/2.
 #   Hauteur
     hauteur = caract_face_1[2][9]
+
+#   Bilan
+    if self._verbose_max:
+      print_tab (n_recur, "coo_x : ", coo_x)
+      print_tab (n_recur, "coo_y : ", coo_y)
+      print_tab (n_recur, "coo_z : ", coo_z)
+      print_tab (n_recur, "axe_x : ", axe_x)
+      print_tab (n_recur, "axe_y : ", axe_y)
+      print_tab (n_recur, "axe_z : ", axe_z)
+      print_tab (n_recur, "rayon_1 : ", rayon_1)
+      print_tab (n_recur, "rayon_2 : ", rayon_2)
+      print_tab (n_recur, "hauteur : ", hauteur)
 
     return coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur
 
@@ -2004,22 +1951,33 @@ Sorties :
       texte += "Hauteur : {}".format(hauteur)
       print (texte)
 
-#   Création du point central
-    centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
-    nom_centre = "{}_centre".format(self.nom_solide)
-    centre.result().setName(nom_centre)
+#   1. Création du point central de la base, côté rayon_1
+    centre_1 = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
+    nom_centre_1 = "{}_centre_1".format(self.nom_solide)
+    centre_1.result().setName(nom_centre_1)
 
-#   Création de l'axe
-    axe = model.addAxis(self.part_doc, axe_x, axe_y, axe_z)
+#   2. Création du point central, du côté de rayon_2
+    centre_2 = model.addPoint(self.part_doc, coo_x+hauteur*axe_x, coo_y+hauteur*axe_y, coo_z+hauteur*axe_z)
+    nom_centre_2 = "{}_centre_2".format(self.nom_solide)
+    centre_2.result().setName(nom_centre_2)
+
+#   3. Création de l'axe
+    axe = model.addAxis(self.part_doc, model.selection("VERTEX", nom_centre_1), model.selection("VERTEX", nom_centre_2))
     nom_axe = "{}_axe".format(self.nom_solide)
     axe.result().setName(nom_axe)
 
-#   Création d'un plan passant par ce centre et cet axe
-    plan = model.addPlane(self.part_doc, model.selection("EDGE", nom_axe), model.selection("VERTEX", nom_centre), False)
+#   4. Création d'un plan passant par le centre de la base et l'axe
+#   4.1. Création d'un vecteur perpendiculaire à l'axe
+    coeff = 10.
+    v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
+    nom_v_perp = "{}_v_perp".format(self.nom_solide)
+    v_perp.result().setName(nom_v_perp)
+#   4.2. Création du plan
+    plan = model.addPlane(self.part_doc, model.selection("EDGE",nom_v_perp), model.selection("VERTEX", nom_centre_1), True)
     nom_plan = "{}_plan".format(self.nom_solide)
     plan.result().setName(nom_plan)
 
-#   Création de l'esquisse
+#   5. Paramétrage
     nom_par_1 = "{}_R_1".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
     nom_par_2 = "{}_R_2".format(self.nom_solide)
@@ -2027,34 +1985,50 @@ Sorties :
     nom_par_3 = "{}_H".format(self.nom_solide)
     model.addParameter(self.part_doc, "{}".format(nom_par_3), "{}".format(hauteur))
 
+#   6. Création de l'esquisse
+
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
 
-    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
+#   6.1. Projection des centres et de l'axe
+    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre_1), False)
     SketchPoint_1 = SketchProjection_1.createdFeature()
+    sk_coo_x_1 = SketchAPI_Point(SketchPoint_1).coordinates().x()
+    sk_coo_y_1 = SketchAPI_Point(SketchPoint_1).coordinates().y()
 
-    SketchProjection_2 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
-    SketchLine_1 = SketchProjection_2.createdFeature()
+    SketchProjection_2 = sketch.addProjection(model.selection("VERTEX", nom_centre_2), False)
+    SketchPoint_2 = SketchProjection_2.createdFeature()
+    sk_coo_x_2 = SketchAPI_Point(SketchPoint_2).coordinates().x()
+    sk_coo_y_2 = SketchAPI_Point(SketchPoint_2).coordinates().y()
 
-    SketchLine_2 = sketch.addLine(coo_x, coo_y, coo_x+rayon_1, coo_y+hauteur)
+    SketchProjection_3 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
+    SketchLine_0 = SketchProjection_3.createdFeature()
+
+#   6.2. Lignes perpendiculaires à l'axe passant par les centres
+    SketchLine_1 = sketch.addLine(sk_coo_x_1, sk_coo_y_1, sk_coo_x_1+rayon_1, sk_coo_y_1)
+    SketchLine_1.setAuxiliary(True)
+    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.startPoint())
+    sketch.setPerpendicular(SketchLine_0.result(), SketchLine_1.result())
+    sketch.setLength(SketchLine_1.result(), nom_par_1)
+
+    SketchLine_2 = sketch.addLine(sk_coo_x_2, sk_coo_y_2, sk_coo_x_2+rayon_2, sk_coo_y_2)
     SketchLine_2.setAuxiliary(True)
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_2.startPoint())
-    sketch.setParallel(SketchLine_1.result(), SketchLine_2.result())
-    sketch.setLength(SketchLine_2.result(), nom_par_3)
+    sketch.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_2.startPoint())
+    sketch.setPerpendicular(SketchLine_0.result(), SketchLine_2.result())
+    sketch.setLength(SketchLine_2.result(), nom_par_2)
 
-    SketchLine_3 = sketch.addLine(coo_x+rayon_1, coo_y, coo_x+rayon_1, coo_y+hauteur)
-    sketch.setDistance(SketchLine_2.startPoint(), SketchLine_3.result(), nom_par_1, True)
-    sketch.setDistance(SketchLine_2.endPoint(), SketchLine_3.result(), nom_par_2, True)
-    sketch.setLength(SketchLine_3.result(), "2.5*{}".format(nom_par_3))
+#   6.3. Ligne joignant les extrémités des précédentes et point milieu
+    SketchLine_3 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
+    sketch.setCoincident(SketchLine_3.startPoint(), SketchLine_1.endPoint())
+    sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_2.endPoint())
+    SketchLine_3.setAuxiliary(True)
+    SketchPoint_3 = sketch.addPoint(sk_coo_x_1, sk_coo_y_1)
+    sketch.setMiddlePoint(SketchLine_3.result(), SketchPoint_3.coordinates())
 
-    SketchPoint_2 = sketch.addPoint(coo_x, coo_y)
-    sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_3.result())
-    sketch.setMiddlePoint(SketchPoint_2.coordinates(), SketchLine_3.result())
-
-    SketchLine_4 = sketch.addLine(coo_x, coo_y, 1.2*coo_x, 1.2*coo_y)
-    SketchLine_4.setAuxiliary(True)
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_4.startPoint())
-    sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_4.endPoint())
-    sketch.setHorizontal(SketchLine_4.result())
+#   6.4. Ligne support de la future révolution
+    SketchLine_4 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
+    sketch.setMiddlePoint(SketchLine_4.result(), SketchPoint_3.coordinates())
+    sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_4.result())
+    sketch.setLength(SketchLine_4.result(), "1.2*{}".format(nom_par_3))
 
     model.do()
     nom_sketch = "{}_esquisse".format(self.nom_solide)
@@ -2063,7 +2037,7 @@ Sorties :
 
 #   Création du cone complet
     nom_cone = "{}_cone".format(self.nom_solide)
-    self._cree_revolution ( nom_sketch, nom_centre, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_cone )
+    self._cree_revolution ( nom_sketch, nom_centre_1, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_cone )
 
 #   Intersection de la face conique avec le solide initial
     face = self._creation_face_inter ( nom_cone )
@@ -2114,7 +2088,7 @@ Sorties :
     nom_plan = "{}_plan".format(prefixe)
     nommage (plan, nom_plan)
 
-    print ("fin de {}".format(nom_fonction))
+    #print ("fin de {}".format(nom_fonction))
 
     return centre, v_norm, plan
 
@@ -2147,23 +2121,23 @@ Sorties :
     bbox = model.getBoundingBox(self.part_doc, model.selection("{}".format(objet.shapeType()), "{}".format(objet.name())))
     bbox.execute(True)
 
-    bbox_nom = bbox.name()
+    bbox_nom = bbox.result().name()
     if self._verbose_max:
-      print_tab (n_recur, "Boîte englobante : '{}' '{}'".format(bbox.name(), bbox.result().name()))
+      print_tab (n_recur, "Boîte englobante : '{}' '{}'".format(bbox.name(), bbox_nom))
 
     if self._verbose_max:
       coo_min = model.getPointCoordinates(self.part_doc, \
-      model.selection("VERTEX", "[{}_1/Back][{}_1/Left][{}_1/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)))
+      model.selection("VERTEX", "[{}/Back][{}/Left][{}/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)))
       coo_max = model.getPointCoordinates(self.part_doc, \
-      model.selection("VERTEX", "[{}_1/Front][{}_1/Right][{}_1/Top]".format(bbox_nom,bbox_nom,bbox_nom)))
+      model.selection("VERTEX", "[{}/Front][{}/Right][{}/Top]".format(bbox_nom,bbox_nom,bbox_nom)))
       texte = "Xmin = {}, Xmax = {}\n".format(coo_min[0],coo_max[0])
       texte += "\tYmin = {}, Ymax = {}\n".format(coo_min[1],coo_max[1])
       texte += "\tZmin = {}, Zmax = {}".format(coo_min[2],coo_max[2])
       print_tab (n_recur, texte)
 
     l_diag = model.measureDistance(self.part_doc, \
-      model.selection("VERTEX", "[{}_1/Back][{}_1/Left][{}_1/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)), \
-      model.selection("VERTEX", "[{}_1/Front][{}_1/Right][{}_1/Top]".format(bbox_nom,bbox_nom,bbox_nom)) )
+      model.selection("VERTEX", "[{}/Back][{}/Left][{}/Bottom]".format(bbox_nom,bbox_nom,bbox_nom)), \
+      model.selection("VERTEX", "[{}/Front][{}/Right][{}/Top]".format(bbox_nom,bbox_nom,bbox_nom)) )
     if self._verbose_max:
       print_tab (n_recur, "Longueur de la diagonale : ", l_diag)
 
@@ -2243,13 +2217,11 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def face_mediane_solide (self, solide, geompy, objet_geom, n_recur=0):
+  def face_mediane_solide (self, solide, n_recur=0):
     """Calcul de la face médiane pour un solide
 
 Entrées :
   :solide: solide SHAPER à traiter
-  :geompy: environnement de GEOM
-  :objet_geom: l'objet solide à traiter au format GEOM
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -2258,7 +2230,7 @@ Sorties :
 """
 
     nom_fonction = __name__ + "/face_mediane_solide"
-    blabla = "Dans {} :\n".format(nom_fonction)
+    blabla = "Dans {} :".format(nom_fonction)
 
     if self._verbose_max:
       print_tab (n_recur, blabla, saut_av=True)
@@ -2272,25 +2244,19 @@ Sorties :
 
     while not erreur :
 
-# 2. Explosion du solide en faces
+# 2. Calcul des caractéristiques géométriques des faces
 
-      erreur, message, l_faces_geom, l_faces = self._faces_du_solide ( geompy, objet_geom, solide, n_recur )
-      if erreur:
-        break
+      tb_caract = self._calcul_caract_faces ( solide, n_recur )
 
-# 3. Calcul des caractéristiques géométriques des faces
-
-      tb_caract = self._calcul_caract_faces ( geompy, l_faces_geom, n_recur )
-
-# 4. Tri des faces en fonction de leurs caractéristiques géométriques
+# 3. Tri des faces en fonction de leurs caractéristiques géométriques
 
       erreur, message, caract_face_1, caract_face_2 = self._tri_faces ( tb_caract, n_recur )
       if erreur:
         break
 
-# 5. Création de la face médiane
+# 4. Création de la face médiane
 
-      erreur, face = self._cree_face_mediane ( solide, geompy, caract_face_1, caract_face_2, n_recur )
+      erreur, face = self._cree_face_mediane ( solide, caract_face_1, caract_face_2, n_recur )
       if erreur:
         break
 
@@ -2315,12 +2281,11 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _traitement_objet (self, solide=None, objet_geom=None, n_recur=0):
+  def _traitement_objet (self, solide, n_recur=0):
     """Traitement d'un objet
 
 Entrées :
   :solide: solide SHAPER à traiter
-  :objet_geom: l'objet GEOM équivalent
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -2333,55 +2298,35 @@ Sorties :
 
     if self._verbose_max:
       print_tab (n_recur, blabla, saut_av=True)
-      print_tab (n_recur, "solide = " , solide)
-      print_tab (n_recur, "objet_geom = ", objet_geom)
+      texte = "solide = {} ".format(solide.name())
+      print_tab (n_recur, texte, solide)
 
-# 1. Préalables
-
-    erreur = 0
-    message = ""
-
-    while not erreur :
-
-# 2. L'aide
-
-      if self.affiche_aide_globale :
-        break
-
-# 3. Les imports pour salomé
-      geompy = geomBuilder.New()
-
-# 4. En cas d'exportation step, répertoire de travail associé à l'éventuel fichier de départ
+# 1. En cas d'exportation step, répertoire de travail associé à l'éventuel fichier de départ
 #    Attention à ne pas recréer le répertoire à chaque fois
-      if self._export_step:
+    if self._export_step:
+
+      if self.rep_step is None:
 
         if self._verbose_max:
           print_tab (n_recur, "Préparation de l'export STEP")
 
-        if self.rep_step is None:
-          if self.ficcao is None:
-            self.rep_step = tempfile.mkdtemp(prefix="{}_".format(self.objet_principal.name()))
+        if self.ficcao is None:
+          self.rep_step = tempfile.mkdtemp(prefix="{}_".format(self.objet_principal.name()))
+        else:
+          self.rep_step = os.path.join(os.path.dirname(self.ficcao),"{}_M".format(self.objet_principal.name()))
+          if os.path.isdir(self.rep_step):
+            l_aux = os.listdir(self.rep_step)
+            for nomfic in l_aux:
+              os.remove(os.path.join(self.rep_step,nomfic))
           else:
-            self.rep_step = os.path.join(os.path.dirname(self.ficcao),"{}_M".format(self.objet_principal.name()))
-            if os.path.isdir(self.rep_step):
-              l_aux = os.listdir(self.rep_step)
-              for nomfic in l_aux:
-                os.remove(os.path.join(self.rep_step,nomfic))
-            else:
-              os.mkdir(self.rep_step)
-        if self._verbose_max:
-          print_tab (n_recur, "Les fichiers CAO des surfaces seront dans le répertoire {}".format(self.rep_step))
+            os.mkdir(self.rep_step)
 
-# 5. Calcul réel de la face médiane
+      if self._verbose_max:
+        print_tab (n_recur, "Les fichiers CAO des surfaces seront dans le répertoire {}".format(self.rep_step))
 
-      if solide is None:
-        self.nom_solide = objet_geom.GetName()
+# 2. Calcul réel de la face médiane
 
-      erreur, message = self.face_mediane_solide (solide, geompy, objet_geom, n_recur)
-      if erreur:
-        break
-
-      break
+    erreur, message = self.face_mediane_solide (solide, n_recur)
 
     return erreur, message
 
@@ -2402,7 +2347,7 @@ Sorties :
 """
 
     nom_fonction = __name__ + "/surf_fic_cao"
-    blabla = "Dans {} :\n".format(nom_fonction)
+    blabla = "Dans {} :".format(nom_fonction)
 
     if self._verbose_max:
       print (blabla)
@@ -2413,6 +2358,9 @@ Sorties :
     model.begin()
 
     while not erreur :
+
+      if self.affiche_aide_globale:
+        break
 
 # 1. Définition de la pièce
 
@@ -2467,28 +2415,40 @@ Sorties :
     if self._verbose_max:
       print (blabla)
 
+    erreur = 0
+    message = ""
+
+    while not erreur :
+
+      if self.affiche_aide_globale:
+        break
+
 # 1. Acquisition de la liste des noms des sous-objets solides
 
-    self.d_statut_so = dict()
-    self.l_noms_so = list()
-    self.l_faces_m = list()
+      self.d_statut_so = dict()
+      self.l_noms_so = list()
+      self.l_faces_m = list()
 
-    _ = self._nom_sous_objets (objet, True)
-    if self._verbose_max:
-      print ("Noms des sous-objets : {}".format(self.l_noms_so))
+      _ = self._nom_sous_objets (objet, True)
+      if self._verbose_max:
+        print ("Noms des sous-objets : {}".format(self.l_noms_so))
 
 # 2. Les faces médianes
 
-    erreur, message = self._surf_objet_shaper_0 ( objet )
+      erreur, message = self._surf_objet_shaper_0 ( objet )
+      if erreur:
+        break
 
 # 3. Gestion des faces créées
 
-    self._surf_objet_shaper_1 ( )
+      self._surf_objet_shaper_1 ( )
 
 # 4. Futur message pour le résultat
 
-    if ( self._export_step and not erreur ):
-      message = "Les fichiers des CAO des surfaces sont dans le répertoire {}".format(self.rep_step)
+      if ( self._export_step and not erreur ):
+        message = "Les fichiers des CAO des surfaces sont dans le répertoire {}".format(self.rep_step)
+
+      break
 
     return erreur, message
 
@@ -2509,7 +2469,7 @@ Sorties :
 """
 
     nom_fonction = __name__ + "/_surf_objet_shaper_0"
-    blabla = "Dans {} :\n".format(nom_fonction)
+    blabla = "Dans {} :".format(nom_fonction)
 
     if self._verbose_max:
       print_tab (n_recur, blabla)
@@ -2520,16 +2480,23 @@ Sorties :
 
     while not erreur :
 
-# 1. Au premier passage, il faut récupérer la pièce et garder la référence au résultat principal
+# 1. Au premier passage, il faut récupérer la pièce SHAPER et garder la référence au résultat principal
 
       if ( n_recur == 0 ):
         self.part_doc = model.activeDocument()
-        objet_0, l_faces = self._surf_objet_shaper_00 (objet)
+        objet_0 = objet.result()
+        self.objet_principal = objet_0
+        objet_bis = objet.defaultResult().shape()
+        if self._verbose_max:
+          print_tab (0, "Examen de l'objet initial ", objet.result().name(), saut_av=True)
+          print_tab (0, "Type python : ", type(objet))
+          print_tab (0, "Type {} / {} ; volume = ".format(objet_bis.shapeType(),objet_bis.shapeTypeStr()), GeomAlgoAPI_ShapeTools.volume(objet_bis))
       else:
         objet_0 = objet
-        print_tab (n_recur, "Examen de l'objet ", objet.name(), saut_av=True)
-        print_tab (n_recur, "Type python : ", type(objet))
-        print_tab (n_recur, "Type ", objet.shapeType())
+        if self._verbose_max:
+          print_tab (n_recur, "Examen de l'objet ", objet.name(), saut_av=True)
+          print_tab (n_recur, "Type python : ", type(objet))
+          print_tab (n_recur, "shapeType : ", objet.shapeType())
 
 # 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
 
@@ -2570,65 +2537,6 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _surf_objet_shaper_00 (self, objet):
-    """Liste les faces d'un objet SHAPER passé en argument
-
-Entrées :
-  :objet: objet à traiter
-
-Sorties :
-  :objet_0: le résultat associé à l'objet
-  :l_faces: liste des faces
-"""
-
-    nom_fonction = __name__ + "/_surf_objet_shaper_00"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-    if self._verbose_max:
-      print (blabla)
-
-# 1. Objet principal
-    objet_0 = objet.result()
-    self.objet_principal = objet_0
-    objet_bis = objet.defaultResult().shape()
-    if self._verbose_max:
-      print_tab (0, "Examen de l'objet initial ", objet.result().name(), saut_av=True)
-      print_tab (0, "Type python : ", type(objet))
-      print_tab (0, "Type {} / {} ; volume = ".format(objet_bis.shapeType(),objet_bis.shapeTypeStr()), GeomAlgoAPI_ShapeTools.volume(objet_bis))
-
-# 2. Décomposition
-# 2.1. En volumes
-    l_volumes = list()
-    exp = GeomAPI_ShapeExplorer(objet_bis, GeomAPI_Shape.SOLID)
-    while exp.more():
-      l_volumes.append(exp.current().solid())
-      exp.next()
-
-# 2.2. Chaque volume en faces
-    for ivolume, volume in enumerate(l_volumes):
-
-      if self._verbose_max:
-        print_tab (1, "Volume n°{} ; volume = ".format(ivolume), GeomAlgoAPI_ShapeTools.volume(volume))
-        print_tab (1, "Type python : ", type(volume))
-        print_tab (1, "Type {} / ".format(volume.shapeType()), volume.shapeTypeStr())
-        #print ("\tInformations : {}".format(volume.shapeInfo()))
-
-      l_faces = list()
-      exp = GeomAPI_ShapeExplorer(volume, GeomAPI_Shape.FACE)
-      while exp.more():
-        l_faces.append(exp.current().face())
-        exp.next()
-
-      if self._verbose_max:
-        for iface, face in enumerate(l_faces):
-          print_tab (2, "Face n°{} ; surface = ".format(iface), GeomAlgoAPI_ShapeTools.area(face))
-
-    return objet_0, l_faces
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
   def _surf_objet_shaper_1 (self, n_recur=0):
     """Gestion des surfaces médianes créées
 
@@ -2663,15 +2571,34 @@ Sorties :
       if self._verbose_max:
         print_tab (n_recur, "Partitionnnement des faces créées.")
 
-      l_objets = list()
+# 2.1.1. Pour une raison mystérieuse, il faut commencer par les faces entières, puis mettre les sous-faces éventuelles
+      d_faces = dict()
       for (face,_) in self.l_faces_m:
-        l_objets.append(model.selection("COMPOUND", "all-in-{}".format(face.name())))
+        if not face.result().numberOfSubs():
+          d_faces[face.name()] = [face.name()]
+      for (face,_) in self.l_faces_m:
+        nb_sub_results = face.result().numberOfSubs()
+        if nb_sub_results:
+          laux = list()
+          for n_sobj in range(nb_sub_results):
+            laux.append(face.result().subResult(n_sobj).name())
+          d_faces[face.name()] = laux
+
+      l_objets = list()
+      for _, laux in d_faces.items():
+        for s_face_n in laux:
+          l_objets.append(model.selection("FACE", s_face_n))
 
       Partition_1 = model.addPartition(self.part_doc, l_objets, keepSubResults = True)
 
       Partition_1.result().setName("{}_M".format(self.objet_principal.name()))
-      for iaux, (face,_) in enumerate(self.l_faces_m):
-        Partition_1.result().subResult(iaux).setName("{}".format(face.name()))
+      iaux = 0
+      for face_n, laux in d_faces.items():
+        Partition_1.result().subResult(iaux).setName("{}".format(face_n))
+        if ( len(laux) > 1 ):
+          for jaux, s_face_n in enumerate(laux):
+            Partition_1.result().subResult(iaux).subResult(jaux).setName("{}_M".format(s_face_n))
+        iaux += 1
       self._couleur_objet (Partition_1, n_recur, coul_r=0, coul_g=170, coul_b=0)
 
 # 2.2. Récupération des faces individuelles
@@ -2687,6 +2614,10 @@ Sorties :
       for iaux, (face,_) in enumerate(self.l_faces_m):
         Recover_1.results()[iaux].setName("{}".format(face.name()))
         Recover_1.results()[iaux].setColor(0, 170, 0)
+        nb_sub_results = Recover_1.results()[iaux].numberOfSubs()
+        for n_sobj in range(nb_sub_results):
+          Recover_1.results()[iaux].subResult(n_sobj).setName("{}_{}".format(face.name(),n_sobj))
+          Recover_1.results()[iaux].subResult(n_sobj).setColor(0, 170, 0)
 
 # 2.3. Mise en dossier
 
@@ -2696,6 +2627,8 @@ Sorties :
       for (face,fonction_0) in self.l_faces_m:
         dossier = model.addFolder(self.part_doc, fonction_0, face)
         dossier.setName(face.name()[:-2])
+      dossier = model.addFolder(self.part_doc, Partition_1, Recover_1)
+      dossier.setName(self.objet_principal.name())
 
     return
 
@@ -2733,99 +2666,24 @@ Sorties :
 # 1. Isolement du solide
       solide_aux, recover = self._isole_solide ( solide, n_recur )
 
-# 2. Exportation dans un fichier step pour traitement dans GEOM
-
-      fichier = tempfile.mkstemp(suffix=".stp")[1]
-      if self._verbose_max:
-        print_tab (n_recur, "fichier = ", fichier)
-        print_tab (n_recur, "solide  = ", solide_aux.name())
-        print_tab (n_recur, "de type = ", solide_aux.shapeType())
-      export = model.exportToFile(self.part_doc, fichier, [model.selection(solide_aux.shapeType(), solide_aux.name())])
-      export.execute(True)
-      model.do()
-
-      taille = os.path.getsize(fichier)
-      if ( taille <= 0 ):
-        message = "Export de SHAPER vers GEOM impossible pour le solide '{}' de type '{}'\n".format(solide_aux.name(), solide_aux.shapeType())
-        message += "Le fichier {} est de taille {}".format(fichier,taille)
-        erreur = 2
-        break
-
-# 3. Importation dans GEOM
-      geompy = geomBuilder.New()
-      objet_geom = geompy.ImportSTEP(fichier, False, True)
-      os.remove(fichier)
-
-# 4. Traitement de l'objet correspondant
-      erreur, message = self._traitement_objet ( solide=solide_aux, objet_geom=objet_geom, n_recur=n_recur )
+# 2. Traitement de l'objet correspondant
+      erreur, message = self._traitement_objet ( solide_aux, n_recur=n_recur )
 
       if ( erreur and self._verbose_max ):
         print (blabla, message)
 
-# 5. Mise en forme de l'objet principal récupéré
-      if ( recover is not None ):
-        _ = self._nom_sous_objets (recover, False)
-
-# 6. Neutralisation des erreurs dues à l'épaisseur
+# 3. Neutralisation des erreurs dues à l'épaisseur
       if ( erreur in (-2,-1,2) ):
         erreur = 0
         message = ""
+      if erreur:
+        break
+
+# 4. Mise en forme de l'objet principal récupéré
+      if ( recover is not None ):
+        _ = self._nom_sous_objets (recover, False)
 
       break
-
-    return erreur, message
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
-  def surf_objet_geom (self, objet_geom):
-    """Calcule la surface médiane pour un objet GEOM passé en argument
-
-Entrées :
-  :objet_geom: l'objet GEOM à traiter
-
-Sorties :
-  :erreur: code d'erreur
-  :message: message d'erreur
-"""
-
-    nom_fonction = __name__ + "/surf_objet_geom"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-    if self._verbose_max:
-      print (blabla)
-
-    erreur, message = self._traitement_objet ( objet_geom=objet_geom )
-
-    if ( erreur and self._verbose_max ):
-      print (blabla, message)
-
-    return erreur, message
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
-  def lancement (self):
-
-    """Lancement
-
-Sorties :
-  :erreur: code d'erreur
-  :message: message d'erreur
-"""
-
-    nom_fonction = __name__ + "/lancement"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-    if self._verbose_max:
-      print (blabla)
-
-    erreur, message = self._traitement_objet ( )
-
-    if ( erreur and self._verbose_max ):
-      print (blabla, message)
 
     return erreur, message
 
@@ -2842,13 +2700,13 @@ if __name__ == "__main__" :
   HOME_SH_SM_EXCHANGE = os.environ["HOME_SH_SM_EXCHANGE"]
   L_FIC_CAO = list()
   #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "Solid_7.step"))
-  #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Objet_1.stp"))
+  L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Objet_1.stp"))
   #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Naval_007.stp"))
   ##L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Naval.stp"))
   #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Partition_2.step"))
   #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Partition_2_1_22.step"))
   #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Partition_2_1_5.step"))
-  L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Observatoire.stp"))
+  #L_FIC_CAO.append(os.path.join(HOME_SH_SM_EXCHANGE, "SHAPER", "SurfaceMediane", "CAO_STEP", "Observatoire.stp"))
 
   for FIC_CAO in L_FIC_CAO:
 
