@@ -33,6 +33,7 @@ from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAn
 from FeaturesAPI import shapeProximity
 from FeaturesAPI import getPointCoordinates, getGeometryCalculation, getBoundingBox
 from FeaturesAPI import getNormal
+from FeaturesAPI import getSharedFaces
 from FeaturesAPI import makeVertexInsideFace
 from FeaturesAPI import addRemoveResults
 from FeaturesAPI import addCopy, addImportResult

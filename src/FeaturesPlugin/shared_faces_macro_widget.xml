@@ -1,0 +1,35 @@
+<source>
+  <shape_selector id="main_object"
+                  label="Object"
+                  tooltip="Select a compsolid or a compound"
+                  shape_types="compsolid compound"
+                  default=""
+                  geometrical_selection="true">
+    <validator id="PartSet_DifferentObjects"/>
+    <validator id="GeomValidators_ShapeType" parameters="compsolid,compound"/>
+  </shape_selector>
+  <groupbox title="Shared faces">
+    <label id="number_shared_faces" label="Number of shared faces : "/>
+    <multi_selector id="group_list"
+                      label="List of faces :"
+                      icon=""
+                      shape_types="faces"
+                      Block_selection = "true"
+                      use_choice="false">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="GeomValidators_ShapeType" parameters="faces"/>
+    </multi_selector>
+  </groupbox>
+  <integervalue id="transparency"
+                label="Transparency"
+                min="0"
+                max="100"
+                step="10"
+                default="50">
+  </integervalue>
+  <optionalbox id="create_group" title="Create group" show_title="true">
+    <groupbox>
+      <stringvalue id="group_name" label="Group name"/>
+    </groupbox>
+  </optionalbox>
+</source>

@@ -14,6 +14,7 @@ Features plug-in provides a set of common topological operations. It implements 
    angularCopyFeature.rst
    boundingBoxFeature.rst
    chamferFeature.rst
+   checkSharedFaceFeature.rst
    copyFeature.rst
    defeaturingFeature.rst
    extrusionCutFeature.rst
