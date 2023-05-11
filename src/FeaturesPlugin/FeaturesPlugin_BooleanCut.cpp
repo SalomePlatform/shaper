@@ -108,6 +108,7 @@ void FeaturesPlugin_BooleanCut::execute()
 
   // When selecting a compound tool object, use its exploded subshapes as tool object instead.
   const ListOfShape aToolList = ExplodeCompounds(aTools.objects());
+
   // For solids cut each object with all tools.
   bool isOk = true;
   for (GeomAPI_ShapeHierarchy::iterator anObjectsIt = anObjects.begin();

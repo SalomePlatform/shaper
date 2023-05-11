@@ -99,6 +99,7 @@
 %shared_ptr(FeaturesAPI_Rotation)
 %shared_ptr(FeaturesAPI_Scale)
 %shared_ptr(FeaturesAPI_Sewing)
+%shared_ptr(FeaturesAPI_SharedFaces)
 %shared_ptr(FeaturesAPI_Symmetry)
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
@@ -245,6 +246,7 @@
 %include "FeaturesAPI_Rotation.h"
 %include "FeaturesAPI_Scale.h"
 %include "FeaturesAPI_Sewing.h"
+%include "FeaturesAPI_SharedFaces.h"
 %include "FeaturesAPI_Symmetry.h"
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"

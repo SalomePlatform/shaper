@@ -156,6 +156,10 @@
       <translation>Boîte englobante</translation>
     </message>
     <message>
+      <source>Check shared faces</source>
+      <translation>Vérifier les faces partagées</translation>
+    </message>
+    <message>
       <source>Placement</source>
       <translation>Placement</translation>
     </message>
@@ -5500,6 +5504,124 @@
     <message>
       <source>The result is empty</source>
       <translation>Le résultat est vide</translation>
+    </message>
+  </context>
+
+  <!-- Check shared faces -->
+  <context>
+    <name>Shared_faces_macro</name>
+    <message>
+      <source>Check shared faces</source>
+      <translation>Vérifier les faces partagées</translation>
+    </message>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>
+    <message>
+      <source>Number of shared faces : </source>
+      <translation>Nombre de faces partagées : </translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces_macro:create_group</name>
+    <message>
+      <source>Create group</source>
+      <translation>Créer un groupe</translation>
+    </message>
+  </context>
+  <context>
+      <name>Shared_faces_macro:group_name</name>
+    <message>
+      <source>Group name</source>
+      <translation>Nom du groupe</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces_macro:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>
+  </context>
+  <context>
+      <name>Shared_faces_macro:group_list</name>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>   
+    <message>
+      <source>List of faces :</source>
+      <translation>Liste des faces :</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces_macro:transparency</name>
+    <message>
+      <source>Transparency</source>
+      <translation>Transparence</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces</name>
+    <message>
+      <source>Check shared faces</source>
+      <translation>Vérifier les faces partagées</translation>
+    </message>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>
+    <message>
+      <source>Number of shared faces : </source>
+      <translation>Nombre de faces partagées : </translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces:create_group</name>
+    <message>
+      <source>Create group</source>
+      <translation>Créer un groupe</translation>
+    </message>
+  </context>
+  <context>
+      <name>Shared_faces:group_name</name>
+    <message>
+      <source>Group name</source>
+      <translation>Nom du groupe</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces:main_object</name>
+    <message>
+      <source>Object</source>
+      <translation>Objet</translation>
+    </message>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>
+  </context>
+  <context>
+      <name>Shared_faces:group_list</name>
+    <message>
+      <source>Shared faces</source>
+      <translation>Faces partagées</translation>
+    </message>   
+    <message>
+      <source>List of faces :</source>
+      <translation>Liste des faces :</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shared_faces:transparency</name>
+    <message>
+      <source>Transparency</source>
+      <translation>Transparence</translation>
     </message>
   </context>
 

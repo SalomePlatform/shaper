@@ -543,6 +543,7 @@ SET(TEST_NAMES_PARA
                TestBooleanCut_Fuzzy_2.py
                TestBooleanFuse_Fuzzy.py
                TestBooleanCommon_Fuzzy.py
+               TestCheckSharedFaces.py
 )
 
 SET(TEST_NAMES_SEQ

@@ -34,6 +34,7 @@
 #include <FeaturesPlugin_Fillet1D.h>
 #include <FeaturesPlugin_GeometryCalculation.h>
 #include <FeaturesPlugin_GlueFaces.h>
+#include <FeaturesPlugin_GroupSharedFaces.h>
 #include <FeaturesPlugin_InspectBoundingBox.h>
 #include <FeaturesPlugin_InspectNormalToFace.h>
 #include <FeaturesPlugin_Intersection.h>
@@ -56,6 +57,7 @@
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_Scale.h>
 #include <FeaturesPlugin_Sewing.h>
+#include <FeaturesPlugin_SharedFaces.h>
 #include <FeaturesPlugin_Symmetry.h>
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Union.h>
@@ -236,6 +238,10 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_PointCloudOnFace);
   } else if (theFeatureID == FeaturesPlugin_LimitTolerance::ID()) {
     return FeaturePtr(new FeaturesPlugin_LimitTolerance);
+  } else if (theFeatureID == FeaturesPlugin_SharedFaces::ID()) {
+    return FeaturePtr(new FeaturesPlugin_SharedFaces);
+  } else if (theFeatureID == FeaturesPlugin_GroupSharedFaces::ID()) {
+    return FeaturePtr(new FeaturesPlugin_GroupSharedFaces);
   }
 
 
