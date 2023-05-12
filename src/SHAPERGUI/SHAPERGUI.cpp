@@ -500,40 +500,45 @@ void SHAPERGUI::logShaperGUIEvent()
   QAction* anAction = static_cast<QAction*>(sender());
   if ( !anAction )
     return;
-  QString anId = anAction->data().toString();
-  QStringList message = (QStringList() << moduleName());
+  const QString anId = anAction->data().toString();
+  const QString section = anId.contains("Sketch") ? "sketcher" : "";
+
+  CAM_Application::logStructuredUserEvent( moduleName(),
+                                           section,
+                                           anAction->text(),
+                                           "activated" );
+}
+
+//******************************************************
+static void onOperationGeneric( ModuleBase_Operation* theOperation,
+                                const QString moduleName,
+                                const QString &event )
+{
+  QString anId = theOperation->id();
+  QString section = "";
+
   if (anId.contains("Sketch"))
-    message << tr("sketcher");
-  message << tr("operation %1 has been activated").arg(anAction->text());
-  CAM_Application::logUserEvent(message.join(": "));
+  {
+    section = "sketcher";
+    anId.remove("Sketch");
+  }
+
+  CAM_Application::logStructuredUserEvent( moduleName,
+                                           section,
+                                           anId,
+                                           event );
 }
 
 //******************************************************
 void SHAPERGUI::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
-  QStringList message = (QStringList() << moduleName());
-  QString anId = theOperation->id();
-  if (anId.contains("Sketch"))
-  {
-    message << tr("sketcher");
-    anId.remove("Sketch");
-  }
-  message << tr("operation %1 has been committed").arg(anId);
-  CAM_Application::logUserEvent(message.join(": "));
+  onOperationGeneric(theOperation, moduleName(), "committed");
 }
 
 //******************************************************
 void SHAPERGUI::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  QStringList message = (QStringList() << moduleName());
-  QString anId = theOperation->id();
-  if (anId.contains("Sketch"))
-  {
-    message << tr("sketcher");
-    anId.remove("Sketch");
-  }
-  message << tr("operation %1 has been aborted").arg(anId);
-  CAM_Application::logUserEvent(message.join(": "));
+  onOperationGeneric(theOperation, moduleName(), "aborted");
 }
 
 //******************************************************
