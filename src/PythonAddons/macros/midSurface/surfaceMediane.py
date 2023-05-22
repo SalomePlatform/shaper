@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.05"
+__revision__ = "V11.07"
 
 #========================= Les imports - Début ===================================
 
@@ -46,7 +46,6 @@ import tempfile
 
 import salome
 
-salome.standalone()
 salome.salome_init()
 
 import SALOMEDS
@@ -1025,14 +1024,11 @@ Sorties :
       print_tab (n_recur, "Taille   : ", taille)
       print_tab (n_recur, "Distance entre les deux faces : ", d_face_1_2)
 
-# 1. Objets préalables
-    nom_par_1 = "{}_taille".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(taille))
-
-    centre, v_norm, plan = self._cree_centre_axe_plan ( coo_c, vnor, self.nom_solide, n_recur )
+# 1. Préalables
+    _, v_norm, plan = self._cree_centre_axe_plan ( coo_c, vnor, self.nom_solide, n_recur )
 
 # 2. Création de l'esquisse
-    sketch = self._cree_face_mediane_plane_1_a ( plan, centre, nom_par_1, taille, n_recur )
+    sketch = self._cree_face_mediane_plane_1_a ( plan, taille, n_recur )
 
 # 3. La face
     face = self._cree_face_mediane_plane_1_b ( solide, sketch, v_norm, d_face_1_2, n_recur )
@@ -1045,13 +1041,11 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane_1_a ( self, plan, centre, nom_par_1, taille, n_recur ):
+  def _cree_face_mediane_plane_1_a ( self, plan, taille, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes - l'esquisse
 
 Entrées :
   :plan: plan
-  :centre: centre
-  :nom_par_1: nom du paramètre
   :taille: estimation de la taille de la future face
   :n_recur: niveau de récursivité
 
@@ -1064,33 +1058,26 @@ Sorties :
     if self._verbose_max:
       print_tab (n_recur, blabla)
       print_tab (n_recur, "Plan      : {}".format(plan.name()))
-      print_tab (n_recur, "Centre    : {}".format(centre.name()))
-      print_tab (n_recur, "Paramètre : {}".format(nom_par_1))
       print_tab (n_recur, "taille    : {}".format(taille))
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", plan.name()))
+    sketch.execute(True)
 
     ### Create SketchLine
     SketchLine_1 = sketch.addLine(-taille/2., taille/2., taille/2., taille/2.)
-    #sketch.setHorizontal(SketchLine_1.result())
+    SketchLine_1.execute(True)
 
     ### Create SketchLine
     SketchLine_2 = sketch.addLine(taille/2., taille/2., taille/2., -taille/2.)
-    #sketch.setVertical(SketchLine_2.result())
-    #sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
+    SketchLine_2.execute(True)
 
     ### Create SketchLine
     SketchLine_3 = sketch.addLine(taille/2., -taille/2., -taille/2., -taille/2.)
-    #sketch.setHorizontal(SketchLine_3.result())
-    #sketch.setCoincident(SketchLine_2.endPoint(), SketchLine_3.startPoint())
-    #sketch.setLength(SketchLine_3.result(), nom_par_1)
+    SketchLine_3.execute(True)
 
     ### Create SketchLine
     SketchLine_4 = sketch.addLine(-taille/2., -taille/2., -taille/2., taille/2.)
-    #sketch.setVertical(SketchLine_4.result())
-    #sketch.setCoincident(SketchLine_4.endPoint(), SketchLine_1.startPoint())
-    #sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_4.startPoint())
-    #sketch.setEqual(SketchLine_3.result(), SketchLine_4.result())
+    SketchLine_4.execute(True)
 
     model.do()
 
@@ -1132,18 +1119,22 @@ Sorties :
     LinearCopy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
     nom = "{}_0".format(self.nom_solide_aux)
     exec_nom (LinearCopy_1,nom)
+    if self._verbose_max:
+      print_tab (n_recur, "Après LinearCopy_1 : ", nom)
 
     ### Create Recover
     Recover_1 = model.addRecover(self.part_doc, LinearCopy_1, [solide])
     nom = "{}_1".format(self.nom_solide_aux)
     exec_nom (Recover_1,nom)
+    if self._verbose_max:
+      print_tab (n_recur, "Après Recover_1 : ", nom)
 
     # Création d'une face ; on la translate d'une demi-épaisseur.
     for iaux in range(2):
 
-      distance = -0.5*d_face_1_2*float(2*iaux-1)
+      d_trans = -0.5*d_face_1_2*float(2*iaux-1)
       nom_solide = "{}_{}".format(self.nom_solide_aux,iaux)
-      face = self._cree_face_mediane_plane_2 ( sketch.name(), v_norm.name(), nom_solide, distance, iaux, n_recur )
+      face = self._cree_face_mediane_plane_2 ( sketch.name(), v_norm.name(), nom_solide, d_trans, iaux, n_recur )
 
       if face.results():
         face = self._cree_face_mediane_plane_11 ( face, Recover_1, n_recur )
@@ -1203,7 +1194,7 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane_2 ( self, nom_sketch, nom_normal, nom_solide, distance, icpt, n_recur ):
+  def _cree_face_mediane_plane_2 ( self, nom_sketch, nom_normal, nom_solide, d_trans, icpt, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Intersection de la face avec le solide
@@ -1212,7 +1203,7 @@ Entrées :
   :nom_sketch: nom de l'esquisse
   :nom_normal: nom du vecteur normal
   :nom_solide: nom du solide à intersecter
-  :distance: la distance de translation
+  :d_trans: la distance de translation
   :icpt: numéro de la tentative
 
 Sorties :
@@ -1220,23 +1211,27 @@ Sorties :
 """
 
     nom_fonction = __name__ + "/_cree_face_mediane_plane_2"
-    blabla = "Dans {} :\n".format(nom_fonction)
+    blabla = "Dans {} :".format(nom_fonction)
     if self._verbose_max:
       print_tab (n_recur, blabla)
       print_tab (n_recur, "nom_sketch : ", nom_sketch)
       print_tab (n_recur, "nom_normal : ", nom_normal)
       print_tab (n_recur, "nom_solide : ", nom_solide)
-      print_tab (n_recur, "distance   : ", distance)
+      print_tab (n_recur, "d_trans    : ", d_trans)
 
     # Création d'une face
     Face_1 = model.addFace(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(nom_sketch))])
     nom_face_1 = "{}_face_1_{}".format(self.nom_solide_aux,icpt)
     exec_nom (Face_1,nom_face_1)
+    if self._verbose_max:
+      print_tab (n_recur, "Après Face_1 : ", nom_face_1)
 
 #   On la translate
-    Translation_1 = model.addTranslation(self.part_doc, [model.selection("FACE", nom_face_1)], axis = model.selection("EDGE", nom_normal), distance = distance, keepSubResults = True)
+    Translation_1 = model.addTranslation(self.part_doc, [model.selection("FACE", nom_face_1)], axis = model.selection("EDGE", nom_normal), distance = d_trans, keepSubResults = True)
     nom_trans = "{}_trans_{}".format(self.nom_solide_aux,icpt)
     exec_nom (Translation_1,nom_trans)
+    if self._verbose_max:
+      print_tab (n_recur, "Après Translation_1 : ", nom_trans)
     Translation_1.result().setColor(85, 0, 255)
 
 #   Intersection de cette face avec le solide initial
@@ -1411,7 +1406,7 @@ Sorties :
     centre, _, plan = self._cree_centre_axe_plan ( coo_c, v_axe, self.nom_solide, n_recur )
 
 # 2. Création de l'esquisse
-    sketch = self._cree_face_mediane_cylindre_1_a ( plan, centre, rayon, nom_par_1, n_recur )
+    sketch = self._cree_face_mediane_cylindre_1_a ( plan, centre, rayon, n_recur )
 
 # 3. La face
     face = self._cree_face_mediane_cylindre_1_b ( sketch, nom_par_2, n_recur )
@@ -1422,7 +1417,7 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_cylindre_1_a ( self, plan, centre, rayon, nom_par_1, n_recur ):
+  def _cree_face_mediane_cylindre_1_a ( self, plan, centre, rayon, n_recur ):
     """Crée la face médiane entre deux autres - cas des cylindres
 
 Création des objets temporaires et de la face externe du cylindre support
@@ -1431,7 +1426,6 @@ Entrées :
   :coo_x, coo_y, coo_z: coordonnées du centre de la base
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon: rayon moyen entre les deux faces
-  :nom_par_1: nom_par_1
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -1448,13 +1442,13 @@ Sorties :
       print_tab (n_recur, "Rayon   : ", rayon)
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", plan.name()))
+    sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", centre.name()), False)
     SketchPoint_1 = SketchProjection_1.createdFeature()
 
     SketchCircle_1 = sketch.addCircle(0., 0., rayon)
     sketch.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
-    sketch.setRadius(SketchCircle_1.results()[1], nom_par_1)
     model.do()
 
     nom_sketch = "{}_esquisse".format(self.nom_solide)
@@ -1618,6 +1612,7 @@ Sorties :
     model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon))
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
+    sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
     SketchPoint_1 = SketchProjection_1.createdFeature()
@@ -1789,6 +1784,7 @@ Sorties :
     model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
+    sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
     SketchPoint_1 = SketchProjection_1.createdFeature()
@@ -1985,6 +1981,7 @@ Sorties :
 #   6. Création de l'esquisse
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
+    sketch.execute(True)
 
 #   6.1. Projection des centres et de l'axe
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre_1), False)
