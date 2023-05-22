@@ -4004,6 +4004,10 @@
       <source>Reversed</source>
       <translation>Renversé</translation>
     </message>
+    <message >
+      <source>Approx by segments and arcs</source>
+      <translation>Environ par segments et arcs</translation>
+    </message>
   </context>
 
   <context>

@@ -65,7 +65,8 @@ void GeomAlgoAPI_Offset::generated(const GeomShapePtr theOldShape,
 GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomPlanePtr& thePlane,
                                        const GeomShapePtr& theEdgeOrWire,
                                        const double theOffsetValue,
-                                       const GeomAlgoAPI_OffsetJoint theJoint)
+                                       const GeomAlgoAPI_OffsetJoint theJoint,
+                                       const bool theIsApprox)
 {
   // 1. Make wire from edge, if need
   TopoDS_Wire aWire;
@@ -101,6 +102,7 @@ GeomAlgoAPI_Offset::GeomAlgoAPI_Offset(const GeomPlanePtr& thePlane,
 
   Standard_Boolean isOpenResult = !aWire.Closed();
   aParal->Init(aFace, aJoin, isOpenResult);
+  aParal->SetApprox(theIsApprox);
   aParal->Perform(theOffsetValue, 0.);
   if (aParal->IsDone()) {
     TopoDS_Shape anOffset = aParal->Shape();

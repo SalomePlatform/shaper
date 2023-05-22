@@ -1051,6 +1051,11 @@
                    tooltip="Reverse the offset"
                    default="false"
                    obligatory="0"/>
+        <boolvalue id="approx"
+                   label="Approx by segments and arcs"
+                   tooltip="Approx by segments and arcs"
+                   default="false"
+                   obligatory="0"/>
         <action id="add_wire"
                 label="Select wire"
                 tooltip="Add the list of segments composing a wire with the selected items through the coincidence by boundary points"/>

@@ -79,6 +79,11 @@ void SketchPlugin_Offset::initAttributes()
   data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
 
+  // Always initialize approximation to false by default for backward compatibility
+  AttributeBooleanPtr approxAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+    data()->addAttribute(APPROX_ID(), ModelAPI_AttributeBoolean::typeId()));
+  approxAttr->setValue(false);
+
   // store original entities
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   // store offset entities
@@ -214,8 +219,15 @@ void SketchPlugin_Offset::execute()
       }
 
       // 5.d. Make offset for the wire
+      AttributeBooleanPtr anApproxAttr = boolean(APPROX_ID());
+      if (!anApproxAttr->isInitialized())
+      {
+        // It must be initialized at least by SketchPlugin_Offset::initAttributes()
+        return;
+      }
+
       std::shared_ptr<GeomAlgoAPI_Offset> anOffsetShape
-        (new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign, aJoint));
+        (new GeomAlgoAPI_Offset(aPlane, aWireShape, aValue*aSign, aJoint, anApproxAttr->value()));
 
       if (anOffsetShape->isDone()) {
         if (aJoint == GeomAlgoAPI_OffsetJoint::Arcs) {

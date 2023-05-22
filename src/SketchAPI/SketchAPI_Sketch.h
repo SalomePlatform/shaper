@@ -376,11 +376,12 @@ public:
 
   /// Add offset
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Offset> addOffset(
+    std::shared_ptr<SketchAPI_Offset> addOffset(
       const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
       const ModelHighAPI_Double & theValue,
       const bool theReversed = false,
-      const std::string & theJointType = SketchPlugin_Offset::JOINT_KEEP_DISTANCE());
+      const std::string & theJointType = SketchPlugin_Offset::JOINT_KEEP_DISTANCE(),
+      const bool theApprox = false);
 
   /// Add translation
   SKETCHAPI_EXPORT

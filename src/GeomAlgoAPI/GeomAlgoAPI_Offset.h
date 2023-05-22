@@ -54,7 +54,8 @@ public:
     (const std::shared_ptr<GeomAPI_Pln>& thePlane,
      const GeomShapePtr& theEdgeOrWire,
      const double theOffsetValue,
-     const GeomAlgoAPI_OffsetJoint theJoint = GeomAlgoAPI_OffsetJoint::KeepDistance);
+     const GeomAlgoAPI_OffsetJoint theJoint = GeomAlgoAPI_OffsetJoint::KeepDistance,
+     const bool theIsApprox = false);
 
   /// \return the list of shapes generated from the shape \a theShape.
   /// \param[in] theOldShape base shape.
