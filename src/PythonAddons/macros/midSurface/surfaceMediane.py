@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.08"
+__revision__ = "V11.10"
 
 #========================= Les imports - Début ===================================
 
@@ -173,6 +173,60 @@ Sorties :
 
 #========================= Début de la fonction ==================================
 
+def couleur_objet (objet, n_recur=0, coul_r=1, coul_g=0, coul_b=0, verbose=False):
+  """Appliquer une couleur à un objet et à ses sous_objets
+
+Entrées :
+  :objet: objet à traiter
+  :n_recur: niveau de récursivité
+  :coul_r,coul_g,coul_b: code RGB de la couleur à appliquer
+
+Sorties :
+  :rang: rang du sous-objet
+"""
+
+  nom_fonction = __name__ + "/couleur_objet"
+  blabla = "Dans {} :".format(nom_fonction)
+
+  if verbose:
+    print (blabla)
+    print_tab(n_recur, "objet : ", objet.name())
+    print_tab(n_recur, "RGB = ({},{},{})".format(coul_r,coul_g,coul_b))
+
+# 1. Au premier passage, il faut garder la référence au résultat principal
+
+  if ( n_recur == 0 ):
+    objet_0 = objet.result()
+  else:
+    objet_0 = objet
+
+# 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
+
+  nb_sub_results = objet_0.numberOfSubs()
+
+  if verbose:
+    print_tab(n_recur, "Examen de l'objet ",objet_0.name())
+    texte = "de type '{}' ".format(objet_0.shapeType())
+    texte += "et de {} sous-objets".format(nb_sub_results)
+    print_tab(n_recur, texte)
+
+  for n_sobj in range(nb_sub_results):
+
+# 2.1. Exploration récursive de l'arborescence
+
+    couleur_objet ( objet_0.subResult(n_sobj), n_recur+1, coul_r, coul_g, coul_b, verbose )
+
+# 2.2. Cet objet n'a pas de sous-objets : on le colore
+  if verbose:
+    print_tab(n_recur, "Couleur affectée à l'objet ",objet_0.name())
+  objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
+
+  #print ("sortie de {}".format(nom_fonction))
+
+#=========================  Fin de la fonction ===================================
+
+#========================= Début de la fonction ==================================
+
 def print_tab (nb_tab, message, argu=None, saut_av=False, saut_ap=False):
   """Imprime avec des tabulations
 
@@ -224,16 +278,17 @@ Entrées :
 
 #========================= Début de la fonction ==================================
 
-def exec_nom (fonction, nom=None):
-  """Execute la fonction après l'avoir nommée et nommé son résultat
+def exec_nom (fonction, nom=None, couleur=None):
+  """Exécute la fonction après l'avoir nommée et nommé son résultat; Couleur éventuelle
 
 Entrées :
   :fonction: fonction à traiter
   :nom: nom à attribuer éventuellement
+  :couleur: éventuellement couleur
 """
 
   if ( nom is not None ):
-    nommage (fonction, nom)
+    nommage (fonction, nom, couleur)
 
   fonction.execute(True)
 
@@ -290,7 +345,8 @@ Arborescence :
 surf_fic_cao --> import_cao
              --> surf_objet_shaper (récursif) --> _nom_sous_objets
                                               --> _surf_objet_shaper_0
-                                              --> surf_solide_shaper --> _isole_solide
+                                              --> surf_solide_shaper --> _isole_solide --> _isole_solide_a
+                                                                                       --> _isole_solide_b
                                                                      --> _traitement_objet --> face_mediane_solide --> _faces_du_solide
                                                                                                                    --> _tri_faces
                                                                                                                    --> _cree_face_mediane
@@ -451,60 +507,6 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _couleur_objet (self, objet, n_recur=0, coul_r=1, coul_g=0, coul_b=0):
-    """Appliquer une couleur à un objet et à ses sous_objets
-
-Entrées :
-  :objet: objet à traiter
-  :n_recur: niveau de récursivité
-  :coul_r,coul_g,coul_b: code RGB de la couleur à appliquer
-
-Sorties :
-  :rang: rang du sous-objet
-"""
-
-    nom_fonction = __name__ + "/_couleur_objet"
-    blabla = "Dans {} :".format(nom_fonction)
-
-    if self._verbose_max:
-      print (blabla)
-      print_tab(n_recur, "objet : ", objet.name())
-      print_tab(n_recur, "RGB = ({},{},{})".format(coul_r,coul_g,coul_b))
-
-# 1. Au premier passage, il faut garder la référence au résultat principal
-
-    if ( n_recur == 0 ):
-      objet_0 = objet.result()
-    else:
-      objet_0 = objet
-
-# 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
-
-    nb_sub_results = objet_0.numberOfSubs()
-
-    if self._verbose_max:
-      print_tab(n_recur, "Examen de l'objet ",objet_0.name())
-      texte = "de type '{}' ".format(objet_0.shapeType())
-      texte += "et de {} sous-objets".format(nb_sub_results)
-      print_tab(n_recur, texte)
-
-    for n_sobj in range(nb_sub_results):
-
-# 2.1. Exploration récursive de l'arborescence
-
-      self._couleur_objet ( objet_0.subResult(n_sobj), n_recur+1, coul_r, coul_g, coul_b )
-
-# 2.2. Cet objet n'a pas de sous-objets : on le colore
-    if self._verbose_max:
-      print_tab(n_recur, "Couleur affectée à l'objet ",objet_0.name())
-    objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
-
-    #print ("sortie de {}".format(nom_fonction))
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
   def _isole_solide ( self, solide, n_recur ):
     """Isole le solide de son arboresence
 
@@ -573,7 +575,7 @@ Sorties :
     self.nom_solide_aux = "{}_S".format(solide.name())
     if self._verbose_max:
       print_tab (n_recur, "\tAttribution à remove_subshapes.result() du nom '{}'".format(self.nom_solide_aux))
-    remove_subshapes.result().setName(self.nom_solide_aux)
+    exec_nom (remove_subshapes,self.nom_solide_aux)
 
     self.fonction_0 = remove_subshapes
 
@@ -901,7 +903,7 @@ Entrées :
     self.l_faces_m.append((face, self.fonction_0))
 
 # 3. Couleur verte pour la face
-    self._couleur_objet (face, coul_r=0, coul_g=170, coul_b=0)
+    couleur_objet (face, coul_r=0, coul_g=170, coul_b=0, verbose=self._verbose_max)
 
 # 4. Changement de statut pour le solide
     self.d_statut_so[self.nom_solide] = 1
@@ -1326,7 +1328,7 @@ Sorties :
     if not erreur:
       face = self._cree_face_mediane_cylindre_1 ( (coo_x, coo_y, coo_z), (axe_x, axe_y, axe_z), rayon, hauteur, n_recur )
     else:
-      self._couleur_objet (solide, n_recur, coul_r=0, coul_g=0, coul_b=255)
+      couleur_objet (solide, n_recur, coul_r=0, coul_g=0, coul_b=255, verbose=self._verbose_max)
       face = None
 
     return erreur, face
@@ -1459,10 +1461,15 @@ Sorties :
     sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", centre.name()), False)
+    SketchProjection_1.execute(True)
+
     SketchPoint_1 = SketchProjection_1.createdFeature()
+    SketchPoint_1.execute(True)
 
     SketchCircle_1 = sketch.addCircle(0., 0., rayon)
+    SketchCircle_1.execute(True)
     sketch.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
+
     model.do()
 
     nom_sketch = "{}_esquisse".format(self.nom_solide)
@@ -1497,10 +1504,8 @@ Sorties :
 
 #   Création du cylindre complet
     cylindre = model.addExtrusion(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(sketch.name()))], model.selection(), nom_par_2, nom_par_2, "Edges")
-    cylindre.execute(True)
-
     nom_cylindre = "{}_cylindre".format(self.nom_solide)
-    nommage (cylindre, nom_cylindre, (85, 0, 255))
+    exec_nom (cylindre, nom_cylindre, (85, 0, 255))
 
 #   Intersection de la face cylindrique avec le solide initial
     face = self._creation_face_inter ( nom_cylindre )
@@ -1654,10 +1659,9 @@ Sorties :
 
 #   Création de la sphère complète
     sphere = model.addRevolution(self.part_doc, [model.selection("COMPOUND", nom_sketch)], model.selection("EDGE", "{}/{}".format(nom_sketch,nom_ligne)), 360, 0, "Edges")
-    sphere.execute(True)
 
     nom_sphere = "{}_sphere".format(self.nom_solide)
-    nommage (sphere, nom_sphere, (85, 0, 255))
+    exec_nom (sphere, nom_sphere, (85, 0, 255))
 
 #   Intersection de la face sphérique avec le solide initial
     face = self._creation_face_inter ( nom_sphere )
@@ -2166,9 +2170,7 @@ Entrées :
 
 #   Création de l'objet complet
     objet = model.addRevolution(self.part_doc, [model.selection("COMPOUND", nom_sketch)], model.selection("EDGE", nom_axe_r), 360, 0, "Edges")
-    objet.execute(True)
-
-    nommage (objet, nom_objet, (85, 0, 255))
+    exec_nom (objet, nom_objet, (85, 0, 255))
 
 #===========================  Fin de la méthode ==================================
 
@@ -2585,7 +2587,7 @@ Sorties :
           for jaux, s_face_n in enumerate(laux):
             Partition_1.result().subResult(iaux).subResult(jaux).setName("{}_M".format(s_face_n))
         iaux += 1
-      self._couleur_objet (Partition_1, n_recur, coul_r=0, coul_g=170, coul_b=0)
+      couleur_objet (Partition_1, n_recur, coul_r=0, coul_g=170, coul_b=0, verbose=self._verbose_max)
 
 # 2.2. Récupération des faces individuelles
 
@@ -2605,18 +2607,27 @@ Sorties :
           Recover_1.results()[iaux].subResult(n_sobj).setName("{}_{}".format(face.name(),n_sobj))
           Recover_1.results()[iaux].subResult(n_sobj).setColor(0, 170, 0)
 
-# 2.3. Mise en dossier
+# 3. Mise en dossier
 
-      if self._verbose_max:
-        print_tab (n_recur, "Mise en dossier.")
+    if self._verbose_max:
+      print_tab (n_recur, "Mise en dossier.")
+
+    if ( len(self.l_faces_m) > 1 ):
 
       for (face,fonction_0) in self.l_faces_m:
+        nom = face.name()[:-2]
+        if self._verbose_max:
+          print ( "Dossier {} de {} à {}".format(nom,fonction_0.name(),face.name()))
         dossier = model.addFolder(self.part_doc, fonction_0, face)
         dossier.execute(True)
-        dossier.setName(face.name()[:-2])
+        dossier.setName(nom)
+
+      nom = self.objet_principal.name()
+      if self._verbose_max:
+        print ( "Dossier {} de {} à {}".format(nom,Partition_1.name(),Recover_1.name()))
       dossier = model.addFolder(self.part_doc, Partition_1, Recover_1)
       dossier.execute(True)
-      dossier.setName(self.objet_principal.name())
+      dossier.setName(nom)
 
 #===========================  Fin de la méthode ==================================
 
