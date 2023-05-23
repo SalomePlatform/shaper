@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.07"
+__revision__ = "V11.08"
 
 #========================= Les imports - Début ===================================
 
@@ -1115,35 +1115,49 @@ Sorties :
       print_tab (n_recur, "Esquisse : ", sketch.name())
       print_tab (n_recur, "Distance entre les deux faces : ", d_face_1_2)
 
+# 1. Copie du solide pour gérer les intersections
     ### Create LinearCopy
     LinearCopy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
     nom = "{}_0".format(self.nom_solide_aux)
     exec_nom (LinearCopy_1,nom)
     if self._verbose_max:
-      print_tab (n_recur, "Après LinearCopy_1 : ", nom)
+      print_tab (n_recur, "Après addMultiTranslation LinearCopy_1 de nom ", nom)
+    nom_solide = LinearCopy_1.result().name()
 
     ### Create Recover
     Recover_1 = model.addRecover(self.part_doc, LinearCopy_1, [solide])
     nom = "{}_1".format(self.nom_solide_aux)
     exec_nom (Recover_1,nom)
     if self._verbose_max:
-      print_tab (n_recur, "Après Recover_1 : ", nom)
+      print_tab (n_recur, "Après addRecover Recover_1 de nom ", nom)
 
-    # Création d'une face ; on la translate d'une demi-épaisseur.
+# 2. Création d'une face ; on la translate d'une demi-épaisseur.
     for iaux in range(2):
 
+# 2.1. Création d'une face à partir du sketch et translation perpendiculaire au plan de la face
+#      On essaie les 2 côtés alternativement car on ne sait pas lequel sera le bon
+
       d_trans = -0.5*d_face_1_2*float(2*iaux-1)
-      nom_solide = "{}_{}".format(self.nom_solide_aux,iaux)
+
       face = self._cree_face_mediane_plane_2 ( sketch.name(), v_norm.name(), nom_solide, d_trans, iaux, n_recur )
 
+# 2.2. Si on est du bon côté, alors on intersecte la face avec le solide et c'est bon
       if face.results():
         face = self._cree_face_mediane_plane_11 ( face, Recover_1, n_recur )
         break
-      # Si l'intersection est vide, on la translate dans l'autre sens
+
+# 2.3. Si l'intersection est vide, on crée une nouvelle copie du solide avant de tester l'autre côté
       else:
         if self._verbose_max:
-          print_tab (n_recur, "L'intersection est vide.")
-        face = None
+          print_tab (n_recur, "L'intersection est vide. On essaie l'autre côté")
+
+        ### Create LinearCopy
+        LinearCopy_2 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", Recover_1.result().name())], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
+        nom = "{}_2".format(self.nom_solide_aux)
+        exec_nom (LinearCopy_2,nom)
+        if self._verbose_max:
+          print_tab (n_recur, "Après addMultiTranslation LinearCopy_2 de nom ", nom)
+        nom_solide = LinearCopy_2.result().name()
 
     #print ("fin de {}".format(nom_fonction))
 
@@ -1221,21 +1235,21 @@ Sorties :
 
     # Création d'une face
     Face_1 = model.addFace(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(nom_sketch))])
-    nom_face_1 = "{}_face_1_{}".format(self.nom_solide_aux,icpt)
-    exec_nom (Face_1,nom_face_1)
+    nom = "{}_face_1_{}".format(self.nom_solide_aux,icpt)
+    exec_nom (Face_1,nom)
     if self._verbose_max:
-      print_tab (n_recur, "Après Face_1 : ", nom_face_1)
+      print_tab (n_recur, "Après addFace pour Face_1 de nom ", nom)
 
 #   On la translate
-    Translation_1 = model.addTranslation(self.part_doc, [model.selection("FACE", nom_face_1)], axis = model.selection("EDGE", nom_normal), distance = d_trans, keepSubResults = True)
-    nom_trans = "{}_trans_{}".format(self.nom_solide_aux,icpt)
-    exec_nom (Translation_1,nom_trans)
+    Translation_1 = model.addTranslation(self.part_doc, [model.selection("FACE", Face_1.result().name())], axis = model.selection("EDGE", nom_normal), distance = d_trans, keepSubResults = True)
+    nom = "{}_trans_{}".format(self.nom_solide_aux,icpt)
+    exec_nom (Translation_1,nom)
     if self._verbose_max:
-      print_tab (n_recur, "Après Translation_1 : ", nom_trans)
+      print_tab (n_recur, "Après addTranslation pour Translation_1 de nom ", nom)
     Translation_1.result().setColor(85, 0, 255)
 
 #   Intersection de cette face avec le solide initial
-    face = model.addCommon(self.part_doc, [model.selection("SOLID", nom_solide), model.selection("FACE", nom_trans)], keepSubResults = True)
+    face = model.addCommon(self.part_doc, [model.selection("SOLID", nom_solide), model.selection("FACE", Translation_1.result().name())], keepSubResults = True)
     face.execute(True)
 
     return face
