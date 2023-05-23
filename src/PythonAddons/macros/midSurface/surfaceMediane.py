@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.11"
+__revision__ = "V11.16"
 
 #========================= Les imports - Début ===================================
 
@@ -1121,17 +1121,17 @@ Sorties :
       print_tab (n_recur, "Distance entre les deux faces : ", d_face_1_2)
 
 # 1. Copie du solide pour gérer les intersections
-    ### Create LinearCopy
-    LinearCopy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
-    nom = "{}_0".format(self.nom_solide_aux)
-    exec_nom (LinearCopy_1,nom)
+    #Copy_1 = model.addCopy(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(self.nom_solide_aux))], 1)
+    Copy_1 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", self.nom_solide_aux)], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
+    nom = "{}_Copy_1".format(self.nom_solide_aux)
+    exec_nom (Copy_1,nom)
     if self._verbose_max:
-      print_tab (n_recur, "Après addMultiTranslation LinearCopy_1 de nom ", nom)
-    nom_solide = LinearCopy_1.result().name()
+      print_tab (n_recur, "Après addMultiTranslation Copy_1 de nom ", nom)
+    nom_solide = Copy_1.result().name()
 
     ### Create Recover
-    Recover_1 = model.addRecover(self.part_doc, LinearCopy_1, [solide])
-    nom = "{}_1".format(self.nom_solide_aux)
+    Recover_1 = model.addRecover(self.part_doc, Copy_1, [solide])
+    nom = "{}_Recover_1".format(self.nom_solide_aux)
     exec_nom (Recover_1,nom)
     if self._verbose_max:
       print_tab (n_recur, "Après addRecover Recover_1 de nom ", nom)
@@ -1157,12 +1157,13 @@ Sorties :
           print_tab (n_recur, "L'intersection est vide. On essaie l'autre côté")
 
         ### Create LinearCopy
-        LinearCopy_2 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", Recover_1.result().name())], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
-        nom = "{}_2".format(self.nom_solide_aux)
-        exec_nom (LinearCopy_2,nom)
+        #Copy_2 = model.addCopy(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(self.nom_solide_aux))], 1)
+        Copy_2 = model.addMultiTranslation(self.part_doc, [model.selection("SOLID", Recover_1.result().name())], model.selection("EDGE", "PartSet/OX"), 0, 1, keepSubResults = True)
+        nom = "{}_Copy_2".format(self.nom_solide_aux)
+        exec_nom (Copy_2,nom)
         if self._verbose_max:
-          print_tab (n_recur, "Après addMultiTranslation LinearCopy_2 de nom ", nom)
-        nom_solide = LinearCopy_2.result().name()
+          print_tab (n_recur, "Après addMultiTranslation Copy_2 de nom ", nom)
+        nom_solide = Copy_2.result().name()
 
     #print ("fin de {}".format(nom_fonction))
 
@@ -1197,7 +1198,7 @@ Sorties :
       if self._verbose_max:
         print_tab (n_recur, "On traite un objet solide unique ==> on le récupère.")
       Recover_2 = model.addRecover(self.part_doc, face, [Recover_1.result()])
-      nom = "{}_S".format(self.nom_solide_aux)
+      nom = "{}_Recover_2".format(self.nom_solide_aux)
       exec_nom (Recover_2,nom)
 
     nb_inter = face.result().numberOfSubs()
@@ -1240,7 +1241,7 @@ Sorties :
 
     # Création d'une face
     Face_1 = model.addFace(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(nom_sketch))])
-    nom = "{}_face_1_{}".format(self.nom_solide_aux,icpt)
+    nom = "{}_Face_1_{}".format(self.nom_solide_aux,icpt)
     exec_nom (Face_1,nom)
     if self._verbose_max:
       print_tab (n_recur, "Après addFace pour Face_1 de nom ", nom)
@@ -1416,102 +1417,40 @@ Sorties :
       print_tab (n_recur, "Rayon   : ", rayon)
       print_tab (n_recur, "Hauteur : ", hauteur)
 
-# 1. Objets préalables
-    nom_par_1 = "{}_R".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon))
-    nom_par_2 = "{}_H".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(hauteur))
+#   Création du point central
+    centre = model.addPoint(self.part_doc, coo_c[0], coo_c[1], coo_c[2])
+    nom_centre = "{}_centre".format(self.nom_solide)
+    exec_nom (centre,nom_centre)
+    if self.fonction_0 is None:
+      self.fonction_0 = centre
 
-    centre, _, plan = self._cree_centre_axe_plan ( coo_c, v_axe, self.nom_solide, n_recur )
+#   Création du vecteur axial
+    axe = model.addAxis(self.part_doc, v_axe[0], v_axe[1], v_axe[2])
+    nom_axe = "{}_vecteur".format(self.nom_solide)
+    exec_nom (axe,nom_axe)
 
-# 2. Création de l'esquisse
-    sketch = self._cree_face_mediane_cylindre_1_a ( plan, centre, rayon, n_recur )
+#   Création du cylindre en volume, de rayon médian
+    Cylinder_1 = model.addCylinder(self.part_doc, model.selection("VERTEX", nom_centre), model.selection("EDGE", nom_axe), rayon, hauteur)
+    nom = "{}_Cylinder_1".format(self.nom_solide)
+    exec_nom (Cylinder_1,nom)
 
-# 3. La face
-    face = self._cree_face_mediane_cylindre_1_b ( sketch, nom_par_2, n_recur )
+#   Le groupe de la surface
+    Group_1 = model.addGroup(self.part_doc, "Faces", [model.selection("FACE", "{}/Face_1".format(nom))])
+    nom = "{}_Group_1".format(self.nom_solide)
+    exec_nom (Group_1,nom)
 
-    return face
+#   Création du cylindre en surface
+    cylindre = model.addGroupShape(self.part_doc, [model.selection("COMPOUND", nom)])
+    nom = "{}_cylindre".format(self.nom_solide)
+    exec_nom (cylindre, nom, (85, 0, 255))
 
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
-  def _cree_face_mediane_cylindre_1_a ( self, plan, centre, rayon, n_recur ):
-    """Crée la face médiane entre deux autres - cas des cylindres
-
-Création des objets temporaires et de la face externe du cylindre support
-
-Entrées :
-  :coo_x, coo_y, coo_z: coordonnées du centre de la base
-  :axe_x, axe_y, axe_z: coordonnées de l'axe
-  :rayon: rayon moyen entre les deux faces
-  :n_recur: niveau de récursivité
-
-Sorties :
-  :face: la face médiane
-"""
-    nom_fonction = __name__ + "/_cree_face_mediane_cylindre_1_a"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-#   Les caractéristiques du cylindre à créer
-    if self._verbose_max:
-      print_tab (n_recur, blabla)
-      print_tab (n_recur, "Plan      : {}".format(plan.name()))
-      print_tab (n_recur, "Centre    : {}".format(centre.name()))
-      print_tab (n_recur, "Rayon   : ", rayon)
-
-    sketch = model.addSketch(self.part_doc, model.selection("FACE", plan.name()))
-    sketch.execute(True)
-
-    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", centre.name()), False)
-    SketchProjection_1.execute(True)
-
-    SketchPoint_1 = SketchProjection_1.createdFeature()
-    SketchPoint_1.execute(True)
-
-    SketchCircle_1 = sketch.addCircle(0., 0., rayon)
-    SketchCircle_1.execute(True)
-    sketch.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
-
-    model.do()
-
-    nom_sketch = "{}_esquisse".format(self.nom_solide)
-    exec_nom (sketch, nom_sketch)
-
-    return sketch
-
-#===========================  Fin de la méthode ==================================
-
-#=========================== Début de la méthode =================================
-
-  def _cree_face_mediane_cylindre_1_b ( self, sketch, nom_par_2, n_recur ):
-    """Crée la face médiane entre deux autres - cas des cylindres
-
-Création des objets de construction et de la face externe du cylindre support
-
-Entrées :
-  :sketch: l'esquisse
-  :n_recur: niveau de récursivité
-
-Sorties :
-  :face: la face médiane
-"""
-    nom_fonction = __name__ + "/_cree_face_mediane_cylindre_1_b"
-    blabla = "Dans {} :\n".format(nom_fonction)
-
-#   Les caractéristiques du cylindre à créer
-    if self._verbose_max:
-      print_tab (n_recur, blabla)
-      print_tab (n_recur, "Esquisse : ", sketch.name())
-      print_tab (n_recur, "nom_par_2 : ", nom_par_2)
-
-#   Création du cylindre complet
-    cylindre = model.addExtrusion(self.part_doc, [model.selection("COMPOUND", "all-in-{}".format(sketch.name()))], model.selection(), nom_par_2, nom_par_2, "Edges")
-    nom_cylindre = "{}_cylindre".format(self.nom_solide)
-    exec_nom (cylindre, nom_cylindre, (85, 0, 255))
+#   Mise en place
+    Translation_1 = model.addTranslation(self.part_doc, [model.selection("COMPOUND", nom)], axis = model.selection("EDGE", nom_axe), distance = -0.5*hauteur, keepSubResults = True)
+    nom = "{}_Translation_1".format(self.nom_solide)
+    exec_nom (Translation_1,nom)
 
 #   Intersection de la face cylindrique avec le solide initial
-    face = self._creation_face_inter ( nom_cylindre )
+    face = self._creation_face_inter ( nom )
 
     return face
 
@@ -1623,56 +1562,27 @@ Sorties :
     centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
     nom_centre = "{}_centre".format(self.nom_solide)
     exec_nom (centre,nom_centre)
+    if self.fonction_0 is None:
+      self.fonction_0 = centre
 
-#   Création d'un plan passant par ce centre et l'axe OX
-    plan = model.addPlane(self.part_doc, model.selection("EDGE", "PartSet/OX"), model.selection("VERTEX", nom_centre), False)
-    nom_plan = "{}_plan".format(self.nom_solide)
-    exec_nom (plan,nom_plan)
+#   Création de la sphère en volume, de rayon médian
+    Sphere_1 = model.addSphere(self.part_doc, model.selection("VERTEX", nom_centre), rayon)
+    nom = "{}_Sphere_1".format(self.nom_solide)
+    exec_nom (Sphere_1,nom)
 
-#   Création de l'esquisse
-    nom_par_1 = "{}_R".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon))
+#   Le groupe de la surface
+    Group_1 = model.addGroup(self.part_doc, "Faces", [model.selection("FACE", "{}/Face_1".format(nom))])
+    nom = "{}_Group_1".format(self.nom_solide)
+    exec_nom (Group_1,nom)
 
-    sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
-    sketch.execute(True)
+#   Création de la sphère en surface
+    sphere = model.addGroupShape(self.part_doc, [model.selection("COMPOUND", nom)])
 
-    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
-    SketchProjection_1.execute(True)
-
-    ### Create SketchArc
-    SketchArc_1 = sketch.addArc(coo_x, coo_y, coo_x-rayon, coo_y, coo_x+rayon, coo_y, False)
-    SketchArc_1.execute(True)
-    sketch.setRadius(SketchArc_1.results()[1], nom_par_1)
-
-    SketchPoint_1 = SketchProjection_1.createdFeature()
-    SketchPoint_1.execute(True)
-    sketch.setCoincident(SketchPoint_1.result(), SketchArc_1.center())
-
-    ### Create SketchLine
-    SketchLine_1 = sketch.addLine(coo_x-rayon, coo_y, coo_x+rayon, coo_y)
-    SketchLine_1.execute(True)
-    nom_ligne = "{}_ligne".format(self.nom_solide)
-    SketchLine_1.setName(nom_ligne)
-    SketchLine_1.result().setName(nom_ligne)
-    SketchLine_1.setAuxiliary(True)
-    sketch.setHorizontal(SketchLine_1.result())
-    sketch.setCoincident(SketchArc_1.startPoint(), SketchLine_1.startPoint())
-    sketch.setCoincident(SketchArc_1.endPoint(), SketchLine_1.endPoint())
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.result())
-
-    model.do()
-
-    nom_sketch = "{}_esquisse".format(self.nom_solide)
-    exec_nom (sketch,nom_sketch)
-
-#   Création de la sphère complète
-    sphere = model.addRevolution(self.part_doc, [model.selection("COMPOUND", nom_sketch)], model.selection("EDGE", "{}/{}".format(nom_sketch,nom_ligne)), 360, 0, "Edges")
-
-    nom_sphere = "{}_sphere".format(self.nom_solide)
-    exec_nom (sphere, nom_sphere, (85, 0, 255))
+    nom = "{}_sphere".format(self.nom_solide)
+    exec_nom (sphere, nom, (85, 0, 255))
 
 #   Intersection de la face sphérique avec le solide initial
-    face = self._creation_face_inter ( nom_sphere )
+    face = self._creation_face_inter ( nom )
 
     return face
 
@@ -1813,21 +1723,28 @@ Sorties :
     sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
+    SketchProjection_1.execute(True)
     SketchPoint_1 = SketchProjection_1.createdFeature()
+    SketchPoint_1.execute(True)
 
     SketchProjection_2 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
+    SketchProjection_2.execute(True)
     SketchLine_1 = SketchProjection_2.createdFeature()
+    SketchLine_1.execute(True)
 
     SketchPoint_2 = sketch.addPoint(rayon_1, 0.)
+    SketchPoint_2.execute(True)
     sketch.setDistance(SketchPoint_1.result(), SketchPoint_2.coordinates(), nom_par_1, True)
 
     SketchLine_2 = sketch.addLine(0., 0., rayon_1, 0.)
+    SketchLine_2.execute(True)
     SketchLine_2.setAuxiliary(True)
     sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_2.startPoint())
     sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_2.endPoint())
     sketch.setPerpendicular(SketchLine_1.result(), SketchLine_2.result())
 
     SketchCircle_1 = sketch.addCircle(0., 0., rayon_2)
+    SketchCircle_1.execute(True)
     sketch.setCoincident(SketchPoint_2.result(), SketchCircle_1.center())
     sketch.setRadius(SketchCircle_1.results()[1], nom_par_2)
 
@@ -2011,26 +1928,34 @@ Sorties :
 
 #   6.1. Projection des centres et de l'axe
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre_1), False)
+    SketchProjection_1.execute(True)
     SketchPoint_1 = SketchProjection_1.createdFeature()
+    SketchPoint_1.execute(True)
     sk_coo_x_1 = SketchAPI_Point(SketchPoint_1).coordinates().x()
     sk_coo_y_1 = SketchAPI_Point(SketchPoint_1).coordinates().y()
 
     SketchProjection_2 = sketch.addProjection(model.selection("VERTEX", nom_centre_2), False)
+    SketchProjection_2.execute(True)
     SketchPoint_2 = SketchProjection_2.createdFeature()
+    SketchPoint_2.execute(True)
     sk_coo_x_2 = SketchAPI_Point(SketchPoint_2).coordinates().x()
     sk_coo_y_2 = SketchAPI_Point(SketchPoint_2).coordinates().y()
 
     SketchProjection_3 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
+    SketchProjection_3.execute(True)
     SketchLine_0 = SketchProjection_3.createdFeature()
+    SketchLine_0.execute(True)
 
 #   6.2. Lignes perpendiculaires à l'axe passant par les centres
     SketchLine_1 = sketch.addLine(sk_coo_x_1, sk_coo_y_1, sk_coo_x_1+rayon_1, sk_coo_y_1)
+    SketchLine_1.execute(True)
     SketchLine_1.setAuxiliary(True)
     sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.startPoint())
     sketch.setPerpendicular(SketchLine_0.result(), SketchLine_1.result())
     sketch.setLength(SketchLine_1.result(), nom_par_1)
 
     SketchLine_2 = sketch.addLine(sk_coo_x_2, sk_coo_y_2, sk_coo_x_2+rayon_2, sk_coo_y_2)
+    SketchLine_2.execute(True)
     SketchLine_2.setAuxiliary(True)
     sketch.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_2.startPoint())
     sketch.setPerpendicular(SketchLine_0.result(), SketchLine_2.result())
@@ -2038,14 +1963,17 @@ Sorties :
 
 #   6.3. Ligne joignant les extrémités des précédentes et point milieu
     SketchLine_3 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
+    SketchLine_3.execute(True)
     sketch.setCoincident(SketchLine_3.startPoint(), SketchLine_1.endPoint())
     sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_2.endPoint())
     SketchLine_3.setAuxiliary(True)
     SketchPoint_3 = sketch.addPoint(sk_coo_x_1, sk_coo_y_1)
+    SketchPoint_3.execute(True)
     sketch.setMiddlePoint(SketchLine_3.result(), SketchPoint_3.coordinates())
 
 #   6.4. Ligne support de la future révolution
     SketchLine_4 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
+    SketchLine_4.execute(True)
     sketch.setMiddlePoint(SketchLine_4.result(), SketchPoint_3.coordinates())
     sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_4.result())
     sketch.setLength(SketchLine_4.result(), "1.2*{}".format(nom_par_3))
@@ -2068,14 +1996,12 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_centre_axe_plan ( self, coo_c, vnor, prefixe, n_recur ):
+  def _cree_centre_axe_plan ( self, coo_c, vect, prefixe, n_recur ):
     """Crée un centre, un axe, un plan
-
-Préparatifs
 
 Entrées :
   :coo_c: coordonnées du centre de la base
-  :vnor: coordonnées du vecteur normal
+  :vect: coordonnées du vecteur
   :prefix: prefixe du nom des objets
   :n_recur: niveau de récursivité
 
@@ -2090,26 +2016,28 @@ Sorties :
     if self._verbose_max:
       print_tab (n_recur, blabla)
       print_tab (n_recur, "Centre   : ({}, {}, {})".format(coo_c[0], coo_c[1], coo_c[2]))
-      print_tab (n_recur, "Normale  : ({}, {}, {})".format(vnor[0], vnor[1], vnor[2]))
+      print_tab (n_recur, "Normale  : ({}, {}, {})".format(vect[0], vect[1], vect[2]))
 
 #   Création du point central
     centre = model.addPoint(self.part_doc, coo_c[0], coo_c[1], coo_c[2])
     nom_centre = "{}_centre".format(prefixe)
     exec_nom (centre,nom_centre)
+    if self.fonction_0 is None:
+      self.fonction_0 = centre
 
-#   Création du vecteur normal
-    v_norm = model.addAxis(self.part_doc, vnor[0], vnor[1], vnor[2])
-    nom_vnorm = "{}_normale".format(prefixe)
-    exec_nom (v_norm,nom_vnorm)
+#   Création du vecteur
+    vecteur = model.addAxis(self.part_doc, vect[0], vect[1], vect[2])
+    nom_vect = "{}_vecteur".format(prefixe)
+    exec_nom (vecteur,nom_vect)
 
 #   Création du plan perpendiculaire au vecteur normal
-    plan = model.addPlane(self.part_doc, model.selection("EDGE", v_norm.name()), model.selection("VERTEX", centre.name()), True)
+    plan = model.addPlane(self.part_doc, model.selection("EDGE", vecteur.name()), model.selection("VERTEX", centre.name()), True)
     nom_plan = "{}_plan".format(prefixe)
     exec_nom (plan,nom_plan)
 
     #print ("fin de {}".format(nom_fonction))
 
-    return centre, v_norm, plan
+    return centre, vecteur, plan
 
 #===========================  Fin de la méthode ==================================
 
@@ -2620,21 +2548,21 @@ Sorties :
     if self._verbose_max:
       print_tab (n_recur, "Mise en dossier.")
 
-    if ( len(self.l_faces_m) > 1 ):
+    for (face,fonction_0) in self.l_faces_m:
+      nom = face.name()[:-2]
+      if self._verbose_max:
+        print ( "Dossier {} de {} à {}".format(nom,fonction_0.name(),face.name()))
+      dossier = model.addFolder(self.part_doc, fonction_0, face)
+      #dossier.execute(True)
+      dossier.setName(nom)
 
-      for (face,fonction_0) in self.l_faces_m:
-        nom = face.name()[:-2]
-        if self._verbose_max:
-          print ( "Dossier {} de {} à {}".format(nom,fonction_0.name(),face.name()))
-        dossier = model.addFolder(self.part_doc, fonction_0, face)
-        dossier.execute(True)
-        dossier.setName(nom)
+    if ( len(self.l_faces_m) > 1 ):
 
       nom = self.objet_principal.name()
       if self._verbose_max:
         print ( "Dossier {} de {} à {}".format(nom,Partition_1.name(),Recover_1.name()))
       dossier = model.addFolder(self.part_doc, Partition_1, Recover_1)
-      dossier.execute(True)
+      #dossier.execute(True)
       dossier.setName(nom)
 
 #===========================  Fin de la méthode ==================================
@@ -2738,7 +2666,7 @@ if __name__ == "__main__" :
       if ERREUR:
         MESSAGE_ERREUR += "\n Code d'erreur : %d\n" % ERREUR
         sys.stderr.write(MESSAGE_ERREUR)
-        break
+        #break
 
     del SURFACE_MEDIANE
 
