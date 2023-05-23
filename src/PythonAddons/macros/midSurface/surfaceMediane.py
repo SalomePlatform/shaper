@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.10"
+__revision__ = "V11.11"
 
 #========================= Les imports - Début ===================================
 
@@ -736,7 +736,7 @@ Sorties :
     nom_fonction = __name__ + "/_tri_faces"
     blabla = "Dans {} :".format(nom_fonction)
 
-# Tri du tableau en fonction des surfaces
+# 1. Tri du tableau en fonction des surfaces
     if self._verbose_max:
       print_tab (n_recur, blabla)
       print_tab (n_recur, "tb_caract brut : ", tb_caract)
@@ -747,25 +747,28 @@ Sorties :
     if self._verbose_max:
       texte  = "\tSurface de la plus grande face      : {}, de caractéristiques {}\n".format(tb_caract_1[-1][1],tb_caract_1[-1][2])
       texte += "\tSurface de la face suivante         : {}, de caractéristiques {}".format(tb_caract_1[-2][1],tb_caract_1[-2][2])
-      if self._verbose_max:
-        texte += "\n\tSurface de la 3ème face suivante    : {}, de caractéristiques {}".format(tb_caract_1[-3][1],tb_caract_1[-3][2])
       print (texte)
 
-# La surface suivante doit être différente, sinon ce n'est pas un solide mince
-    ecart = np.abs((tb_caract_1[-1][1]-tb_caract_1[-3][1])/tb_caract_1[-1][1])
-    if ( ecart < self._epsilon ):
-      message  = "\nSolide '{}'\n".format(self.nom_solide)
-      message += ". Surface de la plus grande face   : {}\n".format(tb_caract_1[-1][1])
-      message += ". Surface de la 1ère face suivante : {}\n".format(tb_caract_1[-2][1])
-      message += ". Surface de la 2ème face suivante : {}\n".format(tb_caract_1[-3][1])
+# 2. La surface suivante doit être différente, sinon ce n'est pas un solide mince
+    if ( len(tb_caract) > 2 ):
+
       if self._verbose_max:
-        message += ". Ecart relatif :{:4.1f}%\n".format(ecart*100.)
-      message += "L'écart est trop faible par rapport à la limite de {}%.\n".format(self._epsilon*100.)
-      message += "==> Impossible de créer la face médiane car le solide n'est pas assez mince.\n"
-      erreur = -1
-      self.d_statut_so[self.nom_solide] = -1
-      self.faces_pb_nb += 1
-      self.faces_pb_msg += message
+        texte += "\tSurface de la 3ème face suivante    : {}, de caractéristiques {}".format(tb_caract_1[-3][1],tb_caract_1[-3][2])
+        print (texte)
+      ecart = np.abs((tb_caract_1[-1][1]-tb_caract_1[-3][1])/tb_caract_1[-1][1])
+      if ( ecart < self._epsilon ):
+        message  = "\nSolide '{}'\n".format(self.nom_solide)
+        message += ". Surface de la plus grande face   : {}\n".format(tb_caract_1[-1][1])
+        message += ". Surface de la 1ère face suivante : {}\n".format(tb_caract_1[-2][1])
+        message += ". Surface de la 2ème face suivante : {}\n".format(tb_caract_1[-3][1])
+        if self._verbose_max:
+          message += ". Ecart relatif :{:4.1f}%\n".format(ecart*100.)
+        message += "L'écart est trop faible par rapport à la limite de {}%.\n".format(self._epsilon*100.)
+        message += "==> Impossible de créer la face médiane car le solide n'est pas assez mince.\n"
+        erreur = -1
+        self.d_statut_so[self.nom_solide] = -1
+        self.faces_pb_nb += 1
+        self.faces_pb_msg += message
 
     return erreur, message, tb_caract_1[-1], tb_caract_1[-2]
 
@@ -1634,15 +1637,20 @@ Sorties :
     sketch.execute(True)
 
     SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
-    SketchPoint_1 = SketchProjection_1.createdFeature()
+    SketchProjection_1.execute(True)
 
     ### Create SketchArc
     SketchArc_1 = sketch.addArc(coo_x, coo_y, coo_x-rayon, coo_y, coo_x+rayon, coo_y, False)
+    SketchArc_1.execute(True)
     sketch.setRadius(SketchArc_1.results()[1], nom_par_1)
+
+    SketchPoint_1 = SketchProjection_1.createdFeature()
+    SketchPoint_1.execute(True)
     sketch.setCoincident(SketchPoint_1.result(), SketchArc_1.center())
 
     ### Create SketchLine
     SketchLine_1 = sketch.addLine(coo_x-rayon, coo_y, coo_x+rayon, coo_y)
+    SketchLine_1.execute(True)
     nom_ligne = "{}_ligne".format(self.nom_solide)
     SketchLine_1.setName(nom_ligne)
     SketchLine_1.result().setName(nom_ligne)
