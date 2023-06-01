@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.16"
+__revision__ = "V11.17"
 
 #========================= Les imports - Début ===================================
 
@@ -2309,8 +2309,6 @@ Sorties :
       #print (message)
 
       break
-
-    model.end()
 
     if ( erreur and self._verbose_max ):
       print (blabla, message)
