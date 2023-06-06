@@ -281,6 +281,59 @@ class TestMiddlePointOnEllipticArc(unittest.TestCase):
     # set flag False to avoid checking middle point constraint in tearDown() method
     self.myTestPassed = False
 
+  def test_middle_point_by_object(self):
+    """ Test 12. Set middle point constraint on elliptic arc
+    """
+
+    self.myArc = self.mySketch.addEllipticArc(26.13481199028052, 14.44743211950145, 27.10553481386106, 8.942189418241149, 30, 8.856406460551019, 22, 11, False)
+    [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_4, SketchLine_5] = self.myArc.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
+    self.mySketch.setLength(SketchLine_5.result(), 10)
+    self.mySketch.setLength(SketchLine_4.result(), 15)
+
+    ### Create SketchProjection
+    SketchProjection_1 = self.mySketch.addProjection(model.selection("EDGE", "PartSet/OX"), False)
+    SketchLine_6 = SketchProjection_1.createdFeature()
+
+    ### Create SketchConstraintAngle
+    self.mySketch.setAngle(SketchLine_6.result(), SketchLine_5.result(), 10, type = "Direct")
+
+    ### Create SketchProjection
+    SketchProjection_2 = self.mySketch.addProjection(model.selection("EDGE", "PartSet/OX"), False)
+    SketchLine_7 = SketchProjection_2.createdFeature()
+
+    ### Create SketchLine
+    SketchLine_8 = self.mySketch.addLine(22, 11, 30, 8.856406460551019)
+    SketchLine_8.setAuxiliary(True)
+    self.mySketch.setCoincident(self.myArc.endPoint(), SketchLine_8.startPoint())
+    self.mySketch.setCoincident(self.myArc.startPoint(), SketchLine_8.endPoint())
+
+    ### Create SketchConstraintAngle
+    self.mySketch.setAngle(SketchLine_7.result(), SketchLine_8.result(), 15, type = "Direct")
+
+    ### Create SketchProjection
+    SketchProjection_3 = self.mySketch.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
+    SketchPoint_8 = SketchProjection_3.createdFeature()
+    self.mySketch.setHorizontalDistance(SketchAPI_Point(SketchPoint_8).coordinates(), SketchLine_8.startPoint(), 22)
+
+    ### Create SketchProjection
+    SketchProjection_4 = self.mySketch.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
+    SketchPoint_9 = SketchProjection_4.createdFeature()
+    self.mySketch.setVerticalDistance(SketchAPI_Point(SketchPoint_9).coordinates(), SketchLine_8.startPoint(), 11)
+
+    ### Create SketchProjection
+    SketchProjection_5 = self.mySketch.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
+    SketchPoint_10 = SketchProjection_5.createdFeature()
+    self.mySketch.setHorizontalDistance(SketchAPI_Point(SketchPoint_10).coordinates(), SketchLine_8.endPoint(), 30)
+
+    # Create auxiliaire middle point
+    SketchPoint_03 = self.mySketch.setMiddlePoint(self.myArc.result())
+    model.do()
+
+    aPoint = SketchPoint_03.result().resultSubShapePair()[0].shape().vertex().point()
+    self.checkMiddlePoint(self.mySketch.to2D(aPoint), self.myArc)
+
+    # set flag False to avoid checking middle point constraint in tearDown() method
+    self.myTestPassed = False
 
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)

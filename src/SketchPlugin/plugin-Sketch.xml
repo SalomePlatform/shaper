@@ -1432,16 +1432,38 @@
       <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line"
                icon="icons/Sketch/middlepoint.png"
                helpfile="middleFeature.html">
-        <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
-          <validator id="PartSet_DifferentObjects"/>
-          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
-          <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityB"/>
-        </sketch_shape_selector>
-        <sketch_shape_selector id="ConstraintEntityB" label="Second object" tooltip="Select a second object" shape_types="vertex edge">
-          <validator id="PartSet_DifferentObjects"/>
-          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
-          <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityA"/>
-        </sketch_shape_selector>
+        <toolbox id="middle_type">
+          <box id="middle_type_by_line_and_point"
+               icon="icons/Sketch/middlepoint.png"
+               title="Line and point">
+            <sketch_shape_selector id="ConstraintEntityA"
+                            label="First object"
+                            tooltip="Select a first object"
+                            shape_types="vertex edge"
+                            use_external="true">
+              <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+              <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityB"/>
+            </sketch_shape_selector>
+            <sketch_shape_selector id="ConstraintEntityB"
+                  label="Second object"
+                  tooltip="Select a second object"
+                  shape_types="vertex edge"
+                  use_external="true">
+              <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+              <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityA"/>
+            </sketch_shape_selector>
+          </box>
+          <box id="middle_type_by_line"
+               icon="icons/Sketch/middlepoint_obj.png"
+               title="Line">
+            <sketch_shape_selector id="ConstraintEntityA"
+             label="Object"
+             tooltip="Select a first object"
+             shape_types="edge"
+             use_external="true">
+            </sketch_shape_selector>
+          </box>
+        </toolbox>
         <validator id="PartSet_MiddlePointSelection"/>
       </feature>
 

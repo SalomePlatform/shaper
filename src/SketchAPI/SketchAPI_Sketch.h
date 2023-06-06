@@ -57,6 +57,7 @@ class SketchAPI_Projection;
 class SketchAPI_Rectangle;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
+class SketchAPI_MacroMiddlePoint;
 
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> PointOrReference;
@@ -522,6 +523,11 @@ public:
   std::shared_ptr<ModelHighAPI_Interface> setMiddlePoint(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & theLine);
+
+  /// Set middle
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_MacroMiddlePoint> setMiddlePoint(
+      const ModelHighAPI_RefAttr& theLine);
 
   /// Set parallel
   SKETCHAPI_EXPORT

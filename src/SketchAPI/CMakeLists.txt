@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
   SketchAPI_Line.h
   SketchAPI_MacroArc.h
   SketchAPI_MacroCircle.h
+  SketchAPI_MacroMiddlePoint.h
   SketchAPI_MacroEllipse.h
   SketchAPI_MacroEllipticArc.h
   SketchAPI_Mirror.h
@@ -57,6 +58,7 @@ SET(PROJECT_SOURCES
   SketchAPI_Line.cpp
   SketchAPI_MacroArc.cpp
   SketchAPI_MacroCircle.cpp
+  SketchAPI_MacroMiddlePoint.cpp
   SketchAPI_MacroEllipse.cpp
   SketchAPI_MacroEllipticArc.cpp
   SketchAPI_Mirror.cpp

@@ -8,5 +8,8 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_1 = Sketch_1.addCircle(16, 54, 10)
 SketchLine_1 = Sketch_1.addLine(10, 10, 80, 80)
 SketchConstraintMiddle_1 = Sketch_1.setMiddlePoint(SketchCircle_1.center(), SketchLine_1.result())
+
+SketchLine_2 = Sketch_1.addLine(20, 10, 90, 80)
+SketchPoint_01 = Sketch_1.setMiddlePoint(SketchLine_2.result())
 model.do()
 model.end()

@@ -67,6 +67,7 @@
 #include "SketchAPI_MacroCircle.h"
 #include "SketchAPI_MacroEllipse.h"
 #include "SketchAPI_MacroEllipticArc.h"
+#include "SketchAPI_MacroMiddlePoint.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Offset.h"
 #include "SketchAPI_Point.h"
@@ -74,6 +75,7 @@
 #include "SketchAPI_Rectangle.h"
 #include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
+#include "SketchAPI_Constraint.h"
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Curve.h>
 #include <GeomAPI_Dir2d.h>
@@ -85,6 +87,125 @@
 #include <algorithm>
 #include <cmath>
 //--------------------------------------------------------------------------------------
+
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(const AttributePtr& thePoint)
+{
+  AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint);
+  return aPnt ? aPnt->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnLine(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Line::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Line::END_ID()));
+
+  if (!aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_XY> aStartPoint = aStartAttr->pnt()->xy();
+  std::shared_ptr<GeomAPI_XY> aEndPoint = aEndAttr->pnt()->xy();
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+    new GeomAPI_Pnt2d(aStartPoint->added(aEndPoint)->multiplied(0.5)));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnCircle(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
+  AttributeDoublePtr aRadius = theFeature->real(SketchPlugin_Circle::RADIUS_ID());
+
+  if (!aCenter || !aRadius)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+    new GeomAPI_Pnt2d(aCenter->x() + aRadius->value(), aCenter->y()));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeature)
+{
+  static const double PI = 3.141592653589793238463;
+
+  AttributePoint2DPtr aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Arc::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(SketchPlugin_Arc::END_ID()));
+
+  if (!aCenterAttr || !aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
+    aStartAttr->x() - aCenterAttr->x(), aStartAttr->y() - aCenterAttr->y()));
+  std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
+    aEndAttr->x() - aCenterAttr->x(), aEndAttr->y() - aCenterAttr->y()));
+
+  double anAngle = aStartDir->angle(aEndDir);
+  bool isReversed = theFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+  if (isReversed && anAngle > 0.)
+    anAngle -= 2.0 * PI;
+  else if (!isReversed && anAngle <= 0.)
+    anAngle += 2.0 * PI;
+
+  double cosA = cos(anAngle);
+  double sinA = sin(anAngle);
+
+  // rotate start dir to find middle point on arc
+  double aRadius = aStartAttr->pnt()->distance(aCenterAttr->pnt());
+  double x = aCenterAttr->x() + aRadius * (aStartDir->x() * cosA - aStartDir->y() * sinA);
+  double y = aCenterAttr->y() + aRadius * (aStartDir->x() * sinA + aStartDir->y() * cosA);
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature,
+  bool isEllipse = true)
+{
+  const std::string& anAttrName = isEllipse ? SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() :
+    SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID();
+  AttributePoint2DPtr aMajorAxisEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(anAttrName));
+  return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnBSpline(const FeaturePtr& theFeature,
+  SketchAPI_Sketch* theSketch)
+{
+  GeomAPI_Edge anEdge(theFeature->lastResult()->shape());
+  GeomPointPtr aMiddle = anEdge.middlePoint();
+  return theSketch->to2D(aMiddle);
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
+  SketchAPI_Sketch* theSketch)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature) {
+    // move only features of the following types
+    const std::string& aFeatureKind = aFeature->getKind();
+    if (aFeatureKind == SketchPlugin_Point::ID())
+      aMiddlePoint = pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
+    else if (aFeatureKind == SketchPlugin_Line::ID())
+      aMiddlePoint = middlePointOnLine(aFeature);
+    else if (aFeatureKind == SketchPlugin_Circle::ID())
+      aMiddlePoint = pointOnCircle(aFeature);
+    else if (aFeatureKind == SketchPlugin_Arc::ID())
+      aMiddlePoint = middlePointOnArc(aFeature);
+    else if (aFeatureKind == SketchPlugin_Ellipse::ID())
+      aMiddlePoint = pointOnEllipse(aFeature);
+    else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
+      aMiddlePoint = pointOnEllipse(aFeature, false);
+    else if (aFeatureKind == SketchPlugin_BSpline::ID() ||
+      aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
+      aMiddlePoint = middlePointOnBSpline(aFeature, theSketch);
+  }
+  return aMiddlePoint;
+}
+
 SketchAPI_Sketch::SketchAPI_Sketch(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -1246,10 +1367,27 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setMiddlePoint(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintMiddle::ID());
+  auto aType = aFeature->data()->string(SketchPlugin_ConstraintMiddle::MIDDLE_TYPE());
+  fillAttribute(SketchPlugin_ConstraintMiddle::MIDDLE_TYPE_BY_LINE_AND_POINT(), aType);
+
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<SketchAPI_MacroMiddlePoint> SketchAPI_Sketch::setMiddlePoint(
+  const ModelHighAPI_RefAttr& theLine)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    compositeFeature()->addFeature(SketchPlugin_Point::ID());
+
+  ObjectPtr anObj = theLine.object();
+  auto aPoint = middlePoint(anObj, this);
+
+  return std::shared_ptr<SketchAPI_MacroMiddlePoint>
+    (new SketchAPI_MacroMiddlePoint(aFeature, theLine, aPoint));
 }
 
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setParallel(
@@ -1311,123 +1449,6 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVertical(
 }
 
 //--------------------------------------------------------------------------------------
-
-static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(const AttributePtr& thePoint)
-{
-  AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint);
-  return aPnt ? aPnt->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnLine(const FeaturePtr& theFeature)
-{
-  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Line::START_ID()));
-  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Line::END_ID()));
-
-  if (!aStartAttr || !aEndAttr)
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  std::shared_ptr<GeomAPI_XY> aStartPoint = aStartAttr->pnt()->xy();
-  std::shared_ptr<GeomAPI_XY> aEndPoint = aEndAttr->pnt()->xy();
-  return std::shared_ptr<GeomAPI_Pnt2d>(
-      new GeomAPI_Pnt2d(aStartPoint->added(aEndPoint)->multiplied(0.5)));
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> pointOnCircle(const FeaturePtr& theFeature)
-{
-  AttributePoint2DPtr aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
-  AttributeDoublePtr aRadius = theFeature->real(SketchPlugin_Circle::RADIUS_ID());
-
-  if (!aCenter || !aRadius)
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  return std::shared_ptr<GeomAPI_Pnt2d>(
-      new GeomAPI_Pnt2d(aCenter->x() + aRadius->value(), aCenter->y()));
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeature)
-{
-  static const double PI = 3.141592653589793238463;
-
-  AttributePoint2DPtr aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
-  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Arc::START_ID()));
-  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Arc::END_ID()));
-
-  if (!aCenterAttr || !aStartAttr || !aEndAttr)
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
-      aStartAttr->x() - aCenterAttr->x(), aStartAttr->y() - aCenterAttr->y()));
-  std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
-      aEndAttr->x() - aCenterAttr->x(), aEndAttr->y() - aCenterAttr->y()));
-
-  double anAngle = aStartDir->angle(aEndDir);
-  bool isReversed = theFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
-  if (isReversed && anAngle > 0.)
-    anAngle -= 2.0 * PI;
-  else if (!isReversed && anAngle <= 0.)
-    anAngle += 2.0 * PI;
-
-  double cosA = cos(anAngle);
-  double sinA = sin(anAngle);
-
-  // rotate start dir to find middle point on arc
-  double aRadius = aStartAttr->pnt()->distance(aCenterAttr->pnt());
-  double x = aCenterAttr->x() + aRadius * (aStartDir->x() * cosA - aStartDir->y() * sinA);
-  double y = aCenterAttr->y() + aRadius * (aStartDir->x() * sinA + aStartDir->y() * cosA);
-
-  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature,
-                                                     bool isEllipse = true)
-{
-  const std::string& anAttrName = isEllipse ? SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() :
-                                  SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID();
-  AttributePoint2DPtr aMajorAxisEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(anAttrName));
-  return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnBSpline(const FeaturePtr& theFeature,
-                                                           SketchAPI_Sketch* theSketch)
-{
-  GeomAPI_Edge anEdge(theFeature->lastResult()->shape());
-  GeomPointPtr aMiddle = anEdge.middlePoint();
-  return theSketch->to2D(aMiddle);
-}
-
-static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
-                                                  SketchAPI_Sketch* theSketch)
-{
-  std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (aFeature) {
-    // move only features of the following types
-    const std::string& aFeatureKind = aFeature->getKind();
-    if (aFeatureKind == SketchPlugin_Point::ID())
-      aMiddlePoint = pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
-    else if (aFeatureKind == SketchPlugin_Line::ID())
-      aMiddlePoint = middlePointOnLine(aFeature);
-    else if (aFeatureKind == SketchPlugin_Circle::ID())
-      aMiddlePoint = pointOnCircle(aFeature);
-    else if (aFeatureKind == SketchPlugin_Arc::ID())
-      aMiddlePoint = middlePointOnArc(aFeature);
-    else if (aFeatureKind == SketchPlugin_Ellipse::ID())
-      aMiddlePoint = pointOnEllipse(aFeature);
-    else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
-      aMiddlePoint = pointOnEllipse(aFeature, false);
-    else if (aFeatureKind == SketchPlugin_BSpline::ID() ||
-             aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
-      aMiddlePoint = middlePointOnBSpline(aFeature, theSketch);
-  }
-  return aMiddlePoint;
-}
 
 void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
                             const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint)

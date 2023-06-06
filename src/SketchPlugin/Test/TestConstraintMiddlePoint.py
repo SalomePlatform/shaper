@@ -37,6 +37,7 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from SketchAPI import *
 import math
 from salome.shaper import model
 
@@ -105,6 +106,8 @@ aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintMiddle")
 reflistA = aConstraint.refattr("ConstraintEntityA")
 reflistB = aConstraint.refattr("ConstraintEntityB")
+anAlgoType = aConstraint.string("middle_type")
+anAlgoType.setValue("middle_type_by_line_and_point")
 reflistA.setAttr(aEndPoint2)
 reflistB.setObject(aLine1.lastResult())
 aConstraint.execute()
@@ -122,6 +125,8 @@ aEndPoint2.setValue(80., 25.)
 aConstraint = aSketchFeature.addFeature("SketchConstraintMiddle")
 reflistA = aConstraint.refattr("ConstraintEntityA")
 reflistB = aConstraint.refattr("ConstraintEntityB")
+anAlgoType = aConstraint.string("middle_type")
+anAlgoType.setValue("middle_type_by_line_and_point")
 reflistA.setAttr(aEndPoint2)
 reflistB.setObject(aLine1.lastResult())
 aConstraint.execute()
@@ -172,6 +177,8 @@ aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintMiddle")
 reflistA = aConstraint.refattr("ConstraintEntityA")
 reflistB = aConstraint.refattr("ConstraintEntityB")
+anAlgoType = aConstraint.string("middle_type")
+anAlgoType.setValue("middle_type_by_line_and_point")
 reflistA.setObject(aLine2.lastResult())
 reflistB.setObject(anOrigin.lastResult())
 aSession.finishOperation()
@@ -205,6 +212,8 @@ aSession.startOperation()
 aMiddle = aSketchFeature.addFeature("SketchConstraintMiddle")
 reflistA = aMiddle.refattr("ConstraintEntityA")
 reflistB = aMiddle.refattr("ConstraintEntityB")
+anAlgoType = aMiddle.string("middle_type")
+anAlgoType.setValue("middle_type_by_line_and_point")
 reflistA.setAttr(aEndPoint3)
 reflistB.setObject(aLine1.lastResult())
 aSession.finishOperation()
@@ -225,6 +234,37 @@ aEndPoint1.setValue(aEndPoint1.x() + deltaX, aEndPoint1.y() + deltaY)
 aSession.finishOperation()
 checkMiddlePoint(aEndPoint3, aLine1)
 assert (model.dof(aSketchFeature) == 8)
+#=========================================================================
+# CreateLine
+#=========================================================================
+aSession.startOperation()
+aLine4 = aSketchFeature.addFeature("SketchLine")
+aStartPoint4 = geomDataAPI_Point2D(aLine4.attribute("StartPoint"))
+aEndPoint4 = geomDataAPI_Point2D(aLine4.attribute("EndPoint"))
+aStartPoint4.setValue(2., 8.)
+aEndPoint4.setValue(20., 14.)
+aRigidConstraint1 = aSketchFeature.addFeature("SketchConstraintRigid")
+aRigidConstraint1.refattr("ConstraintEntityA").setAttr(aStartPoint4)
+aRigidConstraint2 = aSketchFeature.addFeature("SketchConstraintRigid")
+aRigidConstraint2.refattr("ConstraintEntityA").setAttr(aEndPoint4)
+aSession.finishOperation()
+#=========================================================================
+# Set middle point on line
+#=========================================================================
+aSession.startOperation()
+aMiddle = aSketchFeature.addFeature("SketchConstraintMiddle")
+reflistA = aMiddle.refattr("ConstraintEntityA")
+anAlgoType = aMiddle.string("middle_type")
+anAlgoType.setValue("middle_type_by_line")
+reflistA.setObject(aLine4.lastResult())
+aSession.finishOperation()
+arefB = aMiddle.refattr("ConstraintEntityB")
+aPointRes = ModelAPI_Feature.feature(arefB.object())
+aMidPoint = geomDataAPI_Point2D(SketchAPI_Point(aPointRes).coordinates())
+
+# check the point, and no error message
+checkMiddlePoint(aMidPoint, aLine4)
+
 
 #=========================================================================
 # End of test

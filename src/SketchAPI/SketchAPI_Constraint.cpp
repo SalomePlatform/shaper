@@ -21,6 +21,8 @@
 
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
+#include <SketchAPI_SketchEntity.h>
+#include <SketchAPI_Point.h>
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -39,6 +41,7 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_SketchEntity.h>
+#include <SketchPlugin_Point.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -198,35 +201,61 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
       return;
   }
 
-  // postpone constraint until all its attributes be dumped
-  if (!areAllAttributesDumped(theDumper))
-    return;
-
   const std::string& aSketchName = theDumper.parentName(aBase);
-  theDumper << aSketchName << "." << aSetter << "(";
 
-  bool isFirstAttr = true;
-  for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
-    if (aRefAttr && aRefAttr->isInitialized()) {
-      theDumper << (isFirstAttr ? "" : ", ") << aRefAttr;
-      isFirstAttr = false;
+  // Dump middle constraint by object
+  if (SketchPlugin_ConstraintMiddle::ID() == aBase->getKind() &&
+    aBase->string(SketchPlugin_ConstraintMiddle::MIDDLE_TYPE())->value() == SketchPlugin_ConstraintMiddle::MIDDLE_TYPE_BY_LINE())
+  {
+    FeaturePtr aFeature;
+    AttributeRefAttrPtr aPointRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(1));
+    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(0));
+
+    if (!theDumper.isDumped(aRefAttr))
+    {
+      theDumper.postpone(aBase);
+      return;
     }
-  }
+    aFeature = ModelAPI_Feature::feature(aPointRefAttr->object());
 
-  AttributeDoublePtr aValueAttr;
-  if (aBase->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
-      aBase->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
-    aValueAttr = aBase->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID());
+    theDumper.name(aFeature, false, true, true); // mark point as dumped
+
+    theDumper << theDumper.name(aFeature) << " = " << aSketchName << "." << aSetter << "(";
+    if (aRefAttr && aRefAttr->isInitialized()) {
+      theDumper << aRefAttr;
+    }
+    theDumper << ")" << std::endl;
+  }
   else
-    aValueAttr = aBase->real(SketchPlugin_Constraint::VALUE());
-  if (aValueAttr && aValueAttr->isInitialized())
-    theDumper << ", " << aValueAttr;
+  {
+    // postpone constraint until all its attributes be dumped
+    if (!areAllAttributesDumped(theDumper))
+      return;
 
-  if (aBase->getKind() == SketchPlugin_ConstraintDistance::ID()) {
-    AttributeBooleanPtr isSigned = aBase->boolean(SketchPlugin_ConstraintDistance::SIGNED());
-    theDumper << ", " << isSigned->value();
+    theDumper << aSketchName << "." << aSetter << "(";
+    bool isFirstAttr = true;
+    for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+      AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+      if (aRefAttr && aRefAttr->isInitialized()) {
+        theDumper << (isFirstAttr ? "" : ", ") << aRefAttr;
+        isFirstAttr = false;
+      }
+    }
+
+    AttributeDoublePtr aValueAttr;
+    if (aBase->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+      aBase->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+      aValueAttr = aBase->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID());
+    else
+      aValueAttr = aBase->real(SketchPlugin_Constraint::VALUE());
+    if (aValueAttr && aValueAttr->isInitialized())
+      theDumper << ", " << aValueAttr;
+
+    if (aBase->getKind() == SketchPlugin_ConstraintDistance::ID()) {
+      AttributeBooleanPtr isSigned = aBase->boolean(SketchPlugin_ConstraintDistance::SIGNED());
+      theDumper << ", " << isSigned->value();
+    }
+    theDumper << ")" << std::endl;
   }
 
-  theDumper << ")" << std::endl;
 }

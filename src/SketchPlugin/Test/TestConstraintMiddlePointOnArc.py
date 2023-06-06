@@ -44,7 +44,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
   def tearDown(self):
     if self.myTestPassed:
       model.assertArcValidity(self.myArc)
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
       self.checkDOF()
     model.end()
     assert(model.checkPythonDump())
@@ -55,7 +55,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
   def checkMiddlePoint(self, thePoint, theArc):
     self.myTestPassed = False
     # check point on arc
-    dist = thePoint.pnt().distance(theArc.center().pnt())
+    dist = thePoint.distance(theArc.center().pnt())
     NB_DIGITS = 7 - math.floor(math.log10(theArc.radius().value()))
     self.assertAlmostEqual(dist, theArc.radius().value(), NB_DIGITS)
     # check middle point
@@ -86,14 +86,14 @@ class TestMiddlePointOnArc(unittest.TestCase):
     while fullAngle < ANGLE_THRESHOLD:
       self.rotatePoint(self.myArc.startPoint(), self.myArc.center(), -ANGLE_STEP)
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
       fullAngle += ANGLE_STEP
     # move start point of the arc conterclockwise
     fullAngle = 0.0
     while fullAngle < ANGLE_THRESHOLD:
       self.rotatePoint(self.myArc.startPoint(), self.myArc.center(), ANGLE_STEP)
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
       fullAngle += ANGLE_STEP
 
     # move end point of the arc clockwise
@@ -101,14 +101,14 @@ class TestMiddlePointOnArc(unittest.TestCase):
     while fullAngle < ANGLE_THRESHOLD:
       self.rotatePoint(self.myArc.endPoint(), self.myArc.center(), -ANGLE_STEP)
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
       fullAngle += ANGLE_STEP
     # move end point of the arc conterclockwise
     fullAngle = 0.0
     while fullAngle < ANGLE_THRESHOLD:
       self.rotatePoint(self.myArc.endPoint(), self.myArc.center(), ANGLE_STEP)
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
       fullAngle += ANGLE_STEP
 
     # move center of the arc
@@ -118,14 +118,14 @@ class TestMiddlePointOnArc(unittest.TestCase):
         DELTA = [-DELTA[0], -DELTA[1]]
       self.mySketch.move(self.myArc.center(), self.myArc.center().x() + DELTA[0], self.myArc.center().y() + DELTA[1])
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     DELTA = [-1.0, 1.0]
     for i in range(0, 40):
       if i == 10 or i == 30:
         DELTA = [-DELTA[0], -DELTA[1]]
       self.mySketch.move(self.myArc.center(), self.myArc.center().x() + DELTA[0], self.myArc.center().y() + DELTA[1])
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
 
   def moveLine(self):
     DELTA = [1.0, 0.0]
@@ -134,14 +134,14 @@ class TestMiddlePointOnArc(unittest.TestCase):
         DELTA = [-DELTA[0], -DELTA[1]]
       self.mySketch.move(self.myLine.startPoint(), self.myLine.startPoint().x() + DELTA[0], self.myLine.startPoint().y() + DELTA[1])
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     DELTA = [0.0, 1.0]
     for i in range(0, 40):
       if i == 10 or i == 30:
         DELTA = [-DELTA[0], -DELTA[1]]
       self.mySketch.move(self.myLine.startPoint(), self.myLine.startPoint().x() + DELTA[0], self.myLine.startPoint().y() + DELTA[1])
       model.do()
-      self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+      self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
 
 
   def test_middle_point_PA(self):
@@ -187,7 +187,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.myDOF -= 2
     model.do()
     # this check will fail due to the limitation of PlanGCS
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
 
   def test_middle_point_move_arc(self):
     """ Test 6. Set middle point constraint and move arc
@@ -195,7 +195,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.mySketch.setMiddlePoint(self.myLine.startPoint(), self.myArc.results()[1])
     self.myDOF -= 2
     model.do()
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     self.moveArc()
 
   def test_middle_point_coincidence_move_arc(self):
@@ -206,7 +206,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.mySketch.setMiddlePoint(self.myLine.startPoint(), self.myArc.results()[1])
     self.myDOF -= 2
     model.do()
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     self.moveArc()
 
   def test_middle_point_move_line(self):
@@ -215,7 +215,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.mySketch.setMiddlePoint(self.myLine.startPoint(), self.myArc.results()[1])
     self.myDOF -= 2
     model.do()
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     self.moveLine()
 
   def test_middle_point_coincidence_move_line(self):
@@ -226,7 +226,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.mySketch.setMiddlePoint(self.myLine.startPoint(), self.myArc.results()[1])
     self.myDOF -= 2
     model.do()
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     self.moveLine()
 
   def test_remove_middle_point(self):
@@ -236,7 +236,7 @@ class TestMiddlePointOnArc(unittest.TestCase):
     self.myDOF -= 2
     model.do()
     model.assertArcValidity(self.myArc)
-    self.checkMiddlePoint(self.myLine.startPoint(), self.myArc)
+    self.checkMiddlePoint(self.myLine.startPoint().pnt(), self.myArc)
     self.checkDOF()
     # remove middle point
     self.myDocument.removeFeature(mp.feature())
@@ -246,6 +246,36 @@ class TestMiddlePointOnArc(unittest.TestCase):
     # set flag False to avoid checking middle point constraint in tearDown() method
     self.myTestPassed = False
 
+  def test_middle_point_by_object(self):
+    """ Test 11. Set middle point constraint on Arc
+    """
+    self.myArc = self.mySketch.addArc(6, 4, 15, 1, 14, 9, False)
+    self.mySketch.setFixed(self.myArc.center())
+    self.mySketch.setRadius(self.myArc.results()[1], 10)
+
+    SketchLine_2 = self.mySketch.addLine(6, 4, 16, 4)
+    SketchLine_2.setAuxiliary(True)
+    self.mySketch.setCoincident(self.myArc.center(), SketchLine_2.startPoint())
+    self.mySketch.setCoincident(self.myArc.startPoint(), SketchLine_2.endPoint())
+    self.mySketch.setHorizontal(SketchLine_2.result())
+
+    SketchLine_3 = self.mySketch.addLine(6, 4, 14.66025403784439, 9)
+    SketchLine_3.setAuxiliary(True)
+    self.mySketch.setCoincident(self.myArc.center(), SketchLine_3.startPoint())
+    self.mySketch.setCoincident(self.myArc.endPoint(), SketchLine_3.endPoint())
+
+    ### Create SketchConstraintAngle
+    self.mySketch.setAngle(SketchLine_2.result(), SketchLine_3.result(), 30, type = "Direct")
+
+    # Ajout d'un point auxiliaire au milieu
+    SketchPoint_02 = self.mySketch.setMiddlePoint(self.myArc.results()[1])
+    model.do()
+
+    aPoint = SketchPoint_02.coordinates().pnt()
+    self.checkMiddlePoint(aPoint, self.myArc)
+
+    # set flag False to avoid checking middle point constraint in tearDown() method
+    self.myTestPassed = False
 
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)

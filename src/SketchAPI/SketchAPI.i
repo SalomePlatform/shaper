@@ -81,6 +81,7 @@
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
 %shared_ptr(SketchAPI_Point)
+%shared_ptr(SketchAPI_MacroMiddlePoint)
 %shared_ptr(SketchAPI_Projection)
 %shared_ptr(SketchAPI_Rectangle)
 %shared_ptr(SketchAPI_Rotation)
@@ -573,6 +574,7 @@
 // all supported interfaces (the order is very important according dependencies: base class first)
 %include "SketchAPI_SketchEntity.h"
 %include "SketchAPI_Point.h"
+%include "SketchAPI_MacroMiddlePoint.h"
 %include "SketchAPI_IntersectionPoint.h"
 %include "SketchAPI_Line.h"
 %include "SketchAPI_Circle.h"

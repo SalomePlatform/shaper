@@ -527,7 +527,6 @@ bool PlaneGCSSolver_Tools::isAttributeApplicable(const std::string& theAttrName,
            theAttrName == SketchPlugin_BSplinePeriodic::MULTS_ID() ||
            theAttrName == SketchPlugin_BSplinePeriodic::DEGREE_ID();
   }
-
   // suppose that all remaining features are points
   return theAttrName == SketchPlugin_Point::COORD_ID();
 }

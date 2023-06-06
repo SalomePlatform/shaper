@@ -29,6 +29,7 @@
 #include <SketchPlugin_Constraint.h>
 
 class ModelHighAPI_Double;
+class SketchAPI_SketchEntity;
 
 /**\class SketchAPI_Constraint
  * \ingroup CPPHighAPI
