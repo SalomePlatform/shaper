@@ -190,6 +190,7 @@ Sorties :
 
   if verbose:
     print (blabla)
+    print ("n_recur = {}".format(n_recur))
     print_tab(n_recur, "objet : ", objet.name())
     print_tab(n_recur, "RGB = ({},{},{})".format(coul_r,coul_g,coul_b))
 
@@ -199,15 +200,16 @@ Sorties :
     objet_0 = objet.result()
   else:
     objet_0 = objet
+  print (dir(objet))
+  print (dir(objet_0))
 
 # 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
 
   nb_sub_results = objet_0.numberOfSubs()
 
   if verbose:
-    print_tab(n_recur, "Examen de l'objet ",objet_0.name())
-    texte = "de type '{}' ".format(objet_0.shapeType())
-    texte += "et de {} sous-objets".format(nb_sub_results)
+    print_tab(n_recur, "Examen de l'objet",objet_0.name())
+    texte = "Formé de {} sous-objets".format(nb_sub_results)
     print_tab(n_recur, texte)
 
   for n_sobj in range(nb_sub_results):
@@ -874,6 +876,9 @@ Sorties :
     if face is not None:
       self._cree_face_mediane_0 ( face, n_recur )
 
+    if self._verbose_max:
+      print_tab (n_recur, "Sortie de "+blabla)
+
     return erreur, face
 
 #===========================  Fin de la méthode ==================================
@@ -910,6 +915,9 @@ Entrées :
 
 # 4. Changement de statut pour le solide
     self.d_statut_so[self.nom_solide] = 1
+
+    if self._verbose_max:
+      print_tab (n_recur, "Sortie de _cree_face_mediane_0")
 
 #===========================  Fin de la méthode ==================================
 

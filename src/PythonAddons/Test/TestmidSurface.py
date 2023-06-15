@@ -29,12 +29,15 @@ def getFilePath(fileName):
     return os.path.join(path, fileName)
 
 theFile = getFilePath("midSurface.stp")
+print ("theFile = {}".format(theFile))
 
+print ("Create part for mid surface")
 aSession.startOperation("Create part for mid surface")
 aPartFeature = aSession.moduleDocument().addFeature("Part")
 aSession.finishOperation()
 aPart = aSession.activeDocument()
 
+print ("Import file")
 aSession.startOperation("Import file")
 aFeatureKind = "midSurface"
 anImportFeature = aPart.addFeature(aFeatureKind)
@@ -43,6 +46,6 @@ aFile = anImportFeature.string(aFieldName)
 aFile.setValue(theFile)
 aSession.finishOperation()
 
-#print ("Nombre de dossiers : {}".format(aPart.size("Folders")))
+print ("\nNombre de dossiers : {}".format(aPart.size("Folders")))
 
 assert(aPart.size("Folders") == 1), "Wrong number of folders: {}".format(aPart.size("Folders"))

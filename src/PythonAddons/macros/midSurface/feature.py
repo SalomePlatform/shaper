@@ -83,12 +83,13 @@ class midSurface(model.Feature):
         #print("filepath : '{}'".format(filepath))
         if filepath != "" :
             if os.path.isfile(filepath):
+                # print("filepath : {}".format(filepath))
                 # Lancement du script de création des fibres neutres
                 l_options = list()
-                #l_options.append("-v")
-                l_options.append("-vmax")
+                l_options.append("-v")
+                #l_options.append("-vmax")
                 #l_options.append("-export_step")
-                print("l_options : '{}'".format(l_options))
+                print("l_options : {}".format(l_options))
                 s_med = SurfaceMediane(l_options)
                 with open("/tmp/grr_1", "w") as fic :
                     fic.write("{}\n".format(dir(s_med)))
