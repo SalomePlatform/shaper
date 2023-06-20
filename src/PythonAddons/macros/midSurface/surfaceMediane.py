@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.19"
+__revision__ = "V11.20"
 
 #========================= Les imports - Début ===================================
 
@@ -2567,6 +2567,7 @@ Sorties :
         l_objets.append(face.result())
 
       Recover_1 = model.addRecover(self.part_doc, Partition_1, l_objets)
+      exec_nom (Recover_1,nom)
       for iaux, (face,_) in enumerate(self.l_faces_m):
         Recover_1.results()[iaux].setName("{}".format(face.name()))
         Recover_1.results()[iaux].setColor(0, 170, 0)
