@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.17"
+__revision__ = "V11.18"
 
 #========================= Les imports - Début ===================================
 
@@ -200,8 +200,8 @@ Sorties :
     objet_0 = objet.result()
   else:
     objet_0 = objet
-  print (dir(objet))
-  print (dir(objet_0))
+  #print (dir(objet))
+  #print (dir(objet_0))
 
 # 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
 
@@ -221,7 +221,7 @@ Sorties :
 # 2.2. Cet objet n'a pas de sous-objets : on le colore
   if verbose:
     print_tab(n_recur, "Couleur affectée à l'objet ",objet_0.name())
-  objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
+  #objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
 
   #print ("sortie de {}".format(nom_fonction))
 
@@ -281,7 +281,9 @@ Entrées :
 #========================= Début de la fonction ==================================
 
 def exec_nom (fonction, nom=None, couleur=None):
-  """Exécute la fonction après l'avoir nommée et nommé son résultat; Couleur éventuelle
+  """Exécute la fonction puis éventuellement la nomme et nomme son résultat ; Couleur éventuelle
+
+Attention : il faut commencer par exécuter la fonction sinon l enommage n'est pas cohérent en mode macro. Mystère...
 
 Entrées :
   :fonction: fonction à traiter
@@ -289,10 +291,10 @@ Entrées :
   :couleur: éventuellement couleur
 """
 
+  fonction.execute(True)
+
   if ( nom is not None ):
     nommage (fonction, nom, couleur)
-
-  fonction.execute(True)
 
 #=========================  Fin de la fonction ===================================
 
@@ -572,7 +574,9 @@ Sorties :
 # 1. Extraction du solide
     remove_subshapes = model.addRemoveSubShapes(self.part_doc, model.selection("COMPOUND", self.objet_principal.name()))
     exec_nom (remove_subshapes)
+    #print ('remove_subshapes = model.addRemoveSubShapes(part_doc, model.selection("COMPOUND", "{}"))'.format(self.objet_principal.name()))
     remove_subshapes.setSubShapesToKeep([model.selection("SOLID", solide.name())])
+    #print ('remove_subshapes.setSubShapesToKeep([model.selection("SOLID", "{}")])'.format(solide.name()))
 
     self.nom_solide_aux = "{}_S".format(solide.name())
     if self._verbose_max:
@@ -1263,8 +1267,7 @@ Sorties :
     Translation_1.result().setColor(85, 0, 255)
 
 #   Intersection de cette face avec le solide initial
-    face = model.addCommon(self.part_doc, [model.selection("SOLID", nom_solide), model.selection("FACE", Translation_1.result().name())], keepSubResults = True)
-    face.execute(True)
+    face = self._creation_face_inter ( Translation_1.result().name(), nom_solide )
 
     return face
 
@@ -1336,7 +1339,7 @@ Sorties :
 #   Contrôle de la validité de l'épaisseur
     erreur = self._verif_epaisseur ( epaisseur )
 
-#   Création de la face
+#   Création de la face, de couleur bleue si problème
     if not erreur:
       face = self._cree_face_mediane_cylindre_1 ( (coo_x, coo_y, coo_z), (axe_x, axe_y, axe_z), rayon, hauteur, n_recur )
     else:
@@ -2120,7 +2123,7 @@ Entrées :
 
 #=========================== Début de la méthode =================================
 
-  def _creation_face_inter ( self, nom_objet ):
+  def _creation_face_inter ( self, nom_objet, nom_solide=None ):
     """Crée la face par intersection entre l'objet initial et une face complète
 
 . Repère la face principale de l'objet support
@@ -2128,6 +2131,7 @@ Entrées :
 
 Entrées :
   :nom_objet: nom de l'objet 2D créé
+  :nom_solide: nom du solide initial ; si None, on prend self.nom_solide_aux
 
 Sorties :
   :face: la face externe de l'objet support intersecté avec le solide initial
@@ -2139,7 +2143,10 @@ Sorties :
     if self._verbose_max:
       print (blabla)
 
-    face = model.addCommon(self.part_doc, [model.selection("SOLID", self.nom_solide_aux), model.selection("FACE", nom_objet)], keepSubResults = True)
+    if nom_solide is None:
+      nom_solide = self.nom_solide_aux
+
+    face = model.addCommon(self.part_doc, [model.selection("SOLID", nom_solide), model.selection("FACE", nom_objet)], keepSubResults = True)
     face.execute(True)
 
     return face
