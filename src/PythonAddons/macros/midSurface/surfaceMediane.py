@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.20"
+__revision__ = "V11.21"
 
 #========================= Les imports - Début ===================================
 
@@ -1710,26 +1710,37 @@ Sorties :
       texte += "Rayon secondaire : {}".format(rayon_2)
       print (texte)
 
-#   Création du point central
+#   1. Création du point central
     centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
     nom_centre = "{}_centre".format(self.nom_solide)
     exec_nom (centre,nom_centre)
 
-#   Création de l'axe
+#   2. Création de l'axe
     axe = model.addAxis(self.part_doc, axe_x, axe_y, axe_z)
     nom_axe = "{}_axe".format(self.nom_solide)
     exec_nom (axe,nom_axe)
 
-#   Création d'un plan passant par ce centre et cet axe
-    plan = model.addPlane(self.part_doc, model.selection("EDGE", nom_axe), model.selection("VERTEX", nom_centre), False)
+#   3. Création d'un plan passant par le centre de la base et l'axe
+#   3.1. Création d'un vecteur perpendiculaire à l'axe
+    coeff = 10.
+    if ( (abs(axe_x)+abs(axe_y)) < self._epsilon ):
+      v_perp = model.addAxis(self.part_doc, coeff, 0., 0.)
+    else:
+      v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
+    nom_v_perp = "{}_v_perp".format(self.nom_solide)
+    exec_nom (v_perp,nom_v_perp)
+#   3.2. Création du plan
+    plan = model.addPlane(self.part_doc, model.selection("EDGE",nom_v_perp), model.selection("VERTEX", nom_centre), True)
     nom_plan = "{}_plan".format(self.nom_solide)
     exec_nom (plan,nom_plan)
 
-#   Création de l'esquisse
+#   4. Création de l'esquisse
     nom_par_1 = "{}_R_1".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
+    param = model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
+    param.execute(True)
     nom_par_2 = "{}_R_2".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
+    param = model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
+    param.execute(True)
 
     sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
     sketch.execute(True)
@@ -1771,11 +1782,11 @@ Sorties :
     nom_sketch = "{}_esquisse".format(self.nom_solide)
     exec_nom (sketch,nom_sketch)
 
-#   Création du tore complet
+#   5. Création du tore complet
     nom_tore = "{}_tore".format(self.nom_solide)
     self._cree_revolution ( nom_sketch, nom_centre, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_tore )
 
-#   Intersection de la face torique avec le solide initial
+#   6. Intersection de la face torique avec le solide initial
     face = self._creation_face_inter ( nom_tore )
 
     return face
@@ -1923,7 +1934,10 @@ Sorties :
 #   4. Création d'un plan passant par le centre de la base et l'axe
 #   4.1. Création d'un vecteur perpendiculaire à l'axe
     coeff = 10.
-    v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
+    if ( (abs(axe_x)+abs(axe_y)) < self._epsilon ):
+      v_perp = model.addAxis(self.part_doc, coeff, 0., 0.)
+    else:
+      v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
     nom_v_perp = "{}_v_perp".format(self.nom_solide)
     exec_nom (v_perp,nom_v_perp)
 #   4.2. Création du plan
@@ -1933,11 +1947,14 @@ Sorties :
 
 #   5. Paramétrage
     nom_par_1 = "{}_R_1".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
+    param = model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
+    param.execute(True)
     nom_par_2 = "{}_R_2".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
+    param = model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
+    param.execute(True)
     nom_par_3 = "{}_H".format(self.nom_solide)
-    model.addParameter(self.part_doc, "{}".format(nom_par_3), "{}".format(hauteur))
+    param = model.addParameter(self.part_doc, "{}".format(nom_par_3), "{}".format(hauteur))
+    param.execute(True)
 
 #   6. Création de l'esquisse
 
@@ -2013,11 +2030,11 @@ Sorties :
     nom_sketch = "{}_esquisse".format(self.nom_solide)
     exec_nom (sketch,nom_sketch)
 
-#   Création du cone complet
+#   7. Création du cone complet
     nom_cone = "{}_cone".format(self.nom_solide)
     self._cree_revolution ( nom_sketch, nom_centre_1, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_cone )
 
-#   Intersection de la face conique avec le solide initial
+#   8. Intersection de la face conique avec le solide initial
     face = self._creation_face_inter ( nom_cone )
 
     return face
@@ -2582,12 +2599,12 @@ Sorties :
       print_tab (n_recur, "Mise en dossier.")
 
     for (face,fonction_0) in self.l_faces_m:
-      nom = face.name()[:-2]
-      if self._verbose_max:
-        print ( "Dossier {} de {} à {}".format(nom,fonction_0.name(),face.name()))
-      dossier = model.addFolder(self.part_doc, fonction_0, face)
-      #dossier.execute(True)
-      dossier.setName(nom)
+      if fonction_0 is not None:
+        nom = face.name()[:-2]
+        if self._verbose_max:
+          print ( "Dossier {} de {} à {}".format(nom,fonction_0.name(),face.name()))
+        dossier = model.addFolder(self.part_doc, fonction_0, face)
+        dossier.setName(nom)
 
     if ( len(self.l_faces_m) > 1 ):
 
@@ -2595,7 +2612,6 @@ Sorties :
       if self._verbose_max:
         print ( "Dossier {} de {} à {}".format(nom,Partition_1.name(),Recover_1.name()))
       dossier = model.addFolder(self.part_doc, Partition_1, Recover_1)
-      #dossier.execute(True)
       dossier.setName(nom)
 
 #===========================  Fin de la méthode ==================================
