@@ -2567,7 +2567,7 @@ Sorties :
         l_objets.append(face.result())
 
       Recover_1 = model.addRecover(self.part_doc, Partition_1, l_objets)
-      exec_nom (Recover_1,nom)
+      exec_nom (Recover_1)
       for iaux, (face,_) in enumerate(self.l_faces_m):
         Recover_1.results()[iaux].setName("{}".format(face.name()))
         Recover_1.results()[iaux].setColor(0, 170, 0)
