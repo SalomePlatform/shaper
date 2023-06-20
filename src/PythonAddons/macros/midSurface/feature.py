@@ -89,14 +89,8 @@ class midSurface(model.Feature):
                 l_options.append("-v")
                 #l_options.append("-vmax")
                 #l_options.append("-export_step")
-                print("l_options : {}".format(l_options))
                 s_med = SurfaceMediane(l_options)
-                with open("/tmp/grr_1", "w") as fic :
-                    fic.write("{}\n".format(dir(s_med)))
-                    fic.write("\nFichier : {}".format(filepath))
                 erreur, message = s_med.surf_fic_cao (filepath)
-                with open("/tmp/grr_2", "w") as fic :
-                    fic.write("erreur = {}, message = '{}'".format(erreur, message))
                 del s_med
                 if erreur:
                     self.setError(message)
