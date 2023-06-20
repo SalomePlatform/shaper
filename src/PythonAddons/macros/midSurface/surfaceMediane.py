@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.18"
+__revision__ = "V11.19"
 
 #========================= Les imports - Début ===================================
 
@@ -221,7 +221,7 @@ Sorties :
 # 2.2. Cet objet n'a pas de sous-objets : on le colore
   if verbose:
     print_tab(n_recur, "Couleur affectée à l'objet ",objet_0.name())
-  #objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
+  objet_0.setColor (int(coul_r),int(coul_g),int(coul_b))
 
   #print ("sortie de {}".format(nom_fonction))
 
@@ -573,10 +573,11 @@ Sorties :
 
 # 1. Extraction du solide
     remove_subshapes = model.addRemoveSubShapes(self.part_doc, model.selection("COMPOUND", self.objet_principal.name()))
-    exec_nom (remove_subshapes)
+    #exec_nom (remove_subshapes)
     #print ('remove_subshapes = model.addRemoveSubShapes(part_doc, model.selection("COMPOUND", "{}"))'.format(self.objet_principal.name()))
     remove_subshapes.setSubShapesToKeep([model.selection("SOLID", solide.name())])
     #print ('remove_subshapes.setSubShapesToKeep([model.selection("SOLID", "{}")])'.format(solide.name()))
+    #exec_nom (remove_subshapes)
 
     self.nom_solide_aux = "{}_S".format(solide.name())
     if self._verbose_max:
@@ -1745,19 +1746,25 @@ Sorties :
 
     SketchPoint_2 = sketch.addPoint(rayon_1, 0.)
     SketchPoint_2.execute(True)
-    sketch.setDistance(SketchPoint_1.result(), SketchPoint_2.coordinates(), nom_par_1, True)
+    contrainte = sketch.setDistance(SketchPoint_1.result(), SketchPoint_2.coordinates(), nom_par_1, True)
+    contrainte.execute(True)
 
     SketchLine_2 = sketch.addLine(0., 0., rayon_1, 0.)
     SketchLine_2.execute(True)
     SketchLine_2.setAuxiliary(True)
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_2.startPoint())
-    sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_2.endPoint())
-    sketch.setPerpendicular(SketchLine_1.result(), SketchLine_2.result())
+    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_2.startPoint())
+    contrainte.execute(True)
+    contrainte = sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_2.endPoint())
+    contrainte.execute(True)
+    contrainte = sketch.setPerpendicular(SketchLine_1.result(), SketchLine_2.result())
+    contrainte.execute(True)
 
     SketchCircle_1 = sketch.addCircle(0., 0., rayon_2)
     SketchCircle_1.execute(True)
-    sketch.setCoincident(SketchPoint_2.result(), SketchCircle_1.center())
-    sketch.setRadius(SketchCircle_1.results()[1], nom_par_2)
+    contrainte = sketch.setCoincident(SketchPoint_2.result(), SketchCircle_1.center())
+    contrainte.execute(True)
+    contrainte = sketch.setRadius(SketchCircle_1.results()[1], nom_par_2)
+    contrainte.execute(True)
 
     model.do()
 
@@ -1961,33 +1968,45 @@ Sorties :
     SketchLine_1 = sketch.addLine(sk_coo_x_1, sk_coo_y_1, sk_coo_x_1+rayon_1, sk_coo_y_1)
     SketchLine_1.execute(True)
     SketchLine_1.setAuxiliary(True)
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.startPoint())
-    sketch.setPerpendicular(SketchLine_0.result(), SketchLine_1.result())
-    sketch.setLength(SketchLine_1.result(), nom_par_1)
+    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.startPoint())
+    contrainte.execute(True)
+    contrainte = sketch.setPerpendicular(SketchLine_0.result(), SketchLine_1.result())
+    contrainte.execute(True)
+    contrainte = sketch.setLength(SketchLine_1.result(), nom_par_1)
+    contrainte.execute(True)
 
     SketchLine_2 = sketch.addLine(sk_coo_x_2, sk_coo_y_2, sk_coo_x_2+rayon_2, sk_coo_y_2)
     SketchLine_2.execute(True)
     SketchLine_2.setAuxiliary(True)
-    sketch.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_2.startPoint())
-    sketch.setPerpendicular(SketchLine_0.result(), SketchLine_2.result())
-    sketch.setLength(SketchLine_2.result(), nom_par_2)
+    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_2.startPoint())
+    contrainte.execute(True)
+    contrainte = sketch.setPerpendicular(SketchLine_0.result(), SketchLine_2.result())
+    contrainte.execute(True)
+    contrainte = sketch.setLength(SketchLine_2.result(), nom_par_2)
+    contrainte.execute(True)
 
 #   6.3. Ligne joignant les extrémités des précédentes et point milieu
     SketchLine_3 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
     SketchLine_3.execute(True)
-    sketch.setCoincident(SketchLine_3.startPoint(), SketchLine_1.endPoint())
-    sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_2.endPoint())
+    contrainte = sketch.setCoincident(SketchLine_3.startPoint(), SketchLine_1.endPoint())
+    contrainte.execute(True)
+    contrainte = sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_2.endPoint())
+    contrainte.execute(True)
     SketchLine_3.setAuxiliary(True)
     SketchPoint_3 = sketch.addPoint(sk_coo_x_1, sk_coo_y_1)
     SketchPoint_3.execute(True)
-    sketch.setMiddlePoint(SketchLine_3.result(), SketchPoint_3.coordinates())
+    contrainte = sketch.setMiddlePoint(SketchLine_3.result(), SketchPoint_3.coordinates())
+    contrainte.execute(True)
 
 #   6.4. Ligne support de la future révolution
     SketchLine_4 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
     SketchLine_4.execute(True)
-    sketch.setMiddlePoint(SketchLine_4.result(), SketchPoint_3.coordinates())
-    sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_4.result())
-    sketch.setLength(SketchLine_4.result(), "1.2*{}".format(nom_par_3))
+    contrainte = sketch.setMiddlePoint(SketchLine_4.result(), SketchPoint_3.coordinates())
+    contrainte.execute(True)
+    contrainte = sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_4.result())
+    contrainte.execute(True)
+    contrainte = sketch.setLength(SketchLine_4.result(), "1.2*{}".format(nom_par_3))
+    contrainte.execute(True)
 
     model.do()
 
