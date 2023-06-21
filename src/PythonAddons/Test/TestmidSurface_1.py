@@ -43,10 +43,10 @@ aFile = anImportFeature.string(aFieldName)
 aFile.setValue(theFile)
 aSession.finishOperation()
 
-#for cle in ("Bodies", "Groups", "Construction", "Folders"):
+#for cle in ("Construction", "Bodies", "Groups", "Folders"):
   #print (cle,":",aPart.size(cle))
 
-assert(aPart.size("Bodies") == 8), "Right number of construction: {}".format(aPart.size("Bodies"))
 assert(aPart.size("Construction") == 7), "Right number of construction: {}".format(aPart.size("Construction"))
+assert(aPart.size("Bodies") == 8), "Right number of construction: {}".format(aPart.size("Bodies"))
 assert(aPart.size("Groups") == 2), "Right number of construction: {}".format(aPart.size("Groups"))
 assert(aPart.size("Folders") == 4), "Wrong number of folders: {}".format(aPart.size("Folders"))
