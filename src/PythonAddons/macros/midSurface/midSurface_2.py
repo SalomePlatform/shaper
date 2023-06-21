@@ -123,7 +123,6 @@ Extrusion_1.setName("Objet_2")
 Extrusion_1.result().setName("Objet_2")
 Extrusion_1.result().subResult(0).setName("Extrusion_1_1_1")
 Extrusion_1.result().subResult(1).setName("Extrusion_1_1_2")
-
 model.do()
 
 # 2. Un cylindre découpé

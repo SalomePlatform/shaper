@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.24"
+__revision__ = "V11.25"
 
 #========================= Les imports - Début ===================================
 
@@ -1844,7 +1844,8 @@ Sorties :
     exec_nom (axe,nom_axe)
 
 # 4. Création du cône en volume, de rayon médian
-    coeff = 5.
+#    Il faut un gros coefficient pour être certain de tout prendre
+    coeff = 30.
 # 4.1. Calculs des rayons haut et bas et de la valeur de la translation
     rayon_b, rayon_s, d_trans = self._cree_face_mediane_cone_2 ( rayon_1, rayon_2, hauteur, coeff )
 
@@ -1871,7 +1872,7 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_cone_2 ( self, rayon_1, rayon_2, hauteur, coeff=5. ):
+  def _cree_face_mediane_cone_2 ( self, rayon_1, rayon_2, hauteur, coeff=10. ):
     """Crée la face médiane entre deux autres - cas des cônes
 
 Calcul des caractéristiques du cône enveloppant. Merci Thalès !
@@ -1880,7 +1881,7 @@ Remarque : on ne peut pas avoir des cônes pointus
 Entrées :
   :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
   :hauteur: hauteur du cône
-  :coeff: coefficient multiplicateur
+  :coeff: coefficient multiplicateur. Il faut un gros coefficient pour être certain de tout prendre.
 
 Sorties :
   :rayon_b: rayon du cône - partie basse
@@ -1901,16 +1902,20 @@ Sorties :
 
 # 1. Cas étroit en bas
     if ( rayon_1 < rayon_2 ):
+      if self._verbose_max:
+        print ("Cas étroit en bas")
       rayon_b = 0.
-      rayon_s = coeff*rayon_1*rayon_1/(rayon_2-rayon_1)
-      d_trans = -hauteur*(rayon_2-rayon_1)/rayon_1
+      rayon_s = coeff*(rayon_2-rayon_1)
+      d_trans = -hauteur*rayon_1/(rayon_2-rayon_1)
 
 # 2. Cas étroit en haut
 #    Manifestement cela n'arrive jamais une fois passé par du step
     else:
-      rayon_b = coeff*rayon_2*rayon_2/(rayon_1-rayon_2)
+      if self._verbose_max:
+        print ("Cas étroit en haut")
+      rayon_b = coeff*(rayon_1-rayon_2)
       rayon_s = 0.
-      d_trans = (rayon_1/rayon_2 - coeff)*hauteur
+      d_trans = (rayon_1/(rayon_1-rayon_2) - coeff)*hauteur
 
     if self._verbose_max:
       texte = "rayon_b : {}\n".format(rayon_b)
