@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.23"
+__revision__ = "V11.24"
 
 #========================= Les imports - Début ===================================
 
@@ -189,7 +189,6 @@ Sorties :
 
   if verbose:
     print (blabla)
-    print ("n_recur = {}".format(n_recur))
     print_tab(n_recur, "objet : ", objet.name())
     print_tab(n_recur, "RGB = ({},{},{})".format(coul_r,coul_g,coul_b))
 
@@ -205,9 +204,8 @@ Sorties :
   nb_sub_results = objet_0.numberOfSubs()
 
   if verbose:
-    print_tab(n_recur, "Examen de l'objet",objet_0.name())
-    texte = "Formé de {} sous-objets".format(nb_sub_results)
-    print_tab(n_recur, texte)
+    texte = "formé de {} sous-objets".format(nb_sub_results)
+    print_tab(n_recur, "Examen de l'objet '{}' ".format(objet_0.name()), texte)
 
   for n_sobj in range(nb_sub_results):
 
@@ -1710,7 +1708,7 @@ Sorties :
 #=========================== Début de la méthode =================================
 
   def _cree_face_mediane_cone ( self, caract_face_1, caract_face_2, n_recur ):
-    """Crée la face médiane entre deux autres - cas des cones
+    """Crée la face médiane entre deux autres - cas des cônes
 
 Entrées :
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
@@ -1729,7 +1727,7 @@ Sorties :
       print_tab (n_recur, "face_1 : ", caract_face_1)
       print_tab (n_recur, "face_2 : ", caract_face_2)
 
-#   Caractéristiques des cones
+#   Caractéristiques des cônes
     coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur = self._cree_face_mediane_cone_0 ( caract_face_1, caract_face_2, n_recur )
 
 #   Contrôle de la validité de l'épaisseur (bidon)
@@ -1748,7 +1746,7 @@ Sorties :
 #=========================== Début de la méthode =================================
 
   def _cree_face_mediane_cone_0 ( self, caract_face_1, caract_face_2, n_recur ):
-    """Crée la face médiane entre deux autres - cas des cones
+    """Crée la face médiane entre deux autres - cas des cônes
 
 Décodage des caractéristiques
 
@@ -1760,7 +1758,7 @@ Sorties :
   :coo_x, coo_y, coo_z: coordonnées du centre de la base
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
-  :hauteur: hauteur du cone
+  :hauteur: hauteur du cône
 """
 
     nom_fonction = __name__ + "/_cree_face_mediane_cone_0"
@@ -1805,18 +1803,18 @@ Sorties :
 #=========================== Début de la méthode =================================
 
   def _cree_face_mediane_cone_1 ( self, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, rayon_1, rayon_2, hauteur ):
-    """Crée la face médiane entre deux autres - cas des cones
+    """Crée la face médiane entre deux autres - cas des cônes
 
-Création des objets de construction et de la face externe du cone support
+Création des objets de construction et de la face externe du cône support
 
 Entrées :
   :coo_x, coo_y, coo_z: coordonnées du centre de la base
   :axe_x, axe_y, axe_z: coordonnées de l'axe
   :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
-  :hauteur: hauteur du cone
+  :hauteur: hauteur du cône
 
 Sorties :
-  :face: la face externe du cone support
+  :face: la face externe du cône support
 """
     nom_fonction = __name__ + "/_cree_face_mediane_cone_1"
     blabla = "Dans {} :\n".format(nom_fonction)
@@ -1830,128 +1828,97 @@ Sorties :
       texte += "Hauteur : {}".format(hauteur)
       print (texte)
 
-#   1. Création du point central de la base, côté rayon_1
+# 1. Création du point central de la base, côté rayon_1
     centre_1 = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
     nom_centre_1 = "{}_centre_1".format(self.nom_solide)
     exec_nom (centre_1,nom_centre_1)
 
-#   2. Création du point central, du côté de rayon_2
+# 2. Création du point central, du côté de rayon_2
     centre_2 = model.addPoint(self.part_doc, coo_x+hauteur*axe_x, coo_y+hauteur*axe_y, coo_z+hauteur*axe_z)
     nom_centre_2 = "{}_centre_2".format(self.nom_solide)
     exec_nom (centre_2,nom_centre_2)
 
-#   3. Création de l'axe
+# 3. Création de l'axe
     axe = model.addAxis(self.part_doc, model.selection("VERTEX", nom_centre_1), model.selection("VERTEX", nom_centre_2))
     nom_axe = "{}_axe".format(self.nom_solide)
     exec_nom (axe,nom_axe)
 
-#   4. Création d'un plan passant par le centre de la base et l'axe
-#   4.1. Création d'un vecteur perpendiculaire à l'axe
-    coeff = 10.
-    if ( (abs(axe_x)+abs(axe_y)) < self._epsilon ):
-      v_perp = model.addAxis(self.part_doc, coeff, 0., 0.)
-    else:
-      v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
-    nom_v_perp = "{}_v_perp".format(self.nom_solide)
-    exec_nom (v_perp,nom_v_perp)
-#   4.2. Création du plan
-    plan = model.addPlane(self.part_doc, model.selection("EDGE",nom_v_perp), model.selection("VERTEX", nom_centre_1), True)
-    nom_plan = "{}_plan".format(self.nom_solide)
-    exec_nom (plan,nom_plan)
+# 4. Création du cône en volume, de rayon médian
+    coeff = 5.
+# 4.1. Calculs des rayons haut et bas et de la valeur de la translation
+    rayon_b, rayon_s, d_trans = self._cree_face_mediane_cone_2 ( rayon_1, rayon_2, hauteur, coeff )
 
-#   5. Paramétrage
-    nom_par_1 = "{}_R_1".format(self.nom_solide)
-    param = model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
-    param.execute(True)
-    nom_par_2 = "{}_R_2".format(self.nom_solide)
-    param = model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
-    param.execute(True)
-    nom_par_3 = "{}_H".format(self.nom_solide)
-    param = model.addParameter(self.part_doc, "{}".format(nom_par_3), "{}".format(hauteur))
-    param.execute(True)
+# 4.2. Création du grand cône
+    Cone_1 = model.addCone(self.part_doc, model.selection("VERTEX", nom_centre_1), model.selection("EDGE", nom_axe), rayon_b, rayon_s, coeff*hauteur)
+    nom_1 = "{}_Cone_1".format(self.nom_solide)
+    exec_nom (Cone_1,nom_1)
 
-#   6. Création de l'esquisse
+# 4.3. Translation pour superposer au cône de départ
+    Translation_1 = model.addTranslation(self.part_doc, [model.selection("SOLID", nom_1)], axis = model.selection("EDGE", nom_axe), distance = d_trans, keepSubResults = True)
+    nom_2 = "{}_Cone_1_trans".format(self.nom_solide)
+    exec_nom (Translation_1,nom_2)
 
-    sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
-    sketch.execute(True)
+# 5. Création du cône en surface
+    nom = "{}/MF:Translated&{}".format(nom_2,nom_1)
+    cone = self._creation_face_surface ( nom, "cone" )
 
-#   6.1. Projection des centres et de l'axe
-    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre_1), False)
-    SketchProjection_1.execute(True)
-    SketchPoint_1 = SketchProjection_1.createdFeature()
-    SketchPoint_1.execute(True)
-    sk_coo_x_1 = SketchAPI_Point(SketchPoint_1).coordinates().x()
-    sk_coo_y_1 = SketchAPI_Point(SketchPoint_1).coordinates().y()
-
-    SketchProjection_2 = sketch.addProjection(model.selection("VERTEX", nom_centre_2), False)
-    SketchProjection_2.execute(True)
-    SketchPoint_2 = SketchProjection_2.createdFeature()
-    SketchPoint_2.execute(True)
-    sk_coo_x_2 = SketchAPI_Point(SketchPoint_2).coordinates().x()
-    sk_coo_y_2 = SketchAPI_Point(SketchPoint_2).coordinates().y()
-
-    SketchProjection_3 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
-    SketchProjection_3.execute(True)
-    SketchLine_0 = SketchProjection_3.createdFeature()
-    SketchLine_0.execute(True)
-
-#   6.2. Lignes perpendiculaires à l'axe passant par les centres
-    SketchLine_1 = sketch.addLine(sk_coo_x_1, sk_coo_y_1, sk_coo_x_1+rayon_1, sk_coo_y_1)
-    SketchLine_1.execute(True)
-    SketchLine_1.setAuxiliary(True)
-    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_1.startPoint())
-    contrainte.execute(True)
-    contrainte = sketch.setPerpendicular(SketchLine_0.result(), SketchLine_1.result())
-    contrainte.execute(True)
-    contrainte = sketch.setLength(SketchLine_1.result(), nom_par_1)
-    contrainte.execute(True)
-
-    SketchLine_2 = sketch.addLine(sk_coo_x_2, sk_coo_y_2, sk_coo_x_2+rayon_2, sk_coo_y_2)
-    SketchLine_2.execute(True)
-    SketchLine_2.setAuxiliary(True)
-    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_2.startPoint())
-    contrainte.execute(True)
-    contrainte = sketch.setPerpendicular(SketchLine_0.result(), SketchLine_2.result())
-    contrainte.execute(True)
-    contrainte = sketch.setLength(SketchLine_2.result(), nom_par_2)
-    contrainte.execute(True)
-
-#   6.3. Ligne joignant les extrémités des précédentes et point milieu
-    SketchLine_3 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
-    SketchLine_3.execute(True)
-    contrainte = sketch.setCoincident(SketchLine_3.startPoint(), SketchLine_1.endPoint())
-    contrainte.execute(True)
-    contrainte = sketch.setCoincident(SketchLine_3.endPoint(), SketchLine_2.endPoint())
-    contrainte.execute(True)
-    SketchLine_3.setAuxiliary(True)
-    SketchPoint_3 = sketch.addPoint(sk_coo_x_1, sk_coo_y_1)
-    SketchPoint_3.execute(True)
-    contrainte = sketch.setMiddlePoint(SketchLine_3.result(), SketchPoint_3.coordinates())
-    contrainte.execute(True)
-
-#   6.4. Ligne support de la future révolution
-    SketchLine_4 = sketch.addLine(sk_coo_x_1+rayon_1, sk_coo_y_1, sk_coo_x_2+rayon_2, sk_coo_y_2)
-    SketchLine_4.execute(True)
-    contrainte = sketch.setMiddlePoint(SketchLine_4.result(), SketchPoint_3.coordinates())
-    contrainte.execute(True)
-    contrainte = sketch.setCoincident(SketchLine_1.endPoint(), SketchLine_4.result())
-    contrainte.execute(True)
-    contrainte = sketch.setLength(SketchLine_4.result(), "1.2*{}".format(nom_par_3))
-    contrainte.execute(True)
-
-    model.do()
-
-    nom_sketch = "{}_esquisse".format(self.nom_solide)
-    exec_nom (sketch,nom_sketch)
-
-#   7. Création du cone complet
-    nom_cone = "{}_cone".format(self.nom_solide)
-    self._cree_revolution ( nom_sketch, nom_centre_1, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_cone )
-
-#   8. Intersection de la face conique avec le solide initial
-    face = self._creation_face_inter ( nom_cone )
+# 6. Intersection de la face conique avec le solide initial
+    face = self._creation_face_inter ( cone.name() )
 
     return face
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _cree_face_mediane_cone_2 ( self, rayon_1, rayon_2, hauteur, coeff=5. ):
+    """Crée la face médiane entre deux autres - cas des cônes
+
+Calcul des caractéristiques du cône enveloppant. Merci Thalès !
+Remarque : on ne peut pas avoir des cônes pointus
+
+Entrées :
+  :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
+  :hauteur: hauteur du cône
+  :coeff: coefficient multiplicateur
+
+Sorties :
+  :rayon_b: rayon du cône - partie basse
+  :rayon_s: rayon du cône - partie supérieure
+  :d_trans: distance de translation selon l'axe
+"""
+    nom_fonction = __name__ + "/_cree_face_mediane_cone_2"
+    blabla = "Dans {} :\n".format(nom_fonction)
+
+#   Objectif
+    if self._verbose_max:
+      texte = blabla
+      texte += "rayon_1 : {}\n".format(rayon_1)
+      texte += "rayon_2 : {}\n".format(rayon_2)
+      texte += "Hauteur : {}\n".format(hauteur)
+      texte += "coeff   : {}".format(coeff)
+      print (texte)
+
+# 1. Cas étroit en bas
+    if ( rayon_1 < rayon_2 ):
+      rayon_b = 0.
+      rayon_s = coeff*rayon_1*rayon_1/(rayon_2-rayon_1)
+      d_trans = -hauteur*(rayon_2-rayon_1)/rayon_1
+
+# 2. Cas étroit en haut
+#    Manifestement cela n'arrive jamais une fois passé par du step
+    else:
+      rayon_b = coeff*rayon_2*rayon_2/(rayon_1-rayon_2)
+      rayon_s = 0.
+      d_trans = (rayon_1/rayon_2 - coeff)*hauteur
+
+    if self._verbose_max:
+      texte = "rayon_b : {}\n".format(rayon_b)
+      texte += "rayon_s : {}\n".format(rayon_s)
+      texte += "Translation : {}".format(d_trans)
+      print (texte)
+
+    return rayon_b, rayon_s, d_trans
 
 #===========================  Fin de la méthode ==================================
 
@@ -2088,7 +2055,7 @@ Sorties :
   :objet_2d: l'objet 2D support de la face externe de l'objet 3D
 """
 
-    nom_fonction = __name__ + "/_creation_face_inter"
+    nom_fonction = __name__ + "/_creation_face_surface"
     blabla = "Dans {} :\n".format(nom_fonction)
 
     if self._verbose_max:
@@ -2128,7 +2095,10 @@ Sorties :
     blabla = "Dans {} :\n".format(nom_fonction)
 
     if self._verbose_max:
-      print (blabla)
+      texte = blabla
+      texte += "nom_objet  = {}\n".format(nom_objet)
+      texte += "nom_solide = {}".format(nom_solide)
+      print (texte)
 
     if nom_solide is None:
       nom_solide = self.nom_solide_aux
