@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.22"
+__revision__ = "V11.23"
 
 #========================= Les imports - Début ===================================
 
@@ -1428,32 +1428,32 @@ Sorties :
       print_tab (n_recur, "Rayon   : ", rayon)
       print_tab (n_recur, "Hauteur : ", hauteur)
 
-#   Création du point central
+# 1. Création du point central
     centre = model.addPoint(self.part_doc, coo_c[0], coo_c[1], coo_c[2])
     nom_centre = "{}_centre".format(self.nom_solide)
     exec_nom (centre,nom_centre)
     if self.fonction_0 is None:
       self.fonction_0 = centre
 
-#   Création du vecteur axial
+# 2. Création du vecteur axial
     axe = model.addAxis(self.part_doc, v_axe[0], v_axe[1], v_axe[2])
     nom_axe = "{}_vecteur".format(self.nom_solide)
     exec_nom (axe,nom_axe)
 
-#   Création du cylindre en volume, de rayon médian
+# 3. Création du cylindre en volume, de rayon médian
     Cylinder_1 = model.addCylinder(self.part_doc, model.selection("VERTEX", nom_centre), model.selection("EDGE", nom_axe), rayon, hauteur)
     nom = "{}_Cylinder_1".format(self.nom_solide)
     exec_nom (Cylinder_1,nom)
 
-#   Création du cylindre en surface
+# 4. Création du cylindre en surface
     cylindre = self._creation_face_surface ( nom, "cylindre" )
 
-#   Mise en place
+# 5. Mise en place
     Translation_1 = model.addTranslation(self.part_doc, [model.selection("COMPOUND", cylindre.name())], axis = model.selection("EDGE", nom_axe), distance = -0.5*hauteur, keepSubResults = True)
     nom = "{}_Translation_1".format(self.nom_solide)
     exec_nom (Translation_1,nom)
 
-#   Intersection de la face cylindrique avec le solide initial
+# 6. Intersection de la face cylindrique avec le solide initial
     face = self._creation_face_inter ( nom )
 
     return face
@@ -1562,22 +1562,22 @@ Sorties :
       texte += "Rayon : {}".format(rayon)
       print (texte)
 
-#   Création du point central
+# 1. Création du point central
     centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
     nom_centre = "{}_centre".format(self.nom_solide)
     exec_nom (centre,nom_centre)
     if self.fonction_0 is None:
       self.fonction_0 = centre
 
-#   Création de la sphère en volume, de rayon médian
+# 2. Création de la sphère en volume, de rayon médian
     Sphere_1 = model.addSphere(self.part_doc, model.selection("VERTEX", nom_centre), rayon)
     nom = "{}_Sphere_1".format(self.nom_solide)
     exec_nom (Sphere_1,nom)
 
-#   Création de la sphère en surface
+# 3. Création de la sphère en surface
     sphere = self._creation_face_surface ( nom, "sphere" )
 
-#   Intersection de la face sphérique avec le solide initial
+# 4. Intersection de la face sphérique avec le solide initial
     face = self._creation_face_inter ( sphere.name() )
 
     return face
@@ -1694,84 +1694,26 @@ Sorties :
       texte += "Rayon secondaire : {}".format(rayon_2)
       print (texte)
 
-#   1. Création du point central
+# 1. Création du point central
     centre = model.addPoint(self.part_doc, coo_x, coo_y, coo_z)
     nom_centre = "{}_centre".format(self.nom_solide)
     exec_nom (centre,nom_centre)
 
-#   2. Création de l'axe
+# 2. Création de l'axe
     axe = model.addAxis(self.part_doc, axe_x, axe_y, axe_z)
     nom_axe = "{}_axe".format(self.nom_solide)
     exec_nom (axe,nom_axe)
 
-#   3. Création d'un plan passant par le centre de la base et l'axe
-#   3.1. Création d'un vecteur perpendiculaire à l'axe
-    coeff = 10.
-    if ( (abs(axe_x)+abs(axe_y)) < self._epsilon ):
-      v_perp = model.addAxis(self.part_doc, coeff, 0., 0.)
-    else:
-      v_perp = model.addAxis(self.part_doc, -coeff*axe_y, coeff*axe_x, 0.)
-    nom_v_perp = "{}_v_perp".format(self.nom_solide)
-    exec_nom (v_perp,nom_v_perp)
-#   3.2. Création du plan
-    plan = model.addPlane(self.part_doc, model.selection("EDGE",nom_v_perp), model.selection("VERTEX", nom_centre), True)
-    nom_plan = "{}_plan".format(self.nom_solide)
-    exec_nom (plan,nom_plan)
+# 3. Création du tore en volume, de rayon médian
+    Tore_1 = model.addTorus(self.part_doc, model.selection("VERTEX", nom_centre), model.selection("EDGE", nom_axe), rayon_1, rayon_2)
+    nom = "{}_Tore_1".format(self.nom_solide)
+    exec_nom (Tore_1,nom)
 
-#   4. Création de l'esquisse
-    nom_par_1 = "{}_R_1".format(self.nom_solide)
-    param = model.addParameter(self.part_doc, "{}".format(nom_par_1), "{}".format(rayon_1))
-    param.execute(True)
-    nom_par_2 = "{}_R_2".format(self.nom_solide)
-    param = model.addParameter(self.part_doc, "{}".format(nom_par_2), "{}".format(rayon_2))
-    param.execute(True)
+# 4. Création du tore en surface
+    tore = self._creation_face_surface ( nom, "tore" )
 
-    sketch = model.addSketch(self.part_doc, model.selection("FACE", nom_plan))
-    sketch.execute(True)
-
-    SketchProjection_1 = sketch.addProjection(model.selection("VERTEX", nom_centre), False)
-    SketchProjection_1.execute(True)
-    SketchPoint_1 = SketchProjection_1.createdFeature()
-    SketchPoint_1.execute(True)
-
-    SketchProjection_2 = sketch.addProjection(model.selection("EDGE", nom_axe), False)
-    SketchProjection_2.execute(True)
-    SketchLine_1 = SketchProjection_2.createdFeature()
-    SketchLine_1.execute(True)
-
-    SketchPoint_2 = sketch.addPoint(rayon_1, 0.)
-    SketchPoint_2.execute(True)
-    contrainte = sketch.setDistance(SketchPoint_1.result(), SketchPoint_2.coordinates(), nom_par_1, True)
-    contrainte.execute(True)
-
-    SketchLine_2 = sketch.addLine(0., 0., rayon_1, 0.)
-    SketchLine_2.execute(True)
-    SketchLine_2.setAuxiliary(True)
-    contrainte = sketch.setCoincident(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_2.startPoint())
-    contrainte.execute(True)
-    contrainte = sketch.setCoincident(SketchPoint_2.coordinates(), SketchLine_2.endPoint())
-    contrainte.execute(True)
-    contrainte = sketch.setPerpendicular(SketchLine_1.result(), SketchLine_2.result())
-    contrainte.execute(True)
-
-    SketchCircle_1 = sketch.addCircle(0., 0., rayon_2)
-    SketchCircle_1.execute(True)
-    contrainte = sketch.setCoincident(SketchPoint_2.result(), SketchCircle_1.center())
-    contrainte.execute(True)
-    contrainte = sketch.setRadius(SketchCircle_1.results()[1], nom_par_2)
-    contrainte.execute(True)
-
-    model.do()
-
-    nom_sketch = "{}_esquisse".format(self.nom_solide)
-    exec_nom (sketch,nom_sketch)
-
-#   5. Création du tore complet
-    nom_tore = "{}_tore".format(self.nom_solide)
-    self._cree_revolution ( nom_sketch, nom_centre, coo_x, coo_y, coo_z, axe_x, axe_y, axe_z, nom_tore )
-
-#   6. Intersection de la face torique avec le solide initial
-    face = self._creation_face_inter ( nom_tore )
+# 5. Intersection de la face torique avec le solide initial
+    face = self._creation_face_inter ( tore.name() )
 
     return face
 
