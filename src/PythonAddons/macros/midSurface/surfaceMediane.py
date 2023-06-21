@@ -36,12 +36,11 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.21"
+__revision__ = "V11.22"
 
 #========================= Les imports - Début ===================================
 
 import os
-import sys
 import tempfile
 
 import salome
@@ -1446,18 +1445,11 @@ Sorties :
     nom = "{}_Cylinder_1".format(self.nom_solide)
     exec_nom (Cylinder_1,nom)
 
-#   Le groupe de la surface
-    Group_1 = model.addGroup(self.part_doc, "Faces", [model.selection("FACE", "{}/Face_1".format(nom))])
-    nom = "{}_Group_1".format(self.nom_solide)
-    exec_nom (Group_1,nom)
-
 #   Création du cylindre en surface
-    cylindre = model.addGroupShape(self.part_doc, [model.selection("COMPOUND", nom)])
-    nom = "{}_cylindre".format(self.nom_solide)
-    exec_nom (cylindre, nom, (85, 0, 255))
+    cylindre = self._creation_face_surface ( nom, "cylindre" )
 
 #   Mise en place
-    Translation_1 = model.addTranslation(self.part_doc, [model.selection("COMPOUND", nom)], axis = model.selection("EDGE", nom_axe), distance = -0.5*hauteur, keepSubResults = True)
+    Translation_1 = model.addTranslation(self.part_doc, [model.selection("COMPOUND", cylindre.name())], axis = model.selection("EDGE", nom_axe), distance = -0.5*hauteur, keepSubResults = True)
     nom = "{}_Translation_1".format(self.nom_solide)
     exec_nom (Translation_1,nom)
 
@@ -1582,19 +1574,11 @@ Sorties :
     nom = "{}_Sphere_1".format(self.nom_solide)
     exec_nom (Sphere_1,nom)
 
-#   Le groupe de la surface
-    Group_1 = model.addGroup(self.part_doc, "Faces", [model.selection("FACE", "{}/Face_1".format(nom))])
-    nom = "{}_Group_1".format(self.nom_solide)
-    exec_nom (Group_1,nom)
-
 #   Création de la sphère en surface
-    sphere = model.addGroupShape(self.part_doc, [model.selection("COMPOUND", nom)])
-
-    nom = "{}_sphere".format(self.nom_solide)
-    exec_nom (sphere, nom, (85, 0, 255))
+    sphere = self._creation_face_surface ( nom, "sphere" )
 
 #   Intersection de la face sphérique avec le solide initial
-    face = self._creation_face_inter ( nom )
+    face = self._creation_face_inter ( sphere.name() )
 
     return face
 
@@ -2154,6 +2138,43 @@ Entrées :
 #   Création de l'objet complet
     objet = model.addRevolution(self.part_doc, [model.selection("COMPOUND", nom_sketch)], model.selection("EDGE", nom_axe_r), 360, 0, "Edges")
     exec_nom (objet, nom_objet, (85, 0, 255))
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _creation_face_surface ( self, nom_objet, suffixe ):
+    """Crée la face qui est la surface externe d'un objet
+
+. Crée le groupe de la face externe
+. Transforme le groupe en face résultat
+
+Entrées :
+  :nom_objet: nom de l'objet 3D à traiter
+  :suffixe: suffixe pour nommer l'objet 2D
+  :nom_solide: nom du solide initial ; si None, on prend self.nom_solide_aux
+
+Sorties :
+  :objet_2d: l'objet 2D support de la face externe de l'objet 3D
+"""
+
+    nom_fonction = __name__ + "/_creation_face_inter"
+    blabla = "Dans {} :\n".format(nom_fonction)
+
+    if self._verbose_max:
+      print (blabla)
+
+# 1. Le groupe de la surface
+    groupe = model.addGroup(self.part_doc, "Faces", [model.selection("FACE", "{}/Face_1".format(nom_objet))])
+    nom = "{}_{}_groupe".format(self.nom_solide,suffixe)
+    exec_nom (groupe, nom, (85, 0, 255))
+
+# 2. Création de la face en surface
+    objet_2d = model.addGroupShape(self.part_doc, [model.selection("COMPOUND", nom)])
+    nom = "{}_{}".format(self.nom_solide,suffixe)
+    exec_nom (objet_2d, nom, (85, 0, 255))
+
+    return objet_2d
 
 #===========================  Fin de la méthode ==================================
 
