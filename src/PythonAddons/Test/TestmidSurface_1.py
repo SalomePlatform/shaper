@@ -28,7 +28,7 @@ def getFilePath(fileName):
     path = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "macros", "midSurface")
     return os.path.join(path, fileName)
 
-theFile = getFilePath("midSurface.stp")
+theFile = getFilePath("midSurface_1.stp")
 
 aSession.startOperation("Create part for mid surface")
 aPartFeature = aSession.moduleDocument().addFeature("Part")
