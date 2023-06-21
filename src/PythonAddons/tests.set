@@ -22,7 +22,8 @@ SET(TEST_NAMES
   TestRectangleCentered.py
   TestcompoundVertices.py
   TestimportParameters.py
-  TestmidSurface.py
+  TestmidSurface_1.py
+  TestmidSurface_2.py
   TestpipeNetwork_2par2.py
   TestpipeNetwork_parligne.py
 )

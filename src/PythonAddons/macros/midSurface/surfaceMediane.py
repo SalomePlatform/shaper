@@ -199,8 +199,6 @@ Sorties :
     objet_0 = objet.result()
   else:
     objet_0 = objet
-  #print (dir(objet))
-  #print (dir(objet_0))
 
 # 2. On descend dans l'arborescence des sous-objets jusqu'à en trouver un qui n'en n'a pas
 
@@ -572,11 +570,7 @@ Sorties :
 
 # 1. Extraction du solide
     remove_subshapes = model.addRemoveSubShapes(self.part_doc, model.selection("COMPOUND", self.objet_principal.name()))
-    #exec_nom (remove_subshapes)
-    #print ('remove_subshapes = model.addRemoveSubShapes(part_doc, model.selection("COMPOUND", "{}"))'.format(self.objet_principal.name()))
     remove_subshapes.setSubShapesToKeep([model.selection("SOLID", solide.name())])
-    #print ('remove_subshapes.setSubShapesToKeep([model.selection("SOLID", "{}")])'.format(solide.name()))
-    #exec_nom (remove_subshapes)
 
     self.nom_solide_aux = "{}_S".format(solide.name())
     if self._verbose_max:
@@ -880,9 +874,6 @@ Sorties :
     if face is not None:
       self._cree_face_mediane_0 ( face, n_recur )
 
-    if self._verbose_max:
-      print_tab (n_recur, "Sortie de "+blabla)
-
     return erreur, face
 
 #===========================  Fin de la méthode ==================================
@@ -919,9 +910,6 @@ Entrées :
 
 # 4. Changement de statut pour le solide
     self.d_statut_so[self.nom_solide] = 1
-
-    if self._verbose_max:
-      print_tab (n_recur, "Sortie de _cree_face_mediane_0")
 
 #===========================  Fin de la méthode ==================================
 
