@@ -119,6 +119,14 @@ Selection list in the property panel contains a list of exported objects which c
     :param string: The name of the author, empty by default
     :param string: The name for the shape processed in GEOMETRY module, empty by default
 
+.. py:function:: aBuffer = model.exportToXAOMem(Part_doc, Object, Author="", GeometryName="")
+
+    This function enables passing data in XAO format from SHAPER to GEOM through a memory buffer (bytes array), without creation of real file on disk.
+
+    :param object: The object to export
+    :param string: The name of the author, empty by default
+    :param string: The name for the shape processed in GEOMETRY module, empty by default
+
 Result
 """"""
 

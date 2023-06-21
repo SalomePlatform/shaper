@@ -42,4 +42,9 @@ bool XAOExport(const std::string& theFileName,
                XAO::Xao* theXao,
                std::string& theError);
 
+/// Implementation of the export XAO to memory buffer (std::string)
+GEOMALGOAPI_EXPORT
+const std::string XAOExportMem(XAO::Xao* theXao,
+                               std::string& theError);
+
 #endif /* GEOMALGOAPI_XAOEXPORT_H_ */

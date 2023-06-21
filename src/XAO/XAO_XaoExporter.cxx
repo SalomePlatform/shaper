@@ -655,7 +655,9 @@ const std::string XaoExporter::saveToXml(Xao* xaoObject)
 
     xmlChar *xmlbuff;
     int buffersize;
-    xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1); // format = 1 for node indentation
+    //xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1); // format = 1 for node indentation
+    // save with encoding to correspond to "saveToFile" and provide the same file size
+    xmlDocDumpFormatMemoryEnc(doc, &xmlbuff, &buffersize, "UTF-8", 1); // format = 1 for node indentation
     xmlFreeDoc(doc);
     xmlCleanupGlobals();
 

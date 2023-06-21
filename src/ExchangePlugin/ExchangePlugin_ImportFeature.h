@@ -149,6 +149,12 @@ public:
     static const std::string MY_STEP_COLORS_ID("step_colors");
     return MY_STEP_COLORS_ID;
   }
+  /// attribute memory buffer
+  inline static const std::string& MEMORY_BUFFER_ID()
+  {
+    static const std::string MY_MEMORY_BUFFER_ID("memory_buffer");
+    return MY_MEMORY_BUFFER_ID;
+  }
   /// Returns the unique kind of a feature
   EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind() override
   {
@@ -161,12 +167,17 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes
   EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Return false in case of XAOMem import.
+  EXCHANGEPLUGIN_EXPORT virtual bool isEditable();
+
 protected:
   /// Performs the import of the file
   EXCHANGEPLUGIN_EXPORT void importFile(const std::string& theFileName) override;
 
   /// Performs the import of XAO file
-  EXCHANGEPLUGIN_EXPORT void importXAO(const std::string& theFileName);
+  EXCHANGEPLUGIN_EXPORT void importXAO(const std::string& theFileName,
+                                       const std::string& theMemoryBuff = std::string(),
+                                       const bool         isMemoryImport = false);
 
 private:
   /// Set groups of color

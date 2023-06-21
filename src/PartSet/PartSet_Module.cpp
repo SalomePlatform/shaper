@@ -1630,23 +1630,24 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       } else if (aObject->document() == aMgr->activeDocument()) {
         if (hasParameter || hasFeature) {
 
-          // disable Edit menu for groups under ImportResult feature
           bool isEnabled = true;
-          if (aFeature.get() && aFeature->getKind() == "Group")
-          {
-            std::shared_ptr<ModelAPI_CompositeFeature> anOwner =
-              ModelAPI_Tools::compositeOwner (aFeature);
+          if (aFeature.get()) {
+            // disable Edit menu for not editable features
+            isEnabled = aFeature->isEditable();
 
-            if (anOwner.get() && anOwner->getKind() == "ImportResult")
-            {
-              myMenuMgr->action("EDIT_CMD")->setEnabled(false);
-              isEnabled = false;
+            // disable Edit menu for groups under ImportResult feature
+            if (aFeature->getKind() == "Group") {
+              std::shared_ptr<ModelAPI_CompositeFeature> anOwner =
+                ModelAPI_Tools::compositeOwner (aFeature);
+              if (anOwner.get() && anOwner->getKind() == "ImportResult") {
+                isEnabled = false;
+              }
             }
           }
 
-          if (isEnabled)
-          {
-            myMenuMgr->action("EDIT_CMD")->setEnabled(true);
+          myMenuMgr->action("EDIT_CMD")->setEnabled(isEnabled);
+
+          if (isEnabled) {
             theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
             if (aCurrentOp && aFeature.get()) {
               if (aCurrentOp->id().toStdString() == aFeature->getKind())

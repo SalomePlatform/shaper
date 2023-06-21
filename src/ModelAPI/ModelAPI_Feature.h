@@ -41,7 +41,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   std::list<std::shared_ptr<ModelAPI_Result> > myResults;
   ///< is feature disabled or not
   bool myIsDisabled;
-  ///< is feature is stable (not editing)
+  ///< is feature stable (not editing)
   bool myIsStable;
 
  public:
@@ -154,6 +154,9 @@ class ModelAPI_Feature : public ModelAPI_Object
 
   /// Returns the feature is stable or not.
   MODELAPI_EXPORT virtual bool isStable();
+
+  /// Returns the feature is editable or not. Most of features are editable.
+  MODELAPI_EXPORT virtual bool isEditable();
 
   /// Performs some custom feature specific functionality (normally called by some GUI button)
   /// \param theActionId an action key

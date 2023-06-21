@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
+SET(TEST_NAMES_SPR
   TestExportToGEOM
   TestExportToGEOMAllGroupsAndFields
   TestExportToGEOMPartSet
@@ -31,3 +31,10 @@ SET(TEST_NAMES
   TestImportSTL
   TestImportSTEP
 )
+
+SET(TEST_NAMES_ADV
+  TestExportXAOMem
+  TestImportXAOMem
+)
+
+set(TEST_NAMES ${TEST_NAMES_SPR} ${TEST_NAMES_ADV})

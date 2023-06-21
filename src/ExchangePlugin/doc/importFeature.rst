@@ -47,10 +47,10 @@ The import will be performed within the active part. If no part is active, the p
 
 **TUI Command**:
 
-.. py:function:: model.importPart(Doc, FileNameString, [PrevFeature])
+.. py:function:: model.importPart(Part_doc, FileNameString, [PrevFeature])
 
-    :param part: The current part object
-    :param string: A file name string
+    :param Part_doc: The target part document, where to import the data
+    :param string: The file name string
     :param reference: The feature after which the imported entities should be inserted
 
 
@@ -88,8 +88,15 @@ In case of first choice the format of imported file will be defined according to
 
 .. py:function:: model.addImport(Part_doc, FileNameString)
 
-    :param part: The current part object
+    :param Part_doc: The target part document, where to import the data
     :param string: A file name string.
+
+.. py:function:: model.addImportXAOMem(Part_doc, aBuffer)
+
+    This function allows importing data in XAO format from GEOM through a memory buffer (bytes array), without creation of real file on disk.
+
+    :param Part_doc: The target part document, where to import the data
+    :param aBuffer: A byte array with data in XAO format.
 
 Result
 """"""
@@ -127,7 +134,7 @@ The **Import to** combobox provides the list of destinations (one of existing Pa
 
 .. py:function:: model.addImportSTEP(Part_doc, FileNameString,scalInterUnits,materials,colors)
 
-    :param part: The current part object
+    :param Part_doc: The target part document, where to import the data
     :param string: A file name string.
     :param boolean: True if scale to UIS
     :param boolean: True to create groups from materials

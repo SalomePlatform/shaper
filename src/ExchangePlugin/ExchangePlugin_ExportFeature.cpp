@@ -50,6 +50,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
@@ -117,6 +118,10 @@ void ExchangePlugin_ExportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ExportFeature::STL_FILE_TYPE(),
    ModelAPI_AttributeString::typeId());
 
+  // export to memory buffer (implemented for XAO format only)
+  data()->addAttribute(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID(),
+                       ModelAPI_AttributeString::typeId());
+
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
@@ -127,11 +132,14 @@ void ExchangePlugin_ExportFeature::initAttributes()
     ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID());
 
   // to support previous version of document, move the selection list
   // if the type of export operation is XAO
   AttributeStringPtr aTypeAttr = string(EXPORT_TYPE_ID());
-  if (aTypeAttr->isInitialized() && aTypeAttr->value() == "XAO") {
+  if (aTypeAttr->isInitialized() &&
+      (aTypeAttr->value() == "XAO" || aTypeAttr->value() == "XAOMem")) {
     bool aWasBlocked = data()->blockSendAttributeUpdated(true, false);
     AttributeSelectionListPtr aSelList = selectionList(SELECTION_LIST_ID());
     AttributeSelectionListPtr aXAOSelList = selectionList(XAO_SELECTION_LIST_ID());
@@ -163,21 +171,29 @@ void ExchangePlugin_ExportFeature::execute()
       this->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID());
   std::string aFormat = aFormatAttr->value();
 
+  bool isMemoryExport = false;
+  AttributeStringPtr aTypeAttr = string(EXPORT_TYPE_ID());
+  if (aTypeAttr->isInitialized() && aTypeAttr->value() == "XAOMem")
+    isMemoryExport = true;
+
   AttributeStringPtr aFilePathAttr =
       this->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
   std::string aFilePath = aFilePathAttr->value();
-  if (aFilePath.empty())
+  if (aFilePath.empty() && !isMemoryExport)
     return;
 
-  exportFile(aFilePath, aFormat);
+  exportFile(aFilePath, aFormat, isMemoryExport);
 }
 
 void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
-                                              const std::string& theFormat)
+                                              const std::string& theFormat,
+                                              const bool         isMemoryExport)
 {
   std::string aFormatName = theFormat;
 
   if (aFormatName.empty()) { // get default format for the extension
+    if (isMemoryExport) return;
+
     // ".brep" -> "BREP"
     std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFileName);
     if (anExtension == "BREP" || anExtension == "BRP") {
@@ -192,9 +208,9 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 
   if (aFormatName == "XAO") {
-    exportXAO(theFileName);
+    exportXAO(theFileName, isMemoryExport);
     return;
-  }else if (aFormatName == "STL") {
+  } else if (aFormatName == "STL") {
     exportSTL(theFileName);
     return;
   }
@@ -248,7 +264,8 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
 
 /// Returns XAO string by the value from the table
 static std::string valToString(const ModelAPI_AttributeTables::Value& theVal,
-  const ModelAPI_AttributeTables::ValueType& theType) {
+                               const ModelAPI_AttributeTables::ValueType& theType)
+{
   std::ostringstream aStr; // the resulting string value
   switch(theType) {
   case ModelAPI_AttributeTables::BOOLEAN:
@@ -309,7 +326,8 @@ void ExchangePlugin_ExportFeature::exportSTL(const std::string& theFileName)
 }
 
 
-void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
+void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
+                                             const bool         isMemoryExport)
 {
   try {
 
@@ -396,6 +414,12 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     // get the name from the first result
     ResultPtr aResultBody = *aResults.begin();
     aGeometryName = Locale::Convert::toString(aResultBody->data()->name());
+    if (isMemoryExport) {
+      // for python dump
+      string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->setValue(aGeometryName);
+      // or
+      //data()->setName(Locale::Convert::toWString(aGeometryName));
+    }
   }
 
   aXao.getGeometry()->setName(aGeometryName);
@@ -563,7 +587,12 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   }
 
   // exporting
-  XAOExport(theFileName, &aXao, anError);
+  if (isMemoryExport) {
+    string(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID())->setValue(XAOExportMem(&aXao, anError));
+  }
+  else {
+    XAOExport(theFileName, &aXao, anError);
+  }
 
   if (!anError.empty()) {
     setError("An error occurred while exporting " + theFileName + ": " + anError);

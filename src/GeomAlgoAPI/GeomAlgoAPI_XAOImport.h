@@ -36,4 +36,10 @@ std::shared_ptr<GeomAPI_Shape> XAOImport(const std::string& theFileName,
                                           std::string& theError,
                                           XAO::Xao* theXao);
 
+/// Implementation of the import XAO data from memory buffer
+GEOMALGOAPI_EXPORT
+std::shared_ptr<GeomAPI_Shape> XAOImportMem(const std::string& theMemoryBuff,
+                                            std::string& theError,
+                                            XAO::Xao* theXao);
+
 #endif /* GEOMALGOAPI_XAOIMPORT_H_ */

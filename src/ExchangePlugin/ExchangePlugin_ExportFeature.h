@@ -150,6 +150,13 @@ public:
     static const std::string MY_XAO_GEOMETRY_NAME_ID("xao_geometry_name");
     return MY_XAO_GEOMETRY_NAME_ID;
   }
+  /// attribute string memory buffer
+  inline static const std::string& MEMORY_BUFFER_ID()
+  {
+    static const std::string MY_MEMORY_BUFFER_ID("memory_buffer");
+    return MY_MEMORY_BUFFER_ID;
+  }
+
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ExportFeature();
   /// Default destructor
@@ -185,10 +192,12 @@ public:
 protected:
   /// Performs export of the file
   EXCHANGEPLUGIN_EXPORT void exportFile(const std::string& theFileName,
-                                        const std::string& theFormat);
+                                        const std::string& theFormat,
+                                        const bool         isMemoryExport);
 
   /// Performs export to XAO file
-  EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName);
+  EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName,
+                                       const bool         isMemoryExport);
 
   /// Performs export to STL file
   EXCHANGEPLUGIN_EXPORT void exportSTL(const std::string& theFileName);

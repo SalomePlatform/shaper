@@ -81,3 +81,40 @@ bool XAOExport(const std::string& theFileName,
   }
   return true;
 }
+
+//=============================================================================
+/*!
+ *
+ */
+//=============================================================================
+const std::string XAOExportMem(XAO::Xao* theXao,
+                               std::string& theError)
+{
+  std::string aRetBuff ("");
+
+#ifdef _DEBUG
+  std::cout << "Export XAO into memory buffer " << std::endl;
+#endif
+
+  if (!theXao) {
+    theError = "An invalid argument.";
+    return aRetBuff;
+  }
+
+  try {
+    XAO::BrepGeometry* aGeometry = dynamic_cast<XAO::BrepGeometry*>(theXao->getGeometry());
+    TopoDS_Shape aShape = aGeometry->getTopoDS_Shape();
+    bool aWasFree = aShape.Free(); // make top level topology free, same as imported
+    if (!aWasFree)
+      aShape.Free(Standard_True);
+
+    aRetBuff = XAO::XaoExporter::saveToXml(theXao);
+
+    if (!aWasFree)
+      aShape.Free(Standard_False);
+  } catch (XAO::XAO_Exception& e) {
+    theError = e.what();
+    return aRetBuff;
+  }
+  return aRetBuff;
+}

@@ -21,6 +21,8 @@
 //--------------------------------------------------------------------------------------
 #include <ExchangePlugin_ImportPart.h>
 //--------------------------------------------------------------------------------------
+#include <Locale_Convert.h>
+//--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
@@ -52,6 +54,19 @@ ExchangeAPI_Import::ExchangeAPI_Import(
 {
   if (initialize())
     setFilePath(theFilePath);
+}
+
+ExchangeAPI_Import::ExchangeAPI_Import(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    const std::string & /*theFilePath*/,
+    const std::string & theBuffer)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize()) {
+    fillAttribute("XAOMem", myimportType);
+    fillAttribute(theBuffer, mymemoryBuffer);
+    execute();
+  }
 }
 
 ExchangeAPI_Import::ExchangeAPI_Import(
@@ -106,35 +121,48 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
   std::string aPartName = theDumper.name(aBase->document());
 
   AttributeStringPtr aImportTypeAttr =
-                    aBase->string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
+    aBase->string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
   std::string aFormat = aImportTypeAttr->value();
-  std::string aFilePath;
-  if (aFormat == "STEP" || aFormat == "STP")
-  {
-    aFilePath = aBase->string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID())->value();
-  } else {
-    aFilePath = aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID())->value();
-  }
 
-  std::string aFrom = "\\";
-  std::string aTo = "\\\\";
-  for(std::size_t aPos = aFilePath.find(aFrom);
-      aPos != std::string::npos;
-      aPos = aFilePath.find(aFrom, aPos)) {
-    aFilePath.replace(aPos, aFrom.size(), aTo);
-    aPos += aTo.size();
+  if (aFormat == "XAOMem") {
+    theDumper << aBase << " = model.addImportXAOMem(" << aPartName << ", aXAOBuff";
+    std::string aGeometryNamePy = Locale::Convert::toString(aBase->data()->name());
+    if (! aGeometryNamePy.empty()) {
+      // add shape name
+      std::replace(aGeometryNamePy.begin(), aGeometryNamePy.end(), ' ', '_');
+      theDumper << "_" << aGeometryNamePy;
+    }
+    theDumper << ")" << std::endl;
   }
-  std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(aFilePath);
-  if (anExtension == "STP" || anExtension == "STEP"){
+  else {
+    std::string aFilePath;
+    if (aFormat == "STEP" || aFormat == "STP") {
+      aFilePath = aBase->string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID())->value();
+    } else {
+      aFilePath = aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID())->value();
+    }
+
+    std::string aFrom = "\\";
+    std::string aTo = "\\\\";
+    for (std::size_t aPos = aFilePath.find(aFrom);
+         aPos != std::string::npos;
+         aPos = aFilePath.find(aFrom, aPos)) {
+      aFilePath.replace(aPos, aFrom.size(), aTo);
+      aPos += aTo.size();
+    }
+    std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(aFilePath);
+    if (anExtension == "STP" || anExtension == "STEP") {
       theDumper << aBase << " = model.addImportSTEP(" << aPartName << ", \""
                 << aFilePath << "\"" ;
 
       theDumper << ", " << scalInterUnits()->value()
                 << ", " << materials()->value()
                 << ", " << colors()->value() << ")"<< std::endl;
-  } else {
+    }
+    else {
       theDumper << aBase << " = model.addImport(" << aPartName << ", \""
-            << aFilePath << "\")" << std::endl;
+                << aFilePath << "\")" << std::endl;
+    }
   }
 
   // to make import have results
@@ -159,6 +187,14 @@ ImportPtr addImport(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
   return ImportPtr(new ExchangeAPI_Import(aFeature, theFilePath));
+}
+
+ImportPtr addImportXAOMem(const std::shared_ptr<ModelAPI_Document> & thePart,
+                          PyObject* theBuffer)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
+  std::string aString (PyBytes_AsString(theBuffer));
+  return ImportPtr(new ExchangeAPI_Import(aFeature, "", aString));
 }
 
 ImportPtr addImportSTEP(

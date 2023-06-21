@@ -94,6 +94,7 @@ void ExchangePlugin_ImportFeature::initAttributes()
   data()->addAttribute(STEP_MATERIALS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_COLORS_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(STEP_SCALE_INTER_UNITS_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(MEMORY_BUFFER_ID(), ModelAPI_AttributeString::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::STEP_COLORS_ID());
@@ -105,7 +106,22 @@ void ExchangePlugin_ImportFeature::initAttributes()
       getKind(), ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::FILE_PATH_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::MEMORY_BUFFER_ID());
 }
+
+bool ExchangePlugin_ImportFeature::isEditable()
+{
+  AttributeStringPtr aImportTypeAttr = string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
+  std::string aFormat = aImportTypeAttr->value();
+
+  if (aFormat == "XAOMem")
+    // If the shape is imported from memory buffer, do not allow to edit the feature
+    return false;
+
+  return true;
+}
+
 /*
  * Computes or recomputes the results
  */
@@ -113,20 +129,34 @@ void ExchangePlugin_ImportFeature::execute()
 {
   AttributeStringPtr aImportTypeAttr = string(ExchangePlugin_ImportFeature::IMPORT_TYPE_ID());
   std::string aFormat = aImportTypeAttr->value();
-  AttributeStringPtr aFilePathAttr;
-  if (aFormat == "STEP" || aFormat == "STP")
-  {
-    aFilePathAttr = string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID());
-  } else {
-    aFilePathAttr = string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
-  }
-  std::string aFilePath = aFilePathAttr->value();
-  if (aFilePath.empty()) {
-    setError("File path is empty.");
-    return;
-  }
 
-  importFile(aFilePath);
+  if (aFormat == "XAOMem") {
+    // Import from memory buffer
+    AttributeStringPtr aMemoryBuffAttr =
+      string(ExchangePlugin_ImportFeature::MEMORY_BUFFER_ID());
+    std::string aMemoryBuff = aMemoryBuffAttr->value();
+    if (aMemoryBuff.empty()) {
+      setError("Memory buffer is empty.");
+      return;
+    }
+    importXAO("", aMemoryBuff, true);
+  }
+  else {
+    // Import from file
+    AttributeStringPtr aFilePathAttr;
+    if (aFormat == "STEP" || aFormat == "STP") {
+        aFilePathAttr = string(ExchangePlugin_ImportFeature::STEP_FILE_PATH_ID());
+    }
+    else {
+      aFilePathAttr = string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
+    }
+    std::string aFilePath = aFilePathAttr->value();
+    if (aFilePath.empty()) {
+      setError("File path is empty.");
+      return;
+    }
+    importFile(aFilePath);
+  }
 }
 
 void ExchangePlugin_Import_ImageFeature::execute()
@@ -357,16 +387,26 @@ void ExchangePlugin_ImportFeature::setMaterielGroup(
   }
 }
 
-void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
+void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName,
+                                             const std::string& theMemoryBuff,
+                                             const bool         isMemoryImport)
 {
+  std::string aDataSource = theFileName;
+
   try {
   std::string anError;
 
   XAO::Xao aXao;
-  std::shared_ptr<GeomAPI_Shape> aGeomShape = XAOImport(theFileName, anError, &aXao);
+  std::shared_ptr<GeomAPI_Shape> aGeomShape;
+  if (isMemoryImport) {
+    aGeomShape = XAOImportMem(theMemoryBuff, anError, &aXao);
+    aDataSource = "memory buffer";
+  }
+  else
+    aGeomShape = XAOImport(theFileName, anError, &aXao);
 
   if (!anError.empty()) {
-    setError("An error occurred while importing " + theFileName + ": " + anError);
+    setError("An error occurred while importing " + aDataSource + ": " + anError);
     return;
   }
 
@@ -374,8 +414,12 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
   // use the geometry name or the file name for the feature
   std::string aBodyName = aXaoGeometry->getName();
-  if (aBodyName.empty())
-    aBodyName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
+  if (aBodyName.empty()) {
+    if (isMemoryImport)
+      aBodyName = "ImportXAOMem";
+    else
+      aBodyName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
+  }
   data()->setName(Locale::Convert::toWString(aBodyName));
 
   ResultBodyPtr aResultBody = createResultBody(aGeomShape);
@@ -549,7 +593,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 // LCOV_EXCL_START
   } catch (XAO::XAO_Exception& e) {
     std::string anError = e.what();
-    setError("An error occurred while importing " + theFileName + ": " + anError);
+    setError("An error occurred while importing " + aDataSource + ": " + anError);
     return;
   }
 // LCOV_EXCL_STOP

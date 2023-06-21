@@ -133,6 +133,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool a
         //it's pages recursively and setup into the widget.
         if (myWidgetApi->toChildWidget()) {
           do {
+            if (myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) continue;
             QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
             QString aTooltip = qs(myWidgetApi->getProperty(FEATURE_TOOLTIP));
             QString aCaseId = qs(myWidgetApi->getProperty(_ID));

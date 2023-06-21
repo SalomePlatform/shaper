@@ -31,6 +31,16 @@
                    placeholder="Please input the geometry name">
       </stringvalue>
     </case>
+    <case id="XAOMem" title="XAOMem" internal="1">
+      <stringvalue id="xao_author"
+                   label="Author"
+                   placeholder="Please input the author">
+      </stringvalue>
+      <stringvalue id="xao_geometry_name"
+                   label="Geometry name"
+                   placeholder="Please input the geometry name">
+      </stringvalue>
+    </case>
     <case id="STL" title="STL">
       <export_file_selector id="stl_file_path"
                             type="save"
