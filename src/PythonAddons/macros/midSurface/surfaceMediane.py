@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.25"
+__revision__ = "V11.26"
 
 #========================= Les imports - Début ===================================
 
@@ -1844,13 +1844,11 @@ Sorties :
     exec_nom (axe,nom_axe)
 
 # 4. Création du cône en volume, de rayon médian
-#    Il faut un gros coefficient pour être certain de tout prendre
-    coeff = 30.
-# 4.1. Calculs des rayons haut et bas et de la valeur de la translation
-    rayon_b, rayon_s, d_trans = self._cree_face_mediane_cone_2 ( rayon_1, rayon_2, hauteur, coeff )
+# 4.1. Calculs des rayons haut et bas, de sa hauteur et de la valeur de la translation
+    rayon_b, rayon_s, hauteur_c, d_trans = self._cree_face_mediane_cone_2 ( rayon_1, rayon_2, hauteur )
 
 # 4.2. Création du grand cône
-    Cone_1 = model.addCone(self.part_doc, model.selection("VERTEX", nom_centre_1), model.selection("EDGE", nom_axe), rayon_b, rayon_s, coeff*hauteur)
+    Cone_1 = model.addCone(self.part_doc, model.selection("VERTEX", nom_centre_1), model.selection("EDGE", nom_axe), rayon_b, rayon_s, hauteur_c)
     nom_1 = "{}_Cone_1".format(self.nom_solide)
     exec_nom (Cone_1,nom_1)
 
@@ -1872,20 +1870,23 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_cone_2 ( self, rayon_1, rayon_2, hauteur, coeff=10. ):
+  def _cree_face_mediane_cone_2 ( self, rayon_1, rayon_2, hauteur ):
     """Crée la face médiane entre deux autres - cas des cônes
 
 Calcul des caractéristiques du cône enveloppant. Merci Thalès !
-Remarque : on ne peut pas avoir des cônes pointus
+Le coefficient multiplicateur est choisi pour être certain de tout prendre. On calcule la
+plus petite valeur et on ajoute arbitrairement 5.
+
+Remarque : on ne peut pas avoir un cône pointu car il est situé entre deux cônes donc il y a une épaisseur.
 
 Entrées :
   :rayon_1, rayon_2: rayons moyens du côté de la base et à l'opposé
   :hauteur: hauteur du cône
-  :coeff: coefficient multiplicateur. Il faut un gros coefficient pour être certain de tout prendre.
 
 Sorties :
   :rayon_b: rayon du cône - partie basse
   :rayon_s: rayon du cône - partie supérieure
+  :hauteur_c: hauteur du cône
   :d_trans: distance de translation selon l'axe
 """
     nom_fonction = __name__ + "/_cree_face_mediane_cone_2"
@@ -1896,26 +1897,40 @@ Sorties :
       texte = blabla
       texte += "rayon_1 : {}\n".format(rayon_1)
       texte += "rayon_2 : {}\n".format(rayon_2)
-      texte += "Hauteur : {}\n".format(hauteur)
-      texte += "coeff   : {}".format(coeff)
+      texte += "Hauteur : {}".format(hauteur)
       print (texte)
+
+    bonus = 5.
 
 # 1. Cas étroit en bas
     if ( rayon_1 < rayon_2 ):
+#     Distance entre la pointe et la base
+      coeff_a = rayon_1/(rayon_2-rayon_1)
+      d_pointe_base = hauteur*coeff_a
+      coeff = coeff_a + 1. + bonus
       if self._verbose_max:
         print ("Cas étroit en bas")
+        print ("Distance de la pointe à la base : {}*{} = {}".format(coeff_a,hauteur,d_pointe_base))
       rayon_b = 0.
       rayon_s = coeff*(rayon_2-rayon_1)
-      d_trans = -hauteur*rayon_1/(rayon_2-rayon_1)
+      d_trans = -d_pointe_base
 
 # 2. Cas étroit en haut
-#    Manifestement cela n'arrive jamais une fois passé par du step
+#    Manifestement cela n'arrive jamais une fois passé par du step et réimporté dans SHAPER
     else:
+#     Distance entre la pointe et le haut
+      coeff_a = rayon_1/(rayon_1-rayon_2)
+      d_pointe_haut = hauteur*coeff_a
+      coeff = coeff_a + 1. + bonus
       if self._verbose_max:
         print ("Cas étroit en haut")
+        print ("Distance de la pointe et le haut : {}*{} = {}".format(coeff_a,hauteur,d_pointe_haut))
       rayon_b = coeff*(rayon_1-rayon_2)
       rayon_s = 0.
-      d_trans = (rayon_1/(rayon_1-rayon_2) - coeff)*hauteur
+      d_trans = -bonus*hauteur
+
+# 3. La hauteur
+    hauteur_c = coeff*hauteur
 
     if self._verbose_max:
       texte = "rayon_b : {}\n".format(rayon_b)
@@ -1923,7 +1938,7 @@ Sorties :
       texte += "Translation : {}".format(d_trans)
       print (texte)
 
-    return rayon_b, rayon_s, d_trans
+    return rayon_b, rayon_s, hauteur_c, d_trans
 
 #===========================  Fin de la méthode ==================================
 
