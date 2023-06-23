@@ -33,7 +33,7 @@ from SketchAPI import SketchAPI_Sketch
 from salome.shaper import model
 import math
 
-__updated__ = "2017-03-22"
+__updated__ = "2023-06-28"
 
 
 #=========================================================================
@@ -82,6 +82,13 @@ def verifyTangentCircleLine(theCircle, theLine):
     aDistCL = model.distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
 
+#=========================================================================
+# Set old version of Circle for avoid create point.
+#=========================================================================
+def setOldVersionOfCircleFeature(theCircle):
+    aCircleVersion = theCircle.integer("version")
+    assert (type(aCircleVersion) == ModelAPI_AttributeInteger)
+    aCircleVersion.setValue(0)
 
 #=========================================================================
 # Start of test
@@ -121,6 +128,7 @@ assert (not aCirclePnt3.isInitialized())
 aCircleType = aCircle.string("circle_type")
 assert (not aCircleType.isInitialized())
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1.setValue(expectedCenter[0] - expectedRadius, expectedCenter[1])
 aCirclePnt2.setValue(expectedCenter[0] + expectedRadius, expectedCenter[1])
 aCirclePnt3.setValue(expectedCenter[0], expectedCenter[1] + expectedRadius)
@@ -162,6 +170,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1Ref.setAttr(aPrevCenter)
 aCirclePnt1.setValue(aPrevCenter.pnt())
 aCirclePnt2Ref.setObject(aPoint.lastResult())
@@ -209,6 +218,7 @@ aCirclePnt1Ref = aCircle.refattr("first_point_ref")
 aCirclePnt2Ref = aCircle.refattr("second_point_ref")
 aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
+setOldVersionOfCircleFeature(aCircle)
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
 aCirclePnt1Ref.setObject(aPrevCircle.lastResult())
@@ -248,6 +258,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1Ref.setAttr(aStartPnt)
 aCirclePnt1.setValue(aStartPnt.pnt())
 aCirclePnt2Ref.setAttr(aEndPnt)
@@ -279,6 +290,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1.setValue(aLineStart[0] + aDistanceFromLine, aLineStart[1])
 aCirclePnt2.setValue(aLineStart[0] - aDistanceFromLine, aLineStart[1])
 aCirclePnt3Ref.setObject(aLine.lastResult())
@@ -324,6 +336,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1.setValue(0, 0)
 aCirclePnt2Ref.setObject(SketchLine_1.feature().lastResult())
 aCirclePnt2.setValue(SketchLine_1.startPoint().x(), SketchLine_1.startPoint().y())
@@ -353,6 +366,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1.setValue(0, 0)
 aCirclePnt2Ref.setObject(SketchCircle_3.feature().lastResult())
 aCirclePnt2.setValue(40, 0)
@@ -382,6 +396,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1.setValue(0, 0)
 aCirclePnt2Ref.setObject(SketchLine_3.feature().lastResult())
 aCirclePnt2.setValue(30, 0)
@@ -411,6 +426,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1Ref.setObject(SketchLine_1.feature().lastResult())
 aCirclePnt1.setValue(20, 0)
 aCirclePnt2Ref.setObject(SketchLine_2.feature().lastResult())
@@ -442,6 +458,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1Ref.setObject(SketchLine_1.feature().lastResult())
 aCirclePnt1.setValue(20, 0)
 aCirclePnt2Ref.setObject(SketchLine_2.feature().lastResult())
@@ -473,6 +490,7 @@ aCirclePnt3Ref = aCircle.refattr("third_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_three_points")
+setOldVersionOfCircleFeature(aCircle)
 aCirclePnt1Ref.setObject(SketchCircle_1.feature().lastResult())
 aCirclePnt1.setValue(10, 0)
 aCirclePnt2Ref.setObject(SketchCircle_2.feature().lastResult())
@@ -488,6 +506,44 @@ verifyTangentCircles(aCircle, SketchCircle_2.feature())
 verifyTangentCircles(aCircle, SketchCircle_3.feature())
 model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
 model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 15)
+
+#=========================================================================
+# Test 12. Create a circle with point on circle line (addCircleWithPoint)
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+aCircleAngle = aCircle.real("circle_angle")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1Ref.setObject(SketchCircle_1.feature().lastResult())
+aCirclePnt1.setValue(20, 0)
+aCirclePnt2Ref.setObject(SketchCircle_2.feature().lastResult())
+aCirclePnt2.setValue(40, 20)
+aCirclePnt3Ref.setObject(SketchCircle_3.feature().lastResult())
+aCirclePnt3.setValue(50, 0)
+aCircleAngle.setValue(180.)
+anExpectedRot = [60.853417638885404, 4.3837725517883515]
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 33)
+# verify newly created circle
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
+aRotPoint = geomDataAPI_Point2D(aCircle.attribute("circle_rotate"))
+model.assertPoint(aCenter, [35.2879593663427, 5.1151837465370855])
+model.assertPoint(aCirclePnt1, [20, 0])
+model.assertPoint(aCirclePnt2, [40, 20])
+model.assertPoint(aCirclePnt3, [50., 0.])
+model.assertPoint(aRotPoint, anExpectedRot)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 3)
 
 #=========================================================================
 # End of test

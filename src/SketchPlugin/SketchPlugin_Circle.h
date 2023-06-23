@@ -45,10 +45,31 @@ class SketchPlugin_Circle: public SketchPlugin_SketchEntity
     return ID;
   }
 
+  /// 2D point - rotate of the circle
+  inline static const std::string& ROTATE_ID()
+  {
+    static const std::string ID("circle_rotate");
+    return ID;
+  }
+
+  /// Contain created point as feature
+  inline static const std::string& ROTATE_REF_ID()
+  {
+    static const std::string ID("circle_rotate_point");
+    return ID;
+  }
+
   /// Radius of the circle
   inline static const std::string& RADIUS_ID()
   {
     static const std::string ID("circle_radius");
+    return ID;
+  }
+
+  /// Angle of rotation sewing point of the circle
+  inline static const std::string& ANGLE_ID()
+  {
+    static const std::string ID("circle_angle");
     return ID;
   }
 
@@ -57,6 +78,16 @@ class SketchPlugin_Circle: public SketchPlugin_SketchEntity
   {
     static std::string MY_KIND = SketchPlugin_Circle::ID();
     return MY_KIND;
+  }
+
+  static const int THE_VERSION_0 = 0;
+  static const int THE_VERSION_1 = 20232206;
+
+  /// Attribute name of the version of Circle feature
+  inline static const std::string& VERSION_ID()
+  {
+    static const std::string MY_VERSION_ID("version");
+    return MY_VERSION_ID;
   }
 
   /// Returns true is sketch element is under the rigid constraint

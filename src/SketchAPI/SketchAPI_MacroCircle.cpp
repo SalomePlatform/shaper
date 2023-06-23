@@ -26,6 +26,9 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <SketchAPI_Point.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
+
 //==================================================================================================
 SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : SketchAPI_SketchEntity(theFeature)
@@ -38,22 +41,24 @@ SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feat
                                              double theCenterX,
                                              double theCenterY,
                                              double thePassedX,
-                                             double thePassedY)
+                                             double thePassedY,
+                                             double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterAndPassedPoints(theCenterX, theCenterY, thePassedX, thePassedY);
+    setByCenterAndPassedPoints(theCenterX, theCenterY, thePassedX, thePassedY, theAngle);
   }
 }
 
 //==================================================================================================
 SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
-                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint)
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+                                             double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterAndPassedPoints(theCenterPoint, thePassedPoint);
+    setByCenterAndPassedPoints(theCenterPoint, thePassedPoint, theAngle);
   }
 }
 
@@ -61,11 +66,12 @@ SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feat
 SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              double theX1, double theY1,
                                              double theX2, double theY2,
-                                             double theX3, double theY3)
+                                             double theX3, double theY3,
+                                             double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByThreePoints(theX1, theY1, theX2, theY2, theX3, theY3);
+    setByThreePoints(theX1, theY1, theX2, theY2, theX3, theY3, theAngle);
   }
 }
 
@@ -73,11 +79,12 @@ SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feat
 SketchAPI_MacroCircle::SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
+                                             double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByThreePoints(thePoint1, thePoint2, thePoint3);
+    setByThreePoints(thePoint1, thePoint2, thePoint3, theAngle);
   }
 }
 
@@ -90,11 +97,18 @@ SketchAPI_MacroCircle::~SketchAPI_MacroCircle()
 void SketchAPI_MacroCircle::setByCenterAndPassedPoints(double theCenterX,
                                                        double theCenterY,
                                                        double thePassedX,
-                                                       double thePassedY)
+                                                       double thePassedY,
+                                                       double theAngle)
 {
   fillAttribute(SketchPlugin_MacroCircle::CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS(), mycircleType);
   fillAttribute(centerPoint(), theCenterX, theCenterY);
   fillAttribute(passedPoint(), thePassedX, thePassedY);
+
+  bool isNeedPoint =
+    feature()->integer(SketchPlugin_MacroCircle::VERSION_ID())->value() > 0;
+
+  if (isNeedPoint)
+    fillAttribute(theAngle, angle());
 
   execute();
 }
@@ -102,11 +116,18 @@ void SketchAPI_MacroCircle::setByCenterAndPassedPoints(double theCenterX,
 //==================================================================================================
 void SketchAPI_MacroCircle::setByCenterAndPassedPoints(
     const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
-    const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint)
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+    double theAngle)
 {
   fillAttribute(SketchPlugin_MacroCircle::CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS(), mycircleType);
   fillAttribute(theCenterPoint, mycenterPoint);
   fillAttribute(thePassedPoint, mypassedPoint);
+
+  bool isNeedPoint =
+    feature()->integer(SketchPlugin_MacroCircle::VERSION_ID())->value() > 0;
+
+  if (isNeedPoint)
+    fillAttribute(theAngle, angle());
 
   execute();
 }
@@ -114,12 +135,19 @@ void SketchAPI_MacroCircle::setByCenterAndPassedPoints(
 //==================================================================================================
 void SketchAPI_MacroCircle::setByThreePoints(double theX1, double theY1,
                                              double theX2, double theY2,
-                                             double theX3, double theY3)
+                                             double theX3, double theY3,
+                                             double theAngle)
 {
   fillAttribute(SketchPlugin_MacroCircle::CIRCLE_TYPE_BY_THREE_POINTS(), mycircleType);
   fillAttribute(firstPoint(), theX1, theY1);
   fillAttribute(secondPoint(), theX2, theY2);
   fillAttribute(thirdPoint(), theX3, theY3);
+
+  bool isNeedPoint =
+    feature()->integer(SketchPlugin_MacroCircle::VERSION_ID())->value() > 0;
+
+  if (isNeedPoint)
+    fillAttribute(theAngle, angle());
 
   execute();
 }
@@ -127,12 +155,37 @@ void SketchAPI_MacroCircle::setByThreePoints(double theX1, double theY1,
 //==================================================================================================
 void SketchAPI_MacroCircle::setByThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
+                                             double theAngle)
 {
   fillAttribute(SketchPlugin_MacroCircle::CIRCLE_TYPE_BY_THREE_POINTS(), mycircleType);
   fillAttribute(thePoint1, myfirstPoint);
   fillAttribute(thePoint2, mysecondPoint);
   fillAttribute(thePoint3, mythirdPoint);
 
+  bool isNeedPoint =
+    feature()->integer(SketchPlugin_MacroCircle::VERSION_ID())->value() > 0;
+
+  if (isNeedPoint)
+    fillAttribute(theAngle, angle());
+
   execute();
+}
+
+// return created point
+std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_MacroCircle::createdPoint() const
+{
+  std::shared_ptr<SketchAPI_SketchEntity> anEnt;
+
+  AttributeRefAttrPtr anRef = feature()->refattr(SketchPlugin_MacroCircle::ROTATE_POINT_REF_ID());
+  if (!anRef->isInitialized())
+    return anEnt;
+
+  ObjectPtr aPointObj = anRef->object();
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aPointObj);
+  if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
+  {
+    anEnt = std::shared_ptr < SketchAPI_SketchEntity>(new SketchAPI_Point(aFeature));
+  }
+  return anEnt;
 }

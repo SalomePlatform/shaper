@@ -162,12 +162,16 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
     std::shared_ptr<GeomAPI_Pnt> theCenter, std::shared_ptr<GeomAPI_Dir> theNormal,
-    double theRadius)
+    double theRadius, double theRotationAngle)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
 
+  gp_Ax1 anAx(aCenter, aDir);
+
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), theRadius);
+  if (Abs(theRotationAngle) > 1.e-7) // Tolerance
+    aCircle.Rotate(anAx, theRotationAngle);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aCircle);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
