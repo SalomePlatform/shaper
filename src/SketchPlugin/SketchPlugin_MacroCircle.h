@@ -150,6 +150,20 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Is to create construction point or not.
+  inline static const std::string& ADD_CONSTRUCTION_POINT_ID()
+  {
+    static const std::string ID("add_construction_point");
+    return ID;
+  }
+
+  /// Rotate angle of the circle
+  inline static const std::string& CIRCLE_ROTATE_ANGLE_ID()
+  {
+    static const std::string ID("circle_angle");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -190,6 +204,8 @@ private:
 
   void constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature);
   void constraintsForCircleByThreePoints(FeaturePtr theCircleFeature);
+
+  void computeNewAngle(std::shared_ptr<GeomAPI_Circ2d>& theCircle);
 
   FeaturePtr createCircleFeature();
 

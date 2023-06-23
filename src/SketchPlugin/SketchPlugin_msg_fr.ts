@@ -351,6 +351,17 @@
       <translation>L'attribut "%1" est verrouillé par la valeur de modification dans la vue.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroCircle:add_construction_point</name>
+    <message>
+      <source>Add construction point</source>
+      <translation>Ajouter un point de construction</translation>
+    </message>
+    <message>
+      <source>Create visible construction point</source>
+      <translation>Créer un point de construction visible</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchCircle</name>
@@ -392,6 +403,8 @@
       <translation>Rayon</translation>
     </message>
   </context>
+
+
 
   <context>
     <name>SketchConstraintHorizontal:Model_FeatureValidator</name>

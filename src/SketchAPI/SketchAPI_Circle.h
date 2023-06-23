@@ -42,13 +42,17 @@ public:
   SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                    double theCenterX,
                    double theCenterY,
-                   double theRadius);
+                   double theRadius,
+                   bool theIsAddPoint = false,
+                   double theAngle = 0.0);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                   double theRadius);
+                   double theRadius,
+                   bool theIsAddPoint = false,
+                   double theAngle = 0.0);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
@@ -64,21 +68,31 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Circle();
 
-  INTERFACE_3(SketchPlugin_Circle::ID(),
+  INTERFACE_5(SketchPlugin_Circle::ID(),
               center, SketchPlugin_Circle::CENTER_ID(),
               GeomDataAPI_Point2D, /** Center point */,
               radius, SketchPlugin_Circle::RADIUS_ID(),
               ModelAPI_AttributeDouble, /** Radius */,
               external, SketchPlugin_Circle::EXTERNAL_ID(),
-              ModelAPI_AttributeSelection, /** External */)
+              ModelAPI_AttributeSelection, /** External */,
+              angle, SketchPlugin_Circle::ANGLE_ID(),
+              ModelAPI_AttributeDouble, /** Angle */,
+              addpoint, SketchPlugin_Circle::ADD_CONSTRUCTION_POINT_ID(),
+              ModelAPI_AttributeBoolean, /** Is to add point */)
 
   /// Set by center and radius.
   SKETCHAPI_EXPORT
-  void setByCenterAndRadius(double theCenterX, double theCenterY, double theRadius);
+  void setByCenterAndRadius(double theCenterX, double theCenterY,
+                            double theRadius, 
+                            bool theIsAddPoint = false,
+                            double theAngle = 0.0);
 
   /// Set by center and radius.
   SKETCHAPI_EXPORT
-  void setByCenterAndRadius(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter, double theRadius);
+  void setByCenterAndRadius(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                            double theRadius, 
+                            bool theIsAddPoint = false,
+                            double theAngle = 0.0);
 
   /// Set by external.
   SKETCHAPI_EXPORT
@@ -100,9 +114,24 @@ public:
   SKETCHAPI_EXPORT
   void setRadius(double theRadius);
 
+  /// Set angle.
+  SKETCHAPI_EXPORT
+  void setAngle(double theAngle);
+
+  /// Set is to add point.
+  SKETCHAPI_EXPORT
+  void setIsToAddPoint(bool theIsToAddPoint);
+
+  /// Returns created points on circle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_SketchEntity> createdPoint() const;
+
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+private:
+  void createPoint();
 };
 
 /// Pointer on Circle object.

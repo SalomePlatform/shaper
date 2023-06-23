@@ -23,10 +23,15 @@
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Tools.h"
 #include "SketchPlugin_MacroArcReentrantMessage.h"
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 
+#include <Locale_Convert.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
@@ -35,8 +40,10 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_Ax1.h>
 
 #include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
@@ -86,15 +93,32 @@ void SketchPlugin_MacroCircle::initAttributes()
 
   data()->addAttribute(CIRCLE_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(CIRCLE_ROTATE_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+  
+  AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>
+     (data()->addAttribute(CIRCLE_ROTATE_ANGLE_ID(), ModelAPI_AttributeDouble::typeId()));
+  if(!anAngleAttr->isInitialized())
+  {
+    anAngleAttr->setValue(0.0);
+  }
+  // Attrs for rotation point
+  AttributeBooleanPtr isAddConstrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+     (data()->addAttribute(ADD_CONSTRUCTION_POINT_ID(), ModelAPI_AttributeBoolean::typeId()));
+  if (!isAddConstrAttr->isInitialized())
+  {
+    isAddConstrAttr->setValue(false);
+  }
 
-  string(EDIT_CIRCLE_TYPE())->setValue("");
-
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ADD_CONSTRUCTION_POINT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CIRCLE_ROTATE_ANGLE_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIRST_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), THIRD_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_CIRCLE_TYPE());
+
+  string(EDIT_CIRCLE_TYPE())->setValue("");
 }
 
 void SketchPlugin_MacroCircle::execute()
@@ -213,10 +237,16 @@ FeaturePtr SketchPlugin_MacroCircle::createCircleFeature()
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(myCenter->x(),
                                                                              myCenter->y());
+
+  aCircleFeature->real(SketchPlugin_Circle::ANGLE_ID())->setValue(real(CIRCLE_ROTATE_ANGLE_ID())->value());
   aCircleFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(myRadius);
+  aCircleFeature->boolean(SketchPlugin_Circle::ADD_CONSTRUCTION_POINT_ID())
+                ->setValue(boolean(ADD_CONSTRUCTION_POINT_ID())->value());
   aCircleFeature->boolean(SketchPlugin_Circle::AUXILIARY_ID())
                 ->setValue(boolean(AUXILIARY_ID())->value());
+
   aCircleFeature->execute();
+
   return aCircleFeature;
 }
 
@@ -362,25 +392,36 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
 AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
 {
   SketchPlugin_Sketch* aSketch = sketch();
-  if(!aSketch || !myCenter || myRadius == 0) {
+  if (!aSketch || !myCenter || myRadius == 0) {
     return AISObjectPtr();
   }
 
   // Compute a circle in 3D view.
   std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
   std::shared_ptr<GeomDataAPI_Dir> aNDir =
-      std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+    std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  GeomShapePtr aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, myRadius);
+  GeomShapePtr aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, myRadius, 0);
+
   GeomShapePtr aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
-  if(!aCircleShape.get() || !aCenterPointShape.get()) {
+
+  if (!aCircleShape.get() || !aCenterPointShape.get()) {
     return AISObjectPtr();
   }
 
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
   aShapes.push_back(aCircleShape);
   aShapes.push_back(aCenterPointShape);
+  
+  //add visible construction point
+  if(boolean(ADD_CONSTRUCTION_POINT_ID())->value())
+  {
+    std::shared_ptr<GeomAPI_Pnt> aConstrPoint;
+    aConstrPoint = std::shared_ptr<GeomAPI_Pnt>(aSketch->to3D(myCenter->x() + myRadius, myCenter->y()));
+    GeomShapePtr aNewPnt = GeomAlgoAPI_PointBuilder::vertex(aConstrPoint);
+    aShapes.push_back(aNewPnt);
+  }
 
   std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
   AISObjectPtr anAIS = thePrevious;
@@ -398,6 +439,7 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
 void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
   // If circle type switched reset all attributes.
   if(theID == CIRCLE_TYPE()) {
+    SketchPlugin_Tools::resetAttribute(this, ADD_CONSTRUCTION_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_REF_ID());
     SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_ID());
@@ -410,10 +452,13 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
     SketchPlugin_Tools::resetAttribute(this, THIRD_POINT_REF_ID());
   } else if(theID == CENTER_POINT_ID() || theID == PASSED_POINT_ID() ||
             theID == CENTER_POINT_REF_ID() || theID == PASSED_POINT_REF_ID())
+  {
     fillByCenterAndPassed();
+  }
   else if(theID == FIRST_POINT_ID() || theID == FIRST_POINT_REF_ID() ||
           theID == SECOND_POINT_ID() || theID == SECOND_POINT_REF_ID() ||
-          theID == THIRD_POINT_ID() || theID == THIRD_POINT_REF_ID()) {
+          theID == THIRD_POINT_ID() || theID == THIRD_POINT_REF_ID())
+  {
     std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
     int aNbInitialized = 0;
     for(int i = 1; i <= 3; ++i) {
@@ -432,12 +477,15 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
   }
 
   AttributeDoublePtr aRadiusAttr = real(CIRCLE_RADIUS_ID());
+
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   if(myCenter.get()) {
     // center attribute is used in processEvent() to set reference to reentrant arc
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))
         ->setValue(myCenter);
   }
+
   aRadiusAttr->setValue(myRadius);
+
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }

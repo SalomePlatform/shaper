@@ -38,6 +38,8 @@ Click in the view once to set the center point, then move the mouse and click a 
 - When entering a passing point by selecting a point, a Coincident constraint is also created.
 - When entering a passing point by selecting a segment, a Tangent constraint is created.
 
+- "Add construction point" check box regulates the creation of an additional point on the circle. The point is a sewing point for circle. If move this point, sewing point also will be changed 
+
 **TUI Command**:
 
 .. py:function:: Sketch_1.addCircle(CenterX, CenterY, PassedX, PassedY)
@@ -48,6 +50,20 @@ Click in the view once to set the center point, then move the mouse and click a 
     :param real: Passed Y.
     :return: Result object.
 
+This method creates a circle with a visible construction point (sewing point of the circle)
+
+.. py:function:: Sketch_1.addCircleWithPoint(CenterX, CenterY, PassedX, PassedY, Angle)
+
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: Passed X.
+    :param real: Passed Y.
+    :param real: Rotation angle for sewing point
+    :return: Result object.
+
+.. py:function:: SketchCircle_1.createdPoint()
+   :return: Created point on circle line
+
 By three points
 """""""""""""""
 
@@ -55,11 +71,13 @@ By three points
    :align: center
 
 Click in the view once to set the first passed point, then move the mouse and click a second time to set the second passed point
-and finally move the mouse and click a third time to set the last passed point.
+then move the mouse and click a third time to set the last passed point, and finally 
+click last time to set point on the line.
 
 - When entering a passing point by selecting a point, a Coincident constraint is created.
 - When entering a passing point by selecting a segment, a Tangent constraint is created.
 
+- "Add construction point" check box regulates the creation of an additional point on the circle. The point is a sewing point for circle. If move this point, sewing point also will be changed  
 **TUI Command**:
 
 .. py:function:: Sketch_1.addCircle(X1, Y1, X2, Y2, X3, Y3)
@@ -71,6 +89,22 @@ and finally move the mouse and click a third time to set the last passed point.
     :param real: End X.
     :param real: End Y.
     :return: Result object.
+
+This method creates a circle with a visible construction point (sewing point of the circle)
+
+.. py:function:: Sketch_1.addCircleWithPoint(X1, Y1, X2, Y2, X3, Y3, Angle)
+
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: Passed X.
+    :param real: Passed Y.
+    :param real: End X.
+    :param real: End Y.
+    :param real: Rotation angle for sewing point
+    :return: Result object.
+
+.. py:function:: SketchCircle_1.createdPoint()
+   :return: Created point on circle line
 
 Property panel in edition context
 """""""""""""""""""""""""""""""""

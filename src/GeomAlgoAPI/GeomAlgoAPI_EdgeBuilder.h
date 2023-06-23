@@ -65,7 +65,8 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
   /// Creates linear edge in a form of a circle by a point and a circle radius
   static std::shared_ptr<GeomAPI_Edge> lineCircle(std::shared_ptr<GeomAPI_Pnt> theCenter,
                                                     std::shared_ptr<GeomAPI_Dir> theNormal,
-                                                    double theRadius);
+                                                    double theRadius,
+                                                    double theRotationAngle = 0.);
 
   /// Creates linear edge in a form of a circle by GeomAPI_Circle
   static std::shared_ptr<GeomAPI_Edge> lineCircle(std::shared_ptr<GeomAPI_Circ> theCircle);

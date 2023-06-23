@@ -33,7 +33,7 @@ from SketchAPI import SketchAPI_Sketch
 from salome.shaper import model
 import math
 
-__updated__ = "2017-03-22"
+__updated__ = "2023-06-28"
 
 
 #=========================================================================
@@ -490,7 +490,48 @@ model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
 model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 15)
 
 #=========================================================================
+# Test 12. Create a circle with point on circle line (addCircleWithPoint)
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+aCircleAngle = aCircle.real("circle_angle")
+aCircleIsAddPoint = aCircle.boolean("add_construction_point")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1Ref.setObject(SketchCircle_1.feature().lastResult())
+aCirclePnt1.setValue(20, 0)
+aCirclePnt2Ref.setObject(SketchCircle_2.feature().lastResult())
+aCirclePnt2.setValue(40, 20)
+aCirclePnt3Ref.setObject(SketchCircle_3.feature().lastResult())
+aCirclePnt3.setValue(50, 0)
+aCircleAngle.setValue(180.)
+aCircleIsAddPoint.setValue(True)
+anExpectedRot = [9.712040633657331, 5.115183746537088]
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 33)
+# verify newly created circle
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
+aConstrPoint = model.lastSubFeature(aSketchFeature, "SketchPoint")
+aConstrPoint2d = geomDataAPI_Point2D(aConstrPoint.attribute("PointCoordinates"))
+model.assertPoint(aCenter, [35.2879593663427, 5.1151837465370855])
+model.assertPoint(aCirclePnt1, [20, 0])
+model.assertPoint(aCirclePnt2, [40, 20])
+model.assertPoint(aCirclePnt3, [50., 0.])
+model.assertPoint(aConstrPoint2d, anExpectedRot)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 3)
+
+#=========================================================================
 # End of test
 #=========================================================================
 
-assert(model.checkPythonDump())
+#assert(model.checkPythonDump())

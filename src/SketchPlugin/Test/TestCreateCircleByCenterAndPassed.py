@@ -33,7 +33,7 @@ from SketchAPI import SketchAPI_Sketch
 from salome.shaper import model
 import math
 
-__updated__ = "2017-03-22"
+__updated__ = "2023-06-28"
 
 
 #=========================================================================
@@ -90,9 +90,9 @@ norm.setValue(0, 0, 1)
 aSession.finishOperation()
 aSketch = SketchAPI_Sketch(aSketchFeature)
 
-#=========================================================================
+# =========================================================================
 # Test 1. Create a circle by center and radius
-#=========================================================================
+# =========================================================================
 aSession.startOperation()
 aCircle = aSketchFeature.addFeature("SketchCircle")
 assert (aCircle.getKind() == "SketchCircle")
@@ -279,6 +279,39 @@ aSession.startOperation()
 aDocument.removeFeature(aCircle)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12)
+
+#=========================================================================
+# Test 6. Create a circle with point on circle line (addCircleWithPoint)
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("center_point"))
+aCenterRef = aCircle.refattr("center_point_ref")
+aPassed = geomDataAPI_Point2D(aCircle.attribute("passed_point"))
+aPassedRef = aCircle.refattr("passed_point_ref")
+aCircleType = aCircle.string("circle_type")
+aCircleIsAddPoint = aCircle.boolean("add_construction_point")
+aCircleAngle = aCircle.real("circle_angle")
+# initialize attributes
+aCircleType.setValue("circle_type_by_center_and_passed_points")
+aCenter.setValue(35., -35)
+anExpectedCenter = [35., -35]
+aPassed.setValue(45., -35)
+aCircleAngle.setValue(90.)
+aCircleIsAddPoint.setValue(True)
+anExpectedRot = [35., -25]
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 15)
+# verify newly created circle
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
+aConstrPoint = model.lastSubFeature(aSketchFeature, "SketchPoint")
+aConstrPoint2d = geomDataAPI_Point2D(aConstrPoint.attribute("PointCoordinates"))
+model.assertPoint(aCenter, anExpectedCenter)
+model.assertPoint(aConstrPoint2d, anExpectedRot)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 4)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 2)
 
 #=========================================================================
 # End of test

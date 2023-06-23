@@ -43,33 +43,41 @@ public:
                         double theCenterX,
                         double theCenterY,
                         double thePassedX,
-                        double thePassedY);
+                        double thePassedY,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
+                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         double theX1, double theY1,
                         double theX2, double theY2,
-                        double theX3, double theY3);
+                        double theX3, double theY3,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
   SketchAPI_MacroCircle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
+                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 
   /// Destructor.
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_MacroCircle();
 
-  INTERFACE_6(SketchPlugin_MacroCircle::ID(),
+  INTERFACE_8(SketchPlugin_MacroCircle::ID(),
               circleType, SketchPlugin_MacroCircle::CIRCLE_TYPE(),
               ModelAPI_AttributeString, /** Circle type */,
               centerPoint, SketchPlugin_MacroCircle::CENTER_POINT_ID(),
@@ -81,26 +89,38 @@ public:
               secondPoint, SketchPlugin_MacroCircle::SECOND_POINT_ID(),
               GeomDataAPI_Point2D, /** Second point */,
               thirdPoint, SketchPlugin_MacroCircle::THIRD_POINT_ID(),
-              GeomDataAPI_Point2D, /** Third point */)
+              GeomDataAPI_Point2D, /** Third point */,
+              angle, SketchPlugin_MacroCircle::CIRCLE_ROTATE_ANGLE_ID(),
+              ModelAPI_AttributeDouble, /** Angle */,
+              addpoint, SketchPlugin_MacroCircle::ADD_CONSTRUCTION_POINT_ID(),
+              ModelAPI_AttributeBoolean, /** Is to add point */)
 
 private:
   /// Set by center and passed points.
   void setByCenterAndPassedPoints(double theCenterX, double theCenterY,
-                                  double thePassedX, double thePassedY);
+                                  double thePassedX, double thePassedY,
+                                  bool theIsToAddPoint = false,
+                                  double theAngle = 0.0);
 
   /// Set by center and passed points.
   void setByCenterAndPassedPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+                                  bool theIsToAddPoint = false,
+                                  double theAngle = 0.0);
 
   /// Set by three points.
   void setByThreePoints(double theX1, double theY1,
                         double theX2, double theY2,
-                        double theX3, double theY3);
+                        double theX3, double theY3,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 
   /// Set by three points.
   void setByThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
+                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
+                        bool theIsToAddPoint = false,
+                        double theAngle = 0.0);
 };
 
 /// Pointer on Circle object.

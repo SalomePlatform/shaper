@@ -73,6 +73,7 @@
                     accept_expressions="0"
                     enable_value="enable_by_preferences">
         </labelvalue>
+        <boolvalue id="add_construction_point" label="Add construction point" tooltip="Create visible construction point" default="false" obligatory="0" change_visual_attributes="true"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
       </feature>
       <!-- SketchMacroCircle -->
@@ -127,7 +128,6 @@
               <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref,third_point_ref"/>
               <validator id="SketchPlugin_ThirdPointValidator" parameters="third_point_ref"/>
             </sketch-2dpoint_selector>
-            <validator id="GeomValidators_Different" parameters="first_point_ref,second_point_ref,third_point_ref"/>
           </box>
         </toolbox>
         <labelvalue id="circle_radius"
@@ -139,6 +139,12 @@
                     obligatory="0"
                     enable_value="enable_by_preferences">
         </labelvalue>
+        <boolvalue id="add_construction_point"
+                   label="Add construction point"
+                   tooltip="Create visible construction point"
+                   default="false"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
         <boolvalue id="Auxiliary"
                    tooltip="Construction element"
                    label="Auxiliary"

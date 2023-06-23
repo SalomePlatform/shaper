@@ -181,7 +181,7 @@ aPassedPoint.setValue(aLineEnd.pnt())
 aSession.finishOperation()
 
 aRadius = model.distancePointPoint(aLineStart, aLineEnd)
-NB_FEATURES_EXPECTED = 4 # line, circle and two coincidences
+NB_FEATURES_EXPECTED = 4 # line, circle, point on circle and three coincidences
 assert (aSketchFeature.numberOfSubs() == NB_FEATURES_EXPECTED), "Number of features in sketch {}, expected {}".format(aSketchFeature.numberOfSubs(), NB_FEATURES_EXPECTED)
 verifyLastCircle(aSketchFeature, aLineStart.x(), aLineStart.y(), aRadius)
 

@@ -194,44 +194,87 @@ public:
       double theCornerX, double theCornerY
   );
 
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(
       double theCenterX, double theCenterY,
       double theRadius);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(
       const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
       double theRadius);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       double theCenterX, double theCenterY,
       double thePassedX, double thePassedY);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       double theX1, double theY1,
       double theX2, double theY2,
       double theX3, double theY3);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(const ModelHighAPI_Selection & theExternal);
-  /// Add circle
+  /// Add circle.
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(const std::wstring & theExternalName);
+
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_Circle> addCircleWithPoint(
+      double theCenterX, double theCenterY,
+      double theRadius, double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_Circle> addCircleWithPoint(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+      double theRadius, double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_MacroCircle> addCircleWithPoint(
+      double theCenterX, double theCenterY,
+      double thePassedX, double thePassedY,
+      double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_MacroCircle> addCircleWithPoint(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+      double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_MacroCircle> addCircleWithPoint(
+      double theX1, double theY1,
+      double theX2, double theY2,
+      double theX3, double theY3,
+      double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_MacroCircle> addCircleWithPoint(
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
+      double theAngle);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_Circle> addCircleWithPoint(const ModelHighAPI_Selection& theExternal);
+  /// Add circle with point
+  SKETCHAPI_EXPORT
+    std::shared_ptr<SketchAPI_Circle> addCircleWithPoint(const std::wstring& theExternalName);
 
   /// Add arc
   SKETCHAPI_EXPORT

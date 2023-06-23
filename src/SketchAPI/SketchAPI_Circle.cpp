@@ -26,6 +26,9 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <SketchAPI_Point.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
+
 //==================================================================================================
 SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : SketchAPI_SketchEntity(theFeature)
@@ -37,22 +40,26 @@ SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature> & the
 SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                    double theCenterX,
                                    double theCenterY,
-                                   double theRadius)
+                                   double theRadius,
+                                   bool theIsAddPoint,
+                                   double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterAndRadius(theCenterX, theCenterY, theRadius);
+    setByCenterAndRadius(theCenterX, theCenterY, theRadius, theIsAddPoint, theAngle);
   }
 }
 
 //==================================================================================================
 SketchAPI_Circle::SketchAPI_Circle(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                   double theRadius)
+                                   double theRadius,
+                                   bool theIsAddPoint,
+                                   double theAngle)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterAndRadius(theCenter, theRadius);
+    setByCenterAndRadius(theCenter, theRadius, theAngle);
   }
 }
 
@@ -83,22 +90,31 @@ SketchAPI_Circle::~SketchAPI_Circle()
 }
 
 //==================================================================================================
-void SketchAPI_Circle::setByCenterAndRadius(double theCenterX, double theCenterY, double theRadius)
+void SketchAPI_Circle::setByCenterAndRadius(double theCenterX, double theCenterY,
+                                            double theRadius, bool theIsAddPoint,
+                                            double theAngle)
 {
   fillAttribute(center(), theCenterX, theCenterY);
   fillAttribute(theRadius, myradius);
+  fillAttribute(theIsAddPoint, myaddpoint);
+  fillAttribute(theAngle, myangle);
 
   execute();
+  //createPoint();
 }
 
 //==================================================================================================
 void SketchAPI_Circle::setByCenterAndRadius(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                            double theRadius)
+                                            double theRadius, bool theIsAddPoint,
+                                            double theAngle)
 {
   fillAttribute(theCenter, mycenter);
   fillAttribute(theRadius, myradius);
+  fillAttribute(theIsAddPoint, myaddpoint);
+  fillAttribute(theAngle, myangle);
 
   execute();
+  //createPoint();
 }
 
 //==================================================================================================
@@ -142,6 +158,38 @@ void SketchAPI_Circle::setRadius(double theRadius)
 }
 
 //==================================================================================================
+void SketchAPI_Circle::setIsToAddPoint(bool theIsToAddPoint)
+{
+  fillAttribute(theIsToAddPoint, myaddpoint);
+
+  execute();
+}
+
+//==================================================================================================
+void SketchAPI_Circle::setAngle(double theAngle)
+{
+  fillAttribute(ModelHighAPI_Double(theAngle), myangle);
+
+  execute();
+}
+
+//==================================================================================================
+// Return created point
+std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Circle::createdPoint() const
+{
+  AttributeReferencePtr anRef = feature()->reference(SketchPlugin_Circle::CONSTRUCTION_POINT_REF_ID());
+  if (!anRef->isInitialized())
+    return {};
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anRef->value());
+  if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
+  {
+    return std::shared_ptr < SketchAPI_SketchEntity>(new SketchAPI_Point(aFeature));
+  }
+  return {};
+}
+
+//==================================================================================================
 void SketchAPI_Circle::dump(ModelHighAPI_Dumper& theDumper) const
 {
   if (isCopy())
@@ -150,14 +198,35 @@ void SketchAPI_Circle::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 
+  const bool isToAddPoint = addpoint()->value();
+
   AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
   if (anExternal->context()) {
     // circle is external
-    theDumper << aBase << " = " << aSketchName << ".addCircle(" << anExternal << ")" << std::endl;
-  } else {
+    if(isToAddPoint)
+    {
+      theDumper << aBase << " = " << aSketchName << ".addCircleWithPoint(" << anExternal << ")" << std::endl;
+    }
+    else
+    {
+      theDumper << aBase << " = " << aSketchName << ".addCircle(" << anExternal << ")" << std::endl;
+    }
+  }
+  else {
     // circle given by center and radius
-    theDumper << aBase << " = " << aSketchName << ".addCircle("
+    if(isToAddPoint)
+    {
+      theDumper << aBase << " = " << aSketchName << ".addCircleWithPoint(" << center() << ", " << radius();
+      theDumper << ", " << angle() << ")" << std::endl;
+      std::shared_ptr<SketchAPI_SketchEntity> aPoint = createdPoint();
+      if (aPoint)
+        theDumper << aPoint->feature() << " = " << theDumper.name(aBase) << ".createdPoint()" << std::endl;
+    }
+    else
+    {
+      theDumper << aBase << " = " << aSketchName << ".addCircle("
               << center() << ", " << radius() << ")" << std::endl;
+    }
   }
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
