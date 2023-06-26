@@ -1,4 +1,4 @@
-# Copyright (C) 2021  CEA/DEN, EDF R&D
+# Copyright (C) 2016-2022  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,3 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-  TestRectangle.py
-  TestRectangleCentered.py
-  TestcompoundVertices.py
-  TestimportParameters.py
-  TestmidSurface_1.py
-  TestmidSurface_2.py
-  TestpipeNetwork_2par2.py
-  TestpipeNetwork_parligne.py
-)

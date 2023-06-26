@@ -1,0 +1,14 @@
+<source>
+  <workbench id="Macros" document="Part">
+    <group id="Samples">
+      <feature id="midSurface"
+        title="Fibre neutre"
+        tooltip="Create"
+        icon="icons/Addons/midSurface.png"
+        helpfile="midSurfaceFeature.html">
+        <file_selector id="file_path" title="Import file" tooltip="Select file" path="">
+        </file_selector>
+      </feature>
+    </group>
+  </workbench>
+</source>
