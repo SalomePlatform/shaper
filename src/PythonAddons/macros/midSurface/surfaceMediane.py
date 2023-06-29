@@ -36,7 +36,7 @@ guillaume.schweitzer@blastsolutions.io
 Gérald NICOLAS
 """
 
-__revision__ = "V11.26"
+__revision__ = "V11.27"
 
 #========================= Les imports - Début ===================================
 
@@ -737,10 +737,17 @@ Sorties :
 # 1. Tri du tableau en fonction des surfaces
     if self._verbose_max:
       print_tab (n_recur, blabla)
-      print_tab (n_recur, "tb_caract brut : ", tb_caract)
+      print_tab (n_recur, "tb_caract brut : ")
+      for iaux, caract in enumerate(tb_caract):
+        print_tab (n_recur, "Face {} : ".format(iaux), caract)
+
     tb_caract_1 = sorted(tb_caract, key=lambda colonnes: colonnes[1])
     if self._verbose_max:
-      print_tab (n_recur, "tb_caract trié :", tb_caract_1)
+      print ()
+      print_tab (n_recur, "tb_caract trié de la plus petite à la plus grande surface :")
+      for caract in tb_caract_1:
+        print_tab (n_recur, "", caract)
+      print ()
 
     if self._verbose_max:
       texte  = "\tSurface de la plus grande face      : {}, de caractéristiques {}\n".format(tb_caract_1[-1][1],tb_caract_1[-1][2])
@@ -810,12 +817,13 @@ Entrées :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane ( self, solide, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane ( self, solide, caract_face_1, caract_face_2, tb_caract, n_recur ):
     """Crée la face médiane entre deux autres
 
 Entrées :
   :solide: solide SHAPER à traiter
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
+  :tb_caract: tableau des caractéristiques géométriques des faces
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -838,8 +846,8 @@ Sorties :
 
 # 2. Traitement selon la forme de la face
 # 2.1. Face plane
-    if forme in ( "Disk" , "Plane", "Rectangle"):
-      erreur, face = self._cree_face_mediane_plane ( solide, caract_face_1, caract_face_2, n_recur )
+    if forme in ( "Disk", "Plane", "Rectangle" ):
+      erreur, face = self._cree_face_mediane_plane ( solide, caract_face_1, caract_face_2, tb_caract, n_recur )
 
 # 2.2. Face cylindrique
     elif ( forme == "Cylinder" ):
@@ -913,12 +921,13 @@ Entrées :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane ( self, solide, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_plane ( self, solide, caract_face_1, caract_face_2, tb_caract, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Entrées :
   :solide: l'objet solide à traiter
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
+  :tb_caract: tableau des caractéristiques géométriques des faces
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -931,7 +940,7 @@ Sorties :
       print_tab (n_recur, blabla)
 
 #   Caractéristiques des surfaces
-    coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2 = self._cree_face_mediane_plane_0 ( solide, caract_face_1, caract_face_2, n_recur )
+    coo_x, coo_y, coo_z, vnor_x, vnor_y, vnor_z, taille, d_face_1_2 = self._cree_face_mediane_plane_0 ( solide, caract_face_1, caract_face_2, tb_caract, n_recur )
 
 #   Contrôle de la validité de l'épaisseur
     erreur = self._verif_epaisseur ( d_face_1_2 )
@@ -948,7 +957,7 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _cree_face_mediane_plane_0 ( self, solide, caract_face_1, caract_face_2, n_recur ):
+  def _cree_face_mediane_plane_0 ( self, solide, caract_face_1, caract_face_2, tb_caract, n_recur ):
     """Crée la face médiane entre deux autres - cas des surfaces planes
 
 Décodage des caractéristiques
@@ -956,6 +965,7 @@ Décodage des caractéristiques
 Entrées :
   :solide: l'objet solide à traiter
   :caract_face_1, caract_face_2: les caractéristiques des 2 faces les plus grandes
+  :tb_caract: tableau des caractéristiques géométriques des faces
   :n_recur: niveau de récursivité
 
 Sorties :
@@ -982,13 +992,16 @@ Sorties :
     vnor_x = caract_face_1[2][4]
     vnor_y = caract_face_1[2][5]
     vnor_z = caract_face_1[2][6]
+
+# 2. Taille
+
 #   taille : une longueur caractéristique pour être certain de tout prendre
-    l_diag = self._calcul_lg_caract ( solide, n_recur )
+    l_diag = self._calcul_lg_caract_0 ( solide, tb_caract, n_recur )
     taille = 10.*l_diag
     if self._verbose_max:
-      print_tab (n_recur, "Taille englobante : ",taille)
+      print_tab (n_recur, "Taille englobante : ", taille)
 
-# 2. Distance entre les deux faces
+# 3. Distance entre les deux faces
     face_1 = caract_face_1[0]
     face_2 = caract_face_2[0]
     d_face_1_2 = GeomAlgoAPI_ShapeTools.minimalDistance(face_1, face_2)
@@ -1375,7 +1388,7 @@ Sorties :
 #   Rayons
     rayon = (caract_face_2[2][7]+caract_face_1[2][7])/2.
 #   Hauteur : une longueur caractéristique pour être certain de tout prendre
-    l_diag = self._calcul_lg_caract ( solide, n_recur )
+    l_diag = self._calcul_lg_caract_1 ( solide, n_recur )
     hauteur = 10.*l_diag
     if self._verbose_max:
       print_tab (n_recur, "Hauteur englobante : ", hauteur)
@@ -1991,7 +2004,72 @@ Sorties :
 
 #=========================== Début de la méthode =================================
 
-  def _calcul_lg_caract ( self, objet, n_recur ):
+  def _calcul_lg_caract_0 ( self, objet, tb_caract, n_recur ):
+    """Crée une longueur caractéristique de l'objet formés de surfaces planes
+
+Les caractéristiques sont comme en IHM avec 'Inspection' :
+. Si la face est un rectangle, la caractéristique est :
+    Xcoin, Ycoin, Zcoin, Xnormale, Ynormale, Znormale, Largeur, Hauteur
+. Si la face est un polygone, elle est vue comme un plan et la caractéristique est :
+    Xcentre, Ycentre, Zcentre, Xnormale, Ynormale, Znormale
+. Si la face est un disque, elle est vue comme un plan et la caractéristique est :
+    Xcentre, Ycentre, Zcentre, Xnormale, Ynormale, Znormale, Rayon
+
+Si on se contente de raisonner avec la boîte englobante de la face, on a le risque qu'elle ne soit pas au bon endroit.
+
+Il faut ici calculer la dimension d'une boîte centrée sur l'origine qui englobe à coup sûr le solide.
+
+Entrées :
+  :objet: l'objet à traiter
+  :tb_caract: tableau des caractéristiques géométriques des faces
+  :n_recur: niveau de récursivité
+
+Sorties :
+  :l_caract: longueur caractéristique de l'objet
+"""
+
+    nom_fonction = __name__ + "/_calcul_lg_caract_0"
+    blabla = "Dans {} :".format(nom_fonction)
+
+    if self._verbose_max:
+      print_tab (n_recur, blabla)
+
+# 1. On parcourt toutes les faces en repérant les rectangles.
+# Pour ces rectangles on va calculer les plus grandes valeurs des coordonnées et des épaisseurs.
+
+    avec_rectangle = False
+    xyz_max = 0.
+    d_max = 0.
+    for iaux, caract in enumerate(tb_caract):
+      if self._verbose_max:
+        print_tab (n_recur, "Face {} : ".format(iaux), caract)
+      if ( caract[-1][0] == "Rectangle" ):
+        avec_rectangle = True
+        xyz_max = max(xyz_max,abs(caract[-1][1]),abs(caract[-1][2]),abs(caract[-1][3]))
+        d_max = max(d_max,caract[-1][7],caract[-1][8])
+
+    if self._verbose_max:
+      print_tab (n_recur, "xyz_max : ", xyz_max)
+      print_tab (n_recur, "d_max : ", d_max)
+
+# 2. Longueur
+# 2.1. S'il y avait des rectangles, on prend un cube plus grand
+    if avec_rectangle:
+      l_caract = (xyz_max+d_max)*np.sqrt(3.)
+# 2.2. Sinon, on peut utiliser la formule classique
+    else:
+      l_caract = self._calcul_lg_caract_1 ( objet, n_recur )
+
+    if self._verbose_max:
+      print_tab (n_recur, "Longueur caractéristique : ", l_caract)
+
+    return l_caract
+
+#===========================  Fin de la méthode ==================================
+
+#=========================== Début de la méthode =================================
+
+  def _calcul_lg_caract_1 ( self, objet, n_recur ):
     """Crée une longueur caractéristique de l'objet
 
 Entrées :
@@ -2002,7 +2080,7 @@ Sorties :
   :l_caract: longueur caractéristique de l'objet
 """
 
-    nom_fonction = __name__ + "/_calcul_lg_caract"
+    nom_fonction = __name__ + "/_calcul_lg_caract_1"
     blabla = "Dans {} :".format(nom_fonction)
 
     if self._verbose_max:
@@ -2171,7 +2249,7 @@ Sorties :
 
 # 4. Création de la face médiane
 
-      erreur, face = self._cree_face_mediane ( solide, caract_face_1, caract_face_2, n_recur )
+      erreur, face = self._cree_face_mediane ( solide, caract_face_1, caract_face_2, tb_caract, n_recur )
       if ( erreur or ( face is None ) ):
         break
 
