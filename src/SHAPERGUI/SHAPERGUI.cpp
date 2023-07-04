@@ -49,6 +49,7 @@
 
 #include <OCCViewer_ViewModel.h>
 #include <OCCViewer_ViewPort3d.h>
+#include <OCCViewer_ViewManager.h>
 
 #include <SUIT_Selector.h>
 #include <SUIT_Desktop.h>
@@ -549,6 +550,15 @@ void SHAPERGUI::onViewManagerAdded(SUIT_ViewManager* theMgr)
     myWorkshop->selectionActivate()->updateSelectionFilters();
     myWorkshop->selectionActivate()->updateSelectionModes();
     myWorkshop->synchronizeViewer();
+  }
+  if (theMgr->getType() == OCCViewer_Viewer::Type()) {
+    // Set the auto rotate flag in the new viewer based on the current preference
+    OCCViewer_ViewManager *aVM = (OCCViewer_ViewManager*)theMgr;
+    bool aAutoRotation = Config_PropManager::boolean("Visualization", "use_auto_rotation");
+    aVM->setAutoRotation(aAutoRotation);
+
+    connect(theMgr, SIGNAL(viewCreated(SUIT_ViewWindow*)),
+            myProxyViewer, SLOT(onViewCreated(SUIT_ViewWindow*)));
   }
 }
 
@@ -1054,6 +1064,19 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
             aDatumAspect->SetAttribute(Prs3d_DP_ShadingConeLengthPercent, myAxisArrowRate);
             aContext->Redisplay(aTrihedron, true);
           }
+        }
+      }
+    }
+    if (theParam == "use_auto_rotation") {
+      bool aAutoRotation = Config_PropManager::boolean("Visualization", "use_auto_rotation");
+      // Update the auto rotation flag in all OCC 3D view windows
+      ViewManagerList lst;
+      getApp()->viewManagers(OCCViewer_Viewer::Type(), lst);
+      for ( auto it = lst.begin(); it != lst.end(); ++it )
+      {
+        OCCViewer_ViewManager *aVMgr = dynamic_cast<OCCViewer_ViewManager*>(*it);
+        if (aVMgr) {
+          aVMgr->setAutoRotation(aAutoRotation);
         }
       }
     }

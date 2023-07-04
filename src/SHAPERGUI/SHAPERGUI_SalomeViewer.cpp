@@ -22,6 +22,7 @@
 
 #include <OCCViewer_ViewPort3d.h>
 #include <OCCViewer_ViewFrame.h>
+#include <OCCViewer_ViewManager.h>
 #include <SOCC_ViewModel.h>
 #include <SUIT_ViewManager.h>
 
@@ -277,6 +278,9 @@ void SHAPERGUI_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
     OCCViewer_ViewPort3d* aViewPort = aWnd->getViewPort();
     if (aViewPort)
       connect(aViewPort, SIGNAL(vpMapped(OCCViewer_ViewPort3d*)), this, SLOT(onViewPortMapped()));
+    
+    OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>(aWnd->getViewManager());
+    if (aMgr) aWnd->enableAutoRotation(aMgr->isAutoRotation());
   }
   reconnectActions(aWnd, true);
 
@@ -508,6 +512,8 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
       connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
       reconnectActions(aWnd, true);
+      OCCViewer_ViewManager* aOCCMgr = dynamic_cast<OCCViewer_ViewManager*>(aMgr);
+      if (aOCCMgr) aWnd->enableAutoRotation(aOCCMgr->isAutoRotation());
     }
   } else {
     foreach (SUIT_ViewWindow* aView, aViews) {
@@ -517,6 +523,7 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
                  SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
       reconnectActions(aWnd, false);
+      aWnd->enableAutoRotation(false);
     }
   }
 }

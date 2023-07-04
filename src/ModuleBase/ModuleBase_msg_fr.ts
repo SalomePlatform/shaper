@@ -287,6 +287,10 @@
         <translation>Maintenir la taille de la vue des flèches trièdres constante</translation>
     </message>
     <message>
+        <source>Enable automatic rotation</source>
+        <translation>Activer la rotation automatique</translation>
+    </message>
+    <message>
         <source>General</source>
         <translation>Général</translation>
     </message>

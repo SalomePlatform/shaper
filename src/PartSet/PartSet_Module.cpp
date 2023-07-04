@@ -267,6 +267,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "zoom_trihedron_arrows",
     "Keep trihedron arrows view size constant", Config_Prop::Boolean, "false");
 
+  Config_PropManager::registerProp("Visualization", "use_auto_rotation",
+    "Enable automatic rotation", Config_Prop::Boolean, "false");
+
   Config_PropManager::registerProp("Visualization", "axis_arrow_size",
     "Trihedron arrows constant size", Config_Prop::IntSpin, "10");
 
