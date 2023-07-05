@@ -107,28 +107,54 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
     addMovedPath(anOldPath, aNewPath);
 
   // Making pipe.
-  BRepOffsetAPI_MakePipe* aPipeBuilder = new BRepOffsetAPI_MakePipe(aPathWire, aBaseShape);
-  if(!aPipeBuilder) {
-    return;
+  BRepOffsetAPI_MakePipe* aPipeBuilder = NULL;
+  try {
+    aPipeBuilder = new BRepOffsetAPI_MakePipe(aPathWire, aBaseShape);
   }
-  aPipeBuilder->Build();
+  catch (...) {
+  }
 
   // Checking result.
-  if (!aPipeBuilder->IsDone() || aPipeBuilder->Shape().IsNull()) {
-    delete aPipeBuilder;
-    return;
+  bool isDone = false;
+  static const Standard_Real TolPipeSurf = 5.e-4;
+  if (aPipeBuilder &&
+      aPipeBuilder->IsDone() &&
+      !aPipeBuilder->Shape().IsNull() &&
+      aPipeBuilder->ErrorOnSurface() <= TolPipeSurf) {
+    // check result
+    BOPAlgo_ArgumentAnalyzer aChecker;
+    aChecker.SetShape1(aPipeBuilder->Shape());
+    aChecker.SelfInterMode() = Standard_True;
+    aChecker.StopOnFirstFaulty() = Standard_True;
+    aChecker.Perform();
+    if (!aChecker.HasFaulty())
+      isDone = true;
   }
 
-  // Check for self-interfering result
-  BOPAlgo_ArgumentAnalyzer aChecker;
-  aChecker.SetShape1(aPipeBuilder->Shape());
-  aChecker.SelfInterMode() = Standard_True;
-  aChecker.StopOnFirstFaulty() = Standard_True;
-  aChecker.Perform();
-  if (aChecker.HasFaulty()) {
-    myError = "Self-interfering result.";
-    delete aPipeBuilder;
-    return;
+  if (!isDone) {
+    if (aPipeBuilder)
+      delete aPipeBuilder;
+
+    // Try to use Descrete Trihedron mode.
+    aPipeBuilder = new BRepOffsetAPI_MakePipe
+      (aPathWire, aBaseShape, GeomFill_IsDiscreteTrihedron, Standard_True);
+    if (!aPipeBuilder->IsDone() || aPipeBuilder->Shape().IsNull()) {
+      myError = "Pipe algorithm has failed.";
+      delete aPipeBuilder;
+      return;
+    }
+
+    // Check for self-interfering result
+    BOPAlgo_ArgumentAnalyzer aChecker;
+    aChecker.SetShape1(aPipeBuilder->Shape());
+    aChecker.SelfInterMode() = Standard_True;
+    aChecker.StopOnFirstFaulty() = Standard_True;
+    aChecker.Perform();
+    if (aChecker.HasFaulty()) {
+      myError = "Self-interfering result.";
+      delete aPipeBuilder;
+      return;
+    }
   }
 
   this->initialize(aPipeBuilder);
