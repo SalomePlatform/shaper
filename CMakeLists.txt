@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2022  CEA/DEN, EDF R&D
+# Copyright (C) 2014-2023  CEA, EDF
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -50,7 +50,7 @@ ENDIF()
 
 # Versioning
 # ===========
-SALOME_SETUP_VERSION(9.10.0)
+SALOME_SETUP_VERSION(9.11.0)
 MESSAGE(STATUS "Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION} from \"${${PROJECT_NAME}_GIT_SHA1}\"")
 SET(COMPONENT_NAME SHAPER)
 
