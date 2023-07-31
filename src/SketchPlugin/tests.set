@@ -181,7 +181,7 @@ SET(TEST_NAMES_PARA
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestProjectionWithoutReference.py
-  TestRectangle.py
+  TestRectangle1.py
   TestRemainingDoF.py
   TestRemoveBSpline.py
   TestRemoveBSplinePeriodic.py

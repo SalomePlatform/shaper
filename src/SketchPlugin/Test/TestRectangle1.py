@@ -18,12 +18,13 @@
 #
 
 """
-    TestRectangle.py
+    TestRectangle1.py
     Unit test of SketchPlugin_Rectangle class
 
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from GeomAPI import *
 import math
 from salome.shaper import model
 
@@ -47,6 +48,14 @@ def isVertical(line):
     aEnd   = geomDataAPI_Point2D(line.attribute("EndPoint"))
     return aStart.x() == aEnd.x()
 
+def isPerpendicular(line1, line2, tolerance):
+    aStart1 = geomDataAPI_Point2D(line1.attribute("StartPoint"))
+    aEnd1   = geomDataAPI_Point2D(line1.attribute("EndPoint"))
+    aStart2 = geomDataAPI_Point2D(line2.attribute("StartPoint"))
+    aEnd2   = geomDataAPI_Point2D(line2.attribute("EndPoint"))
+    anAngle = abs(GeomAPI_Angle2d(aStart1.pnt(), aEnd1.pnt(), aStart2.pnt(), aEnd2.pnt()).angleDegree())
+    #print("Angle = ", anAngle)
+    return abs(anAngle-90) < tolerance # or abs(anAngle-270) < tolerance
 
 #=========================================================================
 # Start of test
@@ -97,20 +106,28 @@ aLineEnd = geomDataAPI_Point2D(aLastLine.attribute("EndPoint"))
 aLineEnd.setValue(41., 30.)
 aSession.finishOperation()
 #=========================================================================
-# Check the lines of rectangle are parallel to the axes
+# Check that we have still two pairs of lines with same length
+# and that connected lines are perpendicular
 #=========================================================================
 aNbSubs = aSketchFeature.numberOfSubs()
 aNbLines = 0
 tolerance = 1.e-5
-valref = [28.47721, 1.3352780]
+valref = [0, 0]
+aPrevLine = None
 for i in range (0, aNbSubs):
     aFeature = objectToFeature(aSketchFeature.subFeature(i))
     if aFeature.getKind() == "SketchLine":
         aLastLine = aFeature
-        #print (aLastLine.lastResult().shape().edge().length())
-        #print (valref[i%2])
-        #print (abs(aLastLine.lastResult().shape().edge().length()-valref[i%2]))
-        assert(abs(aLastLine.lastResult().shape().edge().length()-valref[i%2]) <= tolerance)
+        # Opposite lines must have same length
+        edgeLen = aLastLine.lastResult().shape().edge().length()
+        if (valref[i%2] == 0):
+            valref[i%2] = edgeLen
+        else:
+            assert(abs(edgeLen-valref[i%2]) <= tolerance)
+        # Connected lines must be perpendicular
+        if aPrevLine != None:
+            assert(isPerpendicular(aPrevLine, aLastLine, tolerance))
+        aPrevLine = aLastLine
         aNbLines = aNbLines + 1
 assert (aNbLines == 4)
 assert (model.dof(aSketchFeature) == 5)
