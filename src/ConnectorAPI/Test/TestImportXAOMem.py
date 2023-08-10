@@ -52,19 +52,17 @@ def testImportXAOMem():
     Box_1 = geompy.MakeBoxDXDYDZ(10, 10, 10)
     Group_1 = geompy.CreateGroup(Box_1, geompy.ShapeType["FACE"])
     geompy.UnionIDs(Group_1, [33])
-    geompy.addToStudy( Box_1, 'Box_1_1' )
-    geompy.addToStudyInFather( Box_1, Group_1, 'Group_1' )
+    geompy.addToStudy( Box_1, 'Box10x10x10' )
+    geompy.addToStudyInFather( Box_1, Group_1, 'GroupTopFace' )
 
     Export_buff = geompy.ExportXAOMem(Box_1, [Group_1], [], "XAO")
 
     # check buffer length
     # export to XAO file and compare size of file and size of buffer
-    #assert(len(Export_buff) == 4392)
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpfilename = os.path.join(tmpdirname, "Box.xao")
         exported = geompy.ExportXAO(Box_1, [Group_1], [], "XAO", tmpfilename, "")
         file_stats = os.stat(tmpfilename)
-        print(file_stats.st_size)
         assert(len(Export_buff) == file_stats.st_size)
         pass
 
@@ -75,12 +73,6 @@ def testImportXAOMem():
     Part_1_doc = Part_1.document()
 
     Import_1 = model.addImportXAOMem(Part_1_doc, Export_buff)
-    model.do()
-    Import_1.subFeature(0).setName("Group_1")
-    Import_1.subFeature(0).result().setName("Group_1")
-    Import_1.setName("Box_1")
-    Import_1.result().setName("Box_1_1")
-
     model.end()
 
     # Check result
@@ -94,7 +86,12 @@ def testImportXAOMem():
     model.testResultsVolumes(Import_1, [1000])
     model.testResultsAreas(Import_1, [600])
 
-    # check groups are the same in both parts
+    assert(Import_1.name() == "Box10x10x10")
+    assert(Import_1.result().name() == "Box10x10x10_1")
+    assert(Import_1.subFeature(0).name() == "GroupTopFace")
+    assert(Import_1.subFeature(0).result().name() == "GroupTopFace")
+
+    # check group
     assert(Part_1_doc.size("Groups") == 1)
     res1 = objectToResult(Part_1_doc.object("Groups", 0))
     assert(res1 is not None)
@@ -106,12 +103,42 @@ def testImportXAOMem():
     p1 = res1.shape().middlePoint()
     aTol = 1.e-7
     assert(math.fabs(p1.x() - 5) <= aTol and math.fabs(p1.y() - 5) <= aTol and math.fabs(p1.z() - 10) <= aTol), "({}, {}, {}) != ({}, {}, {})".format(p1.x(), p1.y(), p1.z(), 5, 5, 10)
+    pass
+
+def testImportXAOMem_EmptyName():
+
+    # Export from GEOM
+    Box_1 = geompy.MakeBoxDXDYDZ(10, 10, 10)
+    Group_1 = geompy.CreateGroup(Box_1, geompy.ShapeType["FACE"])
+    geompy.UnionIDs(Group_1, [33])
+    # here we do not add box to study to check special case of empty shape name in XAO
+
+    Export_buff = geompy.ExportXAOMem(Box_1, [Group_1], [], "XAO")
+
+    # Import to SHAPER
+    model.begin()
+    partSet = model.moduleDocument()
+    Part_1 = model.addPart(partSet)
+    Part_1_doc = Part_1.document()
+
+    Import_1 = model.addImportXAOMem(Part_1_doc, Export_buff)
+    model.end()
+
+    # Check result
+    assert(Import_1.feature().error() == "")
+    model.testNbResults(Import_1, 1)
+
+    assert(Import_1.name() == "ImportXAOMem")
+    assert(Import_1.result().name() == "ImportXAOMem_1")
+    assert(Import_1.subFeature(0).name() == "Group_1")
+    assert(Import_1.subFeature(0).result().name() == "Group_1")
 
 if __name__ == '__main__':
     #=========================================================================
     # Import a shape from XAO memory buffer
     #=========================================================================
     testImportXAOMem()
+    testImportXAOMem_EmptyName()
     #=========================================================================
     # End of test
     #=========================================================================
