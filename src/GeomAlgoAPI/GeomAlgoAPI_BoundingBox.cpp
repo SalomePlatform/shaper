@@ -26,7 +26,6 @@
 #include <BRepBndLib.hxx>
 #include <BRep_Builder.hxx>
 #include <Geom_Circle.hxx>
-#include <ShapeAnalysis.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>
 #include <gp_Pln.hxx>
@@ -105,7 +104,7 @@ Standard_Boolean ModifyShape(const TopoDS_Shape  &theShape,
         double U1,U2,V1,V2;
         // changes for 0020677: EDF 1219 GEOM: MinDistance gives 0 instead of 20.88
         //S->Bounds(U1,U2,V1,V2); changed by
-        ShapeAnalysis::GetFaceUVBounds(TopoDS::Face(theModifiedShape),U1,U2,V1,V2);
+        BRepTools::UVBounds(TopoDS::Face(theModifiedShape),U1,U2,V1,V2);
         // end of changes for 020677 (dmv)
         Handle(Geom_RectangularTrimmedSurface) TrS1 =
           new Geom_RectangularTrimmedSurface(S,U1,(U1+U2)/2.,V1,V2);

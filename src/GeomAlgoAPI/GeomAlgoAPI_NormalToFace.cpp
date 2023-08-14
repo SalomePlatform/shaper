@@ -19,23 +19,27 @@
 
 #include "GeomAlgoAPI_NormalToFace.h"
 
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
-#include <gp_Ax3.hxx>
-#include <Geom_Plane.hxx>
-#include <gp_Pln.hxx>
+#include <TopoDS_Face.hxx>
 #include <TopoDS_Iterator.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
-#include <ShapeAnalysis.hxx>
-#include <ShapeAnalysis_Surface.hxx>
+#include <TopoDS_Shape.hxx>
+
+#include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBndLib.hxx>
-#include <GeomLProp_SLProps.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepGProp.hxx>
+#include <BRepTools.hxx>
+
+#include <ShapeAnalysis_Surface.hxx>
+
+#include <Geom_Plane.hxx>
 #include <GeomAPI_Edge.h>
+#include <GeomLProp_SLProps.hxx>
+#include <GProp_GProps.hxx>
+
+#include <gp_Ax3.hxx>
+#include <gp_Pln.hxx>
 
  /*!
    * \brief Return type of shape for explode. In case of compound it will be a type of its first sub shape.
@@ -155,7 +159,7 @@ bool GeomAlgoAPI_NormalToFace::normal(GeomShapePtr theFace,
   gp_Ax3 aPos = GetPosition(aFace);
   p1 = aPos.Location();
   // Set default starting point using UV bounds
-  ShapeAnalysis::GetFaceUVBounds(aFace, u1, u2, v1, v2);
+  BRepTools::UVBounds(aFace, u1, u2, v1, v2);
   gp_Pnt2d pUV ((u2 + u1) * 0.5, (v2 + v1) * 0.5);
 
   // Change to Vertex coord if selected
