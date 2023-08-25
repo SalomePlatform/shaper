@@ -326,23 +326,50 @@ bool GeomAPI_Shape::isPlanar() const
     BRepBuilderAPI_FindPlane aFindPlane(aShape);
     bool isFound = aFindPlane.Found() == Standard_True;
 
-    if(!isFound && aShapeType == TopAbs_EDGE) {
-      Standard_Real aFirst, aLast;
-      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aFirst, aLast);
-      Handle(Standard_Type) aType = aCurve->DynamicType();
+    if(!isFound) {
 
-      if(aType == STANDARD_TYPE(Geom_TrimmedCurve)) {
-        Handle(Geom_TrimmedCurve) aTrimCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve);
-        aType = aTrimCurve->BasisCurve()->DynamicType();
+      auto checkEdge = [](const TopoDS_Shape& theShape){
+        if(theShape.ShapeType()!= TopAbs_EDGE) 
+          return false;
+
+        Standard_Real aFirst, aLast;
+        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(theShape), aFirst, aLast);
+        Handle(Standard_Type) aType = aCurve->DynamicType();
+        if(aType == STANDARD_TYPE(Geom_TrimmedCurve)) {
+          Handle(Geom_TrimmedCurve) aTrimCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve);
+          aType = aTrimCurve->BasisCurve()->DynamicType();
+        }
+
+        if(aType == STANDARD_TYPE(Geom_Line)
+            || aType == STANDARD_TYPE(Geom_Conic)
+            || aType == STANDARD_TYPE(Geom_Circle)
+            || aType == STANDARD_TYPE(Geom_Ellipse)
+            || aType == STANDARD_TYPE(Geom_Hyperbola)
+            || aType == STANDARD_TYPE(Geom_Parabola)) {
+          return true;
+        }
+        return false;
+      };
+
+      if(aShapeType == TopAbs_WIRE){
+        //check if wire consist of only one edge
+        int aNbEdges = 0;
+        TopExp_Explorer anExp(aShape, TopAbs_EDGE);
+        for (TopExp_Explorer anExp(aShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+          aNbEdges++;
+          if(aNbEdges == 1){
+            const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
+            isFound = checkEdge(anEdge);
+          }
+          else{
+            //if more than one edge, check is not valid
+            isFound = false;
+            break;
+          }
+        }
       }
-
-      if(aType == STANDARD_TYPE(Geom_Line)
-          || aType == STANDARD_TYPE(Geom_Conic)
-          || aType == STANDARD_TYPE(Geom_Circle)
-          || aType == STANDARD_TYPE(Geom_Ellipse)
-          || aType == STANDARD_TYPE(Geom_Hyperbola)
-          || aType == STANDARD_TYPE(Geom_Parabola)) {
-        isFound = true;
+      else if(aShapeType == TopAbs_EDGE){
+        isFound = checkEdge(aShape);
       }
     }
 

@@ -71,4 +71,6 @@ SET(TEST_NAMES
                Test20469.py
                Test20513_1.py
                Test20513_2.py
+               TestNonPlanarFace.py
+               TestNonPlanarFace_Edges.py
 )

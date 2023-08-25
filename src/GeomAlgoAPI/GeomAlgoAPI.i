@@ -175,6 +175,7 @@
 %shared_ptr(GeomAlgoAPI_Rotation)
 %shared_ptr(GeomAlgoAPI_Sewing)
 %shared_ptr(GeomAlgoAPI_SketchBuilder)
+%shared_ptr(GeomAlgoAPI_NonPlanarFace)
 %shared_ptr(GeomAlgoAPI_ShapeBuilder)
 %shared_ptr(GeomAlgoAPI_Translation)
 %shared_ptr(GeomAlgoAPI_Transform)
@@ -219,6 +220,7 @@
 %include "GeomAlgoAPI_WireBuilder.h"
 %include "GeomAlgoAPI_Sewing.h"
 %include "GeomAlgoAPI_ShapeBuilder.h"
+%include "GeomAlgoAPI_NonPlanarFace.h"
 %include "GeomAlgoAPI_Exception.h"
 %include "GeomAlgoAPI_ShapeAPI.h"
 %include "GeomAlgoAPI_Copy.h"

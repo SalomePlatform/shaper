@@ -43,6 +43,7 @@
   #include "GeomAlgoAPI_Rotation.h"
   #include "GeomAlgoAPI_ShapeTools.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
+  #include "GeomAlgoAPI_NonPlanarFace.h"
   #include "GeomAlgoAPI_BREPExport.h"
   #include "GeomAlgoAPI_IGESExport.h"
   #include "GeomAlgoAPI_STEPExport.h"

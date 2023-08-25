@@ -101,6 +101,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_GlueFaces.h
     GeomAlgoAPI_LimitTolerance.h
     GeomAlgoAPI_Utils.h
+    GeomAlgoAPI_NonPlanarFace.h
 )
 
 SET(PROJECT_SOURCES
@@ -182,6 +183,7 @@ SET(PROJECT_SOURCES
   	GeomAlgoAPI_CanonicalRecognition.cpp
     GeomAlgoAPI_LimitTolerance.cpp
     GeomAlgoAPI_Utils.cpp
+    GeomAlgoAPI_NonPlanarFace.cpp
 )
 
 SET(PROJECT_LIBRARIES

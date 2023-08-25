@@ -69,6 +69,10 @@ private:
                          const std::list< std::shared_ptr<GeomAPI_Dir> >& theNormals,
                          std::list< std::shared_ptr<GeomAPI_Shape> >& theFaces,
                          std::shared_ptr<GeomAlgoAPI_MakeShape>& theBuilderAlgo) const;
+
+  void buildNonPlanarFacesByEdges(const ListOfShape& theShapes,
+                                  ListOfShape& theFaces,
+                                  std::shared_ptr<GeomAlgoAPI_MakeShape>& theBuilderAlgo) const;
 };
 
 #endif

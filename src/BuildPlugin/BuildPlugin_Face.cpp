@@ -32,6 +32,7 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_Copy.h>
+#include <GeomAlgoAPI_NonPlanarFace.h>
 
 //=================================================================================================
 BuildPlugin_Face::BuildPlugin_Face()
@@ -60,8 +61,10 @@ void BuildPlugin_Face::execute()
 
   // Collect base shapes.
   ListOfShape anEdges;
+  ListOfShape aNonPlanarEdges;
   ListOfShape anOriginalFaces;
   ListOfShape aContexts;
+
   getOriginalShapesAndContexts(BASE_OBJECTS_ID(), anOriginalFaces, aContexts);
   anOriginalFaces.clear();
   std::list< std::shared_ptr<GeomAPI_Dir> > aListOfNormals;
@@ -88,16 +91,29 @@ void BuildPlugin_Face::execute()
       }
     }
 
-    for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-      GeomShapePtr anEdge = anExp.current();
-      anEdges.push_back(anEdge);
-    }
-
     // check whether the context is a sketch, in this case store its normal for further needs
     std::shared_ptr<GeomAPI_PlanarEdges> aSketch =
         std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContext);
     if (aSketch)
       aListOfNormals.push_back(aSketch->norm());
+
+    bool isPlanar(aShape->isPlanar() || aSketch);
+
+    for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      GeomShapePtr anEdge = anExp.current();
+      isPlanar? anEdges.push_back(anEdge) : aNonPlanarEdges.push_back(anEdge);
+    }
+  }
+
+  if (!anEdges.empty())
+  {
+    //check is planar objects belong to nke
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+    if(!aPln.get())
+    {
+      aNonPlanarEdges.insert(aNonPlanarEdges.end(), anEdges.begin(), anEdges.end());
+      anEdges.clear();
+    }
   }
 
   // Build faces by edges.
@@ -106,6 +122,18 @@ void BuildPlugin_Face::execute()
   if (!anEdges.empty())
     buildFacesByEdges(anEdges, aListOfNormals, aFaces, aFaceBuilder);
   int aNbFacesFromEdges = (int)aFaces.size();
+
+  // Build non-planar faces by edges.
+  GeomMakeShapePtr aNonPlanarFaceBuilder;
+  int aNbNonPlanarFaces = (int)aFaces.size();
+  if(!aNonPlanarEdges.empty())
+  {
+    ListOfShape aNonPlanarFaces;
+    buildNonPlanarFacesByEdges(aNonPlanarEdges, aNonPlanarFaces, aNonPlanarFaceBuilder);
+    // Add non-planar faces to common faces list.
+    aFaces.insert(aFaces.end(), aNonPlanarFaces.begin(), aNonPlanarFaces.end());
+    aNbNonPlanarFaces += (int)aNonPlanarFaces.size();
+  }
 
   // Add faces selected by user.
   aFaces.insert(aFaces.end(), anOriginalFaces.begin(), anOriginalFaces.end());
@@ -116,6 +144,8 @@ void BuildPlugin_Face::execute()
     std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
     if (anIndex < aNbFacesFromEdges)
       aMakeShapeList->appendAlgo(aFaceBuilder);
+    else if(anIndex < aNbNonPlanarFaces)
+      aMakeShapeList->appendAlgo(aNonPlanarFaceBuilder);
 
     GeomShapePtr aShape = *anIt;
     GeomMakeShapePtr aCopy(new GeomAlgoAPI_Copy(aShape));
@@ -124,6 +154,8 @@ void BuildPlugin_Face::execute()
     ListOfShape aBaseShapes;
     if (anIndex < aNbFacesFromEdges)
       aBaseShapes = anEdges;
+    else if(anIndex < aNbNonPlanarFaces)
+      aBaseShapes = aNonPlanarEdges;
     else
       aBaseShapes.push_back(aShape);
     storeResult(aMakeShapeList, aBaseShapes, aContexts, aCopy->shape(), anIndex++);
@@ -132,6 +164,7 @@ void BuildPlugin_Face::execute()
   removeResults(anIndex);
 }
 
+//==================================================================================================
 void BuildPlugin_Face::buildFacesByEdges(
     const ListOfShape& theEdges,
     const std::list< std::shared_ptr<GeomAPI_Dir> >& theNormals,
@@ -166,4 +199,19 @@ void BuildPlugin_Face::buildFacesByEdges(
   theFaces.clear();
   GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aPln->location(), aPln->direction(),
                                              aWires, theFaces);
+}
+
+//==================================================================================================
+void BuildPlugin_Face::buildNonPlanarFacesByEdges(
+    const ListOfShape& theShapes,
+    ListOfShape& theFaces,
+    std::shared_ptr<GeomAlgoAPI_MakeShape>& theBuilderAlgo) const
+{
+
+    // Get faces.
+    std::shared_ptr<GeomAlgoAPI_NonPlanarFace> aNonPlanarFaceBuilder
+            (new GeomAlgoAPI_NonPlanarFace(theShapes));
+    theFaces = aNonPlanarFaceBuilder->faces();
+    theBuilderAlgo = aNonPlanarFaceBuilder;
+
 }

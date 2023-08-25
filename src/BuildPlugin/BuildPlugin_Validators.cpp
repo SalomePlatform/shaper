@@ -39,6 +39,7 @@
 #include <GeomAlgoAPI_WireBuilder.h>
 #include <GeomAlgoAPI_MakeVolume.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_NonPlanarFace.h>
 
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
@@ -292,7 +293,9 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
   bool hasFaces = false;
 
   // Collect base shapes.
-  ListOfShape anEdges;
+  ListOfShape anAllEdges;
+  ListOfShape aPlanarEdges;
+  ListOfShape aNonPlanarEdges;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
@@ -313,24 +316,26 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
       continue;
     }
 
+    bool isPlanar(aShape->isPlanar());
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       hasEdgesOrWires = true;
       GeomShapePtr anEdge = anExp.current();
-      anEdges.push_back(anEdge);
+      anAllEdges.push_back(anEdge);
+      isPlanar? aPlanarEdges.push_back(anEdge): aNonPlanarEdges.push_back(anEdge);
     }
   }
 
   if (hasFaces && hasEdgesOrWires) {
     theError = "Faces and edges/wires should be selected together.";
     return false;
-  } else if (hasEdgesOrWires && anEdges.empty()) {
+  } else if (hasEdgesOrWires && anAllEdges.empty()) {
     theError = "Objects are not selected.";
     return false;
   }
 
   // Check that edges does not have intersections.
-  if(anEdges.size() > 1) {
-    GeomAlgoAPI_PaveFiller aPaveFiller(anEdges, false);
+  if(anAllEdges.size() > 1) {
+    GeomAlgoAPI_PaveFiller aPaveFiller(anAllEdges, false);
     if(!aPaveFiller.isDone()) {
       theError = "Error while checking if edges intersects.";
       return false;
@@ -342,25 +347,36 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
         anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       anEdgesNum++;
     }
-    if(anEdgesNum != anEdges.size()) {
+    if(anEdgesNum != anAllEdges.size()) {
       theError = "Selected objects have intersections.";
       return false;
     }
   }
 
-  if (!anEdges.empty()) {
+  //check only planar onjects
+  bool isPlanarBelongToOnePlane(false);
+  if (!aPlanarEdges.empty()) {
     // Check that they are planar.
-    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
-    if(!aPln.get()) {
-      theError = "Selected object(s) should belong to only one plane.";
-      return false;
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(aPlanarEdges);
+    if(aPln.get()) {
+      // Check that selected objects have closed contours.
+      isPlanarBelongToOnePlane = true;
+      GeomAlgoAPI_SketchBuilder aBuilder(aPln, aPlanarEdges);
+      const ListOfShape& aFaces = aBuilder.faces();
+      if(aFaces.empty()) {
+        theError = "Selected planar objects do not generate closed contour.";
+        return false;
+      }
     }
+  }
 
-    // Check that selected objects have closed contours.
-    GeomAlgoAPI_SketchBuilder aBuilder(aPln, anEdges);
-    const ListOfShape& aFaces = aBuilder.faces();
+  //check non planar objects
+  if(!aNonPlanarEdges.empty() || (!aPlanarEdges.empty() && !isPlanarBelongToOnePlane))
+  {
+    GeomAlgoAPI_NonPlanarFace aNonPlanarFaceBuilder(isPlanarBelongToOnePlane? aNonPlanarEdges : anAllEdges);
+    const ListOfShape& aFaces = aNonPlanarFaceBuilder.faces();
     if(aFaces.empty()) {
-      theError = "Selected objects do not generate closed contour.";
+      theError = "Selected non-planar objects do not generate closed contour.";
       return false;
     }
   }
