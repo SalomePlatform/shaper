@@ -1429,6 +1429,12 @@ void setDisplaying(ResultPartPtr thePart, bool theDisplayFromScript)
 
   isDoingDisplay = true;
   DocumentPtr aDoc = thePart->partDoc();
+
+  if (!aDoc) {
+    // Prevent a crash in case aDoc does not exist
+    return;
+  }
+
   int aConstructionSize = aDoc->size(ModelAPI_ResultConstruction::group());
   int aGroupSize = aDoc->size(ModelAPI_ResultGroup::group());
   int aFieldSize = aDoc->size(ModelAPI_ResultField::group());

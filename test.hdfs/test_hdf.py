@@ -64,6 +64,10 @@ class TestHDF(unittest.TestCase):
       self.session.setActiveDocument(self.partSet)
       self.session.finishOperation()
 
+      # Check that the features are not in error
+      Part_1_doc = aPart.partDoc()
+
+      model.checkFeaturesValidity(Part_1_doc)
     # check reference data
     exec(open(self.reffile, "rb").read(), globals(), aPartsList)
 
@@ -75,11 +79,16 @@ if __name__ == "__main__":
     TestHDF.reffile = sys.argv[2]
   if len(sys.argv) > 3:
     errFile = open(sys.argv[3], 'w')
+  else:
+    # to ease debugging, display the log in embedded python console if no log file is provided
+    # when calling salome in command line for instance
+    # runSalome.py --splash 0 test_hdf.py args:BearingSeparator.hdf,BearingSeparator.py
+    errFile = None
 
   aTest = unittest.TestLoader().loadTestsFromTestCase(TestHDF)
   unittest.TextTestRunner(stream=errFile).run(aTest)
-  errFile.close()
-  #import qtsalome
-  #qtsalome.qApp.closeAllWindows()
-  import signal
-  os.kill(os.getpid(),signal.SIGKILL)
+  if errFile:
+    errFile.close()
+
+  # Quit SALOME the clean way
+  sys.exit()

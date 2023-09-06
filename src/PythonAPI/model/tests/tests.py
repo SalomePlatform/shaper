@@ -20,7 +20,7 @@
 from GeomAlgoAPI import *
 from GeomAPI import *
 from GeomDataAPI import *
-from ModelAPI import ModelAPI_Feature, ModelAPI_Session
+from ModelAPI import ModelAPI_Feature, ModelAPI_Session, objectToFeature
 from ModelHighAPI import *
 import math
 from salome.shaper.model import sketcher
@@ -444,3 +444,32 @@ def checkFilter(thePartDoc, theModel, theFilter, theShapesList):
     assert aFiltersFactory.isValid(theFilter.feature(), parent, shape) == res, "Filter result for {} \"{}\" incorrect. Expected {}.".format(shapeType, shapeName, res)
     if needUndo:
       theModel.undo()
+
+def checkFeaturesValidity(thePartDoc):
+  """ Check that the features are not in error
+  """
+  aFactory = ModelAPI_Session.get().validators()
+
+  nbFeatures = thePartDoc.size("Features")
+
+  assert nbFeatures>0, "No features found in part doc"
+
+  for i in range(nbFeatures):
+    partObject = thePartDoc.object("Features", i)
+    # Check the data
+    partObjectData = partObject.data()
+    name = partObjectData.name()
+    error = partObjectData.error()
+    # raise the error message if there is one
+    assert error == '', "The feature data {0} is in error: {1}".format(name, error)
+    # raise an error if the the feature is not valid (without error message)
+    assert partObject.data().isValid(), "The feature data {0} is in error.".format(name)
+    # Same checks for the feature itself
+    feature = objectToFeature(partObject)
+    if feature is None:
+      # Folders are not real features
+      continue
+    # raise the error message if there is one
+    assert error == '', "The feature {0} is in error: {1}".format(name, error)
+    # raise an error if the the feature is not valid (without error message)
+    assert aFactory.validate(feature), "The feature {0} is in error.".format(name)

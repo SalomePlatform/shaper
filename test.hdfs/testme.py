@@ -37,26 +37,41 @@ if __name__ == '__main__':
 
   tempfile = tempfile.NamedTemporaryFile()
   hdffile_basename = os.path.basename(hdffile)
+  test_hdfpy = "test_hdf.py"
+  if not os.path.exists(test_hdfpy):
+    # add absolute path in SHAPER install directory
+    test_hdfpy = os.path.join(os.getenv("SHAPER_ROOT_DIR"), "bin", "salome", "test", "HDFs", test_hdfpy)
+    if not os.path.exists(test_hdfpy):
+      raise Exception("test_hdf.py could not be found. Check your environment.")
   testlogfile = tempfile.name + "_" + hdffile_basename.replace(".", "_")
   tempfile.close()
 
   isOk = True
   error = ""
 
-  proc = subprocess.Popen(["runSalome.py", "--modules", "SHAPER,GEOM,SHAPERSTUDY", "--gui", "--splash", "0", "test_hdf.py", "args:" + hdffile + "," + testdatafile + "," + testlogfile], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  proc = subprocess.Popen(["runSalome.py", "--modules", "SHAPER,GEOM,SHAPERSTUDY", "--gui", "--splash", "0", test_hdfpy, "args:" + hdffile + "," + testdatafile + "," + testlogfile])
   try:
     proc.communicate(timeout = testTimeout)
-  except TimeoutExpired:
+  except subprocess.TimeoutExpired:
     isOk = False
-    proc.kill()
-    out, err = proc.communicate()
+    import salome_utils
+    port = salome_utils.getPortNumber()
+    import killSalomeWithPort
+    killSalomeWithPort.killMyPort(port)
     error = "Killed by CPU limit."
-    print(err)
+
+  assert isOk, "Test failed. {}".format(error)
 
   with open(testlogfile, 'r') as inputFile:
     s = inputFile.read()
-    print(s)
-    isOk = isOk and s.find("FAIL") < 0
+    #print("logfile: ", s)
+    if s.find("FAIL") > 0:
+      isOk = False
+      error = s
+    elif s.find("OK") < 0:
+      isOk = False
+      error = "Test not ended until OK. Maybe a SIGSEGV."
+
   try:
     os.remove(testlogfile)
   except:
