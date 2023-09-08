@@ -356,7 +356,7 @@ PyObject* exportToXAOMem(const std::shared_ptr<ModelAPI_Document> & thePart,
   ExportPtr aXAOExportAPI (new ExchangeAPI_Export
                            (aFeature, theSelectedShape, theAuthor, theGeometryName));
   std::string aBuff = aFeature->string(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID())->value();
-  return PyBytes_FromString(aBuff.c_str());
+  return PyBytes_FromStringAndSize(aBuff.c_str(), aBuff.length());
 }
 
 void exportPart(const std::shared_ptr<ModelAPI_Document> & thePart,
