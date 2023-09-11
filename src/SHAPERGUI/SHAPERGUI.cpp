@@ -100,7 +100,7 @@ static const QString ToolbarsSection("SHAPER_Toolbars");
 static const QString FreeCommandsParam("OutOFToolbars");
 
 
-/** 
+/**
 * Class for preferences management
 */
 class SHAPERGUI_PrefMgr: public ModuleBase_IPrefMgr
@@ -383,6 +383,16 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
   connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
           this, SLOT(onSaveAsDocByShaper()));
   updateInfoPanel();
+
+  //connect(myWorkshop->operationMgr(), SIGNAL(operationResumed(ModuleBase_Operation*)),
+  //        this, SLOT(onOperationResumed(ModuleBase_Operation*)));
+  //connect(myWorkshop->operationMgr(), SIGNAL(operationStopped(ModuleBase_Operation*)),
+  //        this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myWorkshop->operationMgr(), SIGNAL(operationCommitted(ModuleBase_Operation*)),
+          this, SLOT(onOperationCommitted(ModuleBase_Operation*)));
+  connect(myWorkshop->operationMgr(), SIGNAL(operationAborted(ModuleBase_Operation*)),
+          this, SLOT(onOperationAborted(ModuleBase_Operation*)));
+
   return isDone;
 }
 
@@ -482,6 +492,53 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   publishToStudy();
 
   return LightApp_Module::deactivateModule(theStudy);
+}
+
+//******************************************************
+void SHAPERGUI::logShaperGUIEvent()
+{
+  QAction* anAction = static_cast<QAction*>(sender());
+  if ( !anAction )
+    return;
+  const QString anId = anAction->data().toString();
+  const QString section = anId.contains("Sketch") ? "sketcher" : "";
+
+  CAM_Application::logStructuredUserEvent( moduleName(),
+                                           section,
+                                           anAction->text(),
+                                           "activated" );
+}
+
+//******************************************************
+static void onOperationGeneric( ModuleBase_Operation* theOperation,
+                                const QString moduleName,
+                                const QString &event )
+{
+  QString anId = theOperation->id();
+  QString section = "";
+
+  if (anId.contains("Sketch"))
+  {
+    section = "sketcher";
+    anId.remove("Sketch");
+  }
+
+  CAM_Application::logStructuredUserEvent( moduleName,
+                                           section,
+                                           anId,
+                                           event );
+}
+
+//******************************************************
+void SHAPERGUI::onOperationCommitted(ModuleBase_Operation* theOperation)
+{
+  onOperationGeneric(theOperation, moduleName(), "committed");
+}
+
+//******************************************************
+void SHAPERGUI::onOperationAborted(ModuleBase_Operation* theOperation)
+{
+  onOperationGeneric(theOperation, moduleName(), "aborted");
 }
 
 //******************************************************
@@ -704,6 +761,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
     createTool(separator(), aWBTool);
     registerCommandToolbar(theTBName, -1);
   }
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(logShaperGUIEvent()));
   return aAction;
 }
 
@@ -743,6 +801,8 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
   createTool(separator(), aWBTool); /// nested action is always separated of others
   registerCommandToolbar(theWBName, -1);
 
+  connect(anAction, SIGNAL(triggered(bool)), this, SLOT(logShaperGUIEvent()));
+
   return anAction;
 }
 
@@ -771,6 +831,9 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
   aAction->setStatusTip(theTip);
   aAction->setData(theId);
   createMenu(aId, aMenu, theMenuPosition);
+
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(logShaperGUIEvent()));
+
   return aAction;
 }
 

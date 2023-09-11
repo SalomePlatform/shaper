@@ -36,8 +36,9 @@ class SHAPERGUI_OCCSelector;
 class OCCViewer_Viewer;
 class CAM_Study;
 class QtxInfoPanel;
+class ModuleBase_Operation;
 
-/** 
+/**
  * \ingroup Salome
  * An implementation of SALOME connector class for implementation of
  * XGUI functionality as a module of SALOME
@@ -214,6 +215,9 @@ Q_OBJECT
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 
+   /// \brief The method is called on any GUI action
+  virtual void logShaperGUIEvent();
+
  protected:
    /// Create data model
   CAM_DataModel* createDataModel();
@@ -228,6 +232,9 @@ private slots:
   void onWhatIs(bool isToggled);
 
   void onEditToolbars();
+
+  void onOperationCommitted(ModuleBase_Operation*);
+  void onOperationAborted(ModuleBase_Operation*);
 
  private:
    /// Create selector for OCC Viewer
