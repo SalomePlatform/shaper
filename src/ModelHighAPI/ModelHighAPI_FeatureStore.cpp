@@ -411,9 +411,12 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::COMPOUND;
   for (; aType <= GeomAPI_Shape::VERTEX; aType = GeomAPI_Shape::ShapeType((int)aType + 1)) {
     GeomAPI_ShapeExplorer anExp(theShape, aType);
-    int aCount = 0;
-    for (; anExp.more(); anExp.next()) aCount++;
-    aResult << anExp.current()->shapeTypeStr().c_str() <<  ": " << aCount << std::endl;
+    if (anExp.more()) {
+      std::string aTypeStr = anExp.current()->shapeTypeStr();
+      int aCount = 0;
+      for (; anExp.more(); anExp.next()) aCount++;
+      aResult << aTypeStr.c_str() <<  ": " << aCount << std::endl;
+    }
   }
   // output the main characteristics
   double aVolume = GeomAlgoAPI_ShapeTools::volume(theShape);
