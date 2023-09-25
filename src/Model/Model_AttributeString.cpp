@@ -35,7 +35,9 @@ static const Standard_GUID kUVALUE_IDENTIFIER("04cac509-b2fc-4887-b442-d2a86f2fd
 
 void Model_AttributeString::setValue(const std::string& theValue)
 {
-  TCollection_ExtendedString aValue(theValue.c_str());
+  // Always assume the std::string to be a multi-byte character string
+  // as it can contain accents or other special characters, too!
+  TCollection_ExtendedString aValue(theValue.c_str(), true);
   if (!myIsInitialized || myString->Get() != aValue) {
     if (myString.IsNull())
       myString = TDataStd_Name::Set(myLab, TCollection_ExtendedString());

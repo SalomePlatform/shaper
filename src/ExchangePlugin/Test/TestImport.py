@@ -156,6 +156,8 @@ if __name__ == '__main__':
         testImport("BREP", shape_path, 259982.297176, 39481.415022205365, 10 ** -5)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "solid.brp"))
         testImport("BRP", shape_path, 259982.297176, 39481.415022205365, 10 ** -5)
+        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "pièce.brep"))
+        testImport("BREP", shape_path, 259982.297176, 39481.415022205365, 10 ** -5)
         #=========================================================================
         # Create a shape imported from STEP
         #=========================================================================
