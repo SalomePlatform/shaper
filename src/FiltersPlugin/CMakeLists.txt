@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_OnLine.h
     FiltersPlugin_OnGeometry.h
     FiltersPlugin_OnPlaneSide.h
+    FiltersPlugin_OnShapeName.h
     FiltersPlugin_OppositeToEdge.h
     FiltersPlugin_RelativeToSolid.h
     FiltersPlugin_ExternalFaces.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_OnLine.cpp
     FiltersPlugin_OnGeometry.cpp
     FiltersPlugin_OnPlaneSide.cpp
+    FiltersPlugin_OnShapeName.cpp
     FiltersPlugin_OppositeToEdge.cpp
     FiltersPlugin_RelativeToSolid.cpp
     FiltersPlugin_ExternalFaces.cpp
@@ -83,6 +85,7 @@ SET(XML_RESOURCES
   filter-OnLine.xml
   filter-OnPlane.xml
   filter-OnPlaneSide.xml
+  filter-OnShapeName.xml
   filter-OppositeToEdge.xml
   filter-RelativeToSolid.xml
   filter-TopoConnectedFaces.xml
@@ -101,12 +104,13 @@ SET(TEXT_RESOURCES
 SOURCE_GROUP ("XML Files" FILES ${XML_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
-ADD_DEFINITIONS(-DFILTERS_EXPORTS ${OpenCASCADE_DEFINITIONS})
+ADD_DEFINITIONS(-DFILTERS_EXPORTS ${OpenCASCADE_DEFINITIONS} ${BOOST_DEFINITIONS})
 ADD_LIBRARY(FiltersPlugin SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES} ${TEXT_RESOURCES})
 TARGET_LINK_LIBRARIES(FiltersPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
   ${OpenCASCADE_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/Config
   ${PROJECT_SOURCE_DIR}/src/Events
@@ -115,6 +119,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/GeomValidators
   ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
+  ${PROJECT_SOURCE_DIR}/src/Locale
 )
 
 INSTALL(TARGETS FiltersPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})

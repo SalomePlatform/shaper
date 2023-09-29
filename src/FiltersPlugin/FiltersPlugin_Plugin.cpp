@@ -28,6 +28,7 @@
 #include "FiltersPlugin_OnLine.h"
 #include "FiltersPlugin_OnPlane.h"
 #include "FiltersPlugin_OnPlaneSide.h"
+#include "FiltersPlugin_OnShapeName.h"
 #include "FiltersPlugin_OppositeToEdge.h"
 #include "FiltersPlugin_Plugin.h"
 #include "FiltersPlugin_RelativeToSolid.h"
@@ -64,6 +65,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("VolumeSize", new FiltersPlugin_VolumeSize);
   aFactory->registerFilter("FeatureEdges", new FiltersPlugin_FeatureEdges);
   aFactory->registerFilter("ContinuousFaces", new FiltersPlugin_ContinuousFaces);
+  aFactory->registerFilter("OnShapeName", new FiltersPlugin_OnShapeName);
 
   Config_ModuleReader::loadScript("FiltersPlugin_TopoConnectedFaces");
 
