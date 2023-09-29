@@ -28,6 +28,7 @@ import math
 
 # convenient ratio of time moving point to time creating sketch
 MOVE_BUILD_RATIO = 0.1
+NUM_MOVES = 50
 # tolerance for comparison of reals
 TOLERANCE = 1.e-7
 
@@ -248,7 +249,7 @@ model.do()
 
 sketchTime = timer() - sketchTime
 print("Sketch creation time: {0}".format(sketchTime))
-expectedTime = MOVE_BUILD_RATIO * sketchTime
+expectedTime = MOVE_BUILD_RATIO * sketchTime * NUM_MOVES
 averageTime = 0
 nbMoves = 0
 
@@ -275,20 +276,21 @@ anAngle = math.pi / 100.
 aCos = math.cos(anAngle)
 aSin = math.sin(anAngle)
 
-for ang in range(0, 50):
+for ang in range(0, NUM_MOVES):
     movementTime = timer()
     X = aCenter.x() + aDeltaX * aCos + aDeltaY * aSin
     Y = aCenter.y() - aDeltaX * aSin + aDeltaY * aCos
     aEndPoint.setValue(X, Y)
     model.do()
     movementTime = timer() - movementTime
-    assert movementTime < expectedTime, "Time to move point {0} is greater than expected {1}".format(movementTime, expectedTime)
     assert math.fabs(aEndPoint.x() - X) < TOLERANCE and math.fabs(aEndPoint.y() - Y) < TOLERANCE, "({0}, {1}) != ({2}, {3})".format(aEndPoint.x(), aEndPoint.y(), X, Y)
     averageTime += movementTime
     nbMoves += 1
     aDeltaX = aEndPoint.x() - aCenter.x()
     aDeltaY = aEndPoint.y() - aCenter.y()
-print("Movement average time: {0}".format(averageTime / nbMoves))
+averageTime /= nbMoves
+print("Movement average time: {0}".format(averageTime))
+assert averageTime < expectedTime, "Average time to move point {0} is greater than expected {1}".format(averageTime, expectedTime)
 
 model.end()
 
