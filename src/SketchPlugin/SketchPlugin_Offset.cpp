@@ -75,17 +75,40 @@ SketchPlugin_Offset::SketchPlugin_Offset()
 
 void SketchPlugin_Offset::initAttributes()
 {
-  data()->addAttribute(EDGES_ID(), ModelAPI_AttributeRefList::typeId());
-  data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+  AttributeRefListPtr anEdgesAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
+    (data()->addAttribute(EDGES_ID(), ModelAPI_AttributeRefList::typeId())); // #1
+  data()->addAttribute(VALUE_ID(), ModelAPI_AttributeDouble::typeId());      // #2
+  data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());  // #3
 
-  // Always initialize approximation to false by default for backward compatibility
-  AttributeBooleanPtr approxAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
-    data()->addAttribute(APPROX_ID(), ModelAPI_AttributeBoolean::typeId()));
-  approxAttr->setValue(false);
+  // SketchPlugin_Constraint::ENTITY_A() stores original entities
+  AttributeRefListPtr entaAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
+    (data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(),
+                          ModelAPI_AttributeRefList::typeId())); // #4
 
-  // store original entities
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
+  bool badOrder = false;
+  if (anEdgesAttr->isInitialized()) { // restoring data from saved study
+    badOrder = !entaAttr->isInitialized();
+    // we have not found AttributeRefList at 4th position,
+    // so, we suppose a study with wrong order of offset attributes
+  }
+
+  AttributeBooleanPtr approxAttr;
+  if (badOrder) {
+    // It is a fix for 37570 Tuleap issue.
+    // We could have studies with approxAttr at the 4th position.
+    // Using directly attribute index 4, we create approxAttr on label #4,
+    // otherwise (with default -1 index) it would be created on the next one.
+    approxAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+      (data()->addAttribute(APPROX_ID(),
+                            ModelAPI_AttributeBoolean::typeId(),
+                            4)); // #4
+
+    entaAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>
+      (data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(),
+                            ModelAPI_AttributeRefList::typeId(),
+                            5)); // #5
+  }
+
   // store offset entities
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   // store mapping between original entity and index of the corresponding offset entity
@@ -102,6 +125,16 @@ void SketchPlugin_Offset::initAttributes()
     (data()->addAttribute(JOINT_ID(), ModelAPI_AttributeString::typeId()));
   if (!aJointAttr->isInitialized())
     aJointAttr->setValue(JOINT_KEEP_DISTANCE());
+
+  if (!badOrder) {
+    // Good place for approxAttr is here
+    approxAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+      (data()->addAttribute(APPROX_ID(), ModelAPI_AttributeBoolean::typeId()));
+  }
+
+  // Initialize approximation to false by default for backward compatibility
+  if (!approxAttr->isInitialized())
+    approxAttr->setValue(false);
 }
 
 void SketchPlugin_Offset::execute()

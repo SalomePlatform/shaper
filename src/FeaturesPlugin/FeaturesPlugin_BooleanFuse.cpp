@@ -70,17 +70,65 @@ FeaturesPlugin_BooleanFuse::FeaturesPlugin_BooleanFuse()
 //==================================================================================================
 void FeaturesPlugin_BooleanFuse::initAttributes()
 {
-  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+  AttributeStringPtr aMethodAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>
+    (data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId())); // #1
 
-  data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
-  data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()); // #2
+  data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()); // #3
 
-  data()->addAttribute(FeaturesPlugin_Boolean::USE_FUZZY_ID(), ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(FUZZY_PARAM_ID(), ModelAPI_AttributeDouble::typeId());
-  boolean(USE_FUZZY_ID())->setValue(false); // Do NOT use the fuzzy parameter by default.
-  real(FUZZY_PARAM_ID())->setValue(DEFAULT_FUZZY);
+  data()->addAttribute(REMOVE_INTERSECTION_EDGES_ID(),
+                       ModelAPI_AttributeBoolean::typeId()); // #4 ???
 
-  data()->addAttribute(REMOVE_INTERSECTION_EDGES_ID(), ModelAPI_AttributeBoolean::typeId());
+  AttributeBooleanPtr aUseFuzzyAttr; // #5 ???
+  AttributeDoublePtr aValFuzzyAttr; // #6 ???
+
+  bool badOrder = false;
+  if (aMethodAttr->isInitialized()) { // restoring data from saved study
+    // It is a fix for 37570 Tuleap issue.
+    // We could have studies with aValFuzzyAttr at the 5th position instead of expected 6th.
+
+    // Fuzzy value (check, is it present at 5th label)
+    aValFuzzyAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>
+      (data()->addAttribute(FUZZY_PARAM_ID(),
+                            ModelAPI_AttributeDouble::typeId())); // #5
+    if (aValFuzzyAttr->isInitialized()) {
+      badOrder = true;
+      // bad order of attributes in saved study
+      // 4 - is fuzzy
+      // 5 - fuzzy value
+      // 6 - remove edges
+      aUseFuzzyAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+      (data()->addAttribute(FeaturesPlugin_Boolean::USE_FUZZY_ID(),
+                            ModelAPI_AttributeBoolean::typeId(),
+                            4)); // #4
+      data()->addAttribute(REMOVE_INTERSECTION_EDGES_ID(),
+                           ModelAPI_AttributeBoolean::typeId(),
+                           6); // #6
+    }
+  }
+
+  if (!badOrder) {
+    // good order of attributes
+    // 4 - remove edges
+    // 5 - is fuzzy
+    // 6 - fuzzy value
+
+    // Is fuzzy value
+    aUseFuzzyAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+      (data()->addAttribute(FeaturesPlugin_Boolean::USE_FUZZY_ID(),
+                            ModelAPI_AttributeBoolean::typeId(),
+                            5)); // #5
+    // Fuzzy value
+    aValFuzzyAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>
+      (data()->addAttribute(FUZZY_PARAM_ID(),
+                            ModelAPI_AttributeDouble::typeId(),
+                            6)); // #6
+  }
+
+  if (!aUseFuzzyAttr->isInitialized())
+    aUseFuzzyAttr->setValue(false); // Do NOT use the fuzzy parameter by default.
+  if (!aValFuzzyAttr->isInitialized())
+    aValFuzzyAttr->setValue(DEFAULT_FUZZY);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
