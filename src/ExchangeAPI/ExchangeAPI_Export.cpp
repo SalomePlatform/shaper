@@ -141,7 +141,7 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
   aListOfOneSel.push_back(theResult);
   fillAttribute(aListOfOneSel,
                 theFeature->selectionList(ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID()));
-  execute(true);
+  execute();
   apply(); // finish operation to make sure the export is done on the current state of the history
 }
 
