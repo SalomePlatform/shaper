@@ -95,10 +95,6 @@
       <translation>Opposite to an edge</translation>
     </message>
     <message>
-      <source>On shape name</source>
-      <translation>On shape name</translation>
-    </message>
-    <message>
       <source>Topologically connected faces</source>
       <translation>Topologically connected faces</translation>
     </message>
@@ -308,15 +304,6 @@
     <message>
       <source>The object is empty</source>
       <translation>The object is empty</translation>
-    </message>
-  </context>
-
-  <!-- OnShapeName -->
-  <context>
-    <name>OnShapeName</name>
-    <message>
-      <source>Search pattern:</source>
-      <translation>Search pattern:</translation>
     </message>
   </context>
 

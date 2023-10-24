@@ -124,5 +124,4 @@ SET(TEST_NAMES
   TestFilter_FeatureEdges.py
   TestFilter_ContinuousFaces.py
   TestFilter_VolumeSize.py
-  TestFilter_OnShapeName.py
 )
