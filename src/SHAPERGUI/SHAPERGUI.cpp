@@ -205,7 +205,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
 #endif
     createAction(aId, aTip, QIcon(":pictures/configure_toolbars.png"),
     tr("Edit toolbars..."), aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
-  int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, 30);
+  int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, -1);
 #ifdef _DEBUG
   int aEditItem =
 #endif
