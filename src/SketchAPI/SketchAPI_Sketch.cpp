@@ -589,31 +589,25 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
   return aRect;
 }
 
-// Old way for create circle
 //--------------------------------------------------------------------------------------
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,
                                                               double theRadius)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_Circle::VERSION_ID()));
-  return CirclePtr(new SketchAPI_Circle(aFeature, theCenterX, theCenterY, theRadius, 0));
+  return CirclePtr(new SketchAPI_Circle(aFeature, theCenterX, theCenterY, theRadius));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(
                                     const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                     double theRadius)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_Circle::VERSION_ID()));
-  return CirclePtr(new SketchAPI_Circle(aFeature, theCenter, theRadius, 0));
+  return CirclePtr(new SketchAPI_Circle(aFeature, theCenter, theRadius));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                                    double theCenterY,
                                                                    double thePassedX,
@@ -621,37 +615,30 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(double theCen
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_MacroCircle::VERSION_ID()));
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterX, theCenterY,
-                                                            thePassedX, thePassedY, 0));
+                                                            thePassedX, thePassedY));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(
     const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
     const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_MacroCircle::VERSION_ID()));
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterPoint, thePassedPoint, 0));
+  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterPoint, thePassedPoint));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(double theX1, double theY1,
                                                                    double theX2, double theY2,
                                                                    double theX3, double theY3)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_MacroCircle::VERSION_ID()));
-
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theX1, theY1,
                                                             theX2, theY2,
-                                                            theX3, theY3, 0));
+                                                            theX3, theY3));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(
     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
@@ -659,11 +646,9 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  fillAttribute(SketchPlugin_Circle::THE_VERSION_0, aFeature->integer(SketchPlugin_Circle::VERSION_ID()));
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, thePoint1, thePoint2, thePoint3, 0));
+  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, thePoint1, thePoint2, thePoint3));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_Circle>
   SketchAPI_Sketch::addCircle(const ModelHighAPI_Selection & theExternal)
 {
@@ -672,90 +657,7 @@ std::shared_ptr<SketchAPI_Circle>
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternal));
 }
 
-[[deprecated("Use addCircleWithPoint method instead.")]]
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::wstring & theExternalName)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  return CirclePtr(new SketchAPI_Circle(aFeature, theExternalName));
-}
-
-// New way for create Circle
-//--------------------------------------------------------------------------------------
-std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircleWithPoint(double theCenterX,
-  double theCenterY,
-  double theRadius,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  return CirclePtr(new SketchAPI_Circle(aFeature, theCenterX, theCenterY, theRadius, theAngle));
-}
-
-std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircleWithPoint(
-  const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-  double theRadius,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  return CirclePtr(new SketchAPI_Circle(aFeature, theCenter, theRadius, theAngle));
-}
-
-std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircleWithPoint(double theCenterX,
-  double theCenterY,
-  double thePassedX,
-  double thePassedY,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterX, theCenterY,
-    thePassedX, thePassedY, theAngle));
-}
-
-std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircleWithPoint(
-  const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
-  const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterPoint, thePassedPoint, theAngle));
-}
-
-std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircleWithPoint(double theX1, double theY1,
-  double theX2, double theY2,
-  double theX3, double theY3,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theX1, theY1,
-    theX2, theY2,
-    theX3, theY3, theAngle));
-}
-
-std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircleWithPoint(
-  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
-  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3,
-  double theAngle)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
-  return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, thePoint1, thePoint2, thePoint3, theAngle));
-}
-
-std::shared_ptr<SketchAPI_Circle>
-SketchAPI_Sketch::addCircleWithPoint(const ModelHighAPI_Selection& theExternal)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
-  return CirclePtr(new SketchAPI_Circle(aFeature, theExternal));
-}
-
-std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircleWithPoint(const std::wstring& theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());

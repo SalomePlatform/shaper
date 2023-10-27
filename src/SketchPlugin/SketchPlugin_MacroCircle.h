@@ -87,19 +87,6 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
     return ID;
   }
 
-  /// 2D point - center of the circle.
-  inline static const std::string& ROTATE_POINT_ID()
-  {
-    static const std::string ID("rotate_point");
-    return ID;
-  }
-
-  /// Reference for center point selection.
-  inline static const std::string& ROTATE_POINT_REF_ID()
-  {
-    static const std::string ID("rotate_point_ref");
-    return ID;
-  }
   /// 2D point - passed point of the circle
   inline static const std::string& PASSED_POINT_ID()
   {
@@ -163,21 +150,6 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
     return ID;
   }
 
-  /// Rotate angle of the circle
-  inline static const std::string& CIRCLE_ROTATE_ANGLE_ID()
-  {
-    static const std::string ID("circle_angle");
-    return ID;
-  }
-
-  /// Attribute name of the version of Circle feature
-  /// Need for compability with old way of creating circle
-  inline static const std::string& VERSION_ID()
-  {
-    static const std::string MY_VERSION_ID("version");
-    return MY_VERSION_ID;
-  }
-
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -219,15 +191,11 @@ private:
   void constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature);
   void constraintsForCircleByThreePoints(FeaturePtr theCircleFeature);
 
-  void computeNewAngle(std::shared_ptr<GeomAPI_Circ2d>& theCircle);
-
   FeaturePtr createCircleFeature();
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
-  std::shared_ptr<GeomAPI_Pnt2d> myRotPoint;
   double                         myRadius;
-  double                         myAngle;
 };
 
 #endif

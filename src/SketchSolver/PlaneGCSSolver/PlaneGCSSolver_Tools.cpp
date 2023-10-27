@@ -480,8 +480,7 @@ bool PlaneGCSSolver_Tools::isAttributeApplicable(const std::string& theAttrName,
   }
   else if (theOwnerName == SketchPlugin_Circle::ID()) {
     return theAttrName == SketchPlugin_Circle::CENTER_ID() ||
-           theAttrName == SketchPlugin_Circle::RADIUS_ID() ||
-           theAttrName == SketchPlugin_Circle::ROTATE_ID();
+           theAttrName == SketchPlugin_Circle::RADIUS_ID();
   }
   else if (theOwnerName == SketchPlugin_Line::ID()) {
     return theAttrName == SketchPlugin_Line::START_ID() ||

@@ -35,7 +35,7 @@ class TestMoveCircle(unittest.TestCase):
     self.myCenter = [70., 50.]
     self.myRadius = 20.
     self.myCircle = self.mySketch.addCircle(self.myCenter[0], self.myCenter[1], self.myRadius)
-    self.myDOF = 5
+    self.myDOF = 3
     model.do()
     self.checkDOF()
 

@@ -23,14 +23,10 @@
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Tools.h"
 #include "SketchPlugin_MacroArcReentrantMessage.h"
-#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 
-#include <Locale_Convert.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
-#include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
@@ -39,10 +35,8 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Circ2d.h>
-#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
-#include <GeomAPI_Ax1.h>
 
 #include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
@@ -69,8 +63,7 @@ namespace {
 
 SketchPlugin_MacroCircle::SketchPlugin_MacroCircle()
 : SketchPlugin_SketchEntity(),
-  myRadius(0.0),
-  myAngle(0.0)
+  myRadius(0.0)
 {
 }
 
@@ -91,39 +84,17 @@ void SketchPlugin_MacroCircle::initAttributes()
   data()->addAttribute(SECOND_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(THIRD_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
-  // Attrs for rotation point
-  data()->addAttribute(ROTATE_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(ROTATE_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
-
   data()->addAttribute(CIRCLE_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(CIRCLE_ROTATE_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 
-  // When circle create using addCircle command, angle is not define and new point nor create
-  // This lines must be removed when command for create circle without additional point will be removed from SHAPER
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CIRCLE_ROTATE_ANGLE_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ROTATE_POINT_ID());
+  string(EDIT_CIRCLE_TYPE())->setValue("");
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ROTATE_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIRST_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), THIRD_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_CIRCLE_TYPE());
-
-  // While exist addCircle without creating point.
-  AttributeIntegerPtr aVerAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(
-    data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId()));
-  aVerAttr->setIsArgument(false);
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
-  if (!aVerAttr->isInitialized()) {
-    // this is a newly created feature (not read from file),
-    // so, initialize the latest version
-    aVerAttr->setValue(SketchPlugin_Circle::THE_VERSION_1);
-  }
-
-  string(EDIT_CIRCLE_TYPE())->setValue("");
 }
 
 void SketchPlugin_MacroCircle::execute()
@@ -220,12 +191,6 @@ void SketchPlugin_MacroCircle::constraintsForCircleByCenterAndPassed(FeaturePtr 
   SketchPlugin_Tools::createCoincidenceOrTangency(
       this, PASSED_POINT_REF_ID(), AttributePtr(),
       theCircleFeature->lastResult(), true);
-
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-    SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, ROTATE_POINT_REF_ID(),
-      AttributePtr(),
-      theCircleFeature->lastResult(), false);
 }
 
 void SketchPlugin_MacroCircle::constraintsForCircleByThreePoints(FeaturePtr theCircleFeature)
@@ -240,66 +205,6 @@ void SketchPlugin_MacroCircle::constraintsForCircleByThreePoints(FeaturePtr theC
     SketchPlugin_Tools::createCoincidenceOrTangency(
         this, aPointRef[i], AttributePtr(), aCircleResult, true);
   }
-
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-    SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, ROTATE_POINT_REF_ID(),
-      AttributePtr(),
-      aCircleResult, false);
-}
-
-void SketchPlugin_MacroCircle::computeNewAngle(std::shared_ptr<GeomAPI_Circ2d>& theCircle)
-{
-  if (integer(VERSION_ID())->value() < SketchPlugin_Circle::THE_VERSION_1)
-    return;
-
-  AttributePtr aRotateAtr = attribute(ROTATE_POINT_ID());
-  if (aRotateAtr->isInitialized())
-  {
-    AttributeRefAttrPtr aRotRef = refattr(ROTATE_POINT_REF_ID());
-    std::shared_ptr<GeomAPI_Pnt2d> aRotPoit;
-    std::shared_ptr<GeomAPI_Shape> aTangentCurve;
-    SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
-      aRotRef, aRotateAtr, aTangentCurve, aRotPoit);
-
-    myRotPoint = theCircle->project(aRotPoit);
-
-    std::shared_ptr<GeomAPI_Pnt2d> aNorm(new GeomAPI_Pnt2d(myRadius, 0));
-    double anEndParam, aStartParam;
-    theCircle->parameter(myRotPoint, 1.e-4, anEndParam);
-    theCircle->parameter(aNorm, 1.e-4, aStartParam);
-    myAngle = (anEndParam - aStartParam) / 3.14 * 180.0;
-  }
-  else
-  {
-    std::shared_ptr<GeomAPI_Pnt2d> aRotPoit =
-      std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(myCenter->x() + myRadius, myCenter->y()));
-    myRotPoint = theCircle->project(aRotPoit);
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(ROTATE_POINT_ID()))->setValue(myRotPoint);
-    myAngle = 0;
-  }
-}
-
-static FeaturePtr CreatePoint(FeaturePtr theCircleFeature,
-                              GeomPnt2dPtr thePoint)
-{
-  SketchPlugin_Sketch* aSketch =
-    std::dynamic_pointer_cast<SketchPlugin_Feature>(theCircleFeature)->sketch();
-
-  // create point at sewing point of circle
-  FeaturePtr aPointFeature = aSketch->addFeature(SketchPlugin_Point::ID());
-  aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theCircleFeature);
-
-  AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-    aPointFeature->attribute(SketchPlugin_Point::COORD_ID()));
-  aCoord->setValue(thePoint);
-  aPointFeature->execute();
-
-  SketchPlugin_Tools::createConstraintAttrAttr(aSketch, SketchPlugin_ConstraintCoincidenceInternal::ID(),
-    theCircleFeature->attribute(SketchPlugin_Circle::ROTATE_ID()), aCoord);
-
-  theCircleFeature->reference(SketchPlugin_Circle::ROTATE_REF_ID())->setValue(aPointFeature);
-  return aPointFeature;
 }
 
 FeaturePtr SketchPlugin_MacroCircle::createCircleFeature()
@@ -308,23 +213,10 @@ FeaturePtr SketchPlugin_MacroCircle::createCircleFeature()
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(myCenter->x(),
                                                                              myCenter->y());
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-  {
-    aCircleFeature->real(SketchPlugin_Circle::ANGLE_ID())->setValue(myAngle);
-  }
   aCircleFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(myRadius);
-  aCircleFeature->integer(SketchPlugin_Circle::VERSION_ID())->setValue(integer(VERSION_ID())->value());
   aCircleFeature->boolean(SketchPlugin_Circle::AUXILIARY_ID())
                 ->setValue(boolean(AUXILIARY_ID())->value());
-
   aCircleFeature->execute();
-
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-  {
-    // Create point
-    FeaturePtr aNPoint = CreatePoint(aCircleFeature, myRotPoint);
-  }
-
   return aCircleFeature;
 }
 
@@ -366,8 +258,6 @@ void SketchPlugin_MacroCircle::fillByCenterAndPassed()
   if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
-
-    computeNewAngle(aCircle);
   }
 }
 
@@ -409,8 +299,6 @@ void SketchPlugin_MacroCircle::fillByThreePoints()
   if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
-
-    computeNewAngle(aCircle);
   }
 }
 
@@ -468,48 +356,31 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
   if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
-
-    computeNewAngle(aCircle);
   }
 }
 
 AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
 {
   SketchPlugin_Sketch* aSketch = sketch();
-  if (!aSketch || !myCenter || myRadius == 0) {
+  if(!aSketch || !myCenter || myRadius == 0) {
     return AISObjectPtr();
   }
 
   // Compute a circle in 3D view.
   std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
   std::shared_ptr<GeomDataAPI_Dir> aNDir =
-    std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+          aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  GeomShapePtr aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, myRadius,
-    attribute(ROTATE_POINT_ID())->isInitialized() ? myAngle / 180 * 3.14 : 0);
-
+  GeomShapePtr aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, myRadius);
   GeomShapePtr aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
-
-  if (!aCircleShape.get() || !aCenterPointShape.get()) {
+  if(!aCircleShape.get() || !aCenterPointShape.get()) {
     return AISObjectPtr();
   }
 
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
   aShapes.push_back(aCircleShape);
   aShapes.push_back(aCenterPointShape);
-
-  // For addCircle command skip creating point
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-  {
-    std::shared_ptr<GeomAPI_Pnt> aRotPoint;
-    if (myRotPoint.get())
-      aRotPoint = std::shared_ptr<GeomAPI_Pnt>(aSketch->to3D(myRotPoint->x(), myRotPoint->y()));
-    else
-      aRotPoint = std::shared_ptr<GeomAPI_Pnt>(aSketch->to3D(myCenter->x() + myRadius, myCenter->y()));
-    GeomShapePtr aNewPnt = GeomAlgoAPI_PointBuilder::vertex(aRotPoint);
-    aShapes.push_back(aNewPnt);
-  }
 
   std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
   AISObjectPtr anAIS = thePrevious;
@@ -524,25 +395,9 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
   return anAIS;
 }
 
-namespace
-{
-  static bool isRotPoint(const std::string& theID, const std::string& theCurType, const std::string& theType)
-  {
-    return theCurType == theType
-      && (theID == SketchPlugin_MacroCircle::ROTATE_POINT_ID() || theID == SketchPlugin_MacroCircle::ROTATE_POINT_REF_ID());
-  }
-}
-
 void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
-  std::shared_ptr <GeomAPI_Circ2d> aCircle;
   // If circle type switched reset all attributes.
   if(theID == CIRCLE_TYPE()) {
-    if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-    {
-      SketchPlugin_Tools::resetAttribute(this, ROTATE_POINT_ID());
-      SketchPlugin_Tools::resetAttribute(this, ROTATE_POINT_REF_ID());
-    }
-
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_REF_ID());
     SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_ID());
@@ -554,13 +409,11 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
     SketchPlugin_Tools::resetAttribute(this, THIRD_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, THIRD_POINT_REF_ID());
   } else if(theID == CENTER_POINT_ID() || theID == PASSED_POINT_ID() ||
-            theID == CENTER_POINT_REF_ID() || theID == PASSED_POINT_REF_ID() ||
-            isRotPoint(theID, string(CIRCLE_TYPE())->value(), CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS()))
+            theID == CENTER_POINT_REF_ID() || theID == PASSED_POINT_REF_ID())
     fillByCenterAndPassed();
   else if(theID == FIRST_POINT_ID() || theID == FIRST_POINT_REF_ID() ||
           theID == SECOND_POINT_ID() || theID == SECOND_POINT_REF_ID() ||
-          theID == THIRD_POINT_ID() || theID == THIRD_POINT_REF_ID() ||
-          isRotPoint(theID, string(CIRCLE_TYPE())->value(), CIRCLE_TYPE_BY_THREE_POINTS())) {
+          theID == THIRD_POINT_ID() || theID == THIRD_POINT_REF_ID()) {
     std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
     int aNbInitialized = 0;
     for(int i = 1; i <= 3; ++i) {
@@ -579,29 +432,12 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
   }
 
   AttributeDoublePtr aRadiusAttr = real(CIRCLE_RADIUS_ID());
-
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   if(myCenter.get()) {
     // center attribute is used in processEvent() to set reference to reentrant arc
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))
         ->setValue(myCenter);
   }
-
-  if (integer(VERSION_ID())->value() > SketchPlugin_Circle::THE_VERSION_0)
-  {
-    AttributeDoublePtr anAngleAttr = real(CIRCLE_ROTATE_ANGLE_ID());
-
-    if (myRotPoint.get())
-    {
-      AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(ROTATE_POINT_ID()));
-      aPointAttr->setValue(myRotPoint);
-    }
-
-    if (anAngleAttr->isInitialized())
-      anAngleAttr->setValue(myAngle);
-  }
-
   aRadiusAttr->setValue(myRadius);
-
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }

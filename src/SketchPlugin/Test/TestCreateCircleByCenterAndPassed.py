@@ -33,7 +33,7 @@ from SketchAPI import SketchAPI_Sketch
 from salome.shaper import model
 import math
 
-__updated__ = "2023-06-28"
+__updated__ = "2017-03-22"
 
 
 #=========================================================================
@@ -68,13 +68,6 @@ def verifyTangentCircleLine(theCircle, theLine):
     aDistCL = model.distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
 
-#=========================================================================
-# Set old version of Circle for avoid create point.
-#=========================================================================
-def setVersionOfCircle(theCircle, theVersion):
-    aCircleVersion = theCircle.integer("version")
-    assert (type(aCircleVersion) == ModelAPI_AttributeInteger)
-    aCircleVersion.setValue(theVersion)
 
 #=========================================================================
 # Start of test
@@ -107,7 +100,6 @@ aCircleCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
 assert (not aCircleCenter.isInitialized())
 aCircleRadius = aCircle.real("circle_radius")
 assert (type(aCircleRadius) == ModelAPI_AttributeDouble)
-setVersionOfCircle(aCircle, 0)
 # ModelAPI_AttributeDouble.typeId() is checked in ModelAPI_TestConstants
 assert (aCircleRadius.attributeType() == ModelAPI_AttributeDouble.typeId())
 aCircleCenter.setValue(-25., -25)
@@ -141,7 +133,6 @@ assert (not aCirclePassed.isInitialized())
 aCircleType = aCircle.string("circle_type")
 assert (not aCircleType.isInitialized())
 aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 0)
 aCircleCenter.setValue(-25., -25)
 aCirclePassed.setValue(0., -25.)
 aRadius = model.distancePointPoint(aCircleCenter, aCirclePassed)
@@ -175,7 +166,6 @@ aCircleType = aCircle.string("circle_type")
 assert (not aCircleType.isInitialized())
 # initialize attributes
 aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 0)
 aCenterRef.setObject(aPoint.lastResult())
 aCenter.setValue(aPointCoord.pnt())
 aPassedRef.setAttr(aPrevCenter)
@@ -215,7 +205,6 @@ aPassedRef = aCircle.refattr("passed_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 0)
 aCenterRef.setObject(aLine.lastResult())
 anExpectedCenter = [(aLineStart[0] + aLineEnd[0]) * 0.5, (aLineStart[1] + aLineEnd[1]) * 0.5]
 aCenter.setValue(anExpectedCenter[0], anExpectedCenter[1])
@@ -250,7 +239,6 @@ aPassedRef = aCircle.refattr("passed_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 0)
 anExpectedCenter = [(aLineStart[0] + aLineEnd[0]) * 0.5 + 10., (aLineStart[1] + aLineEnd[1]) * 0.5]
 aCenter.setValue(anExpectedCenter[0], anExpectedCenter[1])
 aPassedRef.setObject(aLine.lastResult())
@@ -280,7 +268,6 @@ aPassedRef = aCircle.refattr("passed_point_ref")
 aCircleType = aCircle.string("circle_type")
 # initialize attributes
 aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 0)
 aCenterRef.setObject(aLine.lastResult())
 aCenter.setValue(anExpectedCenter[0], anExpectedCenter[1])
 aPassedRef.setObject(aLine.lastResult())
@@ -292,37 +279,6 @@ aSession.startOperation()
 aDocument.removeFeature(aCircle)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12)
-
-#=========================================================================
-# Test 6. Create a circle with point on circle line (addCircleWithPoint)
-#=========================================================================
-# create new circle
-aSession.startOperation()
-aCircle = aSketchFeature.addFeature("SketchMacroCircle")
-aCenter = geomDataAPI_Point2D(aCircle.attribute("center_point"))
-aCenterRef = aCircle.refattr("center_point_ref")
-aPassed = geomDataAPI_Point2D(aCircle.attribute("passed_point"))
-aPassedRef = aCircle.refattr("passed_point_ref")
-aCircleType = aCircle.string("circle_type")
-aCircleAngle = aCircle.real("circle_angle")
-# initialize attributes
-aCircleType.setValue("circle_type_by_center_and_passed_points")
-setVersionOfCircle(aCircle, 20232206)
-aCenter.setValue(35., -35)
-anExpectedCenter = [35., -35]
-aPassed.setValue(45., -35)
-aCircleAngle.setValue(90.)
-anExpectedRot = [45., -35]
-aSession.finishOperation()
-assert (aSketchFeature.numberOfSubs() == 15)
-# verify newly created circle
-aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
-aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
-aRotPoint = geomDataAPI_Point2D(aCircle.attribute("circle_rotate"))
-model.assertPoint(aCenter, anExpectedCenter)
-model.assertPoint(aRotPoint, anExpectedRot)
-model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
-model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 2)
 
 #=========================================================================
 # End of test
