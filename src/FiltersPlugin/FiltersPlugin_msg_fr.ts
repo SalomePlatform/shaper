@@ -112,6 +112,10 @@
       <translation>En face d&apos;un bord</translation>
     </message>
     <message>
+      <source>On shape name</source>
+      <translation>Sur le nom des shapes</translation>
+    </message>
+    <message>
       <source>Topologically connected faces</source>
       <translation>Faces topologiquement connectés</translation>
     </message>
@@ -400,6 +404,15 @@
     <message>
       <source>The object is empty</source>
       <translation>L'objet est vide.</translation>
+    </message>
+  </context>
+
+  <!-- OnShapeName -->
+  <context>
+    <name>OnShapeName</name>
+    <message>
+      <source>Search pattern:</source>
+      <translation>Modèle de recherche:</translation>
     </message>
   </context>
 

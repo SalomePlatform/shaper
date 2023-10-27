@@ -179,3 +179,26 @@ This algorithm finds all the faces topologically connected the argument selected
 - **Algorithm:**
     - If a point of an edge is selected as an argument, the result is all faces that contain this argument.If a face is selected, the result is all faces that have shared edges or vertices with this selection.
     - If “propagation” flag is enabled (it is disabled by default), the algorithm becomes recursive: all connected faces are added to the results. So, for the solid shape there will be all faces except internal-volumes faces, not connected to any external faces.
+
+**Shape name**
+
+- **Result type:** Any
+- **Arguments:** A regular expression value, representing a pattern for searching by result name. The search pattern must comply with the rules of regular expressions.
+- **Algorithm:**
+    - Returns objects or subobjects of results where their name matches the given search pattern (regular expression).
+    - For example, if we have in the result a shape with the name “cube” and we want to select all the edges according to the pattern "cube", then we will get all the edges of the objects containing "cube" in their name.
+    - The filter searches not only for complete matches but for any pattern inclusions.
+
+- **Examples:**
+    - Selecting all edges belonging to objects from the result with a name starting with "Cyl".
+    .. figure:: images/selection_byShapeName1.png
+      :align: center
+
+    - Selecting all vertices belonging to objects from the result with a name containing pattern "Cube".
+    .. figure:: images/selection_byShapeName2.png
+      :align: center
+
+    - Selecting all results with names containing "Poutre", followed by a space and a digit.
+    .. figure:: images/selection_byShapeName3.png
+      :align: center
+

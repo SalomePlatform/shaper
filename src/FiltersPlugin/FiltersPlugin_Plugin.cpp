@@ -35,6 +35,7 @@
 #include "FiltersPlugin_Validators.h"
 #include "FiltersPlugin_VerticalFace.h"
 #include "FiltersPlugin_VolumeSize.h"
+#include "FiltersPlugin_OnShapeName.h"
 
 #include <Config_ModuleReader.h>
 
@@ -64,6 +65,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("VolumeSize", new FiltersPlugin_VolumeSize);
   aFactory->registerFilter("FeatureEdges", new FiltersPlugin_FeatureEdges);
   aFactory->registerFilter("ContinuousFaces", new FiltersPlugin_ContinuousFaces);
+  aFactory->registerFilter("OnShapeName", new FiltersPlugin_OnShapeName);
 
   Config_ModuleReader::loadScript("FiltersPlugin_TopoConnectedFaces");
 

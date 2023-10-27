@@ -1,0 +1,4 @@
+<filter id="OnShapeName">
+  <stringvalue id="OnShapeName__pattern" label="Search pattern:">
+  </stringvalue>
+</filter>

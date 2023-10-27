@@ -40,6 +40,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_VolumeSize.h
     FiltersPlugin_FeatureEdges.h
     FiltersPlugin_ContinuousFaces.h
+    FiltersPlugin_OnShapeName.h
 )
 
 SET(PROJECT_SOURCES
@@ -61,6 +62,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_VolumeSize.cpp
     FiltersPlugin_FeatureEdges.cpp
     FiltersPlugin_ContinuousFaces.cpp
+    FiltersPlugin_OnShapeName.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -91,6 +93,7 @@ SET(XML_RESOURCES
   filter-VolumeSize.xml
   filter-FeatureEdges.xml
   filter-ContinuousFaces.xml
+  filter-OnShapeName.xml
 )
 
 SET(TEXT_RESOURCES
@@ -115,6 +118,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/GeomValidators
   ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
+  ${PROJECT_SOURCE_DIR}/src/Locale
 )
 
 INSTALL(TARGETS FiltersPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
