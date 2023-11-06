@@ -44,26 +44,56 @@ PrimitivesPlugin_Sphere::PrimitivesPlugin_Sphere()
 //=================================================================================================
 void PrimitivesPlugin_Sphere::initAttributes()
 {
-  data()->addAttribute(PrimitivesPlugin_Sphere::CREATION_METHOD(),
-                       ModelAPI_AttributeString::typeId());
+  // Attention! A fix for 37570 Tuleap issue.
+  // We could have studies with aCenterPoint at the first position (old studies)
+  // and studies with CREATION_METHOD() at the first position (new studies)
 
   // data for the first mode : by a point and a radius
-  data()->addAttribute(PrimitivesPlugin_Sphere::CENTER_POINT_ID(),
-                       ModelAPI_AttributeSelection::typeId());
+  AttributeSelectionPtr aCenterPoint = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+    (data()->addAttribute(PrimitivesPlugin_Sphere::CENTER_POINT_ID(),
+                          ModelAPI_AttributeSelection::typeId())); // #1 (old studies)
+  if (aCenterPoint->isInitialized()) {
+    // we are opening an old study:
+    // #1 Center Point
+    // #2 Radius
+    // #3 Creation method (initialize now)
 
-  data()->addAttribute(PrimitivesPlugin_Sphere::RADIUS_ID(),
-                       ModelAPI_AttributeDouble::typeId());
+    data()->addAttribute(PrimitivesPlugin_Sphere::RADIUS_ID(),
+                         ModelAPI_AttributeDouble::typeId()); // #2 (old studies)
 
-  // Initialize the center point of the sphere at the origin if the center point is not filled.
-  AttributeSelectionPtr aCenterPoint =
-    data()->selection(PrimitivesPlugin_Sphere::CENTER_POINT_ID());
-  if (!aCenterPoint->isInitialized()) {
-    ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()
-      ->objectByName(ModelAPI_ResultConstruction::group(), L"Origin");
-    if (aPointObj.get()) {
-      ResultPtr aPointRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
-      aCenterPoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());
+    AttributeStringPtr aMethod = std::dynamic_pointer_cast<ModelAPI_AttributeString>
+      (data()->addAttribute(PrimitivesPlugin_Sphere::CREATION_METHOD(),
+                            ModelAPI_AttributeString::typeId())); // #3
+    aMethod->setValue(CREATION_METHOD_BY_PT_RADIUS());
+  }
+  else {
+    // we are opening a new study or creating Sphere from scratch
+    // #1 Creation method
+    // #2 Center Point
+    // #3 Radius
+
+    data()->addAttribute(PrimitivesPlugin_Sphere::CREATION_METHOD(),
+                         ModelAPI_AttributeString::typeId(),
+                         1); // #1 new studies or from scratch
+
+    aCenterPoint = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (data()->addAttribute(PrimitivesPlugin_Sphere::CENTER_POINT_ID(),
+                            ModelAPI_AttributeSelection::typeId(),
+                            2)); // #2
+
+    // Initialize the center point of the sphere at the origin if the center point is not filled.
+    if (!aCenterPoint->isInitialized()) {
+      ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()
+        ->objectByName(ModelAPI_ResultConstruction::group(), L"Origin");
+      if (aPointObj.get()) {
+        ResultPtr aPointRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
+        aCenterPoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());
+      }
     }
+
+    data()->addAttribute(PrimitivesPlugin_Sphere::RADIUS_ID(),
+                         ModelAPI_AttributeDouble::typeId(),
+                         3); // #3
   }
 
   // data for the second mode : by dimensions
