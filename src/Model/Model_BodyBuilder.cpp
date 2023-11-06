@@ -634,6 +634,11 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
     if (aCompound.get()) aShapeToExplore = aCompound;
   }
 
+  // Store all types of subshapes in the map to use them for checking
+  // if the new shapes are sub-shapes of this result
+  TopTools_MapOfShape aResultShapeSubMap;
+  TopExp::MapShapes(aResultShape->impl<TopoDS_Shape>(), aResultShapeSubMap);
+
   TopTools_MapOfShape anAlreadyProcessedShapes;
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   for (GeomAPI_ShapeExplorer anOldShapeExp(aShapeToExplore, theShapeTypeToExplore);
@@ -645,36 +650,40 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
 
     // There is no sense to write history if shape already processed
     // or old shape does not exist in the document.
-    bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
-    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
-      ModelAPI_Session::get()->moduleDocument())->generalLabel();
+    if (!anAlreadyProcessedShapes.Add(anOldSubShape_))
+    {
+      continue;
+    }
+
+    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument())->generalLabel();
     TDF_Label anOriginalLabel;
-    bool anOldSubShapeNotInTree =
-      !isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_, anOriginalLabel);
-    if (anOldSubShapeAlreadyProcessed || anOldSubShapeNotInTree) {
+    if (!isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_, anOriginalLabel))
+    {
       continue;
     }
 
     // Get new shapes.
     ListOfShape aNewShapes;
     theAlgo->modified(anOldSubShape, aNewShapes);
-
     for (ListOfShape::const_iterator aNewShapesIt = aNewShapes.cbegin();
          aNewShapesIt != aNewShapes.cend();
          ++aNewShapesIt)
     {
       GeomShapePtr aNewShape = *aNewShapesIt;
       const TopoDS_Shape& aNewShape_ = aNewShape->impl<TopoDS_Shape>();
-      bool isGenerated = anOldSubShape_.ShapeType() != aNewShape_.ShapeType();
 
-      bool aNewShapeIsSameAsOldShape = anOldSubShape->isSame(aNewShape);
-      bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(aNewShape, false);
-      if (aNewShapeIsSameAsOldShape || aNewShapeIsNotInResultShape)
+      if (anOldSubShape->isSame(aNewShape))
         continue;
 
       if (aResultShape->isSame(aNewShape))
         continue; // it is stored on the root level (2241 - history propagation issue)
 
+      // Look in the map instead of aResultShape->isSubShape(aNewShape, false)
+      // to avoid many iterations of sub-shapes hierarchy that leads to performance issues
+      if (!aResultShapeSubMap.Contains(aNewShape_))
+        continue;
+
+      const bool isGenerated = anOldSubShape_.ShapeType() != aNewShape_.ShapeType();
       int aTag = isGenerated ? getGenerationTag(aNewShape_) : getModificationTag(aNewShape_);
       TNaming_Builder*aBuilder = builder(aTag);
       if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_))
