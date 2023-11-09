@@ -97,6 +97,7 @@ private:
   void CreatePoint();
 
   std::shared_ptr<ModelAPI_Feature> myPoint;
+  bool  myBlockAttribInit;
 };
 
 #endif

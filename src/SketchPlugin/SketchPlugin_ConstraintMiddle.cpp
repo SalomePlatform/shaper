@@ -30,8 +30,27 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Tools.h>
 
+
+class RaiiSetBoolFlag {
+public:
+  RaiiSetBoolFlag() = delete;
+  RaiiSetBoolFlag(bool &theFlag)
+  {
+    myBoolPtr = &theFlag;
+    *myBoolPtr = true;
+  }
+  ~RaiiSetBoolFlag()
+  {
+    *myBoolPtr = false;
+  }
+private:
+  bool *myBoolPtr;
+};
+
+
 SketchPlugin_ConstraintMiddle::SketchPlugin_ConstraintMiddle()
 {
+  myBlockAttribInit = false;
 }
 
 // Create new point for Middle constraint
@@ -73,10 +92,33 @@ void SketchPlugin_ConstraintMiddle::CreatePoint()
 
 void SketchPlugin_ConstraintMiddle::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_ConstraintMiddle::MIDDLE_TYPE(), ModelAPI_AttributeString::typeId());
+  // To maintain compatibility with older study versions, keep the order of all previously existing attributes:
+  //  1) ENTITY_A
+  //  2) ENTITY_B
+  //  ----------- new attributes start here:
+  //  3) MIDDLE_TYPE
+  //  4) POINT_REF_ID
+  AttributeRefAttrPtr aAttrEntA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+    data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId()));
 
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
+  AttributeRefAttrPtr aAttrEntB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+    data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId()));
+  
+  AttributeStringPtr aMethodAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+    data()->addAttribute(SketchPlugin_ConstraintMiddle::MIDDLE_TYPE(), ModelAPI_AttributeString::typeId()));
+  
+  // When loading studies from older versions (<9.12), the MIDDLE_TYPE attribute did not exist
+  // and is therefore not initialized!
+  // BUT: in case of a valid middle point constraint, the ENTITY_A and ENTITY_B attributes must be initialized
+  bool useDefaultMethod = !aMethodAttr->isInitialized();
+  if (aAttrEntA->isInitialized() && aAttrEntB->isInitialized() && useDefaultMethod)
+  {
+    // Initialize the creation method attribute (MIDDLE_TYPE) with the previously default
+    // creation method: "mid point from line and point".
+    // NOTE: ensure that the other attributes are NOT reset, as we want to keep the current inputs
+    RaiiSetBoolFlag blockEntityReset(myBlockAttribInit);
+    aMethodAttr->setValue(MIDDLE_TYPE_BY_LINE_AND_POINT());
+  }
 
   data()->addAttribute(POINT_REF_ID(), GeomDataAPI_Point2D::typeId());
 
@@ -105,8 +147,10 @@ void SketchPlugin_ConstraintMiddle::attributeChanged(const std::string& theID)
 {
   if (theID == MIDDLE_TYPE())
   {
-    SketchPlugin_Tools::resetAttribute(this, ENTITY_A());
-    SketchPlugin_Tools::resetAttribute(this, ENTITY_B());
+    if (!myBlockAttribInit) {
+      SketchPlugin_Tools::resetAttribute(this, ENTITY_A());
+      SketchPlugin_Tools::resetAttribute(this, ENTITY_B());
+    }
   }
   else if (theID == POINT_REF_ID())
   {
