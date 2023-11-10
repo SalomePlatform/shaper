@@ -353,6 +353,20 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
   }
 
+  if (!anAllEdges.empty()) {
+    // Check that they are planar.
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anAllEdges);
+    if(aPln.get()) {
+        // Check that selected objects have closed contours.
+      GeomAlgoAPI_SketchBuilder aBuilder(aPln, anAllEdges);
+      const ListOfShape& aFaces = aBuilder.faces();
+      if(!aFaces.empty()) {
+        return true;
+      }
+    }
+  }
+
+
   //check only planar onjects
   bool isPlanarBelongToOnePlane(false);
   if (!aPlanarEdges.empty()) {

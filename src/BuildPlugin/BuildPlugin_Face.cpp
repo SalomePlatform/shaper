@@ -60,7 +60,8 @@ void BuildPlugin_Face::execute()
   }
 
   // Collect base shapes.
-  ListOfShape anEdges;
+  ListOfShape anAllEdges;
+  ListOfShape aPlanarEdges;
   ListOfShape aNonPlanarEdges;
   ListOfShape anOriginalFaces;
   ListOfShape aContexts;
@@ -101,26 +102,40 @@ void BuildPlugin_Face::execute()
 
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       GeomShapePtr anEdge = anExp.current();
-      isPlanar? anEdges.push_back(anEdge) : aNonPlanarEdges.push_back(anEdge);
+      anAllEdges.push_back(anEdge);
+      isPlanar? aPlanarEdges.push_back(anEdge) : aNonPlanarEdges.push_back(anEdge);
     }
   }
 
-  if (!anEdges.empty())
+  bool isAllPlanar(false);
+  if(!anAllEdges.empty())
   {
-    //check is planar objects belong to nke
-    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+    //check if all the object actually belong to one plane.
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anAllEdges);
+    if(aPln.get() && !aNonPlanarEdges.empty()) 
+    {
+      aPlanarEdges.insert(aPlanarEdges.end(), aNonPlanarEdges.begin(), aNonPlanarEdges.end());
+      aNonPlanarEdges.clear();
+      isAllPlanar = true;
+    }
+  }
+
+  if (!isAllPlanar && !aPlanarEdges.empty())
+  {
+    //check is planar objects belong to one plane
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(aPlanarEdges);
     if(!aPln.get())
     {
-      aNonPlanarEdges.insert(aNonPlanarEdges.end(), anEdges.begin(), anEdges.end());
-      anEdges.clear();
+      aNonPlanarEdges.insert(aNonPlanarEdges.end(), aPlanarEdges.begin(), aPlanarEdges.end());
+      aPlanarEdges.clear();
     }
   }
 
   // Build faces by edges.
   ListOfShape aFaces;
   GeomMakeShapePtr aFaceBuilder;
-  if (!anEdges.empty())
-    buildFacesByEdges(anEdges, aListOfNormals, aFaces, aFaceBuilder);
+  if (!aPlanarEdges.empty())
+    buildFacesByEdges(aPlanarEdges, aListOfNormals, aFaces, aFaceBuilder);
   int aNbFacesFromEdges = (int)aFaces.size();
 
   // Build non-planar faces by edges.
@@ -153,7 +168,7 @@ void BuildPlugin_Face::execute()
 
     ListOfShape aBaseShapes;
     if (anIndex < aNbFacesFromEdges)
-      aBaseShapes = anEdges;
+      aBaseShapes = aPlanarEdges;
     else if(anIndex < aNbNonPlanarFaces)
       aBaseShapes = aNonPlanarEdges;
     else
