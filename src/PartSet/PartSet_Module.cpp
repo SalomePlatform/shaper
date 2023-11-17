@@ -1171,13 +1171,13 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     return;
 
   bool isModified = false;
-  double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
   if (aCurrentOperation &&
     (PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
      sketchMgr()->isNestedSketchOperation(aCurrentOperation) ||
      (aCurrentOperation->id() == "Measurement")))
   {
+    double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
