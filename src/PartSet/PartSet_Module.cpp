@@ -273,10 +273,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "axis_arrow_size",
     "Trihedron arrows constant size", Config_Prop::IntSpin, "10");
 
-  Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
-    "Add parameter in parameters manager dialog",
-    Config_Prop::Shortcut, "Ctrl+A");
-
   Config_PropManager::registerProp("Windows", "use_hide_faces_panel",
     "Use HideFaces panel in operations", Config_Prop::Boolean, "false");
 }

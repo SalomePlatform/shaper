@@ -61,6 +61,7 @@ SET(PROJECT_RESOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/LightApp.xml
     resources/SalomeApp.xml
     resources/shaper.png
+    resources/action_assets.json
 )
 
 SET(TEXT_RESOURCES

@@ -1,0 +1,1627 @@
+{
+    "SHAPER/AngularCopy": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/SVG/multirotation.svg",
+        "langDependentAssets": {
+            "en": {
+                "name": "Angular Copy",
+                "tooltip": "Perform copy and rotate"
+            },
+            "fr": {
+                "name": "Copie angulaire",
+                "tooltip": "Effectuer une copie et une rotation"
+            }
+        }
+    },
+    "SHAPER/Axis": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/axis.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Axis",
+                "tooltip": "Create axis"
+            },
+            "fr": {
+                "name": "Axe",
+                "tooltip": "Créer un axe"
+            }
+        }
+    },
+    "SHAPER/BoundingBoxMacro": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bounding.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Bounding box",
+                "tooltip": "Calculate the bounding box"
+            },
+            "fr": {
+                "name": "Boîte englobante",
+                "tooltip": "Calculer la boîte englobante"
+            }
+        }
+    },
+    "SHAPER/Box": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/box.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Box",
+                "tooltip": "Create a box"
+            },
+            "fr": {
+                "name": "Boîte",
+                "tooltip": "Créer une boîte"
+            }
+        }
+    },
+    "SHAPER/Chamfer": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/chamfer.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Chamfer",
+                "tooltip": "Perform chamfer on face or edge"
+            },
+            "fr": {
+                "name": "Chanfrein",
+                "tooltip": "Effectuer un chanfrein  sur la face ou l'arête"
+            }
+        }
+    },
+    "SHAPER/Common": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bool_common.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Common",
+                "tooltip": "Perform boolean common operation with objects"
+            },
+            "fr": {
+                "name": "Intersection",
+                "tooltip": "Effectuer l'opération booléenne intersection avec des objets"
+            }
+        }
+    },
+    "SHAPER/CompSolid": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_compsolid.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "CompSolid",
+                "tooltip": "Create a compsolid from solids or other compsolids"
+            },
+            "fr": {
+                "name": "Solide Composite",
+                "tooltip": "Créer un solide composite à partir de solides ou d'autres solides composites"
+            }
+        }
+    },
+    "SHAPER/Compound": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_compound.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Compound",
+                "tooltip": "Create a compound of objects"
+            },
+            "fr": {
+                "name": "Ensemble",
+                "tooltip": "Créer un ensemble"
+            }
+        }
+    },
+    "SHAPER/Cone": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/cone.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Cone",
+                "tooltip": "Create a Cone"
+            },
+            "fr": {
+                "name": "Cône",
+                "tooltip": "Créer un cône"
+            }
+        }
+    },
+    "SHAPER/Copy": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/copy.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Copy",
+                "tooltip": "Copies results or sub-results"
+            },
+            "fr": {
+                "name": "Copie",
+                "tooltip": "Copie les résultats ou les sous-résultats"
+            }
+        }
+    },
+    "SHAPER/Cut": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bool_cut.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Cut",
+                "tooltip": "Perform boolean cut operation with objects"
+            },
+            "fr": {
+                "name": "Découpe",
+                "tooltip": "Effectuer l'opération booléenne découpe avec des objets"
+            }
+        }
+    },
+    "SHAPER/Cylinder": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/cylinder.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Cylinder",
+                "tooltip": "Create a cylinder"
+            },
+            "fr": {
+                "name": "Cylindre",
+                "tooltip": "Créer un cylindre"
+            }
+        }
+    },
+    "SHAPER/Defeaturing": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/defeaturing.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Defeaturing",
+                "tooltip": "Perform removing faces from solid"
+            },
+            "fr": {
+                "name": "Supprimer un détail",
+                "tooltip": "Effectuer la suppression de faces d'un solide"
+            }
+        }
+    },
+    "SHAPER/Dump": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Dump",
+                "tooltip": "Dump Python script"
+            },
+            "fr": {
+                "name": "Générer un script",
+                "tooltip": "Générer un script Python"
+            }
+        }
+    },
+    "SHAPER/Duplicate": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/PartSet/duplicate.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Duplicate part",
+                "tooltip": "Duplicate active part"
+            },
+            "fr": {
+                "name": "Dupliquer pièce",
+                "tooltip": "Dupliquer la pièce active"
+            }
+        }
+    },
+    "SHAPER/EXPORT_PART_CMD": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Part...",
+                "tooltip": "Export a part of the current document into a file"
+            },
+            "fr": {
+                "name": "Pièce...",
+                "tooltip": "Exporter une pièce du document courant dans un fichier"
+            }
+        }
+    },
+    "SHAPER/EXPORT_SHAPE_CMD": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Exchange/export.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "To CAD format...",
+                "tooltip": "Export shape to a CAD format file"
+            },
+            "fr": {
+                "name": "Au format CAO...",
+                "tooltip": "Exportation de la forme vers un fichier au format CAO"
+            }
+        }
+    },
+    "SHAPER/Edge": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_edge.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Edge",
+                "tooltip": "Create edges from sketch edges or other edge objects"
+            },
+            "fr": {
+                "name": "Arête",
+                "tooltip": "Créer des arêtes à partir d'arêtes d'esquisse ou d'objets arêtes"
+            }
+        }
+    },
+    "SHAPER/ExportToGEOM": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Connector/geom_export.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Export to GEOM",
+                "tooltip": "Export all results and groups into GEOM module"
+            },
+            "fr": {
+                "name": "Exporter vers GEOM",
+                "tooltip": "Exporter tous les résultats et groupes dans le module GEOM"
+            }
+        }
+    },
+    "SHAPER/Extrusion": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/extrusion.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Extrusion",
+                "tooltip": "Create a solid by extrusion of a face"
+            },
+            "fr": {
+                "name": "Extrusion",
+                "tooltip": "Créer un solide par extrusion d'une face"
+            }
+        }
+    },
+    "SHAPER/ExtrusionCut": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/extrusion_cut.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "ExtrusionCut",
+                "tooltip": "Cuts an extrusion from a solid"
+            },
+            "fr": {
+                "name": "Enlèvement de matière extrudé",
+                "tooltip": "Coupe une extrusion d'un solide"
+            }
+        }
+    },
+    "SHAPER/ExtrusionFuse": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/extrusion_fuse.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "ExtrusionFuse",
+                "tooltip": "Fuses an extrusion with a solid"
+            },
+            "fr": {
+                "name": "Bossage extrudé",
+                "tooltip": "Fusionne une extrusion avec un solide"
+            }
+        }
+    },
+    "SHAPER/Face": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_face.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Face",
+                "tooltip": "Create a face from edges, wires and faces"
+            },
+            "fr": {
+                "name": "Face",
+                "tooltip": "Créer une face à partir d'arêtes, de contours et de faces"
+            }
+        }
+    },
+    "SHAPER/Field": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/field.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Field",
+                "tooltip": "Create fields for selected shapes"
+            },
+            "fr": {
+                "name": "Champ",
+                "tooltip": "Créer des champs pour les formes sélectionnées"
+            }
+        }
+    },
+    "SHAPER/Fillet": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/fillet.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Fillet",
+                "tooltip": "Perform fillet on face or edge"
+            },
+            "fr": {
+                "name": "Congé",
+                "tooltip": "Effectuer un congé sur la face ou l'arête"
+            }
+        }
+    },
+    "SHAPER/Fillet1D": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/fillet1d.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "1D-fillet",
+                "tooltip": "Perform fillet on vertices of a wire"
+            },
+            "fr": {
+                "name": "1D-congé",
+                "tooltip": "Effectuer un congé sur les sommets d'un contour"
+            }
+        }
+    },
+    "SHAPER/Filling": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_filling.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Filling",
+                "tooltip": "Create face from list of edges"
+            },
+            "fr": {
+                "name": "Remplissage",
+                "tooltip": "Créer une face à partir d'une liste d'arêtes"
+            }
+        }
+    },
+    "SHAPER/Fuse": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bool_fuse.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Fuse",
+                "tooltip": "Perform boolean fuse operation with objects"
+            },
+            "fr": {
+                "name": "Fusionner",
+                "tooltip": "Effectuer l'opération booléenne fusion avec des objets"
+            }
+        }
+    },
+    "SHAPER/FusionFaces": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/fusion_faces.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Fuse Faces",
+                "tooltip": "Performs fusion of connected faces"
+            },
+            "fr": {
+                "name": "Fusionner des faces",
+                "tooltip": "Effectue la fusion de faces connectées"
+            }
+        }
+    },
+    "SHAPER/GeometryCalculation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/geometryCalculation.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Geometry calculation",
+                "tooltip": "Calculate properties of objects"
+            },
+            "fr": {
+                "name": "Calcul de la géometrie",
+                "tooltip": "Calculer les propriétés des objets"
+            }
+        }
+    },
+    "SHAPER/GlueFaces": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/glue_faces.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Glue Faces",
+                "tooltip": "Perform gluing of connected faces"
+            },
+            "fr": {
+                "name": "Recoller les faces",
+                "tooltip": "Effectuer le collage des faces connectées"
+            }
+        }
+    },
+    "SHAPER/Group": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/shape_group.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Group",
+                "tooltip": "Create named collection of geometry entities"
+            },
+            "fr": {
+                "name": "Groupe",
+                "tooltip": "Créer une collection nommée d'entités géométriques"
+            }
+        }
+    },
+    "SHAPER/GroupAddition": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/group_addition.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Group Addition",
+                "tooltip": "Join several groups to single group"
+            },
+            "fr": {
+                "name": "Addition de groupes",
+                "tooltip": "Joindre plusieurs groupes pour former un seul groupe"
+            }
+        }
+    },
+    "SHAPER/GroupIntersection": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/group_intersection.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Group Intersection",
+                "tooltip": "Get elements existing in all groups"
+            },
+            "fr": {
+                "name": "Intersection de groupes",
+                "tooltip": "Obtenir les éléments existants dans tous les groupes"
+            }
+        }
+    },
+    "SHAPER/GroupShape": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/svg/group_shape.svg",
+        "langDependentAssets": {
+            "en": {
+                "name": "Group Shape",
+                "tooltip": "Join several groups to single shape"
+            },
+            "fr": {
+                "name": "Forme à partir de groupes",
+                "tooltip": "Joindre plusieurs groupes dans une forme seule"
+            }
+        }
+    },
+    "SHAPER/GroupSubstraction": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Collection/group_substraction.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Group Substraction",
+                "tooltip": "Exclude elements existing tool groups"
+            },
+            "fr": {
+                "name": "Soustraction de groupes",
+                "tooltip": "Exclure des éléments des groupes d'outils existants"
+            }
+        }
+    },
+    "SHAPER/IMPORT_IMAGE_CMD": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Picture...",
+                "tooltip": "Import a picture from an image file"
+            },
+            "fr": {
+                "name": "Une image...",
+                "tooltip": "Import a picture from an image file"
+            }
+        }
+    },
+    "SHAPER/IMPORT_PART_CMD": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Part...",
+                "tooltip": "Import structure of a part"
+            },
+            "fr": {
+                "name": "Pièce...",
+                "tooltip": "Structure d'importation d'une pièce"
+            }
+        }
+    },
+    "SHAPER/IMPORT_SHAPE_CMD": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Exchange/import.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "From CAD format...",
+                "tooltip": "Import shape from a CAD format file"
+            },
+            "fr": {
+                "name": "À partir du format CAO...",
+                "tooltip": "Importer une forme à partir d'un fichier au format CAO"
+            }
+        }
+    },
+    "SHAPER/ImportResult": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/import_result.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Import Result",
+                "tooltip": "Copies results from other parts"
+            },
+            "fr": {
+                "name": "Importer le résultat",
+                "tooltip": "Copie les résultats d'autres pièces"
+            }
+        }
+    },
+    "SHAPER/Interpolation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_interpolation.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Interpolation",
+                "tooltip": "Create an interpolation curve from points"
+            },
+            "fr": {
+                "name": "Interpolation",
+                "tooltip": "Créer une courbe d'interpolation à partir de points"
+            }
+        }
+    },
+    "SHAPER/Intersection": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/intersection.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Intersection",
+                "tooltip": "Intersect objects with tools"
+            },
+            "fr": {
+                "name": "Section",
+                "tooltip": "Intersection d'objets avec des outils"
+            }
+        }
+    },
+    "SHAPER/LimitTolerance": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/limit_tolerance.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Limit Tolerance",
+                "tooltip": "Limit the tolerance on a shape"
+            },
+            "fr": {
+                "name": "Limiter la tolérance",
+                "tooltip": "Limiter la tolérance sur une forme"
+            }
+        }
+    },
+    "SHAPER/LinearCopy": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/multitranslation.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Linear copy",
+                "tooltip": "Perform copy and translate"
+            },
+            "fr": {
+                "name": "Copie linéaire",
+                "tooltip": "Effectuer la copie et la translation"
+            }
+        }
+    },
+    "SHAPER/Loft": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/loft.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Loft",
+                "tooltip": "Generates a shape with two elements"
+            },
+            "fr": {
+                "name": "Lissage",
+                "tooltip": "Génére une forme avec deux éléments"
+            }
+        }
+    },
+    "SHAPER/Measurement": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/measurement.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Measurement",
+                "tooltip": "Calculate properties of objects"
+            },
+            "fr": {
+                "name": "Mesure",
+                "tooltip": "Calculer les propriétés des objets"
+            }
+        }
+    },
+    "SHAPER/NormalMacro": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/normale.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Normal to a face",
+                "tooltip": "Calculate the normal to a face"
+            },
+            "fr": {
+                "name": "Normale d'une face",
+                "tooltip": "Calcule la normale d'une face"
+            }
+        }
+    },
+    "SHAPER/OPEN_CMD": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Part set...",
+                "tooltip": "Import native file"
+            },
+            "fr": {
+                "name": "Assemblage...",
+                "tooltip": "Importer un fichier natif"
+            }
+        }
+    },
+    "SHAPER/Parameter": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/PartSet/expression.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Parameter",
+                "tooltip": "Create a parameter"
+            },
+            "fr": {
+                "name": "Paramètre",
+                "tooltip": "Créer un paramètre"
+            }
+        }
+    },
+    "SHAPER/ParametersMgr": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/PartSet/paper_roll.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Parameters",
+                "tooltip": "Manage parameters"
+            },
+            "fr": {
+                "name": "Paramètres",
+                "tooltip": "Gérer les paramètres"
+            }
+        }
+    },
+    "SHAPER/Part": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/XGUI/part_ico.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "New part",
+                "tooltip": "Create part"
+            },
+            "fr": {
+                "name": "Nouvelle pièce",
+                "tooltip": "Créer une pièce"
+            }
+        }
+    },
+    "SHAPER/Partition": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/partition.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Partition",
+                "tooltip": "Perform partition operations with solids"
+            },
+            "fr": {
+                "name": "Partition",
+                "tooltip": "Effectuer des opérations de partition avec des solides"
+            }
+        }
+    },
+    "SHAPER/Pipe": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/pipe.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Pipe",
+                "tooltip": "Generates extrusion along a path"
+            },
+            "fr": {
+                "name": "Tuyau",
+                "tooltip": "Génère une extrusion le long d'un chemin"
+            }
+        }
+    },
+    "SHAPER/Placement": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/placement.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Placement",
+                "tooltip": "Place objects relatively to another one"
+            },
+            "fr": {
+                "name": "Placement",
+                "tooltip": "Placez les objets l'un par rapport à l'autre"
+            }
+        }
+    },
+    "SHAPER/Plane": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/plane.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Plane",
+                "tooltip": "Create plane"
+            },
+            "fr": {
+                "name": "Plan",
+                "tooltip": "Créer un plan"
+            }
+        }
+    },
+    "SHAPER/Point": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/point.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Point",
+                "tooltip": "Create point"
+            },
+            "fr": {
+                "name": "Point",
+                "tooltip": "Créer un point"
+            }
+        }
+    },
+    "SHAPER/PointCoordinates": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/point_coord.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Point coordinates",
+                "tooltip": "View point coordinate"
+            },
+            "fr": {
+                "name": "Coordonnées d'un point",
+                "tooltip": "Voir les coordonnées du point"
+            }
+        }
+    },
+    "SHAPER/Polyline": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_polyline.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Polyline",
+                "tooltip": "Create a polyline from points"
+            },
+            "fr": {
+                "name": "Polyligne",
+                "tooltip": "Créer une polyligne à partir de points"
+            }
+        }
+    },
+    "SHAPER/REDO_CMD": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/XGUI/redo.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Redo",
+                "tooltip": "Redo last command"
+            },
+            "fr": {
+                "name": "Refaire",
+                "tooltip": "Refaire la dernière commande"
+            }
+        }
+    },
+    "SHAPER/Recover": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/recover.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Recover",
+                "tooltip": "Visualize concealed objects"
+            },
+            "fr": {
+                "name": "Récupérer",
+                "tooltip": "Visualiser les objets cachés"
+            }
+        }
+    },
+    "SHAPER/Remove": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/PartSet/remove.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Remove part",
+                "tooltip": "Remove active part"
+            },
+            "fr": {
+                "name": "Supprimer pièce",
+                "tooltip": "Supprimer la pièce active"
+            }
+        }
+    },
+    "SHAPER/Remove_SubShapes": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/remove_subshapes.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Remove Sub-Shapes",
+                "tooltip": "Allows to remove sub-shapes from wires, shells, compsolids and compounds"
+            },
+            "fr": {
+                "name": "Supprimer les sous-formes",
+                "tooltip": "Permet de supprimer les sous formes de fils, coques, solides composites et ensembles"
+            }
+        }
+    },
+    "SHAPER/Revolution": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/revol.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Revolution",
+                "tooltip": "Create a solid by revolution of a face"
+            },
+            "fr": {
+                "name": "Révolution",
+                "tooltip": "Créer un solide par révolution d'une face"
+            }
+        }
+    },
+    "SHAPER/RevolutionCut": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/revol_cut.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "RevolutionCut",
+                "tooltip": "Cuts a revolution from a solid"
+            },
+            "fr": {
+                "name": "Enlèvement de matière avec révolution",
+                "tooltip": "Coupe une révolution d'un solide"
+            }
+        }
+    },
+    "SHAPER/RevolutionFuse": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/revol_fuse.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "RevolutionFuse",
+                "tooltip": "Fuses a revolution with a solid"
+            },
+            "fr": {
+                "name": "Bossage avec révolution",
+                "tooltip": "Fusionne une révolution avec un solide"
+            }
+        }
+    },
+    "SHAPER/Rotation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/rotation.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Rotation",
+                "tooltip": "Perform rotation of objects around the axis to specified angle"
+            },
+            "fr": {
+                "name": "Rotation",
+                "tooltip": "Effectuer une rotation des objets autour de l'axe avec l'angle spécifié"
+            }
+        }
+    },
+    "SHAPER/SAVEAS_CMD": {
+        "iconPath": "",
+        "langDependentAssets": {
+            "en": {
+                "name": "Part set...",
+                "tooltip": "Export the current document into a native file"
+            },
+            "fr": {
+                "name": "Assemblage...",
+                "tooltip": "Exporter le document actuel dans un fichier natif"
+            }
+        }
+    },
+    "SHAPER/Scale": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/SVG/scale.svg",
+        "langDependentAssets": {
+            "en": {
+                "name": "Scale",
+                "tooltip": "Perform scale objects"
+            },
+            "fr": {
+                "name": "Échelle",
+                "tooltip": "Effectuer un changement d'échelle des objets"
+            }
+        }
+    },
+    "SHAPER/Sewing": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/sewing.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sewing",
+                "tooltip": "Perform sewing operation on shapes"
+            },
+            "fr": {
+                "name": "Coudre les faces",
+                "tooltip": "Effectuer une opération de couture sur des formes"
+            }
+        }
+    },
+    "SHAPER/Shared_faces_macro": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/shared_shapes.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Check shared faces",
+                "tooltip": "Check the shared faces"
+            },
+            "fr": {
+                "name": "Vérifier les faces partagées",
+                "tooltip": "Check the shared faces"
+            }
+        }
+    },
+    "SHAPER/Shell": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_shell.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Shell",
+                "tooltip": "Create a shell from faces or shells objects"
+            },
+            "fr": {
+                "name": "Coque",
+                "tooltip": "Créer une coque à partir d'objets faces ou d'autres coques"
+            }
+        }
+    },
+    "SHAPER/Sketch": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/sketch.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sketch",
+                "tooltip": "Create sketch"
+            },
+            "fr": {
+                "name": "Esquisse",
+                "tooltip": "Créer une esquisse"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintAngle": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/angle_constr.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Angle",
+                "tooltip": "Set fixed angle between two line segments"
+            },
+            "fr": {
+                "name": "Angle",
+                "tooltip": "Définir un angle fixe entre deux segments"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintCoincidence": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/coincedence.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Coincident",
+                "tooltip": "Create constraint for the coincidence of two points or point on line or circle"
+            },
+            "fr": {
+                "name": "Coïncident",
+                "tooltip": "Créer une contrainte pour la coïncidence de deux points ou d'un point sur une ligne ou un cercle"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintCollinear": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/collinear.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Collinear",
+                "tooltip": "Create constraint defining collinearity of two lines"
+            },
+            "fr": {
+                "name": "Colinéaire",
+                "tooltip": "Créer une contrainte définissant la colinéarité de deux lignes"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintDistance": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/distance.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Distance",
+                "tooltip": "Set fixed distance from a point to an object"
+            },
+            "fr": {
+                "name": "Distance",
+                "tooltip": "Définir une distance fixe entre un point et un objet"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintDistanceHorizontal": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/distance_h.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Horizontal Distance",
+                "tooltip": "Set horizontal distance between two points"
+            },
+            "fr": {
+                "name": "Distance horizontale",
+                "tooltip": "Définir la distance horizontale entre deux points"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintDistanceVertical": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/distance_v.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Vertical Distance",
+                "tooltip": "Set vertical distance between two points"
+            },
+            "fr": {
+                "name": "Distance verticale",
+                "tooltip": "Définir la distance verticale entre deux points"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintEqual": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/equal.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Equal",
+                "tooltip": "Create constraint defining equal lengths of two lines or line and arc or equal radiuses of two arcs or two circles or arc and circle"
+            },
+            "fr": {
+                "name": "Égal",
+                "tooltip": "Créer une contrainte définissant des longueurs égales de deux lignes, ou une ligne et un arc, ou des rayons égaux de deux arcs ou de deux cercles ou d'un arc et d'un cercle"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintHorizontal": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/horisontal.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Horizontal",
+                "tooltip": "Create constraint defining horizontal line"
+            },
+            "fr": {
+                "name": "Horizontal",
+                "tooltip": "Créer une contrainte définissant une ligne horizontale"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintLength": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/length.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Length",
+                "tooltip": "Set fixed length of a line segment"
+            },
+            "fr": {
+                "name": "Longueur",
+                "tooltip": "Définir la longueur fixe d'un segment"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintMiddle": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/middlepoint.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Middle point",
+                "tooltip": "Create constraint for setting middle point on a line"
+            },
+            "fr": {
+                "name": "Point milieu",
+                "tooltip": "Créer une contrainte pour définir le milieu de la ligne"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintMirror": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/mirror.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Mirror copy",
+                "tooltip": "Create constraint, mirroring group of objects"
+            },
+            "fr": {
+                "name": "Copie miroir",
+                "tooltip": "Créer une contrainte, mettre en miroir un groupe d'objets"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintParallel": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/parallel.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Parallel",
+                "tooltip": "Create constraint defining two parallel lines"
+            },
+            "fr": {
+                "name": "Parallèle",
+                "tooltip": "Créer une contrainte définissant deux lignes parallèles"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintPerpendicular": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/perpendicular.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Perpendicular",
+                "tooltip": "Create constraint defining two orthogonal objects"
+            },
+            "fr": {
+                "name": "Perpendiculaire",
+                "tooltip": "Créer une contrainte définissant deux objets orthogonaux"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintRadius": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/radius_constr.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Radius",
+                "tooltip": "Set fixed radius of a circle or an arc"
+            },
+            "fr": {
+                "name": "Rayon",
+                "tooltip": "Définir le rayon fixe d'un cercle ou d'un arc"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintRigid": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/fixed.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Fixed",
+                "tooltip": "Fix an object"
+            },
+            "fr": {
+                "name": "Fixé",
+                "tooltip": "Fixer un objet"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintTangent": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/tangent.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Tangent",
+                "tooltip": "Create constraint defining tangency of two segments with common coincident point"
+            },
+            "fr": {
+                "name": "Tangente",
+                "tooltip": "Créer une contrainte définissant la tangence de deux segments avec un point de coïncidence commun"
+            }
+        }
+    },
+    "SHAPER/SketchConstraintVertical": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/vertical.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Vertical",
+                "tooltip": "Create constraint defining vertical line"
+            },
+            "fr": {
+                "name": "Vertical",
+                "tooltip": "Créer une contrainte définissant une ligne verticale"
+            }
+        }
+    },
+    "SHAPER/SketchCopy": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/copy.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sketch copy",
+                "tooltip": "Copy sketch and all its elements to the same plane"
+            },
+            "fr": {
+                "name": "Copie d'esquisse",
+                "tooltip": "Copiez l'esquisse et tous ses éléments dans le même plan"
+            }
+        }
+    },
+    "SHAPER/SketchCurveFitting": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/curvefitting.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Curve fitting",
+                "tooltip": "Create curve passing through the points"
+            },
+            "fr": {
+                "name": "Courbe d'ajustement",
+                "tooltip": "Créer une courbe passant par les points"
+            }
+        }
+    },
+    "SHAPER/SketchDrawer": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/drawer.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sketch drawer",
+                "tooltip": "Creates sketch using elements of selected shape belonging to selected plane"
+            },
+            "fr": {
+                "name": "Créer une esquisse à partir d'un contour",
+                "tooltip": "Crée une esquisse en utilisant des éléments de la forme sélectionnée appartenant au plan sélectionné"
+            }
+        }
+    },
+    "SHAPER/SketchFillet": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/fillet.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Fillet",
+                "tooltip": "Create constraint defining fillet between two connected segments"
+            },
+            "fr": {
+                "name": "Congé",
+                "tooltip": "Créer une contrainte définissant un congé entre deux segments connectés"
+            }
+        }
+    },
+    "SHAPER/SketchIntersectionPoint": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/intersection_point.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Intersection",
+                "tooltip": "Intersect edge with sketch plane"
+            },
+            "fr": {
+                "name": "Section",
+                "tooltip": "Intersecter une arête avec un plan d'esquisse"
+            }
+        }
+    },
+    "SHAPER/SketchLine": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/line.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Line",
+                "tooltip": "Create line"
+            },
+            "fr": {
+                "name": "Ligne",
+                "tooltip": "Créer une ligne"
+            }
+        }
+    },
+    "SHAPER/SketchMacroArc": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/arc.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Arc",
+                "tooltip": "Create arc"
+            },
+            "fr": {
+                "name": "Arc",
+                "tooltip": "Créer un arc"
+            }
+        }
+    },
+    "SHAPER/SketchMacroBSpline": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/bspline.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "B-spline",
+                "tooltip": "Create B-spline curve"
+            },
+            "fr": {
+                "name": "B-spline",
+                "tooltip": "Créer une courbe B-spline"
+            }
+        }
+    },
+    "SHAPER/SketchMacroBSplinePeriodic": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/bspline_p.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Periodic B-spline",
+                "tooltip": "Create periodic B-spline curve"
+            },
+            "fr": {
+                "name": "Périodique B-spline",
+                "tooltip": "Créer une courbe périodique de type B-spline"
+            }
+        }
+    },
+    "SHAPER/SketchMacroCircle": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/circle.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Circle",
+                "tooltip": "Create circle"
+            },
+            "fr": {
+                "name": "Cercle",
+                "tooltip": "Créer un cercle"
+            }
+        }
+    },
+    "SHAPER/SketchMacroEllipse": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/ellipse.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Ellipse",
+                "tooltip": "Create ellipse"
+            },
+            "fr": {
+                "name": "Ellipse",
+                "tooltip": "Créer une ellipse"
+            }
+        }
+    },
+    "SHAPER/SketchMacroEllipticArc": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/elliptic_arc.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Elliptic arc",
+                "tooltip": "Create elliptic arc"
+            },
+            "fr": {
+                "name": "Arc d'ellipse",
+                "tooltip": "Créer un arc d'ellipse"
+            }
+        }
+    },
+    "SHAPER/SketchMultiRotation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/rotate.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Angular copy",
+                "tooltip": "Copy objects and rotate"
+            },
+            "fr": {
+                "name": "Copie angulaire",
+                "tooltip": "Copier des objets et faire pivoter"
+            }
+        }
+    },
+    "SHAPER/SketchMultiTranslation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/translate.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Linear copy",
+                "tooltip": "Copy objects and move"
+            },
+            "fr": {
+                "name": "Copie linéaire",
+                "tooltip": "Copier des objets et les déplacer"
+            }
+        }
+    },
+    "SHAPER/SketchOffset": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/offset.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Offset",
+                "tooltip": "Offset a curve to a distance"
+            },
+            "fr": {
+                "name": "Décalage",
+                "tooltip": "Décaler une courbe d'une distance"
+            }
+        }
+    },
+    "SHAPER/SketchPoint": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/point.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Point",
+                "tooltip": "Create point"
+            },
+            "fr": {
+                "name": "Point",
+                "tooltip": "Créer un point"
+            }
+        }
+    },
+    "SHAPER/SketchProjection": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/projection.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Projection",
+                "tooltip": "Project feature onto sketch plane"
+            },
+            "fr": {
+                "name": "Projection",
+                "tooltip": "Projeter une fonction sur un plan d'esquisse"
+            }
+        }
+    },
+    "SHAPER/SketchRectangle": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Addons/rectangle.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Rectangle",
+                "tooltip": "Create rectangle"
+            },
+            "fr": {
+                "name": "Rectangle",
+                "tooltip": "Créer un rectangle"
+            }
+        }
+    },
+    "SHAPER/SketchSplit": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/split.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Split",
+                "tooltip": "Cut selected segment arc or circle on existing coincident points"
+            },
+            "fr": {
+                "name": "Diviser",
+                "tooltip": "Couper l'arc ou le cercle du segment sélectionné sur les points coïncidents existants"
+            }
+        }
+    },
+    "SHAPER/SketchTrim": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Sketch/trim.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Trim",
+                "tooltip": "Trim selected segment arc or circle on intersection points nearest to the graphic selection"
+            },
+            "fr": {
+                "name": "Réduire",
+                "tooltip": "Couper l'arc ou le cercle du segment sélectionné sur les points d'intersection les plus proches de la sélection graphique"
+            }
+        }
+    },
+    "SHAPER/Smash": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bool_smash.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Smash",
+                "tooltip": "Perform boolean smash operation with objects"
+            },
+            "fr": {
+                "name": "Smash",
+                "tooltip": "Effectuer l'opération booléenne smash avec des objets"
+            }
+        }
+    },
+    "SHAPER/Solid": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_solid.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Solid",
+                "tooltip": "Create a solid from faces or shells"
+            },
+            "fr": {
+                "name": "Solide",
+                "tooltip": "Créer un solide à partir de faces ou de coques"
+            }
+        }
+    },
+    "SHAPER/Sphere": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/sphere.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sphere",
+                "tooltip": "Create a sphere"
+            },
+            "fr": {
+                "name": "Sphère",
+                "tooltip": "Créer une sphère"
+            }
+        }
+    },
+    "SHAPER/Split": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/bool_split.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Split",
+                "tooltip": "Perform boolean split operation with objects"
+            },
+            "fr": {
+                "name": "Diviser",
+                "tooltip": "Effectuer l'opération booléenne division avec des objets"
+            }
+        }
+    },
+    "SHAPER/SubShapes": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_subshapes.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Sub-Shapes",
+                "tooltip": "Allows to add or to remove sub-shapes of the selected shape"
+            },
+            "fr": {
+                "name": "Sous-formes",
+                "tooltip": "Permet d'ajouter ou de supprimer des sous-formes de la forme sélectionnée"
+            }
+        }
+    },
+    "SHAPER/Symmetry": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/SVG/symmetry.svg",
+        "langDependentAssets": {
+            "en": {
+                "name": "Symmetry",
+                "tooltip": "Perform symmetry with respect to a point, an axis or a plane"
+            },
+            "fr": {
+                "name": "Symétrie",
+                "tooltip": "Effectuer une symétrie par rapport à un point, un axe ou un plan"
+            }
+        }
+    },
+    "SHAPER/Torus": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/torus.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Torus",
+                "tooltip": "Create a Torus"
+            },
+            "fr": {
+                "name": "Tore",
+                "tooltip": "Créer un tore"
+            }
+        }
+    },
+    "SHAPER/Translation": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Features/movement.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Translation",
+                "tooltip": "Perform translation of objects along the axis to specified distance"
+            },
+            "fr": {
+                "name": "Translation",
+                "tooltip": "Effectuer la translation des objets le long de l'axe à la distance spécifiée"
+            }
+        }
+    },
+    "SHAPER/Tube": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Primitives/tube.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Tube",
+                "tooltip": "Create a Tube"
+            },
+            "fr": {
+                "name": "Tube",
+                "tooltip": "Créer un tube"
+            }
+        }
+    },
+    "SHAPER/UNDO_CMD": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/XGUI/undo.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Undo",
+                "tooltip": "Undo last command"
+            },
+            "fr": {
+                "name": "Annuler",
+                "tooltip": "Annuler la dernière commande"
+            }
+        }
+    },
+    "SHAPER/Vertex": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_vertex.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Vertex",
+                "tooltip": "Create vertices from sketch point or other vertex objects"
+            },
+            "fr": {
+                "name": "Sommet",
+                "tooltip": "Créer des sommets à partir d'un point d'esquisse ou d'autres objets de sommet"
+            }
+        }
+    },
+    "SHAPER/Wire": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Build/feature_wire.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Wire",
+                "tooltip": "Create a wire from sketch edges, edges and wires objects"
+            },
+            "fr": {
+                "name": "Contour",
+                "tooltip": "Créer un contour à partir d'arêtes de l’esquisse, d'arêtes et de contours"
+            }
+        }
+    },
+    "SHAPER/compoundVertices": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Addons/compound.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Import points",
+                "tooltip": "Import a set of construction points"
+            },
+            "fr": {
+                "name": "Importer des points",
+                "tooltip": "Importer un ensemble de points de construction"
+            }
+        }
+    },
+    "SHAPER/importParameters": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Addons/parameters.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Import parameters",
+                "tooltip": "Import a set of parameters"
+            },
+            "fr": {
+                "name": "Importer des paramètres",
+                "tooltip": "Importer un ensemble de paramètres"
+            }
+        }
+    },
+    "SHAPER/midSurface": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Addons/midSurface.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Create midsurfaces",
+                "tooltip": "Create midsurfaces"
+            },
+            "fr": {
+                "name": "Créer des fibres neutres",
+                "tooltip": "Créer des fibres neutres"
+            }
+        }
+    },
+    "SHAPER/pipeNetwork": {
+        "iconPath": "%SHAPER_ROOT_DIR%/share/salome/resources/shaper/icons/Addons/pipeNetwork.png",
+        "langDependentAssets": {
+            "en": {
+                "name": "Pipe network",
+                "tooltip": "Create a network of pipes"
+            },
+            "fr": {
+                "name": "Réseau de tuyaux",
+                "tooltip": "Créer un réseau de tuyaux"
+            }
+        }
+    }
+}

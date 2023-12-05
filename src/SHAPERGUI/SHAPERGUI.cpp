@@ -764,8 +764,9 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
   int aKeys = 0;
   for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
+
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
-                                  isCheckable);
+                                  isCheckable, nullptr, nullptr, theId);
   aAction->setStatusTip(theStatusTip);
 
   aAction->setData(theId);
@@ -807,7 +808,7 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
                                        const QList<QAction*>& theNestedActions)
 {
   SUIT_Desktop* aDesk = application()->desktop();
-  SHAPERGUI_NestedButton* anAction = new SHAPERGUI_NestedButton(aDesk, theNestedActions);
+  SHAPERGUI_NestedButton* anAction = new SHAPERGUI_NestedButton(aDesk, makeActionID(theInfo.id), theNestedActions);
   anAction->setData(theInfo.id);
   anAction->setCheckable(theInfo.checkable);
   anAction->setChecked(theInfo.checked);
@@ -846,11 +847,11 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
                                            const char* theMenuSourceText,
                                            const QString& theSubMenu,
                                            const int theMenuPosition,
-                                           const int theSuibMenuPosition)
+                                           const int theSubMenuPosition)
 {
   int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
   if (!theSubMenu.isNull())
-    aMenu = createMenu(theSubMenu, aMenu, -1, theSuibMenuPosition);
+    aMenu = createMenu(theSubMenu, aMenu, -1, theSubMenuPosition);
 
   int aId = getNextCommandId();
   myActionsList.append(aId);
@@ -859,7 +860,7 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
   for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
-                                  isCheckable);
+                                  isCheckable, nullptr, nullptr, theId);
   aAction->setStatusTip(theTip);
   aAction->setData(theId);
   createMenu(aId, aMenu, theMenuPosition);

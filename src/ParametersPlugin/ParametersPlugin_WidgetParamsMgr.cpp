@@ -247,13 +247,6 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   connect(myAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
   aBtnLayout->addWidget(myAddBtn);
 
-  QString aAddStr(Config_PropManager::string("Shortcuts", "add_parameter_shortcut").c_str());
-  if (aAddStr.isEmpty())
-    aAddStr = "Ctrl+A";
-
-  QShortcut* aAddShc = new QShortcut(QKeySequence(aAddStr), myAddBtn);
-  connect(aAddShc, SIGNAL(activated()), SLOT(onAdd()));
-
   myInsertBtn = new QPushButton(translate("Insert"), this);
   connect(myInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
   aBtnLayout->addWidget(myInsertBtn);

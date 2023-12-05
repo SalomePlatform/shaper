@@ -27,7 +27,7 @@
 #ifndef SRC_SHAPERGUI_NESTEDBUTTON_H_
 #define SRC_SHAPERGUI_NESTEDBUTTON_H_
 
-#include <QWidgetAction>
+#include <QtxAction.h>
 
 class QFrame;
 class QAction;
@@ -38,31 +38,30 @@ class QToolButton;
  * \ingroup Salome
  * Custom (nested) button in salome mode.
  */
-class SHAPERGUI_NestedButton : public QWidgetAction
+class SHAPERGUI_NestedButton : public QtxAction
 {
   Q_OBJECT
- public:
-   /// Constructor
-   /// \param theParent a parent objects
-   /// \param theNestedActions a list of nested actions
-  SHAPERGUI_NestedButton(QObject* theParent, const QList<QAction*>& theNestedActions);
-  virtual ~SHAPERGUI_NestedButton();
 
- private slots:
+public:
+  /// Constructor
+  /// \param theParent a parent objects
+  /// \param theID Application-unique action ID is used by ShortcutMgr, FindAction dialog, etc.
+  /// \param theNestedActions a list of nested actions
+  SHAPERGUI_NestedButton(QObject* theParent, const QString& theID, const QList<QAction*>& theNestedActions);
+  virtual ~SHAPERGUI_NestedButton() = default;
+
+  virtual void setEnabled(bool theOn);
+
+private slots:
   /// Shows/hides the additional buttons widget
   void showAdditionalButtons(bool);
 
-  /// Slot called on action state
-  void actionStateChanged();
-
- protected:
+protected:
   /// Creates the button representation
   /// \param theParent a parent widget
   virtual QWidget * createWidget(QWidget * theParent);
 
-  virtual bool event(QEvent* theEvent);
-
- private:
+private:
   QList<QAction*> myNestedActions; ///< list of nested actions
   QWidget* myAdditionalButtonsWidget; ///< widget to precess additional buttons visibility
   QFrame* myButtonFrame; ///< frame arround button representation

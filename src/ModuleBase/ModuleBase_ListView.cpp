@@ -25,6 +25,8 @@
 #include <QClipboard>
 #include <QWidget>
 
+#include <SUIT_ShortcutMgr.h>
+
 #ifndef WIN32
 #include <QResizeEvent>
 #include <QTimer>
@@ -44,9 +46,9 @@ ModuleBase_ListView::ModuleBase_ListView(QWidget* theParent, const QString& theO
 
   myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"),
                           theParent, this, SLOT(onCopyItem()));
-  myCopyAction->setShortcut(QKeySequence::Copy);
   myCopyAction->setEnabled(false);
   myListControl->addAction(myCopyAction);
+  SUIT_ShortcutMgr::get()->registerAction("SHAPER/#TOT_DESK_EDIT_COPY", myCopyAction);
 
   myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
                           theParent, this, SIGNAL(deleteActionClicked()));

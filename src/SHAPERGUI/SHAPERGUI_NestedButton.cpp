@@ -33,18 +33,23 @@
 #include <QToolBar>
 #include <QEvent>
 
-SHAPERGUI_NestedButton::SHAPERGUI_NestedButton(QObject* theParent,
-                                           const QList<QAction*>& theNestedActions)
-: QWidgetAction(theParent),
+SHAPERGUI_NestedButton::SHAPERGUI_NestedButton(
+  QObject* theParent,
+  const QString& theID,
+  const QList<QAction*>& theNestedActions
+)
+: QtxAction(theParent, false /*isCheckable*/, theID),
   myNestedActions(theNestedActions),
   myAdditionalButtonsWidget(0),
   myButtonFrame(0),
   myThisButton(0)
-{
-}
+{ }
 
-SHAPERGUI_NestedButton::~SHAPERGUI_NestedButton()
+void SHAPERGUI_NestedButton::setEnabled(bool theOn)
 {
+  QtxAction::setEnabled(theOn);
+  if (myThisButton)
+    myThisButton->setEnabled(theOn);
 }
 
 void SHAPERGUI_NestedButton::showAdditionalButtons(bool isShow)
@@ -99,28 +104,5 @@ QWidget * SHAPERGUI_NestedButton::createWidget(QWidget * theParent)
 
   showAdditionalButtons(false);
   connect(this, SIGNAL(toggled(bool)), this, SLOT(showAdditionalButtons(bool)));
-  connect(this, SIGNAL(changed()), this, SLOT(actionStateChanged()));
   return myButtonFrame;
-}
-
-bool SHAPERGUI_NestedButton::event(QEvent* theEvent)
-{
-  if (theEvent->type() == QEvent::ActionChanged) {
-    if (myThisButton) {
-      myThisButton->setEnabled(isEnabled());
-      return true;
-    }
-  }
-  return QWidgetAction::event(theEvent);
-}
-
-
-void SHAPERGUI_NestedButton::actionStateChanged()
-{
-  if (isEnabled()) {
-    QString s = "true";
-  } else {
-    QString s = "false";
-  }
-
 }
