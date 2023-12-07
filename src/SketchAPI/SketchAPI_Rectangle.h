@@ -41,12 +41,18 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      double theX1, double theY1, double theX2, double theY2);
+                      double theX1, double theY1, 
+                      double theX2, double theY2, 
+                      bool theCreateByCenterAndCorner = false);
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
+                      const std::shared_ptr<GeomAPI_Pnt2d> & thePoint1,
+                      const std::shared_ptr<GeomAPI_Pnt2d> & thePoint2,
+                      bool theCreateByCenterAndCorner = false);
+
+  
+
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rectangle();
@@ -76,6 +82,20 @@ public:
   SKETCHAPI_EXPORT
   void setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
                    const std::shared_ptr<GeomAPI_Pnt2d> & theSecondPoint);
+
+  /// Set by coordinates
+  SKETCHAPI_EXPORT
+  void setByCenterAndCornerCoords(
+    double theCenterX, double theCenterY, 
+    double theCornerX, double theCornerY
+  );
+
+  /// Set by points
+  SKETCHAPI_EXPORT
+  void setByCenterAndCornerPoints(
+    const std::shared_ptr<GeomAPI_Pnt2d> & theCenterPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d> & theCornerPoint
+  );
 
   /// List of lines composing rectangle
   SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;

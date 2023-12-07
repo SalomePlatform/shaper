@@ -34,21 +34,24 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(
 }
 
 SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                                         double theX1, double theY1, double theX2, double theY2)
+                                         double theX1, double theY1, 
+                                         double theX2, double theY2,
+                                         bool theCreateByCenterAndCorner)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    setByCoordinates(theX1, theY1, theX2, theY2);
+    theCreateByCenterAndCorner ? setByCenterAndCornerCoords(theX1, theY1, theX2, theY2) : setByCoordinates(theX1, theY1, theX2, theY2);
   }
 }
 
 SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                                         const std::shared_ptr<GeomAPI_Pnt2d> & theFirstPoint,
-                                         const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
+                                         const std::shared_ptr<GeomAPI_Pnt2d> & thePoint1,
+                                         const std::shared_ptr<GeomAPI_Pnt2d> & thePoint2,
+                                         bool theCreateByCenterAndCorner)
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    setByPoints(theFirstPoint, theEndPoint);
+    theCreateByCenterAndCorner ? setByCenterAndCornerPoints(thePoint1, thePoint2) : setByPoints(thePoint1, thePoint2);
   }
 }
 
@@ -72,6 +75,26 @@ void SketchAPI_Rectangle::setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & the
   fillAttribute("RectangleTypeByCorners", type());
   fillAttribute(theFirstPoint, startPoint());
   fillAttribute(theSecondPoint, endPoint());
+  execute();
+}
+
+void SketchAPI_Rectangle::setByCenterAndCornerCoords(
+  double theCenterX, double theCenterY, 
+  double theCornerX, double theCornerY
+) {
+  fillAttribute("RectangleTypeCentered", type());
+  fillAttribute(centerPoint(), theCenterX, theCenterY);
+  fillAttribute(cornerPoint(), theCornerX, theCornerY);
+  execute();
+}
+
+void SketchAPI_Rectangle::setByCenterAndCornerPoints(
+  const std::shared_ptr<GeomAPI_Pnt2d> & theCenterPoint,
+  const std::shared_ptr<GeomAPI_Pnt2d> & theCornerPoint
+) {
+  fillAttribute("RectangleTypeCentered", type());
+  fillAttribute(theCenterPoint, centerPoint());
+  fillAttribute(theCornerPoint, cornerPoint());
   execute();
 }
 

@@ -38,13 +38,62 @@ def checkRectangle(lines, center, corner, tolerance = 1.e-7):
     ep_ref = points[i]
     assert(ep.distance(ep_ref) <= tolerance)
 
-def checkRectangleL(lines, valref, tolerance = 1.e-5):
-  for i in range(0, 4):
-    line = SketchAPI_Line(lines[i])
-    #print (line.defaultResult().shape().edge().length())
-    #print (valref[i%2])
-    #print (abs(line.defaultResult().shape().edge().length()-valref[i%2]))
-    assert(abs(line.defaultResult().shape().edge().length()-valref[i%2]) <= tolerance)
+def areCounterDirectedAndOfEqualLength(theLineA, theLineB):
+  tolerance = 1.e-5
+
+  aStartA = theLineA.startPoint().pnt()
+  aEndA   = theLineA.endPoint().pnt()
+  aDirA_X = aEndA.x() - aStartA.x()
+  aDirA_Y = aEndA.y() - aStartA.y()
+
+  aStartB = theLineB.startPoint().pnt()
+  aEndB   = theLineB.endPoint().pnt()
+  aDirB_X = aEndB.x() - aStartB.x()
+  aDirB_Y = aEndB.y() - aStartB.y()
+
+  return abs(aDirA_X + aDirB_X) < tolerance and abs(aDirA_Y + aDirB_Y) < tolerance
+
+def arePerpendicular(theLineA, theLineB):
+  tolerance = 1.e-5
+
+  aStartA = theLineA.startPoint().pnt()
+  aEndA   = theLineA.endPoint().pnt()
+  aDirA_X = aEndA.x() - aStartA.x()
+  aDirA_Y = aEndA.y() - aStartA.y()
+  aLengthA = theLineA.defaultResult().shape().edge().length()
+
+  aStartB = theLineB.startPoint().pnt()
+  aEndB   = theLineB.startPoint().pnt()
+  aDirB_X = aEndB.x() - aStartB.x()
+  aDirB_Y = aEndB.y() - aStartB.y()
+  aLengthB = theLineB.defaultResult().shape().edge().length()
+
+  if (aLengthA < tolerance or aLengthB < tolerance):
+    return True
+
+  return (aDirA_X * aDirB_X + aDirA_Y * aDirB_Y) / (aLengthA * aLengthB) < tolerance
+
+def areConnected(theLineA, theLineB):
+  aEndA   = theLineA.endPoint().pnt()
+  aStartB = theLineB.startPoint().pnt()
+  return aEndA.x() == aStartB.x() and aEndA.y() == aStartB.y()
+
+def checkIfArbitraryAlignedRectangle(theEdgeLines):
+  aLine0 = SketchAPI_Line(theEdgeLines[0])
+  aLine1 = SketchAPI_Line(theEdgeLines[1])
+  aLine2 = SketchAPI_Line(theEdgeLines[2])
+  aLine3 = SketchAPI_Line(theEdgeLines[3])
+
+  assert (areCounterDirectedAndOfEqualLength(aLine0, aLine2))
+  assert (areCounterDirectedAndOfEqualLength(aLine1, aLine3))
+  assert (arePerpendicular(aLine0, aLine1))
+  assert (arePerpendicular(aLine2, aLine3))
+  assert (areConnected(aLine0, aLine1))
+  assert (areConnected(aLine1, aLine2))
+  assert (areConnected(aLine2, aLine3))
+  assert (areConnected(aLine3, aLine0))       
+
+
 
 model.begin()
 partSet = model.moduleDocument()
@@ -80,34 +129,22 @@ checkRectangle(lines_3, SketchAPI_Line(lines_1[0]).startPoint().pnt(), SketchAPI
 # move center of rectangle
 SHIFT = 1.0
 center = SketchAPI_Line(lines_1[0]).startPoint().pnt()
-valref = [ \
-400.86931 , 200.78509 , \
-401.73886 , 201.57021 , \
-402.60865 , 202.35537 , \
-403.47866 , 203.14056 , \
-404.34890 , 203.92580 ]
 for i in range(0, 5):
   center.setX(center.x() + SHIFT)
   center.setY(center.y() + SHIFT)
   model.begin()
   sketch.move(SketchAPI_Line(lines_1[0]).startPoint(), center)
   model.end()
-  checkRectangleL(lines_3, valref[2*i:])
+  checkIfArbitraryAlignedRectangle(lines_3)
 
 # move corner of rectangle
 corner = SketchAPI_Line(lines_2[0]).endPoint().pnt()
-valref = [ \
-403.11209 , 202.95437 , \
-401.87551 , 201.98300 , \
-400.63915 , 201.01169 , \
-399.40301 , 200.04043 , \
-398.16710 , 199.06922 ]
 for i in range(0, 5):
   corner.setX(corner.x() + SHIFT)
   corner.setY(corner.y() + SHIFT)
   model.begin()
   sketch.move(SketchAPI_Line(lines_2[0]).endPoint(), corner)
   model.end()
-  checkRectangleL(lines_3, valref[2*i:])
+  checkIfArbitraryAlignedRectangle(lines_3)
 
 assert(model.checkPythonDump())

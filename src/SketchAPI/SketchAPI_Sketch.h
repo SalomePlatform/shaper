@@ -179,13 +179,19 @@ public:
   /// Add rectangle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Rectangle> addRectangle(
-      const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
-      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theStartPoint,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theEndPoint);    
   /// Add rectangle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner);
+  /// Add rectangle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
+      double theCenterX, double theCenterY, 
+      double theCornerX, double theCornerY
+  );
 
   /// Add circle
   SKETCHAPI_EXPORT
