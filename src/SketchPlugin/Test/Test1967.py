@@ -27,7 +27,7 @@ from timeit import default_timer as timer
 import math
 
 # convenient ratio of time moving point to time creating sketch
-MOVE_BUILD_RATIO = 0.1
+MOVE_BUILD_RATIO = 0.2
 # tolerance for comparison of reals
 TOLERANCE = 1.e-7
 
