@@ -558,7 +558,7 @@ static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(
 
 std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theStartPoint,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theEndPoint) 
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theEndPoint)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
   RectanglePtr aRect(new SketchAPI_Rectangle(aFeature));
@@ -568,14 +568,14 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
   aRect->execute();
 
   if (!theStartPoint.second.isEmpty() && aRect->linesList()->size() >= 1) {
-    // Get end point of the first line in rectangle and apply coincidence constraint
+    // Get end point of the first line of rectangle and apply coincidence constraint
     FeaturePtr aLine = ModelAPI_Feature::feature(aRect->linesList()->object(0));
     AttributePtr aLinePnt = aLine->attribute(SketchPlugin_Line::END_ID());
     setCoincident(ModelHighAPI_RefAttr(aLinePnt), theStartPoint.second);
   }
 
   if (!theEndPoint.second.isEmpty() && aRect->linesList()->size() >= 4) {
-    // Get start point of the last line in rectangle and apply coincidence constraint
+    // Get start point of the last line of rectangle and apply coincidence constraint
     FeaturePtr aLine = ModelAPI_Feature::feature(aRect->linesList()->object(3));
     AttributePtr aLinePnt = aLine->attribute(SketchPlugin_Line::START_ID());
     setCoincident(ModelHighAPI_RefAttr(aLinePnt), theEndPoint.second);
@@ -583,7 +583,7 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
   return aRect;
 }
 
-std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
+std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>> SketchAPI_Sketch::addRectangleCentered(
     const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
     const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner)
 {
@@ -595,7 +595,7 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
     fillAttribute(theCenter.second, aRect->centerPointRef());
   else
     fillAttribute(pointCoordinates(theCenter), aRect->centerPoint());
-  
+
   fillAttribute(pointCoordinates(theCorner), aRect->cornerPoint());
   aRect->execute();
 
@@ -605,15 +605,16 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
     AttributePtr aEndPnt = aLine->attribute(SketchPlugin_Line::START_ID());
     setCoincident(ModelHighAPI_RefAttr(aEndPnt), theCorner.second);
   }
-  return aRect;
+  return std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>>(aRect, aRect->centerSketchPoint());
 }
 
-std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangleCentered(
-      double theCenterX, double theCenterY, 
+std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>> SketchAPI_Sketch::addRectangleCentered(
+      double theCenterX, double theCenterY,
       double theCornerX, double theCornerY
 ) {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
-  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theCenterX, theCenterY, theCornerX, theCornerY, true));
+  auto aRect = RectanglePtr(new SketchAPI_Rectangle(aFeature, theCenterX, theCenterY, theCornerX, theCornerY, true));
+  return std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>>(aRect, aRect->centerSketchPoint());
 }
 
 //--------------------------------------------------------------------------------------

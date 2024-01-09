@@ -95,6 +95,9 @@
 // std::pair -> []
 %template(PointRefAttrPair) std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>;
 
+%template(RectangleAndPoint) std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>>;
+
+
 %typecheck(SWIG_TYPECHECK_POINTER) std::shared_ptr<ModelAPI_Feature>, const std::shared_ptr<ModelAPI_Feature> & {
   std::shared_ptr<ModelAPI_Feature> * temp_feature;
   std::shared_ptr<ModelHighAPI_Interface> * temp_interface;

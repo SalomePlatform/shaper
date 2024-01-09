@@ -20,6 +20,7 @@
 #include "SketchAPI_Rectangle.h"
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Pnt2d.h>
+#include "SketchAPI_Point.h"
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -34,7 +35,7 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(
 }
 
 SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                                         double theX1, double theY1, 
+                                         double theX1, double theY1,
                                          double theX2, double theY2,
                                          bool theCreateByCenterAndCorner)
   : SketchAPI_SketchEntity(theFeature)
@@ -53,10 +54,6 @@ SketchAPI_Rectangle::SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature>
   if (initialize()) {
     theCreateByCenterAndCorner ? setByCenterAndCornerPoints(thePoint1, thePoint2) : setByPoints(thePoint1, thePoint2);
   }
-}
-
-SketchAPI_Rectangle::~SketchAPI_Rectangle()
-{
 }
 
 //--------------------------------------------------------------------------------------
@@ -79,7 +76,7 @@ void SketchAPI_Rectangle::setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & the
 }
 
 void SketchAPI_Rectangle::setByCenterAndCornerCoords(
-  double theCenterX, double theCenterY, 
+  double theCenterX, double theCenterY,
   double theCornerX, double theCornerY
 ) {
   fillAttribute("RectangleTypeCentered", type());
@@ -108,4 +105,10 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rectangle::lines()
   for (; anIt != aList.end(); ++anIt)
     aFeatures.push_back(ModelAPI_Feature::feature(*anIt));
   return SketchAPI_SketchEntity::wrap(aFeatures);
+}
+
+std::shared_ptr<SketchAPI_Point> SketchAPI_Rectangle::centerSketchPoint() const
+{
+  auto aFeature = ModelAPI_Feature::feature(centerPointRef()->object());
+  return std::shared_ptr<SketchAPI_Point>(new SketchAPI_Point(aFeature));
 }

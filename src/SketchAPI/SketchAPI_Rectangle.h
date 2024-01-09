@@ -27,6 +27,7 @@
 
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
+class SketchAPI_Point;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_Rectangle
  * \ingroup CPPHighAPI
@@ -41,8 +42,8 @@ public:
   /// Constructor with values
   SKETCHAPI_EXPORT
   SketchAPI_Rectangle(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                      double theX1, double theY1, 
-                      double theX2, double theY2, 
+                      double theX1, double theY1,
+                      double theX2, double theY2,
                       bool theCreateByCenterAndCorner = false);
   /// Constructor with values
   SKETCHAPI_EXPORT
@@ -51,11 +52,11 @@ public:
                       const std::shared_ptr<GeomAPI_Pnt2d> & thePoint2,
                       bool theCreateByCenterAndCorner = false);
 
-  
+
 
   /// Destructor
   SKETCHAPI_EXPORT
-  virtual ~SketchAPI_Rectangle();
+  virtual ~SketchAPI_Rectangle() = default;
 
   INTERFACE_7("SketchRectangle",
               type, "RectangleType", ModelAPI_AttributeString,
@@ -86,7 +87,7 @@ public:
   /// Set by coordinates
   SKETCHAPI_EXPORT
   void setByCenterAndCornerCoords(
-    double theCenterX, double theCenterY, 
+    double theCenterX, double theCenterY,
     double theCornerX, double theCornerY
   );
 
@@ -99,6 +100,8 @@ public:
 
   /// List of lines composing rectangle
   SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;
+
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> centerSketchPoint() const;
 };
 
 //! Pointer on Rectangle object

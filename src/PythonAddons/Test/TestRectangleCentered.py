@@ -91,7 +91,7 @@ def checkIfArbitraryAlignedRectangle(theEdgeLines):
   assert (areConnected(aLine0, aLine1))
   assert (areConnected(aLine1, aLine2))
   assert (areConnected(aLine2, aLine3))
-  assert (areConnected(aLine3, aLine0))       
+  assert (areConnected(aLine3, aLine0))
 
 
 
@@ -103,7 +103,7 @@ centerPoint = geom.Pnt2d(50, 50)
 endPoint = geom.Pnt2d(100, 100)
 
 sketch = model.addSketch(part, model.defaultPlane("XOY"))
-rectangle_1 = sketch.addRectangleCentered(centerPoint, endPoint)
+rectangle_1, center_of_rectangle_1 = sketch.addRectangleCentered(centerPoint, endPoint)
 lines_1 = rectangle_1.lines()
 model.end()
 
@@ -113,14 +113,14 @@ model.begin()
 projection_1 = sketch.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
 point_1 = SketchAPI_Point(projection_1.createdFeature())
 
-rectangle_2 = sketch.addRectangleCentered(point_1.coordinates(), endPoint)
+rectangle_2, _ = sketch.addRectangleCentered(point_1.coordinates(), endPoint)
 lines_2 = rectangle_2.lines()
 model.end()
 
 checkRectangle(lines_2, geom.Pnt2d(0.0, 0.0), endPoint)
 
 model.begin()
-rectangle_3 = sketch.addRectangleCentered(SketchAPI_Line(lines_1[0]).startPoint(), SketchAPI_Line(lines_2[0]).endPoint())
+rectangle_3, _ = sketch.addRectangleCentered(SketchAPI_Line(lines_1[0]).startPoint(), SketchAPI_Line(lines_2[0]).endPoint())
 lines_3 = rectangle_3.lines()
 model.end()
 

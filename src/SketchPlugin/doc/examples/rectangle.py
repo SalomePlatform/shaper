@@ -43,7 +43,7 @@ rectWithPnt2Ds = Sketch_1.addRectangle(Pnt2D_corner1, Pnt2D_corner2)
 Pnt2D_center = geom.Pnt2d(6.5 + 5, 5.5)
 Pnt2D_corner = geom.Pnt2d(8.0 + 5, 8.0)
 
-rectCenteredWithPnt2Ds = Sketch_1.addRectangleCentered(Pnt2D_center, Pnt2D_corner)
+rectCenteredWithPnt2Ds, rectCenteredWithPnt2DCenterSketchPoint = Sketch_1.addRectangleCentered(Pnt2D_center, Pnt2D_corner)
 ############################################################
 
 
@@ -51,12 +51,12 @@ rectCenteredWithPnt2Ds = Sketch_1.addRectangleCentered(Pnt2D_center, Pnt2D_corne
 SP_center = Sketch_1.addPoint(6.5, 5.5)
 SP_corner = Sketch_1.addPoint(8.0, 8.0)
 
-rectCenteredWithPnt2Ds = Sketch_1.addRectangleCentered(SP_center, SP_corner)
+rectCenteredWithPnt2Ds, _ = Sketch_1.addRectangleCentered(SP_center, SP_corner)
 ############################################################
 
 
 ### Rectangle by center and corner defined with doubles.
-rectCenteredWithDoubles = Sketch_1.addRectangleCentered(6.5, -5.5, 8.0, -8.0)
+rectCenteredWithDoubles, _ = Sketch_1.addRectangleCentered(6.5, -5.5, 8.0, -8.0)
 ############################################################
 
 model.do()

@@ -24,6 +24,7 @@
 #include "SketchAPI.h"
 
 #include <list>
+#include <utility>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_SketchEntity.h>
@@ -180,16 +181,16 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Rectangle> addRectangle(
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theStartPoint,
-      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theEndPoint);    
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theEndPoint);
   /// Add rectangle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
+  std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>> addRectangleCentered(
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCenter,
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & theCorner);
   /// Add rectangle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Rectangle> addRectangleCentered(
-      double theCenterX, double theCenterY, 
+  std::pair<std::shared_ptr<SketchAPI_Rectangle>, std::shared_ptr<SketchAPI_Point>> addRectangleCentered(
+      double theCenterX, double theCenterY,
       double theCornerX, double theCornerY
   );
 
