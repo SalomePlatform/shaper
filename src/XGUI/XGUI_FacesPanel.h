@@ -28,7 +28,6 @@
 #include <ModuleBase_ResultPrs.h>
 
 #include <ModelAPI_Object.h>
-#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_Feature.h>
 
 #include <GeomAPI_AISObject.h>
@@ -159,20 +158,6 @@ private:
   static void updateProcessedObjects(QMap<int, ModuleBase_ViewerPrsPtr> theItems,
                                      std::set<ObjectPtr>& theObjects);
 
-  /// Returns maps of shapes and presentations. If object is a body result then it returns
-  /// its ruslts. If it is a group then it returns result of shapes included into the gropup
-  /// The function doesn't clear content of input maps.
-  /// \param thePrs a selected presintation
-  /// \param theObjectsToShapes map of objects to shapes list
-  /// \param theObjectToPrs map of objects to presentations
-  void getObjectsMapFromResult(ResultGroupPtr theResGroup, FeaturePtr theGroupFeature,
-    std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectsToShapes,
-    std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs);
-
-  void getObjectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
-    std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
-    std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs);
-
   /// Returns true if transparency choice is checked
   /// \return boolean value
   bool useTransparency() const;
@@ -208,7 +193,6 @@ private:
   QMap<int, ModuleBase_ViewerPrsPtr> myItems; ///< selected face items
   std::set<ObjectPtr > myItemObjects; ///< cached objects of myItems
   std::set<ObjectPtr > myHiddenObjects; ///< hidden objects
-  std::set<ObjectPtr > myHiddenGroups; ///< hidden objects
 };
 
 #endif

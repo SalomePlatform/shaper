@@ -63,26 +63,6 @@
 static const int LayoutMargin = 3;
 
 //********************************************************************
-bool getGroup(ModuleBase_ViewerPrsPtr thePrs, ResultGroupPtr& theResGroup,
-  FeaturePtr& theGroupFeature)
-{
-  ObjectPtr anObject = thePrs->object();
-  if (!anObject.get())
-    return false;
-
-  theResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(anObject);
-  if (theResGroup.get()) {
-    theGroupFeature = ModelAPI_Feature::feature(theResGroup);
-  }
-  else {
-    theGroupFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    if (theGroupFeature.get())
-      theResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(theGroupFeature->firstResult());
-  }
-  return theGroupFeature.get() && theResGroup.get();
-}
-
-//********************************************************************
 void updateHiddenShapes(Handle(ModuleBase_ResultPrs) thePrs, const TopoDS_ListOfShape& theShapes)
 {
   TopoDS_ListOfShape aAlreadyHidden = thePrs->hiddenSubShapes();
@@ -92,6 +72,31 @@ void updateHiddenShapes(Handle(ModuleBase_ResultPrs) thePrs, const TopoDS_ListOf
       aAlreadyHidden.Remove(aShPIt.Value());
   }
   thePrs->setSubShapeHidden(aAlreadyHidden);
+}
+
+//********************************************************************
+void objectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
+  std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
+  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs)
+{
+  ObjectPtr anObject = thePrs->object();
+  if (!anObject.get())
+    return;
+
+  // Process bodies
+  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
+    thePrs->interactive());
+  if (aResultPrs.IsNull())
+    return;
+
+  if (theObjectToShapes.find(anObject) != theObjectToShapes.end())
+    theObjectToShapes.at(anObject).Append(ModuleBase_Tools::getSelectedShape(thePrs));
+  else {
+    TopoDS_ListOfShape aListOfShapes;
+    aListOfShapes.Append(ModuleBase_Tools::getSelectedShape(thePrs));
+    theObjectToShapes[anObject] = aListOfShapes;
+    theObjectToPrs[anObject] = aResultPrs;
+  }
 }
 
 //********************************************************************
@@ -136,7 +141,7 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
   std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) > anObjectToPrs;
   QMap<int, ModuleBase_ViewerPrsPtr >::const_iterator aIt;
   for (aIt = myItems.cbegin(); aIt != myItems.cend(); aIt++) {
-    getObjectsMapFromPrs(aIt.value(), anObjectToShapes, anObjectToPrs);
+    objectsMapFromPrs(aIt.value(), anObjectToShapes, anObjectToPrs);
   }
 
   std::set<ObjectPtr> aObjects;
@@ -146,10 +151,6 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
     aObjects.insert(aPrsIt->first);
     aPrsIt->second->setSubShapeHidden(anEmpty);
   }
-  std::set<ObjectPtr >::const_iterator aGrpIt;
-  for (aGrpIt = myHiddenGroups.cbegin(); aGrpIt != myHiddenGroups.cend(); aGrpIt++)
-    (*aGrpIt)->setDisplayed(true);
-  myHiddenGroups.clear();
 
   if (redisplayObjects(aObjects))
     flushRedisplay();
@@ -281,75 +282,6 @@ bool XGUI_FacesPanel::processAction(ModuleBase_ActionType theActionType)
   }
 }
 
-//********************************************************************
-void XGUI_FacesPanel::getObjectsMapFromResult(ResultGroupPtr theResGroup,
-  FeaturePtr theGroupFeature,
-  std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
-  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs)
-{
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  // Process a grouip result
-  AttributeSelectionListPtr aSelectionList = theGroupFeature->selectionList("group_list");
-  AISObjectPtr aPrs;
-  for (int i = 0; i < aSelectionList->size(); i++) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(i);
-    ResultPtr aRes = aSelection->context();
-    aPrs = aDisplayer->getAISObject(aRes);
-    if (aPrs.get()) {
-      Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
-        aPrs->impl<Handle(AIS_InteractiveObject)>());
-      if (!aResultPrs.IsNull()) {
-        GeomShapePtr aShape = aSelection->value();
-        if (theObjectToShapes.find(aRes) != theObjectToShapes.end())
-          theObjectToShapes.at(aRes).Append(aShape->impl<TopoDS_Shape>());
-        else {
-          TopoDS_ListOfShape aListOfShapes;
-          aListOfShapes.Append(aShape->impl<TopoDS_Shape>());
-          theObjectToShapes[aRes] = aListOfShapes;
-          theObjectToPrs[aRes] = aResultPrs;
-        }
-      }
-    }
-  }
-}
-
-//********************************************************************
-void objectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
-  std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
-  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs)
-{
-  ObjectPtr anObject = thePrs->object();
-  if (!anObject.get())
-    return;
-
-  // Process bodies
-  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
-    thePrs->interactive());
-  if (aResultPrs.IsNull())
-    return;
-
-  if (theObjectToShapes.find(anObject) != theObjectToShapes.end())
-    theObjectToShapes.at(anObject).Append(ModuleBase_Tools::getSelectedShape(thePrs));
-  else {
-    TopoDS_ListOfShape aListOfShapes;
-    aListOfShapes.Append(ModuleBase_Tools::getSelectedShape(thePrs));
-    theObjectToShapes[anObject] = aListOfShapes;
-    theObjectToPrs[anObject] = aResultPrs;
-  }
-}
-
-//********************************************************************
-void XGUI_FacesPanel::getObjectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
-  std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
-  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs)
-{
-  ResultGroupPtr aResGroup;
-  FeaturePtr aGroupFeature;
-  if (getGroup(thePrs, aResGroup, aGroupFeature))
-    getObjectsMapFromResult(aResGroup, aGroupFeature, theObjectToShapes, theObjectToPrs);
-  else
-    objectsMapFromPrs(thePrs, theObjectToShapes, theObjectToPrs);
-}
 
 //********************************************************************
 void XGUI_FacesPanel::processSelection()
@@ -373,35 +305,15 @@ void XGUI_FacesPanel::processSelection()
     if (!anObject.get())
       continue;
 
-    ResultGroupPtr aResGroup;
-    FeaturePtr aGroupFeature;
-    if (getGroup(aPrs, aResGroup, aGroupFeature)) {
-      AttributeSelectionListPtr aSelectionListAttr =
-        aGroupFeature->data()->selectionList("group_list");
-      std::string aType = aSelectionListAttr->selectionType();
-      if (aType != "Faces")
-        continue;
-    }
-    else {
-      GeomShapePtr aShapePtr = aPrs->shape();
-      if (!aShapePtr.get() || !aShapePtr->isFace())
-        continue;
-    }
+    GeomShapePtr aShapePtr = aPrs->shape();
+    if (!aShapePtr.get() || !aShapePtr->isFace())
+      continue;
 
-    QString aItemName = aResGroup.get()?
-      QString::fromStdWString(aResGroup->data()->name()) : XGUI_Tools::generateName(aPrs);
+    QString aItemName = XGUI_Tools::generateName(aPrs);
     if (myListView->hasItem(aItemName))
       continue;
 
-    if (aResGroup.get()) {
-      if (aResGroup->isDisplayed()) {
-        aResGroup->setDisplayed(false);
-        myHiddenGroups.insert(aResGroup);
-      }
-      getObjectsMapFromResult(aResGroup, aGroupFeature, anObjectToShapes, anObjectToPrs);
-    }
-    else
-      objectsMapFromPrs(aPrs, anObjectToShapes, anObjectToPrs);
+    objectsMapFromPrs(aPrs, anObjectToShapes, anObjectToPrs);
 
     // The code is dedicated to remove already selected items if they are selected twice
     // It can happen in case of groups selection
@@ -409,9 +321,6 @@ void XGUI_FacesPanel::processSelection()
     for (aIt = myItems.cbegin(); aIt != myItems.cend(); aIt++) {
       ModuleBase_ViewerPrsPtr aCurPrs = aIt.value();
       ObjectPtr aObject = aCurPrs->object();
-      ResultGroupPtr aCurResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObject);
-      if (aCurResGroup.get())
-        continue;
       if (anObjectToShapes.find(aObject) != anObjectToShapes.end()) {
         TopoDS_ListOfShape aShapes = anObjectToShapes[aObject];
         GeomShapePtr aShapePtr = aCurPrs->shape();
@@ -464,6 +373,7 @@ void XGUI_FacesPanel::processSelection()
 
   // Remove duplicate items
   removeItems(aToRemove);
+  myWorkshop->selector()->clearSelection();
   if (isModified) {
     updateProcessedObjects(myItems, myItemObjects);
     flushRedisplay();
@@ -495,16 +405,7 @@ bool XGUI_FacesPanel::processDelete()
 
   std::set<ModuleBase_ViewerPrsPtr>::const_iterator aIt;
   for (aIt = aRestored.cbegin(); aIt != aRestored.cend(); aIt++) {
-    getObjectsMapFromPrs((*aIt), anObjectToShapes, anObjectToPrs);
-    ResultGroupPtr aResGroup;
-    FeaturePtr aGroupFeature;
-    if (getGroup((*aIt), aResGroup, aGroupFeature)) {
-      std::set<ObjectPtr >::iterator aGrpIt = myHiddenGroups.find(aResGroup);
-      if (aGrpIt != myHiddenGroups.end()) {
-        aResGroup->setDisplayed(true);
-        myHiddenGroups.erase(aGrpIt);
-      }
-    }
+    objectsMapFromPrs((*aIt), anObjectToShapes, anObjectToPrs);
   }
 
   std::set<ObjectPtr> aRestoredObjects;
@@ -557,21 +458,8 @@ void XGUI_FacesPanel::updateProcessedObjects(QMap<int, ModuleBase_ViewerPrsPtr> 
   for (QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator anIt = theItems.begin();
        anIt != theItems.end(); anIt++) {
     ModuleBase_ViewerPrsPtr aPrs = anIt.value();
-    ResultGroupPtr aResGroup;
-    FeaturePtr aGroupFeature;
-    if (getGroup(aPrs, aResGroup, aGroupFeature)) {
-      AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
-      for (int i = 0; i < aSelectionList->size(); i++) {
-        AttributeSelectionPtr aSelection = aSelectionList->value(i);
-        ResultPtr aRes = aSelection->context();
-        if (theObjects.find(aRes) == theObjects.end())
-          theObjects.insert(aRes);
-      }
-    }
-    else {
-      if (theObjects.find(aPrs->object()) == theObjects.end())
-        theObjects.insert(aPrs->object());
-    }
+    if (theObjects.find(aPrs->object()) == theObjects.end())
+      theObjects.insert(aPrs->object());
   }
 }
 
@@ -595,7 +483,7 @@ void XGUI_FacesPanel::onTransparencyChanged()
   std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) > anObjectToPrs;
   QMap<int, ModuleBase_ViewerPrsPtr >::const_iterator aIt;
   for (aIt = myItems.cbegin(); aIt != myItems.cend(); aIt++) {
-    getObjectsMapFromPrs(aIt.value(), anObjectToShapes, anObjectToPrs);
+    objectsMapFromPrs(aIt.value(), anObjectToShapes, anObjectToPrs);
   }
 
   double aTransp = Config_PropManager::real("Visualization", "hidden_face_transparency");
@@ -653,8 +541,6 @@ void XGUI_FacesPanel::onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS)
     }
   }
   if (aContains) {
-    ResultGroupPtr aResGroup;
-    FeaturePtr aGroupFeature;
     std::map<ObjectPtr, TopoDS_ListOfShape> aObjectToShapes;
     std::map<ObjectPtr, Handle(ModuleBase_ResultPrs)> aObjectToPrs;
     std::set<ObjectPtr> aObjects;
@@ -664,45 +550,11 @@ void XGUI_FacesPanel::onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS)
     std::map<ObjectPtr, TopoDS_ListOfShape>::const_iterator aSIt;
     for (aIt = myItems.begin(); aIt != myItems.end(); aIt++) {
       ModuleBase_ViewerPrsPtr aPrs = aIt.value();
-      if (getGroup(aPrs, aResGroup, aGroupFeature)) {
-        getObjectsMapFromResult(aResGroup, aGroupFeature, aObjectToShapes, aObjectToPrs);
-        if (aResGroup == theObject) {
-          // If group is displayed it means that it has to be deleted from the Faces list and all
-          // corresponded faces have been restored
-          for (aSIt = aObjectToShapes.begin(); aSIt != aObjectToShapes.end(); aSIt++) {
-            TopoDS_ListOfShape aShapes = aSIt->second;
-            Handle(ModuleBase_ResultPrs) aResPrs = aObjectToPrs[aSIt->first];
-            TopoDS_ListOfShape aAlreadyHidden = aResPrs->hiddenSubShapes();
-            TopoDS_ListOfShape::Iterator aShPIt(aShapes);
-            for (; aShPIt.More(); aShPIt.Next()) {
-              if (aAlreadyHidden.Contains(aShPIt.Value()))
-                aAlreadyHidden.Remove(aShPIt.Value());
-            }
-            aResPrs->setSubShapeHidden(aAlreadyHidden);
-            aObjects.insert(aSIt->first);
-          }
-          aIdsToRem.insert(aIt.key());
-        }
-        else {
-          std::map<ObjectPtr, Handle(ModuleBase_ResultPrs)>::iterator aPIt =
-            aObjectToPrs.find(theObject);
-          if (aPIt != aObjectToPrs.end()) {
-            ObjectPtr aObj = aPIt->first;
-            if (aObj == theObject) {
-              TopoDS_ListOfShape aShapes = aObjectToShapes[aObj];
-              aHideShapes.Append(aShapes);
-              aObjects.insert(aObj);
-            }
-          }
-        }
-      }
-      else {
-        if (aPrs->object() == theObject) {
-          TopoDS_Shape aShape = aPrs->shape()->impl<TopoDS_Shape>();
-          if (!aShape.IsNull())
-            aHideShapes.Append(aShape);
-          aPrs->setInteractive(theAIS->impl<Handle(AIS_InteractiveObject)>());
-        }
+      if (aPrs->object() == theObject) {
+        TopoDS_Shape aShape = aPrs->shape()->impl<TopoDS_Shape>();
+        if (!aShape.IsNull())
+          aHideShapes.Append(aShape);
+        aPrs->setInteractive(theAIS->impl<Handle(AIS_InteractiveObject)>());
       }
     }
     double aTransp = transparency();

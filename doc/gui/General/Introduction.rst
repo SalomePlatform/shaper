@@ -337,20 +337,19 @@ The shapes information, equal to the provided Inspection panel information on th
 Hide Faces panel
 ^^^^^^^^^^^^^^^^
 
-**Hide Faces** panel makes possible to hide temporary faces of any displayed object. **Hide Faces** panel looks like following:
+**Hide Faces** panel makes it possible to temporarily hide faces of any displayed object. **Hide Faces** panel looks like following:
 
 .. figure:: /images/hide_faces_panel.png
    :align: center
 
    **Hide Faces** panel
 
-- If this panel is activated it "listens" user selection.
+- If this panel is activated it "listens" to the user selection.
 - If a face is selected then its name will be shown in the panel's list and hidden in the viewer.
-- If user selects a group of faces (or at least a one face of this group) then whole group will be hidden and also all faces from all objects referenced by this group.
-- If user will display the hidden group again (by a show operation) then the group will be removed from Hide Faces list and visibility of all referenced faces will be restored.
+- If the user wants to display a hidden result body again (by a show operation) then the faces of this result body will be removed from Hide Faces list and the visibility of all referenced faces will be restored.
 
-It is also possible not to hide faces, but make them transparent. For this purpose **"Transparent"** check-box can be used. Value of the transparency can be changed in **Visualization** tab of **Preferences** dialog box.
-Closing of **Hide Faces** panel restores visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then user has to press **"Esc"** button.
+Instead of hiding the faces, it is also possible to make them transparent. For this purpose the **"Transparent"** check-box can be used. The value of the transparency can be changed under the **Visualization** tab of the **Preferences** dialog box.
+Closing the **Hide Faces** panel restores the visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then the user has to press the **"Esc"** button.
 
 .. _python console:
 
