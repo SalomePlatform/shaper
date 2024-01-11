@@ -349,7 +349,7 @@ Hide Faces panel
 - If the user wants to display a hidden result body again (by a show operation) then the faces of this result body will be removed from Hide Faces list and the visibility of all referenced faces will be restored.
 
 Instead of hiding the faces, it is also possible to make them transparent. For this purpose the **"Transparent"** check-box can be used. The value of the transparency can be changed under the **Visualization** tab of the **Preferences** dialog box.
-Closing the **Hide Faces** panel restores the visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then the user has to press the **"Esc"** button.
+Closing the **Hide Faces** panel restores the visibility state of all objects. If it is necessary to deactivate the **Hide Faces** panel (preserving the current display state) then the user has to press the **"Esc"** button.
 
 .. _python console:
 
