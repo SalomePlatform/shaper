@@ -31,6 +31,8 @@
 #include <XCAFDoc_ShapeTool.hxx>
 #include <XCAFDoc_ColorTool.hxx>
 #include <STEPCAFControl_Writer.hxx>
+#include <StepData_StepModel.hxx>
+#include <UnitsMethods.hxx>
 #include <Interface_Static.hxx>
 #include <Quantity_Color.hxx>
 
@@ -153,12 +155,22 @@ bool STEPExport(const std::string& theFileName,
     Interface_Static::SetCVal("xstep.cascade.unit", "M");
     Interface_Static::SetIVal("write.step.nonmanifold", 0); // 1 don't allow to export assemly tree
     Interface_Static::SetCVal("write.step.unit", "M");
-#else
+#elif OCC_VERSION_LARGE < 0x07080000
     STEPCAFControl_Writer aWriterTmp;
     Interface_Static::SetCVal("xstep.cascade.unit", "M");
     Interface_Static::SetIVal("write.step.nonmanifold", 0); // 1 don't allow to export assemly tree
     Interface_Static::SetCVal("write.step.unit", "M");
     STEPCAFControl_Writer aWriter;
+#else
+    STEPCAFControl_Writer aWriter;
+    Interface_Static::SetCVal("xstep.cascade.unit", "M");
+    Interface_Static::SetIVal("write.step.nonmanifold", 0); // 1 don't allow to export assemly tree
+    Interface_Static::SetCVal("write.step.unit", "M");
+    Handle(StepData_StepModel) aModel = aWriter.ChangeWriter().Model();
+    aModel->InternalParameters.InitFromStatic();
+    Standard_Integer aWriteUnitInt = Interface_Static::IVal("write.step.unit");
+    Standard_Real aWriteUnitReal = UnitsMethods::GetLengthFactorValue(aWriteUnitInt);
+    aModel->SetWriteLengthUnit(aWriteUnitReal);
 #endif
 
     auto aStatus = aWriter.Transfer(aDoc, STEPControl_AsIs);

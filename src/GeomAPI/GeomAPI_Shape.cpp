@@ -19,6 +19,8 @@
 
 #include "GeomAPI_Shape.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Edge.h>
@@ -59,8 +61,6 @@
 
 #include <sstream>
 #include <algorithm> // for std::transform
-
-#include <BRepTools.hxx>
 
 #define MY_SHAPE implPtr<TopoDS_Shape>()
 
@@ -810,8 +810,13 @@ bool GeomAPI_Shape::Comparator::operator()(const std::shared_ptr<GeomAPI_Shape>&
   const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
   bool isLess = aShape1.TShape() < aShape2.TShape();
   if (aShape1.TShape() == aShape2.TShape()) {
+#if OCC_VERSION_LARGE < 0x07080000
     Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
     Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+#else
+    Standard_Integer aHash1 = aShape1.Location().HashCode();
+    Standard_Integer aHash2 = aShape2.Location().HashCode();
+#endif
     isLess = aHash1 < aHash2;
   }
   return isLess;
@@ -825,8 +830,13 @@ bool GeomAPI_Shape::ComparatorWithOri::operator()(
   const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
   bool isLess = aShape1.TShape() < aShape2.TShape();
   if (aShape1.TShape() == aShape2.TShape()) {
+#if OCC_VERSION_LARGE < 0x07080000
     Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
     Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+#else
+    Standard_Integer aHash1 = aShape1.Location().HashCode();
+    Standard_Integer aHash2 = aShape2.Location().HashCode();
+#endif
     isLess = (aHash1 < aHash2) ||
              (aHash1 == aHash2 && aShape1.Orientation() < aShape2.Orientation());
   }
@@ -836,7 +846,11 @@ bool GeomAPI_Shape::ComparatorWithOri::operator()(
 int GeomAPI_Shape::Hash::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape) const
 {
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+#if OCC_VERSION_LARGE < 0x07080000
   return aShape.HashCode(IntegerLast());
+#else
+  return std::hash<TopoDS_Shape>{}(aShape);
+#endif
 }
 
 bool GeomAPI_Shape::Equal::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
@@ -845,8 +859,13 @@ bool GeomAPI_Shape::Equal::operator()(const std::shared_ptr<GeomAPI_Shape>& theS
   const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
   const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
 
+#if OCC_VERSION_LARGE < 0x07080000
   Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
   Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+#else
+  Standard_Integer aHash1 = aShape1.Location().HashCode();
+  Standard_Integer aHash2 = aShape2.Location().HashCode();
+#endif
 
   return aShape1.TShape() == aShape2.TShape() && aHash1 == aHash2;
 }

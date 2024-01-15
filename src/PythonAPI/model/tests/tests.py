@@ -473,3 +473,14 @@ def checkFeaturesValidity(thePartDoc):
     assert error == '', "The feature {0} is in error: {1}".format(name, error)
     # raise an error if the the feature is not valid (without error message)
     assert aFactory.validate(feature), "The feature {0} is in error.".format(name)
+
+def checkMiddlePoint(theShape, theX, theY, theZ, theTolerance = 1.e-7):
+  """ Check coordinates of middle point of the given shape.
+  :param theShape         the shape to check
+  :param theX, theY, theZ the expected coordinates
+  :param theTolerance     comparison tolerance
+  """
+  assert(theShape is not None)
+  midPoint = theShape.middlePoint()
+  isEqual = math.fabs(midPoint.x() - theX) < theTolerance and math.fabs(midPoint.y() - theY) < theTolerance and math.fabs(midPoint.z() - theZ) < theTolerance
+  assert(isEqual), "Middle point: actual ({}, {}, {}) != expected ({}, {}, {})".format(midPoint.x(), midPoint.y(), midPoint.z(), theX, theY, theZ)

@@ -91,9 +91,6 @@ class GEOMAlgo_AlgoTools  {
 
 
   GEOMALGOIMPL_EXPORT
-    static Standard_Boolean BuildTriangulation(const TopoDS_Shape& aS);
-
-  GEOMALGOIMPL_EXPORT
     static Standard_Integer RefineSDShapes(GEOMAlgo_IndexedDataMapOfPassKeyShapeListOfShape& aMSD,
                                            const Standard_Real aTol,
                                            const Handle(IntTools_Context)& aCtx);

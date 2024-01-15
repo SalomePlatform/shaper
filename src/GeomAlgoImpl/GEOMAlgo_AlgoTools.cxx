@@ -834,57 +834,6 @@ Standard_Integer GEOMAlgo_AlgoTools::RefineSDShapes
   //
   return 0;
 }
-//=======================================================================
-//function : BuildTriangulation
-//purpose  :
-//=======================================================================
-Standard_Boolean 
-  GEOMAlgo_AlgoTools::BuildTriangulation (const TopoDS_Shape& theShape)
-{
-  // calculate deflection
-  Standard_Real aDeviationCoefficient = 0.001;
-
-  Bnd_Box B;
-  BRepBndLib::Add(theShape, B);
-  Standard_Real aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
-  B.Get(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-
-  Standard_Real dx = aXmax - aXmin, dy = aYmax - aYmin, dz = aZmax - aZmin;
-  Standard_Real aDeflection = Max(Max(dx, dy), dz) * aDeviationCoefficient * 4;
-  Standard_Real aHLRAngle = 0.349066;
-
-  // build triangulation
-  BRepMesh_IncrementalMesh Inc (theShape, aDeflection, Standard_False, aHLRAngle);
-
-  // check triangulation
-  bool isTriangulation = true;
-
-  TopExp_Explorer exp (theShape, TopAbs_FACE);
-  if (exp.More())
-  {
-    TopLoc_Location aTopLoc;
-    Handle(Poly_Triangulation) aTRF;
-    aTRF = BRep_Tool::Triangulation(TopoDS::Face(exp.Current()), aTopLoc);
-    if (aTRF.IsNull()) {
-      isTriangulation = false;
-    }
-  }
-  else // no faces, try edges
-  {
-    TopExp_Explorer expe (theShape, TopAbs_EDGE);
-    if (!expe.More()) {
-      isTriangulation = false;
-    }
-    else {
-      TopLoc_Location aLoc;
-      Handle(Poly_Polygon3D) aPE = BRep_Tool::Polygon3D(TopoDS::Edge(expe.Current()), aLoc);
-      if (aPE.IsNull()) {
-        isTriangulation = false;
-      }
-    }
-  }
-  return isTriangulation;
-}
 
 //=======================================================================
 //function : IsCompositeShape

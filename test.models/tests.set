@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2024  CEA, EDF
+# Copyright (C) 2021-2024  CEA, EDF
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,34 +17,26 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME SHAPER)
-set(SALOME_TEST_LABEL_ADV SHAPR_ADV)
-set(SALOME_TEST_LABEL_SEQ SHAPR_SEQ)
-
-# Add all test subdirs
-SUBDIRS(ConnectorAPI
-        HDFs
-        FeaturesPlugin
-        ConstructionPlugin
-        SketchPlugin
-        ModelAPI
-        FiltersPlugin
-        CollectionPlugin
-        BuildPlugin
-        ExchangePlugin
-        PythonAPI
-        GeomAPI
-        ModelHighAPI
-        ParametersPlugin
-        PythonAddons
-        SketchAPI
-        ConstructionAPI
-        PartSetAPI
-        GeomDataAPI
-        Config
-        ExchangeAPI
-        ModelGeomAlgo
-        Locale
-        test_API
-        TestModels
+SET(TEST_NAMES
+            angle30.py
+            bearing_puller.py
+            bobine_film_reel.py
+            bracket32.py
+            bushing.py
+            case24.py
+            clothespin.py
+            coronavirus.py
+            CSWA.py
+            ecran.py
+            flange.py
+            gear.py
+            idler_plate.py
+            piece_02.py
+            piece_09.py
+            piece_12.py
+            plug.py
+            sprocket.py
+            stair_with_cycle.py
+            visor_support.py
+            wheel_rim.py
 )

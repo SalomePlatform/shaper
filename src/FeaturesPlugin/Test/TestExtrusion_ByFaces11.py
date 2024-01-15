@@ -75,9 +75,9 @@ model.testNbResults(Extrusion_1, 1)
 model.testNbSubResults(Extrusion_1, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.SOLID, [2])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.FACE, [13])
-model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [61])
-model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [122])
-model.testResultsVolumes(Extrusion_1, [41289.10946])
+model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [59])
+model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [118])
+model.testResultsVolumes(Extrusion_1, [41289.17344])
 
 # change radius of sketch circle and check failure
 ParamRCir.setValue(10)

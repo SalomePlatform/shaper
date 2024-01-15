@@ -690,7 +690,8 @@ void Model_Document::compactNested()
 /// references and Boolean and Integer Arrays for the current moment.
 static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute) theAttr2)
 {
-  if (Standard_GUID::IsEqual(theAttr1->ID(), TDF_Reference::GetID())) { // reference
+  Standard_GUID aGUID1 = theAttr1->ID();
+  if (aGUID1 == TDF_Reference::GetID()) { // reference
     Handle(TDF_Reference) aRef1 = Handle(TDF_Reference)::DownCast(theAttr1);
     Handle(TDF_Reference) aRef2 = Handle(TDF_Reference)::DownCast(theAttr2);
     if (aRef1.IsNull() && aRef2.IsNull())
@@ -698,7 +699,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
     if (aRef1.IsNull() || aRef2.IsNull())
       return false;
     return aRef1->Get().IsEqual(aRef2->Get()) == Standard_True;
-  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_BooleanArray::GetID())) {
+  } else if (aGUID1 == TDataStd_BooleanArray::GetID()) {
     Handle(TDataStd_BooleanArray) anArr1 = Handle(TDataStd_BooleanArray)::DownCast(theAttr1);
     Handle(TDataStd_BooleanArray) anArr2 = Handle(TDataStd_BooleanArray)::DownCast(theAttr2);
     if (anArr1.IsNull() && anArr2.IsNull())
@@ -716,7 +717,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
       }
       return true;
     }
-  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_IntegerArray::GetID())) {
+  } else if (aGUID1 == TDataStd_IntegerArray::GetID()) {
     Handle(TDataStd_IntegerArray) anArr1 = Handle(TDataStd_IntegerArray)::DownCast(theAttr1);
     Handle(TDataStd_IntegerArray) anArr2 = Handle(TDataStd_IntegerArray)::DownCast(theAttr2);
     if (anArr1.IsNull() && anArr2.IsNull())
@@ -734,7 +735,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
         }
       return true;
     }
-  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_ReferenceArray::GetID())) {
+  } else if (aGUID1 == TDataStd_ReferenceArray::GetID()) {
     Handle(TDataStd_ReferenceArray) anArr1 = Handle(TDataStd_ReferenceArray)::DownCast(theAttr1);
     Handle(TDataStd_ReferenceArray) anArr2 = Handle(TDataStd_ReferenceArray)::DownCast(theAttr2);
     if (anArr1.IsNull() && anArr2.IsNull())
@@ -752,7 +753,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
         }
       return true;
     }
-  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_ReferenceList::GetID())) {
+  } else if (aGUID1 == TDataStd_ReferenceList::GetID()) {
     Handle(TDataStd_ReferenceList) aList1 = Handle(TDataStd_ReferenceList)::DownCast(theAttr1);
     Handle(TDataStd_ReferenceList) aList2= Handle(TDataStd_ReferenceList)::DownCast(theAttr2);
     if (aList1.IsNull() && aList2.IsNull())
@@ -768,7 +769,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
         return false;
     }
     return !aLIter1.More() && !aLIter2.More(); // both lists are with the same size
-  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDF_TagSource::GetID())) {
+  } else if (aGUID1 == TDF_TagSource::GetID()) {
     return true; // it just for created and removed feature: nothing is changed
   }
   return false;
@@ -797,7 +798,7 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
             continue; // attribute is not changed actually
           }
         } else
-          if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
+          if (anADelta->Attribute()->ID() == TDataStd_AsciiString::GetID()) {
             continue; // error message is disappeared
         }
       }

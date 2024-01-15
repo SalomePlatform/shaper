@@ -19,7 +19,7 @@
 
 ENABLE_TESTING()
 
-file(GLOB pyFiles "*.py")
+file(GLOB pyFiles "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
 
 SET(RESTRICTED_ROOT_DIR $ENV{RESTRICTED_ROOT_DIR} CACHE PATH "Path to the restricted repository")
 
@@ -66,3 +66,22 @@ foreach(eachFilePath ${pyFiles};${pyFilesRestr})
 endforeach(eachFilePath ${ARGN})
 
 ADD_CUSTOM_TARGET(run_models_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -L "models_tests")
+
+include(tests.set)
+
+if(${HAVE_SALOME})
+  enable_testing()
+  set(TEST_INSTALL_DIRECTORY "${SALOME_SHAPER_INSTALL_TESTS}/TestModels")
+  
+  install(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)
+  install(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+
+  set(TMP_TESTS_NAMES)
+  foreach(tfile ${TEST_NAMES})
+    list(APPEND TMP_TESTS_NAMES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile})
+  endforeach(tfile ${TEST_NAMES})
+
+  install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
+endif(${HAVE_SALOME})

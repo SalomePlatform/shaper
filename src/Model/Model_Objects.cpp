@@ -18,6 +18,9 @@
 //
 
 #include <Model_Objects.h>
+
+#include <Basics_OCCTVersion.hxx>
+
 #include <Model_Data.h>
 #include <Model_Document.h>
 #include <Model_Events.h>
@@ -47,13 +50,17 @@
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
-#include <TDF_LabelMapHasher.hxx>
 #include <TDF_LabelMap.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
+#if OCC_VERSION_LARGE < 0x07080000
+
+#include <TDF_LabelMapHasher.hxx>
 // for TDF_Label map usage
 static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
 static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
+
+#endif
 
 int kUNDEFINED_FEATURE_INDEX = -1;
 
@@ -1491,7 +1498,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
   int aRefIndex = aRefs->Lower();
   for(; aRefIndex <= aRefs->Upper(); ++aRefIndex) { // iterate all existing features
     TDF_Label aCurLabel = aRefs->Value(aRefIndex);
-    if (IsEqual(aCurLabel, aFirstFeatureLabel))
+    if (aCurLabel.IsEqual(aFirstFeatureLabel))
       break; // no need to continue searching
 
     // searching the folder below, just continue to search last feature from the list
@@ -1502,7 +1509,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
     //               because the folder may end by the feature which is
     //               neither a sub-feature nor a feature in history.
     if (!aLastFeatureInFolder.IsNull()) {
-      if (IsEqual(aCurLabel, aLastFeatureInFolder))
+      if (aCurLabel.IsEqual(aLastFeatureInFolder))
         aLastFeatureInFolder.Nullify(); // the last feature in the folder is achieved
       continue;
     }
@@ -2112,6 +2119,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::internalFeature(const int theIn
   return FeaturePtr(); // invalid
 }
 
+#if OCC_VERSION_LARGE < 0x07080000
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
 {
   return TDF_LabelMapHasher::HashCode(theLab, theUpper);
@@ -2120,3 +2128,4 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 {
   return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }
+#endif
