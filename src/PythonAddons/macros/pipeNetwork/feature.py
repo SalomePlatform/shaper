@@ -232,7 +232,7 @@ Sorties :
                 coox = self.infoPoints[l_noeuds[iaux+jaux]]["X"]
                 cooy = self.infoPoints[l_noeuds[iaux+jaux]]["Y"]
                 cooz = self.infoPoints[l_noeuds[iaux+jaux]]["Z"]
-                vect.append(np.array((coox,cooy,cooz),np.float))
+                vect.append(np.array((coox,cooy,cooz),np.float32))
             cosinus = np.dot(vect[1]-vect[0],vect[1]-vect[2])/(np.linalg.norm(vect[1]-vect[0])* np.linalg.norm(vect[1]-vect[2]))
             #print ("cosinus = {}".format(cosinus))
             # Si l'angle est plat, c'est que les 3 points sont alignés : on arrête... sauf si ce point est un départ d'une autre !
