@@ -71,7 +71,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             EventsAPI.Events_InfoMessage("PublishToStudy", "Not all PartSet parts are up-to-date, nothing is published. Please, make the last PartSet feature as current.", self).send()
             return
         # find a shaper-study component
-        salome.salome_init(1)
+        salome.salome_init(embedded=True)
         aComponent = SHAPERSTUDY_utils.findOrCreateComponent()
         anEngine = SHAPERSTUDY_utils.getEngine()
         # collect all processed internal entries to break the link of unprocessed later

@@ -27,7 +27,7 @@ import tempfile
 
 salome.standalone()
 from salome.geom import geomBuilder
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 geompy = geomBuilder.New()
 
 ## Get the last object published in the GEOM section of the object browser

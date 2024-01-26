@@ -19,7 +19,7 @@
 
 import salome
 salome.standalone()
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 
 from SketchAPI import *
 from salome.shaper import model

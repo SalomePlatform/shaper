@@ -23,7 +23,7 @@ from salome.shaper import model
 
 import salome
 salome.standalone()
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 
 model.begin()
 partSet = model.moduleDocument()

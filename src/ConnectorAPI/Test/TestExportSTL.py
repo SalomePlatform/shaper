@@ -44,7 +44,7 @@ from GeomAlgoAPI import *
 
 __updated__ = "2015-05-22"
 
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 geompy = geomBuilder.New()
 
 #=========================================================================
