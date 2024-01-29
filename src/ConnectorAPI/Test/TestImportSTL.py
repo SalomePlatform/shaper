@@ -22,7 +22,7 @@ from salome.shaper import model
 
 import salome
 salome.standalone()
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 

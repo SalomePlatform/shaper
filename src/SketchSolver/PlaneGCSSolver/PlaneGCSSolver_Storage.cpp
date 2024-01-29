@@ -477,10 +477,18 @@ void PlaneGCSSolver_Storage::adjustParametrizationOfArcs()
 
   // update parameters of Middle point constraint for point on arc
   std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator aCIt = myConstraintMap.begin();
-  for (; aCIt != myConstraintMap.end(); ++aCIt)
+  // [bos#40730] Random crash when running script from terminal:
+  // In this specific case, when iterating over all constraints and finding a MiddlePoint
+  // constraint, it gets notified, causing it to be removed and readded to the map.
+  // At that time, the iterator gets out-of-date and iterating further leads to invalid
+  // pointers, causing the crash.
+  std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator aNextCIt = aCIt;
+  for (; aCIt != myConstraintMap.end(); aCIt=aNextCIt) {
+    ++aNextCIt;
     if (aCIt->second->type() == CONSTRAINT_MIDDLE_POINT) {
       notify(aCIt->first);
     }
+  }
 }
 
 

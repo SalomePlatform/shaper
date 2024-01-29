@@ -24,7 +24,7 @@ from PyQt5.Qt import QApplication
 
 import salome
 salome.salome_init_without_session()
-salome.salome_init(1)
+salome.salome_init(embedded=True)
 if QApplication.instance() is None:
   app = QApplication([])
 
