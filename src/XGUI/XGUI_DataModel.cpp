@@ -366,6 +366,16 @@ bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& the
 {
   beginInsertRows(theParent, theRow, theRow + theCount - 1);
   endInsertRows();
+  
+  //bos #40645 [CEA] Automatically expand tree in Object Browser
+  if (myWorkshop->objectBrowser()) 
+  {
+    XGUI_DataTree* aTreeView = myWorkshop->objectBrowser()->treeView();
+    if(!aTreeView->isExpanded(theParent))
+    {
+      aTreeView->setExpanded(theParent, true);
+    }
+  }
   return true;
 }
 

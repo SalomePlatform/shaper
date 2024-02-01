@@ -28,6 +28,7 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_DataModel.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_MenuMgr.h>
 #include <XGUI_FacesPanel.h>
@@ -39,6 +40,7 @@
 #include <ModuleBase_Preferences.h>
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ITreeNode.h>
 
 #include <ModelAPI_Tools.h>
 
@@ -99,6 +101,7 @@ SHAPERGUI_EXPORT char* getModuleVersion()
 
 static const QString ToolbarsSection("SHAPER_Toolbars");
 static const QString FreeCommandsParam("OutOFToolbars");
+static const std::string PARTROOT_NODE_NAME = "PartRoot";
 
 
 /**
@@ -329,7 +332,26 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       myIsOpened = false;
     }
     else
+    {
       myWorkshop->updateCommandStatus();
+    }
+
+    //bos #40645 [CEA] Automatically expand tree in Object Browser
+    XGUI_DataTree* aTreeView = myWorkshop->objectBrowser()->treeView();
+    XGUI_DataModel* aDataModel = myWorkshop->objectBrowser()->dataModel();
+    QModelIndex aRootIdx = aDataModel->documentRootIndex(ModelAPI_Session::get()->moduleDocument());
+    int aNbChild = aDataModel->rowCount(aRootIdx);
+    for (int i = 0; i < aNbChild; i++)
+    {
+      QModelIndex aIdx = aDataModel->index(i, 0, aRootIdx);
+      ModuleBase_ITreeNode* aNode = (ModuleBase_ITreeNode*)aIdx.internalPointer();
+      std::string aType = aNode->type();
+      if(aType == PARTROOT_NODE_NAME)
+      {
+        if(!aTreeView->isExpanded(aIdx))
+          aTreeView->setExpanded(aIdx, true);
+      }
+    }
   }
   myIsEditEnabled = getApp()->isEditEnabled();
   getApp()->setEditEnabled(false);
