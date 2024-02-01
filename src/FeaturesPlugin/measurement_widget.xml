@@ -83,5 +83,5 @@
       </shape_selector>
     </box>
   </toolbox>
-  <label id="result"/>
+  <label id="result" isSelectable="true"/>
 </source>
