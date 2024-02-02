@@ -26,6 +26,11 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultField.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ITreeNode.h>
@@ -195,6 +200,32 @@ void XGUI_DataTree::mouseReleaseEvent(QMouseEvent* theEvent)
   }
 }
 
+void XGUI_DataTree::highlightDependencies(const QModelIndex& theIndex)
+{
+  XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
+  XGUI_Workshop* aWorkshop = aObjBrowser->workshop();
+
+  XGUI_DataModel* aModel = dataModel();
+  ObjectPtr aObj = aModel->object(theIndex);
+  if(!aObj)
+    return;
+
+  QObjectPtrList anObjs;
+  anObjs.append(aObj);
+  std::string aName = aObj->groupName();
+  if(aName == ModelAPI_ResultBody::group() ||
+     aName == ModelAPI_ResultConstruction::group() ||
+     aName == ModelAPI_ResultGroup::group() ||
+     aName == ModelAPI_ResultField::group())
+  {
+    aWorkshop->highlightFeature(anObjs);
+  }
+  else if(aName == ModelAPI_Feature::group())
+  {
+    aWorkshop->highlightResults(anObjs);
+  }
+}
+
 void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
 {
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -272,6 +303,9 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
 void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
 {
   switch (theIndex.column()) {
+  case 1:
+    highlightDependencies(theIndex);
+    break;
   case 2:
     processHistoryChange(theIndex);
     break;

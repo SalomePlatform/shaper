@@ -136,6 +136,11 @@ private:
   /// \param theIndex a clicked data index
   void processHistoryChange(const QModelIndex& theIndex);
 
+  /// Highlight parent feature for chosen result or highlight
+  /// result for chosen feature
+  /// \param theIndex a clicked data index
+  void highlightDependencies(const QModelIndex& theIndex);
+
   /// Process a visibility change request
   /// \param theIndex a clicked data index
   void processEyeClick(const QModelIndex& theIndex);
