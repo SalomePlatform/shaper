@@ -30,6 +30,8 @@
 #include <list>
 #include <string>
 
+typedef std::list<std::shared_ptr<GeomAPI_Shape> > ListOfShape;
+
 /**\class ModelAPI_Feature
  * \ingroup DataModel
  * \brief Feature function that represents the particular functionality
@@ -163,6 +165,30 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// \return a boolean value about it is performed
   MODELAPI_EXPORT virtual bool customAction(const std::string& theActionId);
 
+  /// Returns all the vertices produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  vertices(const bool theOnlyUnique = false);
+
+  /// Returns all the edges produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  edges(const bool theOnlyUnique = false);
+
+  /// Returns all the wires produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  wires(const bool theOnlyUnique = false);
+
+  /// Returns all the faces produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  faces(const bool theOnlyUnique = false);
+
+  /// Returns all the shells produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  shells(const bool theOnlyUnique = false);
+
+  /// Returns all the solids produced by this feature
+  MODELAPI_EXPORT virtual ListOfShape
+                  solids(const bool theOnlyUnique = false);
+
  //
  // Helper methods, aliases for data()->method()
  // -----------------------------------------------------------------------------------------------
@@ -246,7 +272,12 @@ class ModelAPI_Feature : public ModelAPI_Object
   {
     return data()->attribute(theID);
   }
-  protected:
+
+ private:
+  /// Print warning message to python console
+  void showErrorMessage();
+
+ protected:
   /// This method is called just after creation of the object: it must initialize
   /// all fields, normally initialized in the constructor
   MODELAPI_EXPORT virtual void init();

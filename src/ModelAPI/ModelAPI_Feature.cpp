@@ -29,6 +29,11 @@
 #include <Config_Translator.h>
 #include <Config_PropManager.h>
 
+#include <Locale_Convert.h>
+
+#include <PyInterp_Interp.h>
+#include <Python.h>
+
 void ModelAPI_Feature::setError(const std::string& theError,
                                 bool isSend,
                                 bool isTranslate)
@@ -272,4 +277,76 @@ void ModelAPI_Feature::init()
 {
   myIsDisabled = false;
   myIsStable = true;
+}
+
+void ModelAPI_Feature::showErrorMessage()
+{
+  PyLockWrapper lck;
+  std::string aResName{};
+  if(data().get())
+  {
+    aResName = Locale::Convert::toString(data()->name());
+  }
+  std::string aMessage = "WARNING! The "+ aResName +" feature does not have any results.";
+  PySys_WriteStdout("%s\n", aMessage.c_str());
+}
+
+ListOfShape ModelAPI_Feature::vertices(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->vertices(theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Feature::edges(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->edges(theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Feature::wires(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->wires(theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Feature::faces(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->faces(theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Feature::shells(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->shells(theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Feature::solids(const bool theOnlyUnique)
+{
+  if(myResults.empty())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return lastResult()->solids(theOnlyUnique);
 }

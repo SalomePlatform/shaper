@@ -25,6 +25,8 @@
 class GeomAPI_Shape;
 class ModelAPI_Feature;
 
+typedef std::list<std::shared_ptr<GeomAPI_Shape> > ListOfShape;
+
 /**\class ModelAPI_Result
  * \ingroup DataModel
  * \brief The result of a feature.
@@ -120,11 +122,39 @@ class ModelAPI_Result : public ModelAPI_Object
   MODELAPI_EXPORT virtual ~ModelAPI_Result();
 
   /// Returns the shape-result produced by this feature (or null if no shapes)
-  MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
+  MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape(); 
+
+  /// Returns all the vertices of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  vertices(const bool theOnlyUnique = false);
+
+  /// Returns all the edges of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  edges(const bool theOnlyUnique = false);
+
+  /// Returns all the wires of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  wires(const bool theOnlyUnique = false);
+
+  /// Returns all the faces of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  faces(const bool theOnlyUnique = false);
+
+  /// Returns all the shells of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  shells(const bool theOnlyUnique = false);
+
+  /// Returns all the solids of this result
+  MODELAPI_EXPORT virtual ListOfShape
+                  solids(const bool theOnlyUnique = false);
 
   /// On change of attribute of the result update presentation of this result:
   /// for the current moment there are only presentation attributes assigned to results
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
+
+private:
+  /// Print warning message to python console
+  void showErrorMessage();
 
 protected:
   /// This method is called just after creation of the object: it must initialize

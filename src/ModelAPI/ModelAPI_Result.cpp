@@ -25,7 +25,15 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeBoolean.h>
 
+#include <GeomAPI_Shape.h>
+
 #include <Events_Loop.h>
+#include <Events_InfoMessage.h>
+
+#include <Locale_Convert.h>
+
+#include <PyInterp_Interp.h>
+#include <Python.h>
 
 ModelAPI_Result::~ModelAPI_Result()
 {
@@ -101,10 +109,81 @@ void ModelAPI_Result::setIsConcealed(const bool theValue, const bool /*theForced
   }
 }
 
-
 std::shared_ptr<GeomAPI_Shape> ModelAPI_Result::shape()
 {
   return std::shared_ptr<GeomAPI_Shape>();
+}
+
+void ModelAPI_Result::showErrorMessage()
+{
+  PyLockWrapper lck;
+  std::string aResName{};
+  if(data().get())
+  {
+    aResName = Locale::Convert::toString(data()->name());
+  }
+  std::string aMessage = "WARNING! The "+ aResName +" result is not valid.";
+  PySys_WriteStdout("%s\n", aMessage.c_str());
+}
+
+ListOfShape ModelAPI_Result::vertices(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::VERTEX, theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Result::edges(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::EDGE, theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Result::wires(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::WIRE, theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Result::faces(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::FACE, theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Result::shells(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::SHELL, theOnlyUnique);
+}
+
+ListOfShape ModelAPI_Result::solids(const bool theOnlyUnique)
+{
+  if(!shape().get() || isDisabled())
+  {
+    showErrorMessage();
+    return ListOfShape();
+  }
+  return shape()->subShapes(GeomAPI_Shape::SOLID, theOnlyUnique);
 }
 
 void ModelAPI_Result::attributeChanged(const std::string& theID)

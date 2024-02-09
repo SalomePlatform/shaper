@@ -131,13 +131,11 @@ Solid_tube_ext = model.addSolid(Part_1_doc, liste_tube_ext)
 
 # Recherche de la face du tube sur laquelle faire un congé de raccordement (fillet) :
 face = Filling_4.defaultResult().shape().face()
-exp = GeomAPI_ShapeExplorer(Solid_tube_ext.defaultResult().shape(), GeomAPI_Shape.FACE)
-while exp.more():
-   cur = exp.current().face()
-   if face.isEqual(cur) : # and face.isSameGeometry(cur):
-      res = cur
+faces = Solid_tube_ext.faces()
+for ff in faces:
+   if face.isEqual(ff) : # and face.isSameGeometry(cur):
+      res = ff.face()
       break
-   exp.next()
 #print(type(res))
 Fillet_1 = model.addFillet(Part_1_doc, [model.selection(Solid_tube_ext.defaultResult(), res)], "fillet_radius_top", keepSubResults = False)
 Solid_tube_ext = Fillet_1
@@ -198,13 +196,11 @@ for i in range(Intersection_1.result().numberOfSubs()):
 		maxRad = rad
 #print(Intersection_1.result().subResult(imax).name())
 edge = GeomAPI_Edge(Intersection_1.result().subResult(imax).resultSubShapePair()[1])
-exp = GeomAPI_ShapeExplorer(Fuse_1.defaultResult().shape(), GeomAPI_Shape.EDGE)
-while exp.more():
-   cur = exp.current().edge()
-   if edge.isEqual(cur) : # and edge.isSameGeometry(cur):
-      resEdge = cur
+edges = Fuse_1.edges()
+for ee in edges:
+   if edge.isEqual(ee) : # and edge.isSameGeometry(cur):
+      resEdge = ee.edge()
       break
-   exp.next()
 #print(type(res))
 Sphere_ext = model.addFillet(Part_1_doc, [model.selection(Fuse_1.defaultResult(), resEdge)], "fillet_radius_bottom", keepSubResults = False)
 #Sphere_ext = Fillet_2
@@ -281,15 +277,14 @@ model.do()
 # Détermination des arêtes du bas des tubes sur lesquelles mettre des "fillets" :
 #print("Edge n°",jmax,"avec le plus grand rayon :",Intersection_1.result().subResult(jmax).name(),"-- rayon=",maxRad)
 FilletEdges = []
-exp = GeomAPI_ShapeExplorer(Fuse_2.defaultResult().shape(), GeomAPI_Shape.EDGE)
-while exp.more():
-	cur = exp.current().edge()
+edges = Fuse_2.edges()
+for ee in edges:
+	cur = ee.edge()
 	for edge in EdgesForFillet:
 		if edge.isEqual(cur) : # and edge.isSameGeometry(cur):
 			FilletEdges.append(model.selection(Fuse_2.defaultResult(), cur))
 			EdgesForFillet.remove(edge)
 			break
-	exp.next()
 #print(type(res))
 Fillet_2 = model.addFillet(Part_1_doc, FilletEdges, "fillet_radius_bottom", keepSubResults = False)
 Fillet_2.setName("Fillets_bottom_tubes")

@@ -141,3 +141,39 @@ const std::string& ModelHighAPI_Interface::attributeGetter(const std::string& th
 {
   return myAttrGetter[theAttrName];
 }
+
+ListOfShape ModelHighAPI_Interface::vertices(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->vertices(theOnlyUnique);
+}
+
+ListOfShape ModelHighAPI_Interface::edges(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->edges(theOnlyUnique);
+}
+
+ListOfShape ModelHighAPI_Interface::wires(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->wires(theOnlyUnique);
+}
+
+ListOfShape ModelHighAPI_Interface::faces(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->faces(theOnlyUnique);
+}
+
+ListOfShape ModelHighAPI_Interface::shells(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->shells(theOnlyUnique);
+}
+
+ListOfShape ModelHighAPI_Interface::solids(const bool theOnlyUnique)
+{
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+  return feature()->solids(theOnlyUnique);
+}

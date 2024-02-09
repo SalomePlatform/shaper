@@ -33,6 +33,10 @@ class ModelAPI_Feature;
 class ModelAPI_Result;
 class ModelHighAPI_Selection;
 class ModelHighAPI_Dumper;
+
+class GeomAPI_Shape;
+
+typedef std::list<std::shared_ptr<GeomAPI_Shape> > ListOfShape;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Interface
  * \ingroup CPPHighAPI
@@ -97,6 +101,30 @@ public:
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& /*theDumper*/) const {}
+
+    /// Returns all the vertices produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape
+               vertices(const bool theOnlyUnique = false);
+
+  /// Returns all the edges produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape 
+               edges(const bool theOnlyUnique = false);
+
+  /// Returns all the wires produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape
+               wires(const bool theOnlyUnique = false);
+
+  /// Returns all the faces produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape
+               faces(const bool theOnlyUnique = false);
+
+  /// Returns all the shells produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape 
+               shells(const bool theOnlyUnique = false);
+
+      /// Returns all the solids produced by this feature
+  MODELHIGHAPI_EXPORT virtual ListOfShape
+               solids(const bool theOnlyUnique = false);
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature; ///< feature of this interface
