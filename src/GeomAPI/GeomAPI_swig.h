@@ -37,6 +37,7 @@
   #include "GeomAPI_Cylinder.h"
   #include "GeomAPI_DataMapOfShapeMapOfShapes.h"
   #include "GeomAPI_DataMapOfShapeShape.h"
+  #include "GeomAPI_IndexedMapOfShape.h"
   #include "GeomAPI_Dir.h"
   #include "GeomAPI_Dir2d.h"
   #include "GeomAPI_Edge.h"

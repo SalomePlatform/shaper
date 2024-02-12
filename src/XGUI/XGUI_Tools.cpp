@@ -40,7 +40,7 @@
 #include <Events_InfoMessage.h>
 
 #include <GeomAPI_Shape.h>
-#include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAPI_IndexedMapOfShape.h>
 
 #include <TopoDS_Shape.hxx>
 
@@ -300,7 +300,8 @@ QString generateName(const ModuleBase_ViewerPrsPtr& thePrs)
           aTypeName = "shape";
           break;
         }
-        int aId = GeomAlgoAPI_CompoundBuilder::id(aContext, aSubShape);
+        GeomAPI_IndexedMapOfShape aSubShapesMap (aContext);
+        int aId = aSubShapesMap.FindIndexEqualLocations(aSubShape);
         aName += QString("/%1_%2").arg(aTypeName).arg(aId);
       }
     }

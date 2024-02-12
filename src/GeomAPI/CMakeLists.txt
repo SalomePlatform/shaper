@@ -50,6 +50,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Curve.h
     GeomAPI_DataMapOfShapeMapOfShapes.h
     GeomAPI_DataMapOfShapeShape.h
+    GeomAPI_IndexedMapOfShape.h
     GeomAPI_ICustomPrs.h
     GeomAPI_Vertex.h
     GeomAPI_Ax1.h
@@ -98,6 +99,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Curve.cpp
     GeomAPI_DataMapOfShapeMapOfShapes.cpp
     GeomAPI_DataMapOfShapeShape.cpp
+    GeomAPI_IndexedMapOfShape.cpp
     GeomAPI_Vertex.cpp
     GeomAPI_ICustomPrs.cpp
     GeomAPI_Ax1.cpp

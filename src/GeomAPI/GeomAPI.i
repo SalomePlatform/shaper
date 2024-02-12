@@ -51,6 +51,7 @@
 %shared_ptr(GeomAPI_Cylinder)
 %shared_ptr(GeomAPI_DataMapOfShapeMapOfShapes)
 %shared_ptr(GeomAPI_DataMapOfShapeShape)
+%shared_ptr(GeomAPI_IndexedMapOfShape)
 %shared_ptr(GeomAPI_Dir)
 %shared_ptr(GeomAPI_Dir2d)
 %shared_ptr(GeomAPI_Edge)
@@ -138,6 +139,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %include "GeomAPI_Cylinder.h"
 %include "GeomAPI_DataMapOfShapeMapOfShapes.h"
 %include "GeomAPI_DataMapOfShapeShape.h"
+%include "GeomAPI_IndexedMapOfShape.h"
 %include "GeomAPI_Dir.h"
 %include "GeomAPI_Dir2d.h"
 %include "GeomAPI_Edge.h"

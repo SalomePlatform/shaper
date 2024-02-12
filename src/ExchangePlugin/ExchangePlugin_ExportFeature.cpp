@@ -38,6 +38,7 @@
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_XAOExport.h>
 
+#include <GeomAPI_IndexedMapOfShape.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_Trsf.h>
@@ -426,6 +427,10 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
 
   std::set<ResultPtr> allResultsCashed; // cash to speed up searching in all results selected
 
+  // [bos #38360] [CEA] improve performances of exportXAO and PublishToStudy
+  GeomAPI_IndexedMapOfShape aSubShapesMap;
+  bool isSubShapesMap = false; // we will init it only if required (for performance reason)
+
   // iterate all documents used
   if (aDocuments.empty())
     aDocuments.push_back(document());
@@ -464,7 +469,12 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
           GeomShapePtr aGroupShape = aGroupResExplorer.current();
           if (aDocTrsf.find(*aDoc) != aDocTrsf.end())
             aGroupShape->move(aDocTrsf[*aDoc]);
-          int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aGroupShape);
+
+          if (!isSubShapesMap) {
+            aSubShapesMap.MapShapes(aShape);
+            isSubShapesMap = true;
+          }
+          int aReferenceID = aSubShapesMap.FindIndexEqualLocations(aGroupShape);
           if (aReferenceID == 0) // selected value does not found in the exported shape
             continue;
           std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
@@ -540,7 +550,11 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
               if (!isWholePart) {
                 // element index actually is the ID of the selection
                 AttributeSelectionPtr aSel = aSelectionList->value(aRow - 1);
-                int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSel->value());
+                if (!isSubShapesMap) {
+                  aSubShapesMap.MapShapes(aShape);
+                  isSubShapesMap = true;
+                }
+                int aReferenceID = aSubShapesMap.FindIndexEqualLocations(aSel->value());
                 if (aReferenceID == 0) // selected value does not found in the exported shape
                   continue;
 

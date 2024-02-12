@@ -169,11 +169,12 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
       else:
         allRefGroups.append(ModelAPI.referencedFeatures(theRes, "Group", True))
         allRefGroups.append(ModelAPI.referencedFeatures(theRes, "Shared_faces", True))
+      aResShape = theRes.shape()
+      aMapOfShape = GeomAPI_IndexedMapOfShape(aResShape)
       for aRefGroups in allRefGroups:
         for aRef in aRefGroups:
           aGroupIndices = []
           aGroupHasIndex = {}
-          aResShape = theRes.shape()
           if theFields:
             aSelList = aRef.selectionList("selected")
           else:
@@ -183,7 +184,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aShape = aGroupRes.shape()
             anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
             while anExplorer.more():
-              anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, anExplorer.current())
+              anId = aMapOfShape.FindIndexEqualLocations(anExplorer.current())
               if anId > 0 and not anId in aGroupHasIndex:
                 aGroupIndices.append(anId)
                 aGroupHasIndex[anId] = 0
