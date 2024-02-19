@@ -109,9 +109,10 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             else: # restore a red reference if it was deleted
               aDone, aSO2 = aSShape.GetSO().FindSubObject(1)
               if aDone:
+                aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                aBuilder.SetName(aSShape.GetSO(),aRes.data().name())
                 aDone, aRef = aSO2.ReferencedObject()
                 if not aDone:
-                  aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
                   aBuilder.Addreference(aSO2, aSShape.GetSO())
             allProcessed.append(aSSEntry)
             # Groups
@@ -130,7 +131,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             if isinstance(anObj, SHAPERSTUDY_ORB._objref_SHAPER_Object):
               anEntry = anObj.GetEntry()
               if len(anEntry) == 0:
-                continue;
+                continue
               elif anEntry not in allProcessed: # found a removed shape: make it dead for the moment
                 # remove the reference - red node
                 aRes, aSO2 = aSO.FindSubObject(1)
@@ -140,24 +141,37 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
                     aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
                     aBuilder.RemoveReference(aSO2)
                 # if the object is not marked as dead, mark it (#3201) to make all entries unique
-                aDeadEntry = anObj.GetEntry()
-                if not aDeadEntry.startswith("dead"):
-                  anIndex = aSO.Tag()
-                  anObj.SetEntry("dead0" + str(anIndex) + "_" + aDeadEntry)
-
-                  # also for groups
-                  aGrSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aSO)
-                  while aGrSOIter.More():
-                    aGroupSO = aGrSOIter.Value()
-                    aGrSOIter.Next()
-                    anIOR = aGroupSO.GetIOR()
-                    if len(anIOR):
-                      aGroup = salome.orb.string_to_object(anIOR)
-                      if isinstance(aGroup, SHAPERSTUDY_ORB._objref_SHAPER_Group) or \
-                         isinstance(aGroup, SHAPERSTUDY_ORB._objref_SHAPER_Field):
-                        if not aGroup.GetEntry().startswith("dead"):
-                          aDeadGroupEntry = "dead0" + str(anIndex) + "_" + aGroup.GetEntry()
-                          aGroup.SetEntry(aDeadGroupEntry)
+                aDependancies = SHAPERSTUDY_utils.getStudy().FindDependances(aSO)
+                hasLinkedMesh = False
+                for aDep in aDependancies:
+                  aComp = aDep.GetFatherComponent()
+                  type = aComp.ComponentDataType()
+                  if type == "SMESH":
+                    hasLinkedMesh = True
+                    break
+                if not hasLinkedMesh:
+                  aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                  aBuilder.RemoveObjectWithChildren(aSO)
+                else:
+                  aDeadEntry = anObj.GetEntry()
+                  if not aDeadEntry.startswith("dead"):
+                    anIndex = aSO.Tag()
+                    anObj.SetEntry("dead0" + str(anIndex) + "_" + aDeadEntry)
+                    anEngine.SetDeadPixmapToDeadObject(anObj) #set crossed pixmap to distinguish dead object in GUI
+                    # also for groups
+                    aGrSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aSO)
+                    while aGrSOIter.More():
+                      aGroupSO = aGrSOIter.Value()
+                      aGrSOIter.Next()
+                      anIOR = aGroupSO.GetIOR()
+                      if len(anIOR):
+                        aGroup = salome.orb.string_to_object(anIOR)
+                        if isinstance(aGroup, SHAPERSTUDY_ORB._objref_SHAPER_Group) or \
+                          isinstance(aGroup, SHAPERSTUDY_ORB._objref_SHAPER_Field):
+                          if not aGroup.GetEntry().startswith("dead"):
+                            aDeadGroupEntry = "dead0" + str(anIndex) + "_" + aGroup.GetEntry()
+                            aGroup.SetEntry(aDeadGroupEntry)
+                            anEngine.SetDeadPixmapToDeadObject(aGroup) #set crossed pixmap to distinguish dead object in GUI
 
     # Part of the "execute" method: processes the Groups of theRes result publication.
     # If theFields is true, the same is performed for Fields.
@@ -206,6 +220,9 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
                 aGroup = aGroupOp.CreateGroup(theStudyShape, aSelType)
               aGroup.SetEntry(aGroupEntry)
               theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape)
+            else:
+              aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+              aBuilder.SetName(aGroup.GetSO(),aRef.firstResult().data().name())
             aGroup.SetSelection(aGroupIndices)
             if theFields:
               self.fillField(aGroup, aRef, theEngine, aGroupIndices)
@@ -223,8 +240,23 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
              (not theFields and type(anObj) == SHAPERSTUDY_ORB._objref_SHAPER_Group):
             anEntry = anObj.GetEntry()
             if anEntry not in allGroupsProcessed: # found a removed group => remove
-              aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
-              aBuilder.RemoveObject(anObj.GetSO())
+              aDependancies = SHAPERSTUDY_utils.getStudy().FindDependances(aSO)
+              hasLinkedMesh = False
+              for aDep in aDependancies:
+                aComp = aDep.GetFatherComponent()
+                typeComp = aComp.ComponentDataType()
+                if typeComp == "SMESH":
+                  hasLinkedMesh = True
+                  break
+              if hasLinkedMesh:
+                if not anEntry.startswith("dead"):
+                  anIndex = aSO.Tag()
+                  aDeadGroupEntry = "dead0" + str(anIndex) + "_" + anEntry
+                  anObj.SetEntry(aDeadGroupEntry)
+                  theEngine.SetDeadPixmapToDeadObject(anObj)
+              else:
+                aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                aBuilder.RemoveObject(anObj.GetSO())
         aSOIter.Next()
 
     # Part of the "execute" method: theFiled fields filling.
