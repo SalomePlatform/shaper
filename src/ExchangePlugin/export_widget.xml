@@ -24,12 +24,13 @@
       </export_file_selector>
       <stringvalue id="xao_author"
                    label="Author"
-                   placeholder="Please input the author">
-      </stringvalue>
+                   placeholder="Please input the author"/>
       <stringvalue id="xao_geometry_name"
                    label="Geometry name"
-                   placeholder="Please input the geometry name">
-      </stringvalue>
+                   placeholder="Please input the geometry name"/>
+      <boolvalue id="xao_shape_file_separate"
+                 label="Export shape in a separate file"
+                 default="false"/>
     </case>
     <case id="XAOMem" title="XAOMem" internal="1">
       <stringvalue id="xao_author"

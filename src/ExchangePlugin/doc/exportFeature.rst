@@ -95,8 +95,6 @@ In case of first choice the format of exported file will be defined according to
 
 Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.
 
-*Note*: For XAO format, selection list is not available, the whole part is exported.
-
 **Apply** button exports the file.
   
 **Cancel** button cancels the operation.
@@ -109,15 +107,48 @@ Selection list in the property panel contains a list of exported objects which c
     :param string: The file name
     :param list: A list of exporting objects
 
+Result
+""""""
 
-.. py:function:: model.exportToXAO(Part_doc, FileNameString, Author="", GeometryName="")
-.. py:function:: model.exportToXAO(Part_doc, FileNameString, Object, Author="", GeometryName="")
+The Result of operation is an exported file.
+
+**See Also** a sample TUI Script of :ref:`tui_export_file` operation.
+
+
+Export to XAO
+"""""""""""""
+In this case, the following property panel will be opened:
+
+.. figure:: images/ExportXAO.png
+   :align: center
+
+   **Dialog box to export in XAO format**
+
+The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box
+
+*Note*: For XAO format, selection list is not available, the whole part is exported.
+
+**Author** Author name, empty by default
+
+**Geometry name** Geometry name, empty by default
+
+**Export shape in a separate file** if checked, shape will be exported in a separate BREP file with path = <XAO file name> + ".brep"
+
+**Apply** button exports the file.
+  
+**Cancel** button cancels the operation.
+
+**TUI Command**:
+
+.. py:function:: model.exportToXAO(Part_doc, FileNameString, Author="", GeometryName="", ShapeFile="")
+.. py:function:: model.exportToXAO(Part_doc, FileNameString, Object, Author="", GeometryName="", ShapeFile="")
 
     :param part: The current part object
     :param string: The file name
     :param object: An exporting object, if necessary
     :param string: The name of the author, empty by default
     :param string: The name for the shape processed in GEOMETRY module, empty by default
+    :param string: The shape file name. If not empty, shape data will be stored in a separate BREP file, given by this parameter
 
 .. py:function:: aBuffer = model.exportToXAOMem(Part_doc, Object, Author="", GeometryName="")
 
@@ -127,12 +158,14 @@ Selection list in the property panel contains a list of exported objects which c
     :param string: The name of the author, empty by default
     :param string: The name for the shape processed in GEOMETRY module, empty by default
 
+
 Result
 """"""
 
-The Result of operation is an exported file.
+The Result of operation is an exported XAO file.
 
-**See Also** a sample TUI Script of :ref:`tui_export_file` operation.
+**See Also** a sample TUI Script of :ref:`tui_export_file_XAO` operation.
+
 
 Export to STL
 """""""""""""

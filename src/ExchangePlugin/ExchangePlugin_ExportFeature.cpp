@@ -123,6 +123,11 @@ void ExchangePlugin_ExportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID(),
                        ModelAPI_AttributeString::typeId());
 
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_SHAPE_FILE_PATH_ID(),
+                       ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_SHAPE_FILE_SEPARATE_ID(),
+                       ModelAPI_AttributeBoolean::typeId());
+
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
@@ -135,6 +140,10 @@ void ExchangePlugin_ExportFeature::initAttributes()
     ExchangePlugin_ExportFeature::XAO_SELECTION_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_SHAPE_FILE_PATH_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_SHAPE_FILE_SEPARATE_ID());
 
   // to support previous version of document, move the selection list
   // if the type of export operation is XAO
@@ -605,7 +614,19 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
     string(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID())->setValue(XAOExportMem(&aXao, anError));
   }
   else {
-    XAOExport(theFileName, &aXao, anError);
+    std::string aShapeFile ("");
+    AttributeBooleanPtr aShapeSeparateAttr = boolean(XAO_SHAPE_FILE_SEPARATE_ID());
+    if (aShapeSeparateAttr->isInitialized() &&
+        aShapeSeparateAttr->value() == true) {
+      aShapeFile = theFileName + ".brep";
+    }
+    else {
+      AttributeStringPtr aShapeFileAttr = string(XAO_SHAPE_FILE_PATH_ID());
+      if (aShapeFileAttr->isInitialized())
+        aShapeFile = aShapeFileAttr->value();
+    }
+
+    XAOExport(theFileName, &aXao, anError, aShapeFile);
   }
 
   if (!anError.empty()) {
