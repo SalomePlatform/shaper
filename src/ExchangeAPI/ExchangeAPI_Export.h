@@ -54,7 +54,8 @@ public:
   explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                               const std::string & theFilePath,
                               const std::string & theAuthor = std::string(),
-                              const std::string & theGeometryName = std::string());
+                              const std::string & theGeometryName = std::string(),
+                              const std::string & theShapeFilePath = std::string());
 
   /// Constructor with values for STL of selected result export.
   EXCHANGEAPI_EXPORT
@@ -72,7 +73,8 @@ public:
                               const std::string & theFilePath,
                               const ModelHighAPI_Selection& theResult,
                               const std::string & theAuthor,
-                              const std::string & theGeometryName = std::string());
+                              const std::string & theGeometryName = std::string(),
+                              const std::string & theShapeFilePath = std::string());
 
   /// Constructor with values for XAO of selected result export to memory buffer.
   EXCHANGEAPI_EXPORT
@@ -92,7 +94,7 @@ public:
   EXCHANGEAPI_EXPORT
   virtual ~ExchangeAPI_Export();
 
-  INTERFACE_16(ExchangePlugin_ExportFeature::ID(),
+  INTERFACE_17(ExchangePlugin_ExportFeature::ID(),
                exportType, ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(),
                ModelAPI_AttributeString, /** ExportType */,
                filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(),
@@ -126,7 +128,9 @@ public:
                       ExchangePlugin_ExportFeature::STL_DEFLECTION_TYPE_RELATIVE(),
                ModelAPI_AttributeString, /** Type of the defelection */,
                memoryBuff, ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID(),
-               ModelAPI_AttributeString, /** Bytes*/)
+               ModelAPI_AttributeString, /** Bytes*/,
+               xaoShapeFilePath, ExchangePlugin_ExportFeature::XAO_SHAPE_FILE_PATH_ID(),
+               ModelAPI_AttributeString, /** xao shape file path */)
 
   /// Dump wrapped feature
   EXCHANGEAPI_EXPORT
@@ -150,9 +154,10 @@ ExportPtr exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
  */
 EXCHANGEAPI_EXPORT
 ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
-                 const std::string & theFilePath,
-                 const std::string & theAuthor = std::string(),
-                 const std::string & theGeometryName = std::string());
+                      const std::string & theFilePath,
+                      const std::string & theAuthor = std::string(),
+                      const std::string & theGeometryName = std::string(),
+                      const std::string & theShapeFilePath = std::string());
 
 /**\ingroup CPPHighAPI
  * \brief Exports to STL file the result of the current document
@@ -174,7 +179,8 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
                       const std::string & theFilePath,
                       const ModelHighAPI_Selection& theSelectedShape,
                       const std::string & theAuthor = std::string(),
-                      const std::string & theGeometryName = std::string());
+                      const std::string & theGeometryName = std::string(),
+                      const std::string & theShapeFilePath = std::string());
 
 /**\ingroup CPPHighAPI
 * \brief Exports to XAO format buffer the selected result with groups parts related to it only.

@@ -55,7 +55,8 @@ bool SetShapeToXAO(const std::shared_ptr<GeomAPI_Shape>& theShape,
 //=============================================================================
 bool XAOExport(const std::string& theFileName,
                XAO::Xao* theXao,
-               std::string& theError)
+               std::string& theError,
+               const std::string& theShapeFileName)
 {
   #ifdef _DEBUG
   std::cout << "Export XAO into file " << theFileName << std::endl;
@@ -72,7 +73,7 @@ bool XAOExport(const std::string& theFileName,
     bool aWasFree = aShape.Free(); // make top level topology free, same as imported
     if (!aWasFree)
       aShape.Free(Standard_True);
-    XAO::XaoExporter::saveToFile(theXao, theFileName, "");
+    XAO::XaoExporter::saveToFile(theXao, theFileName, theShapeFileName);
     if (!aWasFree)
       aShape.Free(Standard_False);
   } catch (XAO::XAO_Exception& e) {

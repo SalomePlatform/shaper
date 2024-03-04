@@ -224,6 +224,13 @@
     </message>
   </context>
   <context>
+    <name>Export:xao_shape_file_separate</name>
+    <message>
+      <source>Export shape in a separate file</source>
+      <translation>Exporter la forme dans un fichier séparé</translation>
+    </message>
+  </context>
+  <context>
     <name>Export:stl_absolute</name>
     <message>
       <source>Absolute value.</source>

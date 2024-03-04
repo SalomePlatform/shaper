@@ -150,6 +150,19 @@ public:
     static const std::string MY_XAO_GEOMETRY_NAME_ID("xao_geometry_name");
     return MY_XAO_GEOMETRY_NAME_ID;
   }
+  /// attribute name of xao shape file path
+  inline static const std::string& XAO_SHAPE_FILE_PATH_ID()
+  {
+    static const std::string MY_XAO_SHAPE_FILE_PATH_ID("xao_shape_file_path");
+    return MY_XAO_SHAPE_FILE_PATH_ID;
+  }
+  /// attribute flag to export shape in a separate file during xao export,
+  /// name of shape file will be xao_file_path + .brep
+  inline static const std::string& XAO_SHAPE_FILE_SEPARATE_ID()
+  {
+    static const std::string MY_XAO_SHAPE_FILE_SEPARATE_ID("xao_shape_file_separate");
+    return MY_XAO_SHAPE_FILE_SEPARATE_ID;
+  }
   /// attribute string memory buffer
   inline static const std::string& MEMORY_BUFFER_ID()
   {

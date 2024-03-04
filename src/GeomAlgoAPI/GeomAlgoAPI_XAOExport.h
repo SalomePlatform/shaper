@@ -40,7 +40,8 @@ bool SetShapeToXAO(const std::shared_ptr<GeomAPI_Shape>& theShape,
 GEOMALGOAPI_EXPORT
 bool XAOExport(const std::string& theFileName,
                XAO::Xao* theXao,
-               std::string& theError);
+               std::string& theError,
+               const std::string& theShapeFileName = std::string());
 
 /// Implementation of the export XAO to memory buffer (std::string)
 GEOMALGOAPI_EXPORT

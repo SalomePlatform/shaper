@@ -23,6 +23,7 @@ SET(TEST_NAMES
   Test2290.py
   Test2459.py
   Test18710.py
+  TestExportToXAO_SeparateShapeFile.py
   TestExportToXAOWithFields.py
   TestExportToXAOWithGroupNotUpdated.py
   TestExport_FiniteValidator.py
