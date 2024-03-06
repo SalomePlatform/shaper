@@ -112,11 +112,17 @@ void Model_ResultBody::loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_Make
 {
   if (mySubs.size()) { // consists of subs
     // optimization of getting of new shapes for specific sub-result
-    if (!theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore))
+    bool isJustCollectedNS = false;
+    if (!theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore)) {
       theAlgo->collectNewShapes(theOldShape, theShapeTypeToExplore);
+      isJustCollectedNS = true;
+    }
     std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
       (*aSubIter)->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+    }
+    if (isJustCollectedNS) {
+      theAlgo->cleanNewShapes(theOldShape, theShapeTypeToExplore);
     }
   } else { // do for this directly
     myBuilder->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);

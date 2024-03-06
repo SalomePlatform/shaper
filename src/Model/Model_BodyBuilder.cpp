@@ -626,7 +626,8 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
 {
   GeomShapePtr aResultShape = shape();
   GeomShapePtr aShapeToExplore = theOldShape;
-  if (theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore)) {
+  bool isAlgoHistoryCollected = theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore);
+  if (isAlgoHistoryCollected) {
     // use optimized set of old shapes for this
     GeomShapePtr aCompound = theAlgo->oldShapesForNew(theOldShape,
                                                       aResultShape,
@@ -664,7 +665,12 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
 
     // Get new shapes.
     ListOfShape aNewShapes;
-    theAlgo->modified(anOldSubShape, aNewShapes);
+    if (isAlgoHistoryCollected) {
+      theAlgo->modifiedCached(anOldSubShape, aNewShapes);
+    }
+    else {
+      theAlgo->modified(anOldSubShape, aNewShapes);
+    }
     for (ListOfShape::const_iterator aNewShapesIt = aNewShapes.cbegin();
          aNewShapesIt != aNewShapes.cend();
          ++aNewShapesIt)

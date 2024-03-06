@@ -65,7 +65,6 @@ void GeomAlgoAPI_MakeShapeSet::modified(const GeomShapePtr theOldShape,
       ++aBuilderIt)
   {
     GeomMakeShapePtr aMakeShape = *aBuilderIt;
-    ListOfShape aModifiedShapes;
     aMakeShape->modified(theOldShape, theNewShapes);
   }
 }

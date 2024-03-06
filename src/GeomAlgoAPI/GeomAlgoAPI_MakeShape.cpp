@@ -42,6 +42,9 @@ typedef NCollection_DataMap<TopoDS_Shape,
 typedef
   NCollection_DataMap<int, NCollection_DataMap<TopoDS_Shape, MapNewToOld, TopTools_ShapeMapHasher> >
   HistoryMap;
+typedef
+  NCollection_DataMap<int, NCollection_DataMap<TopoDS_Shape, ListOfShape, TopTools_ShapeMapHasher> >
+  MapModified;
 
 //==================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
@@ -49,6 +52,7 @@ GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
   myDone(false)
 {
   myHist = 0;
+  myModifHist = 0;
 }
 
 //==================================================================================================
@@ -56,6 +60,9 @@ GeomAlgoAPI_MakeShape::~GeomAlgoAPI_MakeShape()
 {
   if (myHist) {
     delete (HistoryMap*)myHist;
+  }
+  if (myModifHist) {
+    delete (MapModified*)myModifHist;
   }
 }
 
@@ -114,7 +121,7 @@ void GeomAlgoAPI_MakeShape::modified(const GeomShapePtr theOldShape,
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
     try {
       aList = aMakeShape->Modified(theOldShape->impl<TopoDS_Shape>());
-    } catch(Standard_NoSuchObject) {
+    } catch(Standard_NoSuchObject const&) {
     }
   } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
@@ -126,6 +133,23 @@ void GeomAlgoAPI_MakeShape::modified(const GeomShapePtr theOldShape,
     if (!isValidForHistory(aShape)) continue;
     fixOrientation(aShape);
     theNewShapes.push_back(aShape);
+  }
+}
+
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::modifiedCached(const GeomShapePtr theOldShape,
+                                           ListOfShape& theNewShapes)
+{
+  if (myModifHist) {
+    MapModified* aModified = (MapModified*)myModifHist;
+    int aShapeType = (int)theOldShape->impl<TopoDS_Shape>().ShapeType();
+    if (aModified->IsBound(aShapeType)) {
+      const NCollection_DataMap<TopoDS_Shape, ListOfShape, TopTools_ShapeMapHasher>& aM =
+        aModified->Find(aShapeType);
+      if (aM.IsBound(theOldShape->impl<TopoDS_Shape>())) {
+        theNewShapes = aM.Find(theOldShape->impl<TopoDS_Shape>());
+      }
+    }
   }
 }
 
@@ -250,6 +274,7 @@ void GeomAlgoAPI_MakeShape::initialize()
     myMap->bind(aCurrentShape, aCurrentShape);
   }
   myHist = 0;
+  myModifHist = 0;
 }
 
 
@@ -304,6 +329,15 @@ bool GeomAlgoAPI_MakeShape::isNewShapesCollected(GeomShapePtr theWholeOld,
 void GeomAlgoAPI_MakeShape::collectNewShapes(
   GeomShapePtr theWholeOld, const int theShapeType)
 {
+  if (!myModifHist)
+    myModifHist = new MapModified;
+  MapModified* aModified = (MapModified*)myModifHist;
+  if (!aModified->IsBound(theShapeType))
+    aModified->Bind(theShapeType,
+                    NCollection_DataMap<TopoDS_Shape, ListOfShape, TopTools_ShapeMapHasher>());
+  NCollection_DataMap<TopoDS_Shape, ListOfShape, TopTools_ShapeMapHasher>& aM =
+    aModified->ChangeFind(theShapeType);
+
   if (!myHist)
     myHist = new HistoryMap;
   HistoryMap* aHist = (HistoryMap*)myHist;
@@ -329,6 +363,26 @@ void GeomAlgoAPI_MakeShape::collectNewShapes(
           aNewShape, NCollection_DataMap<TopoDS_Shape, int, TopTools_ShapeMapHasher>());
       }
       aCurrent.ChangeFind(aNewShape).Bind(anExp.current()->impl<TopoDS_Shape>(), anIndexInWholeOld);
+    }
+    aM.Bind(anExp.current()->impl<TopoDS_Shape>(), aNewList);
+  }
+}
+
+void GeomAlgoAPI_MakeShape::cleanNewShapes(
+  GeomShapePtr theWholeOld, const int theShapeType)
+{
+  if (myModifHist) {
+    MapModified* aModified = (MapModified*)myModifHist;
+    if (aModified->IsBound(theShapeType)) {
+      aModified->UnBind(theShapeType);
+    }
+  }
+  if (myHist) {
+    HistoryMap* aHist = (HistoryMap*)myHist;
+    if (aHist->IsBound(theShapeType)) {
+      if (aHist->Find(theShapeType).IsBound(theWholeOld->impl<TopoDS_Shape>())) {
+        aHist->ChangeFind(theShapeType).UnBind(theWholeOld->impl<TopoDS_Shape>());
+      }
     }
   }
 }

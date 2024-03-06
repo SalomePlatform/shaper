@@ -93,11 +93,20 @@ public:
   GEOMALGOAPI_EXPORT virtual void generated(const GeomShapePtr theOldShape,
                                             ListOfShape& theNewShapes);
 
-  /// \return the list of shapes modified from the shape \a theShape.
+  /// Get a list of new shapes, modified from the given old shape.
+  /// \return the list of shapes modified from the shape \a theOldShape.
   /// \param[in] theOldShape base shape.
-  /// \param[out] theNewShapes shapes modified from \a theShape. Does not cleared!
+  /// \param[out] theNewShapes shapes modified from \a theOldShape. Does not cleared!
   GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
                                            ListOfShape& theNewShapes);
+
+  /// Get a list of new shapes, modified from the given old shape.
+  /// Works correctly only in case if the modifications are cached. Check this with isNewShapesCollected().
+  /// \return the list of shapes modified from the shape \a theOldShape.
+  /// \param[in] theOldShape base shape.
+  /// \param[out] theNewShapes shapes modified from \a theOldShape. Does not cleared!
+  GEOMALGOAPI_EXPORT void modifiedCached(const GeomShapePtr theOldShape,
+                                         ListOfShape& theNewShapes);
 
   /// \return true if theShape was deleted.
   /// \param[in] theOldShape base shape.
@@ -133,6 +142,12 @@ public:
   /// \returns true if optimization containers are already filled
   GEOMALGOAPI_EXPORT void collectNewShapes(GeomShapePtr theWholeOld,
                                            const int theShapeType);
+
+  /// Clean cached data, created by collectNewShapes() method, called with the same arguments.
+  /// \param theWholeOld the whole old shape
+  /// \param theShapeType type of the sub-shapes that is used for optimization
+  GEOMALGOAPI_EXPORT void cleanNewShapes(GeomShapePtr theWholeOld,
+                                         const int theShapeType);
 
   /// Optimization of access the new shapes by old shapes for the limited set of needed new shapes.
   /// \param theWholeOld the whole old shape
@@ -182,6 +197,10 @@ private:
   /// map that is used to keep the optimization structure for access to the history
   /// kind of sub-shapes -> whole old shape -> new shape -> list of old shapes that create this new
   void* myHist;
+
+  /// map that is used to keep the optimization structure for access to the history
+  /// kind of sub-shapes -> old shape -> list of new shapes modified from this old shape
+  void* myModifHist;
 };
 
 typedef std::shared_ptr<GeomAlgoAPI_MakeShape> GeomMakeShapePtr;
