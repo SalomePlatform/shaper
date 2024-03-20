@@ -76,9 +76,6 @@ std::shared_ptr<GeomAPI_Shape> XAOImportMem(const std::string& theMemoryBuff,
                                             std::string& theError,
                                             XAO::Xao* theXao)
 {
-#ifdef _DEBUG
-  std::cout << "Import XAO from file " << theFileName << std::endl;
-#endif
   if (theMemoryBuff.empty() || !theXao) {
     theError = "An invalid argument.";
     return std::shared_ptr<GeomAPI_Shape>();
