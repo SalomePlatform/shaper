@@ -54,8 +54,8 @@
 #include <sstream>
 #include <iomanip>
 
-#define PRECISION 6
-#define TOLERANCE (1.e-7)
+#define PRECISION 5
+#define TOLERANCE (1.e-6)
 
 ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(ObjectPtr theObject) {
   storeData(theObject->data(), myAttrs);
