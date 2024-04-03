@@ -51,7 +51,11 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_IScreenParams.h>
 
+#include <SUIT_Application.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_Session.h>
+#include <SUIT_ViewManager.h>
+#include <SUIT_ViewModel.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -64,6 +68,8 @@
 #include <AIS_Point.hxx>
 #endif
 #include <AIS_Selection.hxx>
+#include <Graphic3d_MapOfStructure.hxx>
+#include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <PrsDim_Dimension.hxx>
@@ -133,6 +139,23 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
   return anInfo.join(theSeparator);
 }
 
+/// Apply the clipping planes to all objects in the "OCC3D" viewer.
+void applyClippingPlanes()
+{
+  SUIT_Application *pApp = SUIT_Session::session()->activeApplication();
+  QList<SUIT_ViewManager*> viewMgrs;
+  pApp->viewManagers(QString("OCCViewer"), viewMgrs);
+  if (!viewMgrs.isEmpty()) {
+    SUIT_ViewManager *pViewMgr = viewMgrs.first();
+    if (pViewMgr) {
+      SUIT_ViewModel *pViewMdl = pViewMgr->getViewModel();
+      if (pViewMdl) {
+        pViewMdl->applyClippingPlanes(true);
+      }
+    }
+  }
+}
+
 //**************************************************************
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop),
@@ -180,6 +203,11 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
     if (anAIS.get())
       aDisplayed = display(theObject, anAIS, isShading, theUpdateViewer);
   }
+
+  if (aDisplayed) {
+    applyClippingPlanes();
+  }
+
   return aDisplayed;
 }
 
@@ -216,6 +244,27 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
+
+    // bos#40617: Apply clipping planes
+    // Retrieve the clipping plane from the OCCT Presentation Manager directly,
+    // as they are stored in the ViewModel of the OCCViewer in GUI, where we 
+    // don't have access to.
+    Handle(ViewerData_AISShape) aShape = Handle(ViewerData_AISShape)::DownCast (anAISIO);
+    if (!aShape.IsNull() && aShape->IsClippable()) {
+      Graphic3d_MapOfStructure aSetOfStructures;
+      aContext->MainPrsMgr()->StructureManager()->DisplayedStructures( aSetOfStructures );
+      Graphic3d_MapIteratorOfMapOfStructure aStructureIt( aSetOfStructures );
+      for( ; aStructureIt.More(); aStructureIt.Next() ) {
+        const Handle(Graphic3d_Structure)& aStructure = aStructureIt.Key();
+        if ( aStructure->IsEmpty() || !aStructure->IsVisible() || aStructure->CStructure()->IsForHighlight )
+          continue;
+        const Handle(Graphic3d_SequenceOfHClipPlane) &planes = aStructure->ClipPlanes();
+        if (!planes.IsNull() && !planes->IsEmpty()) {
+          aShape->SetClipPlanes(planes);
+          break;
+        }
+      }
+    }
 
     //bool isCustomized = customizeObject(theObject);
 
@@ -268,6 +317,10 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
     }
   }
   myResult2AISObjectMap.remove(theObject);
+
+  if (aErased) {
+    applyClippingPlanes();
+  }
 
 #ifdef DEBUG_DISPLAY
   std::ostringstream aPtrStr;
