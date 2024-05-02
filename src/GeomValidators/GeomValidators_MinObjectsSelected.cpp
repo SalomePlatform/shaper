@@ -40,7 +40,8 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
 // LCOV_EXCL_STOP
   }
   //"Interpolation"
-  if (theFeature->name().substr(0, 6) == L"Interp")
+  // bos#41748:
+  if (theFeature->getKind() == BuildPlugin_Interpolation::ID())
   {
     AttributeStringPtr anAttr =theFeature->string(BuildPlugin_Interpolation::CREATION_METHOD_ID());
     if (anAttr->isInitialized())
