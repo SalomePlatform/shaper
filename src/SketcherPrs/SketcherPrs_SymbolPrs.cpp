@@ -178,7 +178,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   aFile += iconName();
   Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
   if (aPixMap->Load(aFile.c_str())) {
-    int aRatio = SketcherPrs_Tools::pixelRatio();
+    const double aRatio = SketcherPrs_Tools::pixelRatio();
     if (aRatio > 1) {
       Handle(Image_AlienPixMap) aSizedMap = new Image_AlienPixMap();
       Standard_Size aWidth = aPixMap->Width() * aRatio;

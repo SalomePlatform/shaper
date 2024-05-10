@@ -180,9 +180,9 @@ namespace SketcherPrs_Tools {
   SKETCHERPRS_EXPORT void sendEmptyPresentationError(ModelAPI_Feature* theFeature,
                                                      const std::string theError);
 
-  SKETCHERPRS_EXPORT void setPixelRatio(int theRatio);
+  SKETCHERPRS_EXPORT void setPixelRatio(const double theRatio);
 
-  SKETCHERPRS_EXPORT int pixelRatio();
+  SKETCHERPRS_EXPORT double pixelRatio();
 };
 
 #endif

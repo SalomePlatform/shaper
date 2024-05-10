@@ -143,7 +143,7 @@ void SketcherPrs_Coincident::Compute(
   Quantity_Color aExternalColor = aIsEdge ? aMainColor : Quantity_NOC_YELLOW;
   Quantity_Color aInternalColor = aIsEdge ? Quantity_NOC_YELLOW : aMainColor;
 
-  int aRatio = SketcherPrs_Tools::pixelRatio();
+  const double aRatio = SketcherPrs_Tools::pixelRatio();
 
   // Create the presentation as a combination of standard point markers
   // The external yellow contour

@@ -288,14 +288,14 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const FeaturePtr theLine,
   return aLin2d.project(thePoint);
 }
 
-static int MyPixelRatio = 1;
+static double MyPixelRatio = 1.0;
 
-void setPixelRatio(int theRatio)
+void setPixelRatio(const double theRatio)
 {
   MyPixelRatio = theRatio;
 }
 
-int pixelRatio()
+double pixelRatio()
 {
   return MyPixelRatio;
 }
