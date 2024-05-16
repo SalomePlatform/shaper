@@ -1090,7 +1090,7 @@ SketchLine_77.result().setName("SketchLine_118")
 SketchProjection_19 = Sketch_8.addProjection(model.selection("EDGE", "Split_2_1_17/Modified_Edge&PartSet/YOZ/YOZ&Sketch_1/SketchArc_2_2"), False)
 SketchProjection_19.setName("SketchProjection_40")
 SketchProjection_19.result().setName("SketchProjection_40")
-SketchBSpline_1 = SketchProjection_19.createdFeature()
+SketchProj19_1 = SketchProjection_19.createdFeature()
 
 ### Create SketchProjection
 SketchProjection_20 = Sketch_8.addProjection(model.selection("EDGE", "Partition_1_1_4/Generated_Edge&PartSet/YOZ/YOZ&Sketch_1/SketchLine_19"), False)
@@ -1100,7 +1100,7 @@ SketchLine_78 = SketchProjection_20.createdFeature()
 SketchLine_78.setName("SketchLine_119")
 SketchLine_78.result().setName("SketchLine_119")
 Sketch_8.setCoincident(SketchLine_74.endPoint(), SketchLine_78.result())
-Sketch_8.setCoincident(SketchLine_74.startPoint(), SketchAPI_BSpline(SketchBSpline_1).startPoint())
+Sketch_8.setCoincident(SketchLine_74.startPoint(), SketchAPI_Arc(SketchProj19_1).startPoint())
 
 ### Create SketchLine
 SketchLine_79 = Sketch_8.addLine(5.676067550792231, 10.23944020672391, 5.829536340268943, 10.44848598250872)

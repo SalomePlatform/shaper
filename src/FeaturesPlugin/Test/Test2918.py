@@ -237,8 +237,8 @@ model.do()
 Revolution_2 = model.addRevolution(Part_1_doc, [model.selection("WIRE", (3.862008317343538, 0, 11.38077471561056))], model.selection("EDGE", (3.241000000000025, 0, 11.62374600149389)), 360, 0)
 Revolution_3 = model.addRevolution(Part_1_doc, [model.selection("WIRE", (4.212769702413368, 0, 11.10430922268928))], model.selection("EDGE", (3.241000000000025, 0, 11.62374600149389)), 360, 0)
 Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", (3.237566604725065, 0, 11.61400119092393)), model.selection("SOLID", (3.223802337712571, 0, 11.57493485456337))], model.selection("FACE", "PartSet/YOZ"), True)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", (-0.02393444277354109, 0, -2.580701826672493))], [model.selection("COMPOUND", (0, 0, 11.60508262087049))])
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", (-0.0201067396659898, 0, -2.591493279115657)), model.selection("COMPOUND", (0, 0, 11.54608275997197))], removeEdges = True)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", (0, 0, -2.5816942490967))], [model.selection("COMPOUND", (0, 0, 11.60508262087049))])
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", (0, 0, -2.5923523532641)), model.selection("COMPOUND", (0, 0, 11.54608275997197))], removeEdges = True)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), 3.6, False)
 Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", (0, 0, 3.6)))
 SketchProjection_9 = Sketch_3.addProjection(model.selection("EDGE", (-6.188, 7.578114393123822e-16, -3.45)), True)
@@ -310,10 +310,10 @@ model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", (0, 0, 1.2))], model.selection(), 10, 0)
 Rotation_1_objects = [model.selection("SOLID", (5, 1.166200656118862e-18, 1.2)), model.selection("SOLID", (6.049686362669476, 0, 1.5)), model.selection("SOLID", (6.320976310013338, 0, 1.5))]
 Rotation_1 = model.addRotation(Part_1_doc, Rotation_1_objects, model.selection("EDGE", "PartSet/OZ"), -90)
-Fuse_2_objects_1 = [model.selection("SOLID", (-0.01517504751345233, 0, -2.581926283264175)), model.selection("SOLID", (0, -6.049686362669479, 1.5)), model.selection("SOLID", (0, -6.320976310013339, 1.5))]
+Fuse_2_objects_1 = [model.selection("SOLID", (0, 0, -2.5825883331029)), model.selection("SOLID", (0, -6.049686362669479, 1.5)), model.selection("SOLID", (0, -6.320976310013339, 1.5))]
 Fuse_2 = model.addFuse(Part_1_doc, Fuse_2_objects_1)
-Cut_2 = model.addCut(Part_1_doc, [model.selection("SOLID", (-0.01017608298903453, -0.03890028204629473, -2.562040714294322))], [model.selection("SOLID", (0, -5, 1.2))])
-FusionFaces_1 = model.addFusionFaces(Part_1_doc, model.selection("SOLID", (-0.008741742572144908, -0.03112823644757425, -2.568357186681257)))
+Cut_2 = model.addCut(Part_1_doc, [model.selection("SOLID", (0, -0.0305282901284, -2.5624546739218))], [model.selection("SOLID", (0, -5, 1.2))])
+FusionFaces_1 = model.addFusionFaces(Part_1_doc, model.selection("SOLID", (0, -0.020170634783153, -2.5687034308941)))
 
 model.end()
 
@@ -323,6 +323,6 @@ model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.FACE, [47])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.EDGE, [202])
 model.testNbSubShapes(FusionFaces_1, GeomAPI_Shape.VERTEX, [404])
-model.testResultsVolumes(FusionFaces_1, [612.7268292882])
+model.testResultsVolumes(FusionFaces_1, [612.727466])
 
 assert(model.checkPythonDump())

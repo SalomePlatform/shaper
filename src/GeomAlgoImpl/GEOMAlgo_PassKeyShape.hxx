@@ -31,6 +31,8 @@
 
 #include <GeomAlgoImpl.h>
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <Standard.hxx>
 #include <Standard_Macro.hxx>
 #include <Standard_Integer.hxx>
@@ -92,8 +94,19 @@ class GEOMAlgo_PassKeyShape  {
   GEOMALGOIMPL_EXPORT
     Standard_Boolean IsEqual(const GEOMAlgo_PassKeyShape& aOther) const;
 
+#if OCC_VERSION_LARGE < 0x07080000
   GEOMALGOIMPL_EXPORT
     Standard_Integer HashCode(const Standard_Integer Upper) const;
+#endif
+
+  GEOMALGOIMPL_EXPORT
+  bool operator==(const GEOMAlgo_PassKeyShape& theOther) const
+  {
+    return IsEqual(theOther);
+  }
+
+  GEOMALGOIMPL_EXPORT
+  size_t GetSum() const { return (size_t)mySum; }
 
   GEOMALGOIMPL_EXPORT
     void Dump(const Standard_Integer aHex = 0) const;

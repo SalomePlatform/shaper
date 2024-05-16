@@ -27,6 +27,8 @@
 //
 #include <GEOMAlgo_PassKeyShape.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
@@ -94,7 +96,11 @@ static
   Clear();
   myNbIds=1;
   myMap.Add(aS1);
+#if OCC_VERSION_LARGE < 0x07080000
   aHC=aS1.HashCode(myUpper);
+#else
+  aHC = std::hash<TopoDS_Shape>{}(aS1);
+#endif
   mySum=NormalizedId(aHC, myNbIds);
 }
 //=======================================================================
@@ -160,7 +166,11 @@ static
   myNbIds=myMap.Extent();
   for(i=1; i<=myNbIds; ++i) {
     const TopoDS_Shape& aS=myMap(i);
+#if OCC_VERSION_LARGE < 0x07080000
     aId=aS.HashCode(myUpper);
+#else
+    aId = std::hash<TopoDS_Shape>{}(aS);
+#endif
     aIdN=NormalizedId(aId, myNbIds);
     mySum+=aIdN;
   }
@@ -195,6 +205,7 @@ static
   }
   return !bRet;
 }
+#if OCC_VERSION_LARGE < 0x07080000
 //=======================================================================
 //function : HashCode
 //purpose  :
@@ -203,6 +214,7 @@ static
 {
   return ::HashCode(mySum, aUpper);
 }
+#endif
 //=======================================================================
 //function : Dump
 //purpose  :

@@ -57,7 +57,7 @@ SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchCircle_2.center(), 
 ExtrusionCut_2.setNestedSketch(Sketch_2)
 model.do()
 Shape = ExtrusionCut_2.results()[0].resultSubShapePair()[0].shape()
-checkMiddlePoint(Shape, 4.999955838, 4.99999192, 4.677925562)
+checkMiddlePoint(Shape, 4.999955680, 4.99999176, 4.677925400)
 
 model.end()
 

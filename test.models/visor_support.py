@@ -360,7 +360,7 @@ model.testNbSubShapes(Fillet_1, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Fillet_1, GeomAPI_Shape.FACE, [5])
 model.testNbSubShapes(Fillet_1, GeomAPI_Shape.EDGE, [18])
 model.testNbSubShapes(Fillet_1, GeomAPI_Shape.VERTEX, [36])
-model.testResultsVolumes(Fillet_1, [13.34526088678])
+model.testResultsVolumes(Fillet_1, [13.345256419562657512756231881])
 
 Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Fillet_1_1")], model.selection("FACE", "PartSet/YOZ"), keepOriginal = True, keepSubResults = True)
 Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Chamfer_1_1")], [model.selection("COMPOUND", "Symmetry_1_1")], keepSubResults = True)

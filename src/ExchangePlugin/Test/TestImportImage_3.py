@@ -104,5 +104,9 @@ with TemporaryDirectory() as tmp_dir:
 # Close SALOME GUI
 import salome_utils
 import subprocess
+import platform
 port = salome_utils.getPortNumber()
-proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])
+if platform.system() == "Windows":
+  proc = subprocess.Popen(["python", "killSalomeWithPort.py", "{}".format(port)])
+else:
+  proc = subprocess.Popen(["killSalomeWithPort.py", "{}".format(port)])

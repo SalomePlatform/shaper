@@ -366,10 +366,10 @@ Revolution_3 = model.addRevolution(Part_1_doc, [model.selection("WIRE", (4.21276
 Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", (3.237566604725065, 1.012489110826635e-16, 11.61400119092393)), model.selection("SOLID", (3.223802337712571, 1.605864674679632e-16, 11.57493485456337))], model.selection("FACE", "PartSet/YOZ"), keepOriginal = True)
 
 ### Create Cut
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", (-0.02393444277354129, -2.619925842544883e-15, -2.580701826672511))], [model.selection("COMPOUND", (0, 0, 11.60508262087049))])
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", (0, 0, -2.581694))], [model.selection("COMPOUND", (0, 0, 11.60508262087049))])
 
 ### Create Fuse
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", (-0.02010673966564346, 1.098068506034238e-08, -2.591493279117804)), model.selection("COMPOUND", (0, 0, 11.54608275997197))], removeEdges = True)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", (0, 0, -2.592352)), model.selection("COMPOUND", (0, 0, 11.54608275997197))], removeEdges = True)
 
 ### Create Plane
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), 3.6, False)
@@ -485,10 +485,10 @@ Rotation_1 = model.addRotation(Part_1_doc, [model.selection("COMPOUND", "all-in-
 Rotation_2 = model.addRotation(Part_1_doc, [model.selection("SOLID", (5, 0, 1.2))], axis = model.selection("EDGE", "PartSet/OZ"), angle = -90)
 
 ### Create Fuse
-Fuse_2 = model.addFuse(Part_1_doc, [model.selection("SOLID", (-0.01517504751343968, 2.050041270815023e-08, -2.581926283264154)), model.selection("COMPOUND", (6.661338147750939e-16, -6.164784975045299, 1.5))], removeEdges = True)
+Fuse_2 = model.addFuse(Part_1_doc, [model.selection("SOLID", (0, 0, -2.582588)), model.selection("COMPOUND", (6.661338147750939e-16, -6.164784975045299, 1.5))], removeEdges = True)
 
 ### Create Cut
-Cut_2 = model.addCut(Part_1_doc, [model.selection("SOLID", (-0.01123484393534465, -0.0370107755507461, -2.561989939908471))], [model.selection("SOLID", (6.683953801956267e-16, -5, 1.2))])
+Cut_2 = model.addCut(Part_1_doc, [model.selection("SOLID", (0, -0.030528, -2.562454))], [model.selection("SOLID", (6.683953801956267e-16, -5, 1.2))])
 
 ### Create Group
 Group_1_objects = [model.selection("VERTEX", (-4.1398177019328, 0, 11.393656164374)),
@@ -708,7 +708,7 @@ Group_3_objects = [model.selection("FACE_4", (-2.517545082612181, -9.79305648457
 Group_3 = model.addGroup(Part_1_doc, "FACE", Group_3_objects)
 
 ### Create Partition
-Partition_1_objects = [model.selection("SOLID", (-0.01000739040276288, -0.02886888807097911, -2.568297753475152)),
+Partition_1_objects = [model.selection("SOLID", (0, -0.0201706, -2.568703)),
                        model.selection("FACE", "PartSet/XOZ"),
                        model.selection("FACE", "PartSet/YOZ")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, keepSubResults = True)
@@ -1090,7 +1090,7 @@ SketchLine_77.result().setName("SketchLine_118")
 SketchProjection_19 = Sketch_8.addProjection(model.selection("EDGE", (0, 5.790750667181333, 10.12202136327199)), False)
 SketchProjection_19.setName("SketchProjection_40")
 SketchProjection_19.result().setName("SketchProjection_40")
-SketchBSpline_1 = SketchProjection_19.createdFeature()
+SketchProj19_1 = SketchProjection_19.createdFeature()
 
 ### Create SketchProjection
 SketchProjection_20 = Sketch_8.addProjection(model.selection("EDGE", (0, 6.534999999999997, 9.721499999999999)), False)
@@ -1100,7 +1100,7 @@ SketchLine_78 = SketchProjection_20.createdFeature()
 SketchLine_78.setName("SketchLine_119")
 SketchLine_78.result().setName("SketchLine_119")
 Sketch_8.setCoincident(SketchLine_74.endPoint(), SketchLine_78.result())
-Sketch_8.setCoincident(SketchLine_74.startPoint(), SketchAPI_BSpline(SketchBSpline_1).startPoint())
+Sketch_8.setCoincident(SketchLine_74.startPoint(), SketchAPI_Arc(SketchProj19_1).startPoint())
 
 ### Create SketchLine
 SketchLine_79 = Sketch_8.addLine(5.676067550792231, 10.23944020672391, 5.829536340268943, 10.44848598250872)
@@ -1126,7 +1126,7 @@ Sketch_8.setCoincident(SketchLine_73.endPoint(), SketchLine_80.result())
 model.do()
 
 ### Create Revolution
-Revolution_9 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", (0, 5.830822237526045, 10.15645361216909))], model.selection("EDGE", "PartSet/OZ"), 360, 0, "Edges")
+Revolution_9 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", (0, 5.830822237526045, 10.3860737))], model.selection("EDGE", "PartSet/OZ"), 360, 0, "Edges")
 
 ### Create Split
 Split_4 = model.addSplit(Part_1_doc, [model.selection("COMPOUND", "all-in-Split_3")], [model.selection("COMPOUND", "all-in-Revolution_9")], keepSubResults = True)

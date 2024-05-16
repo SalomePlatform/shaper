@@ -19,6 +19,8 @@
 
 #include <Model_BodyBuilder.h>
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <Locale_Convert.h>
 
 #include <Model_Data.h>
@@ -938,7 +940,11 @@ int findAmbiguities(const TopoDS_Shape&           theShapeIn,
       continue;
     Standard_Integer anID = 0;
     for(TopTools_ListIteratorOfListOfShape aFaceIt(ancestors); aFaceIt.More(); aFaceIt.Next()) {
+#if OCC_VERSION_LARGE < 0x07080000
       anID ^= HashCode(aFaceIt.ChangeValue(), 1990657); // Pierpont prime
+#else
+      anID ^= ((std::hash<TopoDS_Shape>{}(aFaceIt.ChangeValue()) & IntegerLast()) % 1990657 + 1); // Pierpont prime
+#endif
     }
     if (aFacesIDs.IsBound(anID)) { // there found same edge, check they really have same faces
       const NCollection_List<TopoDS_Shape>& aSameFaces1 =

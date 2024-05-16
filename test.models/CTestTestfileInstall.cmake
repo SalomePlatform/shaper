@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2024  CEA, EDF
+# Copyright (C) 2021-2024  CEA, EDF
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,34 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME SHAPER)
-set(SALOME_TEST_LABEL_ADV SHAPR_ADV)
-set(SALOME_TEST_LABEL_SEQ SHAPR_SEQ)
+include(tests.set)
 
-# Add all test subdirs
-SUBDIRS(ConnectorAPI
-        HDFs
-        FeaturesPlugin
-        ConstructionPlugin
-        SketchPlugin
-        ModelAPI
-        FiltersPlugin
-        CollectionPlugin
-        BuildPlugin
-        ExchangePlugin
-        PythonAPI
-        GeomAPI
-        ModelHighAPI
-        ParametersPlugin
-        PythonAddons
-        SketchAPI
-        ConstructionAPI
-        PartSetAPI
-        GeomDataAPI
-        Config
-        ExchangeAPI
-        ModelGeomAlgo
-        Locale
-        test_API
-        TestModels
-)
+foreach(tfile ${TEST_NAMES})
+  set(TEST_NAME ${COMPONENT_NAME}_Models_${tfile})
+  add_test(${TEST_NAME} python ${tfile})
+  set_tests_properties(${TEST_NAME} PROPERTIES LABELS "${COMPONENT_NAME}")
+endforeach()

@@ -795,7 +795,7 @@ ExtrusionCut_4 = model.addExtrusionCut(Part_1_doc, ExtrusionCut_4_objects_1, mod
 # Test reexecution after parameter change
 Parameter_R.setValue(5)
 model.do()
-model.testResultsVolumes(ExtrusionCut_4, [502616.749082866765093058347702026])
+model.testResultsVolumes(ExtrusionCut_4, [502617.059752906498033553361892700])
 Parameter_R.setValue(3)
 model.end()
 
@@ -807,6 +807,6 @@ model.testNbSubShapes(ExtrusionCut_4, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(ExtrusionCut_4, GeomAPI_Shape.FACE, [81])
 model.testNbSubShapes(ExtrusionCut_4, GeomAPI_Shape.EDGE, [406])
 model.testNbSubShapes(ExtrusionCut_4, GeomAPI_Shape.VERTEX, [812])
-model.testResultsVolumes(ExtrusionCut_4, [502903.236060981987975537776947021])
+model.testResultsVolumes(ExtrusionCut_4, [502903.528831139323301613330841064])
 
 assert(model.checkPythonDump())

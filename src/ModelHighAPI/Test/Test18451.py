@@ -482,7 +482,7 @@ model.testNbSubShapes(Symmetry_2, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Symmetry_2, GeomAPI_Shape.FACE, [44])
 model.testNbSubShapes(Symmetry_2, GeomAPI_Shape.EDGE, [192])
 model.testNbSubShapes(Symmetry_2, GeomAPI_Shape.VERTEX, [384])
-model.testResultsVolumes(Symmetry_2, [0.714262940088946862715602037])
+model.testResultsVolumes(Symmetry_2, [0.71426763])
 
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
