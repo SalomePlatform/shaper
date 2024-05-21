@@ -18,13 +18,13 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-
 if __name__ == '__main__':
 
   import subprocess
   from time import sleep
   import sys, os
   import tempfile
+  import platform
 
   testTimeout = 600
   if len(sys.argv) > 3:
@@ -48,8 +48,11 @@ if __name__ == '__main__':
 
   isOk = True
   error = ""
-
-  proc = subprocess.Popen(["runSalome.py", "--modules", "SHAPER,GEOM,SHAPERSTUDY", "--gui", "--splash", "0", test_hdfpy, "args:" + hdffile + "," + testdatafile + "," + testlogfile])
+  runSalome = os.path.join(os.getenv("KERNEL_ROOT_DIR"), "bin", "salome", "runSalome.py")
+  cmd= [runSalome , "--modules", "SHAPER,GEOM,SHAPERSTUDY", "--gui", "--splash", "0", test_hdfpy, "args:" + hdffile + "," + testdatafile + "," + testlogfile]
+  if platform.system() == "Windows" :
+    cmd = ["python3", *cmd]
+  proc = subprocess.Popen(cmd)
   try:
     proc.communicate(timeout = testTimeout)
   except subprocess.TimeoutExpired:
