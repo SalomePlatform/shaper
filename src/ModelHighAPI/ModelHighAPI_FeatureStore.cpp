@@ -147,6 +147,26 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
+static void dumpFloat(std::ostringstream& theOutput, double x, int nDigits)
+{
+  static double pow10[] = {
+  	1.0, 10., 100., 1.e3, 1.e4, 1.e5, 1.e6, 1.e7, 1.e8, 1.e9, 
+    1.e10, 1.e11, 1.e12, 1.e13, 1.e14, 1.e16, 1.e17, 1.e18, 1.e19
+  };
+  int numdigits = log10(fabs(x)) + 1;
+  if (numdigits >= nDigits)
+  {
+    int idx = numdigits - nDigits;
+    theOutput << std::fixed << std::setprecision(0) << (0 < idx && idx < 20 ? std::round(x / pow10[idx]) * pow10[idx] : x);
+  }
+  else
+  {
+    int prec = (numdigits < 0 ? nDigits : nDigits - numdigits);
+     theOutput << std::fixed << std::setprecision(prec) << x;
+  }
+}
+
+
 static void dumpArray(std::ostringstream& theOutput, const double theArray[],
                       int theSize, int thePrecision = PRECISION)
 {
@@ -155,6 +175,7 @@ static void dumpArray(std::ostringstream& theOutput, const double theArray[],
       theOutput << " ";
     theOutput << std::fixed << std::setprecision(thePrecision)
               << (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]);
+    //dumpFloat(theOutput, (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]), thePrecision);
   }
 }
 
@@ -423,21 +444,15 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   if (aVolume > 1.e-5) {
     aResult<<"Volume: ";
     // volumes of too huge shapes write in the scientific format
-    if (aVolume >= 1.e5)
-      aResult<<std::scientific<<std::setprecision(7);
-    else
-      aResult<<std::fixed<<std::setprecision(3);
-    aResult<<aVolume<<std::endl;
+    dumpFloat(aResult, aVolume, 6);
+    aResult<<std::endl;
   }
   double anArea = GeomAlgoAPI_ShapeTools::area(theShape);
   if (anArea > 1.e-5) {
     aResult << "Area: ";
     // volumes of too huge shapes write in the scientific format
-    if (anArea >= 1.e5)
-      aResult << std::scientific << std::setprecision(7);
-    else
-      aResult << std::fixed << std::setprecision(3);
-    aResult << anArea << std::endl;
+    dumpFloat(aResult, anArea, 6);
+    aResult << std::endl;
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";

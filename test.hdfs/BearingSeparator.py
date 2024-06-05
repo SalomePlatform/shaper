@@ -25,7 +25,8 @@ if __name__ == "__main__":
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [115])
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [890])
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [1780])
-  model.testResultsVolumes(aPartFeature, [1311.87963636394])
+  model.testResultsVolumes(aPartFeature, [1311.87963636394], 6)
   model.testResultsAreas(aPartFeature, [3765.24411189])
 
-  assert(model.checkPythonDump())
+from ModelHighAPI import CHECK_NAMING
+assert(model.checkPythonDump(CHECK_NAMING))
