@@ -60,9 +60,13 @@ private:
   /// returns not empty string with error if something is different
   std::string compareData(std::shared_ptr<ModelAPI_Data> theData,
                  std::map<std::string, std::string>& theAttrs);
+  /// compares the main characteristics of a shape
+  /// returns not empty string with error if something is different
+  std::string compareShape(const std::string &theOrig,
+                           const std::string &theCurrent);
   /// dumps the attribute content to the string
   std::string dumpAttr(const AttributePtr& theAttr);
-  /// dumps the shape main charatceristics to string
+  /// dumps the shape main characteristics to string
   std::string dumpShape(std::shared_ptr<GeomAPI_Shape>& theShape);
 };
 

@@ -54,6 +54,7 @@
 #include <sstream>
 #include <iomanip>
 
+#define MAX_PRECISION 12
 #define PRECISION 5
 #define TOLERANCE (1.e-6)
 
@@ -132,7 +133,13 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
     if (theAttrs.find(aThisIter->first) == theAttrs.end()) {
       return "original model had no attribute '" + aThisIter->first + "'";
     }
-    if (theAttrs[aThisIter->first] != aThisIter->second) {
+    if (aThisIter->first == "__shape__") {
+      // Compare the shape dump
+      if (theAttrs[aThisIter->first] != aThisIter->second) {
+        return compareShape(theAttrs[aThisIter->first], aThisIter->second);
+      }
+    }
+    else if (theAttrs[aThisIter->first] != aThisIter->second) {
       return "attribute '" + aThisIter->first + "' is different (original != current) '" +
         theAttrs[aThisIter->first] + "' != '" + aThisIter->second + "'";
     }
@@ -147,25 +154,34 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
-static void dumpFloat(std::ostringstream& theOutput, double x, int nDigits)
+std::string ModelHighAPI_FeatureStore::compareShape(const std::string &theOrig, const std::string &theCurrent)
 {
-  static double pow10[] = {
-  	1.0, 10., 100., 1.e3, 1.e4, 1.e5, 1.e6, 1.e7, 1.e8, 1.e9, 
-    1.e10, 1.e11, 1.e12, 1.e13, 1.e14, 1.e16, 1.e17, 1.e18, 1.e19
-  };
-  int numdigits = log10(fabs(x)) + 1;
-  if (numdigits >= nDigits)
-  {
-    int idx = numdigits - nDigits;
-    theOutput << std::fixed << std::setprecision(0) << (0 < idx && idx < 20 ? std::round(x / pow10[idx]) * pow10[idx] : x);
-  }
-  else
-  {
-    int prec = (numdigits < 0 ? nDigits : nDigits - numdigits);
-     theOutput << std::fixed << std::setprecision(prec) << x;
-  }
-}
+  std::istringstream issOrig(theOrig), issCurr(theCurrent);
+  std::string strOrig, strCurr;
 
+  // Compare the topological information (as a single string)
+  bool bDifferent = (!std::getline(issOrig, strOrig) || !std::getline(issCurr, strCurr) || strOrig != strCurr);
+
+  if (!bDifferent) {
+    auto cmpDouble = [](double aOrig, double aCurr, double tol=1.e-5) {
+      return (fabs(aOrig) < tol ? fabs(aCurr) < tol : ((fabs(aOrig-aCurr) / fabs(aOrig)) < tol));
+    };
+    auto cmpPoint = [](double pOrig[], double pCurr[], double tol=1.e-4) {
+      return (sqrt((pOrig[0]-pCurr[0])*(pOrig[0]-pCurr[0]) + (pOrig[1]-pCurr[1])*(pOrig[1]-pCurr[1]) + (pOrig[2]-pCurr[2])*(pOrig[2]-pCurr[2])) < tol);
+    };
+
+    // Compare the physical properties (Volume, Area, Center of Mass as doubles with tolerance)
+    double volOrig{}, areaOrig{}, pntOrig[3]={0.,0.,0.};
+    double volCurr{}, areaCurr{}, pntCurr[3]={0.,0.,0.};
+    issOrig >> volOrig >> areaOrig >> pntOrig[0] >> pntOrig[1] >> pntOrig[2];
+    issCurr >> volCurr >> areaCurr >> pntCurr[0] >> pntCurr[1] >> pntCurr[2];
+    bDifferent = (!cmpDouble(volOrig, volCurr) || !cmpDouble(areaOrig, areaCurr) || !cmpPoint(pntOrig, pntCurr));
+  }
+  if (bDifferent)
+    return "attribute '__shape__' is different (original != current) '" + theOrig + "' != '" + theCurrent + "'";
+
+  return "";
+}
 
 static void dumpArray(std::ostringstream& theOutput, const double theArray[],
                       int theSize, int thePrecision = PRECISION)
@@ -175,7 +191,6 @@ static void dumpArray(std::ostringstream& theOutput, const double theArray[],
       theOutput << " ";
     theOutput << std::fixed << std::setprecision(thePrecision)
               << (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]);
-    //dumpFloat(theOutput, (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]), thePrecision);
   }
 }
 
@@ -436,28 +451,27 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
       std::string aTypeStr = anExp.current()->shapeTypeStr();
       int aCount = 0;
       for (; anExp.more(); anExp.next()) aCount++;
-      aResult << aTypeStr.c_str() <<  ": " << aCount << std::endl;
+      aResult << aCount << " ";
+    }
+    else
+    {
+      aResult << "0 ";
     }
   }
+  aResult << "\n";
   // output the main characteristics
   double aVolume = GeomAlgoAPI_ShapeTools::volume(theShape);
   if (aVolume > 1.e-5) {
-    aResult<<"Volume: ";
-    // volumes of too huge shapes write in the scientific format
-    dumpFloat(aResult, aVolume, 6);
-    aResult<<std::endl;
+    aResult << std::fixed << std::setprecision(MAX_PRECISION) << aVolume << " ";
   }
+  else
+    aResult << "0.0 ";
   double anArea = GeomAlgoAPI_ShapeTools::area(theShape);
-  if (anArea > 1.e-5) {
-    aResult << "Area: ";
-    // volumes of too huge shapes write in the scientific format
-    dumpFloat(aResult, anArea, 6);
-    aResult << std::endl;
-  }
+  if (anArea > 1.e-5)
+    aResult << std::fixed << std::setprecision(MAX_PRECISION) << anArea << " ";
+  else
+    aResult << "0.0 ";
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
-  aResult<<"Center of mass: ";
-  double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};
-  dumpArray(aResult, aCenterVals, 3, 5);
-  aResult<<std::endl;
+  aResult << std::fixed << std::setprecision(MAX_PRECISION) << aCenter->x() << " " << aCenter->y() << " " << aCenter->z() << std::endl;
   return aResult.str();
 }
