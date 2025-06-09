@@ -111,6 +111,7 @@ SET(TEST_NAMES_PARA
                TestRemoveSubShapes5.py
                TestRemoveSubShapes6.py
                TestPipe.py
+               TestPipe_CircleAlongArc.py
                TestPipe_DoNotMovePath.py
                TestPipe_Edge.py
                TestPipe_Wire.py

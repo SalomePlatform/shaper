@@ -454,7 +454,6 @@ gp_Trsf getPathToBaseTranslation(const TopoDS_Shape& theBase, const TopoDS_Shape
   gp_Trsf aTranslation;
 
   BRepExtrema_DistShapeShape aDist(theBase, thePath);
-  aDist.Perform();
   if (aDist.IsDone() && aDist.Value() > Precision::Confusion()) {
     gp_Pnt aPntBase = aDist.PointOnShape1(1);
     gp_Pnt aPntPath = aDist.PointOnShape2(1);
