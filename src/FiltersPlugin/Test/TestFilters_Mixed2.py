@@ -19,6 +19,7 @@
 
 from salome.shaper import model
 from GeomAPI import *
+from ModelHighAPI import CHECK_NAMING
 
 model.begin()
 partSet = model.moduleDocument()
@@ -163,4 +164,4 @@ model.begin()
 Group_1_objects = [model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Back"), model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Left"), model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Right"), model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Bottom"), Filters]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 model.end()
-assert(model.checkPythonDump())
+assert(model.checkPythonDump(CHECK_NAMING))

@@ -24,6 +24,12 @@
 #include "Model_Data.h"
 #include "Model_Objects.h"
 
+#include "ModelAPI_Session.h"
+#include "ModelAPI_FiltersFactory.h"
+#include "ModelAPI_FiltersFeature.h"
+
+#include <Events_Loop.h>
+
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -545,4 +551,48 @@ void Model_AttributeSelectionList::setFilters(FiltersFeaturePtr theFeature)
   }
   // remove attribute if something is wrong
   myLab.ForgetAttribute(TDataStd_ReferenceList::GetID());
+}
+
+void Model_AttributeSelectionList::applyFilters()
+{
+  FiltersFeaturePtr aFiltersFeat = this->filters();
+  if (!aFiltersFeat->filters().empty()) {
+    // finish operation to make sure the selection is done on the current state of the history
+    static Events_ID anID = Events_Loop::eventByName("FinishOperation");
+    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
+    Events_Loop* aLoop = Events_Loop::loop();
+    aLoop->send(aMsg);
+
+    // obtaining the selected shapes from the ModelAPI_FiltersFactory select method
+    GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::shapeTypeByStr(this->selectionType());
+    SessionPtr aSession = ModelAPI_Session::get();
+    std::list< std::pair< ResultPtr, GeomShapePtr > > aResList = aSession->filters()->select(aFiltersFeat, aShapeType);
+    std::list< std::pair<ResultPtr, GeomShapePtr> >::const_iterator itSelected = aResList.cbegin();
+
+    // clearing the content of the AttrList
+    this->clear();
+
+    // filling the content of the AttrList with the results of the select() method
+    for (; itSelected != aResList.cend(); itSelected++) {
+      ResultPtr aCurRes = (*itSelected).first;
+      GeomShapePtr aSubShape = (*itSelected).second;
+      this->append(aCurRes, aSubShape);
+    }
+  }
+}
+
+void Model_AttributeSelectionList::removeFilters()
+{
+  FiltersFeaturePtr aFilters = this->filters();
+  if (aFilters.get()) {
+    if (!aFilters->filters().empty()) {
+      std::list<std::string> aFiltersList = aFilters->filters();
+      std::list<std::string>::iterator aFilterName = aFiltersList.begin();
+      for(; aFilterName != aFiltersList.end(); aFilterName++) {
+        aFilters->removeFilter(*aFilterName);
+      }
+    }
+  }
+  aFilters.reset();
+  myLab.ForgetAttribute(kSELECTION_FILTERS_REF);
 }

@@ -41,12 +41,17 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
   ModelAPI
   ModelHighAPI
+  Locale
+  ${PyInterp}
+  ${PYTHON_LIBRARIES}
 )
 
 INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Events
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+  ${PROJECT_SOURCE_DIR}/src/Locale
+  ${SUIT_INCLUDE}
 )
 
 # Plugin headers dependency
@@ -74,6 +79,7 @@ SET(SWIG_LINK_LIBRARIES
   CollectionAPI
   ModelHighAPI
   ModelAPI
+  ${PyInterp}
   ${PYTHON_LIBRARIES}
 )
 

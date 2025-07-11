@@ -23,6 +23,7 @@
 #include "FiltersAPI.h"
 
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelHighAPI_Double.h>
 
 #include <ModelHighAPI_Dumper.h>
@@ -57,6 +58,9 @@ public:
   FILTERSAPI_EXPORT
   FiltersAPI_Argument(const AttributeSelectionPtr& theSelection);
 
+  FILTERSAPI_EXPORT
+  FiltersAPI_Argument(const AttributeSelectionListPtr& theSelectionList);
+
   /// Destructor
   FILTERSAPI_EXPORT
   virtual ~FiltersAPI_Argument();
@@ -75,6 +79,7 @@ private:
   std::string myValue;
   ModelHighAPI_Selection mySelection;
   AttributeSelectionPtr mySelectionAttr;
+  AttributeSelectionListPtr mySelectionListAttr;
 };
 
 #endif

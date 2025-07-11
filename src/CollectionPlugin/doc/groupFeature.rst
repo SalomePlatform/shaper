@@ -38,7 +38,9 @@ Input fields:
  
 - The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection. To delete entities from the list, select them and call pop-up menu *Delete* item.
 
-- **Selection by filters** button opens "selection by filters" property panel and allows to select entities by set of selected filters. For details on filters see :ref:`filtersPlugin`
+- **Selection by filters** button opens "selection by filters" property panel and allows to select entities by set of selected filters. For details on filters see :ref:`filtersPlugin`. Note that manual selection cannot be combined with filter-based selection. To achieve a combined selection, you can use boolean operations on groups or remove the filters and complete the selection manually.
+
+- **Remove filters** button removes the filters in case the selected entities were obtained using the "selection by filters" panel. It retains the selected entities in the selection list even after the filters are removed.
 
 - **Show only** button allows to hide all other objects and shapes and show only selected ones.
 

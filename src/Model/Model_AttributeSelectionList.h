@@ -126,6 +126,12 @@ public:
   /// Sets a selection filters feature if it is defined for this selection list
   MODEL_EXPORT virtual void setFilters(FiltersFeaturePtr theFeature);
 
+  /// Applies the filters to this selection list
+  MODEL_EXPORT virtual void applyFilters();
+
+  /// Removes the filters of this selection list
+  MODEL_EXPORT virtual void removeFilters();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);

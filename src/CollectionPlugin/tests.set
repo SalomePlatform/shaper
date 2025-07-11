@@ -72,6 +72,10 @@ SET(TEST_NAMES
                TestGroupMoveAndSplit5.py
                Test3114.py
                Test18739.py
+               TestGroupFiltersArgSelectedShape.py
+               TestGroupFiltersEmptySelection.py
+               TestGroupFiltersWithParameters.py
+               TestGroupRemoveFilters.py
 )
 
 SET(UNSTABLE_TESTS

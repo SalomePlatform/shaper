@@ -52,11 +52,7 @@ FiltersAPI_Filter::FiltersAPI_Filter(const std::string& theName,
     AttributeSelectionListPtr aSelList =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anArgIt);
     if (aSelList) {
-      int aSize = aSelList->size();
-      for (int i = 0; i < aSize; ++i) {
-        AttributeSelectionPtr aSelection = aSelList->value(i);
-        myFilterArguments.push_back(FiltersAPI_Argument(aSelection));
-      }
+      myFilterArguments.push_back(FiltersAPI_Argument(aSelList));
       continue;
     }
 

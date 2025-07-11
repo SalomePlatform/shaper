@@ -916,37 +916,45 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   // update the selection list attributes if any
   aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
   for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-    std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
     // #19071 : avoid sending of update event in cycle
     bool aWasBlocked = theFeature->data()->blockSendAttributeUpdated(true);
-    // list to keep the shared pointers while update is blocked (in messages raw pointers are used)
+    // List to keep the shared pointers while update is blocked
+    // In messages sent through blockSendAttributeUpdated(), raw pointers are used
     std::list<AttributeSelectionPtr> anAttrList;
-    for(int a = aSel->size() - 1; a >= 0; a--) {
-      std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
-      if (aSelAttr) {
-        ObjectPtr aContext = aSelAttr->context();
-        // update argument only if the referenced object is ready to use
-        if (aContext.get() && !aContext->isDisabled()) {
-          if (isReason(theFeature, aContext)) {
-            anAttrList.push_back(aSelAttr);
-            if (!aSelAttr->update()) {
-              bool isObligatory = !aFactory->isNotObligatory(
-                theFeature->getKind(), theFeature->data()->id(aSel)) &&
-                aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-              if (isObligatory)
-                aState = ModelAPI_StateInvalidArgument;
+
+    // Apply the filters if present
+    if (aSelList->filters().get()) {
+      aSelList->applyFilters();
+    } else {
+      for(int a = aSelList->size() - 1; a >= 0; a--) {
+        std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSelList->value(a));
+        if (aSelAttr) {
+          ObjectPtr aContext = aSelAttr->context();
+          // update argument only if the referenced object is ready to use
+          if (aContext.get() && !aContext->isDisabled()) {
+            if (isReason(theFeature, aContext)) {
+              anAttrList.push_back(aSelAttr);
+              if (!aSelAttr->update()) {
+                bool isObligatory = !aFactory->isNotObligatory(
+                  theFeature->getKind(), theFeature->data()->id(aSelList)) &&
+                  aFactory->isCase(theFeature, theFeature->data()->id(aSelList));
+                if (isObligatory)
+                  aState = ModelAPI_StateInvalidArgument;
+              }
             }
+          } else if (aContext.get()) {
+            // here it may be not obligatory, but if the reference is wrong, it should not be correct
+            bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSelList));
+            if (isObligatory)
+              aState = ModelAPI_StateInvalidArgument;
           }
-        } else if (aContext.get()) {
-          // here it may be not obligatory, but if the reference is wrong, it should not be correct
-          bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-          if (isObligatory)
-            aState = ModelAPI_StateInvalidArgument;
         }
       }
     }
+
     if (!aWasBlocked)
       theFeature->data()->blockSendAttributeUpdated(false);
   }
@@ -1092,11 +1100,16 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
     aRefs = (*anObj)->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
     for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
       std::set<int> aRemoveSet;
-      std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+      std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
-      for(int a = aSel->size() - 1; a >= 0; a--) {
+      // If the selList is built based on filters: clear and reapply the filter
+      if (aSelList->filters().get()) {
+        aSelList->applyFilters();
+      }
+      for(int a = aSelList->size() - 1; a >= 0; a--) {
         AttributeSelectionPtr aSelAttr =
-          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSelList->value(a));
+
         if (aSelAttr.get()) {
           bool aRemove = false;
           aSelAttr->updateInHistory(aRemove);
@@ -1105,7 +1118,7 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
           }
         }
       }
-      aSel->remove(aRemoveSet);
+      aSelList->remove(aRemoveSet);
     }
   }
 }

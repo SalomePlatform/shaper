@@ -64,9 +64,11 @@
 #include <QMainWindow>
 #include <QCheckBox>
 #include <QPushButton>
+#include <QPalette>
 
 #include <memory>
 #include <string>
+#include <iostream>
 
 //#define DEBUG_UNDO_REDO
 
@@ -86,6 +88,17 @@ void printHistoryInfo(const QString& theMethodName, int theCurrentHistoryIndex,
 }
 #endif
 
+// CSS QListView disabled stylesheet, using system colors
+const QString aListViewDisabledStyle = QString(
+        "QListWidget { background-color: %1; color: %2; selection-background-color: %3; selection-color: %4; }"
+        "QListWidget::item:selected { border: 1px solid %5; background: %6; color: %7; }")
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::Base).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::Text).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::Highlight).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::HighlightedText).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::Highlight).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::Highlight).name())
+        .arg(QApplication::palette().color(QPalette::Disabled, QPalette::HighlightedText).name());
 
 QStringList getIconsList(const QStringList& theNames)
 {
@@ -208,6 +221,13 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     myShowOnlyBtn->setCheckable(true);
     myShowOnlyBtn->setChecked(false);
     connect(myShowOnlyBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
+
+    myRemoveFiltersBtn = new QPushButton(tr("Remove filters"), aFltrWgt);
+    myRemoveFiltersBtn->setEnabled(false);
+    connect(myRemoveFiltersBtn, SIGNAL(clicked()), SLOT(onRemoveFilters()));
+
+    aFltrLayout->addWidget(myRemoveFiltersBtn);
+    aFltrLayout->addStretch();
     aFltrLayout->addWidget(myShowOnlyBtn);
 
     myMainLayout->addWidget(aFltrWgt);
@@ -503,6 +523,17 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
+  // avoid the highlighting when hovering over shapes when the selection is made using filters
+  AttributeSelectionListPtr aAttrList = feature()->selectionList(attributeID());
+  if (aAttrList.get()) {
+    FiltersFeaturePtr aFilters = aAttrList->filters();
+    if (aFilters.get()) {
+      if (!aFilters->filters().empty()) {
+        return false;
+      }
+    }
+  }
+
   bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
@@ -598,6 +629,11 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
+  // Remove filters when changing selection type
+  AttributeSelectionListPtr aAttrList = feature()->selectionList(attributeID());
+  if (aAttrList.get())
+    aAttrList->removeFilters();
+
   // Clear current selection in order to avoid updating of object browser with obsolete indexes
   // which can appear because of results deletetion after changing a type of selection
   QString aSelectionType = myTypeCtrl->textValue();
@@ -797,6 +833,13 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetMultiSelector::getAttributeSelec
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionList()
 {
+  // resets the style in case the filters have been removed in a group
+  if (myUseFilters.length() > 0) {
+    myListView->getControl()->setStyleSheet(""); // set default style sheet for the QListView
+    if (myRemoveFiltersBtn)
+      myRemoveFiltersBtn->setEnabled(false);
+  }
+
   myListView->getControl()->clear();
 
   DataPtr aData = myFeature->data();
@@ -807,6 +850,13 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
       myListView->addItem(QString::fromStdWString(aAttr->namingName()), i);
+      FiltersFeaturePtr aFilters = aSelectionListAttr->filters();
+      if (aFilters.get()) {
+        if (!aFilters->filters().empty()) {
+          myRemoveFiltersBtn->setEnabled(true);
+          myListView->getControl()->setStyleSheet(aListViewDisabledStyle); // set disabled style sheet
+        }
+      }
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -884,7 +934,48 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
 {
   myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
                                          true);
+
+  // disabling the delete action when selecting an item in a list created using filters
+  AttributeSelectionListPtr aAttrList = feature()->selectionList(attributeID());
+  if (aAttrList.get()) {
+    FiltersFeaturePtr aFilters = aAttrList->filters();
+    if (aFilters.get()) {
+      if (!aFilters->filters().empty()) {
+        QList<QAction*> aActions = myListView->getControl()->actions();
+        for (QAction* anAction : aActions) {
+          if (anAction->objectName() == "deleteAction") {
+              anAction->setEnabled(false);
+          }
+        }
+      }
+    }
+  }
 }
+
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onRemoveFilters()
+{
+  AttributeSelectionListPtr aAttrList = feature()->selectionList(attributeID());
+  if (aAttrList.get()) {
+    aAttrList->removeFilters();
+  }
+
+  // call the same post process as onSelectionTypeChanged() slot
+  updateObject(myFeature);
+  restoreValue();
+  myWorkshop->setSelected(getAttributeSelection());
+  // may be the feature's result is not displayed, but attributes should be
+  // hope that something is redisplayed by object updated
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments, false);
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeResults, true);
+  // clear history should follow after set selected to do not increase history by setSelected
+  clearSelectedHistory();
+
+  if (myWorkshop->propertyPanel()->activeWidget() != this)
+    myWorkshop->propertyPanel()->activateWidget(this);
+}
+
 
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::getSelectedAttributeIndices(std::set<int>& theAttributeIds)

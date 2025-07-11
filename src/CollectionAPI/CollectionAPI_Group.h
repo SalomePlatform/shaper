@@ -60,6 +60,10 @@ public:
   /// Dump wrapped feature
   COLLECTIONAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+  private:
+  // Check the content of the selection attributes inside the filters
+  bool isFiltersSelectionEmpty() const;
 };
 
 /// Pointer on Group object.

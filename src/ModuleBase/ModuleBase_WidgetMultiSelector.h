@@ -143,6 +143,9 @@ protected slots:
 
   void onShowOnly(bool);
 
+  // Slot is called when filters are removed
+  void onRemoveFilters();
+
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();
@@ -263,6 +266,7 @@ protected:
   QCheckBox* myGeomCheck;
   ModuleBase_FilterStarter* myFiltersWgt;
   QPushButton* myShowOnlyBtn;
+  QPushButton* myRemoveFiltersBtn;
 
   QObjectPtrList myVisibleObjects;
   QStringList myAllowedObjects;

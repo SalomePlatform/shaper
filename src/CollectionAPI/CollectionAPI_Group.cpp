@@ -24,6 +24,10 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <Locale_Convert.h>
+#include <Python.h>
+#include <PyInterp_Interp.h>
+
 //==================================================================================================
 CollectionAPI_Group::CollectionAPI_Group(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -52,7 +56,47 @@ void CollectionAPI_Group::setGroupList(const std::list<ModelHighAPI_Selection>& 
 {
   fillAttribute(theGroupList, mygroupList);
 
+  // Checks the content of the selection inside the filters
+  // If this content is empty (old scripts using filters), the group is created without filters
+  // A warning is sent in the Python console
+  if (isFiltersSelectionEmpty()) {
+    mygroupList->removeFilters();
+    std::string aFeatureName = Locale::Convert::toString(name());
+    PyLockWrapper lck;
+    std::string aMessage = "WARNING! The filters in " + aFeatureName + " have been removed: " +\
+               "the selection argument of one of them was empty.";
+    PySys_WriteStdout("%s\n", aMessage.c_str());
+  }
+
   execute();
+}
+
+//==================================================================================================
+bool CollectionAPI_Group::isFiltersSelectionEmpty() const
+{
+  FiltersFeaturePtr aFiltersFeature = mygroupList->filters();
+  if (aFiltersFeature.get()) {
+    for (std::string const& aFilter: aFiltersFeature->filters()) {
+      std::list<AttributePtr> aListArgs = aFiltersFeature->filterArgs(aFilter);
+      for (AttributePtr const& anAttr: aListArgs) {
+        std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttr);
+        if (aSelList.get()) {
+          if (aSelList->size() == 0) {
+            return true; // filter argument is an empty selection list attribute
+          }
+        }
+        std::shared_ptr<ModelAPI_AttributeSelection> aSel =
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
+        if (aSel.get()) {
+          if (!aSel->isInitialized()) {
+            return true; // filter argument is an empty selection attribute
+          }
+        }
+      }
+    }
+  }
+  return false;
 }
 
 //==================================================================================================

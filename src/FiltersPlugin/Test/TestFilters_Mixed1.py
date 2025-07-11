@@ -19,6 +19,7 @@
 
 from salome.shaper import model
 from GeomAPI import *
+from ModelHighAPI import CHECK_NAMING
 
 model.begin()
 partSet = model.moduleDocument()
@@ -68,4 +69,4 @@ model.checkFilter(Part_1_doc, model, Filters, Reference)
 model.begin()
 Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_2_1/To_Face"), model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_1/SketchCircle_1_2"), Filters])
 model.end()
-assert(model.checkPythonDump())
+assert(model.checkPythonDump(CHECK_NAMING))

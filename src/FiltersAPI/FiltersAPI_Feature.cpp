@@ -25,6 +25,7 @@
 
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
+#include "ModelHighAPI_Services.h"
 
 FiltersAPI_Feature::FiltersAPI_Feature(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -61,6 +62,9 @@ static void separateArguments(const std::list<FiltersAPI_Argument>& theArguments
 
 void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
 {
+  // finish operation to make sure the filters are applied on the current state of history
+  apply();
+
   FiltersFeaturePtr aBase = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(feature());
   for (std::list<FilterAPIPtr>::const_iterator anIt = theFilters.begin();
        anIt != theFilters.end(); ++anIt) {

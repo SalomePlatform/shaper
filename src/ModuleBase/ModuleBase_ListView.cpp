@@ -46,12 +46,14 @@ ModuleBase_ListView::ModuleBase_ListView(QWidget* theParent, const QString& theO
 
   myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"),
                           theParent, this, SLOT(onCopyItem()));
+  myCopyAction->setObjectName("copyAction");
   myCopyAction->setEnabled(false);
   myListControl->addAction(myCopyAction);
   SUIT_ShortcutMgr::get()->registerAction("SHAPER/Edit/#Clipboard_Copy", myCopyAction);
 
   myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
                           theParent, this, SIGNAL(deleteActionClicked()));
+  myDeleteAction->setObjectName("deleteAction");
   myDeleteAction->setEnabled(false);
   myListControl->addAction(myDeleteAction);
 

@@ -203,6 +203,10 @@
         <translation>Type</translation>
     </message>
     <message>
+        <source>Remove filters</source>
+        <translation>Supprimer filtres</translation>
+    </message>
+    <message>
         <source>Show only</source>
         <translation>Montrer seulement</translation>
     </message>

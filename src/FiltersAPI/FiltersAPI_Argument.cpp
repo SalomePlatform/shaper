@@ -53,15 +53,25 @@ FiltersAPI_Argument::FiltersAPI_Argument(const AttributeSelectionPtr& theSelecti
 {
 }
 
+FiltersAPI_Argument::FiltersAPI_Argument(const AttributeSelectionListPtr& theSelectionList)
+  : mySelectionListAttr(theSelectionList)
+{
+}
+
 FiltersAPI_Argument::~FiltersAPI_Argument()
 {
 }
 
 void FiltersAPI_Argument::dump(ModelHighAPI_Dumper& theDumper) const
 {
-  if (mySelectionAttr) {
-    // write empty selection attribute, because parametrization is not supported yet
-    theDumper << "model.selection()"; // mySelectionAttr;
+  if (mySelectionListAttr) {
+    for(int anIndex = 0; anIndex < mySelectionListAttr->size(); ++anIndex) {
+      AttributeSelectionPtr anAttribute = mySelectionListAttr->value(anIndex);
+      theDumper << anAttribute << ", ";
+    }
+  }
+  else if (mySelectionAttr) {
+    theDumper <<  mySelectionAttr;
   }
   else if (mySelection.variantType() == ModelHighAPI_Selection::VT_Empty) {
     if (myDouble.value() > std::numeric_limits<double>::lowest() ) {

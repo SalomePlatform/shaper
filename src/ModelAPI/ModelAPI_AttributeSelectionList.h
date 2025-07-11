@@ -131,6 +131,12 @@ public:
   /// Sets a selection filters feature if it is defined for this selection list
   MODELAPI_EXPORT virtual void setFilters(FiltersFeaturePtr theFeature) = 0;
 
+  /// Applies the filters to this selection list
+  MODELAPI_EXPORT virtual void applyFilters() = 0;
+
+  /// Removes the filters of this selection list
+  MODELAPI_EXPORT virtual void removeFilters() = 0;
+
   /// Returns true if the whole result selection corresponds to selection of all sub-shapes.
   MODELAPI_EXPORT virtual const bool isWholeResultAllowed() const {
     return myIsWholeResultAllowed;
