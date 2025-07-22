@@ -52,12 +52,13 @@ std::shared_ptr<GeomAPI_Shape> STLImport(const std::string& theFileName,
     if (!aSewedShape.IsNull())
       aResShape = aSewedShape;
 #endif
-    if(aResShape.ShapeType() == TopAbs_SHELL)
-    {
-      BRepBuilderAPI_MakeSolid soliMaker(TopoDS::Shell(aResShape));
-      soliMaker.Build();
-      if(soliMaker.IsDone())
-        aResShape = soliMaker.Shape();
+    if(aResShape.ShapeType() == TopAbs_SHELL) {
+      if (aResShape.Closed()) {
+        BRepBuilderAPI_MakeSolid soliMaker(TopoDS::Shell(aResShape));
+        soliMaker.Build();
+        if(soliMaker.IsDone())
+          aResShape = soliMaker.Shape();
+      }
     }
   }
   catch (Standard_Failure const& anException) {

@@ -46,6 +46,16 @@ def testImportSTL():
     Import_2.setName("cube_binary")
     Import_2.result().setName("cube_binary")
 
+    Import_3 = model.addImport(Part_1_doc, os.path.join(data_dir, "open_cube_ascii.stl"))
+    model.do()
+    Import_3.setName("cube_open_ascii")
+    Import_3.result().setName("cube_open_ascii")
+
+    Import_4 = model.addImport(Part_1_doc, os.path.join(data_dir, "open_cube_binary.stl"))
+    model.do()
+    Import_4.setName("cube_open_binary")
+    Import_4.result().setName("cube_open_binary")
+
     model.end()
 
     #=============================================================================
@@ -80,6 +90,37 @@ def testImportSTL():
     assert(abs(dz-10) <= tol)
     model.testResultsVolumes(Import_2, [1000], theNbSignificantDigits = 7)
 
+    # ASCII STL file (shell, open cube) :
+    model.checkResult(Import_3, model, 1, [0], [0], [10], [30], [60])
+    # Checks nb of unique shapes (shell included)
+    model.testResults(Import_3, 1, [0], [1], [10], [17], [8])
+    r=Import_1.defaultResult()
+    s=r.shape()
+    dim=s.computeSize()
+    dim=dim[1:]
+    dx=abs(dim[3]-dim[0])
+    dy=abs(dim[4]-dim[1])
+    dz=abs(dim[5]-dim[2])
+    tol=1e-06
+    assert(abs(dx-14) <= tol)
+    assert(abs(dy-8) <= tol)
+    assert(abs(dz-5) <= tol)
+
+    # Binary STL file (shell, open cube) :
+    model.checkResult(Import_4, model, 1, [0], [0], [10], [30], [60])
+    # Checks nb of unique shapes (shell included)
+    model.testResults(Import_4, 1, [0], [1], [10], [17], [8])
+    r=Import_1.defaultResult()
+    s=r.shape()
+    dim=s.computeSize()
+    dim=dim[1:]
+    dx=abs(dim[3]-dim[0])
+    dy=abs(dim[4]-dim[1])
+    dz=abs(dim[5]-dim[2])
+    tol=1e-06
+    assert(abs(dx-14) <= tol)
+    assert(abs(dy-8) <= tol)
+    assert(abs(dz-5) <= tol)
 
 if __name__ == '__main__':
     testImportSTL()
