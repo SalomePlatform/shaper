@@ -111,7 +111,9 @@ void Model_AttributeSelectionList::append(
   owner()->data()->sendAttributeUpdated(this);
 }
 
-void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const std::string& theType)
+void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, 
+                                          const std::string& theType, 
+                                          const bool theIsIgnoreGroups)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
@@ -124,7 +126,7 @@ void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const st
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
-  aNewAttr->selectSubShape(theType, thePoint);
+  aNewAttr->selectSubShape(theType, thePoint, theIsIgnoreGroups);
   owner()->data()->sendAttributeUpdated(this);
 }
 

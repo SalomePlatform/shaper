@@ -54,7 +54,7 @@ CollectionAPI_Group::~CollectionAPI_Group()
 //==================================================================================================
 void CollectionAPI_Group::setGroupList(const std::list<ModelHighAPI_Selection>& theGroupList)
 {
-  fillAttribute(theGroupList, mygroupList);
+  fillAttribute(theGroupList, mygroupList, true /*ignore selection other groups*/);
 
   // Checks the content of the selection inside the filters
   // If this content is empty (old scripts using filters), the group is created without filters

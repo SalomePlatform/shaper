@@ -98,7 +98,7 @@ public:
 
   /// Append to list attribute
   MODELHIGHAPI_EXPORT virtual
-    void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
+    void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute, const bool theIsIgnoreGroups = false) const;
 
   /// \return variant type.
   MODELHIGHAPI_EXPORT

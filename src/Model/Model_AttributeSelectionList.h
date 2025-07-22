@@ -61,7 +61,8 @@ public:
 
   /// Adds the new reference to the end of the list by inner point on the selected shape
   MODEL_EXPORT virtual void append(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
-                                   const std::string& theType);
+                                   const std::string& theType,
+                                   const bool theIsIgnoreGroups = false);
 
   /// Adds the new reference to the end of the list by weak naming index
   MODEL_EXPORT virtual void append(const std::string& theType,

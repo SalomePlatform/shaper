@@ -205,7 +205,8 @@ void fillAttribute(const ModelHighAPI_Selection & theValue,
 
 //--------------------------------------------------------------------------------------
 void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
-                   const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute)
+                   const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute,
+                   const bool theIsIgnoreGroups)
 {
   theAttribute->clear();
 
@@ -216,7 +217,7 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
   }
 
   for (auto it = theValue.begin(); it != theValue.end(); ++it)
-    it->appendToList(theAttribute);
+    it->appendToList(theAttribute, theIsIgnoreGroups);
 }
 
 //--------------------------------------------------------------------------------------
