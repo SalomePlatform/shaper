@@ -109,7 +109,8 @@ public:
 
   /// Selects sub-shape by its inner point
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
-                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint);
+                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+                                           const bool theIsIgnoreGroups = false);
   /// Selects sub-shape by weak naming index
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
     const std::wstring& theContextName, const int theIndex);

@@ -80,4 +80,5 @@ SET(TEST_NAMES
 
 SET(UNSTABLE_TESTS
                TestCreateShapesFromGroups.py
+               Test46029.py
 )

@@ -116,7 +116,8 @@ void ModelHighAPI_Selection::fillAttribute(
 
 //--------------------------------------------------------------------------------------
 void ModelHighAPI_Selection::appendToList(
-    const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const
+    const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute, 
+    const bool theIsIgnoreGroups) const
 {
   switch(myVariantType) {
     case VT_Empty: return;
@@ -129,7 +130,7 @@ void ModelHighAPI_Selection::appendToList(
       return;
     case VT_TypeInnerPointPair:
       // Note: the reverse order (first - type, second - selected point)
-      theAttribute->append(myTypeInnerPointPair.second, myTypeInnerPointPair.first);
+      theAttribute->append(myTypeInnerPointPair.second, myTypeInnerPointPair.first, theIsIgnoreGroups);
       return;
     case VT_WeakNamingPair:
       // Note: the reverse order (first - type, second - selected point)

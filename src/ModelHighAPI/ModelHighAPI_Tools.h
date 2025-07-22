@@ -131,7 +131,8 @@ void fillAttribute(const ModelHighAPI_Selection & theValue,
 
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
-                   const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute);
+                   const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute,
+                   const bool theIsIgnoreGroups = false);
 
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::string & theValue,

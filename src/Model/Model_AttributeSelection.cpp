@@ -1007,7 +1007,8 @@ void Model_AttributeSelection::selectSubShape(
 }
 
 void Model_AttributeSelection::selectSubShape(const std::string& theType,
-                                              const GeomPointPtr& thePoint)
+                                              const GeomPointPtr& thePoint,
+                                              const bool theIsIgnoreGroups)
 {
   if (theType.empty() || !thePoint)
     return;
@@ -1091,6 +1092,9 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
         ++anApIt; // skip this shape, because one of the previous is selected
 
       if (anApIt != anAppropriate.end()) {
+        if(theIsIgnoreGroups && anApIt->myResult->groupName() == ModelAPI_ResultGroup::group()){
+          continue;
+        }
         if (anApIt->myCenterType == (int)ModelAPI_AttributeSelection::NOT_CENTER)
           setValue(anApIt->myResult, anApIt->mySubshape);
         else
