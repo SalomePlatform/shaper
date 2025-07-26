@@ -20,7 +20,10 @@
 import os, inspect
 from salome.shaper import model
 
-from PyQt5.Qt import QApplication
+if 'SALOME_USE_PYSIDE' in os.environ:
+  from PySide2.QtWidgets import QApplication
+else:
+  from PyQt5.Qt import QApplication
 
 import salome
 salome.salome_init_without_session()
