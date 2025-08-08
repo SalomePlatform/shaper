@@ -72,5 +72,8 @@ SET(TEST_NAMES
                TestGroupMoveAndSplit5.py
                Test3114.py
                Test18739.py
+)
+
+SET(UNSTABLE_TESTS
                TestCreateShapesFromGroups.py
 )

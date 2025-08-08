@@ -121,7 +121,7 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 include(tests.set)
 
-ADD_UNIT_TESTS(${TEST_NAMES})
+ADD_UNIT_TESTS(${UNSTABLE_TESTS} ${TEST_NAMES})
 
 if(${HAVE_SALOME})
   enable_testing()
@@ -136,6 +136,10 @@ if(${HAVE_SALOME})
   foreach(tfile ${TEST_NAMES})
     list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
   endforeach(tfile ${TEST_NAMES})
+
+  foreach(tfile ${UNSTABLE_TESTS})
+    list(APPEND TMP_TESTS_NAMES "Test/${tfile}")
+  endforeach(tfile ${UNSTABLE_TESTS})
   
   install(FILES ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
 endif(${HAVE_SALOME})
