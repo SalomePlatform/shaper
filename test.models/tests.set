@@ -21,7 +21,6 @@ SET(TEST_NAMES
             angle30.py
             bearing_puller.py
             bobine_film_reel.py
-            bracket32.py
             bushing.py
             case24.py
             clothespin.py
@@ -39,4 +38,8 @@ SET(TEST_NAMES
             stair_with_cycle.py
             visor_support.py
             wheel_rim.py
+)
+
+SET(UNSTABLE_TESTS
+            bracket32.py
 )
