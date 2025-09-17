@@ -61,6 +61,7 @@
 #include <SUIT_ViewWindow.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_DataBrowser.h>
+#include <SUIT_AutoSaveResetter.h>
 
 #include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
@@ -847,10 +848,13 @@ int SHAPERGUI::backupDoc()
     QString aFullName = aFolder + aSep + aName + QString(".hdf");
 
     // Save the study into a single HDF file
-    isOk = study->saveDocumentAs( aFullName, true );
-    if (!isOk){
-      myBackupError = tr("Cannot backup study document");
-      return 36;
+    {
+      SUIT_AutoSaveResetter<SUIT_Study> aResetter(study);
+      isOk = study->saveDocumentAs( aFullName );
+      if (!isOk){
+        myBackupError = tr("Cannot backup study document");
+        return 36;
+      }
     }
 
     // Now, dump the python script

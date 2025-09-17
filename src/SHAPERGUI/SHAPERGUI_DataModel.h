@@ -46,13 +46,13 @@ class SHAPERGUI_EXPORT SHAPERGUI_DataModel : public LightApp_DataModel
 
   /// Save module data to file
   /// \param theFiles list of created files
-  virtual bool save(QStringList& theFiles, bool isBackup=false);
+  virtual bool save(QStringList& theFiles);
 
   /// Save module data to a file
   /// \param thePath a path to the directory
   /// \param theStudy a current study
   /// \param theFiles a list of files to open
-  virtual bool saveAs(const QString& thePath, CAM_Study* theStudy, QStringList& theFiles, bool isBackup=false);
+  virtual bool saveAs(const QString& thePath, CAM_Study* theStudy, QStringList& theFiles);
 
   /// Close data structure
   virtual bool close();
