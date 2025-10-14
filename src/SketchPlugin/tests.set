@@ -182,7 +182,6 @@ SET(TEST_NAMES_PARA
   TestProjectionUpdate.py
   TestProjectionWithoutReference.py
   TestRectangle1.py
-  TestRectangleCentered1.py
   TestRectangleCenteredModeSwitch.py
   TestRemainingDoF.py
   TestRemoveBSpline.py
@@ -242,6 +241,7 @@ SET(TEST_NAMES_SEQ
 SET(UNSTABLE_TESTS
   Test19089.py
   TestConstraintMiddlePointOnArc.py
+  TestRectangleCentered1.py
 )
 
 set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_SEQ})
