@@ -22,6 +22,10 @@ Here it is necessary to select a shape and give a value for the desired toleranc
 
 - **Shape** sets the shape to be modified.
 - **Tolerance** sets the desired tolerance value for the selected shape.
+- **Exact check of edge tolerances** if checked, exact calculation of gaps
+   between curves of edges and surfaces of faces will be performed.
+   It takes more time, but gives better results.
+   Please note, that this gap value will limit the tolerance below, but not above.
 
 Example of usage:
 
@@ -32,11 +36,12 @@ Example of usage:
 
 **TUI Command**:
 
-.. py:function:: model.addLimitTolerance(Part_doc, shape, tolerance)
+.. py:function:: model.addLimitTolerance(Part_doc, shape, tolerance, isExact)
 
     :param part: The current part object.
     :param shape: A shape.
     :param tolerance: A tolerance value.
+    :param isExact: An exact check flag.
     :return: Result shape with the modified tolerance.
 
 Result

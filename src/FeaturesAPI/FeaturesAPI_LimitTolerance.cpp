@@ -33,13 +33,15 @@ FeaturesAPI_LimitTolerance::FeaturesAPI_LimitTolerance(const std::shared_ptr<Mod
 //==================================================================================================
 FeaturesAPI_LimitTolerance::FeaturesAPI_LimitTolerance(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                        const ModelHighAPI_Selection& theMainObject,
-                                                       const ModelHighAPI_Double& theTolerance)
+                                                       const ModelHighAPI_Double& theTolerance,
+                                                       const bool theExactCheck)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize())
   {
     setMainObject(theMainObject);
     setTolerance(theTolerance);
+    setExactCheck(theExactCheck);
   }
 }
 
@@ -63,6 +65,13 @@ void FeaturesAPI_LimitTolerance::setTolerance(const ModelHighAPI_Double& theTole
 }
 
 //==================================================================================================
+void FeaturesAPI_LimitTolerance::setExactCheck(const bool theExactCheck)
+{
+  fillAttribute(theExactCheck, exactCheck());
+  execute();
+}
+
+//==================================================================================================
 void FeaturesAPI_LimitTolerance::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -74,16 +83,20 @@ void FeaturesAPI_LimitTolerance::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeDoublePtr anAttrTolerance = aBase->real(FeaturesPlugin_LimitTolerance::TOLERANCE_ID());
   theDumper << ", " << anAttrTolerance;
 
+  AttributeBooleanPtr anAttrExact = aBase->boolean(FeaturesPlugin_LimitTolerance::EXACT_CHECK_ID());
+  theDumper << ", " << anAttrExact;
+
   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 LimitTolerancePtr addLimitTolerance(const std::shared_ptr<ModelAPI_Document>& thePart,
                                     const ModelHighAPI_Selection& theMainObject,
-                                    const ModelHighAPI_Double& theTolerance)
+                                    const ModelHighAPI_Double& theTolerance,
+                                    const bool theExactCheck)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_LimitTolerance::ID());
   LimitTolerancePtr aLimitTolerance;
-  aLimitTolerance.reset(new FeaturesAPI_LimitTolerance(aFeature, theMainObject, theTolerance));
+  aLimitTolerance.reset(new FeaturesAPI_LimitTolerance(aFeature, theMainObject, theTolerance, theExactCheck));
   return aLimitTolerance;
 }

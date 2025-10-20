@@ -35,11 +35,17 @@ public:
   /// @param[in] theShape for which tolerance should be changed
   /// @param[in] theTolerance the new tolerance
   /// @param[in] theCheckGeometry if True, also check geometry
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_LimitTolerance(const GeomShapePtr theShape, const double theTolerance, const bool theCheckGeometry = false);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_LimitTolerance(const GeomShapePtr theShape,
+                                                const double theTolerance,
+                                                const bool theCheckGeometry = false,
+                                                const bool theExactAdjust = false);
 
 private:
   /// Builds resulting shape.
-  void build(const GeomShapePtr theShape, const double theTolerance, const bool theCheckGeometry);
+  void build(const GeomShapePtr theShape,
+             const double theTolerance,
+             const bool theCheckGeometry,
+             const bool theExactAdjust);
 };
 
 #endif

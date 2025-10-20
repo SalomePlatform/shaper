@@ -45,17 +45,23 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_LimitTolerance(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                       const ModelHighAPI_Selection& theShape,
-                                      const ModelHighAPI_Double& theTolerance);
+                                      const ModelHighAPI_Double& theTolerance,
+                                      const bool theExactCheck);
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_LimitTolerance();
 
-  INTERFACE_2(FeaturesPlugin_LimitTolerance::ID(),
+  INTERFACE_3(FeaturesPlugin_LimitTolerance::ID(),
+
               mainObject, FeaturesPlugin_LimitTolerance::OBJECT_ID(),
               ModelAPI_AttributeSelection, /** Main object */,
+
               tolerance, FeaturesPlugin_LimitTolerance::TOLERANCE_ID(),
-              ModelAPI_AttributeDouble, /** Tolerance */)
+              ModelAPI_AttributeDouble, /** Tolerance */,
+
+              exactCheck, FeaturesPlugin_LimitTolerance::EXACT_CHECK_ID(),
+              ModelAPI_AttributeBoolean, /** Exact Check Flag */)
 
   /// Set main object.
   FEATURESAPI_EXPORT
@@ -64,6 +70,10 @@ public:
   /// Set the tolerance.
   FEATURESAPI_EXPORT
   void setTolerance(const ModelHighAPI_Double& theTolerance);
+
+  /// Set the ExactCheck option.
+  FEATURESAPI_EXPORT
+  void setExactCheck(const bool theExactCheck);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -78,6 +88,7 @@ typedef std::shared_ptr<FeaturesAPI_LimitTolerance> LimitTolerancePtr;
 FEATURESAPI_EXPORT
 LimitTolerancePtr addLimitTolerance(const std::shared_ptr<ModelAPI_Document>& thePart,
                                     const ModelHighAPI_Selection& theMainObject,
-                                    const ModelHighAPI_Double& theTolerance);
+                                    const ModelHighAPI_Double& theTolerance,
+                                    const bool theExactCheck = false);
 
 #endif // FEATURESAPI_LIMITTOLERANCE_H_

@@ -24,6 +24,7 @@
 
 #include <GeomAPI_Shape.h>
 
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_ResultBody.h>
@@ -40,6 +41,12 @@ void FeaturesPlugin_LimitTolerance::initAttributes()
 {
   data()->addAttribute(OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(TOLERANCE_ID(), ModelAPI_AttributeDouble::typeId());
+
+  AttributeBooleanPtr anExactAttr =
+    std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+    (data()->addAttribute(EXACT_CHECK_ID(), ModelAPI_AttributeBoolean::typeId()));
+  if (!anExactAttr->isInitialized())
+    anExactAttr->setValue(false);
 }
 
 //=================================================================================================
@@ -48,8 +55,9 @@ void FeaturesPlugin_LimitTolerance::execute()
   // Get all feature arguments
   GeomShapePtr aShape = selection(FeaturesPlugin_LimitTolerance::OBJECT_ID())->value();
   double aTolerance = real(FeaturesPlugin_LimitTolerance::TOLERANCE_ID())->value();
+  bool isExact = boolean(FeaturesPlugin_LimitTolerance::EXACT_CHECK_ID())->value();
 
-  std::shared_ptr<GeomAlgoAPI_LimitTolerance> aLimitToleranceAlgo(new GeomAlgoAPI_LimitTolerance(aShape, aTolerance));
+  std::shared_ptr<GeomAlgoAPI_LimitTolerance> aLimitToleranceAlgo(new GeomAlgoAPI_LimitTolerance(aShape, aTolerance, false, isExact));
 
   std::string anError;
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aLimitToleranceAlgo, getKind(), anError))

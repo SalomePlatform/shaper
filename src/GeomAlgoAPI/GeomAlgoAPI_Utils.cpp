@@ -19,6 +19,8 @@
 
 #include "GeomAlgoAPI_Utils.h"
 
+#include <GEOMAlgo_AlgoTools.hxx>
+
 #include <BRepCheck_Analyzer.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <ShapeFix_ShapeTolerance.hxx>
@@ -29,35 +31,27 @@
 bool GeomAlgoAPI_Utils::FixShapeTolerance(TopoDS_Shape& theShape,
                                           TopAbs_ShapeEnum theType,
                                           const double theTolerance,
-                                          const bool theCheckGeometry)
+                                          const bool theCheckGeometry,
+                                          const bool theExactAdjust)
 {
   ShapeFix_ShapeTolerance aSft;
   aSft.LimitTolerance(theShape, theTolerance, theTolerance, theType);
+  if (theExactAdjust)
+    GEOMAlgo_AlgoTools::FixCurveOnSurfaceTolerances(theShape);
   Handle(ShapeFix_Shape) aSfs = new ShapeFix_Shape(theShape);
   aSfs->Perform();
   theShape = aSfs->Shape();
-  return CheckShape(theShape, theCheckGeometry);
-}
-
-//==================================================================================================
-bool GeomAlgoAPI_Utils::FixShapeTolerance(TopoDS_Shape& theShape,
-                                          const double theTolerance,
-                                          const bool theCheckGeometry)
-{
-  return FixShapeTolerance(theShape, TopAbs_SHAPE, theTolerance, theCheckGeometry);
-}
-
-//==================================================================================================
-bool GeomAlgoAPI_Utils::FixShapeTolerance(TopoDS_Shape& theShape,
-                                          const bool theCheckGeometry)
-{
-  return FixShapeTolerance(theShape, Precision::Confusion(), theCheckGeometry);
+  return CheckShape(theShape, theCheckGeometry, theExactAdjust);
 }
 
 //==================================================================================================
 bool GeomAlgoAPI_Utils::CheckShape(TopoDS_Shape& theShape,
-                                   const bool theCheckGeometry)
+                                   const bool theCheckGeometry,
+                                   const bool theExact)
 {
-  BRepCheck_Analyzer analyzer(theShape, theCheckGeometry);
+  // Exact checking works only with enabled geometry checking
+  Standard_Boolean isCheckGeom = theCheckGeometry || theExact;
+
+  BRepCheck_Analyzer analyzer(theShape, isCheckGeom, Standard_False, theExact);
   return analyzer.IsValid();
 }

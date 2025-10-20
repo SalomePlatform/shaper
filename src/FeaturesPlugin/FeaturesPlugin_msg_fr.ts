@@ -2697,6 +2697,17 @@
     </message>
   </context>
   <context>
+    <name>LimitTolerance:exact_check</name>
+    <message>
+      <source>Exact check of edge tolerances</source>
+      <translation>Vérification précise des tolérances des arêtes</translation>
+    </message>
+    <message>
+      <source>Take into account maximal distance of curve to its surfaces</source>
+      <translation>Tenir compte de la distance maximale de la courbe par rapport à ses surfaces</translation>
+    </message>
+  </context>
+  <context>
     <name>LimitTolerance:object:GeomValidators_BodyShapes</name>
     <message>
       <source>Error: Context is empty.</source>

@@ -14,5 +14,9 @@
                   max="1"
                   default="1.0e-7"
                   tooltip="Tolerance"/>
+    <boolvalue id="exact_check"
+               label="Exact check of edge tolerances"
+               tooltip="Take into account maximal distance of curve to its surfaces"
+               default="false"/>
   </groupbox>
 </source>

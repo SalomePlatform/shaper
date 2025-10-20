@@ -61,6 +61,13 @@ class FeaturesPlugin_LimitTolerance : public ModelAPI_Feature
     return MY_TOLERANCE_ID;
   }
 
+  /// Attribute name for exact_check.
+  inline static const std::string& EXACT_CHECK_ID()
+  {
+    static const std::string MY_EXACT_CHECK_ID("exact_check");
+    return MY_EXACT_CHECK_ID;
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 

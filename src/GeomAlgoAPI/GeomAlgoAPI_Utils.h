@@ -47,24 +47,10 @@ namespace GeomAlgoAPI_Utils
   ///       passing \c true to \a theCheckGeometry parameter
   ///
   GEOMALGOAPI_EXPORT bool FixShapeTolerance(TopoDS_Shape& theShape,
-                                            const TopAbs_ShapeEnum theType,
+                                            const TopAbs_ShapeEnum theType = TopAbs_SHAPE,
                                             const double theTolerance = Precision::Confusion(),
-                                            const bool theCheckGeometry = false);
-
-  ///
-  /// \brief Limit shape tolerance to the given value
-  /// This is overloaded function, it behaves exactly as previous one
-  ///
-  GEOMALGOAPI_EXPORT bool FixShapeTolerance(TopoDS_Shape& theShape,
-                                            const double theTolerance = Precision::Confusion(),
-                                            const bool theCheckGeometry = false);
-
-  ///
-  /// \brief Limit shape tolerance to the given value
-  /// This is overloaded function, it behaves exactly as previous one
-  ///
-  GEOMALGOAPI_EXPORT bool FixShapeTolerance(TopoDS_Shape& theShape,
-                                            const bool theCheckGeometry);
+                                            const bool theCheckGeometry = false,
+                                            const bool theExactAdjust = false);
 
   ///
   /// \brief Check shape
@@ -75,7 +61,8 @@ namespace GeomAlgoAPI_Utils
   /// \return \c true if shape is valid or \c false otherwise
   ///
   GEOMALGOAPI_EXPORT bool CheckShape(TopoDS_Shape& theShape,
-                                     const bool theCheckGeometry = false);
+                                     const bool theCheckGeometry = false,
+                                     const bool theExact = false);
 }
 
 #endif

@@ -544,6 +544,7 @@ SET(TEST_NAMES_PARA
                TestGlueFaces_Shell.py
                TestGlueFaces_Solids.py
                TestLimitTolerance.py
+               TestLimitTolerance_Exact.py
                TestLimitTolerance_Face.py
                TestBooleanCut_Fuzzy_1.py
                TestBooleanCut_Fuzzy_2.py

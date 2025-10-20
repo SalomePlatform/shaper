@@ -27,13 +27,19 @@
 
 
 //==================================================================================================
-GeomAlgoAPI_LimitTolerance::GeomAlgoAPI_LimitTolerance(const GeomShapePtr theShape, const double theTolerance, const bool theCheckGeometry)
+GeomAlgoAPI_LimitTolerance::GeomAlgoAPI_LimitTolerance(const GeomShapePtr theShape,
+                                                       const double theTolerance,
+                                                       const bool theCheckGeometry,
+                                                       const bool theExactAdjust)
 {
-  build(theShape, theTolerance, theCheckGeometry);
+  build(theShape, theTolerance, theCheckGeometry, theExactAdjust);
 }
 
 //==================================================================================================
-void GeomAlgoAPI_LimitTolerance::build(const GeomShapePtr theShape, const double theTolerance, const bool theCheckGeometry)
+void GeomAlgoAPI_LimitTolerance::build(const GeomShapePtr theShape,
+                                       const double theTolerance,
+                                       const bool theCheckGeometry,
+                                       const bool theExactAdjust)
 {
   if (!theShape.get()) {
     return;
@@ -41,7 +47,6 @@ void GeomAlgoAPI_LimitTolerance::build(const GeomShapePtr theShape, const double
 
   const TopoDS_Shape& aOriginalShape = theShape->impl<TopoDS_Shape>();
   Standard_Real aTol = theTolerance;
-  TopAbs_ShapeEnum aType = TopAbs_SHAPE;
 
   if (aTol < Precision::Confusion())
     aTol = Precision::Confusion();
@@ -60,7 +65,8 @@ void GeomAlgoAPI_LimitTolerance::build(const GeomShapePtr theShape, const double
   }
 
   // 2. Limit tolerance.
-  if (!GeomAlgoAPI_Utils::FixShapeTolerance(aShapeCopy, aType, aTol, theCheckGeometry))
+  if (!GeomAlgoAPI_Utils::FixShapeTolerance(aShapeCopy, TopAbs_SHAPE, aTol,
+                                            theCheckGeometry, theExactAdjust))
   {
     return;
   }
