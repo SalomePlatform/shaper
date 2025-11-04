@@ -18,7 +18,7 @@
 //
 
 #include "Config_PropManager.h"
-
+#include <clocale>
 bool Config_PropManager::autoColorStatus = false;
 
 std::vector<int> stringToRGB(const std::string& theColor);

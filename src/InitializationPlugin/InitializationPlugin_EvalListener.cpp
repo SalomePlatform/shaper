@@ -50,7 +50,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-
+#include <list>
 //=================================================================================================
 // Tools
 

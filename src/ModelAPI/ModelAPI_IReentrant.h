@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 class Events_Message;
 

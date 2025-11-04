@@ -25,7 +25,7 @@
 #include <GeomAPI_Interface.h>
 #include <memory>
 #include <list>
-
+#include <string>
 class GeomAPI_Pnt;
 class GeomAPI_Vertex;
 class GeomAPI_Edge;

@@ -22,6 +22,8 @@
 
 #include <ParametersPlugin.h>
 #include <Events_Loop.h>
+#include <string>
+#include <memory>
 
 class ModelAPI_Attribute;
 class ModelAPI_Document;

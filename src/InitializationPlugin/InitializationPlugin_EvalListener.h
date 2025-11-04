@@ -22,7 +22,7 @@
 
 #include <InitializationPlugin.h>
 #include <Events_Loop.h>
-
+#include <string>
 class ModelAPI_Attribute;
 class ModelAPI_Document;
 class ModelAPI_Feature;
