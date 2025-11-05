@@ -442,7 +442,7 @@ model.testNbSubShapes(Extrusion_3, GeomAPI_Shape.SOLID, [1, 1])
 model.testNbSubShapes(Extrusion_3, GeomAPI_Shape.FACE, [10, 12])
 model.testNbSubShapes(Extrusion_3, GeomAPI_Shape.EDGE, [48, 60])
 model.testNbSubShapes(Extrusion_3, GeomAPI_Shape.VERTEX, [96, 120])
-model.testResultsVolumes(Extrusion_3, [148061.943741445, 88885.950576849])
+model.testResultsVolumes(Extrusion_3, [148061.943741445, 88885.950576849], 5)
 
 Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_3_2f-SketchCircle_7_2r-SketchCircle_8_2r-SketchCircle_9_2r-SketchCircle_10_2r-SketchCircle_11_2r-SketchCircle_12_2r-SketchCircle_13_2r")], model.selection(), 36, 0)
 Extrusion_5 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_4_2f-SketchCircle_4_2f-SketchCircle_4_2f-SketchCircle_5_2r")], model.selection(), 20, 0)

@@ -65,6 +65,7 @@ SET(TEST_NAMES_PARA
   Test3170.py
   Test3240.py
   Test19101.py
+  Test19089.py
   Test20274_1.py
   Test20274_2.py
   Test20274_3.py
@@ -239,7 +240,6 @@ SET(TEST_NAMES_SEQ
 )
 
 SET(UNSTABLE_TESTS
-  Test19089.py
   TestConstraintMiddlePointOnArc.py
   TestRectangleCentered1.py
 )
