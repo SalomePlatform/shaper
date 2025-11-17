@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <set>
 #include <unordered_map>
+#include <functional>
 
 namespace NExplodeTools
 {
@@ -84,7 +85,7 @@ namespace NExplodeTools
   /*!
   * \brief Sort shapes in the list by their coordinates.
   */
-  struct CompareShapes : public std::binary_function<TopoDS_Shape, TopoDS_Shape, bool>
+  struct CompareShapes : public std::function<bool(TopoDS_Shape, TopoDS_Shape)>
   {
     typedef std::unordered_map<GeomShapePtr,
                                std::pair<GeomPointPtr, double>,
