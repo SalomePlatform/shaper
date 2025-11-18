@@ -85,7 +85,7 @@ namespace NExplodeTools
   /*!
   * \brief Sort shapes in the list by their coordinates.
   */
-  struct CompareShapes : public std::function<bool(TopoDS_Shape, TopoDS_Shape)>
+  struct CompareShapes : public std::function<bool(GeomShapePtr&, GeomShapePtr&)>
   {
     typedef std::unordered_map<GeomShapePtr,
                                std::pair<GeomPointPtr, double>,
