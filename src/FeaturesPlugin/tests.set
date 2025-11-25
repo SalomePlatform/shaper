@@ -248,6 +248,7 @@ SET(TEST_NAMES_PARA
                TestBooleanSmash_SolidsHistory.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
+               TestBooleanFuse_RemoveEdges_Mirrored.py
                TestBooleanFuse_ErrorMsg.py
                TestBooleanCommon_Vertex_Vertex.py
                TestBooleanCommon_VertexCompound_VertexCompound.py
