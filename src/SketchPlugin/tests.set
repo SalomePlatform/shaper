@@ -110,6 +110,7 @@ SET(TEST_NAMES_PARA
   TestConstraintHorizontalValidator.py
   TestConstraintLength.py
   TestConstraintMiddlePoint.py
+  TestConstraintMiddlePointOnArc.py
   TestConstraintMiddlePointOnEllipticArc.py
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
@@ -240,7 +241,7 @@ SET(TEST_NAMES_SEQ
 )
 
 SET(UNSTABLE_TESTS
-  TestConstraintMiddlePointOnArc.py
+  TestConstraintMiddlePointOnArc2.py
   TestRectangleCentered1.py
 )
 
