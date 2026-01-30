@@ -234,6 +234,8 @@ SET(TEST_NAMES_PARA
   TestTrimLine03.py
   TestTrimPreview.py
   TestUpdateSketch.py
+  TestConstraintMiddlePointOnArc2.py #tuleap 34492
+  TestRectangleCentered1.py #tuleap 41917
 )
 
 SET(TEST_NAMES_SEQ
@@ -241,9 +243,6 @@ SET(TEST_NAMES_SEQ
 )
 
 SET(UNSTABLE_TESTS
-  TestConstraintMiddlePointOnArc2.py
-  TestRectangleCentered1.py
 )
 
-set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_SEQ})
 
