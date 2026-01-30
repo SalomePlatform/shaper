@@ -186,6 +186,8 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 include(tests.set)
 
+set(TEST_NAMES ${TEST_NAMES_PARA} ${TEST_NAMES_SEQ})
+
 ADD_UNIT_TESTS(${TEST_NAMES})
 
 include(tests.set)
@@ -221,6 +223,11 @@ if(${HAVE_SALOME})
   foreach(tfile ${UNSTABLE_TESTS})
     list(APPEND TMP_UNSTABLE_TESTS "Test/${tfile}")
   endforeach(tfile ${UNSTABLE_TESTS})
+
+  #tuleap46893
+  list(APPEND TMP_UNSTABLE_TESTS Test/TestConstraintMiddlePointOnArc2Slave.py)
+  #tuleap41917
+  list(APPEND TMP_UNSTABLE_TESTS Test/TestRectangleCentered1Slave.py)
 
   install(FILES ${TMP_UNSTABLE_TESTS} ${TMP_TESTS_NAMES} DESTINATION ${TEST_INSTALL_DIRECTORY})
   install(DIRECTORY data DESTINATION ${TEST_INSTALL_DIRECTORY})
