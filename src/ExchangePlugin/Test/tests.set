@@ -60,5 +60,6 @@ SET(TEST_NAMES
   TestImportPart_ToEmptyPartSet.py
   TestStep1.py
   TestStep2.py
+  TestStep_Centimetres.py
   TestStep_Colors.py
 )
