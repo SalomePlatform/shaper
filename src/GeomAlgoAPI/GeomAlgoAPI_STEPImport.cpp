@@ -75,21 +75,34 @@ bool readUnits(STEPControl_Reader& aReader,
     aReader.FileUnits(anUnitLengthNames, anUnitAngleNames, anUnitSolidAngleNames);
     if (anUnitLengthNames.Length() > 0) {
       TCollection_AsciiString aLenUnits = anUnitLengthNames.First();
+      aLenUnits.LowerCase();
+      Standard_CString aOccUnit;
       if (aLenUnits == "millimetre")
-        Interface_Static::SetCVal("xstep.cascade.unit", "MM");
+        aOccUnit = "MM";
       else if (aLenUnits == "centimetre")
-        Interface_Static::SetCVal("xstep.cascade.unit", "CM");
+        aOccUnit = "CM";
       else if (aLenUnits == "metre" || aLenUnits.IsEmpty())
-        Interface_Static::SetCVal("xstep.cascade.unit", "M");
-      else if (aLenUnits == "INCH")
-        Interface_Static::SetCVal("xstep.cascade.unit", "INCH");
+        aOccUnit = "M";
+      else if (aLenUnits == "inch")
+        aOccUnit = "INCH";
+      else if (aLenUnits == "micrometre")
+        aOccUnit = "UM";
+      else if (aLenUnits == "kilometre")
+        aOccUnit = "KM";
+      else if (aLenUnits == "milliinch"  || aLenUnits == "mil")
+        aOccUnit = "MIL";
+      else if (aLenUnits == "microinch")
+        aOccUnit = "UIN";
+      else if (aLenUnits == "foot")
+        aOccUnit = "FT";
+      else if (aLenUnits == "mile")
+        aOccUnit = "MI";
       else {
-        theError = "The file contains not supported units.";
+        theError = "The file contains not supported units: ";
+        theError += aLenUnits.ToCString();
         return false;
       }
-      // TODO (for other units than mm, cm, m or inch)
-      //else if (aLenUnits == "")
-      //  Interface_Static::SetCVal("xstep.cascade.unit", "???");
+      Interface_Static::SetCVal("xstep.cascade.unit", aOccUnit);
     }
   }
   else {
