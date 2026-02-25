@@ -56,6 +56,7 @@
 #include <SketchPlugin_Split.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -787,6 +788,17 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theNewFeature->data()->attribute(aPreviewPointAttribute));
     aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
+  }
+  else if (aFeatureKind == SketchPlugin_ConstraintMiddle::ID()) {
+    // set the creation method (MIDDLE_TYPE) of the constraint
+    std::string aTypeAttributeId = SketchPlugin_ConstraintMiddle::MIDDLE_TYPE();
+    AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
+    AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
+    if (!aNewFeatureTypeAttr->isInitialized() || aNewFeatureTypeAttr->value() != aSourceFeatureTypeAttr->value())
+    {
+      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+      aChanged = true;
+    }
   }
   return aChanged;
 }
