@@ -287,13 +287,29 @@ bool ModuleBase_WidgetSelector::isWholeResultAllowed() const
 bool getObjectFromGroup(ObjectPtr& theObject, GeomShapePtr& theShape)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (!aFeature.get())
+    return false;
 
   AttributeSelectionListPtr anAttrList = aFeature->selectionList("group_list");
+  if (!anAttrList.get())
+    return false;
 
   for (int anIndex = 0; anIndex < anAttrList->size(); ++anIndex) {
     AttributeSelectionPtr aSelect = anAttrList->value(anIndex);
-    if (aSelect->context()->shape()->isSubShape(theShape) ||
-        aSelect->context()->shape()->isEqual(theShape)) {
+    if (!aSelect.get())
+      continue;
+
+    ResultPtr aContext = aSelect->context();
+    // The context of a Group may be NULL, if the entire feature was selected
+    // in the Object Browser as its input shape ("all-in-<feature_namme>").
+    // => in that case, shapes are stored directly in the Selection attribute
+    //    as a COMPOUND shape.
+    GeomShapePtr aContextShape = (aContext.get() ? aContext->shape() : aSelect->value());
+    if (!aContextShape.get())
+      continue;
+
+    if (aContextShape->isSubShape(theShape) ||
+        aContextShape->isEqual(theShape)) {
       theObject = aSelect->contextObject();
       return true;
     }
