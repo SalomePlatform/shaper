@@ -32,6 +32,8 @@
 //--------------------------------------------------------------------------------------
 #include <algorithm>
 //--------------------------------------------------------------------------------------
+//
+#include "PythonCppUtils.hxx"
 
 ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -364,6 +366,7 @@ PyObject* exportToXAOMem(const std::shared_ptr<ModelAPI_Document> & thePart,
   ExportPtr aXAOExportAPI (new ExchangeAPI_Export
                            (aFeature, theSelectedShape, theAuthor, theGeometryName));
   std::string aBuff = aFeature->string(ExchangePlugin_ExportFeature::MEMORY_BUFFER_ID())->value();
+  AutoGIL agil;
   return PyBytes_FromStringAndSize(aBuff.c_str(), aBuff.length());
 }
 
