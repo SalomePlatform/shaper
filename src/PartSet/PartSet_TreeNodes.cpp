@@ -538,11 +538,18 @@ void PartSet_FolderNode::update()
   if (!aDoc.get())
     return;
 
+  // Safety: if some earlier logic inserted null placeholders, drop them.
+  myChildren.removeAll(0);
+
   // Remove extra sub-nodes
   int aIndex;
   int aId = 0;
   while (aId < myChildren.size()) {
     ModuleBase_ITreeNode* aNode = myChildren.at(aId);
+    if (!aNode) {
+      myChildren.removeAt(aId);
+      continue;
+    }
     aIndex = aDoc->index(aNode->object(), true);
     if ((aIndex == -1) || (aId != aIndex)) {
       myChildren.removeAll(aNode);
@@ -556,8 +563,11 @@ void PartSet_FolderNode::update()
   int aSize = aDoc->size(aGroup, true);
   for (int i = 0; i < aSize; i++) {
     ObjectPtr aObj = aDoc->object(aGroup, i, true);
-    if (i < myChildren.size()) {
-      if (myChildren.at(i)->object() != aObj) {
+     if (i < myChildren.size()) {
+      ModuleBase_ITreeNode* aAt = myChildren.at(i);
+      if (!aAt || aAt->object() != aObj) {
+        if (!aAt)
+          myChildren.removeAt(i);
         ModuleBase_ITreeNode* aNode = createNode(aObj);
         myChildren.insert(i, aNode);
       }
@@ -568,7 +578,8 @@ void PartSet_FolderNode::update()
   }
 
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aNode->update();
+    if (aNode)
+      aNode->update();
   }
 }
 
@@ -602,7 +613,7 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
     if ((aObj->document() == aDoc) && (aObj->groupName() == aName)) {
       aIdx = aDoc->index(aObj, true);
       if (aIdx != -1) {
-        bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
+        bool aHasObject = (aIdx < myChildren.size()) && myChildren.at(aIdx) && (myChildren.at(aIdx)->object() == aObj);
         if (!aHasObject) {
           ModuleBase_ITreeNode* aNode = createNode(aObj);
           aNewNodes[aIdx] = aNode;
@@ -621,14 +632,21 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
         aNewNodes.remove(i);
       }
     }
-    while (aNewNodes.size()) {
-      i = myChildren.size();
-      myChildren.append(aNewNodes[i]);
-      aNewNodes.remove(i);
+
+    // Append remaining nodes in key order.
+    // IMPORTANT: do not use QMap::operator[] here (aNewNodes[i]) because it
+    // inserts a default value for missing keys (nullptr), which can later
+    // crash when dereferenced and can also keep this loop from terminating.
+    while (!aNewNodes.isEmpty()) {
+      const int aKey = aNewNodes.firstKey();
+      ModuleBase_ITreeNode* aNode = aNewNodes.take(aKey);
+      if (aNode)
+        myChildren.append(aNode);
     }
   }
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aResult.append(aNode->objectCreated(theObjects));
+    if (aNode)
+      aResult.append(aNode->objectCreated(theObjects));
   }
   return aResult;
 }
