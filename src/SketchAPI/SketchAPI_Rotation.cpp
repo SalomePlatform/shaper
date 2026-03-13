@@ -175,7 +175,7 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
         continue;
       bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
 
-      for (int i = 1; i < aNbCopies->value(); ++i, ++anIt) {
+      for (int i = 1; i < aNbCopies->value() && anIt != aList.end(); ++i, ++anIt) {
         aFeature = (*anIt)->feature();
         bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
         if (aFeatAux != aBaseAux)
