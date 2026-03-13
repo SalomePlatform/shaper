@@ -256,7 +256,8 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
                   theEngine.SetDeadPixmapToDeadObject(anObj)
               else:
                 aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
-                aBuilder.RemoveObject(anObj.GetSO())
+                #aBuilder.RemoveObject(anObj.GetSO())
+                aBuilder.RemoveObject(aSO)
         aSOIter.Next()
 
     # Part of the "execute" method: theFiled fields filling.
