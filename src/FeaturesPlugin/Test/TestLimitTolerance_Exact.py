@@ -18,7 +18,7 @@
 #
 
 import os
-from salome.kernel import salome
+import salome
 from salome.shaper import model
 from GeomAPI import GeomAPI_Shape
 
