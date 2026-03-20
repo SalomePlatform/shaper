@@ -383,7 +383,9 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   std::list<gp_Vec> aVectorsList;
   // Calculate all vectors
   for (aItCurv = aCurves.cbegin(); aItCurv != aCurves.cend(); aItCurv++) {
-    aVectorsList.push_back(getVector((*aItCurv), thePrs->plane()->dirX(), aP));
+    gp_Vec aVector = getVector((*aItCurv), thePrs->plane()->dirX(), aP);
+    if (aVector.Magnitude()>0)
+      aVectorsList.push_back(aVector);
   }
 
   // Position of the symbol
