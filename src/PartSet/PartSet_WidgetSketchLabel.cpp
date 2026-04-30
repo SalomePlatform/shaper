@@ -944,6 +944,9 @@ void PartSet_WidgetSketchLabel::deactivate()
   if (aTopWidget)
     aTopWidget->removeEventFilter(this);
 
+  // Restore sketch plane before operation finishing
+  // to respect transaction margins,
+  // as it was nullified in onChangePlane() after operation starting
   if (myTmpPlane.get()) {
     setSketchPlane(myTmpPlane);
     myTmpPlane.reset();
@@ -1094,6 +1097,10 @@ void PartSet_WidgetSketchLabel::onChangePlane()
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->startOperation("Change Sketch plane");
+    myOpenTransaction = true;
+
     mySizeOfViewWidget->setVisible(false);
     myRemoveExternal->setVisible(true);
     myStackWidget->setCurrentIndex(0);
@@ -1105,6 +1112,9 @@ void PartSet_WidgetSketchLabel::onChangePlane()
       myPreviewPlanes->showPreviewPlanes(myWorkshop);
     }
 
+    // Nullify sketch plane after operation starting
+    // and then restore it in deactivate() before operation finishing
+    // to respect transaction margins
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     myTmpPlane = PartSet_Tools::sketchPlane(aSketch);
     PartSet_Tools::nullifySketchPlane(aSketch);
@@ -1119,9 +1129,6 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     aWorkshop->selectionActivate()->updateSelectionFilters();
     aWorkshop->selectionActivate()->updateSelectionModes();
 
-    SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->startOperation("Change Sketch plane");
-    myOpenTransaction = true;
     myWorkshop->viewer()->update();
   }
 }
