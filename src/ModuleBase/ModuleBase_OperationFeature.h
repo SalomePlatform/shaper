@@ -204,6 +204,12 @@ Q_OBJECT
   /// State used only if the operation should not be committed
   bool myNeedToBeAborted;
 
+  /// Avoid committing the operation while updating the preselection on the property panel:
+  /// - Set myDeferCommit to true to temporarily avoid a commit from being performed.
+  /// - myCommitNeeded will then be set to true whenever commit() is called while myDeferCommit is true.
+  bool myDeferCommit;
+  bool myCommitNeeded;
+
   /// List of pre-selected object
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myPreSelection;
 

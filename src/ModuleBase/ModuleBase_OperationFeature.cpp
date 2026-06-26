@@ -58,9 +58,32 @@
 #include <QDebug>
 #endif
 
+// RAII helper class to set a variable to a value for the lifetime of the object
+// and restore it to another value when the object goes out of scope.
+template<typename T>
+class ScopedSetValue
+{
+  public:
+    ScopedSetValue(T &variable, T initialValue, T finalValue)
+      :mVariable(variable)
+      ,mFinalValue(finalValue)
+    {
+      mVariable = initialValue;
+    }
+    ~ScopedSetValue()
+    {
+      mVariable = mFinalValue;
+    }
+
+  private:
+    T &mVariable;  // Reference to the variable to be set
+    T mFinalValue; // Value to be set when the object goes out of scope
+};
+
+
 ModuleBase_OperationFeature::ModuleBase_OperationFeature(const QString& theId, QObject* theParent)
 : ModuleBase_Operation(theId, theParent), myIsEditing(false), myNeedToBeAborted(false),
-myRestartTransactionOnResume(false)
+  myRestartTransactionOnResume(false), myDeferCommit(false), myCommitNeeded(false)
 {
 }
 
@@ -317,6 +340,10 @@ void ModuleBase_OperationFeature::abort()
 
 bool ModuleBase_OperationFeature::commit()
 {
+  if (myDeferCommit) {
+    myCommitNeeded = true;
+    return false;
+  }
 #ifdef DEBUG_OPERATION_START
   qDebug("ModuleBase_OperationFeature::commit -- begin");
 #endif
@@ -400,15 +427,28 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
       }
       else {
         // 1. apply the selection to controls
-        for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
-          aWgt = (*aWIt);
-          if (!aWgt->canAcceptFocus())
-            continue;
-          aPropertyPanel->setPreselectionWidget(aWgt);
-          if (myPreSelection.empty() || !aWgt->setSelection(myPreSelection, true))
-            break;
-          else
-            aFilledWgt = aWgt;
+        // Note on bos #55282:
+        // When preselecting multiple points and starting the SketchLine feature, the line is
+        // created and committed immediately, when the first two points are preselected.
+        // This causes the aWidgets list to be cleared and the for loop to crash. 
+        // To avoid this, we temporarily "deactivate" the commit() during this loop and will
+        // call it after the loop if needed.
+        ScopedSetValue<bool> scoped(myCommitNeeded, false, false);
+        {
+          ScopedSetValue<bool> scoped(myDeferCommit, true, false);
+          for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
+            aWgt = (*aWIt);
+            if (!aWgt->canAcceptFocus())
+              continue;
+            aPropertyPanel->setPreselectionWidget(aWgt);
+            if (myPreSelection.empty() || !aWgt->setSelection(myPreSelection, true))
+              break;
+            else
+              aFilledWgt = aWgt;
+          }
+        }
+        if (myCommitNeeded) {
+          commit();
         }
       }
       aPropertyPanel->setPreselectionWidget(NULL);
