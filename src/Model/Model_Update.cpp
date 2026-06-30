@@ -924,8 +924,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     // In messages sent through blockSendAttributeUpdated(), raw pointers are used
     std::list<AttributeSelectionPtr> anAttrList;
 
-    // Apply the filters if present
-    if (aSelList->filters().get()) {
+    // Apply the filters if present but not during HDF processing
+    if (aSelList->filters().get() && !ModelAPI_Session::get()->isHDFProcessing()) {
       aSelList->applyFilters();
     } else {
       for(int a = aSelList->size() - 1; a >= 0; a--) {
@@ -1103,7 +1103,8 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
       std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
       // If the selList is built based on filters: clear and reapply the filter
-      if (aSelList->filters().get()) {
+      // Skipped during HDF processing
+      if (aSelList->filters().get() && !ModelAPI_Session::get()->isHDFProcessing()) {
         aSelList->applyFilters();
       }
       for(int a = aSelList->size() - 1; a >= 0; a--) {

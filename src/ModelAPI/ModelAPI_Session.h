@@ -41,7 +41,8 @@ class ModelAPI_FiltersFactory;
 class MODELAPI_EXPORT ModelAPI_Session
 {
 protected:
-  bool myIsLoading; ///< keeps the state of the loading of the document
+  bool myIsLoading; ///< keeps the state of the loading of the document (root)
+  bool myIsHDFProcessing; ///< keeps the state of the HDF processing for all the documents
 
  public:
   /// Returns the real implementation (the alone instance per application) of the plugin manager
@@ -52,8 +53,14 @@ protected:
   //! \returns true if file was loaded successfully
   virtual bool load(const char* theFileName) = 0;
 
-  //! Returns true if a loading process is performed (so, no need to react on a new part creation)
+  //! Returns true if a loading process of the root document is performed (so, no need to react on a new part creation)
   virtual bool isLoading() { return myIsLoading; };
+
+  //! Returns true if a loading process is performed : takes into account all the documents
+  virtual bool isHDFProcessing() { return myIsHDFProcessing; };
+
+  //! Sets the myIsHDFProcessing boolean
+  virtual void setIsHDFProcessing(const bool theFlag) { myIsHDFProcessing = theFlag; };
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store

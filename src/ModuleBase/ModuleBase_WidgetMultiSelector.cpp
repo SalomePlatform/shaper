@@ -850,12 +850,12 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
       myListView->addItem(QString::fromStdWString(aAttr->namingName()), i);
-      FiltersFeaturePtr aFilters = aSelectionListAttr->filters();
-      if (aFilters.get()) {
-        if (!aFilters->filters().empty()) {
-          myRemoveFiltersBtn->setEnabled(true);
-          myListView->getControl()->setStyleSheet(aListViewDisabledStyle); // set disabled style sheet
-        }
+    }
+    FiltersFeaturePtr aFilters = aSelectionListAttr->filters();
+    if (aFilters.get()) {
+      if (!aFilters->filters().empty()) {
+        myRemoveFiltersBtn->setEnabled(true);
+        myListView->getControl()->setStyleSheet(aListViewDisabledStyle); // set disabled style sheet
       }
     }
   }

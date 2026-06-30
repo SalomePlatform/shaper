@@ -76,6 +76,7 @@
 #include <OSD_Protection.hxx>
 
 #include <UTL.hxx>
+#include <iostream>
 
 #include <climits>
 #ifndef WIN32
@@ -104,6 +105,25 @@ static const int TAG_EXTERNAL_CONSTRUCTIONS = 5;
 
 /// reference to the shape in external document: string list attribute identifier
 static const Standard_GUID kEXTERNAL_SHAPE_REF("9aa5dd14-6d34-4a8d-8786-05842fd7bbbd");
+
+/**
+ * @brief RAII guard for the reset of Model_Session::myIsHDFProcessing boolean
+ * in the loading of HDF files
+ */
+class HDFProcessingGuard {
+public:
+    HDFProcessingGuard() {
+      std::shared_ptr<Model_Session> aSession =
+          std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+      aSession->setIsHDFProcessing(true);
+    };
+
+    ~HDFProcessingGuard() {
+      std::shared_ptr<Model_Session> aSession =
+          std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+      aSession->setIsHDFProcessing(false);
+  };
+};
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID),
@@ -323,6 +343,8 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
   if (isOk) {
+    // Start of the processing of parts in hdf
+    HDFProcessingGuard aGuard;
     // keep handle to avoid destruction of the document until myObjs works on it
     Handle(TDocStd_Document) anOldDoc = myDoc;
     myDoc = aLoaded;

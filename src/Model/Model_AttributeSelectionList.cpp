@@ -559,12 +559,6 @@ void Model_AttributeSelectionList::applyFilters()
 {
   FiltersFeaturePtr aFiltersFeat = this->filters();
   if (!aFiltersFeat->filters().empty()) {
-    // finish operation to make sure the selection is done on the current state of the history
-    static Events_ID anID = Events_Loop::eventByName("FinishOperation");
-    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
-    Events_Loop* aLoop = Events_Loop::loop();
-    aLoop->send(aMsg);
-
     // obtaining the selected shapes from the ModelAPI_FiltersFactory select method
     GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::shapeTypeByStr(this->selectionType());
     SessionPtr aSession = ModelAPI_Session::get();

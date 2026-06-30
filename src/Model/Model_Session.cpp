@@ -456,6 +456,7 @@ Model_Session::Model_Session()
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
   myIsLoading = false;
+  myIsHDFProcessing = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
