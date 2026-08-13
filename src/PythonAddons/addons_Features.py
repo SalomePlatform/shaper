@@ -25,6 +25,7 @@ from macros.compoundVertices.feature import compoundVertices
 from macros.importParameters.feature import importParameters
 from macros.midSurface.feature import midSurface
 from macros.pipeNetwork.feature import pipeNetwork
+from macros.splitCylinder.feature import SplitCylinder
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
