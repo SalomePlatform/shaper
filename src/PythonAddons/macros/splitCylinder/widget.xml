@@ -6,33 +6,50 @@
                tooltip="Split a cylinder into quadrants with a central square core"
                icon="icons/Addons/splitCylinder.png">
 
-        <shape_selector
-            id="solid_body"
-            label="Solid body"
-            tooltip="Select the cylinder's solid body"
-            shape_types="solid">
-        </shape_selector>
+        <toolbox id="SelectionMethod">
+          <box id="Cylinder" title="Cylinder" icon="icons/Addons/splitCylinder_cyli.png">
+            <shape_selector
+                id="solid_body"
+                label="Solid body"
+                tooltip="Select the cylinder's solid body"
+                shape_types="solid">
+            </shape_selector>
 
-        <shape_selector
-            id="face"
-            label="Cylinder face"
-            tooltip="Select the flat circular face"
-            shape_types="face">
-        </shape_selector>
+            <shape_selector
+                id="face"
+                label="Circular face"
+                tooltip="Select the cylinder's flat circular face"
+                shape_types="face">
+            </shape_selector>
+          </box>
+          <box id="Face" title="Face" icon="icons/Addons/splitCylinder_face.png">
+            <shape_selector
+                id="face"
+                label="Circular face"
+                tooltip="Select a standalone flat circular face"
+                shape_types="face">
+            </shape_selector>
+          </box>
+        </toolbox>
 
-        <boolvalue 
-            id="is_percentage" 
-            label="Value is percentage (%)" 
-            default="false" 
-            tooltip="Check to use percentage of diameter">
-        </boolvalue>
-
-        <doublevalue
-            id="size_input"
-            label="Value"
-            default="4."
-            step="1.">
-        </doublevalue>
+        <toolbox id="SizeMethod">
+          <box id="Percentage" title="Percentage (%)">
+            <doublevalue
+                id="size_percentage"
+                label="Square diagonal length (percentage of diameter)"
+                default="40."
+                step="1.">
+            </doublevalue>
+          </box>
+          <box id="Value" title="Length">
+            <doublevalue
+                id="size_input"
+                label="Square side length"
+                default="1."
+                step="1.">
+            </doublevalue>
+          </box>
+        </toolbox>
 
       </feature>
     </group>

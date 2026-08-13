@@ -21,12 +21,20 @@ class SplitCylinder(model.Feature):
         return "face"
 
     @staticmethod
-    def IS_PERCENTAGE_ID():
-        return "is_percentage"
+    def SELECTION_METHOD_ID():
+        return "SelectionMethod"
+
+    @staticmethod
+    def SIZE_METHOD_ID():
+        return "SizeMethod"
 
     @staticmethod
     def SIZE_INPUT_ID():
         return "size_input"
+
+    @staticmethod
+    def SIZE_PERCENTAGE_ID():
+        return "size_percentage"
 
     def getKind(self):
         return SplitCylinder.ID()
@@ -34,8 +42,10 @@ class SplitCylinder(model.Feature):
     def initAttributes(self):
         self.data().addAttribute(self.SOLID_ID(), ModelAPI.ModelAPI_AttributeSelection_typeId())
         self.data().addAttribute(self.FACE_ID(), ModelAPI.ModelAPI_AttributeSelection_typeId())
-        self.data().addAttribute(self.IS_PERCENTAGE_ID(), ModelAPI.ModelAPI_AttributeBoolean_typeId())
+        self.data().addAttribute(self.SELECTION_METHOD_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
+        self.data().addAttribute(self.SIZE_METHOD_ID(), ModelAPI.ModelAPI_AttributeString_typeId())
         self.data().addAttribute(self.SIZE_INPUT_ID(), ModelAPI.ModelAPI_AttributeDouble_typeId())
+        self.data().addAttribute(self.SIZE_PERCENTAGE_ID(), ModelAPI.ModelAPI_AttributeDouble_typeId())
 
     def execute(self):
         try:
@@ -62,48 +72,77 @@ class SplitCylinder(model.Feature):
         # =========================================================
         # 2. CHECK CURRENT SELECTIONS
         # =========================================================
-        solid_attr = self.selection(self.SOLID_ID())
-        if solid_attr is None or not solid_attr.isInitialized(): return
-        solid_name = solid_attr.namingName()
-        if not solid_name: return
+        method_attr = self.string(self.SELECTION_METHOD_ID())
+        selection_method = method_attr.value() if (method_attr and method_attr.isInitialized()) else "Cylinder"
+        face_only_mode = (selection_method == "Face")
 
         face_attr = self.selection(self.FACE_ID())
         if face_attr is None or not face_attr.isInitialized(): return
         face_name = face_attr.namingName()
         if not face_name: return
 
+        if face_only_mode:
+            # No solid needed in this mode.
+            solid_attr = None
+            solid_name = None
+        else:
+            solid_attr = self.selection(self.SOLID_ID())
+            if solid_attr is None or not solid_attr.isInitialized(): return
+            solid_name = solid_attr.namingName()
+            if not solid_name: return
+
         # =========================================================
         # 3. CACHE SYSTEM (avoids read failures on update)
         # =========================================================
-        # If the cylinder selection changed, or this is the first run,
-        # extract the geometric data and cache it.
+        # If the selection (or the mode) changed, or this is the first
+        # run, extract the geometric data and cache it.
         selection_changed = (
             not hasattr(self, "_cached_selections")
-            or self._cached_selections != (solid_name, face_name)
+            or self._cached_selections != (face_only_mode, solid_name, face_name)
         )
 
         if selection_changed:
 
-            solid_shape = solid_attr.value()
             face_shape = face_attr.value()
 
             R = 10.0
             H = 50.0
-            try:
-                from GeomAPI import GeomAPI_Face, GeomAPI_ShapeExplorer, GeomAPI_Shape
-                exp = GeomAPI_ShapeExplorer(solid_shape, GeomAPI_Shape.FACE)
-                while exp.more():
-                    try:
-                        f = GeomAPI_Face(exp.current())
-                        cyl = f.getCylinder()
-                        R = cyl.radius()
-                        H = cyl.height()
-                        break
-                    except:
-                        pass
-                    exp.next()
-            except Exception:
-                pass
+
+            if face_only_mode:
+                # No solid to explore. Get the radius directly from the
+                # circular edge bounding the selected face.
+                try:
+                    from GeomAPI import GeomAPI_Edge, GeomAPI_ShapeExplorer, GeomAPI_Shape
+                    exp = GeomAPI_ShapeExplorer(face_shape, GeomAPI_Shape.EDGE)
+                    while exp.more():
+                        try:
+                            edge = GeomAPI_Edge(exp.current())
+                            circ = edge.circle()
+                            R = circ.radius()
+                            break
+                        except:
+                            pass
+                        exp.next()
+                except Exception:
+                    traceback.print_exc()
+                # H is not used in face-only mode (no extrusion), keep default.
+            else:
+                solid_shape = solid_attr.value()
+                try:
+                    from GeomAPI import GeomAPI_Face, GeomAPI_ShapeExplorer, GeomAPI_Shape
+                    exp = GeomAPI_ShapeExplorer(solid_shape, GeomAPI_Shape.FACE)
+                    while exp.more():
+                        try:
+                            f = GeomAPI_Face(exp.current())
+                            cyl = f.getCylinder()
+                            R = cyl.radius()
+                            H = cyl.height()
+                            break
+                        except:
+                            pass
+                        exp.next()
+                except Exception:
+                    pass
 
             cx, cy, cz = 0.0, 0.0, 0.0
             try:
@@ -116,7 +155,7 @@ class SplitCylinder(model.Feature):
             self._cached_R = R
             self._cached_H = H
             self._cached_center = (cx, cy, cz)
-            self._cached_selections = (solid_name, face_name)
+            self._cached_selections = (face_only_mode, solid_name, face_name)
 
         # Use the cached data
         R = self._cached_R
@@ -126,10 +165,14 @@ class SplitCylinder(model.Feature):
         # =========================================================
         # 4. SIZE CALCULATION (real-time update)
         # =========================================================
-        is_perc_attr = self.boolean(self.IS_PERCENTAGE_ID())
-        is_percentage = is_perc_attr.value() if (is_perc_attr and is_perc_attr.isInitialized()) else False
+        size_method_attr = self.string(self.SIZE_METHOD_ID())
+        size_method = size_method_attr.value() if (size_method_attr and size_method_attr.isInitialized()) else "Value"
+        is_percentage = (size_method == "Percentage")
 
-        input_attr = self.real(self.SIZE_INPUT_ID())
+        if is_percentage:
+            input_attr = self.real(self.SIZE_PERCENTAGE_ID())
+        else:
+            input_attr = self.real(self.SIZE_INPUT_ID())
         if input_attr is None or not input_attr.isInitialized(): return
         user_input = input_attr.value()
         if user_input <= 0: return
@@ -239,50 +282,83 @@ class SplitCylinder(model.Feature):
 
             sketch.execute(True)
 
-            # --- Extrusion and final cut ---
-            extrusion = model.addExtrusion(
-                doc,
-                [sketch.result()],
-                model.selection(),
-                0.0,
-                H + 0.1,
-                "Edges"
-            )
-            extrusion.execute(True)
+            extrusion = None
+            edge_obj = None
+            if face_only_mode:
+                # --- Face-only mode: split the face directly, no extrusion ---
+                # Split rejects a whole sketch/face selection as a tool
+                # ("result construction not allowed for selection"). It
+                # needs individual EDGE selections, so first materialize
+                # the sketch curves as an Edge feature, then use its
+                # resulting edges as the Split tool objects.
+                edge_obj = model.addEdge(
+                    doc,
+                    [model.selection("COMPOUND", sketch.name())],
+                    False
+                )
+                edge_obj.execute(True)
 
-            split = model.addSplit(
-                doc,
-                [model.selection("SOLID", solid_name)],
-                [extrusion.result()],
-                keepSubResults=False
-            )
-            split.execute(True)
+                split = model.addSplit(
+                    doc,
+                    [model.selection("FACE", face_name)],
+                    list(edge_obj.results()),
+                    keepSubResults=True
+                )
+                split.execute(True)
+            else:
+                # --- Cylinder mode: extrude the sketch and cut the solid ---
+                extrusion = model.addExtrusion(
+                    doc,
+                    [sketch.result()],
+                    model.selection(),
+                    0.0,
+                    H + 0.1,
+                    "Edges"
+                )
+                extrusion.execute(True)
 
-            # --- Clean up extra edges left by the split ---
-            # split.result() is already a ModelHighAPI_Selection, so it
-            # must be passed directly (wrapping it again in
-            # model.selection(...) fails, since that expects a raw
-            # Result/Shape, not an already-built Selection).
-            remove_extra = model.addRemoveExtraEdges(
-                doc,
-                split.result(),
-                True
-            )
-            remove_extra.execute(True)
+                split = model.addSplit(
+                    doc,
+                    [model.selection("SOLID", solid_name)],
+                    [extrusion.result()],
+                    keepSubResults=False
+                )
+                split.execute(True)
+
+            # --- Clean up extra edges left by the split (only makes ---
+            # --- sense for the solid/cylinder cut, not for a flat face) ---
+            remove_extra = None
+            if not face_only_mode:
+                # split.result() is already a ModelHighAPI_Selection, so it
+                # must be passed directly (wrapping it again in
+                # model.selection(...) fails, since that expects a raw
+                # Result/Shape, not an already-built Selection).
+                remove_extra = model.addRemoveExtraEdges(
+                    doc,
+                    split.result(),
+                    True
+                )
+                remove_extra.execute(True)
 
             # --- Store references so we can update or delete them later ---
-            self._preview_features = [
-                center_3d.feature(), sketch.feature(),
-                extrusion.feature(), split.feature(),
-                remove_extra.feature()
-            ]
+            self._preview_features = [center_3d.feature(), sketch.feature()]
+            if extrusion is not None:
+                self._preview_features.append(extrusion.feature())
+            if edge_obj is not None:
+                self._preview_features.append(edge_obj.feature())
+            self._preview_features.append(split.feature())
+            if remove_extra is not None:
+                self._preview_features.append(remove_extra.feature())
+
             self._sq_lines = (sq1, sq2)
             self._d_lines = (d1, d2, d3, d4)
             self._length_constraints = (len_sq1, len_sq2, len_d1, len_d2, len_d3, len_d4)
             self._sketch_obj = sketch
             self._extrusion_obj = extrusion
+            self._edge_obj = edge_obj
             self._split_obj = split
             self._remove_extra_obj = remove_extra
+            self._face_only_mode = face_only_mode
 
             # --- Group all sub-features into a single collapsible tree node ---
             self._group_into_folder(doc)
@@ -299,9 +375,13 @@ class SplitCylinder(model.Feature):
                     traceback.print_exc()
 
             self._sketch_obj.execute(True)
-            self._extrusion_obj.execute(True)
+            if self._extrusion_obj is not None:
+                self._extrusion_obj.execute(True)
+            if self._edge_obj is not None:
+                self._edge_obj.execute(True)
             self._split_obj.execute(True)
-            self._remove_extra_obj.execute(True)
+            if self._remove_extra_obj is not None:
+                self._remove_extra_obj.execute(True)
 
     def _group_into_folder(self, doc):
         """
