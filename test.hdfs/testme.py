@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
   isOk = True
   error = ""
-  runSalome = os.path.join(os.getenv("GUI_ROOT_DIR"), "bin", "salome", "runSalome.py")
+  runSalome = os.path.join(os.getenv("KERNEL_ROOT_DIR"), "bin", "salome", "runSalome.py")
   cmd= [runSalome , "--modules", "SHAPER,GEOM,SHAPERSTUDY", "--gui", "--splash", "0", test_hdfpy, "args:" + hdffile + "," + testdatafile + "," + testlogfile]
   if platform.system() == "Windows" :
     cmd = ["python3", *cmd]
