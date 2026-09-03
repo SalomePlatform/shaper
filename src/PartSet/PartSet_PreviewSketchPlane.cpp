@@ -135,7 +135,11 @@ PartSet_PreviewSketchPlane::PartSet_PreviewSketchPlane(PartSet_SketcherMgr* theM
    myShowSubstrate(false), mySubstrate(nullptr),
    myGridType(PartSet_Tools::SketchPlaneGridType::No), myGridDrawMode(Aspect_GridDrawMode::Aspect_GDM_Lines),
    mySnappingMode(GridSnappingMode::SnapAnyway),
-   myRectangularGridSteps(1, 1), myCircularGridRadialStep(1)
+   myRectangularGridSteps(1, 1), myRectangularGridTransOffset(0, 0),
+   myRectangularGridOffsetAngle(0.), myRectangularGridDimOfNodeSpace(0),
+   myCircularGridRadialStep(1), myCircularGridNumOfAngularSections(0),
+   myCircularGridTransOffset(0, 0), myCircularGridOffsetAngle(0.),
+   myCircularGridDimOfNodeSpace(0)
 {
   myTrihedron->SetXLabel("X'");
   myTrihedron->SetYLabel("Y'");
