@@ -619,8 +619,8 @@ public:
   /// Set tangent
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> setTangent(
-      const ModelHighAPI_RefAttr & theLine,
-      const ModelHighAPI_RefAttr & theCircle,
+      const ModelHighAPI_RefAttr & theCurve1,
+      const ModelHighAPI_RefAttr & theCurve2,
       bool is_active = true);
 
   /// Set vertical

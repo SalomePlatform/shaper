@@ -1574,14 +1574,14 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setRadius(
 }
 
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setTangent(
-    const ModelHighAPI_RefAttr & theLine,
-    const ModelHighAPI_RefAttr & theCircle,
+    const ModelHighAPI_RefAttr & theCurve1,
+    const ModelHighAPI_RefAttr & theCurve2,
     bool theIsActive)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintTangent::ID());
-  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
-  fillAttribute(theCircle, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theCurve1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theCurve2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theIsActive, aFeature->boolean(SketchPlugin_Constraint::CONSTRAINT_ACTIVE()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));

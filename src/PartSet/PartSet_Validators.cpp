@@ -280,7 +280,7 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
     int aNbPoints = shapesNbPoints(theSelection);
     ShapeQuantity aShapes;
     int aNbEdges = shapesNbEdges(theSelection, aShapes);
-    return aNbPoints == 0 && (aNbEdges == 1 || (aNbEdges == 2 && aShapes[GeomAbs_Line] == 1));
+    return aNbPoints == 0 && (aNbEdges == 1 || (aNbEdges == 2 && aShapes[GeomAbs_Line] < 2));
   }
 }
 

@@ -3,7 +3,7 @@
 Tangent constraint
 ==================
 
-Tangent constraint fixes a circle (or an arc) and a line so that a line is tangent to a circle (or an arc).
+Tangent constraint fixes two curves so that the first curve is tangent to the second one.
 
 To create a Tangent in the active Sketch:
 
@@ -17,19 +17,19 @@ Property panel:
 
 Input fields:
 
-- **First object** is a line, a circle or an arc selected in the view.
-- **Second object** is a line, a circle or an arc selected in the view.
+- **First object** is a line, a circle or another curve selected in the view.
+- **Second object** is a line, a circle or another curve selected in the view.
 
-Note that one of two objects should be a line.
+Note that tangency is not available between two lines or two splines.
 
 After the objects are selected, a special sign will be added close to the tangency point in the view.
 
 **TUI Command**:
 
-.. py:function:: Sketch_1.setTangent(Line, CircleOrArc)
+.. py:function:: Sketch_1.setTangent(Curve1, Curve2)
 
-    :param object: A line.
-    :param object: A circle or an arc.
+    :param object: The first curve (line/circle/arc/...).
+    :param object: The second curve (line/circle/arc/...).
     :return: Result object.
 
 Result
