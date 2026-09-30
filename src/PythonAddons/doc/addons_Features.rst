@@ -23,3 +23,4 @@ Some examples of already created custom features are:
    midSurfaceFeature.rst
    rectangleFeature.rst
    pipeNetworkFeature.rst
+   splitCylinder.rst
