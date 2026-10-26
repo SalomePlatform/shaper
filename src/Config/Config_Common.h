@@ -106,10 +106,10 @@ CONFIG_EXPORT bool getParametersInfo(xmlNodePtr theNode, std::string& outPropert
 /*!
  \brief Convert the given parameter to the platform-specific library name.
 
- The function appends platform-specific prefix (lib) and suffix (.dll/.so)
+ The function appends platform-specific prefix (lib) and suffix (.dll/.so/.dylib)
  to the library file name.
- For example, if \a str = "mylib", "libmylib.so" is returned for Linux and
- mylib.dll for Windows.
+ For example, if \a str = "mylib", "libmylib.so" is returned for Linux,
+ mylib.dll for Windows and libmylib.dylib for MacOS.
 
  \param str short library name
  \return full library name

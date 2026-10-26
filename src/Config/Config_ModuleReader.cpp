@@ -390,7 +390,7 @@ void Config_ModuleReader::loadScript(const std::string& theFileName, bool theSen
 
 void Config_ModuleReader::loadLibrary(const std::string& theLibName)
 {
-  std::string aFileName = library(theLibName);
+  std::string aFileName(library(theLibName));
   if (aFileName.empty())
     return;
 
@@ -398,6 +398,13 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
   HINSTANCE aModLib = ::LoadLibraryA(aFileName.c_str());
   #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
+    #if defined(__APPLE__)
+    if (!aModLib)
+    {
+        std::string aDylibName = aFileName.substr(0, aFileName.size() - 6) + ".so";
+        aModLib = dlopen( aDylibName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
+    }
+    #endif
   #endif
   if(!aModLib && theLibName != "DFBrowser") { // don't show error for internal debugging tool
 // LCOV_EXCL_START

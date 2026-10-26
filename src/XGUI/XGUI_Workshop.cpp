@@ -1505,6 +1505,13 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #else
   void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
+  #ifdef __APPLE__
+  if ( !modLib ) {
+    libName.chop(6);
+    libName += ".so";
+    modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
+  }
+  #endif
   if ( !modLib ) {
     err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   } else {
