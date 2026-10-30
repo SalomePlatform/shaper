@@ -1506,15 +1506,24 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 #else
   void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
   #ifdef __APPLE__
+  // plugins are CMake MODULE libraries, named .so on macOS: try it when the
+  // .dylib cannot be loaded, and keep the error of both attempts
   if ( !modLib ) {
-    libName.chop(6);
-    libName += ".so";
-    modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
+    QString aDylibError = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
+    QString aSoName = libName;
+    aSoName.chop(6);
+    aSoName += ".so";
+    modLib = dlopen( aSoName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
+    if ( !modLib )
+      err = aDylibError + "\n" +
+            QString( "Can not load library %1. %2" ).arg( aSoName ).arg( dlerror() );
   }
-  #endif
+  if ( modLib ) {
+  #else
   if ( !modLib ) {
     err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   } else {
+  #endif
     crtInst = (CREATE_FUNC)dlsym( modLib, CREATE_MODULE );
     if ( !crtInst ) {
       err = QString( "Failed to find function %1. %2" ).arg( CREATE_MODULE ).arg( dlerror() );

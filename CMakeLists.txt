@@ -36,11 +36,10 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
 IF(APPLE)
   # macOS: let dylibs and plugin bundles resolve symbols at load time, as ELF
-  # shared objects do on Linux, and link the OpenGL framework everywhere
+  # shared objects do on Linux
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
   SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-  FIND_PACKAGE(OpenGL REQUIRED)
-  LINK_LIBRARIES(${OPENGL_LIBRARIES})
+  FIND_PACKAGE(OpenGL REQUIRED) # OPENGL_LIBRARIES, linked by SketcherPrs and XGUI
 ENDIF()
 
 
