@@ -89,7 +89,7 @@ and items specific for SHAPER module:
 - Features (see :ref:`featuresPlugin`);
 - Macros.
 
- .. _toolbar:
+.. _toolbar:
 
 SHAPER toolbar
 --------------
@@ -198,7 +198,7 @@ New part contains only 3 empty branches:
 
 Features are placed one after another in the active document with default names and their results are placed into the corresponding branch.
 
-Examples of default names assigned automatically for :ref:`box_feature` are:
+Examples of default names assigned automatically for :ref:`Box <box_feature>` are:
 
 * **Box_1**, **Box_2**, ... for Feature;
 * **Box_1_1**, **Box_2_1**, ... for Result.
@@ -630,8 +630,10 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 - **Create sketch entities by dragging** defines a style of sketch etities creation. It concerns creation of lines, rectangles, circles, arcs, ellipses, elliptic arcs. If it is switched ON then points of objects have to be defined by mouse press - mouse move - mouse release. Otherwise every point of an object has to be defined by mouse click;
 - **Allow automatic constraint substitution/remove** allows automatic resolving of conflicting constraints.
   The following conflicts could be processed:
+
     - Horizontal/Vertical automatic constraints (this last constraint will be removed);
     - Pair of arcs connected smoothly, which centers are coincident (Tangency between arcs will be removed);
+
 - **Notify automatic constraint substitution/remove** defines a message box to be shown to the user, if the conflicting constraints situation is automatically resolved.
 
 .. _windows_preferences:

@@ -191,14 +191,17 @@ This algorithm finds all the faces topologically connected the argument selected
 
 - **Examples:**
     - Selecting all edges belonging to objects from the result with a name starting with "Cyl".
+
     .. figure:: images/selection_byShapeName1.png
       :align: center
 
     - Selecting all vertices belonging to objects from the result with a name containing pattern "Cube".
+
     .. figure:: images/selection_byShapeName2.png
       :align: center
 
     - Selecting all results with names containing "Poutre", followed by a space and a digit.
+
     .. figure:: images/selection_byShapeName3.png
       :align: center
 
