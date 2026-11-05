@@ -34,6 +34,15 @@ ENDIF(WIN32)
 # ===========================
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
+IF(APPLE)
+  # macOS: let dylibs and plugin bundles resolve symbols at load time, as ELF
+  # shared objects do on Linux
+  SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+  SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+  FIND_PACKAGE(OpenGL REQUIRED) # OPENGL_LIBRARIES, linked by SketcherPrs and XGUI
+ENDIF()
+
+
 # Detect SALOME mode; append path to SALOME macros
 # ================================================
 SET(HAVE_SALOME NO)
@@ -122,7 +131,7 @@ IF(DEFINED ENV{LIBXML2_ROOT_DIR})
         FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/lib/libxml2.lib LIBXML2_LIBRARIES)
         FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/include LIBXML2_INCLUDE_DIR)
     ELSEIF(NOT "$ENV{LIBXML2_ROOT_DIR}" STREQUAL "/usr")
-        FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/lib/libxml2.so LIBXML2_LIBRARIES)
+        FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/lib/libxml2${CMAKE_SHARED_LIBRARY_SUFFIX} LIBXML2_LIBRARIES)
         FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/include/libxml2 LIBXML2_INCLUDE_DIR)
     ENDIF()
 ENDIF()

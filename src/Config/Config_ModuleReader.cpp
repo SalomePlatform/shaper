@@ -398,6 +398,18 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
   HINSTANCE aModLib = ::LoadLibraryA(aFileName.c_str());
   #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
+    #if defined(__APPLE__)
+    // plugins are CMake MODULE libraries, named .so on macOS: try it when the
+    // .dylib cannot be loaded, and keep the error of both attempts
+    std::string aDylibError;
+    if (!aModLib)
+    {
+        const char* anError = dlerror();
+        aDylibError = anError ? anError : "";
+        std::string aDylibName = aFileName.substr(0, aFileName.size() - 6) + ".so";
+        aModLib = dlopen( aDylibName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
+    }
+    #endif
   #endif
   if(!aModLib && theLibName != "DFBrowser") { // don't show error for internal debugging tool
 // LCOV_EXCL_START
@@ -413,6 +425,9 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
                                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                                    (LPSTR)&messageBuffer, 0, NULL);
     anErrorMsg += ": " +  std::string(messageBuffer, size);
+    #elif defined(__APPLE__)
+    const char* aSoError = dlerror();
+    anErrorMsg += ": " + aDylibError + "\n" + std::string(aSoError ? aSoError : "");
     #else
     anErrorMsg += ": " + std::string(dlerror());
     #endif

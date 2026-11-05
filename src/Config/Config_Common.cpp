@@ -220,15 +220,26 @@ std::string library(const std::string& theLibName)
   if(theLibName.empty())
     return std::string();
   std::string aLibName = theLibName;
-#ifndef WIN32
-  static std::string aLibExt( ".so" );
+#if defined(WIN32)
+  static std::string aLibExt(".dll");
+#elif defined(__APPLE__)
+  static std::string aLibExt( ".dylib" );
   if (aLibName.size() < 3 || aLibName.substr(0, 3) !="lib") {
     aLibName = "lib" + aLibName;
   }
 #else
-  static std::string aLibExt(".dll");
+  static std::string aLibExt( ".so" );
+  if (aLibName.size() < 3 || aLibName.substr(0, 3) !="lib") {
+    aLibName = "lib" + aLibName;
+  }
 #endif
+#if defined(__APPLE__)
+  // ".dylib" is longer than 4 characters
+  std::string anExt = aLibName.size() >= aLibExt.size() ?
+    aLibName.substr(aLibName.size() - aLibExt.size()) : std::string();
+#else
   std::string anExt = aLibName.substr(aLibName.size() - 4);
+#endif
   if (anExt != aLibExt)
     aLibName += aLibExt;
 
