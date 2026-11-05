@@ -79,7 +79,7 @@ def main(src_dir, build_dir):
             indices.append(plugin_name + "/" + plugin_name + '.rst')
             ## Collect TUI scripts
             tui_files = sorted(f for f in os.listdir(lib_dir) if \
-                                   osp.isfile(osp.join(lib_dir, f)) and re.match('TUI_.*\.rst', f))
+                                   osp.isfile(osp.join(lib_dir, f)) and re.match(r'TUI_.*\.rst', f))
             if tui_files:
                 tui_list_file = osp.join(dist_dir, 'TUI_examples.rst')
                 with open(tui_list_file, 'w') as flist:

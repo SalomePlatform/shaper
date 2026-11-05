@@ -1,5 +1,7 @@
 .. |Box_button.icon|    image:: images/Box_button.png
 
+.. _box_feature:
+
 Box
 ===
 
@@ -79,6 +81,7 @@ Input fields:
 **TUI Command**:
 
 .. py:function:: model.addBox(Part_doc, point1, point2)
+   :no-index:
 
     :param part: The current part object.
     :param object: First vertex of diagonal.
@@ -113,6 +116,7 @@ Input fields:
 **TUI Command**:
 
 .. py:function:: model.addBox(Part_doc, OX, OY, OZ, DX, DY, DZ)
+   :no-index:
 
     :param part: The current part object.
     :param real: X coordinate of the center point

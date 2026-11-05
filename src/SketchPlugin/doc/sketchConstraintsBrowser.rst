@@ -1,8 +1,9 @@
+:orphan:
 
 .. _sketchConstraintsBrowsers:
 
 Sketch Constraints Browser
-================
+==========================
 .. figure:: images/ConstraintsBrowser.png
    :align: center
 
